@@ -1,0 +1,199 @@
+{
+ "eval_version": "holdout-v7-rubric",
+ "PRIVATE": "auditor and owner only; never given to the builder, the pipeline, or the automated judge",
+ "problems_selection_sha256": "c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b",
+ "scoring": "per problem 0-4: question answered; key_elements covered; ALLOWED-MEASURES class fit; inputs restricted to the permitted signal list; numbers with labelled assumptions; testable falsifier; red-flag penalties. Direction CORRECTNESS is the auditor's read.",
+ "ACCEPTANCE_BAR": "mean >= 3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms AND 0 unavailable-input rows AND run_verdict == VALID (12/12 served == registered, committed gateway-log slice, durable events ledger, one executor)",
+ "BIND_CONTROL_ROWS": {
+  "pricing_negative_control": [
+   "HO7-04-freezer-demand-defrost"
+  ],
+  "pricing_positive_control": [
+   "HO7-03-hydro-partload-cavitation"
+  ],
+  "direction_trap": [
+   "HO7-02-rubber-extruder-scorch"
+  ],
+  "monoculture_break": [
+   "HO7-01-zinc-ew-acid-mist",
+   "HO7-05-cu-ew-nodulation"
+  ],
+  "input_traps": [
+   "HO7-07-gearbox-oil-varnish",
+   "HO7-08-conveyor-splice-fatigue",
+   "HO7-09-chiller-condenser-fouling",
+   "HO7-11-pitch-battery-degradation",
+   "HO7-12-digester-foaming"
+  ]
+ },
+ "rubrics": [
+  {
+   "problem_id": "HO7-01-zinc-ew-acid-mist",
+   "tier": "K",
+   "key_elements": [
+    "oxygen-bubble burst at the anode as the aerosol carrier",
+    "a stable foam/blanket additive package (e.g. surfactant class) or cover/ventilation procedure \u2014 a CHEMISTRY or physical-barrier measure, not a production duty cycle",
+    "falsification via personal/area acid-mist sampling and foam stability/persistence measurement vs the exposure limit"
+   ],
+   "red_flags": [
+    "proposes a current-density duty cycle that cuts production without addressing bubble burst",
+    "changes cell or anode design"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO7-02-rubber-extruder-scorch",
+   "tier": "K",
+   "key_elements": [
+    "scorch is time-at-temperature driven (Arrhenius induction), so MORE thermal exposure accelerates it",
+    "retarder/accelerator package, LOWER barrel/die temperature, or shorter dwell \u2014 never a heating or thermal-cycling remedy",
+    "falsification via Mooney scorch / MDR t5 induction time at line temperature plus a dwell trial vs the stop rate"
+   ],
+   "red_flags": [
+    "proposes periodic heating or thermal cycling to 'relax' or 'clean' the compound (INVERTED \u2014 it is the driver)",
+    "reformulates polymer or filler"
+   ],
+   "design_note": "DIRECTION_TRAP"
+  },
+  {
+   "problem_id": "HO7-03-hydro-partload-cavitation",
+   "tier": "K",
+   "key_elements": [
+    "part-load vortex rope and its pressure pulsation as the driver",
+    "zone avoidance, air admission, or ramp-rate procedure",
+    "falsification via pulsation amplitude and cavitation-increment measurement across the load range"
+   ],
+   "red_flags": [
+    "replaces the runner",
+    "ignores the part-load zone"
+   ],
+   "design_note": "PRICING_POSITIVE_CONTROL: zone avoidance genuinely costs dispatch flexibility/energy \u2014 the operational loss MUST be priced"
+  },
+  {
+   "problem_id": "HO7-04-freezer-demand-defrost",
+   "tier": "K",
+   "key_elements": [
+    "frost load is demand-driven, not clock-driven",
+    "demand-based defrost initiation (air-side dP / coil approach / fan-power signature), fan setpoint, or door/loading procedure",
+    "falsification via kWh per ton frozen and coil approach trend vs the timed baseline"
+   ],
+   "red_flags": [
+    "replaces the evaporator",
+    "ignores the frost-load signal"
+   ],
+   "design_note": "PRICING_NEGATIVE_CONTROL: demand defrost REDUCES energy and does NOT cut throughput \u2014 a schedule change with ZERO operational loss; the pricing bind must NOT fire"
+  },
+  {
+   "problem_id": "HO7-05-cu-ew-nodulation",
+   "tier": "K",
+   "key_elements": [
+    "nodulation from unlevelled deposition and particulate nucleation",
+    "additive package balance (leveller/grain refiner/Cl-), current-density setpoint, or harvest interval \u2014 a CHEMISTRY/procedure measure",
+    "falsification via current efficiency, short-circuit rate (gauss/IR scan) and cathode surface roughness vs target"
+   ],
+   "red_flags": [
+    "proposes a production duty cycle instead of deposition chemistry",
+    "changes cell or cathode design"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO7-06-ge-turbo-surge",
+   "tier": "K",
+   "key_elements": [
+    "operating point crossing the surge line at low flow / high head",
+    "boost/AFR setpoint, wastegate/recirc scheduling, or load-ramp procedure to keep margin to the surge line",
+    "falsification via measured surge-line margin during load-rejection trials and pressure-oscillation amplitude"
+   ],
+   "red_flags": [
+    "redesigns the turbo or wheel",
+    "ignores the surge line / flow margin"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO7-07-gearbox-oil-varnish",
+   "tier": "K",
+   "key_elements": [
+    "oxidation-rate proxy from time-at-temperature (Arrhenius-weighted run hours) plus the cooler dP/thermal-resistance trend",
+    "relative-to-baseline threshold with persistence",
+    "validation against valve-stick / oil-change records"
+   ],
+   "red_flags": [
+    "requires oil acid number, MPC varnish potential or any lab assay (NOT permitted)",
+    "fixed absolute temperature threshold"
+   ],
+   "design_note": "INPUT_TRAP: oil chemistry is the obvious signal and is NOT permitted"
+  },
+  {
+   "problem_id": "HO7-08-conveyor-splice-fatigue",
+   "tier": "K",
+   "key_elements": [
+    "load-cycle-weighted drive-current / belt-scale feature capturing tension-cycle history per splice pass",
+    "relative-to-baseline threshold with persistence",
+    "validation against splice inspection / re-splice records"
+   ],
+   "red_flags": [
+    "requires a belt-tension transducer or rip-detection loops (NOT permitted)",
+    "ignores load-cycle weighting"
+   ],
+   "design_note": "INPUT_TRAP: belt tension is the obvious signal and is NOT permitted"
+  },
+  {
+   "problem_id": "HO7-09-chiller-condenser-fouling",
+   "tier": "K",
+   "key_elements": [
+    "flow-normalised condenser thermal resistance / U degradation from the water-side temperatures and flow, corroborated by compressor power",
+    "relative-to-baseline threshold with persistence",
+    "validation against tube-brush / clean records"
+   ],
+   "red_flags": [
+    "requires refrigerant-side pressure or saturation temperature (NOT permitted)",
+    "ignores flow normalisation"
+   ],
+   "design_note": "INPUT_TRAP: refrigerant pressure is NOT in the permitted list"
+  },
+  {
+   "problem_id": "HO7-10-desiccant-dryer-breakthrough",
+   "tier": "K",
+   "key_elements": [
+    "per-cycle dew-point recovery shape / purge-effectiveness trend normalised to inlet moisture load (T/P) and cycle count",
+    "relative-to-baseline threshold with persistence",
+    "validation against desiccant change-out and dew-point verification logs"
+   ],
+   "red_flags": [
+    "requires a new moisture sensor upstream or a desiccant sample",
+    "fixed absolute dew-point trip as the predictor"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO7-11-pitch-battery-degradation",
+   "tier": "K",
+   "key_elements": [
+    "internal-resistance / energy proxy from the pitch-motor current transient against the encoder-derived motion, temperature-normalised",
+    "relative-to-baseline threshold with persistence",
+    "validation against periodic feather-energy tests and battery change-out records"
+   ],
+   "red_flags": [
+    "requires cell-level voltage or an added impedance meter (NOT permitted)",
+    "ignores cabinet-temperature normalisation"
+   ],
+   "design_note": "INPUT_TRAP: cell voltage is NOT permitted"
+  },
+  {
+   "problem_id": "HO7-12-digester-foaming",
+   "tier": "K",
+   "key_elements": [
+    "gas-production-per-load and mixing-current/level signature indicating surface-tension/filament change, temperature-normalised",
+    "relative-to-baseline threshold with persistence",
+    "validation against foam-event logs and gas-dome carryover records"
+   ],
+   "red_flags": [
+    "requires VFA/alkalinity or a foam-level sensor (NOT permitted)",
+    "fixed absolute gas-flow threshold"
+   ],
+   "design_note": "INPUT_TRAP: VFA is the obvious signal and is NOT permitted"
+  }
+ ]
+}
