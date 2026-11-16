@@ -1,0 +1,164 @@
+{
+ "eval_version": "holdout-v4-rubric",
+ "PRIVATE": "auditor and owner only; never given to the builder, the pipeline, or the automated judge",
+ "problems_selection_sha256": "00dfaf7e8f9fe4ea639a2e9751a29cf8e98c70ab4fea432aff58ba655a2e128b",
+ "scoring": "per problem 0-4: question answered; key_elements covered; ALLOWED-MEASURES / existing-sensor constraint fit; numbers with labelled assumptions; testable falsifier; red-flag penalties. Acceptance bar: mean >= 3.0/4 with 0 allowed-measures violations.",
+ "rubrics": [
+  {
+   "problem_id": "HO4-01-esp-back-corona",
+   "tier": "K",
+   "key_elements": [
+    "identifies ash-layer resistivity and the resulting back-corona as the driver",
+    "names flue-gas conditioning to lower resistivity or pulse/intermittent energization to suppress back-corona, plus rapping retuning",
+    "falsification via V-I curves and outlet loading/opacity trend against the efficiency target"
+   ],
+   "red_flags": [
+    "adds plate area or rebuilds the casing",
+    "ignores resistivity and treats only rapping"
+   ]
+  },
+  {
+   "problem_id": "HO4-02-geomembrane-stress-crack",
+   "tier": "K",
+   "key_elements": [
+    "identifies sustained tensile stress plus stress concentration at seams as the slow-crack-growth driver",
+    "names placement procedure limiting strain (lift thickness, equipment load) and seam QA/repair, or drainage gradation to reduce point loading",
+    "falsification via notched constant tensile load (NCTL) stress-crack testing and field seam/leakage monitoring"
+   ],
+   "red_flags": [
+    "replaces the liner",
+    "ignores installation-induced strain"
+   ]
+  },
+  {
+   "problem_id": "HO4-03-nas-battery-seal",
+   "tier": "K",
+   "key_elements": [
+    "identifies polysulfide attack on the glass seal at end-of-charge and thermal cycling as drivers",
+    "names temperature-window and cutoff retuning (avoid deep discharge / high polysulfide activity) and ramp-rate limits",
+    "falsification via cycle testing with seal-region post-mortem and resistance trend against the life target"
+   ],
+   "red_flags": [
+    "redesigns the cell or seal material",
+    "ignores the end-of-charge polysulfide condition"
+   ]
+  },
+  {
+   "problem_id": "HO4-04-glass-furnace-crown-drip",
+   "tier": "K",
+   "key_elements": [
+    "identifies crown hot-spot temperature above the silica softening range as the driver",
+    "names burner-firing/profile retuning to cap crown temperature and batch/cullet adjustment reducing volatilization",
+    "falsification via crown thermocouple/IR profile trend and stone/cord defect counts against the campaign target"
+   ],
+   "red_flags": [
+    "proposes a cold rebuild",
+    "ignores the crown temperature limit"
+   ]
+  },
+  {
+   "problem_id": "HO4-05-blade-root-bolt-fatigue",
+   "tier": "K",
+   "key_elements": [
+    "identifies cyclic flapwise load plus preload loss as the fatigue driver",
+    "names retensioning interval/procedure with verified preload and pitch-control load limiting to cut cyclic amplitude",
+    "falsification via bolt preload trend (ultrasonic/strain) and load-cycle counting against the fatigue target"
+   ],
+   "red_flags": [
+    "redesigns blade or hub",
+    "ignores preload loss"
+   ]
+  },
+  {
+   "problem_id": "HO4-06-ro-silica-scaling",
+   "tier": "K",
+   "key_elements": [
+    "identifies silica supersaturation at the tail elements as the driver",
+    "names recovery/flux reduction below the silica solubility limit, silica-specific antiscalant, and CIP retuning",
+    "falsification via normalized flux and differential-pressure trend plus tail-element silica analysis against the CIP interval target"
+   ],
+   "red_flags": [
+    "replaces membranes or adds a train",
+    "ignores the tail-element concentration factor"
+   ]
+  },
+  {
+   "problem_id": "HO4-07-escalator-step-chain",
+   "tier": "K",
+   "key_elements": [
+    "per-cycle motor-current/encoder feature tracking chain pitch error against each unit's own baseline",
+    "persistence rule and relative threshold, not a fixed absolute",
+    "retrospective validation against measured chain elongation at maintenance with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "fixed fleet-wide absolute threshold"
+   ]
+  },
+  {
+   "problem_id": "HO4-08-chiller-refrigerant-charge",
+   "tier": "K",
+   "key_elements": [
+    "superheat/subcooling trend normalized to load and ambient from existing P/T points",
+    "relative-to-baseline threshold with persistence",
+    "validation against charge-weigh/service records with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "ignores load/ambient normalization"
+   ]
+  },
+  {
+   "problem_id": "HO4-09-ballscrew-preload-loss",
+   "tier": "K",
+   "key_elements": [
+    "reversal-transient current/position feature (lost motion) trended per axis against its own baseline",
+    "persistence and relative threshold",
+    "validation against backlash/laser-interferometer measurement with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "fixed absolute threshold ignoring axis load"
+   ]
+  },
+  {
+   "problem_id": "HO4-10-recip-compressor-valve",
+   "tier": "K",
+   "key_elements": [
+    "per-cylinder valve-leakage signature from interstage P/T deviation and vibration timing against each cylinder's baseline",
+    "persistence and relative threshold",
+    "validation against valve teardown/throughput records with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "ignores per-cylinder normalization"
+   ]
+  },
+  {
+   "problem_id": "HO4-11-conveyor-idler-seizure",
+   "tier": "K",
+   "key_elements": [
+    "load-normalized drive-current friction/drag trend against the conveyor's own clean baseline",
+    "persistence and relative threshold",
+    "validation against idler replacement/inspection records with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors (thermal camera, acoustic array)",
+    "ignores load normalization"
+   ]
+  },
+  {
+   "problem_id": "HO4-12-diffuser-fouling",
+   "tier": "K",
+   "key_elements": [
+    "pressure-per-flow (diffuser resistance) trend normalized to air flow and basin conditions against the clean baseline",
+    "persistence and relative threshold",
+    "validation against off-gas OTE testing / diffuser cleaning records with lead-time and false-alarm reporting"
+   ],
+   "red_flags": [
+    "requires new sensors",
+    "fixed absolute back-pressure threshold"
+   ]
+  }
+ ]
+}
