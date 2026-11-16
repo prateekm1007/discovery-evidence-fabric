@@ -1,0 +1,152 @@
+{
+ "problem_id": "bench-p06-water-biofilm",
+ "a1_source": "SYS_A1_INT_V72/r29_a1w_v72_contract",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — To prevent biofilm regrowth in dead-end chloraminated drinking water distribution mains, standard practice uses quarterly manual flushing and chlorine dose increases; the intervention replaces these with a periodic automated flushing cycle using the existing tapping point and a standard solenoid valve, driven by a programmable timer. The closest existing practice is manual flushing, which is labor-intensive and infrequent; this intervention automates the flushing to a schedule that matches biofilm regrowth kinetics, using a standard solenoid valve to create a high-velocity scouring pulse that disrupts biofilm formation. The mechanism attacks the failure's driving physics by periodically increasing flow velocity above the threshold for biofilm detachment, directly addressing the low-flow conditions that allow regrowth.\n\nPHYSICS CHECK — The governing physical relation is the critical shear stress for biofilm detachment, τ_c = k * (1 - Re/Re_c), where Re is the Reynolds number during flow and Re_c is the critical Reynolds number for detachment. By periodically increasing flow velocity (and thus Re) above Re_c, the intervention reduces τ_c to near-zero, forcing biofilm removal. For a typical DN50 dead-end main, increasing flow from 0.1 m/s (Re ≈ 5,000) to 1.5 m/s (Re ≈ 75,000) during a 5-minute flush reduces τ_c by >90%, sufficient to detach established biofilm.\n\nIMPLEMENTATION BILL — \n- (a) Existing tapping point on dead-end main (used as-is for flush connection)\n- (b) Standard solenoid valve, DN50 PN16 (procurable catalog item)\n- (b) Standard programmable timer (procurable catalog item)\n- (c) Configure timer for 5-minute flush cycle every 72 hours (standard operation at rated parameters)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Standard practice: Quarterly manual flushing (labor cost, 4x/year) + chlorine dose increase (chemical cost, continuous)\n- Intervention: \n  - Install solenoid valve (b: 1x, same class as standard practice's existing valves) \n  - Install timer (b: 1x, same class as standard practice's existing control timers) \n  - Configure timer (c: 1x, standard operation, no additional labor) \n- Burden class: Same (no new hardware classes, no continuous chemical cost, labor reduced from 4 manual interventions/year to 1 installation)\n- Operational loss: Zero (flushes scheduled during low-demand nighttime hours, no impact on daytime delivery)\n\nEXECUTABLE TEST — \n- Protocol: Install intervention on 5 representative dead-end mains; monitor total chlorine residual at farthest customer and nitrite levels weekly for 6 months. \n- Instruments: Existing chlorine residual analyzer, nitrite probe, flow meter at tapping point. \n- Pass/fail: Intervention passes if average chlorine residual remains >1.0 mg/L and nitrite never exceeds 0.1 mg/L (regulatory threshold) during summer months; fails if either parameter is violated in >10% of samples. \n- Duration: 6 months (covers two full biofilm regrowth cycles). \n- Kill criterion: If nitrite exceeds 0.1 mg/L in any weekly sample, test fails and intervention is disqualified.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: Quarterly manual flushing (labor cost, 4x/year) + chlorine dose incre",
+    "- Intervention:",
+    "- Install solenoid valve (b: 1x, same class as standard practice's existing valves)",
+    "- Install timer (b: 1x, same class as standard practice's existing control timers)",
+    "- Configure timer (c: 1x, standard operation, no additional labor)",
+    "- Burden class: Same (no new hardware classes, no continuous chemical cost, labor reduced ",
+    "- Operational loss: Zero (flushes scheduled during low-demand nighttime hours, no impact o",
+    "- Protocol: Install intervention on 5 representative dead-end mains; monitor total chlorin",
+    "- Instruments: Existing chlorine residual analyzer, nitrite probe, flow meter at tapping p",
+    "- Pass/fail: Intervention passes if average chlorine residual remains >1.0 mg/L and nitrit",
+    "- Duration: 6 months (covers two full biofilm regrowth cycles).",
+    "- Kill criterion: If nitrite exceeds 0.1 mg/L in any weekly sample, test fails and interve"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'dose' in: novelty statement (intervention) — to prevent biofilm regrowth in dead-end chloraminated drinking water distri",
+    "excluded stem 'dose' in: for a typical dn50 dead-end main, increasing flow from 0.1 m/s (re ≈ 5,000) to 1.5 m/s (re ≈ 75,000) during a "
+   ],
+   "APPARATUS_ROW": [
+    "- Protocol: Install intervention on 5 representative dead-end mains; monitor total chlorine residual at farthe"
+   ],
+   "NAMED_VARIANT": [
+    "model/brand-marker: DN50 | - (b) Standard solenoid valve, DN50 PN16 (procurable catalog item)"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 2492,
+   "latency_s": 6.7,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- No additional sensors or controls (operates via pressure transients)."
+    ],
+    "APPARATUS_ROW": [
+     "- No additional sensors or controls (operates via pressure transients)."
+    ]
+   },
+   "sha256_16": "bed9d9a00fae33f1"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3078,
+   "latency_s": 7.9,
+   "transport_tries": 2,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: Chlorine dose increase (a: existing dosing system), quarterly manual ",
+     "- Intervention:",
+     "- Install standard ball valve (b: DN50 PN16) at dead-end (a: existing tapping point)",
+     "- Set valve to open 30 sec daily at 2 AM (c: standard timer operation on existing controll",
+     "- No additional sensors or controls (c: operates via existing pressure transients)",
+     "- Installation: Standard practice (1 hydrant flush quarterly) vs. intervention (1 ball val",
+     "- Commissioning: Standard practice (dose calibration) vs. intervention (timer setup) — sam",
+     "- Operation: Standard practice (chemical procurement + 4 flushes/year) vs. intervention (0",
+     "- Maintenance: Standard practice (chlorinator maintenance) vs. intervention (valve mainten",
+     "- Operational loss: Zero (actuation occurs during low-demand hours)",
+     "- Protocol: Install pressure transducers upstream/downstream of dead-end, measure chlorine",
+     "- Instruments: Existing pressure monitoring system, standard chlorine test kit (DPD method",
+     "- Pass/fail: Biofilm regrowth confirmed if nitrite >0.1 mg/L OR chlorine residual <1.0 mg/",
+     "- Duration: 6 months (covers summer demand peak).",
+     "- Kill criterion: Single violation of chlorine residual or nitrite limit terminates test a"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'boosting' in: novelty statement (intervention) — to prevent biofilm regrowth in dead-end chloraminated mains, standard pract",
+     "excluded stem 'boosting' in: standard chlorine boosting):\n- standard practice: chlorine dose increase (a: existing dosing system), quarterl",
+     "excluded stem 'dose' in: novelty statement (intervention) — to prevent biofilm regrowth in dead-end chloraminated mains, standard pract",
+     "excluded stem 'dose' in: standard chlorine boosting):\n- standard practice: chlorine dose increase (a: existing dosing system), quarterl"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: DN50 | - Install standard ball valve (b: DN50 PN16) at dead-end (a: existing tapping po"
+    ]
+   },
+   "sha256_16": "e8cd9bb1952c6678",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Standard practice: Chlorine dose increase (a: existing dosing system), quarterly manual ; - Intervention:; -",
+    "CONSTRAINT_EXCLUSION: excluded stem 'boosting' in: novelty statement (intervention) — to prevent biofilm regrowth in dead-end chlora",
+    "NAMED_VARIANT: model/brand-marker: DN50 | - Install standard ball valve (b: DN50 PN16) at dead-end (a: existing tapping po"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3105,
+   "latency_s": 7.8,
+   "transport_tries": 3,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: Quarterly manual flushing (labor cost, 4x/year) + chlorine dose incre",
+     "- Intervention:",
+     "- Install solenoid valve (b: 1x, same class as standard practice's existing valves)",
+     "- Install timer (b: 1x, same class as standard practice's existing control timers)",
+     "- Configure timer (c: 1x, standard operation, no additional labor)",
+     "- Burden class: Same (no new hardware classes, no continuous chemical cost, labor reduced ",
+     "- Operational loss: Zero (flushes scheduled during low-demand nighttime hours, no impact o",
+     "- Protocol: Install intervention on 5 representative dead-end mains; monitor total chlorin",
+     "- Instruments: Existing chlorine residual analyzer, nitrite probe, flow meter at tapping p",
+     "- Pass/fail: Intervention passes if average chlorine residual remains >1.0 mg/L and nitrit",
+     "- Duration: 6 months (covers two full biofilm regrowth cycles).",
+     "- Kill criterion: If nitrite exceeds 0.1 mg/L in any weekly sample, test fails and interve"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'dose' in: novelty statement (intervention) — to prevent biofilm regrowth in dead-end chloraminated drinking water distri",
+     "excluded stem 'dose' in: for a typical dn50 dead-end main, increasing flow from 0.1 m/s (re ≈ 5,000) to 1.5 m/s (re ≈ 75,000) during a "
+    ],
+    "APPARATUS_ROW": [
+     "- Protocol: Install intervention on 5 representative dead-end mains; monitor total chlorine residual at farthe"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: DN50 | - (b) Standard solenoid valve, DN50 PN16 (procurable catalog item)"
+    ]
+   },
+   "sha256_16": "2386493476c6addd",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Standard practice: Quarterly manual flushing (labor cost, 4x/year) + chlorine dose incre; - Intervention:; -",
+    "CONSTRAINT_EXCLUSION: excluded stem 'dose' in: novelty statement (intervention) — to prevent biofilm regrowth in dead-end chloramina",
+    "APPARATUS_ROW: - Protocol: Install intervention on 5 representative dead-end mains; monitor total chlorine residual at farthe",
+    "NAMED_VARIANT: model/brand-marker: DN50 | - (b) Standard solenoid valve, DN50 PN16 (procurable catalog item)"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T05:43:02.225581Z"
+}
