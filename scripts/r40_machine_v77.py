@@ -94,19 +94,19 @@ DIRECTION_CONTRACT = (
     "mechanism that industrially CAUSES this failure mode; do NOT "
     "derive it from the bill's own claims about itself. STEP 2: state "
     "what physical process the remedy's active ingredient actually "
-    "imposes on the part. STEP 3: verdict. INVERTED when the "
-    "ingredient IS the established driver or imposes the SAME sign on "
-    "the damage integral over the duty cycle; COMPENSATING-BENEFIT "
-    "CLAIMS (compressive residual stresses, self-healing, recovery "
-    "pauses, 'exploiting fatigue against fatigue') DO NOT change the "
-    "verdict — an ingredient that is a recognized cause of the "
-    "failure mode is INVERTED however it is argued. UNCLEAR when the "
-    "bill does not let you identify the ingredient's physical action. "
-    "Do not judge feasibility, novelty, or constraint fit — sign "
-    "only. JSON shape: {\"direction\": \"INVERTED\"|\"UNCLEAR\"|"
-    "\"CORRECT\", \"established_driver\": \"<one sentence>\", "
-    "\"ingredient_action\": \"<one sentence>\", \"reason\": \"<one "
-    "sentence>\"}.")
+    "imposes on the part, and the SIGN of what it adds to the damage "
+    "integral over the duty cycle. STEP 3: the sign comparison. "
+    "COMPENSATING-BENEFIT CLAIMS (compressive residual stresses, "
+    "self-healing, recovery pauses, 'exploiting fatigue against "
+    "fatigue') DO NOT change the sign — an ingredient that is a "
+    "recognized cause of the failure mode adds the SAME sign however "
+    "it is argued. Do not judge feasibility, novelty, or constraint "
+    "fit — sign only. JSON shape (fill every field, the verdict "
+    "field is advisory — the verdict is derived from the signs in "
+    "code): {\"direction\": \"INVERTED\"|\"UNCLEAR\"|\"CORRECT\", "
+    "\"sign_of_ingredient_vs_driver\": \"SAME\"|\"OPPOSITE\"|"
+    "\"UNSTATED\", \"established_driver\": \"<one sentence>\", "
+    "\"ingredient_action\": \"<one sentence>\"}.")
 
 _MECH_SPAN = re.compile(r"NOVELTY STATEMENT.{0,2600}", re.S)
 _TEST_CUT = re.compile(
@@ -141,17 +141,26 @@ _COST_PHYSICS = re.compile(
     r"\b(kinetic energy|potential energy|energy of (?:the "
     r")?(?:particle|impact|grain|jet)|surface energy)\b", re.I)
 _COST_QUANT = re.compile(r"\b\d+(?:\.\d+)?\s?(?:%|kWh|MW|t/h|t\/d|"
-                         r"m3|scfm|kPa|bar)\b|\bpercent\b", re.I)
+                         r"m3|scfm|kPa|bar)|\bpercent\b", re.I)
 _ACTION_CLASS = [
+    # D4 (claim c-0055): driver-class SEMANTICS, not wordforms —
+    # 'cyclone'/'cyclonic' are DEVICE nouns (the FCC failure's own
+    # hardware), excluded from the cycling class; the charge-discharge
+    # class requires the charge/discharge PAIRING (a 'charge-sensing
+    # threshold' or a static charge quantity is a measurement, not a
+    # cycling action — the HO6-04 wordform class)
     ("thermal-cycling",
      re.compile(r"\b(thermal shock\w*|shock\w*|quench\w*|thermal "
-                r"cycl\w+|cycl\w+|fatig\w+|heat[ -]?check\w*|"
+                r"cycl\w+|cycl(?!one)\w+|fatig\w+|heat[ -]?check\w*|"
                 r"ramp\w+|thermal transient\w*)\b", re.I)),
     ("wet-dry-cycling",
      re.compile(r"\b(wet[- ]?dry|wetting|drying|immers\w+|dip\w+)\b",
                 re.I)),
     ("charge-discharge",
-     re.compile(r"\b(charg\w+|discharg\w+)\b", re.I)),
+     re.compile(r"\b(?:charg\w+\s*(?:/|and|[-–—]*|or)?\s*discharg\w+|"
+                r"discharg\w+\s*(?:/|and|[-–—]*|or)?\s*charg\w+|"
+                r"charge[\s\-]*cycl\w+|discharge[\s\-]*cycl\w+)\b",
+                re.I)),
     ("vibration",
      re.compile(r"\b(vibrat\w+|sonicat\w+|ultrasonic\w+)\b", re.I)),
 ]
@@ -267,13 +276,14 @@ def scan_input_availability(prob: dict, a: str) -> dict:
 
 
 def scan_duty_cycle_pricing(a: str) -> dict:
-    """AM37 D3, deterministic. Fire UNPRICED_DUTY_CYCLE when the bill
-    modulates a duty cycle / schedule and prices no operational cost:
-    a cost statement counts only as an OPERATIONAL COST line or a
-    cost keyword QUANTIFIED (a magnitude within the sentence);
-    physics-energy phrases (kinetic energy of particles etc.) are not
-    prices."""
-    if not _DUTY.search(a):
+    """AM37 D3, deterministic. Fire UNPRICED_DUTY_CYCLE when the
+    MECHANISM (not a falsification-test protocol — a verification
+    duty cycle is not the intervention) modulates a duty cycle /
+    schedule and prices no operational cost: a cost statement counts
+    only as an OPERATIONAL COST line or a cost keyword QUANTIFIED (a
+    magnitude within the sentence); physics-energy phrases (kinetic
+    energy of particles etc.) are not prices."""
+    if not _DUTY.search(_mechanism_span(a)):
         return {}
     text = _COST_PHYSICS.sub(" ", a)
     if re.search(r"OPERATIONAL\s+COST", text, re.I):
@@ -348,10 +358,42 @@ def direction_lexicon_check(prob: dict, a: str) -> dict:
     return {}
 
 
+def _derive_direction(fields: dict) -> dict:
+    """D5 (claim c-0055): the verdict is DERIVED IN CODE from the
+    structured sign comparison — the model's own verdict label is
+    advisory. SAME -> INVERTED, OPPOSITE -> CORRECT, UNSTATED ->
+    UNCLEAR; a label/derivation disagreement types DIVERGENT
+    (fail-open, disclosed with a pin). The reason is assembled from
+    the fields so verdict and reason CANNOT diverge structurally."""
+    sign = str(fields.get("sign_of_ingredient_vs_driver")
+               or "UNSTATED").upper().strip()
+    if sign not in ("SAME", "OPPOSITE", "UNSTATED"):
+        sign = "UNSTATED"
+    derived = {"SAME": "INVERTED", "OPPOSITE": "CORRECT",
+               "UNSTATED": "UNCLEAR"}[sign]
+    drv = str(fields.get("established_driver") or "")[:280]
+    act = str(fields.get("ingredient_action") or "")[:280]
+    reason = (f"driver: {drv} | ingredient: {act} | "
+              f"ingredient sign vs driver: {sign} -> {derived}")
+    labeled = str(fields.get("direction") or "").upper().strip()
+    out = {"direction": derived, "reason": reason,
+           "established_driver": drv, "ingredient_action": act,
+           "sign_of_ingredient_vs_driver": sign}
+    if labeled in ("INVERTED", "UNCLEAR", "CORRECT") and \
+            labeled != derived:
+        out["divergence"] = (f"the model labeled {labeled} but the "
+                             f"sign comparison derives {derived} — "
+                             "typed DIVERGENT (fail-open, disclosed; "
+                             "the derived verdict is authoritative)")
+    return out
+
+
 def direction_check_llm(prob: dict, a: str, key: str) -> dict:
     """AM37 D1: the typed sign/integral check on the governing
-    relation (one small LLM call, verdict-JSON). Fail-open typed on
-    transport or parse failure (DIRECTION_CHECK_UNAVAILABLE) — the
+    relation (one small LLM call). The verdict is DERIVED from the
+    structured sign fields (D5 — verdict/reason cannot diverge);
+    label disagreement types DIVERGENT. Fail-open typed on transport
+    or parse failure (DIRECTION_CHECK_UNAVAILABLE) — the
     authoritative direction read stays the auditor's."""
     prob_json = json.dumps(
         {k: prob.get(k) for k in ("problem_id", "device", "failure",
@@ -367,14 +409,7 @@ def direction_check_llm(prob: dict, a: str, key: str) -> dict:
             return {"direction": "DIRECTION_CHECK_UNAVAILABLE",
                     "reason": "no verdict JSON in the reply"}
         d = json.loads(m.group(0))
-        dirn = str(d.get("direction") or "UNCLEAR").upper()
-        if dirn not in ("INVERTED", "UNCLEAR", "CORRECT"):
-            dirn = "DIRECTION_CHECK_UNAVAILABLE"
-        return {"direction": dirn,
-                "governing_relation": str(d.get("governing_relation")
-                                          or "")[:300],
-                "integral_sign": str(d.get("integral_sign") or "")[:300],
-                "reason": str(d.get("reason") or "")[:300]}
+        return _derive_direction(d)
     except Exception as e:  # noqa: BLE001 — typed fail-open disclosure
         return {"direction": "DIRECTION_CHECK_UNAVAILABLE",
                 "reason": f"{type(e).__name__}: {str(e)[:120]}"}
@@ -520,4 +555,5 @@ def declared_template(final: str) -> str | None:
 __all__ = ["machine_generate_v77", "declared_template",
            "scan_input_availability", "scan_duty_cycle_pricing",
            "scan_mechanism_template", "direction_lexicon_check",
-           "direction_check_llm", "V77_REQUEST_MODEL", "start_gateway"]
+           "direction_check_llm", "_derive_direction",
+           "V77_REQUEST_MODEL", "start_gateway"]
