@@ -80,6 +80,21 @@ FLAGGED = [
     "eval-new03-insulin-pump-occlusion",
     "eval-sofc-thermal-cycling",
 ]
+V73_SET = [
+    "bench-p04-pump-cavitation",
+    "bench-p08-mems-stiction",
+    "bench-p11-spindle-thermal-drift",
+    "eval-new01-supercap-dryout",
+    "eval-new03-insulin-pump-occlusion",
+]
+V74_SET = [
+    "bench-p04-pump-cavitation",
+]
+TUNED_DIRS = {
+    "V74_R29_TUNED": "eval/pairs/r29_v74_tuned/",
+    "V73_R29_TUNED": "eval/pairs/r29_v73_tuned/",
+    "V72_R29_TUNED": "eval/pairs/r29_v72_tuned/",
+}
 # the conversion-scan pin set (tests/test_r29_conversion_scan.py) +
 # bench-p10 (the operational-loss pin)
 CONVERSION_PIN_SET = [
@@ -93,6 +108,10 @@ CONVERSION_PIN_SET = [
     "eval-new03-insulin-pump-occlusion",
 ]
 OPERATIONAL_PIN = "bench-p10-pv-pid"
+# the sofc row's target defect (the graded composition) is pinned by
+# the r27 CUSTOM_MATERIAL class in tests/test_r27_standard_bill_scan.py
+# (the disclosed V7.1 residual this conversion round clears)
+R27_SB_PIN = "eval-sofc-thermal-cycling"
 
 CHECKS = []
 
@@ -119,14 +138,23 @@ def main() -> int:
     check("row map: 30 rows", len(rows) == 30, str(len(rows)))
     comp = bat["byte_map"]["composition"]
     n_frozen_int = sum(1 for r in rows if r["stage"] == "V7_R26_FROZEN")
-    n_tuned = sum(1 for r in rows if r["stage"] == "V72_R29_TUNED")
+    n_tuned = sum(1 for r in rows
+                  if r["stage"] in TUNED_DIRS)
     n_pred = sum(1 for r in rows if r["stage"] == "V5_R26_FROZEN")
     check("composition 8+10+12",
           (n_frozen_int, n_tuned, n_pred) == (8, 10, 12),
           f"{(n_frozen_int, n_tuned, n_pred)}")
+    n_v72 = sum(1 for r in rows if r["stage"] == "V72_R29_TUNED")
+    n_v73 = sum(1 for r in rows if r["stage"] == "V73_R29_TUNED")
+    n_v74 = sum(1 for r in rows if r["stage"] == "V74_R29_TUNED")
+    check("per-round composition 5+4+1",
+          (n_v72, n_v73, n_v74) == (5, 4, 1),
+          f"{(n_v72, n_v73, n_v74)}")
     check("byte_map matches rows",
           comp["V7_R26_FROZEN_interventions"] == n_frozen_int
-          and comp["V72_R29_TUNED_interventions"] == n_tuned
+          and comp["V72_R29_TUNED_interventions"] == n_v72
+          and comp["V73_R29_TUNED_interventions"] == n_v73
+          and comp["V74_R29_TUNED_interventions"] == n_v74
           and comp["V5_R26_FROZEN_predictors"] == n_pred)
     sha_ok = True
     for r in rows:
@@ -134,46 +162,70 @@ def main() -> int:
             encoding="utf-8"))
         if _sha(rec["a1_answer"]) != r["answer_sha256_16"]:
             sha_ok = False
-        if r["stage"] == "V72_R29_TUNED" and \
-                rec["a1_source"] != "SYS_A1_INT_V72/r29_a1w_v72_contract":
-            sha_ok = False
-        if r["stage"] != "V72_R29_TUNED" and \
+        if r["stage"] in TUNED_DIRS:
+            if not r["pair_path"].startswith(TUNED_DIRS[r["stage"]]):
+                sha_ok = False
+            src = json.loads((REPO / r["pair_path"]).read_text(
+                encoding="utf-8"))["a1_source"]
+            if "SYS_A1_INT_V72" not in src:
+                sha_ok = False
+        if r["stage"] not in TUNED_DIRS and \
                 not r["pair_path"].startswith("eval/pairs/r26_v7_catalog/"):
             sha_ok = False
-    check("per-row sha + contract + frozen-path provenance", sha_ok)
+    check("per-row sha + contract + per-round path provenance", sha_ok)
 
     # ---- 2. frozen/tuned discipline
     no_v71 = all("r27_v71_tuned" not in r["pair_path"] for r in rows)
     check("no r27_v71_tuned byte remains in the battery", no_v71)
     tuned_ok = True
     for r in rows:
-        if r["stage"] != "V72_R29_TUNED":
+        if r["stage"] not in TUNED_DIRS:
             continue
         rec = json.loads((REPO / r["pair_path"]).read_text(
             encoding="utf-8"))
         if not rec.get("attempts"):
             tuned_ok = False
-        if (rec.get("meta", {}).get("repairs") or 0) > 2:
+        if (rec.get("meta", {}).get("repairs") or 0) > 3:
             tuned_ok = False
-    check("tuned rows drawn once (attempts present, repairs <= 2)",
+    check("tuned rows drawn once (attempts present, repairs <= 3)",
           tuned_ok)
+    # the V7.3/V7.4 sets match the pinned round identities
+    v73_rows = sorted(r["problem_id"] for r in rows
+                      if r["stage"] in ("V73_R29_TUNED", "V74_R29_TUNED"))
+    check("V7.3/V7.4 rows == the pinned round sets",
+          v73_rows == sorted(set(V73_SET)), str(v73_rows))
+    check("V7.4 row == the pinned micro-round set",
+          sorted(r["problem_id"] for r in rows
+                 if r["stage"] == "V74_R29_TUNED") == sorted(V74_SET))
 
     # ---- 3. tuning set identity
     check("tuning set == the pre-registered conversion set",
           sorted(gen["tuning_set"]) == sorted(FLAGGED)
           and sorted(bat["tuning_ledger"]["flagged_set"])
           == sorted(FLAGGED))
-    check("tuning set == conversion-pin set + the operational pin",
-          sorted(CONVERSION_PIN_SET + [OPERATIONAL_PIN])
+    check("tuning set == conversion-pin set + the operational pin "
+          "+ the r27 standard-bill pin",
+          sorted(CONVERSION_PIN_SET + [OPERATIONAL_PIN, R27_SB_PIN])
           == sorted(FLAGGED))
+    check("round ledgers present (v72/v73/v74)",
+          all((REPO / p).exists() for p in (
+              "eval/r29_tuning_generation.json",
+              "eval/r29_v73_tuning_generation.json",
+              "eval/r29_v74_tuning_generation.json")))
     per_row_match = all(
-        gen["rows"][pid]["repairs"]
-        == json.loads((REPO / next(
+        json.loads((REPO / next(
             r["pair_path"] for r in rows
             if r["problem_id"] == pid)).read_text(
                 encoding="utf-8"))["meta"]["repairs"]
+        == (gen["rows"][pid]["repairs"] if pid not in V73_SET + V74_SET
+            else json.loads((REPO / (
+                "eval/r29_v74_tuning_generation.json"
+                if pid in V74_SET
+                else "eval/r29_v73_tuning_generation.json"))
+                .read_text(encoding="utf-8"))["rows"][pid]["repairs"])
         for pid in FLAGGED)
-    check("ledger per-row repairs match the pair metas", per_row_match)
+    check("round ledgers' per-row repairs match the pair metas",
+          per_row_match)
 
     # ---- 4. final scan reads recompute
     probs = {}
@@ -251,18 +303,21 @@ def main() -> int:
 
     # ---- 6. judge-blind window
     blind_ok = True
-    for pid in FLAGGED:
-        rec = json.loads(
-            (REPO / "eval/pairs/r29_v72_tuned" / f"{pid}.json")
-            .read_text(encoding="utf-8"))
-        for att in rec.get("attempts", []):
-            for f in (att.get("findings_disclosed") or []):
-                low = f.lower()
-                if ("novelty delta" in low or "novelty_delta" in low
-                        or "feasibility gap" in low
-                        or "feasibility_gap" in low
-                        or "judged" in low):
-                    blind_ok = False
+    for tuned_dir in ("r29_v72_tuned", "r29_v73_tuned",
+                      "r29_v74_tuned"):
+        d = REPO / "eval" / "pairs" / tuned_dir
+        if not d.exists():
+            continue
+        for pf in sorted(d.glob("*.json")):
+            rec = json.loads(pf.read_text(encoding="utf-8"))
+            for att in rec.get("attempts", []):
+                for f in (att.get("findings_disclosed") or []):
+                    low = f.lower()
+                    if ("novelty delta" in low or "novelty_delta" in low
+                            or "feasibility gap" in low
+                            or "feasibility_gap" in low
+                            or "judged" in low):
+                        blind_ok = False
     check("judge-blind window (no judged numbers in any repair prompt)",
           blind_ok)
 
@@ -272,6 +327,13 @@ def main() -> int:
           len(c25) == 1 and c25[0]["role"] == "EXECUTOR"
           and c25[0]["status"] == "OPEN"
           and c25[0]["work_id"] == "r29-v72-battery-conversion")
+    c27 = [c for c in claims["claims"] if c["claim_id"] == "c-0027"]
+    c28 = [c for c in claims["claims"] if c["claim_id"] == "c-0028"]
+    check("c-0027/c-0028 EXECUTOR claims present",
+          len(c27) == 1 and len(c28) == 1
+          and c27[0]["work_id"] == "r29-v73-residual-conversion"
+          and c28[0]["work_id"]
+          == "r29-v74-deployed-part-no-modification")
     paths_ok = all((REPO / p).exists() for p in c25[0]["artifact_paths"]
                    if not p.endswith("/"))
     check("claim artifact paths exist", paths_ok)

@@ -50,7 +50,11 @@ from eval.run import _rubric_prompt  # noqa: E402
 
 R26_DIR = REPO / "eval" / "pairs" / "r26_v7_catalog"
 R29_DIR = REPO / "eval" / "pairs" / "r29_v72_tuned"
+R29B_DIR = REPO / "eval" / "pairs" / "r29_v73_tuned"
+R29C_DIR = REPO / "eval" / "pairs" / "r29_v74_tuned"
 TUNING_LEDGER = REPO / "eval" / "r29_tuning_generation.json"
+TUNING_LEDGER_B = REPO / "eval" / "r29_v73_tuning_generation.json"
+TUNING_LEDGER_C = REPO / "eval" / "r29_v74_tuning_generation.json"
 BATTERY_OUT = REPO / "eval" / "battery_v7_2_catalog_r29.json"
 PACKET_OUT = REPO / "eval" / "r29_judge_packet.json"
 AXIS_SUFFIX = (REPO / "scripts" / "_f28_axis_suffix_v2.txt").read_text()
@@ -67,6 +71,36 @@ FLAGGED = [
     "eval-new03-insulin-pump-occlusion",
     "eval-sofc-thermal-cycling",
 ]
+# the per-round provenance map: which tuned dir each row's final bytes
+# live in (the V7.2 round drew all 10; the V7.3 round re-drew the 5
+# conversion-residual rows; the V7.4 round re-drew the one
+# deployed-part-modification row)
+V73_SET = [
+    "bench-p04-pump-cavitation",
+    "bench-p08-mems-stiction",
+    "bench-p11-spindle-thermal-drift",
+    "eval-new01-supercap-dryout",
+    "eval-new03-insulin-pump-occlusion",
+]
+V74_SET = [
+    "bench-p04-pump-cavitation",
+]
+
+
+def _tuned_dir(pid: str) -> Path:
+    if pid in V74_SET:
+        return R29C_DIR
+    if pid in V73_SET:
+        return R29B_DIR
+    return R29_DIR
+
+
+def _tuned_stage(pid: str) -> str:
+    if pid in V74_SET:
+        return "V74_R29_TUNED"
+    if pid in V73_SET:
+        return "V73_R29_TUNED"
+    return "V72_R29_TUNED"
 
 
 def _sha(s: str) -> str:
@@ -100,6 +134,10 @@ def _pair_row(pid: str, stage: str, pair_path: Path) -> dict:
 def main() -> int:
     probs = _prob_map()
     gen_ledger = json.loads(TUNING_LEDGER.read_text(encoding="utf-8"))
+    gen_ledger_b = json.loads(TUNING_LEDGER_B.read_text(
+        encoding="utf-8"))
+    gen_ledger_c = json.loads(TUNING_LEDGER_C.read_text(
+        encoding="utf-8"))
 
     rows = []
     tuned = set(FLAGGED)
@@ -112,8 +150,8 @@ def main() -> int:
                  else "V7_R26_FROZEN")
         rows.append(_pair_row(pid, stage, f))
     for pid in FLAGGED:
-        rows.append(_pair_row(pid, "V72_R29_TUNED",
-                              R29_DIR / f"{pid}.json"))
+        rows.append(_pair_row(pid, _tuned_stage(pid),
+                              _tuned_dir(pid) / f"{pid}.json"))
     rows.sort(key=lambda r: ((r["question_type"] or ""),
                              r["problem_id"]))
     assert len(rows) == 30, len(rows)
@@ -194,19 +232,23 @@ def main() -> int:
             "n_predictors": 12,
             "composition": {
                 "V7_R26_FROZEN_interventions": 8,
-                "V72_R29_TUNED_interventions": 10,
+                "V72_R29_TUNED_interventions": 5,
+                "V73_R29_TUNED_interventions": 4,
+                "V74_R29_TUNED_interventions": 1,
                 "V5_R26_FROZEN_predictors": 12,
             },
             "map_note": (
                 "the pre-registered r26 ALL-FRESH map (18 V7-family "
                 "interventions + 12 V5 predictors), unchanged; the 10 "
-                "tuned rows are re-draws of the auditor-adjudicated "
-                "gap>=1 set + bench-p10 (F38) under SYS_A1_INT_V72 (the "
-                "AM27 D2 conversion), each drawn ONCE under the c-0025 "
-                "machine; the 20 frozen rows (8 gap-0 interventions + "
-                "12 predictors) are never re-drawn (Art. 29(c)); no "
-                "r27_v71_tuned byte remains in the battery — all 7 r27-"
-                "tuned rows are re-drawn under V7.2"),
+                "conversion rows were drawn under SYS_A1_INT_V72 in "
+                "three pre-registered rounds (c-0025 V7.2 all 10; "
+                "c-0027 V7.3 the 5 conversion-residual rows; c-0028 "
+                "V7.4 the one deployed-part-modification row) — each "
+                "row's final bytes live in exactly one tuned dir with "
+                "the round named in its stage tag; the 20 frozen rows "
+                "(8 gap-0 interventions + 12 predictors) are never "
+                "re-drawn (Art. 29(c)); no r27_v71_tuned byte remains "
+                "in the battery"),
         },
         "tuning_ledger": {
             "flagged_set": FLAGGED,
@@ -220,13 +262,59 @@ def main() -> int:
                 "test_r29_operational_loss_scan.py (the bench-p10 pin)"),
             "machine": gen_ledger["machine"],
             "per_row": gen_ledger["rows"],
+            "rounds": {
+                "v72": {
+                    "set": FLAGGED,
+                    "machine": gen_ledger["machine"],
+                    "per_row": gen_ledger["rows"],
+                    "ledger": "eval/r29_tuning_generation.json",
+                    "outcome": (
+                        "5/10 converted (bench-p01, bench-p06, "
+                        "bench-p09, bench-p10, eval-sofc-thermal-"
+                        "cycling); 5 exhausted budget 2 with the defect "
+                        "class intact (the satisficing shape — relabel "
+                        "instead of recompose)"),
+                },
+                "v73": {
+                    "set": V73_SET,
+                    "machine": gen_ledger_b["machine"],
+                    "per_row": gen_ledger_b["rows"],
+                    "ledger": "eval/r29_v73_tuning_generation.json",
+                    "claim": "c-0027 (the V73 RELOCATION directive + "
+                             "budget 3, pre-registered)",
+                    "outcome": (
+                        "5/5 converted off their defect classes (the "
+                        "CONVERSION scan clean on every row); one row "
+                        "kept a deployed-part-modification residual under "
+                        "a different class (bench-p04: the groove)"),
+                },
+                "v74": {
+                    "set": V74_SET,
+                    "machine": gen_ledger_c["machine"],
+                    "per_row": gen_ledger_c["rows"],
+                    "ledger": "eval/r29_v74_tuning_generation.json",
+                    "claim": "c-0028 (the V74 DEPLOYED-PART directive "
+                             "+ budget 3, pre-registered)",
+                    "outcome": (
+                        "1/1 converted fully CLEAN on every scan leg "
+                        "(bench-p04: standard perforated-plate turbulence "
+                        "generator + existing-VFD duty schedule; 1 repair)"),
+                },
+            },
             "disclosed_residuals": {
-                pid: {k: v for k, v in (gen_ledger["rows"].get(pid, {})
-                                         .get("residual_findings")
-                                         or {}).items()}
+                pid: {
+                    k: v
+                    for k, v in ((
+                        gen_ledger_c["rows"].get(pid, {}).get(
+                            "residual_findings")
+                        if pid in V74_SET else
+                        gen_ledger_b["rows"].get(pid, {}).get(
+                            "residual_findings")
+                        if pid in V73_SET else
+                        gen_ledger["rows"].get(pid, {}).get(
+                            "residual_findings")) or {}).items()
+                }
                 for pid in FLAGGED
-                if (gen_ledger["rows"].get(pid, {})
-                    .get("residual_findings"))
             },
         },
         "final_scan_reads": {
