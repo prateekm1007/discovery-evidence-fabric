@@ -179,7 +179,7 @@ def gen_with_fallback(prompt: str, contract: str, gw_key: str,
         try:
             content, meta = nvidia_chat_stream(
                 [{"role": "system", "content": contract},
-                 {"role": "user", "content": prompt}])
+                 {"role": "user", "content": prompt}], model=model)
             meta["fallback_reason"] = last_err
             _infra_fail_streak["n"] = 0  # served; probe primary next row
             return content, meta
