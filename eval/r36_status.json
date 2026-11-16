@@ -1,0 +1,40 @@
+{
+ "record": "R36_STATUS/1.0.0",
+ "session": "builder-r20s2",
+ "at": "2026-11-16T14:35:00Z (sandbox clock)",
+ "builder_base": "b510b26c6",
+ "audited_tip": "audit/r11-auditor-verdict-20261114 @ ee5227b17 (AM32+33 re-read; AM34 NOT YET COMMITTED — the auditor's tooling failed; the ruling rides the message and is executed verbatim, disclosed below)",
+ "auditor_ruling_executed": {
+  "registration_correction": "gen_call (scripts/r11_a1f_v3_generate.py), the attestation gate REGISTERED_MODEL (scripts/r34_served_model_attestation.py) and the window probe (scripts/r35_serving_preflight.py) now carry the exact servable id glm-4-plus with the ruling quoted in place. NOT self-re-registration: the auditor MADE the correction by ruling (Art. 7); this executes it. The NVIDIA z-ai/glm-5.3-flash alternate is noted with its own identity — never silently promoted.",
+  "dev_claim_retirement": "acknowledged — the AM28 dev-battery gate-MET claim is RETIRED as UNATTESTED; no builder record depends on it; acceptance rests on the sealed v6 run alone",
+  "bar": "unchanged and accepted: 12/12 served == glm-4-plus + committed gateway-log slice + one named executor + durable all-row ledger + auditor mean >=3.0/4 + 0 allowed-measures violations + 0 inverted-direction mechanisms"
+ },
+ "d1_v6_one_shot": {
+  "status": "NOT TAKEN — TWO typed blockers, both non-builder, both escalatable",
+  "blocker_1_serving_window": "AVAILABILITY_BLOCK — the z-ai upstream still returns HTTP 429 'Too many requests' (since 11-16 13:28Z, reproduced across rounds via gateway x2 and direct CLI). Identity is RESOLVED by the ruling: once the upstream answers, served == glm-4-plus holds by the transport's single-model design. One probe command re-verifies: scripts/r35_serving_preflight.py (now typed to distinguish AVAILABILITY_BLOCK from SUBSTITUTION)",
+  "blocker_2_custody_anchor": "UNANCHORED — the pre-registration's selection_sha256 (4d60488a…) matches NO committed byte sequence: the problems file has exactly ONE commit (d49694879, 16,991 bytes, sha cb4e984a…, byte-stable since), and the registered hash matches no canonicalization, no inner selection, no rubric/concat/manifest form (full evidence: eval/v6_seal_custody_break.json). Likely cause: the auditor hashed an authoring-workspace version before the final committed edit. The anchor is the ONLY proof the PRIVATE rubric was authored against exactly these problems — generating without it risks spending the one-shot seal on a run that could be rightly refused scoring. NO BURN; problems UNREAD; claim-before-read held",
+  "escalation": "ONE auditor commit re-anchors the seal: amend selection_sha256 to cb4e984a… with an explicit attestation that the rubric was authored against exactly these 12 problems, or re-seal if the text changed. c-0038 stays OPEN with both preconditions typed; the run fires the moment BOTH verify"
+ },
+ "d2_c0026": {
+  "state": "PARTIALLY MEASURED; completion needs an auditor act",
+  "interventions": "15/18 within +/-1 (measured last round on the pre-registered route crowllm/qwen-3.8-max:free, K=3 valid draws, eval/judge_feasibility_calibration_r29.json) — BELOW the 16/18 bar; typed NOT MET",
+  "predictors": "UNMEASURABLE — no auditor feasibility anchor exists for the 12 predictor rows anywhere on the audit branch (searched every auditor judgment/adjudication file; auditor_r28_adjudication.json per_row covers exactly the 18 intervention rows). The >=10/12 bar has no auditor side to compare against",
+  "judge_route": "the auditor reports DeepSeek-V4-Flash LIVE (200 after one typed 503) — noted; it is NOT the pre-registered c-0026 route, and switching rungs is an auditor act. The peer's r11 re-qualification showed DS-V4-Flash 503-dead in its window; its recovery is consistent with the auditor's probe",
+  "accept": "NOT MET (15 < 16 interventions; predictor axis unmeasurable without the auditor's predictor adjudication)"
+ },
+ "d3_c0039_pins": {
+  "state": "ALREADY LANDED (R35, commit 025e65c5e — predates the auditor's visibility)",
+  "accept": "MET — ACTUATION_DEVICE_AS_MEASURE fires on the committed HO5-05 solenoid-valve bytes; DIRECTION_INVERTED_ARITHMETIC fires on the committed HO5-06 bytes; 0 false positives on conformant rows; 5 pytest tests, suite 17/17; both wired in the V7.6 generation path (r30_tune_battery_v76 calls both scans). Evidence: eval/r35_pin_tests.json + tests/test_r30_am29_binds.py"
+ },
+ "d4_verifier": {
+  "state": "DISCHARGED — ALL EXACT, 5/5 checks, zero-LLM, from committed bytes (eval/r36_verifier_recompute.json): the bind suite re-runs clean; the c-0026 acceptance recomputes EXACTLY from the committed per-row bytes; the pin acceptance recomputes EXACTLY; the seal is byte-verified untouched (problems sha cb4e984a…, no v6 artifacts, no v6 EXECUTOR completion); the precondition chain agrees across every committed record",
+  "disclosure": "self-verification of the builder's own claims, filed on the auditor's direct order because the peer verifier's sandbox is down; the peer's independent recompute stays INVITED when their tooling recovers (Art. 29(c))"
+ },
+ "art27_verdict": "NO CAPABILITY CHANGE — the registration ruling is transport plumbing; no generation ran; the engine contract is byte-unchanged",
+ "m11_and_f45": "M11 acknowledged (unchanged); vault custody unchanged (NVIDIA + CROWLLM keys gitignored; F45 rotation stays the owner's account-level prerogative)",
+ "next_steps": [
+  "auditor (one commit when tooling recovers): AM34 with the registration correction + dev-claim retirement + the seal RE-ANCHOR (selection_sha256 := cb4e984a… with the rubric-matches-these-problems attestation) + a predictor-row feasibility adjudication if the >=10/12 predictor axis is to be measurable",
+  "builder: fires the v6 one-shot the moment the window AND the anchor verify — both are one-command checks",
+  "peer: independent verifier recompute when the sandbox recovers"
+ ]
+}

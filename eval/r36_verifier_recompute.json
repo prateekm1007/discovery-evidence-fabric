@@ -1,0 +1,69 @@
+{
+ "record": "R36_VERIFIER_RECOMPUTE/1.0.0",
+ "session": "builder-r20s2",
+ "at": "2026-11-16T14:30:00Z (sandbox clock)",
+ "verifies": [
+  "c-0038 (sealed v6 one-shot — precondition state)",
+  "c-0039 (instrument pins + c-0026 calibration)"
+ ],
+ "method": "zero-LLM recompute from committed bytes (Art. 13/29(c)); deterministic scans re-run; acceptance recomputed from committed per-row bytes; NO live re-judgment",
+ "disclosure": "self-verification of the builder's own claims, filed on the auditor's direct order (AM34-ruling D4) because the peer verifier's sandbox is down; the peer's independent recompute stays invited",
+ "all_exact": true,
+ "checks": [
+  {
+   "item": "c-0039 pytest bind suite",
+   "expected": "exit 0; exactly 17 passing dots; no F/E markers",
+   "observed": ".................                                           ",
+   "exact": true
+  },
+  {
+   "item": "c-0026 acceptance recompute",
+   "expected": {
+    "n_compared": 18,
+    "n_within_1": 15,
+    "met": false
+   },
+   "observed": {
+    "n_compared": 18,
+    "n_within_1": 15,
+    "met": false
+   },
+   "exact": true
+  },
+  {
+   "item": "c-0039 pin acceptance recompute",
+   "expected": {
+    "d2_fire": true,
+    "d3_fire": true,
+    "fp_rows": 0
+   },
+   "observed": {
+    "d2_fire": true,
+    "d3_fire": true,
+    "fp_rows": 0
+   },
+   "exact": true
+  },
+  {
+   "item": "c-0038 seal-untouched",
+   "expected": "no v6 generation artifacts; problems bytes cb4e984a…; no v6 EXECUTOR completion",
+   "observed": {
+    "artifacts": false,
+    "problems_sha16": "cb4e984ad94832db",
+    "v6_executor_done": []
+   },
+   "exact": true
+  },
+  {
+   "item": "c-0038 precondition chain",
+   "expected": "all committed records agree: no burn",
+   "observed": {
+    "transport_block": "TYPED INFRA BLOCK — the v6 one-shot is NOT taken (claim c-00",
+    "custody_break": "UNANCHORED — the pre-registration's selection_sha256 matches",
+    "window_probe": "AVAILABILITY_BLOCK — the upstream call failed (see transport",
+    "peer_record_verdict": "\"\""
+   },
+   "exact": true
+  }
+ ]
+}

@@ -34,7 +34,9 @@ os.environ.setdefault(
     "ZAI_GATEWAY_LOG", str(REPO / "ENGINE_RUNS" / "zai_gateway_calls.jsonl"))
 from r11_a1f_v3_generate import start_gateway  # noqa: E402
 
-REGISTERED = "zai-org/GLM-5.3"
+# R36: corrected registration (auditor ruling) — the machine requests
+# the exact servable id; the probe verifies served == registered.
+REGISTERED = "glm-4-plus"
 GW = "http://127.0.0.1:8787/v1/chat/completions"
 LOG = Path(os.environ["ZAI_GATEWAY_LOG"])
 
@@ -81,10 +83,15 @@ def main() -> int:
                     d.get("status") == "OK":
                 last = d
         log_served = (last or {}).get("model")
-        verdict = ("VERIFIED — served == registered"
-                   if served == REGISTERED and log_served == REGISTERED
-                   else "SUBSTITUTION — the transport cannot serve the "
-                        "registered model")
+        if served == REGISTERED and log_served == REGISTERED:
+            verdict = "VERIFIED — served == registered"
+        elif served is None:
+            verdict = ("AVAILABILITY_BLOCK — the upstream call failed "
+                       "(see transport_error_body); identity not "
+                       "measurable this window")
+        else:
+            verdict = ("SUBSTITUTION — the transport cannot serve the "
+                       "registered model")
         out = {
             "record": "V6_SERVING_PREFLIGHT/1.0.0",
             "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -101,11 +108,15 @@ def main() -> int:
                                 "verbatim, never rewritten",
             "latency_s": round(latency, 1),
             "verdict": verdict,
-            "seal_decision": ("BURN — run the v6 one-shot"
-                              if verdict.startswith("VERIFIED") else
-                              "DO NOT BURN — born-VOID run refused "
-                              "(Art. 3); typed infra block + "
-                              "registration escalation (Art. 15)"),
+            # R36: the seal ALSO requires the custody anchor to verify
+            # (pre-registration selection_sha256 vs the sealed problems
+            # bytes — see eval/v6_seal_custody_break.json: currently
+            # UNANCHORED). A verified window alone does not burn.
+            "seal_decision": (
+                "WINDOW OPEN — the seal burns ONLY when the v6 custody "
+                "anchor verifies (see eval/v6_seal_custody_break.json)"
+                if verdict.startswith("VERIFIED") else
+                "DO NOT BURN — window closed (Art. 3/15)"),
         }
         out_path = REPO / "eval" / "v6_serving_preflight.json"
         out_path.write_text(

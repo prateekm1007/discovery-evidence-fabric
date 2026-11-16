@@ -40,10 +40,17 @@ GW_LOG = REPO / "ENGINE_RUNS" / "zai_gateway_calls.jsonl"
 SUMMARY = REPO / "eval" / "holdout_v5_full_summary.json"
 OUT = REPO / "eval" / "holdout_v5_attestation.json"
 
-REGISTERED_MODEL = "zai-org/GLM-5.3"
-REGISTRY_PROVENANCE = ("discovery_fabric/engine/llm_registry.py catalog entry "
-                       "(zai-org/GLM-5.3, openai-compatible, 128k ctx) + the "
-                       "gateway log requested_model field")
+# R36: per the auditor's registration ruling, the registered generator
+# id is glm-4-plus (the exact servable id on the loop-local zai
+# gateway). The prior zai-org/GLM-5.3 anchor named a model no endpoint
+# serves; the gate now attests served == glm-4-plus.
+REGISTERED_MODEL = "glm-4-plus"
+REGISTRY_PROVENANCE = ("auditor registration ruling (R36 message, AM34 to "
+                       "be committed): the frozen-machine generator "
+                       "registration corrected to the exact servable id "
+                       "glm-4-plus on the loop-local zai gateway; NVIDIA "
+                       "z-ai/glm-5.3-flash is a typed alternate with its "
+                       "own identity, never silently promoted")
 
 
 def load_rows(d: Path) -> dict[str, dict]:

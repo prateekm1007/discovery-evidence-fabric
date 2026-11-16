@@ -153,8 +153,13 @@ def start_gateway():
 
 
 def gen_call(prompt, key, max_tokens=2600):
+    # R36: the auditor's registration ruling (Art. 7, executed verbatim):
+    # "the frozen-machine generator registration is corrected to the
+    # exact servable id glm-4-plus on the loop-local zai gateway." The
+    # prior id zai-org/GLM-5.3 is servable on zero reachable paths —
+    # the machine now requests the registered id it is attested against.
     body = json.dumps({
-        "model": "zai-org/GLM-5.3",
+        "model": "glm-4-plus",
         "messages": [{"role": "system", "content": SYS_A1F_V3},
                      {"role": "user", "content": prompt}],
         "max_tokens": max_tokens, "temperature": 0.0}).encode()

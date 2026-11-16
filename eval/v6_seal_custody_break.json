@@ -1,0 +1,23 @@
+{
+ "record": "V6_SEAL_CUSTODY_BREAK/1.0.0",
+ "at": "2026-11-16T14:20:00Z (sandbox clock)",
+ "session": "builder-r20s2",
+ "verdict": "UNANCHORED — the pre-registration's selection_sha256 matches NO committed byte sequence; the one-shot seal is NOT burned and the v6 problems remain UNREAD",
+ "registered_hash": "4d60488a581897b9b7452158158049e65656c26ac58ea7e611236047a9aab804",
+ "registered_in": "audit/holdout_v6/PREREGISTRATION.json (commit 29e3dfb1b, AFTER the problems commit d49694879)",
+ "candidate_hashes_tested": {
+  "problems_file_raw_tip": "cb4e984ad94832db016c9fd3d4f2508bba6b4fe03dbffd81c35f2cc1105abdb4",
+  "problems_file_raw_at_d49694879": "cb4e984ad94832db016c9fd3d4f2508bba6b4fe03dbffd81c35f2cc1105abdb4 (the file has exactly ONE commit — byte-stable since sealing, never amended)",
+  "canonicalizations": ["compact", "compact_sorted", "indent1", "indent1_sorted", "indent2", "indent2_sorted", "no_trailing_newline"],
+  "inner_problems_compact": "fefbde82fed7993ffd89…",
+  "problem_ids_newline": "316b3a21584c96a26bda…",
+  "per_problem_sorted_concat": "3fcb93f659af01244b0b…",
+  "rubric_raw_hash_only": "d2a79dea7f86afe6db7c… (hash computed; PRIVATE content never opened)",
+  "problems_plus_rubric_concat": "ffa1ff983728763ceee0…",
+  "manifest_form": "58ac60b85b4cc9d801d6…"
+ },
+ "interpretation": "the auditor most likely hashed an authoring-workspace version of the problems file BEFORE the final edit that was committed — the pre-anchor version was never committed, so the anchor cannot be recovered by the builder",
+ "why_no_burn": "the selection hash is the ONLY proof that the PRIVATE rubric was authored against EXACTLY the sealed problems bytes; generating on these bytes without that proof risks spending the one-shot seal on a run the auditor could rightly refuse to score (rubric/problem mismatch). The v5 burn taught the cost of evidence-custody gaps; this one is caught BEFORE the burn",
+ "escalation": "ONE auditor commit re-anchors the seal: either (a) amend PREREGISTRATION.json's selection_sha256 to the committed bytes cb4e984a… with an explicit attestation that the rubric was authored against exactly these 12 problems, or (b) re-seal the packet if the problems text actually changed after hashing. Until then claim c-0038 stays OPEN with TWO typed preconditions: (1) the serving window (currently AVAILABILITY_BLOCK: z-ai upstream HTTP 429 since 11-16 13:28Z, reproduced across rounds; identity resolved by the registration ruling), (2) the custody anchor",
+ "seal_state": "INTACT — problems UNREAD (claim-before-read held); no v6 generation artifacts exist anywhere in the tree"
+}
