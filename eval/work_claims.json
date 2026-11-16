@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-15T17:52:00Z",
+ "at": "2026-11-16T05:35:00Z",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -473,14 +473,14 @@
    "base_sha": "d8ee3be062da174d7d2b8265e483e15a3c5a854f",
    "claimed_at": "2026-11-16T05:25:00Z",
    "lease_expiry": "2026-11-16T16:00:00Z",
-   "status": "OPEN",
+   "status": "DONE",
    "takes_over": null,
    "artifact_paths": [
     "tests/test_judge_strict_contract.py",
     "eval/work_claims.json",
     "eval/r29_status.json"
    ],
-   "notes": "AM27 D4: fix the DISCLOSED pre-existing failure (builder-r28s1, Art. 5 disclosure at d8ee3be06) — tests/test_judge_strict_contract.py::test_calibration_full_set_gate_requires_24_correct IndexError at line 199: the stub indexes the 30-entry eval/judge_calibration.json corpus by TRANSPORT-CALL counter, but the driver's AM3 D5 cap escalation (one empty first response -> ONE retry at max_tokens x2 through the SAME prompt) consumes a second call per empty pair -> 31 calls > 30 entries. Fix = make the stub PAIR-SCOPED (the escalation repeats the same prompt; the parse retry extends it — a repeated/extended prompt is the SAME pair), preserving the test's original semantics exactly: n_empty pairs never answer (empty on both the first attempt and the escalation), the next n_good pairs answer with the good pick, the rest answer valid-but-wrong. The calibration DRIVER is byte-unchanged (the cap escalation is the measured instrument behavior; Art. XIX constitutional test: the defect was in the outdated stub, not the evidence). Acceptance (AM27 verdict): the suite green on a clean base."
+   "notes": "AM27 D4 EXECUTED: the calibration stub is now PAIR-SCOPED (tests/test_judge_strict_contract.py::_calib_fake) — pair identity recovered from the prompt bytes (the AM3 D5 cap escalation repeats the SAME prompt; the parse retry EXTENDS it; a repeated/extended prompt is the SAME pair), n_empty pairs return empty on both the first attempt and the escalation, an out-of-corpus call types loudly (FAIL with a stub-defect error, never a silent wrong-shape answer). The DRIVER (eval/run.py) is BYTE-UNCHANGED. Art. XIX constitutional test: (1) what was false — the stub modeled the pre-AM3-D5 one-call-per-pair pattern, so the 2 escalation calls for 2 empty pairs overran the 30-entry corpus (31 calls, IndexError at line 199); (2) what changed — the stub's pair model only, no production byte; (3) independent evidence — the suite green (12/12) with the original semantics preserved exactly (n_empty=2 -> n_valid 28, correct 24, passed True; n_good=23 -> passed False; n_good=1/n_empty=29 -> n_valid 1, correct 1, passed False); (4) the attack — any future driver change that adds a same-prompt call is now absorbed by the pair model instead of silently overrunning the corpus; (5) prevention — the out-of-corpus loud FAIL; (6) the fix changed the TEST's outdated model, not the scientific evidence. Local run: 12/12 green. The peer/auditor may verify from the committed bytes (pytest tests/test_judge_strict_contract.py, zero LLM, zero network)."
   },
   {
    "claim_id": "c-0024",
