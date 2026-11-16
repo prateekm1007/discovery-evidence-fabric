@@ -659,6 +659,26 @@
      "text": "R32 amendment #3, filed BEFORE any row used it (forward commit). During the dev-battery run the primary z.ai gateway RECOVERED from the R31 401 (rows 1-13 served on route=zai_gateway, real content, all contract sections present) but the upstream now flaps with sustained HTTP 500 outages (row 14 died once on the exhausted 5-try ladder; restart resumed from the committed anchors). CLAUSE: a single transient 500 still retries on the primary (the R24 ladder behavior, unchanged); after >=2 CONSECUTIVE primary infra failures (500-class only, never auth — auth falls through immediately), the AMENDED chain serves and the row's route record discloses sustained_primary_outage; every successful primary call resets the streak, and the primary is probed again on every row. No row is re-drawn; 13 committed rows stand. Route disclosure per row is unchanged; the machine-side claims are computed from the route-tagged ledger either way."
     }
    ]
+  },
+  {
+   "claim_id": "c-0034",
+   "work_id": "r33-holdout-v5-oneshot",
+   "session_id": "builder-r20s1",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "one_shot": true,
+   "sealed_set": "audit/holdout_v5/ (PREREGISTRATION.json, tip 622450281)",
+   "base_sha": "ad0432bbd",
+   "claimed_at": "2026-11-16T18:20:00Z",
+   "lease_expiry": "2026-11-17T02:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/pairs/holdout_v5_generation/",
+    "eval/holdout_v5_run.json",
+    "eval/holdout_v5_problems.json"
+   ],
+   "notes": "AM31 D1 ACCEPTANCE one-shot: 12 auditor-authored sealed problems (6 intervention + 6 predictor, domain-disjoint from v1-v4) under the FROZEN V7.6 machine (both AM29 binds in path, budget 3, K_GEN=1, one run). This claim is PUSHED BEFORE any problem read (Art. 29(b) push-as-mutex). The builder reads PROBLEMS ONLY — the PRIVATE rubric is never read. Acceptance bar (auditor-scored): mean >=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms; the set burns after use. Transport: the c-0031 amended fallback chain serves if the primary is down; route/route_model recorded per attempt. VERIFIER: peer recomputes integrity from bytes."
   }
  ],
  "trailer_violations": [
