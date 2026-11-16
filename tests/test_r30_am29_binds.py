@@ -142,3 +142,95 @@ def test_direction_bind_driver_as_remedy():
            "IMPLEMENTATION BILL — (a) existing heater; (c) schedule.")
     r = scan_physics_direction(prob, bad)
     assert r.get("DRIVER_AS_REMEDY"), r
+
+
+# --- R35 pins (AM33 D2/D3) on committed holdout-v5 bytes -------------
+
+V5_PACKET = REPO / "eval" / "holdout_v5_problems.json"
+V5_ROWS = REPO / "eval" / "pairs" / "holdout_v5_generation"
+
+
+def _v5_probs():
+    d = json.loads(V5_PACKET.read_text(encoding="utf-8"))
+    rows = d.get("rows") or d.get("problems") or []
+    return {r["problem_id"]: (r.get("problem") or r) for r in rows}
+
+
+def _v5_row(pid):
+    return json.loads((V5_ROWS / f"{pid}.json").read_text(
+        encoding="utf-8"))
+
+
+def test_d2_actuation_device_pin_fires_on_HO5_05():
+    # AM33 D2 accept: the pin fires on the committed solenoid-valve
+    # bytes (the timer-controlled valve was laundered into a permitted
+    # duty-cycle change in the v5 run)
+    probs = _v5_probs()
+    row = _v5_row("HO5-05-gearbox-oil-foaming")
+    out = scan_allowed_measures_class(
+        probs["HO5-05-gearbox-oil-foaming"], row["a1_answer"])
+    assert out.get("ACTUATION_DEVICE_AS_MEASURE"), out
+    assert "solenoid" in out["ACTUATION_DEVICE_AS_MEASURE"][0]
+
+
+def test_d2_pin_preserves_dose_pump_precedent():
+    # the documented precedent: dose selection admits the dosing pump
+    prob = {"constraint": "allowed measures: dose selection, filter "
+                          "setpoint retuning only",
+            "failure": "particle breakthrough"}
+    answer = (
+        "NOVELTY STATEMENT (INTERVENTION) — retune the dose selection "
+        "curve and install a dosing pump on the existing line.\n"
+        "IMPLEMENTATION BILL — (b) dosing pump, as-sold.")
+    out = scan_allowed_measures_class(prob, answer)
+    assert not out.get("ACTUATION_DEVICE_AS_MEASURE"), out
+
+
+def test_d3_direction_arithmetic_pin_fires_on_HO5_06():
+    # AM33 D3 accept: added thermal holds vs a claimed creep-integral
+    # reduction — the sign is arithmetic and the compensation is
+    # unquantified, so the pin fires
+    probs = _v5_probs()
+    row = _v5_row("HO5-06-vacuum-furnace-hotzone-sag")
+    out = scan_physics_direction(
+        probs["HO5-06-vacuum-furnace-hotzone-sag"], row["a1_answer"])
+    assert out.get("DIRECTION_INVERTED_ARITHMETIC"), out
+    assert "600" in out["DIRECTION_INVERTED_ARITHMETIC"][0]
+    assert "1000" in out["DIRECTION_INVERTED_ARITHMETIC"][0]
+
+
+def test_d3_quantified_compensation_is_typed_not_fired():
+    # when the answer quantifies the relief kinetics, the net sign is
+    # not machine-decidable — typed for the auditor, never fired
+    prob = {"constraint": "allowed measures: ramp schedule retuning "
+                          "only", "failure": "hot-zone sag"}
+    answer = (
+        "NOVELTY STATEMENT (INTERVENTION) — add a 30-minute hold at "
+        "900C during heating to allow stress relaxation and reduce "
+        "cumulative creep strain.\n"
+        "PHYSICS CHECK — DIRECTION-OF-EFFECT: driving variable = "
+        "cumulative creep strain; the hold lowers stress from 60 MPa "
+        "before to 25 MPa after (activation energy Q=380 kJ/mol "
+        "assumed), so the creep integral decreases.\n"
+        "DIRECTION-OF-EFFECT: the hold cuts cumulative creep strain.\n"
+        "IMPLEMENTATION BILL — (a) schedule change only.")
+    out = scan_physics_direction(prob, answer)
+    assert out.get("DIRECTION_CONTESTABLE_TYPED"), out
+    assert not out.get("DIRECTION_INVERTED_ARITHMETIC"), out
+
+
+def test_r35_pins_zero_false_positives_on_other_v5_rows():
+    probs = _v5_probs()
+    fp = []
+    for f in sorted(V5_ROWS.glob("HO5-*.json")):
+        pid = f.stem
+        if pid.startswith(("HO5-05", "HO5-06")):
+            continue
+        row = json.loads(f.read_text(encoding="utf-8"))
+        c = scan_allowed_measures_class(probs[pid], row["a1_answer"])
+        d = scan_physics_direction(probs[pid], row["a1_answer"])
+        for fam in ("ACTUATION_DEVICE_AS_MEASURE",
+                    "DIRECTION_INVERTED_ARITHMETIC"):
+            if c.get(fam) or d.get(fam):
+                fp.append((pid, fam))
+    assert not fp, fp

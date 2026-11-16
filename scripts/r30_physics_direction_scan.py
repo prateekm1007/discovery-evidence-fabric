@@ -61,6 +61,34 @@ DIRECTION_STATEMENT = re.compile(
     r"DIRECTION-OF-EFFECT\s*[:\-]\s*(.+?)(?:\n[A-Z][A-Z ]{8,}\n|\Z)",
     re.S)
 
+# R35 D3 pin (AM33 D3, the HO5-06 class): ADDED thermal holds proposed
+# by the answer, and a claimed REDUCTION of a thermally-activated
+# damage integral. The arithmetic: every hold (T_K, t_h) adds
+# D_I = t_h * exp(-Q/(R*T_K)) > 0 to the time-at-temperature integral
+# — strictly positive for any hold — so a pure-reduction claim is
+# arithmetically inverted UNLESS the answer quantifies the
+# compensating stress-relief term (kinetics numbers: activation
+# energy, stress exponent, or a measured stress drop). Quantified
+# compensation is typed CONTESTABLE for the auditor; unquantified
+# compensation FIRES.
+HOLD_PATTERN = re.compile(
+    r"(\d+)\s*[-\s]?\s*(?:min(?:ute)?s?|h(?:our)?s?)\s+"
+    r"(?:holds?|dwell\w*|soak\w*)\s+(?:at|of)\s+"
+    r"((?:\d{2,4})\s*(?:°|deg\w*)?\s*[CF](?:(?:\s*(?:,|and|/)\s*|"
+    r"\s+and\s+)\d{2,4}\s*(?:°|deg\w*)?\s*[CF])*)", re.I)
+TEMP_TOKEN = re.compile(r"(\d{2,4})\s*(?:°|deg\w*)?\s*([CF])\b", re.I)
+THERMAL_DAMAGE_NOUN = re.compile(
+    r"\b(creep\b|creep strain|creep damage|creep deformation|"
+    r"temper\w*|embrittl\w*|degrad\w*|ageing|aging|thermal fatigue|"
+    r"creep integral|creep rate)", re.I)
+KINETICS_BASIS = re.compile(
+    r"\b(activation energy|Q\s*=|stress exponent|creep exponent|"
+    r"\bMPa\b.{0,40}(?:before|after|from|to)\b|(?:before|from)\b.{0,40}"
+    r"\bMPa\b|Norton|Arrhenius)\b", re.I)
+DECREASE_CLASS = re.compile(
+    r"\b(reduc\w*|lower\w*|decreas\w*|cut\w*|mitigat\w*|suppress\w*|"
+    r"slow\w*|limit\w*|prevent\w*|avoid\w*|minimi[sz]\w*)\b", re.I)
+
 
 def scan_physics_direction(problem: dict, answer: str) -> dict:
     """The DIRECTION-OF-EFFECT bind (deterministic legs).
@@ -112,4 +140,45 @@ def scan_physics_direction(problem: dict, answer: str) -> dict:
                 "stated failure driver — a remedy may not be the "
                 "driver (HO4-03 class: cycling to heal cycling-driven "
                 "cracking)"]
+
+    # leg 3 (R35 D3): ADDED thermal holds vs a claimed reduction of a
+    # thermally-activated damage integral — the sign is arithmetic
+    mech = re.search(r"NOVELTY STATEMENT.{0,1200}", a, re.S)
+    scope = mech.group(0) if mech else a[:1200]
+    holds = []
+    for hm in HOLD_PATTERN.finditer(scope):
+        mins = float(hm.group(1))
+        t_h = mins / 60.0 if re.search(r"min", hm.group(0), re.I) else mins
+        temps = [f"{t}{u.upper()}" for t, u in TEMP_TOKEN.findall(hm.group(2))]
+        for t in temps:
+            holds.append((t, t_h))
+    if holds:
+        holds = list(dict.fromkeys(holds))  # dedupe, order-preserving
+        claim_win = st_txt if st else scope
+        claimed_down = THERMAL_DAMAGE_NOUN.search(scope) and \
+            DECREASE_CLASS.search(scope + " " + claim_win)
+        if claimed_down:
+            if KINETICS_BASIS.search(a):
+                out["DIRECTION_CONTESTABLE_TYPED"] = [
+                    "added thermal holds "
+                    f"{holds[:4]} accompany a claimed reduction of a "
+                    "thermally-activated integral, but the answer "
+                    "quantifies a compensating relief term — the net "
+                    "sign is not machine-decidable; typed for the "
+                    "auditor (AM33 D3 domain-only rule)"]
+            else:
+                terms = ", ".join(
+                    f"ΔI({t}; {h:g} h) = {h:g}·exp(-Q/(R·{t})) > 0"
+                    for t, h in holds[:4])
+                out["DIRECTION_INVERTED_ARITHMETIC"] = [
+                    "the answer ADDS thermal exposure "
+                    f"({'; '.join(f'{t} for {h:g} h' for t, h in holds[:4])})"
+                    " while claiming to REDUCE a thermally-activated "
+                    "integral: every hold contributes "
+                    f"{terms} — the time-at-temperature integral "
+                    "strictly increases, and the claimed net reduction "
+                    "relies on a stress-relief term the answer never "
+                    "quantifies (no activation energy, stress exponent, "
+                    "or measured stress drop); the reduction claim is "
+                    "arithmetically unsupported as stated"]
     return out

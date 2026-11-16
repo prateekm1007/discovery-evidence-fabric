@@ -108,6 +108,29 @@ DECREASE_VERB = re.compile(
 LIMIT_FORM = re.compile(
     r"\b((?:[\w\-]+/)?[\w\-]+(?:[\w\-/ ]{0,30})?)\s+limits?\b", re.I)
 
+# R35 D2 pin (AM33 D2, the HO5-05 escape): an ACTUATION DEVICE —
+# hardware whose function is powered/controlled motion or switching —
+# is never a setpoint, a procedure, or a consumable chemical. The
+# v5 escape: a "timer-controlled solenoid valve" was laundered into a
+# permitted "duty cycle" change because the row's OTHER object stems
+# met permitted stems. The pin fires the device by its own modifier +
+# noun family, in bill rows AND the mechanism statement (the escape
+# lived there), exempting only when the permitted span itself names
+# the device family (the documented precedent: "dose selection"
+# admits the dosing pump — dosing stem meets the device's).
+ACTUATION_DEVICE = re.compile(
+    r"\b("
+    r"solenoid[\w-]*\s+(?:valve|pump|damper|gate|injector|switch)"
+    r"|(?:timer[- ]?controlled|motorized|motorised|electrically[- ]?"
+    r"actuated|pneumatically[- ]?actuated|power[- ]?actuated|"
+    r"servo[- ]?(?:driven|operated)|electrically?[- ]controlled)"
+    r"\s+(?:control\s+)?(?:valve|pump|damper|gate|injector|switch|"
+    r"actuator|dosing\s+(?:valve|pump))"
+    r"|(?:valve|pump|damper)\s+with\s+(?:an?\s+)?(?:electric|"
+    r"pneumatic|hydraulic|timer)[\w-]*\s+actuator"
+    r")\b", re.I)
+MECHANISM_WINDOW = re.compile(r"NOVELTY STATEMENT.{0,1200}", re.S)
+
 
 def parse_permitted_set(constraint: str) -> dict:
     """Parse the permitted-measure span and type its exhaustiveness.
@@ -223,6 +246,36 @@ def scan_allowed_measures_class(problem: dict, answer: str) -> dict:
     """The CONSTRAINT-CLASS bind (precision-first)."""
     perm = parse_permitted_set(problem.get("constraint") or "")
     out: dict = {}
+    # R35 D2 pin: actuation-device laundering. Runs whenever the
+    # constraint states a BOUNDED permitted set ("only"), even when the
+    # set is not param-exhaustive (the HO5-05 set carried "antifoam
+    # dosing", which made the old scan go silent and admit the
+    # timer-controlled solenoid valve). Exemption: the permitted span
+    # itself names the device family or dosing stem (dose-pump
+    # precedent). The primary class read stays the auditor's.
+    if perm["span"] and perm["only"]:
+        perm_stems = _permitted_stems(perm["items"])
+        dev_hits = []
+        mech = MECHANISM_WINDOW.search(str(answer or ""))
+        scopes = _bill_rows_scoped(str(answer or ""))
+        if mech:
+            scopes.append(mech.group(0))
+        for scope in scopes:
+            for mdev in ACTUATION_DEVICE.finditer(scope):
+                dev_txt = mdev.group(0)
+                dev_stems = {_stem(w) for w in _content_words(dev_txt)}
+                if dev_stems & perm_stems:
+                    continue  # the permitted set names this device family
+                ctx = scope[max(0, mdev.start() - 60):mdev.end() + 60]
+                dev_hits.append(
+                    "actuation device proposed as the measure while the "
+                    "bounded permitted set names no such hardware | "
+                    f"{dev_txt} | ...{ctx[:110]}...")
+                break
+            if dev_hits:
+                break
+        if dev_hits:
+            out["ACTUATION_DEVICE_AS_MEASURE"] = dev_hits[:2]
     if not perm["param_exhaustive"]:
         return out  # typed not-applicable; stem scan still runs
     perm_stems = _permitted_stems(perm["items"])

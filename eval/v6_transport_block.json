@@ -1,0 +1,20 @@
+{
+ "record": "V6_TRANSPORT_BLOCK/1.0.0",
+ "at": "2026-11-17T03:20:00Z",
+ "verdict": "TYPED INFRA BLOCK — the v6 one-shot is NOT taken (claim c-0038 stays OPEN with its typed precondition unmet)",
+ "facts": [
+  {
+   "fact": "STRUCTURAL IDENTITY SUBSTITUTION",
+   "bytes": "gateway call log: 311/311 requests for zai-org/GLM-5.3 served glm-4-plus; fresh probe reproduced: served(gateway log)=glm-4-plus for requested zai-org/GLM-5.3",
+   "cause": "zai_gateway.mjs R458-C1 disclosure: every call routes through the z-ai CLI, which serves the grant's SINGLE embedded model; requested ids are recorded verbatim, never rewritten — the registered name is not servable on this transport",
+   "consequence": "any one-shot on this transport is born-VOID (served != registered); the attestation gate would void it pre-scoring"
+  },
+  {
+   "fact": "TRANSPORT AVAILABILITY",
+   "bytes": "z-ai CLI exit 1 reproduced twice (gateway probe x2 + direct CLI): 'API request failed with status 429: Too many requests, please try again later'; last successful upstream call in the log: 2026-11-15T19:31:10Z",
+   "consequence": "even a re-registered identity cannot generate until the grant's quota window recovers"
+  }
+ ],
+ "seal_state": "INTACT — holdout v6 problems UNREAD (claim-before-read discipline held); one generation still available under c-0038",
+ "escalation": "AUDITOR DECISION REQUIRED (instrument definition, not builder's to take): (a) re-register the frozen machine's model identity as the grant's truthfully-served model (glm-4-plus / z-ai grant embedded weights — the same weights that produced every scored generation v1-v5), OR (b) owner supplies a serving path that actually serves GLM-5.3 weights. The one-shot fires the moment EITHER a re-registration or a live GLM-5.3 endpoint verifies (probe is one command: scripts/r35_serving_preflight.py)."
+}
