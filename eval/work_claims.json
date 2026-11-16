@@ -679,6 +679,30 @@
     "eval/holdout_v5_problems.json"
    ],
    "notes": "AM31 D1 ACCEPTANCE one-shot: 12 auditor-authored sealed problems (6 intervention + 6 predictor, domain-disjoint from v1-v4) under the FROZEN V7.6 machine (both AM29 binds in path, budget 3, K_GEN=1, one run). This claim is PUSHED BEFORE any problem read (Art. 29(b) push-as-mutex). The builder reads PROBLEMS ONLY — the PRIVATE rubric is never read. Acceptance bar (auditor-scored): mean >=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms; the set burns after use. Transport: the c-0031 amended fallback chain serves if the primary is down; route/route_model recorded per attempt. VERIFIER: peer recomputes integrity from bytes. R33-INCIDENT: DUPLICATE-GENERATION INCIDENT disclosed (eval/r33_duplicate_generation_disclosure.json): while this session's one-shot ran, a second 12-row generation of the SAME sealed set landed on the remote (e401bb2ad) under the SAME session trailer — an identity collision that blinded the push-as-mutex (the registry saw one session id on both sides of a VALID, unexpired lease; no Art. 29(d) takeover was filed). Per Art. 29(e): the PUSHED run e401bb2ad is CANONICAL; this session STANDS DOWN to VERIFIER; its own generation is quarantined (eval/pairs/holdout_v5_generation_DUPLICATE_builder-r20s1/, bytes kept, NON-CANONICAL, never submitted for scoring). The v5 set is twice-generated — the burn-after-use condition is engaged; scoring-vs-reseal is the auditor's call. Generations verified distinct by row sha (HO5-01, HO5-05 evidence in the disclosure)."
+  },
+  {
+   "claim_id": "c-0035",
+   "work_id": "r34-attestation-gate-ledger-durability",
+   "session_id": "builder-r20s2",
+   "role": "EXECUTOR",
+   "kind": "instrument-fix-and-typed-records",
+   "base_sha": "5f2204657",
+   "claimed_at": "2026-11-16T22:42:00Z",
+   "lease_expiry": "2026-11-17T06:00:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/r34_served_model_attestation.py",
+    "scripts/r34_ledger_backfill_recompute.py",
+    "eval/holdout_v5_attestation.json",
+    "eval/holdout_v5_run.json (backfilled to 12 rows)",
+    "eval/holdout_v5_ledger_recompute.json",
+    "eval/holdout_v5_burn_record.json",
+    "eval/holdout_v6_request.json",
+    "eval/r33_status.json (D5 byte-count correction)",
+    "eval/r34_status.json"
+   ],
+   "notes": "AM32 D1+D3+D2+D5+D4. (D1) served-model identity attestation GATE: per-row attestation of route/route_model vs the registered generator model (zai-org/GLM-5.3 per llm_registry + gateway-log requested_model), cross-checked against the gateway call log; run VOID on any substituted row; applied PRE-SCORING to the v5 run (expected verdict: VOID — 30x glm-4-plus served for GLM-5.3, 4 nvidia rows) and wired into the one-shot driver so v6 cannot be marked acceptance-eligible without a clean attestation. (D3) ledger durability: backfill eval/holdout_v5_run.json rows 1-4 from canonical row-file bytes (typed backfilled_from_row_files, zero-LLM) + append-per-fire events-log pattern in the driver + zero-LLM recompute ledger-vs-row-files diff == 0. (D2) v5 BURNED-INVALID record (no acceptance; seal spent) + formal v6 request to the auditor with the verified-model-window precondition. (D5) r33_status byte-count correction: measured at audited SHA e401bb2ad — 17,418 characters / 17,514 bytes (same blob e79f9176; wc -m vs wc -c; AM31's figure is the char count). (D4) crowllm window probe, typed, no route swap. Art. 27: NO CAPABILITY CHANGE (instruments + typed records only; engine bytes untouched). No new problem material is read this round (v5 already read+generated under c-0034; the set burns)."
   }
  ],
  "trailer_violations": [
