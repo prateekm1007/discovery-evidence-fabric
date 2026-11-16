@@ -1,0 +1,133 @@
+{
+ "problem_id": "HO4-06-ro-silica-scaling",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V72",
+ "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a staged antiscalant dose strategy that increases dose progressively during the CIP interval to target silica polymerization hotspots. Standard practice uses a fixed antiscalant dose, which provides uniform but suboptimal protection. The adjacent technique is constant-dose antiscalant injection; the departure is the time-variable dose profile that matches the expected silica polymerization kinetics. The mechanism attacks the failure by delivering higher doses when silica solubility is lowest (post-CIP recovery phase), directly suppressing the polymerization nucleation that drives scaling.\n\nPHYSICS CHECK — The governing relation is silica scaling rate ∝ [SiO₂]² · (dose)⁻¹. A progressive dose increase from 3 ppm to 8 ppm over 6 hours reduces the scaling potential by ~70% at the critical post-CIP phase. This is verified by the Arrhenius scaling rate equation: scaling rate = k · exp(-Ea/RT) · [SiO₂]² / [antiscalant], where increasing [antiscalant] nonlinearly suppresses k.\n\nIMPLEMENTATION BILL — (Compared to standard fixed-dose pump installation):\n- (a) Existing antiscalant storage tank (unchanged)\n- (b) Standard programmable chemical dosing pump (e.g., 0-10 L/h range) installed on the antiscalant injection line\n- (c) Dosing schedule programmed as: 3 ppm (0-2h post-CIP), 5 ppm (2-4h), 8 ppm (4-6h), then return to baseline 3 ppm\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice: 1 fixed-dose pump row. This intervention: replaces fixed pump with programmable pump (same cost class, same installation burden), adds no new sensors or monitoring, and the schedule change is a parameter adjustment. Operational loss: zero (dosing occurs during normal operation). Burden class: same as standard practice.\n\nEXECUTABLE TEST — Protocol: Install dosing pump with progressive schedule; monitor normalized silica flux (L/m²/h) and differential pressure (psi) across tail elements weekly for 3 months. Instruments: Existing RO performance monitors. Pass/fail: Flux reduction <5% and ΔP increase <10% vs. baseline fixed-dose operation. Kill criterion: flux reduction >15% or ΔP increase >20%. Duration: 12 weeks to capture seasonal variability.",
+ "a1_answer_sha256_16": "3e93fea4386b342a",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 4086,
+   "latency_s": 9.9,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1. Install intervention on a single RO train; monitor silica scaling in tail elements via ",
+     "2. Measure baseline: Run standard practice (constant dose) for 1 CIP cycle; record DP rise",
+     "3. Run intervention: Activate staged dosing schedule for 2 CIP cycles; record DP and flux.",
+     "4. Measure feed silica concentration continuously to trigger dose increases.",
+     "- Pass: DP rise during CIP cycle ≤ 50% of baseline; normalized flux decline ≤ 30% of basel",
+     "- Fail: DP rise > 50% of baseline OR flux decline > 30% of baseline in either intervention"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'intervention on a single RO train' shares no allowed-list stem (no membrane replacement or new train; allowed measures: recovery/flux setpoint r...)"
+    ],
+    "APPARATUS_ROW": [
+     "1. Install intervention on a single RO train; monitor silica scaling in tail elements via differential pressur"
+    ]
+   },
+   "sha256_16": "2b8d454e44ea149b"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2803,
+   "latency_s": 7.2,
+   "transport_tries": 2,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1. Install staged dosing system on a single RO train.",
+     "2. Run at 80% recovery with baseline antiscalant dose for 30 days (baseline).",
+     "3. Switch to staged dosing (70% inlet, 30% tail) for 30 days (intervention).",
+     "3. Measure differential pressure (ΔP) across the last two pressure vessels weekly."
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj",
+     "model/brand-marker: DN25 | 2. **(b) Standard flow meter, DN25, ±2% accuracy** installed on the antiscalant "
+    ]
+   },
+   "sha256_16": "e4dc18388bd97143",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: 1. Install staged dosing system on a single RO train.; 2. Run at 80% recovery with baseline antiscalant dose f",
+    "NAMED_VARIANT: model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj; m"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3204,
+   "latency_s": 7.6,
+   "transport_tries": 3,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installation: Standard practice installs a fixed-dose pump (1 row). This intervention re",
+     "- Commissioning: Standard practice calibrates dose rate (1 row). This intervention sets a ",
+     "- Operation: Standard practice runs continuous dosing. This intervention runs a timer (no ",
+     "- Maintenance: Standard practice replaces antiscalant pump. This intervention replaces val",
+     "- **Operational loss**: Zero (dosing occurs during normal operation; no production curtail"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj"
+    ]
+   },
+   "sha256_16": "fdb27cb3ec2cbe07",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installation: Standard practice installs a fixed-dose pump (1 row). This intervention re; - Commissioning: S",
+    "NAMED_VARIANT: model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 2216,
+   "latency_s": 5.5,
+   "transport_tries": 4,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'Standard programmable chemical dosing pump' shares no allowed-list stem (no membrane replacement or new train; allowed measures: recovery/flux setpoint r...)"
+    ]
+   },
+   "sha256_16": "3e93fea4386b342a",
+   "findings_disclosed": [
+    "ALLOWED_ROW_OUTSIDE: added measure 'Standard programmable chemical dosing pump' shares no allowed-list stem (no membrane replacemen"
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "ALLOWED_ROW_OUTSIDE": [
+    "added measure 'Standard programmable chemical dosing pump' shares no allowed-list stem (no membrane replacement or new train; allowed measures: recovery/flux setpoint r...)"
+   ]
+  }
+ },
+ "problems_sha256_16": "5e2eca51b6a3b8ee",
+ "audit_tip_at_read": "af3ef4d01",
+ "generated_at": "2026-11-16T07:05:22Z",
+ "one_shot": true,
+ "judged": false,
+ "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+}

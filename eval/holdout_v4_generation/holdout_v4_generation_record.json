@@ -1,0 +1,1836 @@
+{
+ "record": "HOLDOUT_V4_GENERATION/1.0.0",
+ "work_id": "holdout-v4-generation",
+ "claim": "c-0029 (EXECUTOR builder-r20s1, one_shot, filed+pushed BEFORE any problem read / generation call — Art. 29(b)); the EXECUTOR is the non-author session per the sealed pre-registration (author: the AUDITOR — fully auditor-authored problems and rubric, removing the v3 builder-authored-problems caveat)",
+ "at": "2026-11-16T07:00:51Z",
+ "custody": {
+  "audit_branch": "origin/audit/r11-auditor-verdict-20261114",
+  "audit_tip_at_read": "af3ef4d01",
+  "problems_file": "audit/holdout_v4/holdout_v4_problems.json",
+  "problems_sha256_16": "5e2eca51b6a3b8ee",
+  "selection_sha256_received": "00dfaf7e8f9fe4ea639a2e9751a29cf8e98c70ab4fea432aff58ba655a2e128b",
+  "private_rubric_accessed": false,
+  "note": "executor received PROBLEMS ONLY per the sealed pre-registration; the PRIVATE rubric was never opened, listed, or copied by the executor (no rubric exists on any builder-visible branch by design; names-only custody listing)"
+ },
+ "discipline": {
+  "one_shot": "one generation pass per problem (Art. 29(c)); a call that returns content is never re-drawn; transport-level transient retries only (Art. 15)",
+  "machine": "FROZEN V7.4 machine IMPORTED BYTE-IDENTICAL from the peer's committed module scripts/r29_tune_battery_v74.py::machine_generate_v74 (commit 7a1b7e050): contract_for_v72 (intervention -> SYS_A1_INT_V72, predictor -> SYS_A1F_V5) + critic + question-type gate + typed scans (base + constraint-fit + catalog-v2 + standard-bill + operational-loss + conversion) + the machine's own NEUTRAL V74 repair directive, budget 3. Import (not copy) = the no-contract-edit proof. The machine-internal repair loop is part of the machine under test (same code path as the R29 dev battery, disclosed)",
+  "no_selection": "K_GEN=1 — no best-of-k, no selection (BOK arm RETIRED per ABLATION_REGISTRY)",
+  "no_judge": "NO judge calls, NO baseline/B-side assembly — the auditor scores with the PRIVATE rubric (never seen by builder/pipeline/judge)",
+  "no_iteration": "no rubric feedback, no problem-set iteration, no tuning — the problems are unseen (the executor is the non-author session)",
+  "stagger": "pace 13.0s between problems (shared upstream quota)"
+ },
+ "generator": {
+  "model": "zai-org/GLM-5.3",
+  "temperature": 0.0,
+  "max_tokens": 2600,
+  "route": "local zai gateway (infra, not contract)"
+ },
+ "results": [
+  {
+   "problem_id": "HO4-01-esp-back-corona",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V72",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a rapping-interval retuning strategy that applies a variable-frequency rapping schedule based on ash-layer resistivity, reducing charge accumulation and back-corona onset. Standard practice uses fixed-interval rapping regardless of ash properties; this intervention dynamically adjusts rapping frequency by periodically measuring ash resistivity and retuning the rapping schedule to maintain a target charge density below the back-corona threshold. Adjacent-technique clearance: closest existing practice is fixed-interval rapping with manual adjustments; this differs by automating resistivity-based retuning. The mechanism attacks the driving physics by directly controlling the charge density buildup that causes back-corona in high-resistivity ash layers.\n\nPHYSICS CHECK — The governing relation is the critical charge density for back-corona onset: J_c = σ * E, where σ is ash resistivity and E is electric field. For σ > 1e11 ohm-cm, J_c exceeds typical ESP operating currents, causing charge buildup. By retuning rapping frequency to maintain charge density below J_c (e.g., by increasing rapping rate as resistivity rises), the intervention keeps J < J_c. Magnitude verification: if resistivity increases by 10x, rapping frequency increases by 2x (empirically observed), reducing charge density by 50%, sufficient to stay below J_c.\n\nIMPLEMENTATION BILL — (a) Existing ESP rapping controller (PWM controller, no sensor tap), (b) Standard resistivity probe (catalog: industrial ash resistivity probe, +/-10% accuracy), (b) Standard programmable logic controller (catalog: PLC with analog input module), (c) Rapping schedule algorithm (parameter change: set PLC to measure resistivity hourly and adjust rapping interval using f_rap = k / σ, where k is a tuning constant). Standard practice bill: (a) Existing ESP rapping controller (fixed interval). Intervention adds: (b) Resistivity probe, (b) PLC, (c) Algorithm.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installation: Standard practice (1 rapping controller) vs. Intervention (1 rapping controller + 1 probe + 1 PLC) — same burden (catalog parts, no new infrastructure). Commissioning: Standard practice (fixed setup) vs. Intervention (PLC programming, 1-day setup) — same burden (standard programming task). Operation: Standard practice (fixed rapping) vs. Intervention (hourly resistivity measurement + algorithm) — same burden (existing control system). Maintenance: Standard practice (controller maintenance) vs. Intervention (controller + probe + PLC maintenance) — same burden (catalog parts). Operational loss: Zero (rapping occurs during normal operation, no production downtime).\n\nEXECUTABLE TEST — Protocol: Install resistivity probe and PLC on ESP; run at full load for 30 days with variable ash resistivity (1e11 to 1e12 ohm-cm). Instruments: Resistivity probe, stack opacity monitor, ESP current meter. Pass/fail: Stack opacity increase <5% from baseline, ESP current variation <10% from setpoint. Duration: 30 days. Kill criterion: Opacity increase >10% or current drop >20%. Falsification: If opacity or current exceeds thresholds, the mechanism fails to mitigate back-corona.",
+   "a1_answer_sha256_16": "a906bbd896206181",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3041,
+     "latency_s": 11.2,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: PWM controller (existing), no sensor tap, fixed waveform, no paramete"
+      ]
+     },
+     "sha256_16": "0dbbd076244e5ef4"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3208,
+     "latency_s": 11.0,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "sha256_16": "a906bbd896206181",
+     "findings_disclosed": []
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 1,
+    "residual_findings": {}
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:01:14Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-02-geomembrane-stress-crack",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V72",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**  \nTo prevent slow crack growth in HDPE geomembrane seams and stress concentrations, the intervention modifies the drainage-layer gradation to reduce localized stress concentrations at the geomembrane-drainage layer interface. Standard practice uses uniform drainage-layer gradation; this intervention introduces a graded transition zone with coarser aggregate directly beneath the geomembrane to distribute stress and minimize point loads. The closest existing practice is using geocomposite drainage layers, but this differs by leveraging a simple gradation change in granular drainage material rather than a manufactured geocomposite, avoiding new hardware. The mechanism reduces stress concentrations by increasing the contact area and load distribution at the critical interface.\n\n**PHYSICS CHECK**  \nThe driving mechanism for slow crack growth is localized stress concentration at the geomembrane-drainage layer interface. By increasing the aggregate size directly beneath the geomembrane, the contact area between the geomembrane and drainage layer increases, reducing the peak stress (σ_max) at any point. The stress reduction follows σ_max ∝ 1/√(contact area), and a 2x increase in aggregate size (e.g., 50 mm to 100 mm nominal diameter) can reduce σ_max by ~30%, below the threshold for slow crack propagation in HDPE.\n\n**IMPLEMENTATION BILL**  \n*(Standard practice: Uniform drainage-layer placement with single-gradation aggregate.)*  \n1. (b) Coarse aggregate (nominal 100 mm diameter), placed as a 300 mm thick layer directly beneath the geomembrane seam/stress zones.  \n2. (b) Fine aggregate (nominal 20 mm diameter), placed as a transition layer (300 mm thick) between coarse aggregate and remaining drainage layer.  \n3. (c) Placement procedure: Install coarse aggregate first beneath geomembrane seams/stress zones, then fine aggregate as a graded transition, followed by standard drainage-layer placement.  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installation: Same as standard practice (placement of drainage layer), no new equipment.  \n- Material cost: Coarse and fine aggregate are standard procurable materials; total material volume unchanged.  \n- Operational loss: Zero (drainage-layer placement occurs during construction, no impact on landfill operation).  \n- Burden class: Same as standard practice (material procurement and placement).\n\n**EXECUTABLE TEST**  \n- Protocol: Install test cells (10 m x 10 m) with and without the graded drainage layer under simulated 30 m waste load (1.5 m height equivalent).  \n- Instruments: Strain gauges on geomembrane seams, pressure transducers at drainage layer interface.  \n- Pass/fail: Geomembrane strain < 0.5% and no detectable leakage after 6 months simulated loading.  \n- Duration: 6 months per test cell.  \n- Kill criterion: Strain > 1.0% or leakage > 1 L/m²/day.",
+   "a1_answer_sha256_16": "9641bc66159cc798",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4227,
+     "latency_s": 9.7,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice requires placement of granular drainage layer (same labo",
+       "- Materials: Standard practice uses granular drainage layer (same cost class). This interv",
+       "- Equipment: No new equipment required (standard landfill dozers already used for soil pla",
+       "- Inspection: Standard practice requires seam inspection after soil placement. This interv",
+       "- Maintenance: No additional maintenance required (geocomposite is passive).",
+       "- Operational loss: Zero (placement procedure unchanged in production windows, no throughp",
+       "- Conclusion: Same burden class (installation, materials, equipment), reduced inspection b"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'directly on top of the geomembrane primary liner' shares no allowed-list stem (no liner replacement; allowed measures: cover-soil placement procedure and seam-...)",
+       "added measure 'Standard strain gauges' shares no allowed-list stem (no liner replacement; allowed measures: cover-soil placement procedure and seam-...)",
+       "added measure 'Standard displacement transducers' shares no allowed-list stem (no liner replacement; allowed measures: cover-soil placement procedure and seam-...)"
+      ]
+     },
+     "sha256_16": "40f4f69b99bcc464"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3709,
+     "latency_s": 12.0,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice requires placement of granular drainage layer (same labo",
+       "- Materials: Standard practice uses granular drainage layer only. This intervention adds o",
+       "- Operation: Standard practice requires frequent seam inspection. This intervention reduce",
+       "- Maintenance: No change (same repair protocol for any residual cracks)."
+      ]
+     },
+     "sha256_16": "acede380190a1137",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Standard practice requires placement of granular drainage layer (same labo; - Materials: Stand"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3415,
+     "latency_s": 11.4,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Uses allowed measure: drainage-layer gradation change (geocomposite is a drainage layer)",
+       "- No liner replacement or machining of geomembrane.",
+       "- No custom parts; geocomposite is a standard catalog item.",
+       "- No added sensors; uses existing instrumentation."
+      ]
+     },
+     "sha256_16": "33b8c830114959b1",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Uses allowed measure: drainage-layer gradation change (geocomposite is a drainage layer); - No liner replace"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2879,
+     "latency_s": 9.6,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Same as standard practice (placement of drainage layer), no new equipment.",
+       "- Material cost: Coarse and fine aggregate are standard procurable materials; total materi",
+       "- Operational loss: Zero (drainage-layer placement occurs during construction, no impact o",
+       "- Burden class: Same as standard practice (material procurement and placement).",
+       "- Protocol: Install test cells (10 m x 10 m) with and without the graded drainage layer un",
+       "- Instruments: Strain gauges on geomembrane seams, pressure transducers at drainage layer ",
+       "- Pass/fail: Geomembrane strain < 0.5% and no detectable leakage after 6 months simulated ",
+       "- Duration: 6 months per test cell.",
+       "- Kill criterion: Strain > 1.0% or leakage > 1 L/m²/day."
+      ]
+     },
+     "sha256_16": "9641bc66159cc798",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Same as standard practice (placement of drainage layer), no new equipment.; - Material cost: C"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installation: Same as standard practice (placement of drainage layer), no new equipment.",
+      "- Material cost: Coarse and fine aggregate are standard procurable materials; total materi",
+      "- Operational loss: Zero (drainage-layer placement occurs during construction, no impact o",
+      "- Burden class: Same as standard practice (material procurement and placement).",
+      "- Protocol: Install test cells (10 m x 10 m) with and without the graded drainage layer un",
+      "- Instruments: Strain gauges on geomembrane seams, pressure transducers at drainage layer ",
+      "- Pass/fail: Geomembrane strain < 0.5% and no detectable leakage after 6 months simulated ",
+      "- Duration: 6 months per test cell.",
+      "- Kill criterion: Strain > 1.0% or leakage > 1 L/m²/day."
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:02:10Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-03-nas-battery-seal",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V72",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a thermal cycling schedule modification that alternates between upper and lower temperature setpoints with dwell times to periodically crystallize and heal microcracks in the glass seal, thereby reducing sodium polysulfide attack. Standard practice maintains constant temperature (300°C) continuously, which allows polysulfide buildup and stress accumulation. This mitigation departs by introducing a controlled thermal cycling regime to exploit glass relaxation and crack healing mechanisms. The closest existing practice is thermal shock testing in glass manufacturing, but this is a one-time destructive test, not a continuous operational cycling schedule. The intervention attacks the failure's driving physics by periodically annealing the glass seal, reducing residual stresses and sealing microcracks that otherwise propagate due to polysulfide corrosion.\n\nPHYSICS CHECK — The governing physical relation is the Arrhenius equation for glass relaxation: relaxation time τ = τ₀ exp(Q/RT), where Q is activation energy, R is gas constant, and T is temperature. At 300°C, relaxation is slow, allowing stress buildup. Cycling between 280°C and 320°C (within the operating window) accelerates relaxation during dwells. A magnitude verification shows that at 320°C, τ decreases by ~50% compared to 300°C, enabling significant stress relief over 1-hour dwells. This reduces crack propagation rate by a factor of ~2-3 per cycle, as per Paris' law for crack growth.\n\nIMPLEMENTATION BILL — \n- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no thermal cycling.\n- **Your bill**:\n  1. (c) Modify existing temperature controller schedule: add alternating setpoints (280°C and 320°C) with 1-hour dwells at each setpoint, cycling every 4 hours (total cycle time: 8 hours).  \n  2. (a) Use existing temperature sensor for setpoint verification (no new hardware).  \n  3. (c) Implement dwell timer in existing controller logic (parameter change only).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installation: Zero additional burden (uses existing controller and sensor).  \n- Commissioning: Zero additional burden (parameter programming only).  \n- Operation: Zero additional burden (automatic cycling within existing control system).  \n- Maintenance: Zero additional burden (no new parts to maintain).  \n- Operational loss: Zero (cycling occurs during normal operation, no production downtime).  \nConclusion: Same burden class as standard practice (only parameter changes, no hardware).\n\nEXECUTABLE TEST — \n- **Protocol**: Run 100 thermal cycles (8-hour cycles: 1h @ 320°C → 1h @ 280°C, repeated) on test cells. Measure internal resistance hourly and seal integrity via helium leak testing pre/post cycling.  \n- **Instruments**: Existing cell monitoring system (resistance), calibrated helium leak detector.  \n- **Pass/fail**: Pass if internal resistance increase ≤5% over baseline and no leaks detected; fail if resistance increase >5% or leaks occur.  \n- **Duration**: 800 hours (100 cycles).  \n- **Kill criterion**: Immediate halt if resistance spike >10% or leak detected during testing.",
+   "a1_answer_sha256_16": "8dcef297fdead0da",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3283,
+     "latency_s": 8.4,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice bill: Constant temperature control, continuous standby, no purge.",
+       "- Your bill:",
+       "- Installation: Zero new hardware; reconfiguration of existing controller parameters. Same",
+       "- Commissioning: One-time schedule entry into controller (same as standard practice’s para",
+       "- Operation: No added labor; purge runs automatically during standby. No operational loss ",
+       "- Maintenance: No added maintenance; uses existing valve and controller. Same as standard ",
+       "- Cost class: Zero additional cost (uses existing infrastructure). Same burden."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'labor' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)",
+       "added measure 'maintenance' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)"
+      ]
+     },
+     "sha256_16": "4b2631a53ba5aefd"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2646,
+     "latency_s": 7.7,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice bill: Constant temperature control (300°C), continuous standby, no pur",
+       "- Your bill:",
+       "- Commissioning: Reprogramming controller (standard procedure, no development). Timer setu",
+       "- Operation: No additional labor (automated cycling). No operational loss (standby periods",
+       "- Maintenance: Same as standard practice (no new wear points)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial programmable timer module' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)",
+       "added measure 'same as standard practice’s control system).' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)"
+      ]
+     },
+     "sha256_16": "964d4abcdfbcb5f8",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice bill: Constant temperature control (300°C), continuous standby, no pur; - Your bill:; - Co",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial programmable timer module' shares no allowed-list stem (cell redesign excluded; allo"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3869,
+     "latency_s": 11.7,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no",
+       "- **Your bill**:"
+      ]
+     },
+     "sha256_16": "bd8faf1045330a30",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Standard practice bill**: Constant temperature control (300°C), continuous standby, no; - **Your bill**:"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3176,
+     "latency_s": 9.1,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no",
+       "- **Your bill**:",
+       "- Installation: Zero additional burden (uses existing controller and sensor).",
+       "- Commissioning: Zero additional burden (parameter programming only).",
+       "- Operation: Zero additional burden (automatic cycling within existing control system).",
+       "- Maintenance: Zero additional burden (no new parts to maintain).",
+       "- Operational loss: Zero (cycling occurs during normal operation, no production downtime).",
+       "- **Protocol**: Run 100 thermal cycles (8-hour cycles: 1h @ 320°C → 1h @ 280°C, repeated) ",
+       "- **Instruments**: Existing cell monitoring system (resistance), calibrated helium leak de",
+       "- **Pass/fail**: Pass if internal resistance increase ≤5% over baseline and no leaks detec",
+       "- **Duration**: 800 hours (100 cycles).",
+       "- **Kill criterion**: Immediate halt if resistance spike >10% or leak detected during test"
+      ]
+     },
+     "sha256_16": "8dcef297fdead0da",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Standard practice bill**: Constant temperature control (300°C), continuous standby, no; - **Your bill**:; "
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no",
+      "- **Your bill**:",
+      "- Installation: Zero additional burden (uses existing controller and sensor).",
+      "- Commissioning: Zero additional burden (parameter programming only).",
+      "- Operation: Zero additional burden (automatic cycling within existing control system).",
+      "- Maintenance: Zero additional burden (no new parts to maintain).",
+      "- Operational loss: Zero (cycling occurs during normal operation, no production downtime).",
+      "- **Protocol**: Run 100 thermal cycles (8-hour cycles: 1h @ 320°C → 1h @ 280°C, repeated) ",
+      "- **Instruments**: Existing cell monitoring system (resistance), calibrated helium leak de",
+      "- **Pass/fail**: Pass if internal resistance increase ≤5% over baseline and no leaks detec",
+      "- **Duration**: 800 hours (100 cycles).",
+      "- **Kill criterion**: Immediate halt if resistance spike >10% or leak detected during test"
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:02:59Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-04-glass-furnace-crown-drip",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V72",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is to install a thermal shield above the silica crown using standard refractory panels and a mechanical support structure, positioned to intercept infrared radiation and reduce crown temperature. Standard practice relies solely on burner-firing adjustments; this mitigation introduces a physical heat-rejection barrier as a departure from thermal management. The closest existing practice is furnace crown insulation, but this intervention differs by using an actively cooled shield (via furnace exhaust gas) that is removable without crown modification, enabling thermal protection without refractory rebuild. The mechanism reduces crown temperature by reflecting and convecting radiant heat away from the crown surface.\n\nPHYSICS CHECK — The governing relation is Stefan-Boltzmann law for radiative heat transfer: \\( q = \\epsilon \\sigma A T^4 \\), where \\( q \\) is heat flux, \\( \\epsilon \\) is emissivity, \\( \\sigma \\) is the Stefan-Boltzmann constant, \\( A \\) is area, and \\( T \\) is temperature. By intercepting 30–50% of the incident radiation (typical for a shield at 100 mm standoff), the crown’s heat load reduces by 15–25%, lowering its temperature by 40–60°C (verified via empirical data for similar shields in steel reheating furnaces). This moves the crown below the softening threshold (~1500°C for silica).\n\nIMPLEMENTATION BILL — (all rows tagged per procurement rule):\n- (a) Existing crown (no modification)\n- (b) Standard refractory panels (alumina-silica, 50 mm thick, rated for 1600°C) — installed horizontally 100 mm above crown\n- (b) Standard support brackets (Inconel, 304 grade) — bolted to furnace sidewalls (existing mounting points)\n- (c) Operating parameter: Shield cooling via existing exhaust gas (no new hardware; duct rerouted to shield plenum)\n- (c) Procedure: Install shield during routine maintenance (4-hour window, same as standard refractory inspection)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Compared to standard burner retuning:\n- Installation: Same labor (4 hours, same crew as standard refractory work)\n- Commissioning: Zero (uses existing gas flow; no calibration)\n- Operation: Zero added energy (exhaust gas is waste heat)\n- Maintenance: Same as standard (inspected during routine crown checks)\n- Operational loss: Zero (shield installed during non-production hours)\nConclusion: Same burden class (labor, cost, downtime) as standard practice.\n\nEXECUTABLE TEST — Protocol: Monitor crown temperature via existing IR pyrometer during shield operation (no new sensors). Pass/Fail: Crown temperature must stabilize ≤1500°C (measured at crown center) for 72 continuous hours; fail if >1500°C persists. Duration: 7 days (covers thermal transients). Kill criterion: Temperature exceeds 1500°C for >1 hour. Falsification: If crown temperature remains >1500°C with the shield, the intervention fails.",
+   "a1_answer_sha256_16": "16ea9dd438d9fc0c",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3023,
+     "latency_s": 8.8,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Retune burners for steady 1560°C crown temperature (existing procedure).",
+       "- Monitor crown thermocouples (existing instrument).",
+       "- Burner retuning: same as standard practice (no new hardware).",
+       "- Batch adjustment: same material class (cullet is standard batch component).",
+       "- No additional monitoring or instrumentation (uses existing thermocouples).",
+       "- Operational loss: Zero (cycling occurs during production; no throughput impact)."
+      ]
+     },
+     "sha256_16": "cc69153b20c1b3dc"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2930,
+     "latency_s": 9.3,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Operation: No additional labor (cooling phase is automated).",
+       "- Maintenance: Timer is a standard catalog item; same class as existing control components",
+       "- Operational loss: Cooling phase reduces crown temperature by 50°C for 15 min/cycle; outp",
+       "- Protocol: Run furnace with intervention for 30 days; measure stone/cord defects daily.",
+       "- Instruments: Existing thermocouples (crown temp), production QC (defect count).",
+       "- Pass/Fail: Defect rate must drop by >50% vs. baseline (steady-state operation).",
+       "- Duration: 30 days (covers 120 cooling cycles).",
+       "- Kill Criterion: If defect rate increases by >10%, falsify intervention."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'no standard part' shares no allowed-list stem (no cold rebuild this campaign; allowed measures: crown temperature profile and b...)"
+      ]
+     },
+     "sha256_16": "73cac13980e1eca2",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Operation: No additional labor (cooling phase is automated).; - Maintenance: Timer is a standard catalog ite",
+      "ALLOWED_ROW_OUTSIDE: added measure 'no standard part' shares no allowed-list stem (no cold rebuild this campaign; allowed measures:"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2754,
+     "latency_s": 9.7,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Protocol**: Monitor crown temperature via existing IR pyrometer during shield operatio",
+       "- **Pass/Fail**: Crown temp must stay ≤1500°C (baseline: 1560°C) for 7 continuous days.",
+       "- **Kill Criterion**: If temp exceeds 1520°C for >1 hr, test fails.",
+       "- **Duration**: 7 days (covers 2 shield duty cycles).",
+       "- No modification to crown (DEPLOYED-PART CLAUSE satisfied).",
+       "- Novelty in arrangement (suspended shield + cooling duty), not custom parts.",
+       "- Operational loss: Zero (cooling during non-production windows)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'standard refractory/valve' shares no allowed-list stem (no cold rebuild this campaign; allowed measures: crown temperature profile and b...)"
+      ]
+     },
+     "sha256_16": "262f4e10ce477b75",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Protocol**: Monitor crown temperature via existing IR pyrometer during shield operatio; - **Pass/Fail**: C",
+      "ALLOWED_ROW_OUTSIDE: added measure 'standard refractory/valve' shares no allowed-list stem (no cold rebuild this campaign; allowed "
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2887,
+     "latency_s": 9.2,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Same labor (4 hours, same crew as standard refractory work)",
+       "- Commissioning: Zero (uses existing gas flow; no calibration)",
+       "- Operation: Zero added energy (exhaust gas is waste heat)",
+       "- Maintenance: Same as standard (inspected during routine crown checks)",
+       "- Operational loss: Zero (shield installed during non-production hours)"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard refractory panels' shares no allowed-list stem (no cold rebuild this campaign; allowed measures: crown temperature profile and b...)",
+       "added measure 'Standard support brackets' shares no allowed-list stem (no cold rebuild this campaign; allowed measures: crown temperature profile and b...)"
+      ]
+     },
+     "sha256_16": "16ea9dd438d9fc0c",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Same labor (4 hours, same crew as standard refractory work); - Commissioning: Zero (uses exist",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard refractory panels' shares no allowed-list stem (no cold rebuild this campaign; allowed"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installation: Same labor (4 hours, same crew as standard refractory work)",
+      "- Commissioning: Zero (uses existing gas flow; no calibration)",
+      "- Operation: Zero added energy (exhaust gas is waste heat)",
+      "- Maintenance: Same as standard (inspected during routine crown checks)",
+      "- Operational loss: Zero (shield installed during non-production hours)"
+     ],
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'Standard refractory panels' shares no allowed-list stem (no cold rebuild this campaign; allowed measures: crown temperature profile and b...)",
+      "added measure 'Standard support brackets' shares no allowed-list stem (no cold rebuild this campaign; allowed measures: crown temperature profile and b...)"
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:03:49Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-05-blade-root-bolt-fatigue",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V72",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a novel washer arrangement under each bolt head during installation to distribute clamp load more evenly and reduce stress concentration at the bolt head/shaft junction, preventing fatigue crack initiation. Standard practice applies torque to tighten bolts directly against the blade root surface; this mitigation departs by introducing a compliant washer layer that redistributes local contact stresses and accommodates minor misalignment. Adjacent-technique clearance: The closest existing practice is the use of standard washers for load distribution, but this is not a departure; our novelty is the specific washer selection (elastomeric, not metal) and its use in a fatigue-critical application to absorb cyclic strains. The mechanism attacks the failure’s driving physics by reducing peak stress at the bolt root via elastic deformation under load, which directly counters the stress concentration that initiates fatigue cracks.\n\nPHYSICS CHECK — The governing relation is the stress concentration factor Kt at the bolt head/shank junction. A washer with elastic modulus E and thickness t reduces Kt by increasing the effective bearing area and allowing localized deformation. For a typical T-bolt, adding a 3 mm EPDM washer (E ≈ 50 MPa) reduces Kt by an estimated 20–30%, lowering the alternating stress Δσ by 15–25%, which extends fatigue life by a factor of 2–4 (per S-N curve slope). This directly mitigates the cyclic stress amplitude driving fatigue failure.\n\nIMPLEMENTATION BILL —\n- Installation: Install a commercial EPDM washer, 60 Shore A, 3 mm thickness, under each bolt head prior to torquing (b). Standard practice requires 2 technicians × 4 hours/turbine; this adds no new hardware or time.\n- Commissioning: None (a). Commissioning remains unchanged from standard practice.\n- Operation: Same as standard practice (a). No new monitoring or instrumentation is added.\n- Maintenance: Same as standard practice (a). Retensioning intervals and procedures are unchanged.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —\n- Installation: Standard practice uses 2 technicians × 4 hours. This intervention adds no new hardware or labor (EPDM washers are low-cost, installed during standard torquing). Burden is same as standard practice.\n- Commissioning: No change (a).\n- Operation: No change (a).\n- Maintenance: No change (a). Operational loss is zero (no impact on turbine output or availability).\n- Cost class: EPDM washers are standard catalog items, same cost class as standard hardware. Total burden is same as standard practice.\n\nEXECUTABLE TEST — Protocol: Install EPDM washers on a test turbine and a control turbine (no washers). Instrument both with strain gauges on 5 bolts per turbine to monitor cyclic strain amplitude. Run for 6 months or 10^7 load cycles, whichever comes first. Pass/fail threshold: If the intervention turbine shows ≥20% lower peak alternating strain (Δε) compared to control, it passes. Kill criterion: If any bolt fracture occurs in either turbine during the test, the intervention fails (it must prevent fracture, not just reduce strain).",
+   "a1_answer_sha256_16": "2e3bcfd7e347a1f7",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3415,
+     "latency_s": 9.1,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard wind-speed input signal' shares no allowed-list stem (no blade or hub redesign; allowed measures: torque/preload retensioning interval...)"
+      ]
+     },
+     "sha256_16": "0486608bf032e060"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 4634,
+     "latency_s": 11.4,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Instrument 10 root bolts with strain gauges (existing practice).",
+       "2. Deploy intervention on 5 turbines; keep 5 as controls.",
+       "3. Run for 12 months, recording bolt preload and stress cycles.",
+       "- **Mechanism:** Duty-cycling pitch control uses existing hardware (no development).",
+       "- **Constraint Adherence:** Only pitch-control parameters changed; no blade/hub redesign.",
+       "- **Operational Loss:** Zero (uses low-wind windows).",
+       "- **Allowed Measures:** Torque/preload retensioning (via pitch-induced load) and pitch-con",
+       "- **Exclusions:** No blade/hub redesign; no added hardware.",
+       "- **Performance Bounds:** Pitch ±2° is within standard actuator range (no derate).",
+       "- **Generic Classes:** Pitch actuator (standard), wind-speed input (existing).",
+       "- **Novelty:** Duty-cycle arrangement (not new parts).",
+       "- **No Apparatus:** No added sensors (uses existing).",
+       "- **Full Specification:** Pitch ±2° at 0.1 Hz, 2-hour/72-hour schedule.",
+       "- **Forbidden Classes:** No custom machining/processes; uses stock actuator settings.",
+       "- **Premise Validity:** Pitch system bidirectional; no second path needed (reversal via ac",
+       "- **Forbidden Classes:** No surface treatments/added steps; uses standard control paramete",
+       "- **Operational Loss:** Zero (low-wind windows)."
+      ]
+     },
+     "sha256_16": "86fbe725ebff55e4",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. Instrument 10 root bolts with strain gauges (existing practice).; 2. Deploy intervention on 5 turbines; kee"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3207,
+     "latency_s": 7.8,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice requires 2 technicians × 4 hours/turbine. This intervent",
+       "- Commissioning: None (operates at existing torque wrench calibration).",
+       "- Operation: Same as standard practice (no new monitoring).",
+       "- Maintenance: Reduced frequency (12 vs 6 months) offsets washer cost ($0.50/bolt).",
+       "- Operational loss: Zero (retensioning performed during scheduled downtime)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'washer under each bolt head prior to torquing' shares no allowed-list stem (no blade or hub redesign; allowed measures: torque/preload retensioning interval...)",
+       "added measure 'minutes/bolt' shares no allowed-list stem (no blade or hub redesign; allowed measures: torque/preload retensioning interval...)"
+      ],
+      "APPARATUS_ROW": [
+       "- Operation: Same as standard practice (no new monitoring)."
+      ]
+     },
+     "sha256_16": "9efa3b32c63b8524",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Standard practice requires 2 technicians × 4 hours/turbine. This intervent; - Commissioning: N",
+      "ALLOWED_ROW_OUTSIDE: added measure 'washer under each bolt head prior to torquing' shares no allowed-list stem (no blade or hub red",
+      "APPARATUS_ROW: - Operation: Same as standard practice (no new monitoring)."
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3133,
+     "latency_s": 8.0,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice uses 2 technicians × 4 hours. This intervention adds no ",
+       "- Cost class: EPDM washers are standard catalog items, same cost class as standard hardwar"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'commercial EPDM washer' shares no allowed-list stem (no blade or hub redesign; allowed measures: torque/preload retensioning interval...)"
+      ],
+      "APPARATUS_ROW": [
+       "- Operation: Same as standard practice (a). No new monitoring or instrumentation is added."
+      ]
+     },
+     "sha256_16": "2e3bcfd7e347a1f7",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Standard practice uses 2 technicians × 4 hours. This intervention adds no ; - Cost class: EPDM",
+      "ALLOWED_ROW_OUTSIDE: added measure 'commercial EPDM washer' shares no allowed-list stem (no blade or hub redesign; allowed measures",
+      "APPARATUS_ROW: - Operation: Same as standard practice (a). No new monitoring or instrumentation is added."
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installation: Standard practice uses 2 technicians × 4 hours. This intervention adds no ",
+      "- Cost class: EPDM washers are standard catalog items, same cost class as standard hardwar"
+     ],
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'commercial EPDM washer' shares no allowed-list stem (no blade or hub redesign; allowed measures: torque/preload retensioning interval...)"
+     ],
+     "APPARATUS_ROW": [
+      "- Operation: Same as standard practice (a). No new monitoring or instrumentation is added."
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:04:39Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-06-ro-silica-scaling",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V72",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a staged antiscalant dose strategy that increases dose progressively during the CIP interval to target silica polymerization hotspots. Standard practice uses a fixed antiscalant dose, which provides uniform but suboptimal protection. The adjacent technique is constant-dose antiscalant injection; the departure is the time-variable dose profile that matches the expected silica polymerization kinetics. The mechanism attacks the failure by delivering higher doses when silica solubility is lowest (post-CIP recovery phase), directly suppressing the polymerization nucleation that drives scaling.\n\nPHYSICS CHECK — The governing relation is silica scaling rate ∝ [SiO₂]² · (dose)⁻¹. A progressive dose increase from 3 ppm to 8 ppm over 6 hours reduces the scaling potential by ~70% at the critical post-CIP phase. This is verified by the Arrhenius scaling rate equation: scaling rate = k · exp(-Ea/RT) · [SiO₂]² / [antiscalant], where increasing [antiscalant] nonlinearly suppresses k.\n\nIMPLEMENTATION BILL — (Compared to standard fixed-dose pump installation):\n- (a) Existing antiscalant storage tank (unchanged)\n- (b) Standard programmable chemical dosing pump (e.g., 0-10 L/h range) installed on the antiscalant injection line\n- (c) Dosing schedule programmed as: 3 ppm (0-2h post-CIP), 5 ppm (2-4h), 8 ppm (4-6h), then return to baseline 3 ppm\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice: 1 fixed-dose pump row. This intervention: replaces fixed pump with programmable pump (same cost class, same installation burden), adds no new sensors or monitoring, and the schedule change is a parameter adjustment. Operational loss: zero (dosing occurs during normal operation). Burden class: same as standard practice.\n\nEXECUTABLE TEST — Protocol: Install dosing pump with progressive schedule; monitor normalized silica flux (L/m²/h) and differential pressure (psi) across tail elements weekly for 3 months. Instruments: Existing RO performance monitors. Pass/fail: Flux reduction <5% and ΔP increase <10% vs. baseline fixed-dose operation. Kill criterion: flux reduction >15% or ΔP increase >20%. Duration: 12 weeks to capture seasonal variability.",
+   "a1_answer_sha256_16": "3e93fea4386b342a",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4086,
+     "latency_s": 9.9,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Install intervention on a single RO train; monitor silica scaling in tail elements via ",
+       "2. Measure baseline: Run standard practice (constant dose) for 1 CIP cycle; record DP rise",
+       "3. Run intervention: Activate staged dosing schedule for 2 CIP cycles; record DP and flux.",
+       "4. Measure feed silica concentration continuously to trigger dose increases.",
+       "- Pass: DP rise during CIP cycle ≤ 50% of baseline; normalized flux decline ≤ 30% of basel",
+       "- Fail: DP rise > 50% of baseline OR flux decline > 30% of baseline in either intervention"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'intervention on a single RO train' shares no allowed-list stem (no membrane replacement or new train; allowed measures: recovery/flux setpoint r...)"
+      ],
+      "APPARATUS_ROW": [
+       "1. Install intervention on a single RO train; monitor silica scaling in tail elements via differential pressur"
+      ]
+     },
+     "sha256_16": "2b8d454e44ea149b"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2803,
+     "latency_s": 7.2,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Install staged dosing system on a single RO train.",
+       "2. Run at 80% recovery with baseline antiscalant dose for 30 days (baseline).",
+       "3. Switch to staged dosing (70% inlet, 30% tail) for 30 days (intervention).",
+       "3. Measure differential pressure (ΔP) across the last two pressure vessels weekly."
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj",
+       "model/brand-marker: DN25 | 2. **(b) Standard flow meter, DN25, ±2% accuracy** installed on the antiscalant "
+      ]
+     },
+     "sha256_16": "e4dc18388bd97143",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. Install staged dosing system on a single RO train.; 2. Run at 80% recovery with baseline antiscalant dose f",
+      "NAMED_VARIANT: model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj; m"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3204,
+     "latency_s": 7.6,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice installs a fixed-dose pump (1 row). This intervention re",
+       "- Commissioning: Standard practice calibrates dose rate (1 row). This intervention sets a ",
+       "- Operation: Standard practice runs continuous dosing. This intervention runs a timer (no ",
+       "- Maintenance: Standard practice replaces antiscalant pump. This intervention replaces val",
+       "- **Operational loss**: Zero (dosing occurs during normal operation; no production curtail"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj"
+      ]
+     },
+     "sha256_16": "fdb27cb3ec2cbe07",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Standard practice installs a fixed-dose pump (1 row). This intervention re; - Commissioning: S",
+      "NAMED_VARIANT: model/brand-marker: DN25 | 1. **(b) Standard 3-way ball valve, DN25 PN16** installed on the antiscalant inj"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2216,
+     "latency_s": 5.5,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard programmable chemical dosing pump' shares no allowed-list stem (no membrane replacement or new train; allowed measures: recovery/flux setpoint r...)"
+      ]
+     },
+     "sha256_16": "3e93fea4386b342a",
+     "findings_disclosed": [
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard programmable chemical dosing pump' shares no allowed-list stem (no membrane replacemen"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'Standard programmable chemical dosing pump' shares no allowed-list stem (no membrane replacement or new train; allowed measures: recovery/flux setpoint r...)"
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:05:22Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-07-escalator-step-chain",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT  \nUSER CONSTRAINT: Standard practice delivers a monitoring/indication scheme using periodic manual chain elongation measurement.  \nASSUMPTION: Novelty departure: Use drive-motor current harmonics and step-position encoder periodicity drift as a continuous, physics-based elongation proxy without physical intervention.  \nASSUMPTION: Connection: Chain elongation increases mechanical slack, altering torque harmonics and causing step-position encoder jitter due to inconsistent step engagement.  \n\nPHYSICS CHECK  \nCALCULATED: Governing relation: Torque harmonics (T_h) ∝ chain slack ∝ elongation. Motor current (I) contains harmonics at frequencies f_h = n*f_fund (n=2,3,...). Elongation increases 2nd harmonic amplitude by 0.5–2% per 0.1% elongation (based on metro-escalator drive-train stiffness data).  \nCALCULATED: Verification: For 20-ton chain load, 0.1% elongation (~0.3 mm) increases 2nd harmonic by 0.7% (within measurable range of existing current sensors).  \n\nIMPLEMENTATION BILL  \n(a) Data-acquisition module (uses existing controller telemetry feed)  \n(b) Harmonic-analysis software (real-time FFT of drive-motor current)  \n(c) Step-position encoder periodicity analyzer (existing encoder data stream)  \n(d) Threshold calculator (derives elongation threshold from physics)  \n(e) Alert scheduler (21-day warning window)  \n\nALREADY-RECORDED: Drive-motor current (controller telemetry feed)  \nALREADY-RECORDED: Step-position encoder pulses (controller telemetry feed)  \nCALCULATED: Harmonic threshold: 2nd harmonic > 1.5% of fundamental (derived from 0.2% elongation failure threshold and 0.7%/0.1% physics relation)  \nCALCULATED: Periodicity drift threshold: >0.05% step-period variation (derived from chain-pitch geometry and encoder resolution)  \nCALCULATED: False-alarm rate: 1/50 escalators/year (Poisson distribution, λ=0.02/year)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \nInstallability: SAME (uses existing data feeds, no new hardware)  \nOperability: SAME (no additional operator actions; automated alerts)  \nMaintenance: SAME (software-only updates; no physical maintenance)  \nCost class: SAME (no new hardware; marginal software cost)  \nOperational loss: ZERO (no downtime for monitoring)  \n\nEXECUTABLE TEST  \nProtocol: Record drive-motor current and step-position encoder data for 6 months on 10 escalators. Inject artificial elongation via temporary chain slack (simulating 0.1–0.3% elongation) in 3 escalators.  \nInstruments: Existing controller telemetry; oscilloscope for validation.  \nPass/fail: Trigger alert within 21 days of 0.2% elongation; no false alerts on 7 healthy escalators.  \nDuration: 6 months (covers 21-day window + safety margin).  \nKill criterion: >1 false alert or missed elongation event.  \nValidation: Against historical elongation data (stated \"existing records\").  \n\nCONSTRAINT BIND  \nUSER CONSTRAINT: Primary indicator is drive-motor current harmonics (per problem's \"drive-motor current\" constraint). Step-position encoder periodicity supplements but does not replace it.",
+   "a1_answer_sha256_16": "4bf33ed7c4f5b3f4",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3040,
+     "latency_s": 8.0,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Instruments**:",
+       "- Existing drive-motor current sensor (ALREADY-RECORDED: \"controller's drive-motor current",
+       "- Existing step-position encoder (ALREADY-RECORDED: \"controller's step-position encoder pu",
+       "- **Procedure**:",
+       "1. Compute 6th harmonic amplitude (A₆) and phase (φ₆) of motor current FFT.",
+       "2. Measure phase difference (Δφ) between current harmonics and encoder pulses.",
+       "- **Thresholds**:",
+       "- A₆ > 1.15×baseline (CALCULATED: baseline from new-install current specs, elongation star",
+       "- Δφ > 0.5° (CALCULATED: 0.5° lag = 10 mm elongation from torsional stiffness).",
+       "- **Failure prediction**: Trigger warning if A₆ > 1.15×baseline AND Δφ > 0.5° for 5 consec",
+       "- **Installability**: Same as standard (no new hardware; uses existing telemetry).",
+       "- **Operability**: Same (no operator intervention; automated alerts).",
+       "- **Maintenance**: Same (no calibration; thresholds derived from physics).",
+       "- **Cost**: Same class (software-only update vs. standard's manual measurement labor).",
+       "- **Burden class**: Identical to standard, but eliminates manual inspections.",
+       "- **Protocol**:",
+       "1. Collect 6 months of historical motor current and encoder data (ALREADY-RECORDED) from 1",
+       "2. Simulate elongation by adding phase lag to encoder pulses in software (validated agains",
+       "3. Apply predictor to data; record false alarms and detection time.",
+       "- **Pass/fail**:",
+       "- Detect elongation ≥21 days before trip (threshold from constraint).",
+       "- ≤0.2 false alarms/year/escalator (1/50 escalators/year).",
+       "- **Duration**: 1 week (simulated data).",
+       "- **Kill criterion**: If false alarms > 0.2/year or detection time < 21 days, mechanism fa",
+       "- Primary indicator: Chain elongation (directly causes failure per problem statement).",
+       "- Secondary supplement: Motor current harmonics (supports elongation inference but does no"
+      ]
+     },
+     "sha256_16": "a55902f293c59c57"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2863,
+     "latency_s": 9.9,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "4. **Threshold calculator** (d) — DERIVED from stated specs: baseline ripple (healthy chai",
+       "5. **Warning logic** (e) — Triggers alert if ripple exceeds threshold for >5 consecutive t",
+       "- **Installability**: SAME — uses existing controller ports, no hardware mods.",
+       "- **Operability**: SAME — real-time processing, no operator intervention.",
+       "- **Maintenance**: SAME — no new parts; algorithm updates during routine downtime.",
+       "- **Cost class**: SAME — uses existing sensors; marginal compute load.",
+       "- **Operational loss**: ZERO — no downtime; warnings during operation."
+      ]
+     },
+     "sha256_16": "81f14e39c3d8bd04",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 4. **Threshold calculator** (d) — DERIVED from stated specs: baseline ripple (healthy chai; 5. **Warning logic"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2875,
+     "latency_s": 8.9,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: SAME (uses existing data feeds, no new hardware).",
+       "- Operability: SAME (no additional operator training; integrates with existing controller)",
+       "- Maintenance: SAME (no moving parts; software-only update).",
+       "- Cost class: SAME (no new sensors or parts; only software modification).",
+       "- Operational loss: ZERO (no downtime for installation)."
+      ]
+     },
+     "sha256_16": "022ae95a0da4ce1b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: SAME (uses existing data feeds, no new hardware).; - Operability: SAME (no additional operat"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3043,
+     "latency_s": 8.8,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "sha256_16": "4bf33ed7c4f5b3f4",
+     "findings_disclosed": []
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "residual_findings": {}
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:06:11Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-08-chiller-refrigerant-charge",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT  \nUSER CONSTRAINT: Standard practice delivers a MONITORING/INDICATION scheme using suction pressure as a direct proxy for refrigerant charge.  \nCALCULATED: Novel departure: infer charge loss from the *thermodynamic coupling efficiency* between compressor current (power input) and enthalpy lift (discharge temperature minus suction temperature), which degrades as charge drops due to increased superheat and reduced mass flow.  \nUSER CONSTRAINT: This works because refrigerant charge loss reduces mass flow, lowering the compressor's ability to convert electrical energy into refrigerant enthalpy lift, creating a detectable efficiency signature before pressure thresholds are breached.  \n\nPHYSICS CHECK  \nGOVERNING RELATION: Thermodynamic efficiency η = (h₂ - h₁) / (W_compressor / η_motor), where h₁, h₂ are suction/discharge enthalpy (from T/P), W_compressor is motor current (converted to power via nameplate voltage/efficiency).  \nCALCULATED: Magnitude verification: At full charge, η ≈ 0.65–0.75 for screw chillers. A 10% charge loss may reduce η by 3–5% due to increased superheat and reduced volumetric efficiency, detectable above sensor noise (±0.5% in T/P, ±2% in current).  \n\nIMPLEMENTATION BILL  \n1. **Suction pressure sensor** (ALREADY-RECORDED: \"controller's existing suction pressure\")  \n2. **Discharge pressure sensor** (ALREADY-RECORDED: \"controller's existing discharge pressure\")  \n3. **Suction temperature sensor** (ALREADY-RECORDDED: \"controller's existing suction temperature\")  \n4. **Discharge temperature sensor** (ALREADY-RECORDED: \"controller's existing discharge temperature\")  \n5. **Compressor current sensor** (ALREADY-RECORDED: \"controller's existing compressor current\")  \n6. **Chiller controller software** (NEW: compute real-time thermodynamic efficiency η from above inputs)  \n   - DERIVED: h₁, h₂ from suction/discharge T/P using R134a property tables (stated physics: REFPROP or equivalent embedded in controller).  \n   - DERIVED: W_compressor from current and nameplate voltage/stated motor efficiency (CALCULATED: W = V × I × PF × η_motor, PF=0.85 assumed per industry standard).  \n   - DERIVED: η = (h₂ - h₁) / (W_compressor / η_motor) (CALCULATED: η_motor from nameplate spec).  \n7. **Efficiency trend monitor** (NEW: track η over 7-day rolling window)  \n   - DERIVED: Threshold Δη = -3% from baseline (baseline = η at commissioning, CALCULATED: from stated \"as-left\" chiller performance data at startup).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- INSTALLABILITY: SAME (uses existing sensors; software update only).  \n- OPERABILITY: SAME (no new training; displays η alongside existing metrics).  \n- MAINTENANCE: SAME (no additional calibration; sensors already maintained).  \n- COST CLASS: SAME (software-only change; no hardware cost).  \n- OPERATIONAL LOSS: ZERO (no downtime; early warning prevents trip).  \n\nEXECUTABLE TEST  \nPROTOCOL: Log η daily for 30 days on 100 identical chillers under varying loads (25–100%). Use historical data from 5 chillers with confirmed charge loss to validate.  \nINSTRUMENTS: Existing controller logs (T/P/current).  \nPASS/FAIL: Must trigger warning at 14 days before low-pressure trip in all charge-loss cases; ≤1 false alarm/100 chillers/year (η drop due to transients <3%).  \nKILL CRITERION: >2 false alarms or missed warnings in test set.  \nVALIDATION: Against \"as-left\" performance data (stated spec) and historical charge-loss logs (stated telemetry).  \n\nCONSTRAINT BIND  \nUSER CONSTRAINT: Primary indicator is suction pressure (per failure definition). This predictor *supplements* it by using efficiency degradation as a leading indicator, while pressure remains the primary trip trigger.",
+   "a1_answer_sha256_16": "0b90b1fd3497849f",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3742,
+     "latency_s": 9.8,
+     "transport_tries": 1,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams** (all ALREADY-RECORDED per USER CONSTRAINT):",
+       "- Suction pressure (stated sensor: \"controller's existing suction pressure\")",
+       "- Discharge temperature (stated sensor: \"controller's existing discharge temperature\")",
+       "- Compressor current (stated sensor: \"controller's existing compressor current\")",
+       "- **Reference/threshold** (DERIVED from stated physics):",
+       "- Baseline efficiency η_baseline = (h2s_baseline - h1_baseline)/(h2_baseline - h1_baseline",
+       "- Threshold: η_current < 0.85 * η_baseline (15% decay), derived from physics (USER CONSTRA",
+       "- **Procedure**:",
+       "1. Continuously compute η_current using real-time suction/discharge temps/pressures and co",
+       "2. Trigger warning when η_current < 0.85 * η_baseline.",
+       "- **Installability**: SAME (uses existing sensors; no new hardware).",
+       "- **Operability**: SAME (controller can compute efficiency with existing logic).",
+       "- **Maintenance**: SAME (no new calibration; relies on existing sensor maintenance).",
+       "- **Cost class**: SAME (no new instruments; only software modification).",
+       "- **Why worth it**: Earlier warning (14 days vs. standard superheat thresholds) due to sen"
+      ]
+     },
+     "sha256_16": "88d667ac03dc9c2b"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3135,
+     "latency_s": 9.6,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Derivation: \\( I_0 \\) (baseline current) from nameplate full-load amps at design conditi",
+       "- Installability: SAME (uses existing controller I/O, no new wiring).",
+       "- Operability: SAME (no operator action; auto-alarms per existing HMI).",
+       "- Maintenance: SAME (no new calibration; thresholds fixed per physics).",
+       "- Cost class: SAME (software-only change; no hardware).",
+       "- Operational loss: ZERO (no downtime or efficiency penalty).",
+       "- Protocol: Log \\( P_{suc} \\), \\( P_{dis} \\), \\( T_{suc} \\), \\( T_{dis} \\), \\( I \\) at 10-",
+       "- Pass/fail: Trigger within 14 days of injection with <1 false alarm/100 chillers/year (va",
+       "- Duration: 30 days (covers 2x warning window).",
+       "- Kill criterion: False trigger in baseline (no-loss) data or failure to trigger within 16",
+       "- Primary indicator: Compressor current rise (per USER CONSTRAINT, as low-pressure trip is"
+      ]
+     },
+     "sha256_16": "73e12843ddbc8493",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Derivation: \\( I_0 \\) (baseline current) from nameplate full-load amps at design conditi; - Installability: "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3151,
+     "latency_s": 9.8,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **Suction pressure sensor** (ALREADY-RECORDED: \"controller's existing suction pressure\"",
+       "2. **Discharge pressure sensor** (ALREADY-RECORDED: \"controller's existing discharge press",
+       "3. **Compressor current sensor** (ALREADY-RECORDED: \"controller's existing compressor curr",
+       "4. **Chiller load signal** (ALREADY-RECORDED: \"controller's existing chilled water tempera",
+       "5. **Power calculation module** (CALCULATED: \\( W = \\sqrt{3} \\cdot V \\cdot I \\cdot PF \\), ",
+       "6. **Specific power threshold calculator** (CALCULATED: Baseline \\( SP_0 = W_0 / Q_{\\text{",
+       "7. **Alarm logic** (CALCULATED: Trigger when \\( SP > SP_0 + 0.15 \\cdot SP_0 \\) for >168 ho",
+       "- **Installability**: SAME (uses existing sensors, no hardware changes).",
+       "- **Operability**: SAME (no training; integrated into existing controller logic).",
+       "- **Maintenance**: SAME (no new components to maintain).",
+       "- **Cost class**: SAME (only software logic update; no hardware procurement)."
+      ]
+     },
+     "sha256_16": "5f5a057bd1d8af4f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **Suction pressure sensor** (ALREADY-RECORDED: \"controller's existing suction pressure\"; 2. **Discharge pre"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3697,
+     "latency_s": 9.8,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **Suction pressure sensor** (ALREADY-RECORDED: \"controller's existing suction pressure\"",
+       "2. **Discharge pressure sensor** (ALREADY-RECORDED: \"controller's existing discharge press",
+       "3. **Suction temperature sensor** (ALREADY-RECORDDED: \"controller's existing suction tempe",
+       "4. **Discharge temperature sensor** (ALREADY-RECORDED: \"controller's existing discharge te",
+       "5. **Compressor current sensor** (ALREADY-RECORDED: \"controller's existing compressor curr",
+       "6. **Chiller controller software** (NEW: compute real-time thermodynamic efficiency η from",
+       "- DERIVED: h₁, h₂ from suction/discharge T/P using R134a property tables (stated physics: ",
+       "- DERIVED: W_compressor from current and nameplate voltage/stated motor efficiency (CALCUL",
+       "- DERIVED: η = (h₂ - h₁) / (W_compressor / η_motor) (CALCULATED: η_motor from nameplate sp",
+       "7. **Efficiency trend monitor** (NEW: track η over 7-day rolling window)",
+       "- DERIVED: Threshold Δη = -3% from baseline (baseline = η at commissioning, CALCULATED: fr",
+       "- INSTALLABILITY: SAME (uses existing sensors; software update only).",
+       "- OPERABILITY: SAME (no new training; displays η alongside existing metrics).",
+       "- MAINTENANCE: SAME (no additional calibration; sensors already maintained).",
+       "- COST CLASS: SAME (software-only change; no hardware cost).",
+       "- OPERATIONAL LOSS: ZERO (no downtime; early warning prevents trip)."
+      ]
+     },
+     "sha256_16": "0b90b1fd3497849f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **Suction pressure sensor** (ALREADY-RECORDED: \"controller's existing suction pressure\"; 2. **Discharge pre"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "1. **Suction pressure sensor** (ALREADY-RECORDED: \"controller's existing suction pressure\"",
+      "2. **Discharge pressure sensor** (ALREADY-RECORDED: \"controller's existing discharge press",
+      "3. **Suction temperature sensor** (ALREADY-RECORDDED: \"controller's existing suction tempe",
+      "4. **Discharge temperature sensor** (ALREADY-RECORDED: \"controller's existing discharge te",
+      "5. **Compressor current sensor** (ALREADY-RECORDED: \"controller's existing compressor curr",
+      "6. **Chiller controller software** (NEW: compute real-time thermodynamic efficiency η from",
+      "- DERIVED: h₁, h₂ from suction/discharge T/P using R134a property tables (stated physics: ",
+      "- DERIVED: W_compressor from current and nameplate voltage/stated motor efficiency (CALCUL",
+      "- DERIVED: η = (h₂ - h₁) / (W_compressor / η_motor) (CALCULATED: η_motor from nameplate sp",
+      "7. **Efficiency trend monitor** (NEW: track η over 7-day rolling window)",
+      "- DERIVED: Threshold Δη = -3% from baseline (baseline = η at commissioning, CALCULATED: fr",
+      "- INSTALLABILITY: SAME (uses existing sensors; software update only).",
+      "- OPERABILITY: SAME (no new training; displays η alongside existing metrics).",
+      "- MAINTENANCE: SAME (no additional calibration; sensors already maintained).",
+      "- COST CLASS: SAME (software-only change; no hardware cost).",
+      "- OPERATIONAL LOSS: ZERO (no downtime; early warning prevents trip)."
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:07:03Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-09-ballscrew-preload-loss",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using motor current deviation from baseline as a leading indicator. My same-class mechanism departure is using the dynamic coupling between motor current and position error during axis reversal, quantified as the integral of current-position error hysteresis area. This works because preload loss reduces the ballscrew's torsional stiffness, increasing the elastic wind-up and wind-down during direction changes, which manifests as a growing hysteresis loop in current-position error space.\n\nPHYSICS CHECK — The governing physical relation is the torsional spring constant of the ballscrew assembly: k_t = (π * G * d^4) / (32 * L), where G is the shear modulus (80 GPa for steel), d is the screw root diameter (CALCULATED from stated spec: 40 mm nominal), and L is the axis travel (CALCULATED from stated spec: 1000 mm). For a preload loss of 20%, k_t decreases by ~15%, increasing the angular wind-up θ = T / k_t by 18% for the same torque T. This increases the position error hysteresis area by ~15%, which is detectable within 30 days of failure progression.\n\nIMPLEMENTATION BILL — \n(a) CNC controller PLC logic module (uses existing PLC CPU, no hardware changes) \n(b) Real-time position error calculation (ALREADY-RECORDED: linear scale position feedback minus commanded position) \n(c) Real-time motor current measurement (ALREADY-RECORDED: axis motor current telemetry) \n(d) Hysteresis area calculation algorithm (integral of |current × position error| during axis reversals) \n(e) Trend analysis module (moving average of daily hysteresis area maxima) \n(f) Threshold comparator (DERIVED from physics: 15% increase from initial healthy baseline, where baseline is CALCULATED from first 7 days of operation data)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installability: SAME (uses existing PLC logic, no hardware changes) \n- Operability: SAME (real-time processing, no operator intervention required) \n- Maintenance: SAME (no new sensors, software-based) \n- Cost class: SAME (PLC logic update only, comparable to standard practice's current monitoring) \n- Operational loss: ZERO (no downtime for implementation, performed during scheduled maintenance)\n\nEXECUTABLE TEST — \nProtocol: Monitor 200 identical CNC axes for 6 months, recording hysteresis area daily. \nInstruments: Existing CNC controller logs (position feedback and motor current). \nPass threshold: <1 false alarm per 200 axes per year (hysteresis increase <15% in healthy axes). \nFail criterion: >3 false alarms or failure to detect preload loss in any axis. \nDuration: 6 months (covers 30-day warning window requirement). \nValidation: Against ALREADY-RECORDED data from prior maintenance logs showing preload loss correlation with positioning error. \n\nCONSTRAINT BIND — The primary indicator is position error (as defined in the problem), which directly causes scrapped parts. The hysteresis area supplements this by detecting the preload-induced elastic deformation that precedes position error exceedance. The threshold is set to warn 30 days before position error exceeds spec, based on the calculated 15% hysteresis increase rate.",
+   "a1_answer_sha256_16": "6e6a71ccb53cf40c",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3446,
+     "latency_s": 24.1,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Installability**: SAME (uses existing PLC/sensors; no new hardware).",
+       "- **Operability**: SAME (no new training; integrates with existing HMI).",
+       "- **Maintenance**: SAME (no new calibration; software update only).",
+       "- **Cost class**: SAME (no new hardware; minor software dev cost).",
+       "- **Feasibility**: Earned by using only ALREADY-RECORDED data and deriving threshold from ",
+       "- **Protocol**:",
+       "1. Run 10 axes with known preload loss (from historical data) and 10 healthy axes.",
+       "2. Execute constant-load moves (programmed feed rate) for 1 hour per axis.",
+       "3. Record position error and motor current at 10 Hz.",
+       "4. Compute Δθ/Δt (position error rate) during constant-current segments.",
+       "- **Instruments**: Existing PLC, linear scale, motor current sensor (all ALREADY-RECORDED)",
+       "- **Pass/Fail**:",
+       "- PASS: Δθ/Δt > 0.5 µm/s for all worn axes; ≤0.5 µm/s for all healthy axes.",
+       "- FAIL: Any healthy axis exceeds threshold or worn axis misses threshold.",
+       "- **Duration**: 1 hour per axis (total 20 hours).",
+       "- **Kill criterion**: >1 false positive (healthy axis flagged) or >1 missed detection (wor",
+       "- **Validation**: Threshold derived from stated positioning error spec (20 µm) and 30-day ",
+       "- **Primary indicator**: Position error (per problem statement: \"positioning error exceeds",
+       "- **Supplement**: Rate of position error change (leading indicator for preload loss).",
+       "- **Why**: Position error is the direct failure metric; rate change provides early warning"
+      ]
+     },
+     "sha256_16": "4c709bda927890a9"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2751,
+     "latency_s": 12.8,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Input 1: Motor current (ALREADY-RECORDED: \"existing axis motor current\").",
+       "- Input 2: Linear scale position (ALREADY-RECORDED: \"existing linear scale position feedba",
+       "- Reference: Asymmetry threshold = 7% of rated motor current (CALCULATED: ISO 3408-5 torqu",
+       "- **Installability**: SAME (uses existing PLC/sensors; no new hardware).",
+       "- **Operability**: SAME (no new training; integrates with existing HMI alarms).",
+       "- **Maintenance**: SAME (no new calibration; threshold is physics-derived).",
+       "- **Cost class**: SAME (zero new hardware; software-only change).",
+       "- Primary indicator: Motor current asymmetry (directly tied to torque imbalance from prelo",
+       "- Secondary supplement: Position error (used only to confirm primary indicator correlation",
+       "- **Protocol**:",
+       "1. Record baseline current asymmetry during 100 bidirectional positioning cycles (healthy ",
+       "2. Introduce simulated preload loss (shim adjustment in test rig).",
+       "3. Monitor current asymmetry until positioning error exceeds spec.",
+       "- **Pass/Fail**:",
+       "- PASS: Asymmetry threshold exceeded ≥30 days before positioning error fails.",
+       "- FAIL: Asymmetry threshold not triggered or false alarm within 30 days.",
+       "- **Duration**: 72 hours (accelerated wear test per ISO 3408-7).",
+       "- **Kill Criterion**: >1 false alarm per 200 axes/year (validated against historical data)"
+      ]
+     },
+     "sha256_16": "79aa08df48d10241",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Input 1: Motor current (ALREADY-RECORDED: \"existing axis motor current\").; - Input 2: Linear scale position "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2874,
+     "latency_s": 18.3,
+     "transport_tries": 3,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: No hardware changes (uses existing CNC controller PLC logic).",
+       "- Operability: Real-time processing (same as current-based monitoring).",
+       "- Maintenance: Zero additional servicing (no new sensors).",
+       "- Cost class: Same as standard practice (software-only modification).",
+       "- Operational loss: Zero (no production impact).",
+       "- Protocol: Record 10,000 cycles of motor current and position data from 200 axes under no",
+       "- Instruments: Existing CNC data logger (no new hardware).",
+       "- Pass/Fail: >95% detection rate of injected preload loss; false alarms <1/200 axes/year.",
+       "- Duration: 30 days (covers 30-day warning requirement).",
+       "- Kill criterion: If false alarms exceed 1/200 axes/year or detection rate <90%, mechanism",
+       "- Primary indicator: Position tracking error (per problem statement, as positioning error ",
+       "- Supplement: Motor current ripple frequency (used to confirm preload-induced resonance).",
+       "- Rationale: Position error directly correlates to scrap; current ripple provides early wa"
+      ]
+     },
+     "sha256_16": "b03470065ea919de",
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED",
+      "BILL_UNTAGGED: - Installability: No hardware changes (uses existing CNC controller PLC logic).; - Operability: Real-time proc"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3183,
+     "latency_s": 26.6,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: SAME (uses existing PLC logic, no hardware changes)",
+       "- Operability: SAME (real-time processing, no operator intervention required)",
+       "- Maintenance: SAME (no new sensors, software-based)",
+       "- Cost class: SAME (PLC logic update only, comparable to standard practice's current monit",
+       "- Operational loss: ZERO (no downtime for implementation, performed during scheduled maint"
+      ]
+     },
+     "sha256_16": "6e6a71ccb53cf40c",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: SAME (uses existing PLC logic, no hardware changes); - Operability: SAME (real-time processi"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installability: SAME (uses existing PLC logic, no hardware changes)",
+      "- Operability: SAME (real-time processing, no operator intervention required)",
+      "- Maintenance: SAME (no new sensors, software-based)",
+      "- Cost class: SAME (PLC logic update only, comparable to standard practice's current monit",
+      "- Operational loss: ZERO (no downtime for implementation, performed during scheduled maint"
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:11:34Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-10-recip-compressor-valve",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme using pressure/temperature deviations as direct failure proxies.  \n- Departure: Same-class monitoring via cross-stage thermodynamic entropy generation rate as a precursor to leakage-induced efficiency loss.  \n- Connection: Valve leakage increases irreversibility (entropy) across stages before measurable throughput loss; entropy spikes correlate with incipient plate fatigue.  \n\n**PHYSICS CHECK**  \n- Governing relation: ΔS = Cp·ln(T₂/T₁) - R·ln(P₂/P₁) (isentropic efficiency loss).  \n- Magnitude verification: For 5% throughput loss (USER CONSTRAINT), ΔS ≈ 0.15 J/kg·K (CALCULATED from adiabatic compression work and ideal gas law). Threshold set at 0.1 J/kg·K to allow 10-day warning.  \n\n**IMPLEMENTATION BILL**  \n(a) Data acquisition module: Existing interstage P/T sensors (ALREADY-RECORDED: \"interstage pressure/temperature\").  \n(b) Vibration analyzer: Existing frame vibration sensor (ALREADY-RECORDED: \"frame vibration\").  \n(c) Entropy calculator: Software module using ΔS = Cp·ln(T₂/T₁) - R·ln(P₂/P₁) (CALCULATED from stated physics).  \n(d) Threshold comparator: 0.1 J/kg·K (DERIVED: \"stated spec for 5% throughput loss\" via physics above).  \n(e) Alarm logic: >0.1 J/kg·K for 48h (DERIVED: \"10-day warning\" from entropy accumulation rate).  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: Same as standard (no new hardware; software only).  \n- Operability: No operator training (uses existing HMI).  \n- Maintenance: Zero (no moving parts).  \n- Cost class: Same as standard (software upgrade only).  \n- Operational loss: Zero (no downtime).  \n\n**EXECUTABLE TEST**  \n- Protocol: Monitor entropy in 3 machines for 6 months; record alarms vs. actual valve replacements.  \n- Instruments: Existing P/T/vibration sensors + data historian.  \n- Pass/fail: ≤2 false alarms/year (USER CONSTRAINT); all alarms ≥10 days before 5% throughput loss.  \n- Duration: 6 months (covers multiple valve life cycles).  \n- Kill criterion: >2 false alarms or any alarm <10 days pre-failure.  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Interstage entropy (ΔS) per problem statement (\"interstage temperature\" as primary failure indicator; entropy is its thermodynamic precursor).  \n- Secondary indicator: Vibration (supplements entropy for confirmation).",
+   "a1_answer_sha256_16": "a0ae73fddad646b4",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4279,
+     "latency_s": 20.3,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs (all ALREADY-RECORDED):**",
+       "- Stage 1-2 interstage pressure (stated sensor: \"interstage pressure\")",
+       "- Stage 2-3 interstage pressure (stated sensor: \"interstage pressure\")",
+       "- Stage 1-2 interstage temperature (stated sensor: \"interstage temperature\")",
+       "- Stage 2-3 interstage temperature (stated sensor: \"interstage temperature\")",
+       "- Frame vibration (stated sensor: \"frame vibration\")",
+       "- **Derivatives/Thresholds (all DERIVED):**",
+       "- Pressure asymmetry: ΔP_asym = |(P12 - P13) - (P12_nominal - P13_nominal)| (DERIVED from ",
+       "- Temperature asymmetry: ΔT_asym = |(T12 - T13) - (T12_nominal - T13_nominal)| (DERIVED fr",
+       "- Vibration harmonic ratio: VHR = V2f / V1f (V2f: 2x running frequency; V1f: 1x running fr",
+       "- **Thresholds (CALCULATED):**",
+       "- ΔP_asym > 1.5σ_P (σ_P: standard deviation of healthy ΔP_asym, CALCULATED from historical",
+       "- ΔT_asym > 1.5σ_T (σ_T: standard deviation of healthy ΔT_asym, CALCULATED from historical",
+       "- VHR > 1.2 (CALCULATED from nominal VHR for healthy valves)",
+       "- **Indicator Logic:** Trigger warning if (ΔP_asym > 1.5σ_P AND ΔT_asym > 1.5σ_T) OR VHR >",
+       "- **Installability:** Same as standard practice (no new sensors, uses existing data stream",
+       "- **Operability:** Real-time calculation (same as standard practice’s monitoring).",
+       "- **Maintenance:** No additional maintenance (uses existing data, no new hardware).",
+       "- **Cost class:** Same as standard practice (no new capital, same data processing overhead",
+       "- **Burden parity:** Achieved; no increase in installability, operability, or maintenance ",
+       "- **Protocol:**",
+       "1. Collect 6 months of healthy baseline data (ALREADY-RECORDED) to calculate σ_P, σ_T, and",
+       "2. Simulate valve leakage by incrementally reducing valve spring preload (ASSUMPTION: this",
+       "3. Monitor ΔP_asym, ΔT_asym, and VHR in real time.",
+       "- **Pass/Fail Threshold:**",
+       "- Pass: Trigger occurs >10 days before throughput loss exceeds 5% (measured by flowmeter) ",
+       "- Fail: Trigger occurs <10 days before throughput loss OR >2 false alarms.",
+       "- **Duration:** 6 months (covers multiple degradation cycles).",
+       "- **Kill Criterion:** If trigger accuracy <95% (hit rate) or false alarm rate >3/6 months,",
+       "- **Validation:** Baseline and thresholds are derived from ALREADY-RECORDED data and state",
+       "- Primary indicator: Interstage pressure/temperature asymmetry (directly tied to thermodyn",
+       "- Secondary indicator: Vibration harmonic ratio (supplements by detecting mechanical chang",
+       "- Rationale: Pressure/temperature asymmetry is the primary indicator because it directly r"
+      ]
+     },
+     "sha256_16": "ba4a010dceb65971"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3519,
+     "latency_s": 11.1,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Installability**: SAME (uses existing sensors; no new hardware).",
+       "- **Operability**: SAME (identical to standard practice’s monitoring workflow).",
+       "- **Maintenance**: SAME (no moving parts; software updates only).",
+       "- **Cost class**: SAME (no additional instrumentation; computational overhead negligible).",
+       "- **Operational loss**: ZERO (no throughput impact during monitoring).",
+       "- **Protocol**:",
+       "1. Record interstage pressure at 1 kHz for 10 days on a healthy compressor.",
+       "2. Simulate valve fatigue by artificially increasing valve clearance (permitted as non-dep",
+       "3. Monitor skewness (S) until throughput drops by 5%.",
+       "- **Instruments**: Existing pressure sensors, data acquisition system.",
+       "- **Pass/fail**: Predictor passes if S > 0.5 at least 10 days before 5% throughput loss.",
+       "- **Duration**: 10 days (or until 5% throughput loss occurs).",
+       "- **Kill criterion**: If S > 0.5 but throughput loss occurs in <10 days, predictor fails.",
+       "- **Validation**: Uses stated physics (fatigue → pulse asymmetry → skewness) and existing ",
+       "- **Primary indicator**: Interstage pressure (per problem statement: \"interstage pressure/"
+      ]
+     },
+     "sha256_16": "7eacceace46e750c",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Installability**: SAME (uses existing sensors; no new hardware).; - **Operability**: SAME (identical to st"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2644,
+     "latency_s": 16.1,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- (d) Threshold comparator (derived: \"stated spec for 5% throughput loss\")",
+       "- (e) Alarm logic (derived: \"stated constraint of 2 false alarms/year\")",
+       "- Installability: SAME (uses existing sensors; no new hardware).",
+       "- Operability: SAME (identical to standard practice’s alarm interface).",
+       "- Maintenance: SAME (no moving parts; recalibration only if sensor drifts).",
+       "- Cost class: SAME (computationally trivial; no added hardware).",
+       "- Protocol: Monitor efficiency (η) continuously. Trigger alarm when η < η_threshold, where",
+       "- Instruments: Existing pressure/temperature sensors, vibration analyzer.",
+       "- Pass/fail: Alarm must occur ≥10 days before throughput drops 5% (validated against histo",
+       "- Duration: 12 months (to confirm ≤2 false alarms/year).",
+       "- Kill criterion: If alarm occurs <10 days before throughput loss or >2 false alarms in 12",
+       "- Primary indicator: Interstage temperature (directly tied to compression efficiency per a",
+       "- Secondary supplement: Frame vibration (detects mechanical stress from leakage but not di"
+      ]
+     },
+     "sha256_16": "95ca7b2e0057e2f4",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - (d) Threshold comparator (derived: \"stated spec for 5% throughput loss\"); - (e) Alarm logic (derived: \"state"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2339,
+     "latency_s": 15.4,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as standard (no new hardware; software only).",
+       "- Operability: No operator training (uses existing HMI).",
+       "- Maintenance: Zero (no moving parts).",
+       "- Cost class: Same as standard (software upgrade only).",
+       "- Operational loss: Zero (no downtime).",
+       "- Protocol: Monitor entropy in 3 machines for 6 months; record alarms vs. actual valve rep",
+       "- Instruments: Existing P/T/vibration sensors + data historian.",
+       "- Pass/fail: ≤2 false alarms/year (USER CONSTRAINT); all alarms ≥10 days before 5% through",
+       "- Duration: 6 months (covers multiple valve life cycles).",
+       "- Kill criterion: >2 false alarms or any alarm <10 days pre-failure.",
+       "- Primary indicator: Interstage entropy (ΔS) per problem statement (\"interstage temperatur",
+       "- Secondary indicator: Vibration (supplements entropy for confirmation)."
+      ]
+     },
+     "sha256_16": "a0ae73fddad646b4",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as standard (no new hardware; software only).; - Operability: No operator training (use"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installability: Same as standard (no new hardware; software only).",
+      "- Operability: No operator training (uses existing HMI).",
+      "- Maintenance: Zero (no moving parts).",
+      "- Cost class: Same as standard (software upgrade only).",
+      "- Operational loss: Zero (no downtime).",
+      "- Protocol: Monitor entropy in 3 machines for 6 months; record alarms vs. actual valve rep",
+      "- Instruments: Existing P/T/vibration sensors + data historian.",
+      "- Pass/fail: ≤2 false alarms/year (USER CONSTRAINT); all alarms ≥10 days before 5% through",
+      "- Duration: 6 months (covers multiple valve life cycles).",
+      "- Kill criterion: >2 false alarms or any alarm <10 days pre-failure.",
+      "- Primary indicator: Interstage entropy (ΔS) per problem statement (\"interstage temperatur",
+      "- Secondary indicator: Vibration (supplements entropy for confirmation)."
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:12:50Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-11-conveyor-idler-seizure",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme using vibration or temperature sensors to detect bearing degradation.  \n- Novel mechanism departure: Inference of incipient seizure from non-linear torque transfer inefficiency in the drive-motor current signal under varying belt load, without physical contact or new sensors.  \n- Failure physics connection: Bearing wear increases rotational friction, causing non-linear torque spikes during load transients. These spikes manifest as high-frequency harmonics in motor current that correlate with rising mechanical resistance, detectable before complete seizure.  \n\n**PHYSICS CHECK**  \n- Governing relation: Torque transfer efficiency (η) = (P_out / P_in) = (T_load × ω) / (T_motor × ω), where non-linearity in T_motor under load transients indicates η degradation.  \n- Magnitude verification: For a 10% bearing friction increase, η drops by ~8–12% (CALCULATED from mechanical efficiency curves for conveyor idlers). A 5% threshold ensures detection well before seizure.  \n\n**IMPLEMENTATION BILL**  \n| Component | Material/Instrument | Tag | Rationale |  \n|-----------|---------------------|-----|-----------|  \n| 1. Data acquisition module | PLC or SCADA system | (a) | ALREADY-RECORDED: \"drive-motor current and belt-scale load signal at 1-minute resolution\" (user constraint). |  \n| 2. Signal processing unit | FFT algorithm (existing control system software) | (b) | ALREADY-RECORDED: \"existing drive-motor current\" signal processed in real-time. |  \n| 3. Threshold module | Statistical deviation calculator (existing control system software) | (b) | DERIVED: Threshold = 5% (CALCULATED from 10% friction increase → 8–12% η drop, per physics check). |  \n| 4. Alarm logic | Programmable logic (existing control system software) | (b) | ALREADY-RECORDED: \"existing\" control infrastructure. |  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- **Installability**: SAME as standard practice (no new hardware; uses existing PLC/SCADA).  \n- **Operability**: SAME (no additional operator training; integrates with current HMI).  \n- **Maintenance**: SAME (no new sensors to calibrate; software-based).  \n- **Cost class**: SAME (reuses existing instrumentation; no capital expenditure).  \n- **Operational loss**: ZERO (no downtime for installation; false alarms capped at 1/year per constraint).  \n\n**EXECUTABLE TEST**  \n- **Protocol**:  \n  1. Collect 1-minute resolution motor current and belt load data from a conveyor with known idler bearing wear history.  \n  2. Compute torque transfer efficiency (η) during load transients (e.g., material surges).  \n  3. Flag events where η drops below 5% (threshold) for ≥3 consecutive 1-minute intervals.  \n- **Pass/Fail**:  \n  - PASS: Alerts ≥14 days before seizure (per maintenance logs) with ≤1 false alarm/year.  \n  - FAIL: False alarms >1/year or alerts <14 days before seizure.  \n- **Duration**: 6 months (covers seasonal load variations).  \n- **Kill criterion**: Failure to detect 2+ seizures or >3 false alarms.  \n- **Validation**: Uses ALREADY-RECORDED data (per user constraint), not a new campaign.  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Motor current (per user constraint: \"use only the existing drive-motor current\"). Belt load supplements by enabling torque efficiency calculation but does not replace current.",
+   "a1_answer_sha256_16": "3ff31d22812d172f",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3343,
+     "latency_s": 8.4,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams**:",
+       "- Drive-motor current (ALREADY-RECORDED: \"existing drive-motor current at 1-minute resolut",
+       "- Belt-scale load (ALREADY-RECORDED: \"existing belt-scale load signal at 1-minute resoluti",
+       "- **Mechanism**:",
+       "- Compute cross-correlation between current and load over a 10-minute sliding window (ASSU",
+       "- Flag when correlation coefficient drops below 0.85 (CALCULATED: healthy system has >0.95",
+       "- **Threshold**: 0.85 (DERIVED from stated spec: \"at most 1 false alarm per conveyor per y",
+       "- **Installability**: SAME (uses existing signals; no new hardware).",
+       "- **Operability**: SAME (no additional training; real-time computation).",
+       "- **Maintenance**: SAME (no physical maintenance; software update only).",
+       "- **Cost class**: SAME (leverages existing telemetry; no sensors or wiring).",
+       "- **Protocol**:",
+       "1. Collect 6 months of historical current/load data from a healthy conveyor.",
+       "2. Inject synthetic seizure signatures: simulate 5% current spikes every 3 minutes for 10 ",
+       "3. Run the predictor on the data; record false alarms and detection time.",
+       "- **Pass/fail**:",
+       "- Detect all injected events ≥14 days before seizure (threshold: 336 hours of warning).",
+       "- ≤1 false alarm in 6 months (threshold: 0.002 false alarms/day).",
+       "- **Duration**: 1 day (simulation run time).",
+       "- **Kill criterion**: If detection time <14 days or false alarms >1 in 6 months, mechanism",
+       "- Primary indicator: Drive-motor current (directly reflects torque changes from seizure).",
+       "- Supplement: Belt-scale load (confirms localized resistance anomalies).",
+       "- Rationale: Current is the primary signal per the constraint (\"use only the existing driv"
+      ]
+     },
+     "sha256_16": "de6b0abf51094470"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2743,
+     "latency_s": 14.4,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **Data acquisition module** (ALREADY-RECORDED: \"existing drive-motor current at 1-minut",
+       "2. **Belt-scale interface** (ALREADY-RECORDED: \"existing belt-scale load signal at 1-minut",
+       "3. **Cross-correlation processor** (CALCULATED: derive from stated physics of torque-load ",
+       "4. **Threshold comparator** (CALCULATED: 7% sustained current deviation from load-predicte",
+       "5. **Alarm scheduler** (CALCULATED: 1 false alarm/year = 0.0027/day; use Poisson distribut",
+       "- **Installability**: SAME (uses existing signals; no new wiring).",
+       "- **Operability**: SAME (1-minute resolution matches standard practice).",
+       "- **Maintenance**: SAME (no moving parts; processor is software-based).",
+       "- **Cost class**: SAME (no new hardware; only software calibration).",
+       "- **Operational loss**: ZERO (no unplanned stops if warnings act).",
+       "- **Protocol**:",
+       "- **Pass/Fail**:",
+       "- PASS: Detects all simulated seizures ≥14 days prior with ≤1 false alarm in 6 months.",
+       "- FAIL: Misses ≥1 seizure or exceeds false-alarm rate.",
+       "- **Duration**: 1 week (using historical data).",
+       "- **Kill criterion**: False-positive rate >2/year or detection window <14 days.",
+       "- Primary indicator: Motor current (per problem statement; defines seizure threshold).",
+       "- Supplemental indicator: Belt-scale load (used to normalize current for load changes)."
+      ]
+     },
+     "sha256_16": "1f7e41e7e7d19d4f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **Data acquisition module** (ALREADY-RECORDED: \"existing drive-motor current at 1-minut; 2. **Belt-scale in"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3494,
+     "latency_s": 19.7,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **Data acquisition module**",
+       "2. **Signal processing unit**",
+       "3. **Threshold module**",
+       "4. **Alarm logic**",
+       "- Installability: SAME (uses existing signals; no new hardware beyond standard practice’s ",
+       "- Operability: SAME (identical data streams; same maintenance as current monitoring).",
+       "- Maintenance: SAME (no new sensors; software update only).",
+       "- Cost class: SAME (no new instrumentation; minor software development cost).",
+       "- Operational loss: ZERO (no downtime from false alarms; 14-day warning enables scheduled ",
+       "- Protocol:",
+       "1. Collect 6 months of historical motor current and belt-scale load data (ALREADY-RECORDED",
+       "2. Compute γ² for 2× line frequency in 1-minute windows.",
+       "3. Measure time-to-seizure from γ² > 0.8 to actual stop (from maintenance logs).",
+       "- Pass/fail:",
+       "- PASS: γ² > 0.8 occurs ≥14 days before all seizures; false alarms ≤1/year.",
+       "- FAIL: γ² > 0.8 occurs <14 days before any seizure; or false alarms >1/year.",
+       "- Duration: 6 months (historical data).",
+       "- Kill criterion: Fails to detect any seizure with ≥14-day warning or exceeds false alarm ",
+       "- Primary indicator: γ² at 2× line frequency (directly tied to bearing friction physics).",
+       "- Supplemental indicator: Load-normalized current RMS (secondary, used to reject load-indu"
+      ]
+     },
+     "sha256_16": "cb49fedb8cd18d55",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **Data acquisition module**; 2. **Signal processing unit**; 3. **Threshold module**; 4. **Alarm logic**; - "
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3352,
+     "latency_s": 11.1,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Installability**: SAME as standard practice (no new hardware; uses existing PLC/SCADA)",
+       "- **Operability**: SAME (no additional operator training; integrates with current HMI).",
+       "- **Maintenance**: SAME (no new sensors to calibrate; software-based).",
+       "- **Cost class**: SAME (reuses existing instrumentation; no capital expenditure).",
+       "- **Operational loss**: ZERO (no downtime for installation; false alarms capped at 1/year ",
+       "- **Protocol**:",
+       "1. Collect 1-minute resolution motor current and belt load data from a conveyor with known",
+       "2. Compute torque transfer efficiency (η) during load transients (e.g., material surges).",
+       "3. Flag events where η drops below 5% (threshold) for ≥3 consecutive 1-minute intervals.",
+       "- **Pass/Fail**:",
+       "- PASS: Alerts ≥14 days before seizure (per maintenance logs) with ≤1 false alarm/year.",
+       "- FAIL: False alarms >1/year or alerts <14 days before seizure.",
+       "- **Duration**: 6 months (covers seasonal load variations).",
+       "- **Kill criterion**: Failure to detect 2+ seizures or >3 false alarms.",
+       "- **Validation**: Uses ALREADY-RECORDED data (per user constraint), not a new campaign.",
+       "- Primary indicator: Motor current (per user constraint: \"use only the existing drive-moto"
+      ]
+     },
+     "sha256_16": "3ff31d22812d172f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Installability**: SAME as standard practice (no new hardware; uses existing PLC/SCADA); - **Operability**:"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Installability**: SAME as standard practice (no new hardware; uses existing PLC/SCADA)",
+      "- **Operability**: SAME (no additional operator training; integrates with current HMI).",
+      "- **Maintenance**: SAME (no new sensors to calibrate; software-based).",
+      "- **Cost class**: SAME (reuses existing instrumentation; no capital expenditure).",
+      "- **Operational loss**: ZERO (no downtime for installation; false alarms capped at 1/year ",
+      "- **Protocol**:",
+      "1. Collect 1-minute resolution motor current and belt load data from a conveyor with known",
+      "2. Compute torque transfer efficiency (η) during load transients (e.g., material surges).",
+      "3. Flag events where η drops below 5% (threshold) for ≥3 consecutive 1-minute intervals.",
+      "- **Pass/Fail**:",
+      "- PASS: Alerts ≥14 days before seizure (per maintenance logs) with ≤1 false alarm/year.",
+      "- FAIL: False alarms >1/year or alerts <14 days before seizure.",
+      "- **Duration**: 6 months (covers seasonal load variations).",
+      "- **Kill criterion**: Failure to detect 2+ seizures or >3 false alarms.",
+      "- **Validation**: Uses ALREADY-RECORDED data (per user constraint), not a new campaign.",
+      "- Primary indicator: Motor current (per user constraint: \"use only the existing drive-moto"
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:13:56Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  },
+  {
+   "problem_id": "HO4-12-diffuser-fouling",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+   "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme using pressure-flow curves to detect fouling-induced back-pressure rise.  \n- Departure: Same-class mechanism using **pressure-flow hysteresis area** as a leading indicator, capturing non-recoverable fouling buildup before steady-state pressure rises.  \n- Physics connection: Fouling creates irreversible surface roughness and scaling, causing air flow resistance to increase non-linearly during transient blower cycling. Hysteresis area quantifies energy dissipation from this non-ideal behavior.  \n\n**PHYSICS CHECK**  \n- Governing relation: Hysteresis area = ∫(P_up - P_down) dQ during blower load/unload cycles, where P_up is pressure during increasing flow, P_down is pressure during decreasing flow.  \n- Magnitude verification: For a 10% OTE drop, ΔOTE ∝ (1 - (A_fouled/A_clean)). Fouling increases hysteresis by ~15% at 10% OTE loss (per membrane diffuser lab studies).  \n\n**IMPLEMENTATION BILL**  \n- (a) Existing blower discharge pressure transducer (ALREADY-RECORDED: \"blower discharge pressure\")  \n- (b) Existing air flow meter (ALREADY-RECORDED: \"air flow\")  \n- (c) Existing DO probe (ALREADY-RECORDED: \"basin DO\")  \n- (d) Hysteresis calculator module (NEW catalog part: PLC logic block or edge device script)  \n- (e) Threshold: 120% baseline hysteresis area (CALCULATED: from stated blower load/unload cycle specs and clean-diffuser pressure-flow data)  \n- (f) Warning trigger: Hysteresis area exceeds threshold for 3 consecutive cycles (CALCULATED: from stated blower cycle frequency)  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: SAME (uses existing sensors, no new hardware).  \n- Operability: SAME (no operator intervention; automatic alert).  \n- Maintenance: SAME (no calibration; threshold derived from existing specs).  \n- Cost class: SAME (software-only addition; no capital cost).  \n- Operational loss: Zero (no process disruption; early warning).  \n\n**EXECUTABLE TEST**  \n- Protocol:  \n  1. Record baseline hysteresis area from 30 days of clean-diffuser operation (ALREADY-RECORDED data).  \n  2. Simulate fouling by gradually restricting 5% of diffusers (stated physical relation: ΔP ∝ flow resistance).  \n  3. Monitor hysteresis area until OTE drops 10% (stated failure threshold).  \n- Pass/fail: Predictor must trigger warning >30 days before OTE drop; false alarms ≤1/year (validated against historical fouling events).  \n- Duration: 60 days (covers multiple blower cycles).  \n- Kill criterion: False alarm rate >1/year or warning <30 days prior to OTE drop.  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Blower discharge pressure (stated in constraint as the key variable for back-pressure). Hysteresis area supplements this by capturing transient behavior.",
+   "a1_answer_sha256_16": "32ad98a74824a361",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3535,
+     "latency_s": 8.3,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Installability**: Same as standard (no new hardware; uses existing sensors).",
+       "- **Operability**: Same (real-time calculation from existing telemetry).",
+       "- **Maintenance**: Same (no additional calibration; relies on existing sensor maintenance)",
+       "- **Cost**: Same (no new equipment; only software logic).",
+       "- **Parity**: Identical burden class, with novelty in the physics-based DO deficit inferen",
+       "- **Protocol**:",
+       "1. Collect 6 months of historical data (DO, flow, pressure) from a plant with known diffus",
+       "2. Calculate DO saturation deficit (C_sat - DO) daily.",
+       "3. Flag when deficit exceeds 0.5 mg/L for 5 consecutive days.",
+       "- **Instruments**: Existing DO probe, flow meter, pressure sensor (ALREADY-RECORDED).",
+       "- **Pass/Fail**:",
+       "- **Pass**: All fouling events (with 10% OTE loss) flagged ≥30 days in advance; ≤1 false a",
+       "- **Fail**: Any event missed or false alarm rate >1/year.",
+       "- **Duration**: 6 months (covers seasonal DO variations).",
+       "- **Kill Criterion**: If DO deficit does not consistently precede OTE loss by ≥30 days in ",
+       "- **Primary stated indicator**: Oxygen transfer efficiency (OTE) is the primary failure me"
+      ]
+     },
+     "sha256_16": "0a2676cd6bd53491"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2482,
+     "latency_s": 11.5,
+     "transport_tries": 2,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Installability**: Same (uses existing sensors; no new hardware).",
+       "- **Operability**: Same (real-time calculation, no operator intervention).",
+       "- **Maintenance**: Same (no moving parts; recalibration only if blower curve changes).",
+       "- **Cost**: Same class (uses existing data; no new instrumentation).",
+       "- **Protocol**: Record power (\\( P \\)), flow (\\( Q \\)), and DO daily for 90 days. Calculat",
+       "- **Pass/Fail**: Index > 1.08 for ≥30 consecutive days = pass (predicts 10% efficiency los",
+       "- **Duration**: 90 days (covers fouling development).",
+       "- **Kill Criterion**: >1 false alarm/year (index >1.08 without DO drop).",
+       "- **Validation**: Uses ALREADY-RECORDED data; no new sensors.",
+       "- Primary indicator: Blower power-flow deviation (per problem statement, as efficiency los",
+       "- Baseline: Derived from blower curve (stated spec), not historical data."
+      ]
+     },
+     "sha256_16": "a5b967f52cae86c9",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Installability**: Same (uses existing sensors; no new hardware).; - **Operability**: Same (real-time calcu"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2984,
+     "latency_s": 12.8,
+     "transport_tries": 3,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Existing blower discharge pressure transducer (ALREADY-RECORDED: \"blower discharge press",
+       "- Existing air flow meter (ALREADY-RECORDED: \"air flow\")",
+       "- Existing basin DO probe (ALREADY-RECORDED: \"basin DO\")",
+       "- Data acquisition system (standard practice bill item)",
+       "- Control logic software (standard practice bill item)",
+       "- Real-time calculation of P/Q ratio from existing sensors.",
+       "- Compute 24-hour rolling derivative: Δ(P/Q)/Δt (units: bar/(m³/min)/day).",
+       "- Threshold: 0.05 bar/(m³/min)/day (CALCULATED: 0.1 bar/min * 60 min/h * 24 h/day / (5 m³/",
+       "- Installability: Same (uses existing sensors; no new hardware).",
+       "- Operability: Same (real-time calculation added to existing control system).",
+       "- Maintenance: Same (no new parts; software update only).",
+       "- Cost class: Same (standard practice uses pressure/flow sensors; this adds only software)",
+       "- Operational loss: Zero (no process interruption; early warning avoids energy penalties).",
+       "- Protocol:",
+       "1. Use 6 months of historical blower pressure/flow data from a non-fouled diffuser bank (A",
+       "2. Simulate fouling by adding a 0.1 bar/day pressure ramp to historical data.",
+       "3. Run Δ(P/Q)/Δt algorithm on modified data.",
+       "- Pass/fail:",
+       "- Pass: Alarm triggered ≥30 days before simulated 10% OTE drop (P/Q increase ≥20%).",
+       "- Fail: Alarm <30 days or false alarm in clean data.",
+       "- Duration: 1 run (historical data simulation).",
+       "- Kill criterion: >1 false alarm in clean data or missed early warning.",
+       "- Primary indicator: Blower discharge pressure (per problem statement, as it directly refl",
+       "- Supplemental indicator: Air flow (used to normalize pressure into P/Q ratio). Basin DO i"
+      ]
+     },
+     "sha256_16": "c582378886803a38",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Existing blower discharge pressure transducer (ALREADY-RECORDED: \"blower discharge press; - Existing air flo"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2785,
+     "latency_s": 8.1,
+     "transport_tries": 4,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- (d) Hysteresis calculator module (NEW catalog part: PLC logic block or edge device scrip",
+       "- (e) Threshold: 120% baseline hysteresis area (CALCULATED: from stated blower load/unload",
+       "- (f) Warning trigger: Hysteresis area exceeds threshold for 3 consecutive cycles (CALCULA",
+       "- Installability: SAME (uses existing sensors, no new hardware).",
+       "- Operability: SAME (no operator intervention; automatic alert).",
+       "- Maintenance: SAME (no calibration; threshold derived from existing specs).",
+       "- Cost class: SAME (software-only addition; no capital cost).",
+       "- Operational loss: Zero (no process disruption; early warning).",
+       "- Protocol:",
+       "1. Record baseline hysteresis area from 30 days of clean-diffuser operation (ALREADY-RECOR",
+       "2. Simulate fouling by gradually restricting 5% of diffusers (stated physical relation: ΔP",
+       "3. Monitor hysteresis area until OTE drops 10% (stated failure threshold).",
+       "- Pass/fail: Predictor must trigger warning >30 days before OTE drop; false alarms ≤1/year",
+       "- Duration: 60 days (covers multiple blower cycles).",
+       "- Kill criterion: False alarm rate >1/year or warning <30 days prior to OTE drop.",
+       "- Primary indicator: Blower discharge pressure (stated in constraint as the key variable f"
+      ]
+     },
+     "sha256_16": "32ad98a74824a361",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - (d) Hysteresis calculator module (NEW catalog part: PLC logic block or edge device scrip; - (e) Threshold: 1"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- (d) Hysteresis calculator module (NEW catalog part: PLC logic block or edge device scrip",
+      "- (e) Threshold: 120% baseline hysteresis area (CALCULATED: from stated blower load/unload",
+      "- (f) Warning trigger: Hysteresis area exceeds threshold for 3 consecutive cycles (CALCULA",
+      "- Installability: SAME (uses existing sensors, no new hardware).",
+      "- Operability: SAME (no operator intervention; automatic alert).",
+      "- Maintenance: SAME (no calibration; threshold derived from existing specs).",
+      "- Cost class: SAME (software-only addition; no capital cost).",
+      "- Operational loss: Zero (no process disruption; early warning).",
+      "- Protocol:",
+      "1. Record baseline hysteresis area from 30 days of clean-diffuser operation (ALREADY-RECOR",
+      "2. Simulate fouling by gradually restricting 5% of diffusers (stated physical relation: ΔP",
+      "3. Monitor hysteresis area until OTE drops 10% (stated failure threshold).",
+      "- Pass/fail: Predictor must trigger warning >30 days before OTE drop; false alarms ≤1/year",
+      "- Duration: 60 days (covers multiple blower cycles).",
+      "- Kill criterion: False alarm rate >1/year or warning <30 days prior to OTE drop.",
+      "- Primary indicator: Blower discharge pressure (stated in constraint as the key variable f"
+     ]
+    }
+   },
+   "problems_sha256_16": "5e2eca51b6a3b8ee",
+   "audit_tip_at_read": "af3ef4d01",
+   "generated_at": "2026-11-16T07:14:50Z",
+   "one_shot": true,
+   "judged": false,
+   "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+  }
+ ],
+ "serialization_note": "the c-0029 driver emitted [rec] array wrappers (rec literal parsed as a one-element tuple — a serialization artifact of the driver, not a machine output); unwrapped ZERO-LLM from the same bytes with per-record a1_answer_sha256_16 recompute verified (the answers are the one-shot bytes, byte-identical)"
+}

@@ -199,11 +199,12 @@ def main() -> int:
                 "generated_at": _now(),
                 "one_shot": True,
                 "judged": False,
-                "note": "PENDING-AUDITOR (Art. 10: the builder never "
-                        "scores; the auditor scores with the PRIVATE "
-                        "rubric; acceptance bar mean >=3.0/4 and 0 "
-                        "allowed-measures violations per the sealed "
-                        "pre-registration)"},
+                "note": ("PENDING-AUDITOR (Art. 10: the builder never "
+                         "scores; the auditor scores with the PRIVATE "
+                         "rubric; acceptance bar mean >=3.0/4 and 0 "
+                         "allowed-measures violations per the sealed "
+                         "pre-registration)")
+            }
             out.write_text(json.dumps(rec, indent=1, ensure_ascii=False)
                            + "\n", encoding="utf-8")
             record["results"].append(rec)

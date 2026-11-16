@@ -1,0 +1,148 @@
+{
+ "problem_id": "HO4-03-nas-battery-seal",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V72",
+ "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a thermal cycling schedule modification that alternates between upper and lower temperature setpoints with dwell times to periodically crystallize and heal microcracks in the glass seal, thereby reducing sodium polysulfide attack. Standard practice maintains constant temperature (300°C) continuously, which allows polysulfide buildup and stress accumulation. This mitigation departs by introducing a controlled thermal cycling regime to exploit glass relaxation and crack healing mechanisms. The closest existing practice is thermal shock testing in glass manufacturing, but this is a one-time destructive test, not a continuous operational cycling schedule. The intervention attacks the failure's driving physics by periodically annealing the glass seal, reducing residual stresses and sealing microcracks that otherwise propagate due to polysulfide corrosion.\n\nPHYSICS CHECK — The governing physical relation is the Arrhenius equation for glass relaxation: relaxation time τ = τ₀ exp(Q/RT), where Q is activation energy, R is gas constant, and T is temperature. At 300°C, relaxation is slow, allowing stress buildup. Cycling between 280°C and 320°C (within the operating window) accelerates relaxation during dwells. A magnitude verification shows that at 320°C, τ decreases by ~50% compared to 300°C, enabling significant stress relief over 1-hour dwells. This reduces crack propagation rate by a factor of ~2-3 per cycle, as per Paris' law for crack growth.\n\nIMPLEMENTATION BILL — \n- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no thermal cycling.\n- **Your bill**:\n  1. (c) Modify existing temperature controller schedule: add alternating setpoints (280°C and 320°C) with 1-hour dwells at each setpoint, cycling every 4 hours (total cycle time: 8 hours).  \n  2. (a) Use existing temperature sensor for setpoint verification (no new hardware).  \n  3. (c) Implement dwell timer in existing controller logic (parameter change only).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installation: Zero additional burden (uses existing controller and sensor).  \n- Commissioning: Zero additional burden (parameter programming only).  \n- Operation: Zero additional burden (automatic cycling within existing control system).  \n- Maintenance: Zero additional burden (no new parts to maintain).  \n- Operational loss: Zero (cycling occurs during normal operation, no production downtime).  \nConclusion: Same burden class as standard practice (only parameter changes, no hardware).\n\nEXECUTABLE TEST — \n- **Protocol**: Run 100 thermal cycles (8-hour cycles: 1h @ 320°C → 1h @ 280°C, repeated) on test cells. Measure internal resistance hourly and seal integrity via helium leak testing pre/post cycling.  \n- **Instruments**: Existing cell monitoring system (resistance), calibrated helium leak detector.  \n- **Pass/fail**: Pass if internal resistance increase ≤5% over baseline and no leaks detected; fail if resistance increase >5% or leaks occur.  \n- **Duration**: 800 hours (100 cycles).  \n- **Kill criterion**: Immediate halt if resistance spike >10% or leak detected during testing.",
+ "a1_answer_sha256_16": "8dcef297fdead0da",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3283,
+   "latency_s": 8.4,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice bill: Constant temperature control, continuous standby, no purge.",
+     "- Your bill:",
+     "- Installation: Zero new hardware; reconfiguration of existing controller parameters. Same",
+     "- Commissioning: One-time schedule entry into controller (same as standard practice’s para",
+     "- Operation: No added labor; purge runs automatically during standby. No operational loss ",
+     "- Maintenance: No added maintenance; uses existing valve and controller. Same as standard ",
+     "- Cost class: Zero additional cost (uses existing infrastructure). Same burden."
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'labor' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)",
+     "added measure 'maintenance' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)"
+    ]
+   },
+   "sha256_16": "4b2631a53ba5aefd"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2646,
+   "latency_s": 7.7,
+   "transport_tries": 2,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice bill: Constant temperature control (300°C), continuous standby, no pur",
+     "- Your bill:",
+     "- Commissioning: Reprogramming controller (standard procedure, no development). Timer setu",
+     "- Operation: No additional labor (automated cycling). No operational loss (standby periods",
+     "- Maintenance: Same as standard practice (no new wear points)."
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'Commercial programmable timer module' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)",
+     "added measure 'same as standard practice’s control system).' shares no allowed-list stem (cell redesign excluded; allowed measures: operating temperature window and charg...)"
+    ]
+   },
+   "sha256_16": "964d4abcdfbcb5f8",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Standard practice bill: Constant temperature control (300°C), continuous standby, no pur; - Your bill:; - Co",
+    "ALLOWED_ROW_OUTSIDE: added measure 'Commercial programmable timer module' shares no allowed-list stem (cell redesign excluded; allo"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3869,
+   "latency_s": 11.7,
+   "transport_tries": 3,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no",
+     "- **Your bill**:"
+    ]
+   },
+   "sha256_16": "bd8faf1045330a30",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Standard practice bill**: Constant temperature control (300°C), continuous standby, no; - **Your bill**:"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 3176,
+   "latency_s": 9.1,
+   "transport_tries": 4,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no",
+     "- **Your bill**:",
+     "- Installation: Zero additional burden (uses existing controller and sensor).",
+     "- Commissioning: Zero additional burden (parameter programming only).",
+     "- Operation: Zero additional burden (automatic cycling within existing control system).",
+     "- Maintenance: Zero additional burden (no new parts to maintain).",
+     "- Operational loss: Zero (cycling occurs during normal operation, no production downtime).",
+     "- **Protocol**: Run 100 thermal cycles (8-hour cycles: 1h @ 320°C → 1h @ 280°C, repeated) ",
+     "- **Instruments**: Existing cell monitoring system (resistance), calibrated helium leak de",
+     "- **Pass/fail**: Pass if internal resistance increase ≤5% over baseline and no leaks detec",
+     "- **Duration**: 800 hours (100 cycles).",
+     "- **Kill criterion**: Immediate halt if resistance spike >10% or leak detected during test"
+    ]
+   },
+   "sha256_16": "8dcef297fdead0da",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Standard practice bill**: Constant temperature control (300°C), continuous standby, no; - **Your bill**:; "
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Standard practice bill**: Constant temperature control (300°C), continuous standby, no",
+    "- **Your bill**:",
+    "- Installation: Zero additional burden (uses existing controller and sensor).",
+    "- Commissioning: Zero additional burden (parameter programming only).",
+    "- Operation: Zero additional burden (automatic cycling within existing control system).",
+    "- Maintenance: Zero additional burden (no new parts to maintain).",
+    "- Operational loss: Zero (cycling occurs during normal operation, no production downtime).",
+    "- **Protocol**: Run 100 thermal cycles (8-hour cycles: 1h @ 320°C → 1h @ 280°C, repeated) ",
+    "- **Instruments**: Existing cell monitoring system (resistance), calibrated helium leak de",
+    "- **Pass/fail**: Pass if internal resistance increase ≤5% over baseline and no leaks detec",
+    "- **Duration**: 800 hours (100 cycles).",
+    "- **Kill criterion**: Immediate halt if resistance spike >10% or leak detected during test"
+   ]
+  }
+ },
+ "problems_sha256_16": "5e2eca51b6a3b8ee",
+ "audit_tip_at_read": "af3ef4d01",
+ "generated_at": "2026-11-16T07:02:59Z",
+ "one_shot": true,
+ "judged": false,
+ "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+}
