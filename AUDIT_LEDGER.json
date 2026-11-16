@@ -988,6 +988,75 @@
    "articles": [
     27
    ]
+  },
+  {
+   "id": "F45",
+   "severity": "CRITICAL",
+   "title": "LIVE CREDENTIALS IN PUBLIC GIT HISTORY \u2014 VERIFIED BY THE AUDITOR. Repo prateekm1007/discovery-evidence-fabric is PUBLIC (visibility=public). Two commit messages carry live-looking API keys: f90fc7d9f (2026-08-18, PatSnap-class sk-lcQO3\u2026bwZ7) and 76c23fef7 (2026-08-18, OpenRouter sk-or-v1\u20266679). Public since 2026-08-18 (~3 months). Auditor pattern-scan of the last 300 queue commits found 0 further hits; the Aug17-20 window found exactly these 2. ROTATION IS OWNER-SIDE AND URGENT; history rewrite is NOT the remedy (F42) \u2014 rotate the keys, then consider repo visibility.",
+   "status": "OPEN-OWNER-URGENT",
+   "opened": "2026-11-16",
+   "last_checked": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "f90fc7d9f",
+     "path": "commit message",
+     "note": "PatSnap-class key, masked"
+    },
+    {
+     "sha": "76c23fef7",
+     "path": "commit message",
+     "note": "OpenRouter key, masked"
+    }
+   ],
+   "articles": [
+    12,
+    17
+   ]
+  },
+  {
+   "id": "F46",
+   "severity": "MEDIUM",
+   "title": "Judge-route probe category error: the builder probed OpenRouter for crowllm/qwen-3.8-max:free and concluded the model is ABSENT. The pre-registered route is https://crowllm.com/v1/chat/completions with CROWLLM_API_KEY (llm_registry.py) \u2014 a DIFFERENT provider. Absence from the OpenRouter catalog says nothing about crowllm. The earlier failures were crowllm-side 503/CF congestion, not an absent model.",
+   "status": "OPEN",
+   "opened": "2026-11-16",
+   "last_checked": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+     "path": "discovery_fabric/engine/llm_registry.py",
+     "note": "crowllm base URL + CROWLLM_API_KEY"
+    }
+   ],
+   "articles": [
+    1,
+    3
+   ]
+  },
+  {
+   "id": "F47",
+   "severity": "LOW",
+   "title": "Constitution read-order confusion: the audit branch carries a STALE 127,701-byte v2.x builder constitution (85 articles, no Art.29, no Art.28 addendum); the canonical builder constitution is on queue/dev12_r7 (17,418 bytes, v3.1.0, Art.29 + addendum present). The builder's 'tip is v2.11.0 not v3.1.0' claim read the wrong branch; AM30's citation was correct.",
+   "status": "OPEN",
+   "opened": "2026-11-16",
+   "last_checked": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+     "path": "EPISTEMIC_CONSTITUTION.md",
+     "note": "v3.1.0 on builder branch"
+    },
+    {
+     "sha": "ad2eb8d90",
+     "path": "EPISTEMIC_CONSTITUTION.md",
+     "note": "stale v2.x on audit branch"
+    }
+   ],
+   "articles": [
+    8
+   ]
   }
  ],
  "amendments": [
@@ -1580,6 +1649,26 @@
      "sha": "8e8e1b635b764b65271b96659ab2123f220b1e71",
      "path": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_30_2026-11-16.md",
      "note": "AM30"
+    }
+   ]
+  },
+  {
+   "id": "AM31",
+   "date": "2026-11-16",
+   "status": "ISSUED",
+   "reason": "R32 \u2014 F45 public credential leak VERIFIED; judge-route + constitution corrections; holdout v5 authored",
+   "changes": [
+    "F45 CRITICAL: two live-looking keys in PUBLIC commit messages (f90fc7d9f, 76c23fef7), verified by the auditor; owner-side rotation urgent",
+    "F46: judge-route probe was at the WRONG provider (OpenRouter vs crowllm.com) \u2014 'absent model' conclusion withdrawn",
+    "F47: constitution read-order confusion \u2014 builder branch is v3.1.0 (AM30 citation correct); audit branch copy is stale",
+    "holdout v5 AUTHORED + SEALED (12 fresh, fully auditor-authored) as the V7.6 acceptance test",
+    "no new invention-machine commits since R31 -> NO CAPABILITY CHANGE"
+   ],
+   "evidence": [
+    {
+     "sha": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+     "path": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_31_2026-11-16.md",
+     "note": "AM31"
     }
    ]
   }
@@ -2267,6 +2356,16 @@
    "capability_change": "NONE (instruments only; both credentials blocked)",
    "acceptance": "NOT GRANTED (v4 burned)",
    "evidence_sha": "eval/auditor_r31_verdict.json"
+  },
+  {
+   "id": "V31",
+   "round": "R11 R32 (custody/verification round)",
+   "commit": "8e8e1b635b764b65271b96659ab2123f220b1e71",
+   "gate": "NOT_MET on acceptance (unchanged)",
+   "capability_change": "NONE (no new invention-machine commits)",
+   "security": "F45 CRITICAL public credential leak verified",
+   "holdout_v5": "SEALED_REGISTERED",
+   "evidence_sha": "eval/auditor_r32_verdict.json"
   }
  ],
  "gold_set": {
@@ -2278,7 +2377,7 @@
   "n_bad": 6,
   "last_self_check": {
    "date": "2026-11-16",
-   "round": "R31",
+   "round": "R32",
    "result": "10/10 (no new judged material)"
   },
   "burn_log": []
@@ -2297,7 +2396,7 @@
   }
  ],
  "pruning_review": {
-  "audits_completed": 31,
+  "audits_completed": 32,
   "catches_per_article": {
    "1": 3,
    "2": 1,
@@ -2400,6 +2499,17 @@
    "allowed_measures_violations": 2,
    "acceptance": "NOT_GRANTED",
    "burned_at": "2026-11-16"
+  },
+  "holdout_v5": {
+   "status": "SEALED_REGISTERED",
+   "selection_sha256": "d1944a8fb9565172",
+   "n": 12,
+   "intervention": 6,
+   "predictor": 6,
+   "author": "auditor (fully auditor-authored problems AND rubric)",
+   "purpose": "ACCEPTANCE test for V7.6 with both AM29 binds in the machine path",
+   "bar": "mean>=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction mechanisms",
+   "one_shot": "builder claims holdout-v5-generation; frozen V7.6; peer verify; auditor score; burn after"
   }
  },
  "progress_note": "52-60%: F31 closed (question-type generalization fixed \u2014 major milestone), novelty type-honest strongest 2.433; feasibility 1.9 FAIL isolated to heavy-mechanism interventions; fresh holdout v2 needed",
