@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-16T17:40:00Z (sandbox clock)",
+ "at": "2026-11-16T18:15:00Z (sandbox clock)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -1085,6 +1085,22 @@
     ".github/workflows/r11_queue_surface.yml"
    ],
    "notes": "VERIFIER FINDING (found during the c-0052 pre-work reads, disclosed at claim time): tests/test_guard_activation.py exists and passes 4/4 locally but is wired into NO CI workflow — the activation-checker itself gates nothing (the F32/F52/F53 'file exists but does not defend' class, 4th instance). Fix: wire the suite into the queue-surface zero-LLM block with a core.hooksPath setup step (fresh CI checkouts have no hooksPath configured; the setup step both activates the recipe and makes test 1's assertion meaningful in CI). Completes AM37 D4's 'hook + CI activation asserted in-suite, not assumed'. No instrument files; no engine change; one workflow file."
+  },
+  {
+   "claim_id": "c-0054",
+   "work_id": "r40-json-guard-hook",
+   "session_id": "builder-r39s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "41c465e4f",
+   "claimed_at": "2026-11-16T18:15:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-16T23:45:00Z",
+   "status": "OPEN",
+   "takes_over": null,
+   "artifact_paths": [
+    ".githooks/pre-commit"
+   ],
+   "notes": "RECURRENCE GUARD (verifier-found, F32/F52/F53-class 5th instance): the peer's R40 round record eval/r40_status.json landed at cbb8e3d70 as INVALID JSON (Python-literal style: parenthesized continuations + implicit string concatenation) BECAUSE the R39b 'per-commit JSON validation' lesson was session-local discipline — it existed but did not defend when the other session pushed. The guard validates every STAGED *.json at COMMIT time (git show :file | python3 -m json.tool), binding BOTH sessions at the shared commit surface. --no-verify remains the typed escape and must be disclosed in the commit message. Three legacy invalid files exist in untouched archive dirs (R510/R549) — the guard fires only on future staged changes to them, forcing conscious repair or typed escape. No instrument files; no engine change; gates record integrity, not measurement; retirement: delete on auditor ruling."
   }
  ],
  "trailer_violations": [
