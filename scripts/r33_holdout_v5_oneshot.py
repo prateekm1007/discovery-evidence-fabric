@@ -49,6 +49,11 @@ PACKET = REPO / "eval" / "holdout_v5_problems.json"
 OUT_DIR = REPO / "eval" / "pairs" / "holdout_v5_generation"
 LEDGER = REPO / "eval" / "holdout_v5_run.json"
 LOCK = REPO / "eval" / ".r33_v5_oneshot.lock"
+# AM32 D3: durable append-per-fire events log + AM32 D1: committed
+# gateway-log slice (the served-identity evidence must be a run artifact)
+EVENTS = REPO / "eval" / "holdout_v5_run_events.jsonl"
+GW_SLICE = REPO / "eval" / "holdout_v5_gateway_log_slice.jsonl"
+RUN_NAME = "v5"
 
 CLAIM = ("r33-holdout-v5-oneshot (c-0034, pre-registered and PUSHED "
          "BEFORE any problem read; one-shot/sealed per Art. 29(c): "
@@ -80,14 +85,32 @@ def main() -> int:
           f"problems={len(probs)} (claim: {CLAIM})", flush=True)
 
     gw, gw_key = start_gateway()
-    ledger = {"rows": {}, "packet_sha256": packet_sha,
-              "claim": CLAIM,
-              "machine": "frozen V7.6 (V7.4 path + V76 directive + "
-                         "AM29 class-bind + direction-bind in path; "
-                         "budget 3; K_GEN=1)",
-              "acceptance_bar": "auditor mean >=3.0/4 AND 0 "
-                                "allowed-measures violations AND 0 "
-                                "inverted-direction mechanisms"}
+    # DURABLE LEDGER (AM32 D3 fix): merge rows AND provenance keys from
+    # the existing ledger AND the events log — a process restart can
+    # never drop rows or launder the backfill flags again
+    base = {"packet_sha256": packet_sha,
+            "claim": CLAIM,
+            "machine": "frozen V7.6 (V7.4 path + V76 directive + "
+                       "AM29 class-bind + direction-bind in path; "
+                       "budget 3; K_GEN=1)",
+            "acceptance_bar": "auditor mean >=3.0/4 AND 0 "
+                              "allowed-measures violations AND 0 "
+                              "inverted-direction mechanisms"}
+    prior = {}
+    if LEDGER.exists():
+        try:
+            prior = json.loads(LEDGER.read_text(encoding="utf-8")) or {}
+        except Exception:
+            prior = {}
+    ledger = {**prior, **base, "rows": dict(prior.get("rows") or {})}
+    if EVENTS.exists():
+        for line in EVENTS.read_text(encoding="utf-8").splitlines():
+            try:
+                ev = json.loads(line)
+                if ev.get("kind") == "row":
+                    ledger["rows"][ev["problem_id"]] = ev["row"]
+            except Exception:
+                pass
     try:
         for pid, prob in probs.items():
             dst = OUT_DIR / f"{pid}.json"
@@ -107,7 +130,7 @@ def main() -> int:
                                 "%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
                            indent=1, ensure_ascii=False) + "\n",
                 encoding="utf-8")
-            ledger["rows"][pid] = {
+            row_rec = {
                 "repairs": meta["repairs"],
                 "residual_findings": meta["residual_findings"],
                 "chars": len(ans),
@@ -115,6 +138,15 @@ def main() -> int:
                                   if a.get("route")}),
                 "models": sorted({a.get("route_model") for a in attempts
                                   if a.get("route_model")})}
+            ledger["rows"][pid] = row_rec
+            # append-per-fire: the event survives even if the process
+            # dies before the next JSON rewrite
+            with EVENTS.open("a", encoding="utf-8") as ef:
+                ef.write(json.dumps({"kind": "row", "problem_id": pid,
+                                     "row": row_rec,
+                                     "ts": time.strftime(
+                                         "%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}) + "\n")
             LEDGER.write_text(
                 json.dumps(ledger, indent=1, ensure_ascii=False) + "\n",
                 encoding="utf-8")
@@ -126,7 +158,60 @@ def main() -> int:
             gw.terminate()
         except Exception:
             pass
-    print(f"-> {OUT_DIR} + {LEDGER}", flush=True)
+
+    # ---- AM32 D1: PRE-SCORING SERVED-MODEL ATTESTATION GATE ----------
+    # commit the gateway-log slice for the run window as a run artifact
+    # (the v5 run's serving evidence lived in an uncommitted gitignored
+    # log — the custody gap typed in eval/holdout_v5_attestation.json)
+    try:
+        import r34_served_model_attestation as att
+        times = sorted(str(d.get("generated_at", ""))
+                       for d in ledger["rows"].values())
+        win_start = win_end = None
+        if times and att.GW_LOG.exists():
+            win_start, win_end = times[0][:13], times[-1][:13]
+            lines = [ln for ln in
+                     att.GW_LOG.read_text(encoding="utf-8").splitlines()
+                     if win_start <= json.loads(ln).get("ts", "")[:13]
+                     <= win_end]
+            GW_SLICE.write_text("\n".join(lines) + ("\n" if lines else ""),
+                                encoding="utf-8")
+            print(f"[v5-oneshot] gateway-log slice committed: "
+                  f"{len(lines)} calls ({GW_SLICE.name})", flush=True)
+        gw_hist = (att.gateway_window(win_start, win_end)
+                   if win_start and win_end else {})
+        summary_serving = None
+        verdict = att.attest(
+            att.load_rows(OUT_DIR), gw_hist, summary_serving,
+            f"{RUN_NAME} one-shot (this driver)")
+        ledger["served_model_attestation"] = {
+            "registered_model": att.REGISTERED_MODEL,
+            "n_equal": verdict["n_equal"], "n_rows": verdict["n_rows"],
+            "verdict": verdict["verdict"],
+            "gate": "pre-scoring (AM32 D1)",
+            "gateway_log_slice": str(GW_SLICE.name),
+            "serving_histogram": gw_hist}
+        run_void = verdict["verdict"] != "PASS"
+        ledger["run_verdict"] = ("VOID — served-model substitution "
+                                 "(registered machine did not execute; "
+                                 "scoring refused, Art. 3 fail-closed)"
+                                 if run_void else "VALID — 12/12 rows "
+                                 "attested equal to the registered model")
+        ledger["acceptance_eligible"] = not run_void
+        print(f"[v5-oneshot] ATTESTATION: {verdict['n_equal']}/"
+              f"{verdict['n_rows']} equal -> {verdict['verdict']}",
+              flush=True)
+    except Exception as e:  # gate failure fails CLOSED, never open
+        ledger["run_verdict"] = (f"UNPROVABLE — attestation gate error: "
+                                 f"{type(e).__name__}: {e}")
+        ledger["acceptance_eligible"] = False
+        print(f"[v5-oneshot] ATTESTATION ERROR (fail-closed): {e}",
+              flush=True)
+    LEDGER.write_text(
+        json.dumps(ledger, indent=1, ensure_ascii=False) + "\n",
+        encoding="utf-8")
+    print(f"-> {OUT_DIR} + {LEDGER} "
+          f"(run_verdict: {ledger.get('run_verdict')})", flush=True)
     return 0
 
 
