@@ -1,0 +1,252 @@
+{
+ "eval_version": "holdout-v7",
+ "authored_at": "2026-11-17",
+ "author": "independent auditor (Claude) \u2014 fully auditor-authored problems AND rubric",
+ "provenance": "SEALED HOLDOUT v7: ACCEPTANCE test for the V7.7 machine (class-bind + direction-bind + input-bind + pricing + diversity). One-shot. Burned after the scored run.",
+ "n_problems": 12,
+ "selection_sha256": "c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b",
+ "selection_hash_basis": "sha256 over canonical tuples (problem_id,device,failure,question,question_type,user_variables) sorted by problem_id, identical to eval/validate_problems.py",
+ "design": "v6 failed on duty-cycle monoculture + inverted physics + unavailable inputs. v7 embeds: 2 chemistry/barrier-class problems (HO7-01, HO7-05) that a duty cycle cannot answer; 1 DIRECTION TRAP (HO7-02 scorch \u2014 thermal exposure IS the driver); 1 PRICING NEGATIVE CONTROL (HO7-04 demand defrost \u2014 zero operational loss, pricing bind must NOT fire); 1 PRICING POSITIVE CONTROL (HO7-03 zone avoidance genuinely costs dispatch); 5 INPUT TRAPS where the obvious signal is explicitly NOT permitted.",
+ "problems": [
+  {
+   "problem_id": "HO7-01-zinc-ew-acid-mist",
+   "device": "zinc electrowinning tankhouse, 3.2 kA/m2, lead-silver anodes, sulphuric electrolyte",
+   "failure": "oxygen evolution at the anode bursts bubbles that carry acid aerosol into the tankhouse air above the exposure limit",
+   "failure_mode": "acid-aerosol-mist",
+   "constraint": "no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket chemistry selection and dosing, electrolyte temperature setpoint retuning, or tankhouse ventilation and cell-cover procedure only",
+   "domain": "hydrometallurgy",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket chemistry selection and dosing, electrolyte temperature setpoint retuning, or tankhouse ventilation and cell-cover procedure only",
+    "device of record: zinc electrowinning tankhouse, 3.2 kA/m2, lead-silver anodes, sulphuric electrolyte",
+    "failure to address: acid-aerosol-mist"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-02-rubber-extruder-scorch",
+   "device": "rubber compound extrusion line, silica-filled S-SBR, 105 C barrel, hot-feed",
+   "failure": "premature crosslink (scorch) in the barrel and die during dwell causes lumps, die drool and line stops",
+   "failure_mode": "compound-scorch",
+   "constraint": "no compound reformulation of the polymer or filler; allowed measures: accelerator/retarder (PVI) package selection and dosing, barrel/die temperature profile setpoint retuning, or screw-speed and dwell-time scheduling only",
+   "domain": "rubber-processing",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no compound reformulation of the polymer or filler; allowed measures: accelerator/retarder (PVI) package selection and dosing, barrel/die temperature profile setpoint retuning, or screw-speed and dwell-time scheduling only",
+    "device of record: rubber compound extrusion line, silica-filled S-SBR, 105 C barrel, hot-feed",
+    "failure to address: compound-scorch"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-03-hydro-partload-cavitation",
+   "device": "Francis hydro unit, 120 MW, run frequently at 40-60 percent gate for grid regulation",
+   "failure": "part-load draft-tube vortex rope drives pressure pulsation, runner blade cavitation erosion and fatigue",
+   "failure_mode": "partload-vortex-rope",
+   "constraint": "no runner replacement; allowed measures: operating-zone / load-scheduling avoidance, draft-tube air-admission setpoint retuning, or wicket-gate ramp-rate procedure only",
+   "domain": "hydro-machinery",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no runner replacement; allowed measures: operating-zone / load-scheduling avoidance, draft-tube air-admission setpoint retuning, or wicket-gate ramp-rate procedure only",
+    "device of record: Francis hydro unit, 120 MW, run frequently at 40-60 percent gate for grid regulation",
+    "failure to address: partload-vortex-rope"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-04-freezer-demand-defrost",
+   "device": "industrial spiral freezer, ammonia evaporator, timed hot-gas defrost every 6 h",
+   "failure": "frost builds unevenly; fixed-interval defrost wastes energy on clean coils and starves capacity on loaded ones",
+   "failure_mode": "timed-defrost-mismatch",
+   "constraint": "no evaporator or refrigeration redesign; allowed measures: defrost-initiation logic and interval retuning, evaporator fan-speed setpoint retuning, or door/curtain and loading procedure only",
+   "domain": "industrial-refrigeration",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no evaporator or refrigeration redesign; allowed measures: defrost-initiation logic and interval retuning, evaporator fan-speed setpoint retuning, or door/curtain and loading procedure only",
+    "device of record: industrial spiral freezer, ammonia evaporator, timed hot-gas defrost every 6 h",
+    "failure to address: timed-defrost-mismatch"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-05-cu-ew-nodulation",
+   "device": "copper electrowinning tankhouse, permanent stainless cathodes, 320 A/m2",
+   "failure": "cathode nodulation and dendrite growth bridge to the anode, causing short circuits, current-efficiency loss and burned sheets",
+   "failure_mode": "cathode-nodulation",
+   "constraint": "no cell or cathode redesign; allowed measures: levelling/grain-refiner additive package (glue/thiourea/chloride) selection and dosing, current-density setpoint retuning, or cathode harvest/inspection interval and procedure only",
+   "domain": "copper-electrometallurgy",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no cell or cathode redesign; allowed measures: levelling/grain-refiner additive package (glue/thiourea/chloride) selection and dosing, current-density setpoint retuning, or cathode harvest/inspection interval and procedure only",
+    "device of record: copper electrowinning tankhouse, permanent stainless cathodes, 320 A/m2",
+    "failure to address: cathode-nodulation"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-06-ge-turbo-surge",
+   "device": "lean-burn gas engine turbocharger, compressor at 3.2 pressure ratio, hot-and-high site",
+   "failure": "low-flow high-head operation pushes the compressor into surge during load rejection, damaging thrust bearing and wheel",
+   "failure_mode": "compressor-surge",
+   "constraint": "no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint retuning, wastegate or recirculation-valve scheduling, or load-ramp and rejection procedure only",
+   "domain": "gas-engine-boost",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint retuning, wastegate or recirculation-valve scheduling, or load-ramp and rejection procedure only",
+    "device of record: lean-burn gas engine turbocharger, compressor at 3.2 pressure ratio, hot-and-high site",
+    "failure to address: compressor-surge"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-07-gearbox-oil-varnish",
+   "device": "industrial gearbox oil system, mineral ISO VG 320, 78 C sump, splash lube",
+   "failure": "oil oxidation produces varnish that sticks valves and coats surfaces, raising friction and temperature",
+   "failure_mode": "oil-oxidation-varnish",
+   "constraint": "use only the existing sump/bearing oil temperature, run-hours counter and cooler differential pressure; warn at least 30 days before varnish causes a valve stick; at most 1 false alarm per 200 gearboxes per year; no new sensors and NO oil sampling/lab analysis",
+   "domain": "industrial-lubrication-reliability",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing sump/bearing oil temperature, run-hours counter and cooler differential pressure; warn at least 30 days before varnish causes a valve stick; at most 1 false alarm per 200 gearboxes per year; no new sensors and NO oil sampling/lab analysis",
+    "device of record: industrial gearbox oil system, mineral ISO VG 320, 78 C sump, splash lube",
+    "failure to address: oil-oxidation-varnish"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-08-conveyor-splice-fatigue",
+   "device": "overland conveyor, 1200 mm ST2500 belt, 14 splices, cyclic loading",
+   "failure": "splice fatigue and pull-out develop between inspections, risking a belt rip",
+   "failure_mode": "splice-fatigue",
+   "constraint": "use only the existing drive-motor current and the belt-scale load signal at 1-minute resolution; warn at least 21 days before a splice defect reaches grade 3; at most 1 false alarm per conveyor per year; no new sensors and NO belt-tension transducer",
+   "domain": "bulk-handling-belts",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing drive-motor current and the belt-scale load signal at 1-minute resolution; warn at least 21 days before a splice defect reaches grade 3; at most 1 false alarm per conveyor per year; no new sensors and NO belt-tension transducer",
+    "device of record: overland conveyor, 1200 mm ST2500 belt, 14 splices, cyclic loading",
+    "failure to address: splice-fatigue"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-09-chiller-condenser-fouling",
+   "device": "water-cooled centrifugal chiller, 900 kW, open cooling-tower condenser water",
+   "failure": "condenser tube fouling raises approach and compressor power until a high-head trip",
+   "failure_mode": "condenser-fouling",
+   "constraint": "use only the existing condenser-water inlet/outlet temperature, condenser-water flow meter and compressor input power; warn at least 14 days before head reaches the trip; at most 1 false alarm per chiller per year; no new sensors and NO refrigerant-side pressure taps",
+   "domain": "hvac-watercooled",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing condenser-water inlet/outlet temperature, condenser-water flow meter and compressor input power; warn at least 14 days before head reaches the trip; at most 1 false alarm per chiller per year; no new sensors and NO refrigerant-side pressure taps",
+    "device of record: water-cooled centrifugal chiller, 900 kW, open cooling-tower condenser water",
+    "failure to address: condenser-fouling"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-10-desiccant-dryer-breakthrough",
+   "device": "compressed-air desiccant dryer, heatless twin-tower, 7 bar, 4-min NEMA cycle",
+   "failure": "desiccant ageing and incomplete regeneration let moisture break through into the plant air",
+   "failure_mode": "desiccant-breakthrough",
+   "constraint": "use only the existing outlet dew-point sensor, inlet air temperature/pressure and the tower-switch cycle counter; warn at least 7 days before dew point exceeds the class limit; at most 1 false alarm per 100 dryers per year; no new sensors",
+   "domain": "compressed-air-treatment",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing outlet dew-point sensor, inlet air temperature/pressure and the tower-switch cycle counter; warn at least 7 days before dew point exceeds the class limit; at most 1 false alarm per 100 dryers per year; no new sensors",
+    "device of record: compressed-air desiccant dryer, heatless twin-tower, 7 bar, 4-min NEMA cycle",
+    "failure to address: desiccant-breakthrough"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-11-pitch-battery-degradation",
+   "device": "wind-turbine blade pitch system with a lead-acid or Li-ion backup cabinet per blade",
+   "failure": "battery capacity fade leaves insufficient energy for a safe feather on grid loss",
+   "failure_mode": "pitch-backup-fade",
+   "constraint": "use only the existing pitch-motor current, cabinet temperature and the pitch-angle encoder; warn at least 60 days before a feather-energy test fails; at most 1 false alarm per turbine per year; no new sensors and NO cell-level voltage taps",
+   "domain": "wind-pitch-systems",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing pitch-motor current, cabinet temperature and the pitch-angle encoder; warn at least 60 days before a feather-energy test fails; at most 1 false alarm per turbine per year; no new sensors and NO cell-level voltage taps",
+    "device of record: wind-turbine blade pitch system with a lead-acid or Li-ion backup cabinet per blade",
+    "failure to address: pitch-backup-fade"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO7-12-digester-foaming",
+   "device": "anaerobic digester, 4000 m3, mesophilic 38 C, mixed by external pump recirculation",
+   "failure": "filamentous/organic overload foaming carries sludge into the gas dome and blocks the flare line",
+   "failure_mode": "digester-foaming",
+   "constraint": "use only the existing biogas flow, digester level, sludge temperature and mixing-pump current; warn at least 48 hours before foam reaches the gas dome; at most 1 false alarm per plant per year; no new sensors and NO VFA/alkalinity lab assay",
+   "domain": "wastewater-anaerobic",
+   "source": "auditor_holdout_v7",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only the existing biogas flow, digester level, sludge temperature and mixing-pump current; warn at least 48 hours before foam reaches the gas dome; at most 1 false alarm per plant per year; no new sensors and NO VFA/alkalinity lab assay",
+    "device of record: anaerobic digester, 4000 m3, mesophilic 38 C, mixed by external pump recirculation",
+    "failure to address: digester-foaming"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  }
+ ]
+}
