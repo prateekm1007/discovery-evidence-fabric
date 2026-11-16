@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-16T06:25:00Z",
+ "at": "2026-11-16T06:40:00Z",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -604,6 +604,17 @@
    "finding": "git add -A swept eval/pairs/r22_feas_repair_v5/* (11 pair files) into the c-0007 task-trailer commit whose artifact_paths do not cover that dir — T5 RED at that snapshot; the suites were run pre-commit only and the line was not re-verified post-commit",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "F36-pattern: pushed history is never rewritten; remediation is forward — all c-0006 commits carry the correct Work-Id, the auditor adjudicates the mixed-commit gap; the peer's catch is acknowledged with thanks (the mechanism catching its own executor)"
+  },
+  {
+   "sha": "50f2cf62e",
+   "session": "builder-r29s1",
+   "correct_work_id": "r29-v72-battery-conversion",
+   "correct_claim_id": "c-0025",
+   "detected_by": "builder-r29s1 (self-caught post-push)",
+   "detected_at": "2026-11-16T06:40:00Z",
+   "finding": "the V7.2 execution bytes commit carried the c-0027 pre-registration trailer (Work-Id: r29-v73-residual-conversion) because both the V7.2 execution bytes (eval/pairs/r29_v72_tuned/, c-0025's canonical paths) and the c-0027 pre-registration files were pushed in ONE commit; the canonical bytes ARE covered by the c-0025 EXECUTOR claim (its artifact_paths list eval/pairs/r29_v72_tuned/), only the TRAILER named the other claim",
+   "status": "DISCLOSED_RESOLVED",
+   "note": "F36-pattern: pushed history is never rewritten; the subsequent battery-assembly and V7.3 commits carry the correct per-claim trailers; the violation is registered here with the correct work_id named per the typed allowance (T5 fail-closed the other way)"
   }
  ],
  "findings": [
