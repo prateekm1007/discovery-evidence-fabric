@@ -87,21 +87,39 @@ DIRECTION_CONTRACT = (
     "You are a typed physics-direction checker inside a machine that "
     "writes engineering intervention bills. Judge ONLY the sign "
     "consistency of the proposed mechanism against the failure's "
-    "governing relation. English only. Reply with ONE JSON object and "
-    "nothing else: {\"direction\": \"INVERTED\"|\"UNCLEAR\"|"
-    "\"CORRECT\", \"governing_relation\": \"<one sentence: the "
-    "quantity that drives the failure and its sign>\", "
-    "\"integral_sign\": \"<does the remedy's action add the same or "
-    "the opposite sign to the damage integral over the duty cycle>\", "
-    "\"reason\": \"<one sentence>\"}. INVERTED means the remedy's "
-    "active ingredient imposes the SAME sign as the failure's own "
-    "driver (more of the driver to undo the driver). UNCLEAR means "
-    "the bill does not state the sign consistently enough to judge. "
-    "Do not judge feasibility, novelty, or constraint fit — sign only.")
+    "governing relation. English only. Work in THREE steps, then "
+    "reply with ONE JSON object and nothing else. STEP 1: from "
+    "ENGINEERING KNOWLEDGE of the device class and the stated failure "
+    "mode, state the failure's established physical driver — the "
+    "mechanism that industrially CAUSES this failure mode; do NOT "
+    "derive it from the bill's own claims about itself. STEP 2: state "
+    "what physical process the remedy's active ingredient actually "
+    "imposes on the part. STEP 3: verdict. INVERTED when the "
+    "ingredient IS the established driver or imposes the SAME sign on "
+    "the damage integral over the duty cycle; COMPENSATING-BENEFIT "
+    "CLAIMS (compressive residual stresses, self-healing, recovery "
+    "pauses, 'exploiting fatigue against fatigue') DO NOT change the "
+    "verdict — an ingredient that is a recognized cause of the "
+    "failure mode is INVERTED however it is argued. UNCLEAR when the "
+    "bill does not let you identify the ingredient's physical action. "
+    "Do not judge feasibility, novelty, or constraint fit — sign "
+    "only. JSON shape: {\"direction\": \"INVERTED\"|\"UNCLEAR\"|"
+    "\"CORRECT\", \"established_driver\": \"<one sentence>\", "
+    "\"ingredient_action\": \"<one sentence>\", \"reason\": \"<one "
+    "sentence>\"}.")
 
 _MECH_SPAN = re.compile(r"NOVELTY STATEMENT.{0,2600}", re.S)
 _TEST_CUT = re.compile(
-    r"(?:FALSIFICATION|TEST PLAN|VERIFICATION|VALIDATION)", re.I)
+    r"(?:FALSIFICATION|TEST PLAN|VERIFICATION|VALIDATION|EXECUTABLE\s+"
+    r"TEST)", re.I)
+# the measured QUANTITY: the hyphenated prefix of an "X-sensing"
+# compound, or the 1-3 words after the sensing verb
+_QTY_COMPOUND = re.compile(
+    r"([A-Za-z][a-z\-]{2,28})[-\s]\s*(?:sens\w+|monitor\w*|measur\w+|"
+    r"analy\w+|interrogat\w+)")
+_QTY_OBJECT = re.compile(
+    r"\b(?:sens\w+|monitor\w*|measur\w+|analyz\w+|analyse\w+|"
+    r"interrogat\w+)\s+(?:of\s+|the\s+)?((?:[A-Za-z\-]+\s?){1,3})")
 _MEASUREMENT = re.compile(
     r"\b(online|continuous|real[- ]time|each cycle|during "
     r"(?:operation|production)|in[- ]line|in[- ]service)?[^\n.]{0,80}?"
@@ -111,10 +129,19 @@ _MEASUREMENT = re.compile(
 _DUTY = re.compile(
     r"\b(duty[ -]?cycle|periodic\w*|cyclic\w*|schedul\w+|interval\w*|"
     r"rest period|pause|on[- ]off)\b", re.I)
+_SIGNAL_SPAN = re.compile(
+    r"(?:(?:use|using)\s+only|only\s+the\s+existing|no\s+new\s+"
+    r"sensors?|permitted\s+signals?|available\s+signals?)\s*[:\-]?\s*"
+    r"(.+?)(?:\.|;|$)", re.I)
 _COST = re.compile(
     r"\b(throughput|energy|production (?:rate|loss)|availability|"
     r"yield|operational cost|cost|penalt\w+|price|given up|gives? up|"
     r"trade[sd]? (?:off|against)|lost production|% ?/? ?cycle)\b", re.I)
+_COST_PHYSICS = re.compile(
+    r"\b(kinetic energy|potential energy|energy of (?:the "
+    r")?(?:particle|impact|grain|jet)|surface energy)\b", re.I)
+_COST_QUANT = re.compile(r"\b\d+(?:\.\d+)?\s?(?:%|kWh|MW|t/h|t\/d|"
+                         r"m3|scfm|kPa|bar)\b|\bpercent\b", re.I)
 _ACTION_CLASS = [
     ("thermal-cycling",
      re.compile(r"\b(thermal shock\w*|shock\w*|quench\w*|thermal "
@@ -172,15 +199,24 @@ def _mechanism_span(a: str) -> str:
     return span
 
 
+_DERIVED = re.compile(
+    r"\b(?:derived|computed|calculated|estimated)\s+from\s+"
+    r"([^\n.]{5,90})|\bvia\s+([^\n.]{5,90})", re.I)
+
+
 def scan_input_availability(prob: dict, a: str) -> dict:
     """AM37 D2, deterministic, precision-first. Fire
-    INPUT_UNAVAILABLE only when (a) the constraint's permitted-measure
-    span parses, and (b) the mechanism span REQUIRES an online signal
-    whose object stems share no content stem with the permitted span.
-    Silent (fail-open) otherwise — the authoritative read stays the
-    auditor's."""
+    INPUT_UNAVAILABLE only when (a) the constraint's permitted-
+    measures/signals span parses (the allowed-measures span OR the
+    use-only/existing-sensors phrasing), and (b) the mechanism span
+    REQUIRES an online signal whose MEASURED QUANTITY (parentheticals
+    stripped — a '(derivative of an existing measurement)' aside does
+    not rescue an unpermitted quantity) shares no content stem with
+    the permitted span. Silent (fail-open) otherwise — the
+    authoritative read stays the auditor's."""
     cons = str(prob.get("constraint") or "")
-    m = (PERMITTED_SPAN.search(cons) or ALLOWED_SPAN.search(cons))
+    m = (PERMITTED_SPAN.search(cons) or ALLOWED_SPAN.search(cons)
+         or _SIGNAL_SPAN.search(cons))
     if not m:
         return {}
     permitted_stems = _content_stems(m.group(1))
@@ -194,11 +230,37 @@ def scan_input_availability(prob: dict, a: str) -> dict:
                          r"cycle|during (?:operation|production)|in[- ]"
                          r"line|in[- ]service|monitor)", phrase):
             continue  # only ONGOING requirements bind (AM37: online)
-        obj = re.sub(r"^[^\w)]*[\)\.:\-—]?\s*", "", mm.group(0))
-        obj_stems = _content_stems(obj)
-        if obj_stems and not (obj_stems & permitted_stems):
-            out.append(f"required online signal '{obj[:60]}' is not "
-                       "among the permitted measures/signals")
+        # the measured QUANTITY: the "X-sensing" compound prefix or
+        # the object after the verb — parenthetical asides removed
+        # (they are argumentation, not the signal)
+        s, e = mm.start(), mm.end()
+        w = span[max(0, s - 45):min(len(span), e + 45)]
+        w = re.sub(r"\([^)]*\)", " ", w)
+        qty = None
+        qc = _QTY_COMPOUND.search(w)
+        qo = _QTY_OBJECT.search(w)
+        if qc:
+            qty = qc.group(1)
+        elif qo:
+            qty = qo.group(1)
+        if not qty:
+            continue  # no identifiable quantity — fail-open silent
+        qty_stems = _content_stems(qty)
+        if qty_stems and not (qty_stems & permitted_stems):
+            out.append(f"required online signal '{qty.strip()[:50]}' "
+                       "is not among the permitted measures/signals")
+    # leg 2 (predictor features): a feature DERIVED from a quantity
+    # that requires unpermitted inputs (AM37 D2: "every predictor
+    # feature ... must derive only from the constraint's named
+    # signals" — the HO6-12 class: a saturation index via ion
+    # activity products under temperature/flow-only meters)
+    for dm in _DERIVED.finditer(span):
+        cap = dm.group(1) or dm.group(2) or ""
+        cap = re.sub(r"\*|\([^)]*\)", " ", cap)
+        stems = _content_stems(cap)
+        if stems and not (stems & permitted_stems):
+            out.append(f"derived feature input '{cap.strip()[:60]}' "
+                       "is not derivable from the permitted signals")
     if out:
         return {"INPUT_UNAVAILABLE": out[:3]}
     return {}
@@ -206,16 +268,25 @@ def scan_input_availability(prob: dict, a: str) -> dict:
 
 def scan_duty_cycle_pricing(a: str) -> dict:
     """AM37 D3, deterministic. Fire UNPRICED_DUTY_CYCLE when the bill
-    modulates a duty cycle / schedule and states no operational
-    cost."""
+    modulates a duty cycle / schedule and prices no operational cost:
+    a cost statement counts only as an OPERATIONAL COST line or a
+    cost keyword QUANTIFIED (a magnitude within the sentence);
+    physics-energy phrases (kinetic energy of particles etc.) are not
+    prices."""
     if not _DUTY.search(a):
         return {}
-    if _COST.search(a):
+    text = _COST_PHYSICS.sub(" ", a)
+    if re.search(r"OPERATIONAL\s+COST", text, re.I):
         return {}
+    for sm in _COST.finditer(text):
+        seg = text[max(0, sm.start() - 90):sm.end() + 90]
+        if _COST_QUANT.search(seg):
+            return {}
     return {"UNPRICED_DUTY_CYCLE": [
-        "the bill modulates a duty cycle or schedule but states no "
-        "operational cost (throughput/energy/availability) — the "
-        "OPERATIONAL COST line is mandatory"]}
+        "the bill modulates a duty cycle or schedule but prices no "
+        "operational cost (throughput/energy/availability, "
+        "quantified or bounded) — the OPERATIONAL COST line is "
+        "mandatory"]}
 
 
 def scan_mechanism_template(a: str, used: Counter | None) -> dict:
@@ -246,12 +317,27 @@ def direction_lexicon_check(prob: dict, a: str) -> dict:
     differs from the failure text)."""
     fail_txt = " ".join(str(prob.get(k) or "") for k in
                         ("failure", "failure_mode", "followup_finding"))
+    # the "duty-cycle modulation" TEMPLATE phrase is not an action
+    # ingredient (F54) — strip it before class matching
+    strip = re.compile(r"duty[ -]cycl\w*", re.I)
     span = _mechanism_span(a)
+    span = strip.sub(" ", span)
+    fail_txt = strip.sub(" ", fail_txt)
     out = []
+    _REDUCTION = re.compile(
+        r"\b(reduc\w*|lower\w*|decreas\w*|avoid\w*|prevent\w*|"
+        r"suppress\w*|limit\w*|eliminat\w*|minimiz\w*|mitigat\w*|"
+        r"combat\w*|inhibit\w*|fight\w*|against)\b", re.I)
     for cls_name, rx in _ACTION_CLASS:
         act = rx.search(span)
         drv = rx.search(fail_txt)
         if act and drv:
+            # a class word that is the TARGET of a reduction verb in
+            # the remedy ("reduces fatigue") is the remedy's GOAL,
+            # not its active ingredient — skip
+            pre = span[max(0, act.start() - 40):act.start()]
+            if _REDUCTION.search(pre):
+                continue
             out.append(f"the mechanism's action ingredient "
                        f"'{act.group(0)[:40]}' and the stated failure "
                        f"driver '{drv.group(0)[:40]}' are the same "
@@ -372,6 +458,10 @@ def machine_generate_v77(prob: dict, gw_key: str,
             pv = predictor_violations(final)
             if pv:
                 vio.update({"PREDICTOR_VIOLATION": list(pv)})
+            # AM37 D2: "every predictor FEATURE ... must derive only
+            # from the constraint's named signals" — the
+            # input-availability bind covers predictors too.
+            vio.update(scan_input_availability(prob, final))
         findings = [f"{k}: {'; '.join(map(str, v))[:110]}"
                     for k, v in vio.items() if v]
         problems: list = []

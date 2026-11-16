@@ -107,23 +107,39 @@ def main() -> int:
         return next((r for r in rows if r["problem_id"] == pid), {})
 
     def fired(r, key):
-        return bool(r.get(key))
+        return bool((r or {}).get(key))
 
+    # HO6-12 (DHX scaling) is a PREDICTOR row in the v6 set — AM37
+    # cites it under the unavailable-inputs failures, so it is checked
+    # explicitly (the input-availability bind covers predictor
+    # features per AM37 D2).
+    p12 = next((p for p in plist
+                if p["problem_id"] == "HO6-12-dhx-scaling"), None)
+    r12_extra = {}
+    if p12 is not None:
+        rf12 = ROWS_DIR / "HO6-12-dhx-scaling.json"
+        if rf12.exists():
+            a12 = json.loads(rf12.read_text(encoding="utf-8"))["a1_answer"]
+            r12_extra = {
+                "question_type": p12.get("question_type"),
+                "v77_input_availability": sorted(
+                    scan_input_availability(p12, a12)),
+            }
+
+    r02 = row("HO6-02-caster-mould-taper")
+    llm02 = ((r02.get("v77_direction_llm") or {}).get("direction"))
     mapping = {
         "HO6-02_direction_fires": (
-            fired(row("HO6-02-caster-mould-taper"),
-                  "v77_direction_lexicon")
-            or row("HO6-02-caster-mould-taper", {}).get(
-                "v77_direction_llm", {}).get("direction")
-            in ("INVERTED", "UNCLEAR")),
+            fired(r02, "v77_direction_lexicon")
+            or llm02 in ("INVERTED", "UNCLEAR")),
         "HO6-03_pricing_fires": fired(
             row("HO6-03-fcc-cyclone-erosion"),
             "v77_duty_cycle_pricing"),
         "HO6-04_input_fires": fired(
             row("HO6-04-gis-spacer-charge"),
             "v77_input_availability"),
-        "HO6-12_input_fires": fired(
-            row("HO6-12-dhx-scaling"), "v77_input_availability"),
+        "HO6-12_input_fires": bool(
+            r12_extra.get("v77_input_availability")),
     }
     record = {
         "record": "R40_V77_FIRETEST/1.0.0",
@@ -131,6 +147,7 @@ def main() -> int:
                  "the COMMITTED v6 rows — zero regeneration; the v6 "
                  "rows stay burned)",
         "rows": rows,
+        "ho6_12_predictor_check": r12_extra,
         "acceptance_mapping": mapping,
         "note": "the mapping validates the CHECKERS against the "
                 "auditor's cited failures; the authoritative v7 "
