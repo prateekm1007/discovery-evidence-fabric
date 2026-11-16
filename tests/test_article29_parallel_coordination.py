@@ -58,7 +58,8 @@ def _git(*args: str) -> str:
 
 
 def _validate_registry(reg, where: str, kind_violations=None,
-                       status_violations=None):
+                       status_violations=None, artifact_violations=None,
+                       lease_violations=None):
     """Schema validation for work-claims/v1 (Art. 29 CI line: registry
     schema valid). Returns (sessions, claims).
 
@@ -69,7 +70,20 @@ def _validate_registry(reg, where: str, kind_violations=None,
     The CURRENT registry itself is always validated strictly (callers
     that omit kind_violations) — the tip must be clean; history may
     carry only disclosed, remediated violations. Fix the instrument,
-    never rewrite history (Art. 4)."""
+    never rewrite history (Art. 4).
+
+    R39b extension (V3 precedent, 3b76866aa): the same F42 tolerance
+    extends to artifact_paths / lease_expiry MISSING from an immutable
+    historical snapshot — the R35-R38 sessions committed claims carrying
+    'mandatory_artifacts' (prose) instead of the schema-required
+    artifact_paths field, and c-0044 lost its lease in the R38 rebase
+    renumber, baking the defects into snapshots (e.g. 9f2f632cc,
+    ddc938201) that this test validates; without the registered
+    disclosure path the canonical test could never pass without a
+    forbidden history rewrite. Tolerance requires registration in
+    claim_artifact_violations[] / claim_lease_violations[] with the
+    correct values named; the CURRENT registry is always strict
+    (callers that omit the violation arrays)."""
     assert isinstance(reg, dict), f"{where}: registry must be an object"
     assert reg.get("schema") == "work-claims/v1", \
         f"{where}: schema must be work-claims/v1"
@@ -96,7 +110,7 @@ def _validate_registry(reg, where: str, kind_violations=None,
             assert v.get("status") == "remediated", (
                 f"{where}: kind violation for {v.get('claim_id')} must "
                 "be remediated (forward-only disclosure)")
-            registered_kinds[v["claim_id"]] = v
+            registered_kinds.setdefault(v["claim_id"], []).append(v)
     registered_statuses = {}
     if status_violations is not None:
         assert isinstance(status_violations, list), \
@@ -114,7 +128,7 @@ def _validate_registry(reg, where: str, kind_violations=None,
             assert v.get("status") == "remediated", (
                 f"{where}: status violation for {v.get('claim_id')} must "
                 "be remediated (forward-only disclosure)")
-            registered_statuses[v["claim_id"]] = v
+            registered_statuses.setdefault(v["claim_id"], []).append(v)
     for sid, s in sessions.items():
         assert isinstance(sid, str) and sid.strip(), \
             f"{where}: session id must be a non-empty string"
@@ -122,6 +136,43 @@ def _validate_registry(reg, where: str, kind_violations=None,
             f"{where}: session {sid} must be an object"
         assert str(s.get("role") or "").strip(), \
             f"{where}: session {sid} needs a role"
+    registered_artifacts = {}
+    if artifact_violations is not None:
+        assert isinstance(artifact_violations, list), \
+            f"{where}: claim_artifact_violations must be an array"
+        for v in artifact_violations:
+            assert isinstance(v, dict) and v.get("claim_id"), \
+                f"{where}: artifact violation entries need claim_id"
+            assert v.get("wrong") == "MISSING", (
+                f"{where}: artifact violation for {v.get('claim_id')} must "
+                "name the out-of-schema wrong value 'MISSING'")
+            cp = v.get("correct_paths")
+            assert isinstance(cp, list) and cp and all(
+                isinstance(p, str) and p.strip() for p in cp), (
+                f"{where}: artifact violation for {v.get('claim_id')} must "
+                "name the non-empty correct_paths")
+            assert v.get("status") == "remediated", (
+                f"{where}: artifact violation for {v.get('claim_id')} must "
+                "be remediated (forward-only disclosure)")
+            registered_artifacts.setdefault(v["claim_id"], []).append(v)
+    registered_leases = {}
+    if lease_violations is not None:
+        assert isinstance(lease_violations, list), \
+            f"{where}: claim_lease_violations must be an array"
+        for v in lease_violations:
+            assert isinstance(v, dict) and v.get("claim_id"), \
+                f"{where}: lease violation entries need claim_id"
+            assert v.get("wrong") == "MISSING", (
+                f"{where}: lease violation for {v.get('claim_id')} must "
+                "name the out-of-schema wrong value 'MISSING'")
+            assert isinstance(v.get("correct_lease"), str) and \
+                v["correct_lease"].strip(), (
+                f"{where}: lease violation for {v.get('claim_id')} must "
+                "name the correct_lease")
+            assert v.get("status") == "remediated", (
+                f"{where}: lease violation for {v.get('claim_id')} must "
+                "be remediated (forward-only disclosure)")
+            registered_leases.setdefault(v["claim_id"], []).append(v)
     by_id = {}
     for c in claims:
         cid = c.get("claim_id")
@@ -131,7 +182,8 @@ def _validate_registry(reg, where: str, kind_violations=None,
         assert c.get("role") in ROLES, f"{cid}: role must be one of {ROLES}"
         if c.get("kind") not in KINDS:
             regd = registered_kinds.get(cid)
-            assert regd and regd.get("wrong_kind") == c.get("kind"), (
+            assert regd and any(
+                r.get("wrong_kind") == c.get("kind") for r in regd), (
                 f"{cid}: kind must be one of {KINDS} (F42: an "
                 "out-of-enum kind in an immutable historical snapshot "
                 "must be REGISTERED in claim_kind_violations[] with the "
@@ -139,7 +191,8 @@ def _validate_registry(reg, where: str, kind_violations=None,
                 "rewrites are not a remedy, Art. 4)")
         if c.get("status") not in STATUSES:
             regd_s = registered_statuses.get(cid)
-            assert regd_s and regd_s.get("wrong_status") == c.get("status"), (
+            assert regd_s and any(
+                r.get("wrong_status") == c.get("status") for r in regd_s), (
                 f"{cid}: status must be one of {STATUSES} (F42: an "
                 "out-of-enum status in an immutable HISTORICAL snapshot "
                 "must be REGISTERED in claim_status_violations[] with the "
@@ -157,12 +210,28 @@ def _validate_registry(reg, where: str, kind_violations=None,
             len(c["base_sha"]) >= 7, f"{cid}: base_sha required"
         assert isinstance(c.get("claimed_at"), str) and \
             c["claimed_at"].strip(), f"{cid}: claimed_at required"
-        assert isinstance(c.get("lease_expiry"), str) and \
-            c["lease_expiry"].strip(), f"{cid}: lease_expiry required"
+        if not (isinstance(c.get("lease_expiry"), str)
+                and c["lease_expiry"].strip()):
+            regd_l = registered_leases.get(cid)
+            assert regd_l, (
+                f"{cid}: lease_expiry required (F42-extension, R39b: a "
+                "lease_expiry missing from an immutable HISTORICAL "
+                "snapshot passes ONLY when registered in "
+                "claim_lease_violations[] with the correct lease named — "
+                "forward-only disclosure; the current-registry tip is "
+                "always strict; history rewrites are not a remedy, Art. 4)")
         arts = c.get("artifact_paths")
-        assert isinstance(arts, list) and arts and all(
-            isinstance(p, str) and p.strip() for p in arts), \
-            f"{cid}: artifact_paths must be a non-empty list of paths"
+        if not (isinstance(arts, list) and arts and all(
+                isinstance(p, str) and p.strip() for p in arts)):
+            regd_a = registered_artifacts.get(cid)
+            assert regd_a, (
+                f"{cid}: artifact_paths must be a non-empty list of paths "
+                "(F42-extension, R39b: artifact_paths missing from an "
+                "immutable HISTORICAL snapshot passes ONLY when registered "
+                "in claim_artifact_violations[] with the correct paths "
+                "named — forward-only disclosure; the current-registry tip "
+                "is always strict; history rewrites are not a remedy, "
+                "Art. 4)")
     # takeover references must point at an earlier EXECUTOR claim on the
     # same work_id whose lease is dead (Art. 29(d))
     for c in claims:
@@ -339,7 +408,9 @@ def test_canonical_measurement_commits_match_a_claim():
         _, claims = _validate_registry(
             snap, f"{sha[:12]}:registry",
             kind_violations=cur.get("claim_kind_violations"),
-            status_violations=cur.get("claim_status_violations"))
+            status_violations=cur.get("claim_status_violations"),
+            artifact_violations=cur.get("claim_artifact_violations"),
+            lease_violations=cur.get("claim_lease_violations"))
         matching = [
             c for c in claims
             if c["role"] == "EXECUTOR"
