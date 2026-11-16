@@ -1,0 +1,97 @@
+{
+ "record": "HOLDOUT_V4_AUDITOR_SCORE/1.0.0",
+ "scored_at": "2026-11-16",
+ "scored_by": "auditor (Claude) with the PRIVATE v4 rubric",
+ "generation": "eval/holdout_v4_generation/ (c-0029 one-shot, frozen V7.4 imported byte-identical)",
+ "selection_sha256": "00dfaf7e8f9fe4ea",
+ "problems_sha256_16": "5e2eca51b6a3b8ee",
+ "per_problem": [
+  {
+   "problem_id": "HO4-01-esp-back-corona",
+   "score_0_4": 3,
+   "rationale": "rapping-interval retuning IS an allowed measure; identifies ash resistivity/back-corona; resistivity inference must come from existing V-I curves (no new probe); falsifier present"
+  },
+  {
+   "problem_id": "HO4-02-geomembrane-stress-crack",
+   "score_0_4": 2,
+   "rationale": "drainage-gradation change IS allowed, but the physics is INVERTED: coarser aggregate directly beneath the membrane raises point loading; correct measure is finer bedding"
+  },
+  {
+   "problem_id": "HO4-03-nas-battery-seal",
+   "score_0_4": 2,
+   "rationale": "temperature-window retuning IS allowed, but deliberate thermal cycling to 'heal' glass microcracks is not a real mechanism at 300 C and cycling is the very driver of seal damage; NAS must stay molten"
+  },
+  {
+   "problem_id": "HO4-04-glass-furnace-crown-drip",
+   "score_0_4": 1,
+   "rationale": "ALLOWED-MEASURES VIOLATION: installs a thermal shield + mechanical support + exhaust-gas cooling = new hardware; constraint permits burner/profile retuning or batch/cullet adjustment ONLY"
+  },
+  {
+   "problem_id": "HO4-05-blade-root-bolt-fatigue",
+   "score_0_4": 1,
+   "rationale": "ALLOWED-MEASURES VIOLATION: adds a washer arrangement = hardware change; constraint permits retensioning interval/procedure or pitch-control parameter retuning ONLY"
+  },
+  {
+   "problem_id": "HO4-06-ro-silica-scaling",
+   "score_0_4": 3,
+   "rationale": "staged antiscalant dose IS an allowed measure; identifies tail-element silica supersaturation; falsifier via normalized flux/DP"
+  },
+  {
+   "problem_id": "HO4-07-escalator-step-chain",
+   "score_0_4": 3,
+   "rationale": "motor-current harmonics + encoder periodicity drift on existing sensors; relative-to-own-baseline elongation proxy"
+  },
+  {
+   "problem_id": "HO4-08-chiller-refrigerant-charge",
+   "score_0_4": 3,
+   "rationale": "current-to-enthalpy-lift coupling efficiency from existing P/T + current; load/ambient normalization"
+  },
+  {
+   "problem_id": "HO4-09-ballscrew-preload-loss",
+   "score_0_4": 3,
+   "rationale": "current-position hysteresis area at reversal from existing motor current + linear scale; per-axis baseline"
+  },
+  {
+   "problem_id": "HO4-10-recip-compressor-valve",
+   "score_0_4": 3,
+   "rationale": "cross-stage entropy-generation rate from existing interstage P/T; per-cylinder normalization"
+  },
+  {
+   "problem_id": "HO4-11-conveyor-idler-seizure",
+   "score_0_4": 3,
+   "rationale": "load-normalized drive-current torque inefficiency from existing current + belt scale; no new sensors"
+  },
+  {
+   "problem_id": "HO4-12-diffuser-fouling",
+   "score_0_4": 3,
+   "rationale": "pressure-flow hysteresis area from existing pressure/flow; flow-normalized vs clean baseline"
+  }
+ ],
+ "aggregate": {
+  "n": 12,
+  "total": 30,
+  "mean_0_4": 2.5,
+  "pct": 62.5,
+  "intervention_mean": 2.0,
+  "predictor_mean": 3.0,
+  "allowed_measures_violations": 2,
+  "violating_rows": [
+   "HO4-04-glass-furnace-crown-drip",
+   "HO4-05-blade-root-bolt-fatigue"
+  ]
+ },
+ "acceptance_bar": {
+  "mean_required": 3.0,
+  "violations_required": 0
+ },
+ "ACCEPTANCE": "NOT GRANTED \u2014 mean 2.5 < 3.0 AND 2 allowed-measures violations (HO4-04 installs a thermal shield; HO4-05 adds washers; both constraints permit tuning/procedure measures ONLY)",
+ "comparison": {
+  "v1": 36.5,
+  "v2": 62.5,
+  "v3": 68.8,
+  "v4": 62.5
+ },
+ "headline": "The dev-battery gate-MET did NOT transfer. On fresh unseen problems the V7.4 machine still proposes HARDWARE where the constraint permits only tuning/procedure, and two mechanisms are physically inverted (coarser bedding raises point loading; thermal cycling 'heals' a seal whose failure driver is cycling). Predictors are strong (3.0/4); interventions are the failure (2.0/4).",
+ "art6_ruling": "This is exactly what Art. 6 exists to catch: the V7 family was tuned across V7..V7.5 against the dev set; its constraint-bind learned the dev allowed-measures lists, not the CLASS of constraint. Acceptance is withheld.",
+ "burn": "HOLDOUT v4 BURNED (becomes DEV); a fresh v5 is required for the next acceptance attempt"
+}
