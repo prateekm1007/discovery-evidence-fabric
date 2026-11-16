@@ -80,3 +80,10 @@
 
 ## AMENDMENT — auditor v1.1.0 (owner-directed, 2026-11-15)
 Owner added Arts. 13 (independent tally recompute) and 14 (pre-registered sample size/power); size law expanded 12->14. **Art. 7 (sealed instruments) RETAINED** — the owner deployed holdout v1 (scored + burned R14); Art. 7 is in active use. **Prune rule unchanged:** an article with zero catches across 5 consecutive audits is deleted (never-deployed instruments exempt until first deployment + 5 audits).
+
+
+## AMENDMENT — auditor v1.2.0 (OWNER STANDING DIRECTIVE, 2026-11-16)
+**Owner instruction (verbatim intent):** from henceforth, tell the coder to read the **FULL constitution**, not just some articles.
+**Rule (binds Art. 11 and every future round):** the coder-facing reminder in every verdict, direction set and checklist must direct a **complete read of `EPISTEMIC_CONSTITUTION.md` from the builder branch (`queue/dev12_r7`)** — all articles, in full — never a selected article list. Citing specific articles alongside the full-read instruction is permitted only as emphasis, never as a substitute for the full read.
+**Test:** every round's directions open with a full-constitution read instruction naming the builder branch and its SHA; a reminder that lists only selected articles is a defect in the auditor's own output.
+**Reason:** selective article citation let the builder miss governing clauses it had not been pointed at (the recurring failures were unenforced/unread rules, not missing rules — the owner's own v3.0.0 finding). Forward-only amendment; no history rewritten.
