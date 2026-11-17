@@ -61,11 +61,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import os from "node:os";
+import { fileURLToPath } from "node:url";
 
 const PORT = Number(process.argv[2] || process.env.ZAI_GATEWAY_PORT || 8787);
 const KEY = process.env.ZAI_GATEWAY_KEY || "";
+// R58 fix (F64-class, typed): the default log path was HARDCODED to a
+// foreign clone's absolute path (/home/z/my-project/discovery-evidence-
+// fabric/...) — a sandbox-path-bound artifact location (auditor Art. 1
+// v1.3.0: sandbox-bound evidence is UNVERIFIED even when committed).
+// Every attestation in THIS clone measured 0 completed calls because
+// the calls were logged into the OTHER clone's tree. Default: relative
+// to THIS script's repo (scripts/../ENGINE_RUNS/), overridable by env.
 const LOG = process.env.ZAI_GATEWAY_LOG ||
-  "/home/z/my-project/discovery-evidence-fabric/ENGINE_RUNS/zai_gateway_calls.jsonl";
+  path.join(path.dirname(fileURLToPath(import.meta.url)),
+            "..", "ENGINE_RUNS", "zai_gateway_calls.jsonl");
 
 if (!KEY) {
   console.error("[zai-gateway] refusing to start: ZAI_GATEWAY_KEY unset");

@@ -19,6 +19,23 @@ custody). Committing the evaluator now keeps the adoption bar
 pre-registered and CI-testable BEFORE any run (the AM44 protocol:
 criteria before data).
 
+AMENDMENT — R58 (2026-11-17, claim c-0079, dated BEFORE any scored
+evaluation and BEFORE this round's criteria legs ran): the verdict
+order is corrected for the UNMEASURABLE criterion-3 case. The v1.0.0
+verdict ladder typed DELETE whenever criteria 1+2 were met but
+criterion 3 was UNMEASURABLE — a deletion decided on NO measurement,
+the symmetric violation of "never pass a gate on a point estimate"
+(auditor constitution Art. 14: an under-powered or unmeasured clause
+is UNRESOLVED, never passed and never failed). The amendment:
+criterion 3 UNMEASURABLE with criteria 1+2 met now types
+ADOPTION_DEFERRED_CRITERION_3_UNMEASURABLE (the adoption decision
+waits for the confidential instrument; the numeric bars 1+2 still
+bind and can still kill the addition). The MEASURED paths are
+UNCHANGED: all-measured-and-met -> ADOPT; measured-and-unmet ->
+DELETE; criteria 1/2 unmet -> the pre-registered bar says the
+addition does not survive. No numeric bar (SCHEDULE_BAR, the 0/0
+legs, the mean comparison) is touched by this amendment.
+
 Zero LLM, zero network.
 """
 from __future__ import annotations
@@ -73,15 +90,25 @@ def evaluate(rows_path: Path, baseline_path: Path) -> dict:
                            "confidential valid one (v9 post-P0 custody)",
                  "met": False}
     all_met = crit1["met"] and crit2["met"] and crit3["met"]
-    return {"record": "R53_P2_ABLATION_CRITERIA/1.0.0",
+    crit3_unmeasurable = crit3.get("value") == "UNMEASURABLE"
+    # R58 amendment (dated above): an UNMEASURABLE criterion-3 with
+    # criteria 1+2 met DEFERS the adoption decision — never a DELETE
+    # on no measurement (auditor Art. 14: unmeasured = UNRESOLVED).
+    # The measured paths are byte-equivalent to v1.0.0.
+    verdict = ("ADOPT" if all_met else
+               "ADOPTION_DEFERRED_CRITERION_3_UNMEASURABLE"
+               if crit1["met"] and crit2["met"] and crit3_unmeasurable
+               else "DELETE" if crit1["met"] and crit2["met"] else
+               "INCOMPLETE — criteria unmet; the pre-registered "
+               "bar says the addition does not survive")
+    return {"record": "R53_P2_ABLATION_CRITERIA/1.1.0",
             "schedule_bar": SCHEDULE_BAR,
             "overlapping_rows": len(common),
             "criteria": [crit1, crit2, crit3],
-            "verdict": ("ADOPT" if all_met else
-                        "DELETE" if crit1["met"] and crit2["met"] else
-                        "INCOMPLETE — criteria unmet; the pre-registered "
-                        "bar says the addition does not survive"),
-            "note": "evaluator only; the RUN defers (see module docstring)"}
+            "verdict": verdict,
+            "note": "evaluator only; the RUN defers (see module "
+                     "docstring); v1.1.0 = the R58 UNMEASURABLE-"
+                     "verdict amendment (dated in the docstring)"}
 
 
 def main() -> None:
