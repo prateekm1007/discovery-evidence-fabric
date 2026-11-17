@@ -22,14 +22,14 @@ Best-first search: AIDE-style ONLY now (computed checks give a trustworthy metri
 Conformal predictors: MAPIE+telemanom validated on C-MAPSS/XJTU-SY/CWRU with own loaders.
 Speed: median <=2min, worst <=5min per problem, 429-safe backoff.
 GATE: two consecutive sealed sets mean>=3.3; measured path through engine; pre-registered gain on a DEV slice the optimizer never saw.
-## Phase 4 real novelty (->8)
-Prior-art distance: SPECTER2-class embeddings vs patents+papers.
-Cross-domain retrieval: MOOSE-Chem inspiration pattern; failed-mechanism memory blocks repeats.
-Blind rating: >=3 domain experts OR cross-family judge panel calibrated to them.
-GATE: >=50% interventions viable+non-obvious; novelty distance separates known-novel from known-obvious by >=0.2 cosine; 0 canary completions.
-## Phase 5 external proof (->9)
-Rediscovery: >=30 granted patents/papers published after generator training cutoff (canary-confirmed); engine sees only the problem; auditor scores blind vs rubrics stored OFF-REPO.
-Real-world validation: >=3 generated candidates/quarter to external validation.
-Unattended: a 30-batch completes end-to-end with 0 human interventions.
-GATE: >=40% key mechanisms recovered (pre-registered); >=1 externally confirmed candidate; unattended run passes.
-NOTE: P4/P5 depend on owner-provided domain experts + real-world tests; without them the ceiling is ~7.
+## Phase 4 real novelty (->8) — AGENT-RUN (AM46 owner directive: AI agents replace human experts)
+Prior-art distance: SPECTER2-class embeddings vs patents+papers (deterministic). Cross-domain retrieval: MOOSE-Chem inspiration pattern; failed-mechanism memory blocks repeats.
+BLIND AI PANEL: >=3 judge agents, >=2 model families distinct from generator AND each other; every rung R-CAL qualified (accuracy>=0.8, answered_rate>=0.9) before service; blind + position-swapped; structured per-axis scores; judge!=generator (provider AND model).
+PANEL CALIBRATION GATE: agreement>=0.7 (alpha>=0.6) on 10-item slice; AUC>=0.8 ranking known-novel over known-obvious controls; auditor cross-check>=20% (family disclosed); disagreement rule pre-registered.
+GATE: >=50% viable+non-obvious by calibrated blind panel; >=0.2 cosine separation; 0 canary completions. LABEL: AI-rated, not physical efficacy.
+## Phase 5 external proof (->9) — AGENT-RUN (AM46)
+Rediscovery: >=30 granted patents/papers AFTER generator cutoff (canary-confirmed); engine sees only the problem; auditor agents score blind vs OFF-REPO rubrics. Human-produced artifacts = external ground truth; agent scoring against them is objective.
+VALIDATION TIERS: T1 executable computed/simulated falsifier (unit-checked, sandboxed, evidence committed); T2 retrieval-agent cross-check, every citation resolves; T3 owner physical test OPTIONAL gold label. Externally confirmed = >=1 candidate passes T1+T2 (agent-validated).
+Unattended: 30-batch end-to-end, 0 human interventions.
+GATE: >=40% key mechanisms recovered (pre-registered); >=1 agent-validated candidate; unattended pass. LABEL: physical efficacy unclaimed unless T3.
+LOOP: auditor agents author/seal -> builder agents generate -> verifier agents recompute -> calibrated panel rates -> retrieval agents check prior art -> burn -> next. Gateway+judge queue only. Only owner act remaining: P0 one-time custody+rotation.
