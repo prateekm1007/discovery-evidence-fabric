@@ -1,0 +1,33 @@
+{
+ "record": "R57S2_ROUTE_QUALIFICATION/1.0.0",
+ "session": "builder-r57s2",
+ "claim": "c-0078",
+ "base_sha": "b6be7c6b7",
+ "owner_directive": "'try Xkiro and agnes'",
+ "method": "provider docs fetched first (docs.xkiro.com; wiki.agnes-ai.com) to fix base URLs and auth shapes BEFORE any key left the vault; keys sent ONLY to their identified own-service endpoints; minimal payloads (models list = zero generation cost, then one <=64-token completion each)",
+ "xkiro": {
+  "service": "xkiro.com (OpenAI-compatible aggregator)",
+  "base_url": "https://api.xkiro.com/v1",
+  "auth": "Authorization: Bearer",
+  "models_list": "HTTP 200, 69 models (roster incl. google/gemini-3.6-flash, x-ai/grok-4.7, anthropic/claude-sonnet-5.5, openai/gpt-6.1-sol, deepseek/deepseek-v4-pro-0813)",
+  "generation": "HTTP 200 model mistralai/ministral-14b, visible completion returned, usage 13 tokens",
+  "verdict": "LIVE + FUNDED \u2014 route qualified"
+ },
+ "agnes": {
+  "service": "agnes-ai.com (OpenAI-compatible)",
+  "base_url": "https://apihub.agnes-ai.com/v1",
+  "auth": "Authorization: Bearer",
+  "models_list": "HTTP 200, 10 models (agnes-2.5-pro/flash tiers + image/video)",
+  "generation": "HTTP 200 model agnes-2.5-flash: at max_tokens=16 the budget went entirely to reasoning tokens (empty visible text); at max_tokens=64 visible text returned ('ready'), usage 309 tokens (256 prompt cached)",
+  "verdict": "LIVE + FUNDED \u2014 route qualified; NOTE for v9: reasoning-style token budget must be sized for visible output"
+ },
+ "p2_impact": {
+  "typed": "the P2 'LLM credential' blocker is LIFTED \u2014 two funded routes qualified (XKIRO, AGNES); DEEPAI remains 402 Pro-gated; OPENROUTER/CROWLLM/INCEPTION unprobed (spares)",
+  "remaining_gate": "P0 custody ONLY (owner act; F60: the v9 instrument must be confidential first)"
+ },
+ "secrets_check": {
+  "full_keys_in_committed_files": false,
+  "vault_gitignored": true,
+  "keys_sent_only_to_own_service": true
+ }
+}
