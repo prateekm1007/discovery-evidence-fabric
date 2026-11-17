@@ -1172,7 +1172,7 @@
    "claim_id": "c-0057",
    "work_id": "holdout-v7-generation",
    "title": "the holdout-v7 one-shot: ONE generation of the frozen V7.7 machine over the auditor's 12 sealed problems (seal c7b4473c…), registered BEFORE any problem read",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-17T10:05:00Z (sandbox clock)",
    "session_id": "builder-r20s4",
    "role": "EXECUTOR",
@@ -1191,7 +1191,7 @@
    "pre_registration_note": "Art. 29(b) + the v7 PREREGISTRATION one_shot_protocol step 1: this claim is committed and pushed BEFORE any v7 problem is read. The problems come ONLY from audit/holdout_v7/holdout_v7_problems.json (seal c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b); the PRIVATE rubric is never read by this session; ONE generation, frozen V7.7 (V77_REQUEST_MODEL=glm-4-plus), zero re-generation; the attestation gate runs PRE-SCORING.",
    "scope": "Per audit/holdout_v7/PREREGISTRATION.json (SEALED_REGISTERED, AM39 D2): generate bills for the 12 sealed problems (6 intervention + 6 predictor) with the frozen V7.7 machine; commit 12 pair rows + the gateway-log slice (requested+served per call over the run window) + the durable all-row events ledger + the run ledger (run_verdict, seal_anchor, serving_evidence_full); attestation gate PRE-SCORING: 12/12 served_model == registered glm-4-plus, seal recompute EXACT, ONE executor id, green pushed CI read from the check-run API. BURN is the post-scoring act (prereg step 5 follows step 4 scoring) — not this session's.",
    "outcome": "EXECUTION-COMPLETE-PENDING-VERIFIER-RECOMPUTE. The one-shot ran exactly once (8d30772cf, CI SUCCESS API-read): seal recompute EXACT before any generation (c7b4473c…), 12/12 rows with the frozen V7.7 machine, zero batch re-generation, 72/72 completed gateway calls requested AND served glm-4-plus (14 lines in the slice are the gateway's 429-backoff telemetry — no model fields — correctly excluded after the v1.0.0 attestation mistake was found and disclosed), one executor id, critic CLEAN on all 12 finals, direction checks 6/6 CORRECT on the intervention rows (the authoritative read stays the auditor's rubric scoring). Machine-tightness observation disclosed: every row reached CLEAN at repair_3 (the budget ceiling); per-attempt findings are in the events ledger. Handoff: auditor scores vs the PRIVATE rubric (prereg step 4); BURN is step 5.",
-   "verifier": "awaiting the peer verifier's byte recompute (prereg step 2) — the run artifacts are eval/v7_run/: 12 rows, events ledger, gateway slice, serving attestation v1.1.0, run ledger v1.1.0 (run_verdict=VALID)",
+   "verifier": "eval/r42_verifier_c0057.json — VERIFIED (c-0059, builder-r42s1; prereg step 2 complete): seal EXACT (c7b4473c…, canonical-tuple recompute), 72/72 completed gateway calls requested AND served glm-4-plus (zero mismatches; 14 telemetry lines correctly excluded; the v1.0.0->v1.1.0 attestation correction recomputes from the UNCHANGED raw slice), 12/12 rows verified against the sealed packet, one executor id, ONE generation (draft+repair_1..3 per row, no batch re-run), events-ledger sha chains consistent, diversity cap held on declared rows (3/6 declared, 3 MECHANISM_CLASS_UNSTATED residuals), direction-LLM committed reads 6/6 CORRECT (never re-run, Art. 29(c)), full deterministic scan-battery recompute over all 12 rows: ZERO mismatches — every residual finding faithful (ALLOWED_ROW_OUTSIDE 7 on 4 rows; INPUT_UNAVAILABLE 8 on 7 rows; UNPRICED_DUTY_CYCLE 4; MECHANISM_CLASS_UNSTATED 3 — all disclosed for the rubric), claim-before-problem-read HELD (claim pushed 23:58:28Z, window started 00:12:15Z), run_verdict VALID stands, CI at 8d30772cf SUCCESS API-read. Scoring is the auditor's (prereg step 4); BURN post-scoring (step 5).",
    "schema_correction_note": "R42 closeout v2 (forward-only, Art. 4): the closeout commit 4bca7a13a flipped this claim DONE while the verifier recompute (the PREREGISTRATION one_shot_protocol step 2 — the peer verifier's recompute from committed bytes) has not happened; the Art. 29(c) gate correctly refused a DONE measurement without a VERIFIER record (the pushed CI ran FAILURE at 4bca7a13a, API-read, preserved as fact). Status returns to OPEN: the EXECUTION is complete (run artifacts committed at 8d30772cf, run_verdict=VALID) but the WORK ITEM includes the independent check, so the claim stays open until the verifier record lands."
   },
   {
@@ -1209,6 +1209,22 @@
     "eval/r42_verifier_c0056.json"
    ],
    "notes": "VERIFIER for c-0056 (EXECUTOR builder-r20s4). Zero-LLM recompute from committed bytes only (Art. 13/29(c)): full queue surface re-executed locally at the verified tips; the rendered constitution step extracted from the committed YAML and run as bash (64 tests, exit 0); the pushed CI read from the check-run API (fd28fecb6=FAILURE preserved; 069a16430=SUCCESS); refusal-path negative controls re-run; determinism stress 5/5 random hash seeds; map citations checked; c-0055 flip + citation verified on the audit branch @1dad86c14; secret-grep 0 on both diff segments; v6 byte-frozen. One DEFECT found at the wiring commit (the comment-in-continuation break), typed in the record — executor-disclosed and fixed forward-only before this verification."
+  },
+  {
+   "claim_id": "c-0059",
+   "work_id": "holdout-v7-generation",
+   "session_id": "builder-r42s1",
+   "role": "VERIFIER",
+   "kind": "one_shot",
+   "base_sha": "8d30772cf",
+   "claimed_at": "2026-11-17T01:00:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-17T07:00:00Z",
+   "status": "DONE",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r42_verifier_c0057.json"
+   ],
+   "notes": "VERIFIER for c-0057 (EXECUTOR builder-r20s4; the 4bca7a13a Art. 29(c) refusal resolved — this is the awaited prereg-step-2 verifier recompute). Zero-LLM recompute from committed bytes only (Art. 13/29(c)); the direction-LLM legs were NEVER re-run. All run-integrity legs verified; the residual bind findings recomputed FAITHFUL (zero mismatches) and are filed for the auditor's PRIVATE-rubric scoring — this record does not score the run."
   }
  ],
  "trailer_violations": [
