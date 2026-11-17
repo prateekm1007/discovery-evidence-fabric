@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-17T19:55:00Z (sandbox clock)",
+ "at": "2026-11-17T20:05:00Z (sandbox clock)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -1594,7 +1594,7 @@
    "claim_id": "c-0073",
    "work_id": "r54-fv5-physics-hardening",
    "title": "R54: port the F-V5 physics hardening onto the remote lineage \u2014 the typed out-of-domain refusals the relay never carried: arrhenius 0 K domain guard + exponent saturation bounds (the V8.1.2 1995f7e75 pattern), npsh rho/pvap guard moved BEFORE the head division, dewpoint Magnus floor (b+t<=0) + degenerate (a==alpha) guard; regression pins in tests/test_physics_checks.py; LIVE-REPRODUCED at the remote tip 576a1195c BEFORE this claim: run_check('arrhenius_rate_ratio', t2_degC=-273.15) raises uncaught ZeroDivisionError, run_check('npsh_margin', rho_kg_m3=0.0) raises uncaught ZeroDivisionError, run_check('dewpoint_frost_margin', t_air_degC=-243.04) raises uncaught ZeroDivisionError \u2014 Art. 3 typed-refusal violation (out-of-domain must return typed REFUSED, never raise through run_check)",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-17T19:10:00Z (sandbox clock)",
    "session_id": "builder-r54s2",
    "role": "EXECUTOR",
@@ -1609,7 +1609,9 @@
     "eval/r54_fv5_remediation.json",
     "eval/work_claims.json"
    ],
-   "notes": "Claim-before-work per Art. 29(b); the live-reproduction probes (3 crash classes, zero-LLM, read-only diagnostics) ran in this session immediately before this claim was filed and are typed here + in the remediation record. The fix is content-preserving on in-range inputs (the committed P1 measurement's 36/36 and the labelled regression's PASS 0/0/0 must remain byte-identical \u2014 verified post-fix). Provenance: the identical defect was verifier-filed (F-V5) and live-reproduced during the R53 P1-gate measurement on the local r53s1 lineage; its fix landed locally under the r53s1 c-0073 lane but the relay to the remote lineage (which folded the r53s1 lanes into remote c-0071) did NOT carry the physics hardening \u2014 verified by code inspection + live probes at 576a1195c before this claim. Disjoint-work rebase per Art. 29(e)."
+   "notes": "Claim-before-work per Art. 29(b); the live-reproduction probes (3 crash classes, zero-LLM, read-only diagnostics) ran in this session immediately before this claim was filed and are typed here + in the remediation record. The fix is content-preserving on in-range inputs (the committed P1 measurement's 36/36 and the labelled regression's PASS 0/0/0 must remain byte-identical \u2014 verified post-fix). Provenance: the identical defect was verifier-filed (F-V5) and live-reproduced during the R53 P1-gate measurement on the local r53s1 lineage; its fix landed locally under the r53s1 c-0073 lane but the relay to the remote lineage (which folded the r53s1 lanes into remote c-0071) did NOT carry the physics hardening \u2014 verified by code inspection + live probes at 576a1195c before this claim. Disjoint-work rebase per Art. 29(e).",
+   "done_at": "2026-11-17T20:05:00Z (sandbox clock)",
+   "done_note": "Execution complete (executor self-flip, the c-0060/c-0065 pattern; auditor confirmation pending next round): the F-V5 hardening ported onto the remote lineage \u2014 arrhenius 0 K domain guard + exponent saturation bounds (1995f7e75 pattern, clamp disclosed in-band), npsh rho/pvap guard moved BEFORE the head division, dewpoint Magnus floor + degenerate guards; 4 regression pins appended to tests/test_physics_checks.py (14/14 green). CONTENT-PRESERVING, byte-evidenced: eval/r54_p1_unit_checked.json sha256-identical pre/post fix (fd410bdcdc6ea307b9565d8593372616460e08715c832d6616b70a8bb8871386); the labelled regression PASS 0/0/0 byte-identical; all 12 reference scenarios value-identical (arrhenius 1.0016369747921925 / npsh 6.6883 / dewpoint -6.698). Full CI battery green (step1 14 + retally + critic_r2; step2 157; step3 57; both gate drivers; tips gate PASS 75/75 baselined 0 unbaselined). Art. 27 accounting: this fix is content-preserving robustness \u2014 NO capability change claimed, no metric-path touched; engine .py +73/-11 of +201/-14 total = 36.3% raw-insertions basis, 38.7% changed-lines basis \u2014 both >= 30%. Evidence: eval/r54_fv5_remediation.json."
   },
   {
    "claim_id": "c-0074",
