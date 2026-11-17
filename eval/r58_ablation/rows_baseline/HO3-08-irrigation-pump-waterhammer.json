@@ -1,0 +1,44 @@
+{
+ "problem_id": "HO3-08-irrigation-pump-waterhammer",
+ "arm": "baseline",
+ "dev_source": "v3-burned",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:52:23.447660Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers a MONITORING/INDICATION scheme using peak pressure transient amplitude at the pump header as the primary indicator.  \n- Departure: Cumulative surge dose (integrated pressure transients) as a fatigue-predictive metric, derived from existing 10 Hz traces.  \n- Connection: PVC joint fatigue is driven by cumulative stress cycles; peak amplitude alone ignores frequency, while cumulative dose matches Miner's rule for fatigue life.  \n\n**PHYSICS CHECK**  \n- Governing relation: Cumulative fatigue damage \\( D = \\sum \\frac{n_i}{N_i} \\), where \\( n_i \\) = cycles at stress level \\( i \\), \\( N_i \\) = cycles to failure at \\( i \\).  \n- Direction-of-effect: Driving variable = cumulative pressure transients; the mechanism reduces damage by flagging when \\( D \\) approaches 1 (failure), enabling early intervention.  \n- Magnitude verification: PVC joints typically fail at \\( \\sim 10^6 \\) cycles at 10 bar; 100 transients/day at 10 bar = \\( 3.65 \\times 10^4 \\)/year, so threshold at 27 years cumulative dose (ASSUMPTION: conservative joint spec).  \n\n**IMPLEMENTATION BILL**  \n- MECHANISM CLASS: Cumulative fatigue damage calculator  \n- (a) Data acquisition: ALREADY-RECORDED 10 Hz pump header pressure trace (problem constraint).  \n- (b) Signal processing: Digital integrator (e.g., PLC or edge device) to compute \\( \\sum |P_{peak}| \\) per event.  \n- (c) Threshold logic: DERIVED from PVC joint fatigue spec (CALCULATED: 10 bar × 10^6 cycles = 10^7 bar-cycles cumulative dose).  \n- (d) Alert system: Existing SCADA/alarm module (no new hardware).  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: SAME (uses existing pressure trace; no new sensors).  \n- Operability: SAME (automated calculation; no manual intervention).  \n- Maintenance: SAME (threshold derived from spec; no calibration).  \n- Cost class: SAME (no new hardware; minimal compute overhead).  \n- Operational loss: ZERO (alerts only; no throughput reduction).  \n\n**EXECUTABLE TEST**  \n- Protocol: Analyze 3 years of existing 10 Hz pressure traces; compute cumulative dose per season.  \n- Pass/fail: ≤2 false alerts/season (user constraint); alerts must occur within 1 season of joint bursts (historical data).  \n- Duration: 1 month (covers seasonal variations).  \n- Kill criterion: >2 false alerts or missed bursts.  \n- Validation: Against historical joint failures (stated data).  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Peak pressure transient at pump header (per problem definition); cumulative dose supplements it by incorporating fatigue physics.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- MECHANISM CLASS: Cumulative fatigue damage calculator",
+    "- (d) Alert system: Existing SCADA/alarm module (no new hardware).",
+    "- Installability: SAME (uses existing pressure trace; no new sensors).",
+    "- Operability: SAME (automated calculation; no manual intervention).",
+    "- Maintenance: SAME (threshold derived from spec; no calibration).",
+    "- Cost class: SAME (no new hardware; minimal compute overhead).",
+    "- Operational loss: ZERO (alerts only; no throughput reduction).",
+    "- Protocol: Analyze 3 years of existing 10 Hz pressure traces; compute cumulative dose per",
+    "- Pass/fail: ≤2 false alerts/season (user constraint); alerts must occur within 1 season o",
+    "- Duration: 1 month (covers seasonal variations).",
+    "- Kill criterion: >2 false alerts or missed bursts.",
+    "- Validation: Against historical joint failures (stated data).",
+    "- Primary indicator: Peak pressure transient at pump header (per problem definition); cumu"
+   ]
+  }
+ },
+ "declared_template_prose": "cumulative fatigue damage calculator",
+ "allowed_row_outside": 0,
+ "sha256_16": "01a089c3e6f8afad",
+ "smoke": false
+}

@@ -1,0 +1,41 @@
+{
+ "problem_id": "bench-p02-leadacid-grid-corrosion",
+ "arm": "baseline",
+ "dev_source": "dev12",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T19:00:37.168277Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nThe intervention is a periodic microcurrent reversal schedule applied during float charge to reverse the net corrosion current on the positive grid. Standard practice applies constant 2.27 V/cell float charge, causing continuous anodic dissolution of the lead grid. The adjacent-technique clearance is equalization charging, which briefly raises voltage to >2.4 V/cell to desulfate but accelerates corrosion; here, the reversal occurs at the same float voltage without exceeding it. The mechanism exploits the reversibility of lead corrosion electrochemistry: brief cathodic pulses at float voltage reduce Pb²⁺ back to Pb, netting zero cross-section loss over a duty cycle.  \n\nPHYSICS CHECK  \nDriving variable = net anodic current density; the mechanism moves it down by reversing polarity (microampere/cm² pulses at float voltage), which reduces the failure driver by integrating to zero net dissolution over a cycle. The governing relation is Faraday’s law: Δm = (I·t·M)/(n·F), where reversing I for 10% of the cycle at same |t| yields net Δm ≈ 0.  \n\nIMPLEMENTATION BILL  \nStandard practice bill: (a) Float charger at 2.27 V/cell continuous.  \nIntervention bill:  \n1. (b) Commercial programmable timer, installed on charger control output, set to 15 min on / 2 h off (duty cycle 11%).  \n2. (c) Timer output wired to reverse polarity relay coil (existing charger relay repurposed for bidirectional switching).  \n3. (b) Standard DPDT relay (catalog class: 24 V DC coil, 30 A contacts), installed across battery terminals, wired for polarity reversal.  \n4. (c) Charger setpoint unchanged at 2.27 V/cell; timer modulates relay to reverse battery polarity during off periods.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installation: Timer/relay added (2 catalog parts) vs. none in standard; same electrician labor class.  \n- Commissioning: Timer programming (15 min/2 h cycle) vs. none in standard; same technician time.  \n- Operation: No additional energy (relay coil power negligible); no operational loss (float charge maintained).  \n- Maintenance: Relay contacts (standard replacement interval) vs. none in standard; same class.  \nConclusion: Same burden class (infrastructure unchanged, labor parity).  \n\nEXECUTABLE TEST  \nProtocol: Deploy 10 identical VRLA batteries (2% Sb grids) with/without intervention. Float at 2.27 V/cell (25°C). Measure grid cross-section loss via micro-CT at 0, 5, 10, 15 years. Pass/fail: Cross-section loss < 15% at 15 years. Kill criterion: >20% loss at any interval. Duration: 15-year accelerated test (1.5× voltage, 40°C).  \n\nMECHANISM CLASS: Electrochemical current reversal.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installation: Timer/relay added (2 catalog parts) vs. none in standard; same electrician",
+    "- Commissioning: Timer programming (15 min/2 h cycle) vs. none in standard; same technicia",
+    "- Operation: No additional energy (relay coil power negligible); no operational loss (floa",
+    "- Maintenance: Relay contacts (standard replacement interval) vs. none in standard; same c"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ },
+ "declared_template_prose": "electrochemical current reversal.",
+ "allowed_row_outside": 0,
+ "sha256_16": "5fc416504caecaea",
+ "smoke": false
+}

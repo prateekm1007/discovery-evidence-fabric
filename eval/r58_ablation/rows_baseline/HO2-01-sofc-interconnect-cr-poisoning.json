@@ -1,0 +1,44 @@
+{
+ "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+ "arm": "baseline",
+ "dev_source": "v2-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:05:35.401171Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is to install a sacrificial iron-chromium alloy upstream of the cathode inlet to preferentially oxidize and sequester chromium species before they reach the cathode. Standard practice uses protective coatings on the interconnect, which do not address upstream chromium vapor; this intervention introduces a sacrificial getter mechanism that acts on the vapor phase. The closest existing practice is getter materials in vacuum systems, but this departs by targeting specific chromium species in oxidizing gas streams and operating at SOFC temperatures. The mechanism exploits the higher affinity of sacrificial iron for chromium oxide formation, reducing CrO₃ transport to the cathode.\n\nPHYSICS CHECK — The driving variable is CrO₃ partial pressure at the cathode inlet; the sacrificial getter lowers it by preferential oxidation of Cr to Cr₂O₃ on the iron surface. At 500 ppb CrO₃ in inlet air, the getter’s equilibrium CrO₃ reduction is estimated at 95% (Fe + CrO₃ → Fe₂O₃ + Cr₂O₃, ΔG < 0 at 750°C), which reduces the chromium deposition rate at the triple-phase boundary by a factor of 20, lowering polarization resistance growth from 20% to <1% over 10,000 h.\n\nIMPLEMENTATION BILL —  \n- (b) Standard porous iron-chromium alloy sheet (FeCr20, 1 mm thick, 50% porosity), cut to fit existing gas-manifold cross-section, installed upstream of cathode inlet (uses existing manifold space).  \n- (c) Procedure: Replace existing gas-manifold segment with sacrificial sheet; no machining of interconnect or cell (retrofit only). Operate at standard flow rate (no parameter change).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- Standard practice: Protective coating application (custom process, development burden).  \n- This intervention: (b) Standard sheet (same cost class as manifold gaskets), (c) Standard replacement procedure (same as manifold maintenance). Burden: same (no new tooling, same labor class, no operational loss).  \n\nEXECUTABLE TEST —  \nProtocol: Test 10 identical SOFC stacks (5 control, 5 intervention) at 750°C, 0.7 A/cm² for 10,000 h. Measure CrO₃ at cathode inlet (ppb) via online mass spectrometer (existing instrumentation). Measure polarization resistance every 500 h via EIS. Pass/fail: Intervention stacks show <5% power decay and CrO₃ levels <25 ppb at cathode inlet; control stacks show >15% decay. Kill criterion: >10% decay in any stack before 5,000 h.  \n\nMECHANISM CLASS: Sacrificial vapor-phase getter.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: Protective coating application (custom process, development burden)."
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'alloy' in: novelty statement (intervention) — the intervention is to install a sacrificial iron-chromium alloy upstream o",
+    "excluded stem 'alloy' in: at 500 ppb cro₃ in inlet air, the getter’s equilibrium cro₃ reduction is estimated at 95% (fe + cro₃ → fe₂o₃ +",
+    "excluded stem 'cell' in: - (c) procedure: replace existing gas-manifold segment with sacrificial sheet; no machining of interconnect or",
+    "excluded stem 'interconnect' in: standard practice uses protective coatings on the interconnect, which do not address upstream chromium vapor; "
+   ],
+   "STANDARD_BILL": [
+    "CUSTOM_MACHINING: machining/machined work: - (c) Procedure: Replace existing gas-manifold segment with sacrificial sheet; no machining of interconnect or cell (retrofit only). Operate at standard flow ra"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ]
+  }
+ },
+ "declared_template_prose": "sacrificial vapor-phase getter.",
+ "allowed_row_outside": 0,
+ "sha256_16": "327ebde6cfecb740",
+ "smoke": false
+}

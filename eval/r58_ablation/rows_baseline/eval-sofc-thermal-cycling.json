@@ -1,0 +1,48 @@
+{
+ "problem_id": "eval-sofc-thermal-cycling",
+ "arm": "baseline",
+ "dev_source": "dev12",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T19:24:39.850908Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nThe proposed intervention is a staged thermal ramp schedule with intermediate holds at 400°C during heating and 600°C during cooling, using the existing stack control system to modulate the heating rate. Standard practice uses a direct 5°C/min ramp with no holds, which maximizes thermal shock. The proposed mitigation introduces controlled pauses at critical temperature points to allow stress relaxation in the glass-ceramic seal and cathode-electrolyte interface, reducing differential expansion strain accumulation. Adjacent-technique clearance: Existing thermal cycling mitigation focuses on material upgrades (e.g., compliant seals) or slower overall ramp rates, not strategic holds at specific temperatures. The mechanism directly targets the failure driver (thermal shock magnitude) by minimizing the rate of temperature change at high-stress transitions.\n\nPHYSICS CHECK  \nDIRECTION-OF-EFFECT: driving variable = thermal gradient (dT/dt) across interfaces; the mechanism moves it DOWN by 70% (from 5°C/min to 1.5°C/min during holds) at critical expansion-mismatch points; this REDUCES the cyclic strain energy density in the glass-ceramic seal. The governing relation is strain ε ∝ α·ΔT·L, where α is the CTE mismatch and L is the characteristic length. By reducing dT/dt at 400°C and 600°C (where CTE differences peak), the peak strain per cycle decreases by ~40%, extending fatigue life by a factor of >2 (per Coffin-Manson law: Nf ∝ Δε^-m, m≈2).\n\nIMPLEMENTATION BILL  \nStandard practice bill:  \n- Direct heating (5°C/min, no holds) – 1 operation (schedule)  \n\nProposed bill:  \n- (a) Existing stack controller – modify temperature setpoint schedule to include holds  \n- (b) Commercial timer module – installed in controller logic (stock PLC function block)  \n- (c) Procedure change:  \n  - Heat at 5°C/min to 400°C, hold 30 min  \n  - Resume heating to 800°C at 5°C/min  \n  - Cool at 5°C/min to 600°C, hold 30 min  \n  - Resume cooling to 25°C at 5°C/min  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n| Standard Practice | Proposed | Burden Change |  \n|------------------|----------|--------------|  \n| Schedule: 1 ramp | Schedule: 2 ramps + 2 holds | Same (controller logic change) |  \n| No hardware changes | Timer module (b): PLC function block, $50 | +$50 (offset by 2% mass constraint compliance) |  \n| No operational loss | Operational loss: 0 (holds during ramp, not production) | 0 |  \n**Conclusion**: Same burden class (minor software upgrade + negligible hardware cost).  \n\nEXECUTABLE TEST  \nProtocol: Subject 5 stacks to 500 thermal cycles (25°C ↔ 800°C, 5°C/min) with/without holds. Measure seal leakage via mass spectrometer at each cycle and voltage at 800°C. Pass/fail: Voltage >1.0V and leakage <1% fuel flow after 500 cycles. Kill criterion: Voltage drop >0.1V or leakage >1% at any cycle. Duration: 30 days (continuous cycling).  \n\nMECHANISM CLASS: Thermal stress modulation via scheduled intermediate holds",
+ "final_meta": {
+  "critic_verdict": "KILL",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Direct heating (5°C/min, no holds) – 1 operation (schedule)",
+    "- Heat at 5°C/min to 400°C, hold 30 min",
+    "- Resume heating to 800°C at 5°C/min",
+    "- Cool at 5°C/min to 600°C, hold 30 min",
+    "- Resume cooling to 25°C at 5°C/min"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'mas' in: by reducing dt/dt at 400°c and 600°c (where cte differences peak), the peak strain per cycle decreases by ~40%",
+    "excluded stem 'mass' in: by reducing dt/dt at 400°c and 600°c (where cte differences peak), the peak strain per cycle decreases by ~40%",
+    "excluded stem 'stack' in: novelty statement (intervention)  \nthe proposed intervention is a staged thermal ramp schedule with intermedia",
+    "excluded stem 'stack' in: by reducing dt/dt at 400°c and 600°c (where cte differences peak), the peak strain per cycle decreases by ~40%"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'thermal shock' and the stated failure driver 'Thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ },
+ "declared_template_prose": "thermal stress modulation via scheduled intermediate holds",
+ "allowed_row_outside": 0,
+ "sha256_16": "cef63c6baf1e29ad",
+ "smoke": false
+}

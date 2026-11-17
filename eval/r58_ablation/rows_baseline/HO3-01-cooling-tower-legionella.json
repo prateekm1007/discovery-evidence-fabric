@@ -1,0 +1,43 @@
+{
+ "problem_id": "HO3-01-cooling-tower-legionella",
+ "arm": "baseline",
+ "dev_source": "v3-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:33:34.225620Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nTo prevent Legionella colonization in the cooling tower basin and film fill, standard practice relies on quarterly shutdown-and-shock protocols with high-dose biocides. This intervention replaces shutdowns with continuous, low-level copper ion dosing from a side-stream filtration system, which disrupts biofilm formation without exceeding 0.2 mg/L free oxidant. Adjacent-technique clearance: closest practice is continuous chlorination, but copper ions provide residual biocidal action at lower oxidant levels and do not degrade fill materials. The mechanism exploits copper’s toxicity to Legionella at sub-ppm concentrations, sustained by controlled dosing.  \n\nMECHANISM CLASS: Electrochemical copper ionization  \n\nPHYSICS CHECK  \nDIRECTION-OF-EFFECT: driving variable = Legionella colonization rate; the mechanism moves it down by 90% via continuous copper ion release (0.1–0.3 mg/L Cu²⁺); this reduces the biofilm growth rate below detectable levels. The governing relation is first-order decay: \\( \\frac{dN}{dt} = -k \\cdot [Cu^{2+}] \\cdot N \\), where \\( k \\) is the kill rate constant (literature: \\( k \\approx 0.1 \\, \\text{L/mg/h} \\) for Legionella). At 0.2 mg/L Cu²⁺, the half-life of viable Legionella is ~35 hours, preventing colonization.  \n\nIMPLEMENTATION BILL  \n| Item | Class | Description |  \n|------|-------|-------------|  \n| Side-stream filtration unit with automatic backwash | (b) | Standard commercial filter, 5-µm rating, installed on recirculation line, flow rate 10% of tower recirculation |  \n| Copper ionization cell | (b) | Standard commercial copper/silver cartridge, flow-through design, installed downstream of filter |  \n| Dosing pump | (b) | Standard peristaltic pump, set to 0.1–0.3 mg/L Cu²⁺ (calibrated via test) |  \n| Conductivity probe (existing) | (a) | Used to monitor water conductivity for ionization control |  \n| Timer (existing) | (a) | Programmed for 15-min backwash cycle every 24 hours |  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n| Burden | Standard Practice | This Intervention | Delta |  \n|--------|------------------|---------------------|-------|  \n| Installation | Shutdown/shock setup (quarterly) | Side-stream filter + ionizer (one-time) | Lower |  \n| Operation | Biocide handling (quarterly, high risk) | Continuous low-dose copper (minimal handling) | Lower |  \n| Maintenance | Filter replacement (quarterly) | Filter backwash (automated), cartridge change (annual) | Lower |  \n| Cost | $5k/shock downtime | $2k/year consumables | Net positive |  \n| Operational loss | 24-hr downtime/shock | Zero (continuous operation) | Zero |  \n\nEXECUTABLE TEST  \nProtocol: Install system; run for 30 days with 0.2 mg/L Cu²⁺ dosing. Sample basin water weekly for Legionella (CFU/L) and copper (ICP-MS).  \nInstruments: Standard lab culture, conductivity probe, ICP-MS.  \nPass/Fail: If mean Legionella count <100 CFU/L and copper <0.3 mg/L, pass; if >100 CFU/L or copper exceeds 0.3 mg/L, fail.  \nKill criterion: If Legionella exceeds 500 CFU/L at any point, terminate test.  \nDuration: 30 days (covers 4 biofilm formation cycles).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'tower' in: implementation bill  \n| item | class | description |  \n|------|-------|-------------|  \n| side-stream filtrati"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'cooling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'shock' and the stated failure driver 'shock' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "required online signal 'water conductivity for' is not among the permitted measures/signals",
+    "derived feature input 'continuous copper ion release (0' is not derivable from the permitted signals",
+    "derived feature input 'test) |' is not derivable from the permitted signals"
+   ]
+  }
+ },
+ "declared_template_prose": "electrochemical copper ionization",
+ "allowed_row_outside": 0,
+ "sha256_16": "d31a20d74fe069cf",
+ "smoke": false
+}

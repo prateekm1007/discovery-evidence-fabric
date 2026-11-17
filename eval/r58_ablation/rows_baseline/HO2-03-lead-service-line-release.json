@@ -1,0 +1,46 @@
+{
+ "problem_id": "HO2-03-lead-service-line-release",
+ "arm": "baseline",
+ "dev_source": "v2-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:15:32.153196Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a galvanic anode array installed on the discharge side of the water meter to shift the corrosion potential of the lead service line. Standard practice uses orthophosphate dosing to passivate lead surfaces; this intervention instead exploits galvanic coupling with a more anodic metal to force the lead line to become cathodic, halting oxidation. Adjacent-technique clearance: sacrificial anodes are used in pipelines for corrosion control, but those are directly electrically bonded to the pipe metal; this intervention places the anode in the water stream, not bonded, to avoid stray currents and achieve localized potential shift via water conductivity. The mechanism attacks the failure by making the lead line cathodic relative to the anode, thus reversing the electrochemical driving force for lead dissolution.\n\nPHYSICS CHECK — DIRECTION-OF-EFFECT: driving variable = electrochemical potential of the lead surface; the mechanism moves it DOWN by ~200-300 mV via galvanic coupling to the zinc anode; this REDUCES the oxidation rate of lead. The governing relation is the Butler-Volmer equation: corrosion current i = i₀ exp[(2.3F/RT)(E_anode - E_lead)], where reducing E_lead (making it more cathodic) exponentially decreases i. A 250 mV shift at pH 6.8 reduces i by ~90%, verified by literature on galvanic protection of lead in water.\n\nIMPLEMENTATION BILL — \n1. Install zinc sacrificial anode rods (commercial grade, ASTM B699, Type II) in standard PVC tee fittings downstream of the water meter (a: existing tee, b: catalog anode rods).  \n2. Connect anode holders to tee using standard stainless steel U-bolts (b: catalog fasteners).  \n3. Set anode-to-lead service line spacing to 5 cm (c: configuration change to existing piping).  \n4. Schedule anode replacement every 24 months (c: procedure change, aligned with standard maintenance cycles).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installation: 2 labor hours (same as orthophosphate dosing checkouts).  \n- Materials: $15 per anode (vs. $0 for chemical dosing, but no chemical handling costs).  \n- Maintenance: Bi-visual inspection (same as standard practice).  \n- Operational loss: Zero (no flow restriction or pressure drop).  \n- Burden class: Same (labor and maintenance parity, material offset by eliminated chemical handling).\n\nEXECUTABLE TEST — Protocol: Install test rigs with identical lead coupons in low-alkalinity water (pH 6.8, alkalinity 50 mg/L CaCO₃). Group 1: baseline (no anode). Group 2: zinc anode array at 5 cm spacing. Monitor lead release (ICP-MS) and scale coverage (SEM/EDS) weekly for 90 days. Pass/fail: Group 2 lead release <50% of Group 1 at 90th percentile. Kill criterion: Group 2 release exceeds Group 1 at any point. Duration: 90 days. Falsifies effectiveness if lead reduction is not statistically significant (p<0.05, t-test).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Install zinc sacrificial anode rods (commercial grade, ASTM B699, Type II) in standard ",
+    "2. Connect anode holders to tee using standard stainless steel U-bolts (b: catalog fastene",
+    "3. Set anode-to-lead service line spacing to 5 cm (c: configuration change to existing pip",
+    "4. Schedule anode replacement every 24 months (c: procedure change, aligned with standard ",
+    "- Installation: 2 labor hours (same as orthophosphate dosing checkouts).",
+    "- Materials: $15 per anode (vs. $0 for chemical dosing, but no chemical handling costs).",
+    "- Maintenance: Bi-visual inspection (same as standard practice).",
+    "- Operational loss: Zero (no flow restriction or pressure drop).",
+    "- Burden class: Same (labor and maintenance parity, material offset by eliminated chemical"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "6fbf8ccab50ac0ef",
+ "smoke": false
+}

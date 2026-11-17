@@ -1,0 +1,46 @@
+{
+ "problem_id": "HO3-02-offshore-riser-internal-corrosion",
+ "arm": "baseline",
+ "dev_source": "v3-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:34:20.688978Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is a pulsed inhibitor injection schedule that reduces top-of-line condensation corrosion by minimizing inhibitor concentration at the riser inlet while maintaining total dose. Standard practice uses continuous 25 ppm injection; the proposed method uses a 10 ppm baseline with periodic 50 ppm pulses to overcome mass-transfer limitations. This departs from standard practice by introducing a time-varying concentration profile that targets the dewpoint band more effectively. The closest existing practice is batch inhibitor injection, but the difference is the duty cycle: standard batch injection is infrequent and high-dose, while this method uses high-frequency low-dose pulses to maintain continuous protection with lower average concentration. The mechanism attacks the driving physics by increasing the inhibitor concentration gradient at the condensation interface during dewpoint events, enhancing mass transfer of inhibitor molecules to the metal surface.\n\nPHYSICS CHECK\nThe governing relation is the mass-transfer-limited corrosion rate: Rate = k × C_inhibitor^n, where k is the mass-transfer coefficient and n is typically 0.5-1.0 for inhibitor films. DIRECTION-OF-EFFECT: driving variable = inhibitor concentration at the metal surface; the mechanism moves it up by 40-60% during pulses via concentration gradient enhancement; this reduces the corrosion driver by 20-35% (since n=0.7, (1.5^0.7 - 1) ≈ 0.33). The pulsed schedule increases the instantaneous concentration gradient at the condensation interface, overcoming the stagnant film resistance that limits continuous injection efficiency.\n\nIMPLEMENTATION BILL\nStandard practice: continuous 25 ppm injection (24/7), no hardware changes.\nProposed implementation:\n- (a) Existing umbilical injection point (no change)\n- (b) Commercial programmable timer relay, installed at control panel\n- (c) Set injection duty cycle: 10 ppm continuous + 50 ppm for 2 hours every 24 hours\n- (c) Modify inhibitor injection pump control signal to follow timer output\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installation: 1 hour (vs. standard 0 hours) - timer installation at control panel\n- Commissioning: 2 hours (vs. standard 0.5 hours) - timer programming and calibration\n- Operation: Same energy consumption (pump runs continuously at lower base rate)\n- Maintenance: Same frequency (timer relay is standard industrial component)\n- Cost class: Same (timer relay is catalog item, no additional consumables)\n- Operational loss: Zero (injection occurs during production, no throughput impact)\n\nEXECUTABLE TEST\nProtocol: Install timer relay and program duty cycle. Monitor corrosion rate using ILI tools at 18-month intervals. Compare metal loss rate between control section (continuous 25 ppm) and test section (10 ppm + 50 ppm pulses).\nInstruments: ILI tool with ultrasonic wall thickness measurement, existing pressure/temperature sensors.\nPass/fail threshold: Test section must show ≤ 0.6 mm/year metal loss (33% reduction from current 0.9 mm/year).\nDuration: 36 months (two full ILI cycles).\nKill criterion: If test section shows > 0.8 mm/year loss at any ILI run, the mechanism is falsified and the test is terminated.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installation: 1 hour (vs. standard 0 hours) - timer installation at control panel",
+    "- Commissioning: 2 hours (vs. standard 0.5 hours) - timer programming and calibration",
+    "- Operation: Same energy consumption (pump runs continuously at lower base rate)",
+    "- Maintenance: Same frequency (timer relay is standard industrial component)",
+    "- Cost class: Same (timer relay is catalog item, no additional consumables)",
+    "- Operational loss: Zero (injection occurs during production, no throughput impact)"
+   ],
+   "ALLOWED_ROW_OUTSIDE": [
+    "added measure 'Commercial programmable timer relay' shares no allowed-list stem (allowed measures: batch corrosion-inhibitor injection at the riser inlet or in-l...)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 1,
+ "sha256_16": "b22cd760e1470705",
+ "smoke": false
+}

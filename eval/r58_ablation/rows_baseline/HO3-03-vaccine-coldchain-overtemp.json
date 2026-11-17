@@ -1,0 +1,42 @@
+{
+ "problem_id": "HO3-03-vaccine-coldchain-overtemp",
+ "arm": "baseline",
+ "dev_source": "v3-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:35:06.107088Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is to implement a predictive thermal buffer strategy by retarding the defrost cycle initiation until a calculated thermal buffer is depleted, rather than using a fixed interval. Standard practice uses fixed-time defrost cycles every 6 hours; this mitigation replaces the fixed interval with a dynamic schedule that defrosts only when the cabinet's thermal inertia (from frozen evaporator and cold mass) is insufficient to keep the air temperature below +8°C during the upcoming defrost and recovery. This is a departure from standard practice, which does not model thermal buffer depletion. The closest existing technique is adaptive defrost in refrigeration, but those typically respond to runtime or efficiency metrics, not predictive thermal inertia modeling. The mechanism attacks the failure by ensuring defrosts occur only when the thermal buffer is small, thus minimizing the temperature rise during defrost and recovery.\n\nPHYSICS CHECK — The governing relation is: ΔT_defrost ≈ Q_defrost / (m × Cp), where Q_defrost is the heat load from defrost, m is the thermal mass (buffer), and Cp is its specific heat. The mechanism increases m by delaying defrost until the thermal buffer is fully charged, thereby reducing ΔT_defrost. For a typical cabinet, increasing m by 50% (from partial to full thermal charge) reduces ΔT_defrost by ~30%, keeping it below the +8°C threshold.\n\nMECHANISM CLASS: Predictive thermal inertia defrost scheduling\n\nIMPLEMENTATION BILL —\n1. (a) Existing cabinet controller: Modify defrost trigger logic from fixed interval to dynamic schedule.\n2. (b) Commercial temperature sensor (existing): Use to calculate thermal buffer state.\n3. (c) Procedure: Implement algorithm that defrosts only when thermal buffer < threshold (e.g., 30% of full capacity).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —\n- Standard practice: Fixed 6-hour defrost interval (no calculation).\n- Proposed: Adds algorithm logic to existing controller (same class as standard setpoint tuning), no new hardware. Operational loss is zero (defrosts still occur, just at optimal times). Burden is same class (controller parameter change).\n\nEXECUTABLE TEST —\nProtocol: Run 10 defrost cycles under standard and modified conditions, logging air temperature.\nInstruments: Existing cabinet temperature sensor.\nPass/fail: Modified cycles must show all temperature excursions < +8°C for <12 minutes.\nDuration: 1 week (30 cycles).\nKill criterion: Any excursion > +8°C or >12 minutes fails the test.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: Fixed 6-hour defrost interval (no calculation).",
+    "- Proposed: Adds algorithm logic to existing controller (same class as standard setpoint t"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ },
+ "declared_template_prose": "predictive thermal inertia defrost scheduling",
+ "allowed_row_outside": 0,
+ "sha256_16": "50234e1158f56665",
+ "smoke": false
+}
