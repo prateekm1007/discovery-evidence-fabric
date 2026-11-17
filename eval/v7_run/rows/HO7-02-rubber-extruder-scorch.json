@@ -1,0 +1,33 @@
+{
+ "problem_id": "HO7-02-rubber-extruder-scorch",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v7/holdout_v7_problems.json@c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b",
+ "executor_id": "builder-r20s4@holdout-v7-generation",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "generated_at": "2026-11-17T00:13:01.614353Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The question-answered sentence first: Introduce a cyclic temperature modulation in the barrel/die temperature profile to periodically cool the compound below scorch initiation temperature, breaking the Arrhenius-driven crosslinking kinetics. Standard practice: Constant barrel/die temperature setpoint (105°C) throughout the dwell cycle, allowing uninterrupted heat accumulation and scorch. Your mitigation: A cyclic temperature modulation that periodically reduces the barrel/die temperature to 95°C for 60 seconds every 10 minutes, directly reducing the cumulative heat input to the compound. Adjacent-technique clearance: Closest existing practice is constant temperature control; your departure is the periodic duty cycle that exploits the time-temperature superposition principle to reduce the effective dwell time at scorch-critical temperatures. The mechanism attacks the failure's driving physics by reducing the time-integral of the exponential reaction rate (Arrhenius equation: rate ∝ exp(-Ea/RT)), directly lowering the accumulated crosslink density.\n\nPHYSICS CHECK — Governing physical relation: Scorch rate = k₀ exp(-Ea/RT), where T is temperature. The cyclic modulation reduces the average temperature experienced by the compound: T_avg < 105°C. For a 10-minute cycle with 60 seconds at 95°C and 540 seconds at 105°C, T_avg ≈ 104.5°C. This reduces the exponential term by ~15%, directly lowering the crosslinking rate and extending the effective safe dwell time. DIRECTION-OF-EFFECT: driving variable = temperature; the mechanism moves it DOWN by 10°C periodically; this REDUCES the failure driver (crosslinking rate).\n\nIMPLEMENTATION BILL — (Standard practice: Constant 105°C barrel/die temperature, no additional hardware; Proposed intervention:)\n\n1. (b) Commercial PLC timer module, mounted to existing extruder control panel, programmed to cycle barrel/die setpoint between 105°C (9 min) and 95°C (1 min) continuously.\n2. (c) Parameter change to existing barrel/die temperature controller: setpoint modulation enabled, linked to PLC timer output signal.\n3. (c) Procedure change: Operator verifies timer cycle status during startup (1 min check).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — (Standard practice bill: 1. Constant temperature setpoint (no hardware); 2. Operator verification (routine). Proposed bill: 1. PLC timer module (stock catalog item, same class as existing timers); 2. Parameter change (existing equipment); 3. Procedure change (same verification step). Burden class: Same. No new training required (timer operation is standard), no additional maintenance (PLC timers are robust), no operational loss (modulation occurs during production).\n\nEXECUTABLE TEST — Protocol: Run extrusion line with standard compound at 105°C constant temperature for 1 hour (baseline), then with cyclic modulation (105°C/95°C) for 1 hour. Instruments: Die thermocouples (existing), torque sensor (existing), optical die drool camera (existing). Pass/fail: Scorch failure rate (lumps/drool events) must decrease by ≥50% in the modulation cycle. Kill criterion: If scorch rate increases or remains unchanged, mechanism fails. Duration: 2 hours total (1 baseline + 1 intervention).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Scorch is caused by Arrhenius-driven crosslinking kinetics, where the reaction rate increases exponentially with temperature. | ingredient: The cyclic temperature modulation reduces the average temperature experienced by the compound, directly lowering the exponential crosslinking rate. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Scorch is caused by Arrhenius-driven crosslinking kinetics, where the reaction rate increases exponentially with temperature.",
+   "ingredient_action": "The cyclic temperature modulation reduces the average temperature experienced by the compound, directly lowering the exponential crosslinking rate.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "sha256_16": "0fa5d8f4d5b22105"
+}

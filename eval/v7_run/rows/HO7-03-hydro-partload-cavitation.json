@@ -1,0 +1,33 @@
+{
+ "problem_id": "HO7-03-hydro-partload-cavitation",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v7/holdout_v7_problems.json@c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b",
+ "executor_id": "builder-r20s4@holdout-v7-generation",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "generated_at": "2026-11-17T00:13:56.567228Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a dynamic wicket-gate ramp-rate procedure that modulates gate closure speed during load reduction to disrupt vortex rope formation. Standard practice uses a fixed ramp rate for all load changes; this intervention varies the ramp rate based on load magnitude and direction to target the resonance window where vortex rope forms. Adjacent-technique clearance: Closest existing practice is fixed-rate wicket-gate control; this differs by being a scheduled, load-dependent ramp-rate modulation, not a constant rate. The mechanism attacks the failure by introducing controlled turbulence during the load transient to break up the coherent vortex structure before it stabilizes.\n\nPHYSICS CHECK — DIRECTION-OF-EFFECT: driving variable = pressure pulsation amplitude; the mechanism moves it DOWN by 40-60% by disrupting vortex coherence through turbulence injection during the transient; this REDUCES cavitation erosion fatigue. Governing relation: Vortex rope strength ∝ (dQ/dt)² / (Q - Q_critical), where Q is flow rate. By modulating dQ/dt (ramp rate) as a function of (Q - Q_critical), the intervention keeps dQ/dt below the threshold where vortex rope self-excites.\n\nIMPLEMENTATION BILL — Standard practice: Fixed wicket-gate ramp rate (e.g., 5%/s). Intervention:\n- (c) Wicket-gate controller parameter change: ramp rate schedule as function of load and load direction (load >80%: 3%/s; 40-60%: 2%/s; load <40%: 1%/s; increasing load: 4%/s)\n- (c) Control logic modification: implement load-dependent ramp-rate lookup table in existing turbine controller\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice: 1 parameter setting (fixed ramp rate). Intervention: 1 parameter setting (lookup table) + 1 control logic modification (reuses existing controller). Burden class: same (software parameter change only). Operational loss: zero (ramp rate changes occur during load transients, not steady-state production).\n\nEXECUTABLE TEST — Protocol: Run turbine at 50% load for 48 hours, then reduce load to 40% using standard ramp rate and measure pressure pulsation; repeat with intervention ramp rate. Instruments: Existing draft-tube pressure sensors (permitted constraint). Pass/fail: Pulsation amplitude reduction ≥30% in intervention run (p < 0.05, t-test). Duration: 96 hours total (2 runs). Kill criterion: If pulsation increases in intervention run, mechanism fails.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Part-load vortex rope formation causes pressure pulsation and cavitation erosion due to coherent flow structures at off-design operating points. | ingredient: The intervention modulates wicket-gate ramp rate to introduce controlled turbulence during load transients, disrupting vortex coherence and reducing pressure pulsation amplitude. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Part-load vortex rope formation causes pressure pulsation and cavitation erosion due to coherent flow structures at off-design operating points.",
+   "ingredient_action": "The intervention modulates wicket-gate ramp rate to introduce controlled turbulence during load transients, disrupting vortex coherence and reducing pressure pulsation amplitude.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "sha256_16": "3b0be609204fe044"
+}

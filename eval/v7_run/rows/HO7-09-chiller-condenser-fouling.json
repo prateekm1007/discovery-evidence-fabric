@@ -1,0 +1,42 @@
+{
+ "problem_id": "HO7-09-chiller-condenser-fouling",
+ "question_type": "predictor-design",
+ "problem_ref": "audit/holdout_v7/holdout_v7_problems.json@c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b",
+ "executor_id": "builder-r20s4@holdout-v7-generation",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "generated_at": "2026-11-17T00:26:59.545790Z",
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers a MONITORING/INDICATION scheme using condenser approach temperature (ΔT_cond = T_outlet - T_inlet) as the primary indicator.  \n- Departure: COP (coefficient of performance) degradation inferred from compressor power and condenser heat transfer, detecting fouling earlier via energy efficiency decline.  \n- Failure physics: Fouling reduces condenser heat transfer, raising ΔT_cond and compressor power to maintain cooling load; COP degradation precedes ΔT_cond rise.  \n\n**PHYSICS CHECK**  \n- Governing relation: COP = Q_cooling / P_compressor, where Q_cooling = ṁ * Cp * ΔT_cond (ṁ = flow, Cp = specific heat).  \n- Magnitude verification: For 900 kW chiller, ṁ = 100 kg/s (ASSUMPTION, typical for open tower), Cp = 4.18 kJ/kg·K. Fouling reduces Q_cooling by 5% (CALCULATED from COP threshold), requiring P_compressor increase to maintain load.  \n- DIRECTION-OF-EFFECT: driving variable = condenser heat transfer rate; the mechanism raises it by maintaining ΔT_cond via compressor power increase, which reduces the fouling driver (thermal resistance).  \n\n**IMPLEMENTATION BILL**  \nMECHANISM CLASS: Energy-efficiency trend analysis  \n(a) Data acquisition module:  \n- Inputs: ALREADY-RECORDED condenser-water inlet temperature, ALREADY-RECORDED condenser-water outlet temperature, ALREADY-RECORDED condenser-water flow rate, ALREADY-RECORDED compressor input power.  \n(b) COP calculation module:  \n- COP = (ṁ * Cp * ΔT_cond) / P_compressor (CALCULATED from stated physics).  \n(c) Baseline module:  \n- Baseline COP = nominal COP at commissioning (CALCULATED from stated specs: 900 kW / design power).  \n(d) Threshold module:  \n- Triggers warning when COP degradation exceeds 5% (CALCULATED from baseline COP).  \n(e) Alarm system:  \n- Audible/visual alert integrated with existing chiller controls.  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: No new hardware; uses existing sensors and controls (SAME as standard practice).  \n- Operability: Real-time trend analysis; no operator intervention (SAME as standard practice).  \n- Maintenance: Software-based; no physical upkeep (SAME as standard practice).  \n- Cost class: Low (software upgrade vs. standard practice’s ΔT monitoring hardware).  \n- Operational loss: Zero (no throughput/energy trade-off; only analysis delay).  \n\n**EXECUTABLE TEST**  \n- Protocol: Log COP daily for 30 days using ALREADY-RECORDED data; introduce artificial fouling (e.g., reduce flow by 10%) and measure time to 5% COP degradation.  \n- Instruments: Existing data historian.  \n- Pass/fail: Warning must trigger ≥14 days before head trip; ≤1 false alarm/year (validated against historical data).  \n- Duration: 30 days.  \n- Kill criterion: False alarm rate >1/year or warning <14 days prior.  \n\n**CONSTRAINT BIND**  \n- Primary indicator: COP degradation (inferred from compressor power and condenser heat transfer), as it directly reflects fouling’s impact on energy efficiency. Secondary indicator: ΔT_cond supplements but does not replace COP.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "direction_check": null,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Inputs: ALREADY-RECORDED condenser-water inlet temperature, ALREADY-RECORDED condenser-w",
+    "- COP = (ṁ * Cp * ΔT_cond) / P_compressor (CALCULATED from stated physics).",
+    "- Baseline COP = nominal COP at commissioning (CALCULATED from stated specs: 900 kW / desi",
+    "- Triggers warning when COP degradation exceeds 5% (CALCULATED from baseline COP).",
+    "- Audible/visual alert integrated with existing chiller controls.",
+    "- Installability: No new hardware; uses existing sensors and controls (SAME as standard pr",
+    "- Operability: Real-time trend analysis; no operator intervention (SAME as standard practi",
+    "- Maintenance: Software-based; no physical upkeep (SAME as standard practice).",
+    "- Cost class: Low (software upgrade vs. standard practice’s ΔT monitoring hardware).",
+    "- Operational loss: Zero (no throughput/energy trade-off; only analysis delay).",
+    "- Protocol: Log COP daily for 30 days using ALREADY-RECORDED data; introduce artificial fo",
+    "- Instruments: Existing data historian.",
+    "- Pass/fail: Warning must trigger ≥14 days before head trip; ≤1 false alarm/year (validate",
+    "- Duration: 30 days.",
+    "- Kill criterion: False alarm rate >1/year or warning <14 days prior.",
+    "- Primary indicator: COP degradation (inferred from compressor power and condenser heat tr"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "derived feature input 'energy efficiency decline' is not derivable from the permitted signals"
+   ]
+  }
+ },
+ "sha256_16": "3a2376752b12d1a0"
+}
