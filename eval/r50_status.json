@@ -1,0 +1,44 @@
+{
+ "record": "R50_BUILDER_STATUS/1.0.0",
+ "session": "builder-r50s1",
+ "work_id": "r50-p0-ci-p1-physics-slice",
+ "round": "R50 (roadmap 4->9: P0.2-P0.3 + P1.1 slice)",
+ "protocol": [
+  "FULL constitution reads: both constitutions byte-identity-verified at the round-open SHAs (EPISTEMIC @ a57972828 md5 525536896f8000a17fab124fac845ca0; AUDITOR @ 604c3efc4 md5 abe1c4127bfc9e53b0f29c16e14892d5) — identical to the prior FULL reads, which stand",
+  "claim-before-work: this is the round record; push attempted once (push tooling down per the owner roadmap — queued for the push-capable round)",
+  "secret-grep staged diff: 0 live-token-prefix findings (3 detect-secrets hex-entropy findings in work_claims.json inspected and typed as registry commit-SHA identifiers, disclosed in the commit message, NOT baselined away)"
+ ],
+ "delivered": {
+  "P0_2_ci_red_fixed_forward_only": {
+   "diagnosis": "local repro of the full queue-surface workflow: 2 failures — (1) tests/test_remote_ci_rule.py: r45_status.json carried remote_ci_conclusion 'SUCCESS' (not an enum member, no quoted check-run list); (2) tests/test_article29_parallel_coordination.py: 2 trailer-less r47 commits (a57972828, 6327f4618) unregistered",
+   "fix_1": "r45_status.json conclusion -> 'unreadable' (the D2 re-read was BLOCKED by GitHub API rate limit: HTTP 403 'API rate limit exceeded for user ID 240354214', request IDs E9CC:13A9AD:2428EC1:384F67D:6AFC2B2C and 9630:7947D:244C8F0:3876BE8:6AFC2B2C, 2026-11-17 10:23:40 UTC — quoted in the record), original string preserved in the correction note; re-read via scripts/r41_remote_ci_read.py --apply on the push-capable round",
+   "fix_2": "both r47 commits registered in eval/work_claims.json trailer_violations[] (F36 typed allowance, session-attributed builder-r47s1/r47s2, DISCLOSED_PENDING_REMEDIATION); ALL builder commits from r50s1 carry Session:/Work-Id: trailers",
+   "result": "both suites PASS locally (re-run green); local green is NOT remote green — the remote conclusion stays 'unreadable' until the push-capable round"
+  },
+  "P0_3_secret_scan": {
+   "pre_commit": "detect-secrets block wired into .githooks/pre-commit (typed refusal on findings; typed degradation when the module is missing; first commit caught the hook's own 'list plugins instead of scan' bug — fixed before landing)",
+   "enumeration_report": "eval/r50_secret_scan_partial.json — all-refs prefix-level enumeration over 29 refs (23 branches + 4 archive tags + HEAD): ghp_ x876, nvapi- x337, sk-or- x355, gho_ x67, github_pat_ x152 path-hits; F59 precision note: PREFIX-level (mentions/audit records/masked fingerprints vs live tokens NOT yet separated — content-level verification is the next P0.3 step; gitleaks binary unavailable in this sandbox, disclosed; method = git pickaxe --all + per-ref git grep + detect-secrets); remediation of any LIVE credential remains the P0.1 owner act (F45/F60)",
+   "wiring_next": "gitleaks into CI when the binary is available in CI images; detect-secrets baseline with audited sha-field allowlist for the registry"
+  },
+  "P1_1_physics_slice": {
+   "file": "discovery_fabric/engine/physics_checks.py",
+   "contents": "pint-based computed-physics registry keyed by failure class: arrhenius_rate_ratio (thermal_aging), fouling_u_degradation (fouling), langelier_lsi (scaling); direction-of-effect = the SIGN of the computed result (never prose); typed refusals for out-of-domain inputs and unknown ids; optional-lib policy = UNAVAILABLE verdict, never a fabricated number",
+   "tests": "tests/test_physics_checks.py 5/5 green, wired into the queue-surface zero-LLM block (r11_queue_surface.yml)",
+   "engine_line_share": "the round's engine-file additions are 100% of the new engine code (physics_checks.py ~280 lines engine code vs ~120 lines tests/config) — the >=30% engine-lines rule is met by construction of the slice"
+  },
+  "roadmap_durable_commit": "eval/roadmap_4_to_9.md staged verbatim (owner document + builder provenance header); AM46 rides the next push-capable round with the owner's own commit"
+ },
+ "remote_ci": {
+  "pushed_sha": "ebacc1c3a",
+  "remote_ci_conclusion": "unreadable",
+  "read_at": "2026-11-17T11:05:00Z",
+  "note": "push tooling is DOWN this round (owner roadmap: the durable commit of the roadmap + AM46 is queued for the next push-capable round; the plan is in force now) AND the check-run API read is rate-limited (403 quoted above). ebacc1c3a is the round's WORK commit, queued for push; the conclusion is re-read via scripts/r41_remote_ci_read.py --apply immediately after the first successful push. NO green is claimed remotely or locally-in-place-of-remote."
+ },
+ "next_round": [
+  "P0.3 content-level verification of the prefix hits (live vs masked) + gitleaks in CI",
+  "P0.1 owner escalation (once, per the risk register): custody + rotation — the plan's hard prerequisite",
+  "P1.2 enum-schema extension of mechanism_candidate/1.0.0 + prose-scanner retirement via the Art. 16 ledger; P1.3 engine-route integration (the 14/14 probe is the negative-case evidence; assemble_candidate + physics_checks + binds)",
+  "P1.4 regression on labelled v6/v7 rows through the new path; D2d matched-budget DEV ablation (plan layer from r47s2: eval/v82_dev_plan_population.json, schedule-share 4.63% <= 17%, ALLOWED_ROW_OUTSIDE=0)"
+ ],
+ "gate_self_check": "P0 gate NOT claimable this round (no push, no remote green, P0.1 owner act pending); P1.1 slice landed and unit-green locally; nothing here passes on a point estimate"
+}
