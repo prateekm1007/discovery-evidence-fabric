@@ -42,3 +42,29 @@ done <<EOF
 $(git diff --cached --name-only --diff-filter=ACMR -- '*.json')
 EOF
 [ "$status" -eq 0 ] || exit 1
+
+# ROADMAP P0.3 (claim lineage c-0066): detect-secrets pre-commit — the
+# staged files pass the secret scanners before any commit. Typed
+# behavior: findings REFUSE the commit (fix, baseline via
+# `detect-secrets audit`, or --no-verify with disclosure); a missing
+# module degrades to a typed warning so fresh clones without the dep
+# can still commit — the authoritative all-refs scan is CI-side
+# (eval/r50_secret_scan_partial.json), not hook-side.
+if python3 -c "import detect_secrets" >/dev/null 2>&1; then
+  STAGED=$(git diff --cached --name-only --diff-filter=ACMR | tr '\n' ' ')
+  if [ -n "$(echo "$STAGED" | tr -d ' ')" ]; then
+    # shellcheck disable=SC2086
+    HITS=$(python3 -m detect_secrets scan --list-all-plugins $STAGED 2>/dev/null \
+           | python3 -c "import sys,json;d=json.load(sys.stdin);print(sum(len(v) for v in d.get('results',{}).values()))" 2>/dev/null || echo ERR)
+    if [ "$HITS" = "ERR" ]; then
+      echo "pre-commit: detect-secrets scan FAILED to run — treat as no-findings ONLY if you accept the typed degradation; refusing (remove the hook line or --no-verify with disclosure)" >&2
+      exit 1
+    fi
+    if [ "${HITS:-0}" -gt 0 ]; then
+      echo "pre-commit: detect-secrets flags $HITS finding(s) in the staged diff — commit refused (ROADMAP P0.3; fix, baseline, or --no-verify and disclose)" >&2
+      exit 1
+    fi
+  fi
+else
+  echo "pre-commit: detect-secrets module unavailable — secret scan SKIPPED for this commit (typed degradation; pip install detect-secrets)" >&2
+fi
