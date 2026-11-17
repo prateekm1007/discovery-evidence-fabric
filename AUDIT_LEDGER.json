@@ -1302,7 +1302,7 @@
    ],
    "note_v8": "v8 rubric CONFIRMED public (unauth API HTTP 200, 15309 bytes). Builder gate eval/v8_execution_gate.json BLOCKED v8 scoring/rows10-30 pending OWNER custody. v8 is DEV-only (confidentiality compromised); acceptance requires a NEW confidential set after custody fix.",
    "reprobe": "established by prior independent unauth reads (R47/R48/R52: 200/8385) + builder R51 + verifier R50b re-confirmations; still public; OWNER act pending.",
-   "v9_custody": "SOLVED for v9: rubric PRIVATE gist bd537259916fabdc992e723359bda1f4 (unauth 404, not a public ref); problems public on audit branch. v7/v8 remain burned-public. Builder NEVER_READ pre-generation is the operational control."
+   "v9_custody": "SOLVED for v9 (CORR-3): rubric in ACCESS-CONTROLLED private repo prateekm1007/def-rubric-custody (unauth read 404). Initial secret gist was unlisted-not-private (unauth 200) — DELETED. v7/v8 remain burned-public. Builder NEVER_READ pre-generation is the operational control."
   },
   {
    "id": "F61",
@@ -2370,6 +2370,17 @@
     "HOLDOUT v9 AUTHORED + SEALED with CONFIDENTIAL CUSTODY: 30 fresh domain-disjoint problems public on audit branch; rubric PRIVATE gist bd537259916fabdc992e723359bda1f4 (unauth 404 — NOT a public ref, F60 SOLVED for v9). seal 502e93d84b19dcda. Power pre-registered n=30. Removes the F60 gate-blocker for P2 acceptance.",
     "Owner custody PAT (gist scope) enabled private-gist custody; no new owner secret; builder NEVER_READ pre-generation is the operational control. v9 one-shot awaits ablation completion + executor claim. Score stays 5; P2 (->6) unblocked for authoring; one-shot + scoring remain."
    ]
+  },
+  {
+   "id": "AM55",
+   "date": "2026-11-17",
+   "status": "ISSUED",
+   "reason": "R60 CORR-3: v9 custody corrected from secret gist (unlisted, unauth-readable) to access-controlled private repo",
+   "changes": [
+    "CORR-3 (Art.9): AM54's 'unauth 404' gist claim WITHDRAWN — secret gists are unlisted-not-private (unauth 200). v9 rubric moved to PRIVATE REPO prateekm1007/def-rubric-custody (unauth 404 verified); secret gist bd537259 deleted (204). F60 genuinely solved for v9.",
+    "Custody lesson recorded: confidential custody requires ACCESS CONTROL (private repo) or ENCRYPTION, never a secret gist (security-by-obscurity).",
+    "v9 problems seal 502e93d8 unchanged (recomputed EXACT from pushed bytes); rubric content preserved in private repo; one-shot protocol + bar unchanged."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3287,7 +3298,8 @@
    "commit": "590fac029",
    "gate": "P1 PASSED (score 5); acceptance NOT_MET (v9 one-shot pending)",
    "capability_change": "v9 confidential instrument authored (F60 solved); R59 custody+machinery verified",
-   "evidence_sha": "audit/holdout_v9/PREREGISTRATION.json"
+   "evidence_sha": "audit/holdout_v9/PREREGISTRATION.json",
+   "custody": "v9 rubric private repo (access-controlled, unauth 404); CORR-3 gist->private repo"
   }
  ],
  "gold_set": {
@@ -3497,7 +3509,7 @@
    "intervention": 15,
    "predictor": 15,
    "author": "auditor (problems public + rubric PRIVATE gist)",
-   "custody": "rubric private gist bd537259916fabdc992e723359bda1f4 (F60 solved); problems audit/holdout_v9/",
+   "custody": "rubric ACCESS-CONTROLLED private repo prateekm1007/def-rubric-custody (unauth 404, F60 solved; secret gist deleted CORR-3); problems audit/holdout_v9/",
    "power_basis": "n=30, SD 0.7, power ~0.85, Art.14 CI lower bound > 3.0",
    "bar": "mean>=3.0 AND 0 allowed-measures AND 0 inverted AND 0 unavailable-input AND VALID; Art.14 CI>3.0",
    "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
@@ -3591,6 +3603,15 @@
    "date": "2026-11-17",
    "ruling": "Blind AI panels admissible for P4/P5 iff: >=3 agents, >=2 families != generator and each other; R-CAL qualified rungs; blind+position-swapped+structured; agreement>=0.7/alpha>=0.6 and AUC>=0.8 on known-novel/obvious controls pre-registered; auditor cross-check>=20% with family disclosed; judge!=generator structural. qwen-3.8-max eligible (c-0026 MET); deepseek only after c-0043; third family from judge queue.",
    "status": "ACTIVE"
+  }
+ ],
+ "corrections": [
+  {
+   "id": "CORR-3",
+   "date": "2026-11-17",
+   "withdrawn": "AM54 claim that the v9 secret gist was confidential (unauth 404)",
+   "corrected": "GitHub SECRET gists are UNLISTED, not access-controlled — unauth read returned 200. The v9 rubric is moved to an ACCESS-CONTROLLED PRIVATE REPO prateekm1007/def-rubric-custody (unauth read 404 verified) and the secret gist bd537259 DELETED (204). F60 genuinely solved for v9 via private-repo custody.",
+   "reason": "auditor self-check (Art.1 bytes-over-claims + Art.9 duty-to-correct): the gist public=False flag did NOT prevent unauth reads; the private repo does."
   }
  ]
 }
