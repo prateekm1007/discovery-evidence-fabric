@@ -19,23 +19,26 @@
   "deletions": "none — nothing removed; the r30 fix changes word-selection ORDER only (semantics preserved, pinned)."
  },
  "remote_ci": {
-  "pushed_sha": "8d30772cf",
-  "remote_ci_conclusion": "success",
-  "check_runs": [{"name": "surface", "status": "completed", "conclusion": "success"}],
-  "read_at": "2026-11-17T00:43:42Z (sandbox clock; check-run API via authenticated read)",
+  "pushed_sha": "4bca7a13a",
+  "remote_ci_conclusion": "failure",
+  "check_runs": [{"name": "surface", "status": "completed", "conclusion": "failure"}],
+  "read_at": "2026-11-17T00:49:32Z (sandbox clock; check-run API via authenticated read)",
   "history": [
    {"pushed_sha": "fd28fecb6", "remote_ci_conclusion": "failure",
     "note": "the executor's own D2 rule caught the comment-inside-continuation break before any green claim; exit 126; preserved as fact"},
    {"pushed_sha": "069a16430", "remote_ci_conclusion": "success",
     "note": "the F56 fix; the rendered step executed locally before pushing"},
    {"pushed_sha": "8d30772cf", "remote_ci_conclusion": "success",
-    "note": "the v7 one-shot run commit"}]
+    "note": "the v7 one-shot run commit"},
+   {"pushed_sha": "4bca7a13a", "remote_ci_conclusion": "failure",
+    "note": "the closeout flipped c-0057 DONE before the verifier recompute existed — the Art. 29(c) gate refused a DONE measurement without a VERIFIER record (the prereg's step-2 recompute is the peer's act); c-0057 returned to OPEN forward-only; this final tip stays FAILURE as fact until the correction lands green"}]
  },
  "honesty_notes": [
   "the v1.0.0 attestation mistake is disclosed: telemetry counted as calls, a clean run wrongly voided; the recompute touched only the attestation and run-ledger JSON, never the rows, events, or slice",
   "every row reached critic CLEAN at repair_3 — the repair-budget ceiling: first-draft quality is a machine-tightness signal for the auditor to weigh during scoring; the per-attempt findings are in the events ledger",
   "transport reality: the NVIDIA fallback leg is dead in this sandbox (NVIDIA_API_KEY absent from the vault) — the gateway primary carried the whole run; three transient 500/429 storms were survived by the typed retry chain inside the SAME generation (no re-run)",
   "the peer verifier (builder-r42s1, c-0058) verified c-0056 and flipped it DONE while this session was generating — the rebase over 658b349e8 is disclosed; their typed limitation note stands: map-completeness gates by string containment, so the D2 remote read stays the load-bearing catcher for present-but-broken invocations",
-  "the rubric was never read; the problems file was read exactly once, after the claim push; BURN intentionally NOT executed (prereg step 5 follows scoring)"
+  "the rubric was never read; the problems file was read exactly once, after the claim push; BURN intentionally NOT executed (prereg step 5 follows scoring)",
+  "the closeout itself was caught by the gates twice: the Art. 29(c) DONE-without-verifier refusal (4bca7a13a) and — earlier — the c-0054 JSON guard's refusal on Python-literal JSON; both refusals are the coordination design working against its own executor"
  ]
 }

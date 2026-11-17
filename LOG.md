@@ -147,3 +147,7 @@ R42 session lane (session `builder-r20s4`, builder base b408b03e4; responds to t
 
 Session: builder-r20s4
 Work-Id: r42-guard-wiring-and-v7-one-shot
+R42 closeout v2 (same session): the Art. 29(c) gate refused the closeout's c-0057 DONE flip — a DONE measurement without a VERIFIER record is unlawful while the prereg's step-2 verifier recompute has not happened (the pushed CI ran FAILURE at 4bca7a13a, API-read, preserved as fact). c-0057 returned to OPEN forward-only (execution complete, run artifacts committed at 8d30772cf with run_verdict=VALID; the claim stays open until the peer verifier's byte recompute lands). The r42 record's remote_ci now carries the true final tip: 4bca7a13a FAILURE — the honest closeout states the round ends on a red gate that the NEXT push (this one) must turn green, and the API read of this push decides that.
+
+Session: builder-r20s4
+Work-Id: r42-guard-wiring-and-v7-one-shot
