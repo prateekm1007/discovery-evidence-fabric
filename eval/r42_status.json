@@ -1,0 +1,41 @@
+{
+ "record": "R42_STATUS/1.0.0",
+ "session": "builder-r20s4",
+ "at": "2026-11-17T00:50:00Z (sandbox clock)",
+ "builder_base": "b408b03e4 (AM39/V37/prereg/preflight/verifier read in full from the audit ref 1dad86c14; both constitutions byte-identical to the fully-read bytes — the drift checks against the queue tip and the audit tip are empty; the rubric holdout_v7_rubric_PRIVATE.json was never opened by any code path or read in this session)",
+ "pushed": ["fd28fecb6 (block 1: F56 wiring + the c-0055 flip + the c-0056/c-0057 claims + the r30 determinism fix — surface=FAILURE API-read, preserved as fact: the wiring's comment lines sat inside the pytest continuation chain and the gate caught my own break before any green claim)",
+            "069a16430 (the F56 fix: comment moved outside the chain; the rendered step extracted from the committed YAML and executed locally before pushing — surface=SUCCESS API-read)",
+            "8d30772cf (block 2: the holdout-v7 ONE-SHOT run — surface=SUCCESS API-read; rebased over the peer verifier's c-0056/c-0058 closeout 658b349e8)",
+            "this record's commit (the closeout)"],
+ "r42_direction_response": {
+  "d1_f56_closed_by_wiring": "DONE and independently VERIFIED (the peer's c-0058 at 658b349e8): both R41 guard suites join the zero-LLM CI block and are cited WIRED (Art. 18 / Art. 6); test_guard_activation gains its citation; the Art. 27 stale PARTIAL map text corrected to WIRED; the refusal path is four in-suite negative tests (no remote_ci block / fake conclusion / unquoted success / partial success all RED) — now remotely executed on every push. The 7th exists-but-does-not-gate instance closed by wiring, and the fix itself produced (and the gate caught) the 8th instance: the fd28fecb6 break was a comment inside the pytest continuation chain — the first pytest ran truncated and PASSED, then bash tried to EXECUTE a test file (exit 126). Never again pushed without running the RENDERED step locally: the fix commit did exactly that (extracted the committed YAML's step, bash -n + full execution, 64 tests in one invocation).",
+  "discovered_and_fixed_r30_nondeterminism": "OUTSIDE F56 but blocking: the queue CI's own deterministic block was FLAKY — HO4-06 flipped run-to-run (reproduced 4/15 and 6/15 standalone stress). Root cause: r30_allowed_class_scan._content_words returned a SET and _object_stems took 'the first six content words' of it — unordered selection under PYTHONHASHSEED varied the procured-object stems and flipped the dosing-pump exemption. Fixed (ordered text-order list; membership-only call sites unaffected), pinned in-suite (four seeded subprocesses must give the identical verdict), stress 0/15 + 0/8 after.",
+  "d2_v7_one_shot_executed": "DONE per the PREREGISTRATION: claim-before-problem-read held (c-0057 pushed in fd28fecb6 before any problem byte was read); problems ONLY from holdout_v7_problems.json on the fetched audit ref; seal recomputed FIRST (canonical-tuple projection) and EXACT (c7b4473c…); ONE generation, frozen V7.7, zero batch re-generation; 12 rows + events ledger + raw gateway slice + serving attestation + run ledger committed; green pushed CI API-read at 8d30772cf.",
+  "d3_attestation_and_handoff": "The serving attestation: 72/72 completed gateway calls requested AND served glm-4-plus, zero mismatches. The v1.0.0 attestation counted the gateway's 429-backoff telemetry lines (status RATE_LIMITED_RETRY, no model fields) as calls and wrongly voided the run — the v1.1.0 recompute separates completed calls from telemetry and was recomputed from the UNCHANGED raw slice (rows/events/slice byte-untouched; the filter fix is forward-only in the one-shot script). run_verdict=VALID on all five prereg gates. Handoff: scoring is the auditor's (prereg step 4) against the PRIVATE rubric; BURN is step 5 — not this session's."
+ },
+ "art27_capability_budget": {
+  "engine_diff": ".github/workflows/r11_queue_surface.yml EDITED (the two guard suites join the zero-LLM block; the comment-continuation break fixed); eval/enforcement_flags.json EDITED (Art. 18/6 citations, Art. 27 PARTIAL->WIRED text correction); tests/test_remote_ci_rule.py REWRITTEN (single validator + four refusal-path negative tests); scripts/r30_allowed_class_scan.py EDITED (the _content_words determinism fix); tests/test_r30_am29_binds.py EXTENDED (the seeded-subprocess determinism pin); scripts/r42_v7_one_shot.py ADDED (the one-shot runner) and EDITED (the telemetry filter fix); scripts/r42_v7_attest_recompute.py ADDED (the attestation recompute); eval/v7_run/ ADDED (12 rows, events ledger, gateway slice, attestation v1.1.0, run ledger v1.1.0); eval/work_claims.json EDITED (session builder-r20s4; c-0055 DONE+verifier; c-0056, c-0057 registered and executed; c-0057 DONE pending verifier recompute). The v6 rows and the frozen V7.6 path are BYTE-UNCHANGED.",
+  "primary_metric_delta": "none claimed — the v7 run is GENERATED and ATTESTED but UNSCORED: the acceptance measurement is the auditor's rubric read (prereg step 4). The machine self-reads (critic CLEAN 12/12; direction 6/6 CORRECT; every row at the repair budget) are disclosed as machine observations, never as a score, bar, or capability number.",
+  "deletions": "none — nothing removed; the r30 fix changes word-selection ORDER only (semantics preserved, pinned)."
+ },
+ "remote_ci": {
+  "pushed_sha": "8d30772cf",
+  "remote_ci_conclusion": "success",
+  "check_runs": [{"name": "surface", "status": "completed", "conclusion": "success"}],
+  "read_at": "2026-11-17T00:43:42Z (sandbox clock; check-run API via authenticated read)",
+  "history": [
+   {"pushed_sha": "fd28fecb6", "remote_ci_conclusion": "failure",
+    "note": "the executor's own D2 rule caught the comment-inside-continuation break before any green claim; exit 126; preserved as fact"},
+   {"pushed_sha": "069a16430", "remote_ci_conclusion": "success",
+    "note": "the F56 fix; the rendered step executed locally before pushing"},
+   {"pushed_sha": "8d30772cf", "remote_ci_conclusion": "success",
+    "note": "the v7 one-shot run commit"}]
+ },
+ "honesty_notes": [
+  "the v1.0.0 attestation mistake is disclosed: telemetry counted as calls, a clean run wrongly voided; the recompute touched only the attestation and run-ledger JSON, never the rows, events, or slice",
+  "every row reached critic CLEAN at repair_3 — the repair-budget ceiling: first-draft quality is a machine-tightness signal for the auditor to weigh during scoring; the per-attempt findings are in the events ledger",
+  "transport reality: the NVIDIA fallback leg is dead in this sandbox (NVIDIA_API_KEY absent from the vault) — the gateway primary carried the whole run; three transient 500/429 storms were survived by the typed retry chain inside the SAME generation (no re-run)",
+  "the peer verifier (builder-r42s1, c-0058) verified c-0056 and flipped it DONE while this session was generating — the rebase over 658b349e8 is disclosed; their typed limitation note stands: map-completeness gates by string containment, so the D2 remote read stays the load-bearing catcher for present-but-broken invocations",
+  "the rubric was never read; the problems file was read exactly once, after the claim push; BURN intentionally NOT executed (prereg step 5 follows scoring)"
+ ]
+}
