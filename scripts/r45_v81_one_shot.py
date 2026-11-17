@@ -138,8 +138,8 @@ def main() -> int:
     events: list = []
     rows: list = []
     interruptions: list = []
-    if resume:
-        ev_path = OUT / "v81_events_ledger.json"
+    ev_path = OUT / "v81_events_ledger.json"
+    if resume and ev_path.exists():
         old = json.loads(ev_path.read_text(encoding="utf-8"))
         events = old["events"]
         rows = [json.loads(rp.read_text(encoding="utf-8"))

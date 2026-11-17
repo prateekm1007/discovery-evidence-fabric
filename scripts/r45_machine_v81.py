@@ -68,7 +68,7 @@ V81_CANDIDATE_DIRECTIVE = (
     "physics layer can verify your magnitude from your own inputs.")
 
 MACHINE_DESCRIPTOR = {
-    "machine": "V8.1",
+    "machine": "V8.1.1",
     "base": "V8.0 (r43_machine_v8, frozen) + AM42 D1 computed-physics "
             "layer (scripts/v81_physics.py) + D2 population search "
             "with TRIZ seeding (scripts/triz_principles.py)",
@@ -76,6 +76,12 @@ MACHINE_DESCRIPTOR = {
     "k_candidates": 3,
     "repair_budget": REPAIR_BUDGET,
     "direction_llm": "selected candidate only",
+    "v81_1_fix": "candidate-plan enumeration dedupes INSIDE the loop "
+                 "(always exactly 3 distinct (class, principle) "
+                 "plans); the V8.1 attempt produced cands=2 on its "
+                 "first row (HO8-01) — that run was stopped and its "
+                 "single row VOIDED-BUILD-DEFECT "
+                 "(eval/v81_run_voided_v81_defect/)",
 }
 
 
@@ -89,19 +95,43 @@ def _candidate_plans(prob: dict) -> list:
     if seed_principles and seed_cls:
         plans.append((seed_cls, seed_principles[0]))
     from triz_principles import CONTRADICTION_MAP
+    # dedupe INSIDE the loop (the V8.1.1 fix): the seed duplicate and
+    # any repeat never occupy one of the three plan slots, so the
+    # enumeration always yields exactly 3 distinct (class, principle)
+    # plans — V8.1's pre-dedupe break could leave 2 (caught on the
+    # first V8.1 row, HO8-01: cands=2; the run was stopped and the
+    # single row VOIDED-BUILD-DEFECT; the machine bumped V8.1.1)
+    seen = set(plans)
+    used_cls = {cls for cls, _ in plans}
+    used_pids = {pid for _, pid in plans}
     for rx, principles, cls in CONTRADICTION_MAP:
         if len(plans) >= 3:
             break
-        if not DUTY_CYCLE_FAMILY_RX.search(cls.lower()):
+        if DUTY_CYCLE_FAMILY_RX.search(cls.lower()):
+            continue
+        if cls in used_cls:
+            # mechanistic distinctness: one plan per class — a family
+            # whose class is already seeded never contributes a second
+            # same-class plan (V8.1.1: distinct CLASSES and distinct
+            # principles across the three plans)
+            continue
+        # prefer a principle not already used by another plan (the
+        # distinct-principles bind): families thermal-load and
+        # efficiency both lead with 35; if every principle of this
+        # family is already used, its first is taken (class
+        # distinctness wins; the residual is disclosed in the row's
+        # population facts)
+        for pid in principles:
+            if pid not in used_pids:
+                used_pids.add(pid)
+                seen.add((cls, pid))
+                plans.append((cls, pid))
+                break
+        else:
+            seen.add((cls, principles[0]))
             plans.append((cls, principles[0]))
-    # dedupe (class, principle) pairs while preserving order
-    seen = set()
-    uniq = []
-    for cls, pid in plans:
-        if (cls, pid) not in seen:
-            seen.add((cls, pid))
-            uniq.append((cls, pid))
-    return uniq[:3]
+        used_cls.add(cls)
+    return plans[:3]
 
 
 def _battery(prob: dict, final: str, qt: str,

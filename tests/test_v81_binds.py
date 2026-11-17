@@ -179,9 +179,12 @@ def test_v80_machine_byte_frozen():
 
 
 def test_machine_descriptor_v81():
-    assert MACHINE_DESCRIPTOR["machine"] == "V8.1"
+    assert MACHINE_DESCRIPTOR["machine"].startswith("V8.1")
     assert MACHINE_DESCRIPTOR["k_candidates"] == 3
     assert MACHINE_DESCRIPTOR["request_model"] == "glm-4-plus"
+    if MACHINE_DESCRIPTOR["machine"] != "V8.1":
+        # the V8.1.1 build-defect fix must be documented in-band
+        assert "dedupe" in MACHINE_DESCRIPTOR.get("v81_1_fix", "")
 
 
 def test_retirement_ledger_accounting():
