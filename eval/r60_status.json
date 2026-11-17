@@ -1,0 +1,95 @@
+{
+ "record": "R60_ROUND_STATUS/1.0.0",
+ "session": "builder-r60s1",
+ "work_ids": [
+  "r58-p2-dev-ablation-machine-leg (c-0079, OPEN — continuation session; challenger-arm resume on transport recovery, lease 2026-11-19T00:00:00Z)",
+  "holdout-v9-generation (machine FROZEN pre-claim @6f1a87913; the claim lands AFTER the ablation completes per the owner's directed order, immediately before the one-shot)"
+ ],
+ "base_sha": "2686b15d8",
+ "round": 60,
+ "constitution_reads": {
+  "epistemic": "v3.2.0 @590fac029 FULL (29 articles + amendment records + Art. 28 addendum; identical at HEAD)",
+  "auditor": "v1.3.0 @04b5e0983 FULL (14 articles + 3 amendment records)",
+  "artifacts": "audit/holdout_v9/PREREGISTRATION.json + AM54/AM55 + CORR-3 (the ledger's v9_custody record) read before any work"
+ },
+ "vault_custody": {
+  "state": "RE-ESTABLISHED (CORR-3: vault presence re-verified FIRST)",
+  "entries": [
+   "XKIRO_API_KEY (f6c09bee9bde)",
+   "AGNES_API_KEY (d0c666a3842f)",
+   "AGNES_BASE_URL",
+   "GH_PAT (f1ebca5f9b62)",
+   "GITHUB_TOKEN (f1ebca5f9b62)"
+  ],
+  "digest_verification": "3 owner-delivered keys verified byte-exact against the committed R59 custody record digests (sha256[:12]); mode 600; gitignored verified",
+  "absent_vs_r59": [
+   "INCEPTION_API_KEY",
+   "OPENROUTER_API_KEY",
+   "CROWLLM_API_KEY",
+   "CROWLLM_BASE_URL",
+   "DEEPAI (dead 402)"
+  ],
+  "absent_note": "no values in this session's custody; unprobed spares / dead routes; never re-asked (Art. 17 look-up-never-re-ask)"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "NONE — no engine module changed this round (the r53 criteria evaluator is scripts/; the v9 machine driver is scripts/)",
+  "primary_metric_delta": "no primary-metric change claimed this round; the round's capability legs ARE the P2 ablation completion (criteria 1+2 computed at the arms-complete evaluation, never projected) + the v9 one-shot generation (both quota-gated on the upstream transport recovery)",
+  "deletions": "NONE this round. The prose-scanner deletion (direction R60-3) is TYPED SEQUENCED: the physical deletion rides the v7.7-path retirement per the Art. 16 ledger's own same-change rule — and the frozen v9 machine (@6f1a87913) imports the V7.7 expansion loop per the prereg's machine continuity, so the retirement lands AFTER the v9 one-shot (the wrapper lineage retires together: machine + batteries + scanner layer, one Art. 16 change)",
+  "engine_share_declaration": {
+   "diff_base_sha": "2686b15d8",
+   "diff_head_sha": "6f1a87913",
+   "engine_insertions": 0,
+   "engine_changed": 0,
+   "measurement_method": "git diff --numstat over the declared range (discovery_fabric/engine/ untouched)"
+  },
+  "below_rule_disclosure": "an ablation-execution + instrument round (the R55 below-rule precedent): the shape hardening (scripts/r53 v1.2.0 + regression pins), the v9 machine freeze (scripts/r60_v9_one_shot.py — the frozen engine-route machine that RUNS the engine, authored in scripts/ per the driver convention), and the ablation/v9 execution evidence (eval JSON). The round's capability evidence is the completed measurements, not engine-line share",
+  "engine_line_share_measured": 0.0,
+  "share_exception_reason": "ablation-execution + instrument round per the R55 precedent; the engine itself is the MEASURED PATH the round runs (engine_route -> mechanism_space per problem), not the diff target"
+ },
+ "shape_hardening": {
+  "claim": "c-0079 continuation (direction R60-2)",
+  "what": "scripts/r53_p2_ablation_criteria.py v1.1.0 -> v1.2.0: typed row-shape refusals BEFORE any computation (Art. 3)",
+  "empirical_basis": "the R59 verifier's non-blocking Art. 3 observation (590fac029), reproduced live from committed bytes: raw run-records crash untyped (AttributeError); partial dicts silently default allowed_row_outside to 0",
+  "pins": "tests/test_r53_criteria_typed_refusal.py (5 typed-refusal + 3 content-preservation), wired into the queue surface + the Art. 3 map entry",
+  "measured_paths": "byte-equivalent to v1.1.0 (dry-run deferred/adopt/delete/incomplete all green)"
+ },
+ "v9_machine_freeze": {
+  "commit": "6f1a87913",
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "design": "per problem: engine_route.run_row (typed plans K>=3 distinct principles, domain clamp, the six operator contracts via mechanism_space.assemble_candidate, schema 1.1.0 enums, physics routing with PENDING_INPUTS typed, novelty gate) + the PRE-REGISTERED winner rule over the engine's live plan space + the FROZEN V7.7 expansion loop BYTE-REUSED (machine_generate_v77) rendering the winner on the R36 registered zai-gateway glm-4-plus route (route_adapter.require_registered_model gate)",
+  "seal": "the published canonical-tuple recipe (F50 @9ea2614a8), fail-closed; verified on burned v7 in the zero-LLM dry-run",
+  "dry_run": "PASS (zero LLM, zero network): seal recipe on burned v7 (c7b4473c exact), engine route + winner + payload on 3 burned DEV + all 12 burned v7 problems (12/12 non_schedule_first)",
+  "claim_state": "NOT YET CLAIMED — the claim (c-0082) lands after the c-0079 ablation completes (the owner's directed order), BEFORE any v9 problem read"
+ },
+ "transport_state": {
+  "upstream": "the sandbox z-ai CLI upstream: R58's 500-outage (~19:45Z) transitioned to 429-at-every-call (typed by direct CLI probes 21:53Z-22:22Z; a paced recovery monitor runs, probe every 180s)",
+  "discipline": "Art. 15 (infra failure is never scientific rejection) + the matched-model-identity constraint (the lane waits on the transport, it never switches families)"
+ },
+ "remote_ci": {
+  "pushed_shas": {
+   "4db375c3a (shape hardening)": {
+    "check_runs": [
+     {
+      "name": "surface",
+      "status": "completed",
+      "conclusion": "success"
+     }
+    ],
+    "read_at": "2026-11-17T22:46:59Z",
+    "remote_ci_conclusion": "success"
+   },
+   "6f1a87913 (v9 machine freeze)": {
+    "check_runs": [
+     {
+      "name": "surface",
+      "status": "completed",
+      "conclusion": "success"
+     }
+    ],
+    "read_at": "2026-11-17T22:47:07Z",
+    "remote_ci_conclusion": "success"
+   }
+  },
+  "note": "both R60 heads green via the check-run API (the D2 procedure); THIS record's own push head is read by the next session's opening read (the one-step recursion)"
+ }
+}
