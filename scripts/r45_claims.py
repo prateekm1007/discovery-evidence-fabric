@@ -103,6 +103,11 @@ if "c-0066" not in have:
                  "may rule the packet spent and author v9 instead "
                  "(Art. 28: the loop escalates and acts, never "
                  "idles)."})
+claims.extend(new)  # THE BUG FIX: the previous two runs built `new`
+                    # but never appended it — the prints and commit
+                    # messages claimed filings that never landed
+                    # (caught by the post-write union assertion;
+                    # disclosed in the restore commit)
 d["at"] = NOW
 p.write_text(json.dumps(d, indent=1, ensure_ascii=False) + "\n",
              encoding="utf-8")
