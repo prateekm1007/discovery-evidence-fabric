@@ -21,9 +21,9 @@
  },
  "remote_ci": {
   "pushed_sha": "bc62ebcb5",
-  "remote_ci_conclusion": "SUCCESS",
-  "read_at": "2026-11-17T06:00:45Z",
-  "note": "read from the check-run API (the D2 rule) — the green is the remote full surface's, not a local pytest run"
+  "remote_ci_conclusion": "unreadable",
+  "read_at": "2026-11-17T10:40:00Z (sandbox clock)",
+  "note": "R50 CORRECTION (Art. 4, claim c-0068): the prior value 'SUCCESS' was NOT a real check-run API conclusion (the API enum is lowercase success|failure|timed_out|cancelled|pending|neutral|skipped|unreadable) — the producing session asserted the string instead of quoting the read, which is exactly the defect the D2 rule exists for; the queue CI red-gated it (tests/test_remote_ci_rule.py, byte-verified locally at 6327f4618). The ORIGINAL claim (an API read at 2026-11-17T06:00:45Z concluding success) is preserved verbatim here per Art. 4 — it is not re-asserted: the R50 re-read attempt returned HTTP 403 'API rate limit exceeded' (unauthenticated, shared IP 47.57.232.232, 0/60 remaining at 10:31Z, reset 11:26Z) and no authenticated credential exists this round (push tooling down; rotation pending per P0.1). Typed value 'unreadable' is the honest state. A re-read quoting the exact API enum value is QUEUED for the next push-capable round and rides the next push's round record."
  },
  "honesty_notes": [
   "CLAIM-FILING BUG (self-caught): r45_claims.py built the new-claims list and printed it WITHOUT ever extending d['claims'] — two runs and one pushed commit (7889b6e61) claimed filings that never landed; caught by a post-write union assertion, fixed with claims.extend(new) + an in-script assert; the registry now carries c-0065/c-0066 with verified union (63 claims)",
