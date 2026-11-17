@@ -1,5 +1,5 @@
 {
- "record": "R58_ROUND_STATUS/1.2.0",
+ "record": "R58_ROUND_STATUS/1.3.0",
  "session": "builder-r58s1",
  "note_v1_1_0": "rewritten AFTER the Art. 29(e) stand-down (the v1.0.0 bytes archived at queue/r58s1-unpushed-archive, commit fcdfbb226): the parallel session builder-r58s2 landed the canonical v3.2.0 ratification (c-0080, b5fe03ca6..81e9b0f13, remote-CI green) while this session worked a duplicate ratification lane; this session yielded the ratification identifiers, archived its 4-commit lineage, reset to the remote tip, and re-landed ONLY the disjoint residual (the c-0079 machine-leg machinery + the scanner messages-leg residual that makes the canonical Art. 17 gate detector-real). Never rebased the duplicate (Art. 29(e)); zero takeover of the peer's identifiers.",
  "work_ids": [
@@ -31,9 +31,10 @@
  },
  "p2_ablation": {
   "claim": "c-0079 (builder-r58s1, OPEN)",
-  "state": "ONE-SHOT IN FLIGHT: baseline arm resumed from committed PARTIAL row 1/36 (HO2-01 CLEAN, repairs=3, chars=2488); chunked foreground execution (the sandbox killed the background process group after row 1 — typed infra event, Art. 15, resume-safe by design)",
+  "state": "ONE-SHOT PAUSED ON TYPED INFRA (Art. 15): baseline arm COMPLETE 36/36 (committed 348053718); challenger arm 4/36 committed (HO2-01..04 CLEAN) when the upstream z-ai provider began returning 500 on every call (~19:45Z, typed via direct CLI probe AND the machine path; the frozen machine's 4-attempt exhaustion raises — byte-unchanged constraint). The provider outage persisted through the session's polling window (~70 min typed). The resume-safe driver continues from committed bytes when the transport recovers; the matched-model-identity constraint holds (no family switch mid-ablation). Criteria 1+2 UNCOMPUTED (never projected); criterion 3 UNMEASURABLE (F60-gated). The VERIFIER record (builder-r59s1, 590fac029) typed this exact state: MACHINERY_VERIFIED, one-shot in flight.",
   "machinery": "cherry-picked disjoint residual 74405cb24: route_adapter + driver (gateway lifecycle fix) + criteria v1.1.0 union (peer's MEASURED_PATH + this session's UNMEASURABLE-verdict ladder) + gateway mjs log-path fix + test_r58_route_adapter (10/10) + smoke evidence",
-  "criteria_note": "criteria 1+2 computed at the one-shot; criterion 3 typed UNMEASURABLE (F60 instrument-gated, owner custody)"
+  "criteria_note": "criteria 1+2 computed at the one-shot; criterion 3 typed UNMEASURABLE (F60 instrument-gated, owner custody)",
+  "resume_point": "eval/r58_ablation/rows_challenger/ (4 rows) + eval/r58_ablation/events_challenger.json; run: python3 scripts/r58_p2_ablation_driver.py challenger"
  },
  "scanner_residual": {
   "files": [
