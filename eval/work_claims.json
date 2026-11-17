@@ -92,6 +92,11 @@
    "registered_at": "2026-11-17T05:40:00Z (sandbox clock)",
    "role": "builder",
    "note": "R45 session (the AM42 D1+D2 adoption lane + the fresh v8-v81 one-shot executor). Registered before the claim push per Art. 29(a)."
+  },
+  "builder-r50s1": {
+   "registered_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "role": "builder",
+   "note": "R50 session (P0.2-P0.3 + P1.1 per the owner ROADMAP 4->9). Sandbox recycled since builder-r45s1 (the r45 .env.keys custody died with the old sandbox; push credentials GONE - push verified down this round via git push --dry-run exit 128 'could not read Username'). This session CONTINUES the builder-r45s1 lineage lane c-0067 (all-refs-secret-scan, lease 2026-11-19T00:00:00Z UNEXPIRED - lineage continuation, no takeover needed per Art. 29(d); original claimant sandbox dead, disclosed). Claim-before-work (Art. 29(b)): claims c-0068/c-0069/c-0070 filed HERE before any build work; the claim PUSH is impossible this round (owner-acknowledged outage, documented in each claim) - the commit sequence inside this round is the claim-before-work evidence; the auditor adjudicates ordering at the next push-capable round."
   }
  },
  "claims": [
@@ -1425,7 +1430,68 @@
     ".githooks/pre-commit",
     "eval/r45_status.json"
    ],
-   "notes": "Claimed BEFORE any build work (Art. 29(b)). The D8 acceptance (AM42): all-23-branch + full-history scan in CI; 0 unbaselined findings; detect-secrets pre-commit. Baseline discipline (Art. 9): the KNOWN exposures (the F45 live PAT on r448/visual-lab x 2 files + the R451 credential-shaped scan records) are baselined with provenance and owner-rotation-pending disclosure (no history rewrite per F42); any NEW finding fails CI. Zero LLM calls; zero v8 problem bytes (the v8/v81 lanes are c-0065/c-0066, builder-r45s2's — no duplication)."
+   "notes": "Claimed BEFORE any build work (Art. 29(b)). The D8 acceptance (AM42): all-23-branch + full-history scan in CI; 0 unbaselined findings; detect-secrets pre-commit. Baseline discipline (Art. 9): the KNOWN exposures (the F45 live PAT on r448/visual-lab x 2 files + the R451 credential-shaped scan records) are baselined with provenance and owner-rotation-pending disclosure (no history rewrite per F42); any NEW finding fails CI. Zero LLM calls; zero v8 problem bytes (the v8/v81 lanes are c-0065/c-0066, builder-r45s2's — no duplication). || CONTINUATION 2026-11-17T10:33Z (builder-r50s1): original claimant sandbox (builder-r45s1) died in a recycle before any D8 work commit; this session resumes the SAME lineage lane under the UNEXPIRED lease (no takeover per Art. 29(d) - the lease is live). Work this round: P0.3 per owner ROADMAP 4->9. Zero LLM calls; zero v8 problem bytes."
+  },
+  {
+   "claim_id": "c-0068",
+   "work_id": "r50-ci-forward-fix",
+   "title": "P0.2 (owner ROADMAP 4->9): fix the red queue CI forward-only. Diagnosis (byte-checked locally at 6327f4618 + API-read): (1) tests/test_remote_ci_rule.py::test_round_records_carry_the_remote_conclusion RED - eval/r45_status.json carries remote_ci_conclusion 'SUCCESS', not a real check-run API value (the API enum is lowercase; the producing session asserted the string instead of quoting the read); (2) tests/test_article29_parallel_coordination.py::test_post_adoption_commits_carry_session_and_work_id_trailers RED - commits a579728282 + 6327f46188 lack Session:/Work-Id: trailers and are unregistered in trailer_violations. Fix: correct the record to the typed honest value + register both trailer violations (F36 typed allowance; pushed history never rewritten).",
+   "status": "OPEN",
+   "registered_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "session_id": "builder-r50s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "6327f4618",
+   "claimed_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "lease_expiry": "2026-11-19T00:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r45_status.json",
+    "eval/work_claims.json",
+    "eval/r50_status.json"
+   ],
+   "notes": "Claimed BEFORE any build work (Art. 29(b) - local filing; the claim push is down this round, owner-acknowledged: 'push tooling is down this round'). Both fixes are DATA-only forward fixes (no history rewrite, Art. 4). The API read for the corrected record was rate-limited (unauthenticated, shared IP 0 remaining at 10:31Z, resets 11:26Z) - the typed honest value available NOW is 'unreadable' with the full incident note; a re-read is queued for the next push-capable round. Real quoted API reads this session (pre-limit): a57972828 surface=failure, 6327f4618 surface=failure (both check-run reads succeeded and are quoted in eval/r50_status.json). Zero LLM calls."
+  },
+  {
+   "claim_id": "c-0069",
+   "work_id": "engine-physics-checks-pint",
+   "title": "P1.1 first slice (owner ROADMAP 4->9): discovery_fabric/engine/physics_checks.py - the computed-physics layer as ENGINE code: a typed registry of computable governing relations keyed by failure class (Arrhenius time-at-temperature, NPSH margin, Langelier LSI, Carnot COP ceiling, Larson-Miller creep, Kern-Seaton fouling, frost psychrometrics dewpoint) with PINT unit-checked inputs/outputs; direction-of-effect = the sign of the computed result, never prose; typed verdicts (COMPUTED_CONSISTENT | COMPUTED_INCONSISTENT | UNCOMPUTABLE_NO_INPUTS | typed out-of-domain notes) per the Art. 9 labelled-assumption path. Negative controls: wrong-sign inputs must yield INCONSISTENT (the contract the roadmap demands before any ablation claim).",
+   "status": "OPEN",
+   "registered_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "session_id": "builder-r50s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "6327f4618",
+   "claimed_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "lease_expiry": "2026-11-19T00:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "discovery_fabric/engine/physics_checks.py",
+    "tests/test_physics_checks.py",
+    ".github/workflows/r11_queue_surface.yml",
+    "eval/r50_status.json"
+   ],
+   "notes": "Claimed BEFORE any build work (Art. 29(b) - local filing; push down this round, owner-acknowledged). Builds on (does not duplicate) builder-r45s2's scripts/v81_physics.py D1 adoption - that stays the RUN machine's layer; this claim is the ENGINE-side registry (discovery_fabric/engine/) the roadmap names, with pint unit safety as the new capability. Art. 27: the round's engine-diff share is computed and reported in eval/r50_status.json (roadmap rule: >=30% of changed lines in engine code). Tests are zero-LLM; CI deps gain pint (pure-python BSD, wired into the CI install line). Zero v8 problem bytes; the v8 lanes stay c-0066's."
+  },
+  {
+   "claim_id": "c-0070",
+   "work_id": "roadmap-4-to-9-durable",
+   "title": "Durable commit of the owner's ROADMAP 4->9 (the governing plan) + the AM46 agent-loop amendment record (P4/P5 AGENT-RUN authorization), per the owner directive: 'the durable commit of this document + AM46 is queued for the next push-capable round - the plan is in force now'. The document is committed VERBATIM from the owner message; AM46 lands as a dated amendment record referencing the owner directive (the constitutional AM46 text, if the owner issues one beyond the roadmap, supersedes).",
+   "status": "OPEN",
+   "registered_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "session_id": "builder-r50s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "6327f4618",
+   "claimed_at": "2026-11-17T10:34:30Z (sandbox clock)",
+   "lease_expiry": "2026-11-19T00:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "ROADMAP_4_TO_9.md",
+    "eval/roadmap_4_to_9.json",
+    "eval/r50_status.json"
+   ],
+   "notes": "Claimed BEFORE any build work (Art. 29(b) - local filing; push down this round). The commit exists locally THIS round and is pushed at the next push-capable round (Art. 18: work that dies with the sandbox is not evidence - the durable commit is queued, disclosed in the round record and the checklist)."
   }
  ],
  "trailer_violations": [
