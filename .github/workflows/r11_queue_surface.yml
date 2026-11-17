@@ -76,6 +76,11 @@ jobs:
           # after a line-continuation truncates the command (the
           # fd28fecb6 push red-gated exactly this — exit 126 trying
           # to execute a test file as a command).
+          # R43 (claim c-0060): tests/test_v8_generation_binds.py joins
+          # the same block ON THE SAME RULE — the V8 generation-binds
+          # acceptance suite (the R42 verdict D1/D2/D5) gates every
+          # queue push the moment it exists; the 9th instance never
+          # opens.
           python3 -m pytest tests/test_article19_metric_unit_tests.py \
             tests/test_article20_ablation_registry.py \
             tests/test_article21_label_integrity.py \
@@ -91,6 +96,7 @@ jobs:
             tests/test_article_map_completeness.py \
             tests/test_remote_ci_rule.py \
             tests/test_v77_bind_controls.py \
+            tests/test_v8_generation_binds.py \
             -q -p no:warnings
       # Anti-gaming / independence / infra-separation suites (the Art.
       # 2/3/6 WIRED mechanisms in eval/enforcement_flags.json) — the
