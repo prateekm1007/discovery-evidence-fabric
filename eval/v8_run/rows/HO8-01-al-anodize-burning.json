@@ -1,0 +1,43 @@
+{
+ "problem_id": "HO8-01-al-anodize-burning",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip 7c9c8ffb6)",
+ "executor_id": "builder-r44s1@holdout-v8-generation",
+ "machine": {
+  "machine": "V8.0",
+  "base": "V7.7 (r40_machine_v77) with the R42-verdict generation binds (claims c-0060)",
+  "request_model": "glm-4-plus",
+  "repair_budget": 3,
+  "k_gen": 1
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T03:32:06.754077Z",
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**  \nTo prevent high-current-density burning at the rack contact zone in aluminium sulphuric anodizing, this intervention introduces a **current-density modulation profile** that reduces localized overheating at contact points. Standard practice uses a constant current density of 1.5 A/dm², which concentrates heat at high-resistance contact zones. The mitigation departs by **splitting the anodizing cycle into a low-current pre-soak phase followed by a controlled ramp**, which equalizes temperature distribution and mitigates thermal runaway. Adjacent-technique clearance: Existing industry uses temperature-controlled baths or pulse-reverse current, but this intervention avoids new hardware by using only existing PLC-controlled power supplies and bath temperature sensors. The mechanism attacks the failure driver (localized Joule heating) by reducing peak current density at contacts during the most thermally sensitive phase.\n\n---\n\n**PHYSICS CHECK**  \nDIRECTION-OF-EFFECT: Driving variable = current density at contact points; the mechanism moves it **down** by **30% during the initial 5-minute soak phase** (from 1.5 A/dm² to 1.05 A/dm²); this **reduces** Joule heating (P = I²R) at high-resistance interfaces. Magnitude verification: At 20°C bath temperature, a 30% current reduction lowers heat generation by 51% (since P ∝ I²), suppressing thermal runaway before full current is applied.\n\n---\n\n**IMPLEMENTATION BILL**  \n*(Standard practice bill: PLC/power supply, bath temperature sensor, rack loading, chemistry monitoring.)*  \n1. **PLC program modification** (c) — Update existing PLC to implement a two-phase current profile: Phase 1 (5 min) at 70% of setpoint (1.05 A/dm²), Phase 2 (remainder) at 1.5 A/dm².  \n2. **Temperature sensor data feed** (a) — Use existing bath temperature sensor (20°C setpoint) to monitor for anomalies during Phase 1.  \n3. **No new hardware** — All changes use existing equipment.  \n\n---\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n| **Standard Practice** | **This Intervention** | **Burden Change** |  \n|-----------------------|-----------------------|-------------------|  \n| PLC operation (constant current) | PLC operation (modified profile) | **Same** (software change only) |  \n| Bath temperature monitoring | Bath temperature monitoring (same) | **Same** |  \n| Rack loading | Rack loading (same) | **Same** |  \n| **Total** | | **Same burden class** |  \n\n---\n\n**EXECUTABLE TEST**  \n**Protocol:** Run 10 test racks at 1.5 A/dm² (standard) vs. 10 racks with the new profile. Measure rack contact temperature via IR thermocouple and track burning incidence.  \n**Instruments:** Existing PLC, IR thermocouple (calibrated), visual inspection rack.  \n**Pass/Fail:** Burning incidence ≤ 5% in test group vs. 20% in control; peak contact temperature ≤ 25°C (vs. 30°C in control).  \n**Duration:** 1 hour per rack (5-min soak + full cycle).  \n**Kill Criterion:** Stop if burning exceeds 5% or temperature exceeds 25°C.  \n\n---\n\n**CANDIDATE CLASSES**  \n1. **Electrolyte additive chemistry** — Complexants like tartrate could chelate aluminium ions, reducing conductivity spikes at contacts.  \n2. **Bath temperature retuning** — Lowering setpoint to 15°C would reduce thermal runaway but risk incomplete anodization.  \n3. **Current-density modulation profile** — Reduces peak heating at contacts without new hardware.  \n**SELECTED:** Current-density modulation profile — Non-duty-cycle candidates (additives/temperature) risk bath instability or process deviation, while modulation directly addresses the Joule heating driver with zero new hardware.  \n\n**MECHANISM CLASS:** Duty-cycle modulation  \n**SIGNALS USED:** None (open-loop)  \n**OPERATIONAL COST:** Zero (modulation occurs during production; no throughput loss)",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Localized Joule heating at high-resistance contact points causes burning in aluminium anodizing. | ingredient: Reduces current density during initial phase, thereby decreasing Joule heating at contact points. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Localized Joule heating at high-resistance contact points causes burning in aluminium anodizing.",
+   "ingredient_action": "Reduces current density during initial phase, thereby decreasing Joule heating at contact points.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "3. **No new hardware** — All changes use existing equipment.",
+    "1. **Electrolyte additive chemistry** — Complexants like tartrate could chelate aluminium ",
+    "2. **Bath temperature retuning** — Lowering setpoint to 15°C would reduce thermal runaway ",
+    "3. **Current-density modulation profile** — Reduces peak heating at contacts without new h"
+   ],
+   "DUTY_CYCLE_PREFERENCE_UNPROVEN": [
+    "the SELECTED class is duty-cycle-shaped while a non-duty-cycle candidate is enumerated — state the PHYSICS that rejects the non-duty-cycle candidate (the preference bind); convenience is not a physics reason"
+   ]
+  }
+ },
+ "sha256_16": "2452e7d6948bca30"
+}
