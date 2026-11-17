@@ -1,0 +1,46 @@
+{
+ "record": "R56_CUSTODY_STATUS/1.0.0",
+ "session": "builder-r56s1",
+ "work_id": "r56-deepai-credential-custody",
+ "claim": "c-0076",
+ "base_sha": "5a54f362f",
+ "round": "R56 (owner-supplied DeepAI credential \u2014 custody + probe + P2 impact typed)",
+ "protocol": [
+  "constitutions byte-identical at both pins (EPISTEMIC 525536896f8000a17fab124fac845ca0; AUDITOR abe1c4127bfc9e53b0f29c16e14892d5) \u2014 FULL reads stand, typed",
+  "Art. 17 custody: DEEPAI_API_KEY appended to .env.keys (gitignored, verified via git check-ignore); the full token exists ONLY in the vault",
+  "committed-bytes hygiene: masked only (shape 8-4-4-4-12 hex UUID, prefix 2af94dc2\u2026); staged-diff secret-grep 0 findings; the boolean full-token check below",
+  "claim-before-work: builder-r56s1 registered BEFORE c-0076 (27 sessions / 73 claims)"
+ ],
+ "probe": {
+  "method": "one minimal POST per endpoint to the key's OWN service (deepai.org API) \u2014 no third-party transmission, trivial payloads",
+  "endpoints": [
+   "text-generator",
+   "summarization"
+  ],
+  "http": "402 on both",
+  "body_quoted": "{\"status\": \"APIs are only available for Pro members in good standing - please check your Dashboard: https://deepai.org/dashboard\"}",
+  "typed_conclusion": "the key AUTHENTICATES (service-recognized; a bad key yields 401/403, not 402) but the account is NOT a Pro member in good standing \u2014 zero usable API calls"
+ },
+ "p2_impact": {
+  "typed": "the P2 'LLM credential' blocker is NOT lifted by this credential in its current state \u2014 v9 generation needs a funded route",
+  "vault_candidates_for_route_qualification": [
+   "OPENROUTER_API_KEY",
+   "CROWLLM_API_KEY",
+   "AGNES_API_KEY",
+   "INCEPTION_API_KEY",
+   "XKIRO_API_KEY"
+  ],
+  "nvidia_note": "NVIDIA_API_KEY still absent from the vault (the standing absence, carried)",
+  "owner_action": "activate DeepAI Pro (or confirm another vault credential is funded) so the round can qualify the v9 generation route; P0 custody remains the other half of the P2 gate (F60: the instrument must be confidential first)"
+ },
+ "secrets_check": {
+  "full_token_in_committed_files": false,
+  "vault_gitignored": true
+ },
+ "remote_ci": {
+  "pushed_sha": "filled at push",
+  "remote_ci_conclusion": "unreadable",
+  "read_at": "PENDING",
+  "check_runs": []
+ }
+}
