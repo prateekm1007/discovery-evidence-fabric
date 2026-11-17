@@ -236,6 +236,35 @@ def leg_rows(packet_ids: list) -> list:
 
 
 # ---------------------------------------------------------------------------
+# leg 4b — the run ledger cross-check
+# ---------------------------------------------------------------------------
+def leg_run_ledger() -> dict:
+    p = next(RUN_DIR.glob("v8_run_ledger*.json"), None)
+    assert p, "eval/v8_run/v8_run_ledger*.json missing"
+    led = json.loads(p.read_text(encoding="utf-8"))
+    gates = led.get("gates") or {}
+    verdict_ok = led.get("run_verdict") == "VALID"
+    seal_ok = (led.get("seal_anchor") == REGISTERED_SEAL
+               and led.get("seal_recomputed") == REGISTERED_SEAL
+               and led.get("seal_match") is True)
+    machine_ok = ("V8.0" in str(led.get("machine", "")) and
+                  "glm-4-plus" in str(led.get("machine", "")))
+    slice_ok = (led.get("serving_evidence_full", {})
+                .get("slice_path", "")
+                .endswith("gateway_log_slice.txt"))
+    legs["run_ledger"] = {
+        "verdict": ("CROSSCHECKS"
+                    if verdict_ok and seal_ok and machine_ok
+                    and slice_ok else "MISMATCH"),
+        "evidence": (
+            f"run_verdict={led.get('run_verdict')}; seal_anchor=="
+            f"prereg={led.get('seal_anchor') == REGISTERED_SEAL}; "
+            f"machine={str(led.get('machine'))[:70]}; gates="
+            f"{json.dumps(gates)}; slice_path ok={slice_ok}")}
+    return led
+
+
+# ---------------------------------------------------------------------------
 # leg 5 — the deterministic scan-battery recompute (zero LLM)
 # ---------------------------------------------------------------------------
 def leg_scan_battery(rows: list, evs: list) -> None:
@@ -738,7 +767,7 @@ def main() -> int:
     greens = ("EXACT", "RECOMPUTES_CLEAN", "ONE_TRAIL", "VERIFIED",
               "ZERO_MISMATCHES", "HELD", "LAWFUL", "PRESENT",
               "0_FINDINGS", "QUOTED", "REPORTED",
-              "MATCHES_AUDITOR_SET")
+              "MATCHES_AUDITOR_SET", "CROSSCHECKS")
     n_ok = sum(1 for v in legs.values()
                if str(v.get("verdict")) in greens)
     print(f"[verifier] {n_ok}/{len(legs)} legs green at "
