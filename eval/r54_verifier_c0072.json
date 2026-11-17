@@ -1,0 +1,59 @@
+{
+ "record": "R54_VERIFIER_C0072/1.0.0",
+ "session": "builder-r54s2",
+ "role": "VERIFIER",
+ "claim": "c-0074",
+ "verified_claim": "c-0072",
+ "executor": "builder-r54s1",
+ "work_id": "r54-p1-unit-checked-measurement",
+ "work_commit": "d1ab96178",
+ "verification_tree": "e7128eadd (the claims commit on top of c96e44078; physics/registry bytes identical to d1ab96178 for the verification legs — the claims commit touched eval/work_claims.json only)",
+ "method": "Art. 29(c) zero-LLM recompute from committed bytes; the verifier never re-runs any LLM leg (none exists — the measurement is deterministic and network-free)",
+ "legs": {
+  "recompute_byte_identity": {
+   "result": "PASS",
+   "detail": "scripts/r54_p1_unit_checked_measurement.py re-run at the committed tree: the artifact eval/r54_p1_unit_checked.json is BYTE-IDENTICAL before/after (sha256 fd410bdcdc6ea307b9565d8593372616460e08715c832d6616b70a8bb8871386 both sides) — the number 36/36=1.0 P1_UNIT_CHECKED_PASS reproduces exactly from committed bytes"
+  },
+  "row_set_identity": {
+   "result": "PASS",
+   "detail": "the 12 measured rows ARE the labelled DEV set: eval/r43_v7_problem_fields_burned.json problems, problem_id lists match the artifact's rows in order (12/12)"
+  },
+  "no_fabrication": {
+   "result": "PASS",
+   "detail": "user_variables and clarification_answer are None on all 12 rows (the rows carry no numeric context); on_row_physics_runs == 0 on all 12 rows — the route recorded ZERO fabricated on-row physics runs; the honest on-row state is PENDING_INPUTS exactly as the pre-registered definition types it"
+  },
+  "independent_tally": {
+   "result": "PASS",
+   "detail": "the verifier's own tally from the artifact's rows array: carrying=36, total=36, fraction=1.0 — matches the artifact header (36/36) with zero diff (the auditor Art. 13 spirit applied builder-side)"
+  },
+  "router_determinism": {
+   "result": "PASS",
+   "detail": "classify_failure re-run per row: every row's failure_class matches the artifact AND a case-inversion probe (uppercased input) returns the identical class for all 12 — the keyword router is deterministic, first-match, no prose fallback"
+  },
+  "scenario_runs": {
+   "result": "PASS",
+   "detail": "all 12 committed REFERENCE_SCENARIOS run via run_check with verdict RUN (12/12) — every relation in the expanded 12-relation registry demonstrates a running pint calculation on its committed input set"
+  },
+  "ci_bar_gate": {
+   "result": "PASS",
+   "detail": "the queue workflow carries the step 'P1 unit-checked measurement on labelled DEV outputs (c-0072)' which greps P1_UNIT_CHECKED_PASS and reds otherwise; the artifact verdict string is exactly what the gate greps; the gate logic (PASS iff fraction >= 0.80) verified against the artifact"
+  },
+  "registry_defect_hunt": {
+   "result": "FINDING (typed; does NOT invalidate the measurement)",
+   "detail": "the verifier's self-attack on the registry the measurement depends on reproduced THREE crash classes through run_check at the committed bytes: arrhenius at T2=0 K (ZeroDivisionError), npsh at rho=0 (ZeroDivisionError, the guard sits AFTER the head division), dewpoint at the Magnus floor t=-243.04 (ZeroDivisionError) — Art. 3 typed-refusal violations (out-of-domain inputs must return typed REFUSED, never raise). NONE of the 12 committed reference scenarios enters these domains, so the 36/36 measurement itself is unaffected and its verdict stands; the defect is the F-V5 class the local r53s1 lineage live-reproduced and fixed in R53 — the relay to the remote lineage did not carry that hardening. Remedy: claim c-0073 (r54-fv5-physics-hardening, same session) filed BEFORE this verification's remediation work, executed after this record"
+  }
+ },
+ "methodology_audit": {
+  "pre_registration": "the claim/carrying definitions are pre-registered in the measurement script's docstring BEFORE the number appears in the artifact (the AM44 criteria-before-data protocol as practiced in-script); the enforcement that makes the pre-registration meaningful is byte-reproducibility from committed bytes (leg 1) + the CI bar gate (leg 7), not commit ordering — typed honestly",
+  "anti_gaming": [
+   "the claim set is the route's own numeric-direction claims on the labelled DEV rows (no hand-picked subset: all 12 rows, all 3 candidates each = 36/36 enumerated)",
+   "carrying requires a deterministic router match AND a committed scenario RUN — no prose judgment, no LLM, no tuning knob",
+   "the rows' missing numeric context is typed PENDING_INPUTS, never fabricated to inflate the fraction",
+   "the reference scenarios are disclosed as wiring proofs, never presented as the rows' measured data (artifact + claim + script all carry the typing)"
+  ],
+  "residual_typed": "the carrying leg demonstrates registry coverage (routing + running unit-checked calcs), NOT on-row numeric verification — on-row unit-checking of real candidate numbers awaits rows carrying numeric context (the P2 matched-budget ablation's measurement, pre-registered criteria evaluator already committed at scripts/r53_p2_ablation_criteria.py). The >=80% clause as pre-defined and CI-gated is MEASURED PASS at 1.0; the P1 gate evaluation itself remains the auditor's call"
+ },
+ "verdict": "VERIFICATION_PASS — the c-0072 measurement (36/36 = 1.0 >= 0.80, P1_UNIT_CHECKED_PASS) is real, reproducible from committed bytes, honestly typed, anti-gaming audited, and CI-gated. The c-0072 flip to DONE citing this record is lawful per the c-0068/c-0069/c-0071 verifier-attribution precedent",
+ "llm_calls": 0,
+ "sandbox_clock_note": "all timestamps in this record carry the (sandbox clock) convention; ordering is proven by commit ancestry, not timestamps"
+}
