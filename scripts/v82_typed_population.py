@@ -9,7 +9,7 @@ import json
 import sys
 from pathlib import Path
 
-REPO = Path("/home/z/my-project/discovery-evidence-fabric")
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 

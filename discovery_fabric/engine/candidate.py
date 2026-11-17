@@ -59,8 +59,22 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds") + "Z"
 
 
+def _canonical_default(o: Any) -> Any:
+    # R53 (F64 remedy, claim c-0071): sets serialize as SORTED string
+    # lists — the previous default=str gave hash-order reprs, which
+    # rotate per process under PYTHONHASHSEED and made every engine
+    # hash (candidate_id/candidate_hash/structured_hash) seed-luck.
+    # Dict keys are already sort_keys=True; this closes the one
+    # remaining unordered container class. Bytes of historical
+    # committed artifacts are untouched (they stay as committed).
+    if isinstance(o, (set, frozenset)):
+        return sorted(map(str, o))
+    return str(o)
+
+
 def canonical_json(obj: Any) -> str:
-    return json.dumps(obj, sort_keys=True, ensure_ascii=False, default=str)
+    return json.dumps(obj, sort_keys=True, ensure_ascii=False,
+                      default=_canonical_default)
 
 
 def sha256_obj(obj: Any) -> str:

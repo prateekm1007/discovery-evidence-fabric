@@ -109,6 +109,17 @@ jobs:
             tests/test_novelty_gate_engine.py \
             tests/test_all_refs_secret_scan.py \
             -q -p no:warnings
+      # F64 remedy (R53, c-0071): the P1.4 labelled regression runs IN
+      # CI from committed bytes — the gate verdict must be PASS 0/0/0
+      # or the push reds. The driver is zero-LLM (deterministic,
+      # content-only candidate hashes after the derived_at/hash-seed
+      # fixes), so CI is the reproducibility proof.
+      - name: P1.4 labelled regression through the integrated engine route (F64)
+        run: |
+          set -e
+          python3 scripts/r52_labelled_regression.py | tee /tmp/r53_regression.log
+          grep -q '"verdict":"PASS 0/0/0"' /tmp/r53_regression.log \
+            || grep -q '"verdict": "PASS 0/0/0"' /tmp/r53_regression.log
       # Anti-gaming / independence / infra-separation suites (the Art.
       # 2/3/6 WIRED mechanisms in eval/enforcement_flags.json) — the
       # map-completeness test fails any WIRED citation whose test is

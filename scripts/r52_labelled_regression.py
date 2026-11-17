@@ -33,7 +33,7 @@ import json
 import sys
 from pathlib import Path
 
-REPO = Path("/home/z/my-project/discovery-evidence-fabric")
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from discovery_fabric.engine import engine_route as er      # noqa: E402

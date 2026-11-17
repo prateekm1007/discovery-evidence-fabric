@@ -951,14 +951,25 @@ def assemble_candidate(operator: Dict[str, Any],
         "candidate_state": "CANDIDATE" if testable["testable"] else
         "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
     }
+    # R53 (F64 remedy, claim c-0071): the ID/hash inputs exclude
+    # derived_at — a wall-clock provenance stamp inside the trace made
+    # every candidate_id rotate per run (two runs 1s apart produced
+    # different IDs; the committed regression evidence could never be
+    # reproduced). derived_at STAYS on the candidate as provenance
+    # metadata; the identity hashes are content-only now. Historical
+    # committed artifacts keep their recorded bytes.
+    _hashable_trace = {k: v for k, v in cand["derivation_trace"].items()
+                       if k != "derived_at"}
+    _hash_fields = {k: (cand[k] if k != "derivation_trace"
+                        else _hashable_trace)
+                    for k in CANDIDATE_REQUIRED_FIELDS}
     cand["candidate_id"] = (
         f"cand:MS:{operator['operator_id']}:"
-        f"{sha256_obj({k: cand[k] for k in CANDIDATE_REQUIRED_FIELDS})[:12]}"
+        f"{sha256_obj(_hash_fields)[:12]}"
     ) if cand["candidate_state"] == "CANDIDATE" else (
         f"noncand:MS:{operator['operator_id']}:"
-        f"{sha256_obj(cand['derivation_trace'])[:12]}")
-    cand["candidate_hash"] = sha256_obj(
-        {k: cand[k] for k in CANDIDATE_REQUIRED_FIELDS})
+        f"{sha256_obj(_hashable_trace)[:12]}")
+    cand["candidate_hash"] = sha256_obj(_hash_fields)
     # R6 (owner directive 2026-11-11, item 4): deterministic gates ride
     # EVERY assembled candidate — (a) NOT_AN_INTERVENTION rejection (a
     # monitor-only / gather-data-only / empty "intervention" is not a
