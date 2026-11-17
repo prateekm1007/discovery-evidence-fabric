@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-17T02:50:00Z (sandbox clock)",
+ "at": "2026-11-17T03:05:00Z (sandbox clock)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -77,6 +77,11 @@
    "registered_at": "2026-11-17T02:50:00Z (sandbox clock)",
    "role": "builder",
    "note": "R43 session-2: STOOD DOWN TO VERIFIER per Art. 29(b)/(e) — this session independently built the same D1/D2/D5 lane from base 90ad970d7 without having pushed a claim first (process miss, disclosed in eval/r43_verifier_c0060.json); the peer's pushed claim c-0060 (b1632cd2c, 01:33:10Z) predates this session's first implementation write, so pusher-wins and the duplicate scratch was archived outside the repo, never pushed. This session verifies c-0060 instead."
+  },
+  "builder-r44s1": {
+   "registered_at": "2026-11-17T03:05:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R44 session (the v8 one-shot executor lane + the F59 security-scan precision deliverable). Registered before the claim push per Art. 29(a)."
   }
  },
  "claims": [
@@ -1277,6 +1282,30 @@
     "scripts/r43_verifier_registry.py"
    ],
    "notes": "VERDICT: RUN-INTEGRITY-VERIFIED (11 legs green: executor_suite RECOMPUTES_GREEN 23/23 at a792a6a97; rendered_ci_local RECOMPUTES_GREEN — the committed workflow's 4 rendered pytest invocations, 191 tests total, exit 0 as bash; remote_ci_api_read RECOMPUTES_TRUE — 29dc8af66=failure preserved as fact, f70b95160=success, a792a6a97=success, all matching the round record's history; secret_grep_diff 0; trailers lawful; Art. 27 keys present; Art. 16 retirement ledger present; F45-class finding VERIFIED_TYPED (the R451 credential-scan records at origin-reachable 3db194e8f carry 5+7 credential-shaped strings, values never printed — owner-side rotation, no history rewrite); rubric NEVER_READ (the sole mention is the disclosure sentence); registry lawful — exactly one c-0060 claim, push-as-mutex held; labelled-corpus conventions present). Zero LLM calls. No re-generation, no re-run of the executor's work."
+  },
+  {
+   "claim_id": "c-0062",
+   "work_id": "holdout-v8-generation",
+   "title": "the holdout-v8 ONE-SHOT generation (the auditor's preregistration audit/holdout_v8/PREREGISTRATION.json step 1): ONE generation of the frozen V8.0 machine (scripts/r43_machine_v8.py, glm-4-plus) over the 30 sealed problems (15 intervention + 15 predictor, seal f65b9d8b…), claim committed and pushed BEFORE any problem byte is read; the PRIVATE rubric is never opened by any code path",
+   "status": "OPEN",
+   "registered_at": "2026-11-17T03:05:00Z (sandbox clock)",
+   "session_id": "builder-r44s1",
+   "role": "EXECUTOR",
+   "kind": "one_shot",
+   "base_sha": "88e693581",
+   "claimed_at": "2026-11-17T03:05:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-17T15:05:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/v8_run/rows/",
+    "eval/v8_run/v8_events_ledger.json",
+    "eval/v8_run/v8_serving_attestation.json",
+    "eval/v8_run/v8_run_ledger.json",
+    "eval/v8_run/gateway_log_slice.txt",
+    "scripts/r44_v8_one_shot.py",
+    "eval/r44_status.json"
+   ],
+   "notes": "Preregistration gates: seal recomputed EXACT before any generation; 30/30 served==registered glm-4-plus attestation PRE-SCORING; one executor; zero re-generation (the machine's internal repair budget is its own frozen loop); green pushed CI read from the check-run API. Scoring is the auditor's step 4; BURN follows (step 5)."
   }
  ],
  "trailer_violations": [
