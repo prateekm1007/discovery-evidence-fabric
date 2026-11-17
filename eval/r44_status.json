@@ -17,11 +17,17 @@
   "deletions": "none — no value-negative artifact deleted; the frozen V8.0 machine is byte-unchanged from 88e693581."
  },
  "remote_ci": {
-  "pushed_sha": null,
-  "remote_ci_conclusion": null,
-  "check_runs": [],
-  "read_at": null,
-  "note": "filled from the check-run API for THIS record's push (the D2 rule); the two earlier R44 pushes (04ef10ab6 claim, 3e936c525 scan) were not API-read individually — this record's push read covers the round's final state"
+  "pushed_sha": "c1b1414ca",
+  "remote_ci_conclusion": "failure",
+  "check_runs": [
+   {
+    "name": "surface",
+    "status": "completed",
+    "conclusion": "failure"
+   }
+  ],
+  "read_at": "2026-11-17T05:10:08ZZ (API read by the verifier)",
+  "note": "VERIFIER FORWARD-FIX (claim c-0064, builder-r45s1; the f70b95160/29dc8af66 precedent): the executor's session ended at its time budget BEFORE this block could be API-read; the null fields crashed the D2 rule test (re.match on None) and redded every subsequent queue push. The honest API-read FAILURE of this record's own push c1b1414ca is quoted AS FACT — the D2 rule's own text: 'a record that carries failure passes this suite and FAILS the round's green claim'. The record's content is otherwise byte-preserved (minimal diff, the canonical-path disclosure rides the registry c-0064 notes and the fix commit). The executor's continuation (R44_RESUME=1, rows 24-30, all predictors) updates this record at completion per the house convention."
  },
  "honesty_notes": [
   "VAULT CLOBBER DISCLOSED (this session's own error): the sandbox restore had already wiped the askpass helper; restoring GH_PAT, this session OVERWROTE the existing 672-byte .env.keys (multiple entries) down to the single GH_PAT line — the lost entries are unrecoverable (gitignored = no custody); measured impact: the NVIDIA fallback leg fails closed typed ('NVIDIA_API_KEY not set') on every primary hiccup (slower retries, no silent path, no row served by NVIDIA — the attestation counts only completed model-field calls); other lost entries are unknown-by-contract (names never logged)",
