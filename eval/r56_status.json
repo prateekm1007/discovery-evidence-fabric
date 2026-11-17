@@ -4,25 +4,25 @@
  "work_id": "r56-deepai-credential-custody",
  "claim": "c-0076",
  "base_sha": "5a54f362f",
- "round": "R56 (owner-supplied DeepAI credential \u2014 custody + probe + P2 impact typed)",
+ "round": "R56 (owner-supplied DeepAI credential — custody + probe + P2 impact typed)",
  "protocol": [
-  "constitutions byte-identical at both pins (EPISTEMIC 525536896f8000a17fab124fac845ca0; AUDITOR abe1c4127bfc9e53b0f29c16e14892d5) \u2014 FULL reads stand, typed",
+  "constitutions byte-identical at both pins (EPISTEMIC 525536896f8000a17fab124fac845ca0; AUDITOR abe1c4127bfc9e53b0f29c16e14892d5) — FULL reads stand, typed",
   "Art. 17 custody: DEEPAI_API_KEY appended to .env.keys (gitignored, verified via git check-ignore); the full token exists ONLY in the vault",
-  "committed-bytes hygiene: masked only (shape 8-4-4-4-12 hex UUID, prefix 2af94dc2\u2026); staged-diff secret-grep 0 findings; the boolean full-token check below",
+  "committed-bytes hygiene: masked only (shape 8-4-4-4-12 hex UUID, prefix 2af94dc2…); staged-diff secret-grep 0 findings; the boolean full-token check below",
   "claim-before-work: builder-r56s1 registered BEFORE c-0076 (27 sessions / 73 claims)"
  ],
  "probe": {
-  "method": "one minimal POST per endpoint to the key's OWN service (deepai.org API) \u2014 no third-party transmission, trivial payloads",
+  "method": "one minimal POST per endpoint to the key's OWN service (deepai.org API) — no third-party transmission, trivial payloads",
   "endpoints": [
    "text-generator",
    "summarization"
   ],
   "http": "402 on both",
   "body_quoted": "{\"status\": \"APIs are only available for Pro members in good standing - please check your Dashboard: https://deepai.org/dashboard\"}",
-  "typed_conclusion": "the key AUTHENTICATES (service-recognized; a bad key yields 401/403, not 402) but the account is NOT a Pro member in good standing \u2014 zero usable API calls"
+  "typed_conclusion": "the key AUTHENTICATES (service-recognized; a bad key yields 401/403, not 402) but the account is NOT a Pro member in good standing — zero usable API calls"
  },
  "p2_impact": {
-  "typed": "the P2 'LLM credential' blocker is NOT lifted by this credential in its current state \u2014 v9 generation needs a funded route",
+  "typed": "the P2 'LLM credential' blocker is NOT lifted by this credential in its current state — v9 generation needs a funded route",
   "vault_candidates_for_route_qualification": [
    "OPENROUTER_API_KEY",
    "CROWLLM_API_KEY",
@@ -38,26 +38,20 @@
   "vault_gitignored": true
  },
  "remote_ci": {
-  "pushed_sha": "c1ee1ac1a",
-  "remote_ci_conclusion": "failure",
-  "read_at": "2026-11-17T22:20:00Z",
+  "pushed_sha": "d7df5f719",
   "check_runs": [
    {
     "name": "surface",
-    "conclusion": "failure",
-    "head": "c1ee1ac1a"
+    "status": "completed",
+    "conclusion": "success"
    }
   ],
-  "failure_account": "QUOTED from the check-runs API: surface=failure at c1ee1ac1a, failed step 'Constitution v3.1.0 enforcement' \u2014 test_round_records_carry_the_remote_conclusion red because THIS record's remote_ci carried the placeholder 'filled at push' (not hex) at that run's bytes. The work commit 790ad75d4's own run failed on the same test for the additional reason that the art27_capability_budget block was missing (the pre-commit pytest exit was masked by `| tail -1` \u2014 typed in the fix commit). This honest-failure record IS the fix; the round-closing r41_remote_ci_read.py --apply after the next push carries the corrected run's conclusion.",
-  "push_sequence": [
-   "790ad75d4 (work, ran red: record incomplete)",
-   "c1ee1ac1a (art27 fix-forward, ran red: remote_ci placeholder)"
-  ]
+  "read_at": "2026-11-17T16:07:12.724745Z"
  },
  "art27_capability_budget": {
-  "engine_diff": "NONE \u2014 a pure custody round: one vault append (gitignored), one masked status record, one registry flip (c-0076). Zero engine lines touched.",
-  "primary_metric_delta": "NOT CLAIMED \u2014 no capability work this round; the probe consumed no project budget (two 402 responses, zero usable generation).",
-  "engine_line_share_measured": "0% \u2014 disclosed: a custody round legitimately moves no engine code; the >=30% rule binds capability/precision rounds (R54 peer c-0073 carried 36.3%/38.7%; R55 carried 7.7% with its typed reason).",
+  "engine_diff": "NONE — a pure custody round: one vault append (gitignored), one masked status record, one registry flip (c-0076). Zero engine lines touched.",
+  "primary_metric_delta": "NOT CLAIMED — no capability work this round; the probe consumed no project budget (two 402 responses, zero usable generation).",
+  "engine_line_share_measured": "0% — disclosed: a custody round legitimately moves no engine code; the >=30% rule binds capability/precision rounds (R54 peer c-0073 carried 36.3%/38.7%; R55 carried 7.7% with its typed reason).",
   "deletions": "NONE",
   "secrets_accounting": "the credential arrived OUTSIDE git (owner message -> vault); 0 full-token bytes committed (boolean check passed); the probe responses contain no secrets"
  }
