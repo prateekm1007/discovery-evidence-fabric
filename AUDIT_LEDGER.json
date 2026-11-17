@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "ebd55822e",
+  "queue/dev12_r7": "01c0a9491",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1025,7 +1025,8 @@
     17
    ],
    "precision_note": "HF_SPACE_SECRETS*.json / SECRETS_R491.json in queue tree are REGISTRIES (boolean probe: no raw hf_/sk_/ghp_ tokens) — NOT raw exposures; values sealed server-side. Confirmed raw exposure remains the PAT on r448/visual-lab. .secrets.baseline.json (detect-secrets) + tests/test_secret_scanning.py exist; all-refs gitleaks enumeration still required (Phase 0).",
-   "scope_note": "R50/R51 scan covered ref TREE BLOBS; the 2 Aug-18 keys live in COMMIT MESSAGES (f90fc7d9f, 76c23fef7) — gitleaks git-mode full-history scan required in R52 to cover messages."
+   "scope_note": "R50/R51 scan covered ref TREE BLOBS; the 2 Aug-18 keys live in COMMIT MESSAGES (f90fc7d9f, 76c23fef7) — gitleaks git-mode full-history scan required in R52 to cover messages.",
+   "inventory_precision": "Baseline (tree blobs): 8 fingerprints, exactly 1 LIVE = the GitHub PAT (r448/visual-lab). google-api-key = PUBLIC-THIRD-PARTY (Google Patents embedded AIza, not a repo secret); rest test fixtures/synthetic. The Aug-18 PatSnap+OpenRouter keys live in COMMIT MESSAGES (f90fc7d9f/76c23fef7) — git-mode history scan required to enumerate; r53 'OpenRouter+both GitHub credentials' phrasing is loose (1 GitHub PAT in blobs; PatSnap+OpenRouter are commit-message keys)."
   },
   {
    "id": "F46",
@@ -1359,7 +1360,7 @@
    "id": "F64",
    "severity": "HIGH",
    "title": "P1.4 labelled-regression evidence is SANDBOX-BOUND and not CI-gated (auditor independent confirm of verifier F-V9): scripts/r52_labelled_regression.py hardcodes REPO = Path('/home/z/my-project/discovery-evidence-fabric'); the committed eval/r52_labelled_regression.json 'PASS 0/0/0' cannot be reproduced from a fresh clone or CI; the driver is NOT in the workflow. The driver is zero-LLM (verified) so it IS CI-wirable. Until fixed, the P1 gate (0 allowed-measures / 0 false input-flags / 0 inverted) is NOT validly demonstrated. FIX: REPO = Path(__file__).resolve().parents[1]; re-run from committed bytes; wire into CI zero-LLM block; commit reproducible report.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-17",
    "last_checked": "ebd55822e",
    "rounds_open": 1,
@@ -1378,19 +1379,21 @@
    "articles": [
     22,
     27
-   ]
+   ],
+   "resolution": "R53 (597cbf30e): 4 measured-path drivers -> relative REPO; TWO engine determinism root causes fixed content-preserving: (1) derived_at wall-clock excluded from hash inputs (kept as provenance), (2) canonical_json sets via str(set) hash-order -> sorted lists (_canonical_default). AUDITOR INDEPENDENT RECOMPUTE: canonical_json identical across PYTHONHASHSEED 1/2/3/random. Regression driver CI-gated (reds unless PASS 0/0/0); fresh-clone byte-identical proof recorded. Historical bytes untouched (forward-only). CONSEQUENCE typed: hash formula changed -> historical candidate_ids not reproducible under new formula (were seed-luck); gate verdicts stable."
   },
   {
    "id": "F65",
    "severity": "MEDIUM",
    "title": "Process-integrity misses in peer R50/R51 (verifier F-V3 class): executed the c-0067 lane WITHOUT claim-before-work and with session builder-r50s1 UNREGISTERED (Art.29(a)/(b)); builder-r50s1 still absent from registry sessions. Also typed: remote_ci.read_at 11:35Z cited inside commit 7a7c820ff (10:48:14Z) = sandbox-clock anomaly; trailer-violation entries cite non-existent sessions builder-r47s1/r47s2. Partially remediated (builder-r50s2/r52s1 registered; verifier attribution gap documented via c-0070 sharing c-0069 work_id). FIX: retro-register builder-r50s1 with typed late note; correct trailer session refs; enforce claim-before-work.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-17",
    "last_checked": "ebd55822e",
    "rounds_open": 1,
    "articles": [
     29
-   ]
+   ],
+   "resolution": "R53: c-0069 DONE (c-0070+auditor attribution); builder-r50s1 retro-registered with typed late note; CORR-1 trailer session refs corrected (builder-r47s1/r47s2 never existed); clock anomaly typed (ordering by ancestry)."
   }
  ],
  "amendments": [
@@ -2265,6 +2268,20 @@
     "F64 OPENED (HIGH): P1.4 regression sandbox-bound + not CI-gated — P1 gate NOT validly passed until fixed (one-line path + CI wire + re-run). F65 OPENED (MEDIUM): R50/R51 claim-before-work + session-registration misses + clock/trailer anomalies.",
     "c-0067 DONE (residual landed); c-0069 OPEN awaiting flip with c-0070 verifier attribution; c-0070 DONE VERIFIER. P0 coder-side COMPLETE; OWNER custody+rotation still the hard gate-blocker (escalation #4)."
    ]
+  },
+  {
+   "id": "AM49",
+   "date": "2026-11-17",
+   "status": "ISSUED",
+   "reason": "R54 auditor audit of R53 (ebd55822e..01c0a9491): F64 determinism remedy + TRIZ full data + F65 closure",
+   "changes": [
+    "F64 CLOSED + INDEPENDENTLY VERIFIED: auditor recompute confirms canonical_json seed-stable across PYTHONHASHSEED 1/2/3/random (sets->sorted lists); derived_at excluded from hash; 4 drivers relative REPO; regression CI-gated PASS 0/0/0; fresh-clone byte-identical proof recorded. The seed-luck hash bug (every prior engine hash was PYTHONHASHSEED-dependent) is fixed content-preserving; historical candidate_ids not reproducible under new formula (typed consequence).",
+    "F65 CLOSED: c-0069 DONE, builder-r50s1 retro-registered, CORR-1 trailer refs fixed.",
+    "TRIZ FULL VERIFIED: 1254 cells, 39 params, 0 diagonal, cell 1_2=[15,8,29,34] classical known-answer; MIT triz-engine vendored, license verbatim in NOTICE-triz-engine; 6 CI-wired tests; accessor known-answer verified.",
+    "P1 GATE STATUS: 0/0/0 leg reproducible + CI-gated PASS; >=80% numeric-claims-unit-checked leg NOT yet measured on outputs (builder defers to auditor; registry 6 relations/21 tests exists but the fraction on actual claims unreported). P1 gate pending that number.",
+    "Engine share R53 = 11.5% (auditor count; builder 13.4%) < 30% rule — disclosed determinism/evidence round; TRIZ matrix minified to 1 line undercounts; work_claims +291 churn. Direction: pretty-print TRIZ JSON + keep >=30% going forward.",
+    "Credential inventory precision: 1 live GitHub PAT in blobs; Aug-18 PatSnap+OpenRouter in commit messages (git-mode scan needed). c-0071 OPEN awaiting verifier. P0 owner custody still acceptance gate-blocker."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3123,6 +3140,18 @@
     "F63"
    ],
    "evidence_sha": "eval/r53_auditor_verification.json"
+  },
+  {
+   "id": "V46",
+   "round": "R54 audit of R53 determinism+TRIZ",
+   "commit": "01c0a9491",
+   "gate": "NOT_MET (P1 >=80% unit-checked unmeasured; P0 owner-blocked)",
+   "capability_change": "engine hashes now deterministic (verified); TRIZ full matrix landed; P1 0/0/0 CI-gated",
+   "closed_findings": [
+    "F64",
+    "F65"
+   ],
+   "evidence_sha": "eval/r54_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3328,7 +3357,7 @@
    ]
   }
  },
- "progress_note": "Score 4. P0 coder-side COMPLETE (all-refs scan + content verify + 8-fingerprint baseline + CI gate + fail-closed evidence); OWNER custody+rotation PENDING (hard gate-blocker, escalation #4). P1 ~90% built: engine_route integrated (F61/F63 remediated), physics 6 relations, schema enums, contract negatives 14/14 — BUT P1.4 regression evidence sandbox-bound + not CI-gated (F64): one-line fix + CI wire unlocks P1 gate. P2: TRIZ partial (13/40), ablation pending. Secret-scan CI gate live. Next: F64 fix -> P1 gate -> TRIZ full + ablation -> v9 (needs P0).",
+ "progress_note": "Score 4, approaching 5. P1: engine route integrated + physics 6 + schema enums + contract negatives + DETERMINISM FIXED (auditor-verified seed-stable) + 0/0/0 reproducible CI-gated. Remaining P1 clause: measure >=80% numeric-claims-unit-checked on outputs. P2: TRIZ full 1254-cell matrix landed (MIT, known-answer verified), zero-LLM criteria evaluator pre-registered; ablation run pending confidential instrument (F60) + LLM credential. P0 coder-side complete; owner custody gate-blocker. Engine-share rule: R53 11.5% (disclosed); pretty-print TRIZ + >=30% going forward.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
