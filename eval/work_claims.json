@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-17T20:30:00Z (sandbox clock)",
+ "at": "2026-11-17T16:13:40Z (sandbox clock)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -137,6 +137,11 @@
    "registered_at": "2026-11-17T21:30:00Z (sandbox clock)",
    "role": "builder",
    "note": "R56 custody session (owner-supplied DEEPAI_API_KEY stored in the gitignored vault per Art. 17; masked record only; P2 impact typed). Registered BEFORE the claim. Constitutions byte-identical at both pins (FULL reads stand)."
+  },
+  "builder-r57s1": {
+   "registered_at": "2026-11-17T16:04:10Z (sandbox clock)",
+   "role": "builder",
+   "note": "R57 custody-hygiene session (vault re-establishment after the working-tree rehydration left .env.keys absent; R56 record's remote_ci block completed by the real D2 read; DeepAI liveness re-probe). Registered BEFORE the claim. Pins re-verified byte-identical (EPI 525536896f8000a17fab124fac845ca0 / AUD abe1c4127bfc9e53b0f29c16e14892d5 at 01c0a9491 / 14e309bfb); AM50+AM51 read from the audit branch."
   }
  },
  "claims": [
@@ -1686,6 +1691,29 @@
    ],
    "secrets_note": "the full token value lives ONLY in .env.keys (gitignored); every committed byte is masked (shape + 8-char prefix)",
    "done_note": "custody executed (vault append, gitignored, secret-grep 0); probe typed 402 Pro-gate; P2 impact recorded \u2014 the blocker stands pending owner action"
+  },
+  {
+   "claim_id": "c-0077",
+   "work_id": "r57-vault-custody-restore",
+   "title": "R57: vault custody re-established (.env.keys absent from the rehydrated working tree; rebuilt from the owner's fresh re-delivery of the same DeepAI token + the R54 GH_PAT); the R56 record's malformed remote_ci block completed by the real API read (the local remote_ci gate was RED at c1ee1ac1a); DeepAI liveness re-probe typed",
+   "status": "DONE",
+   "registered_at": "2026-11-17T16:04:10Z (sandbox clock)",
+   "session_id": "builder-r57s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "dd2740551",
+   "claimed_at": "2026-11-17T16:04:10Z (sandbox clock)",
+   "lease_expiry": "2026-11-19T00:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r57_status.json",
+    "eval/work_claims.json",
+    "eval/r56_status.json"
+   ],
+   "secrets_note": "full tokens live ONLY in .env.keys (gitignored); every committed byte masked (shape + 8-char prefix); 0 full-token bytes in tracked files",
+   "done_note": "custody re-established: vault rebuilt (2 names, gitignored, check-ignore verified, 0 full-token bytes in tracked files pre/post); probe re-typed 402/402 (the key authenticates, account not Pro \u2014 the P2 LLM-credential blocker STANDS); the R56 record remote_ci red was diagnosed INDEPENDENTLY by this session and the peer (convergence typed in eval/r57_status.json) \u2014 the peer's tool-fixed apply is canonical, this round's quote of the c1ee1ac1a failure stands as the honest pre-fix state; c-0075 flagged, not touched (live lease)",
+   "done_at": "2026-11-17T16:06:30Z (sandbox clock)",
+   "base_sha_note": "registered at c1ee1ac1a; rebased onto dd2740551 (the peer's concurrent R56 D2-close lineage d7df5f719/06629d0f9/dd2740551 landed while this round was in flight; Art. 29(b) fetch-first; the only conflict \u2014 eval/r56_status.json \u2014 resolved to the peer's canonical block; the registry merged cleanly, additive-only)"
   }
  ],
  "trailer_violations": [

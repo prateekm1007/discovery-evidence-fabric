@@ -1,0 +1,82 @@
+{
+ "record": "R57_CUSTODY_RESTORE_STATUS/1.0.0",
+ "session": "builder-r57s1",
+ "work_id": "r57-vault-custody-restore",
+ "claim": "c-0077",
+ "base_sha": "c1ee1ac1a",
+ "round": "R57 (vault custody re-established after the working-tree rehydration lost .env.keys; the R56 record's malformed remote_ci block completed by the real D2 read \u2014 the remote surface at c1ee1ac1a is RED, quoted below, and the committed cause is the malformed pushed_sha; DeepAI liveness re-probe typed: still 402) \u2014 CONVERGENCE TYPED: the peer's concurrent commits (d7df5f719 D2 close + 06629d0f9 apply + dd2740551 r41 tool fix) landed the SAME R56-record completion and fixed the r41 tool defect (conclude() never wrote remote_ci_conclusion); the rebase resolved eval/r56_status.json to the peer's canonical block (their applied read at d7df5f719, success) per Art. 29(e); this record's quote of the c1ee1ac1a failure stands as the honest pre-fix state that BOTH sessions independently diagnosed",
+ "protocol": [
+  "pins re-verified byte-identical by THIS session's own md5 computation: EPISTEMIC v3.1.0 @ 01c0a9491 = 525536896f8000a17fab124fac845ca0, AUDITOR v1.2.0 @ 14e309bfb = abe1c4127bfc9e53b0f29c16e14892d5 (FULL reads stand from the R54S2/R56 sessions; this session's new reading: AM50 + AM51 read from the audit branch tip f82cb3e38)",
+  "claim-before-work per Art. 29(b): session builder-r57s1 + claim c-0077 registered OPEN in eval/work_claims.json BEFORE the vault rebuild, the probe, and the D2 read; single-commit custody round per the c-0076 precedent (R56)",
+  "Art. 17 custody: .env.keys rebuilt (gitignored, verified via git check-ignore .gitignore:2); full tokens exist ONLY in the vault; names only reach logs",
+  "committed-bytes hygiene: boolean full-token check 0 across all tracked files, re-verified this session at c1ee1ac1a before the rebuild and again on the staged diff before commit"
+ ],
+ "corr_3_vault_absence": {
+  "what": "the R56 custody record's durable state did not survive: .env.keys is ABSENT from the current working tree (discovered 2026-11-17T16:04Z by builder-r57s1; the boolean vault-exists check returned 0; the gitignore rule survived intact at .gitignore:2)",
+  "cause": "UNPROVEN \u2014 the suspected cause is the sandbox working-tree rehydration between sessions (an untracked+ignored file is not carried by a git-side restore); the committed tree is unaffected by construction",
+  "committed_bytes": "unaffected \u2014 0 tracked files contain the full token (boolean check re-run at c1ee1ac1a; the R56 masked record shape 8-4-4-4-12 UUID with prefix 2af94dc2 is the only committed trace)",
+  "remedy": "the vault rebuilt from credentials actually in this session's custody: DEEPAI_API_KEY (the owner's fresh re-delivery of the SAME token \u2014 prefix 2af94dc2 + UUID shape match the R56 masked record) and GH_PAT (the R54 directive's PAT, current per the owner's standing instruction)",
+  "absent_names": "the R56 route-qualification candidates (OPENROUTER_API_KEY, CROWLLM_API_KEY, AGNES_API_KEY, INCEPTION_API_KEY, XKIRO_API_KEY) are NOT in this session's custody \u2014 never fabricated; the NVIDIA_API_KEY absence carries again (typed every custody round since mid-R52)",
+  "typed_lesson": "vault custody is session-local state: the Art. 17 contract holds within a working tree but does not survive rehydration \u2014 every custody round re-verifies vault presence FIRST (a one-line check) before claiming custody standing"
+ },
+ "probe": {
+  "method": "same as R56: one minimal POST per endpoint to the key's OWN service (deepai.org API) \u2014 no third-party transmission, trivial payload",
+  "endpoints": [
+   "text-generator",
+   "summarization"
+  ],
+  "http": "402 on both (re-probe 2026-11-17T16:04Z, after vault rebuild, after claim registration)",
+  "body_quoted": "{\"status\": \"APIs are only available for Pro members in good standing - please check your Dashboard: https://deepai.org/dashboard\"}",
+  "typed_conclusion": "identical to R56: the key AUTHENTICATES (402, not 401/403) but the account is still NOT a Pro member in good standing \u2014 zero usable API calls"
+ },
+ "remote_ci": {
+  "pushed_sha": "c1ee1ac1aba8173483ff48b871a01b116e3780cd",
+  "check_runs": [
+   {
+    "name": "surface",
+    "status": "completed",
+    "conclusion": "failure"
+   }
+  ],
+  "read_at": "2026-11-17T16:04:39.023982Z",
+  "remote_ci_conclusion": "failure",
+  "note": "the honest D2 read of the pre-fix state (c1ee1ac1a surface failure) \u2014 quoted by BOTH this session and the peer's d7df5f719 independently; the R56 record's completed block is the peer's canonical apply (eval/r56_status.json resolved to theirs in the rebase); the read of THIS round's own push head belongs to the next record and is quoted in the session report"
+ },
+ "p2_impact": {
+  "typed": "UNCHANGED from R56: the P2 'LLM credential' blocker is NOT lifted by the re-probe (still 402) \u2014 v9 generation needs a funded route; the owner's re-delivery of the same key + the dashboard-profile URL does not change the account state the API reports",
+  "owner_action": "activate DeepAI Pro (or confirm another funded vault credential from the R56 candidate list) so a round can qualify the v9 generation route; P0 custody (F60: the confidential instrument) remains the other half of the P2 gate",
+  "prepared": "the zero-LLM adoption-criteria evaluator stays pre-registered (scripts/r53_p2_ablation_criteria.py); the baseline arm is ready (R55 record)"
+ },
+ "c0075_flag": {
+  "what": "typed observation, NOT touched: claim c-0075 (builder-r55s1 \u2014 F66 disambiguation + battery migration + Art. 16 deletion) is still OPEN in the registry although its work landed (8d410fbc5) and AM51 live-verified F66 CLOSED ('F66_router ... correct')",
+  "why_not_flipped": "the claim's lease is LIVE until 2026-11-19T00:00:00Z and the Art. 29(b) mutex convention gives the status transition to the claim's own session (a verifier-attribution flip is precedented \u2014 c-0072 \u2014 but this round's claimed work is the custody restore, and scope does not expand); if the lease dies, a takeover flip citing AM51 attribution is the ready path",
+  "impact": "none on this round; flagged for the owner and the next builder/auditor pass"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "NONE \u2014 a custody/hygiene round: one gitignored vault rebuild, one new status record, the R56 record's remote_ci completion, one registry claim (c-0077). Zero engine lines touched.",
+  "primary_metric_delta": "NOT CLAIMED \u2014 no capability work this round; the probe consumed no project budget (two 402 responses, zero usable generation)",
+  "engine_line_share_measured": "0% \u2014 disclosed: a custody round legitimately moves no engine code (the R56 precedent); the >=30% rule binds capability/precision rounds",
+  "deletions": "NONE",
+  "secrets_accounting": "0 full-token bytes committed (boolean check passed pre-rebuild and on the staged diff); the vault holds exactly 2 names (DEEPAI_API_KEY, GH_PAT); the probe responses contain no secrets"
+ },
+ "llm_calls": 0,
+ "honesty_notes": [
+  "the probe ran AFTER the claim registration (claim-before-work ordering; typed in the registry)",
+  "the R56 protocol line 'the full token exists ONLY in the vault' was true at its commit time \u2014 CORR-3 documents the later divergence WITHOUT rewriting that history; the remote_ci completion is the D2 round-closing procedure filling an explicitly PENDING block, not a content rewrite",
+  "the pre-push local suite run is a LOCAL green only \u2014 the D2 rule's green for THIS fix commit must come from the API read after the push (quoted in the session report; the next record carries it)",
+  "the delivered owner message carried the key and the dashboard-profile URL; the dashboard page itself was NOT read (it requires an authenticated browser session; the API probe is the verification channel) \u2014 typed here so the unread URL is never implied as read"
+ ],
+ "base_head_d2_read": {
+  "pushed_sha": "dd2740551",
+  "check_runs": [
+   {
+    "name": "surface",
+    "status": "completed",
+    "conclusion": "success"
+   }
+  ],
+  "read_at": "2026-11-17T16:13:06.865736Z",
+  "remote_ci_conclusion": "success",
+  "note": "the R57 opening read requested by the peer's 06629d0f9 ('its own run's conclusion is R57's opening read') \u2014 the peer's tool-fixed head is green remotely"
+ }
+}
