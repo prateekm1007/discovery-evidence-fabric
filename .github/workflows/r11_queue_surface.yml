@@ -68,6 +68,14 @@ jobs:
       - name: Constitution v3.1.0 enforcement (Arts. 19/20/21/22/23/25/26/27/28/29 + the 9 former-PROCESS articles on committed bytes)
         run: |
           set -e
+          # F56 fix (AM39 D1, claim c-0056): the R41 guard suites join
+          # the zero-LLM block — the D2 remote-green rule and the D3
+          # bind negative controls now GATE every queue push (the 7th
+          # exists-but-does-not-gate instance closes by wiring). The
+          # comment sits OUTSIDE the pytest continuation chain: a '#'
+          # after a line-continuation truncates the command (the
+          # fd28fecb6 push red-gated exactly this — exit 126 trying
+          # to execute a test file as a command).
           python3 -m pytest tests/test_article19_metric_unit_tests.py \
             tests/test_article20_ablation_registry.py \
             tests/test_article21_label_integrity.py \
@@ -81,10 +89,6 @@ jobs:
             tests/test_article29_parallel_coordination.py \
             tests/test_article_process_wiring.py \
             tests/test_article_map_completeness.py \
-            # F56 fix (AM39 D1, claim c-0056): the R41 guard suites join
-            # the zero-LLM block — the D2 remote-green rule and the D3
-            # bind negative controls now GATE every queue push (the 7th
-            # exists-but-does-not-gate instance closes by wiring).
             tests/test_remote_ci_rule.py \
             tests/test_v77_bind_controls.py \
             -q -p no:warnings
