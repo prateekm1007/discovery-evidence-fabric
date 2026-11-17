@@ -1,0 +1,350 @@
+{
+ "record": "R58_ABLATION_EVENTS_BASELINE/1.0.0",
+ "run": "r58-p2-dev-ablation-machine-leg",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "registered_model": "glm-4-plus",
+ "window_started_at": "2026-11-17T16:57:47.065842Z",
+ "events": [
+  {
+   "problem_id": "HO7-01-zinc-ew-acid-mist",
+   "generated_at": "2026-11-17T16:57:47.066150Z",
+   "histogram_before": {},
+   "histogram_after": {},
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3399,
+     "latency_s": 12.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice uses manual air sparging; this replaces manual operation",
+       "- Commissioning: Standard practice requires manual adjustment; this requires timer program",
+       "- Operation: Standard practice requires continuous operator attention; this is fully autom",
+       "- Maintenance: Standard practice requires daily sparger checks; this requires monthly time",
+       "- Cost class: All components are catalog-standard (solenoid valve, timer, hose). Burden: s",
+       "- Protocol: Install intervention on one cell; run side-by-side with control cell for 72 ho",
+       "- Instruments: Acid aerosol sampler (gravimetric, NIOSH method 7900), data logger.",
+       "- Pass/fail: Intervention cell shows ≥50% reduction in average acid aerosol concentration ",
+       "- Duration: 72 hours (covers multiple agitation cycles).",
+       "- Kill criterion: If intervention cell aerosol level does not meet pass threshold, or if c"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+       "added measure 'Standard mechanical timer' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+       "added measure 'Standard flexible PVC hose' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+       "added measure 'automated solenoid valve and timer' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
+      ],
+      "APPARATUS_ROW": [
+       "- Instruments: Acid aerosol sampler (gravimetric, NIOSH method 7900), data logger."
+      ],
+      "ACTUATION_DEVICE_AS_MEASURE": [
+       "actuation device proposed as the measure while the bounded permitted set names no such hardware | solenoid valve | ...- (b) Standard solenoid valve, DN25, 6 bar rating, 24 VDC, normally closed (installed on ..."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Oxygen evolution at the anode generates bubbles that burst and loft acid aerosol into the tankhouse air. | ingredient: Agitation increases shear stress at the bubble surface, destabilizing the acid film and promoting coalescence into larger, slower-rising bubbles. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Oxygen evolution at the anode generates bubbles that burst and loft acid aerosol into the tankhouse air.",
+      "ingredient_action": "Agitation increases shear stress at the bubble surface, destabilizing the acid film and promoting coalescence into larger, slower-rising bubbles.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "348904a52237977f"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3104,
+     "latency_s": 11.6,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: interfacial tension modification",
+       "- Installation:",
+       "- Commissioning:",
+       "- Operation:"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'interfacial tension modification' is not derivable from the permitted signals",
+       "derived feature input 'hydrophobic film reinforcement; this reduces aerosol ejectio' is not derivable from the permitted signals",
+       "derived feature input 'surface tension measurement' is not derivable from the permitted signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Oxygen evolution at the anode generates bubbles that burst and eject acid aerosol into the tankhouse air. | ingredient: The hydrophobic additive increases surface tension and bubble film thickness, reducing bubble bursting and aerosol ejection. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Oxygen evolution at the anode generates bubbles that burst and eject acid aerosol into the tankhouse air.",
+      "ingredient_action": "The hydrophobic additive increases surface tension and bubble film thickness, reducing bubble bursting and aerosol ejection.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "edcd1799785621ea",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - MECHANISM CLASS: interfacial tension modification; - Installation:; - Commissioning:; - Operation:",
+      "INPUT_UNAVAILABLE: derived feature input 'interfacial tension modification' is not derivable from the permitted signals; derived ",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3160,
+     "latency_s": 11.5,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. \"MECHANISM CLASS: interfacial viscoelastic foam modifier\"",
+       "- Standard practice: Foam-blanket chemistry (30 ppm) + dosing pump operation.",
+       "- Burden: Identical installation/commissioning; operation cost: $0.05/kg zinc (surfactant ",
+       "- Operational loss: Zero (no throughput impact).",
+       "- Protocol: Install in one tankhouse bay; compare aerosol concentration (ppm) above cells ",
+       "- Instruments: Existing plant air monitors (permitted constraint).",
+       "- Pass/fail: ≥25% reduction in average acid aerosol concentration.",
+       "- Kill criterion: If aerosol increases or shows no change, mechanism fails.",
+       "- Duration: 72 hours (covers 3 electrolyte circulation cycles)."
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: FS-61 | 2. (b) Commercial silicone-polyether surfactant blend (e.g., Dow FS-61, 10% w/w "
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Bubble bursting at the anode due to oxygen evolution generates aerosol through kinetic energy transfer. | ingredient: The surfactant increases interfacial elasticity, reducing bubble bursting kinetic energy by lowering the Weber number. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Bubble bursting at the anode due to oxygen evolution generates aerosol through kinetic energy transfer.",
+      "ingredient_action": "The surfactant increases interfacial elasticity, reducing bubble bursting kinetic energy by lowering the Weber number.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "eb4a1c411189451b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. \"MECHANISM CLASS: interfacial viscoelastic foam modifier\"; - Standard practice: Foam-blanket chemistry (30 ",
+      "NAMED_VARIANT: model/brand-marker: FS-61 | 2. (b) Commercial silicone-polyether surfactant blend (e.g., Dow FS-61, 10% w/w "
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3180,
+     "latency_s": 12.1,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: foam-blanket chemistry (0.03 kg/tonne FS-61, 40°C, 10-min cover delay",
+       "- This intervention: viscoelastic surfactant (0.05 kg/tonne, 38°C, 5-min cover delay)",
+       "- Burden comparison:",
+       "- Material cost: +20% (higher surfactant dose) but offset by reduced ventilation needs",
+       "- Operational cost: -5% (lower temperature saves energy)",
+       "- Maintenance: same (dosing pump already exists)",
+       "- Labor: same (cover procedure adjustment is minimal)",
+       "- Net burden: same (material increase offset by energy savings)"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: FS-61 | - Standard practice: foam-blanket chemistry (0.03 kg/tonne FS-61, 40°C, 10-min c",
+       "model/brand-marker: FS-61 | EXECUTABLE TEST — Protocol: Deploy viscoelastic surfactant blend at 0.05 kg/tonn"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Bubble bursting at the anode surface transfers kinetic energy to aerosol droplets, ejecting them into the tankhouse air. | ingredient: Viscoelastic foam dissipates bubble bursting energy through elastic deformation and viscous damping, reducing the kinetic energy available for aerosol ejection. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Bubble bursting at the anode surface transfers kinetic energy to aerosol droplets, ejecting them into the tankhouse air.",
+      "ingredient_action": "Viscoelastic foam dissipates bubble bursting energy through elastic deformation and viscous damping, reducing the kinetic energy available for aerosol ejection.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "c8e0dc1f1b50a433",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: foam-blanket chemistry (0.03 kg/tonne FS-61, 40°C, 10-min cover delay; - This interventio",
+      "NAMED_VARIANT: model/brand-marker: FS-61 | - Standard practice: foam-blanket chemistry (0.03 kg/tonne FS-61, 40°C, 10-min c; ",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   ],
+   "final_sha256_16": "c8e0dc1f1b50a433",
+   "final_chars": 3180
+  },
+  {
+   "problem_id": "HO7-09-chiller-condenser-fouling",
+   "generated_at": "2026-11-17T16:58:39.619964Z",
+   "histogram_before": {},
+   "histogram_after": {},
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3413,
+     "latency_s": 10.5,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs**:",
+       "- Compressor input power (ALREADY-RECORDED: \"compressor input power\" per constraint).",
+       "- Condenser water inlet temperature (ALREADY-RECORDED: \"condenser-water inlet temperature\"",
+       "- Condenser water outlet temperature (ALREADY-RECORDED: \"condenser-water outlet temperatur",
+       "- Condenser water flow rate (ALREADY-RECORDED: \"condenser-water flow meter\" per constraint",
+       "- **Indicator**: Rate of change of (ΔP/ṁ), where ΔP = current compressor power - baseline ",
+       "- **Baseline**: Baseline ΔP/ṁ (DERIVED from \"stated physical relation\": ΔP/ṁ = 0 at clean ",
+       "- **Threshold**: 0.5% increase in ΔP/ṁ per day (CALCULATED from 14-day warning window and ",
+       "- **Installability**: Same as standard practice (uses existing sensors, no new taps).",
+       "- **Operability**: Real-time calculation (no commissioning needed, baseline is physics-der",
+       "- **Maintenance**: No additional maintenance (same sensor class as standard practice).",
+       "- **Cost class**: Same as standard practice (no new hardware, only software logic)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "2eeb8f298080f8a5"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2897,
+     "latency_s": 6.1,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: SAME (uses existing sensor feeds)",
+       "- Operability: SAME (no operator intervention required)",
+       "- Maintenance: SAME (no new hardware to maintain)",
+       "- Cost class: SAME (computation-only solution, no new equipment)",
+       "- Operational loss: ZERO (no throughput or energy trade-off)"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "a274c5e36b7b65e4",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: SAME (uses existing sensor feeds); - Operability: SAME (no operator intervention required); "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3207,
+     "latency_s": 7.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Inputs: ALREADY-RECORDED condenser-water inlet temperature (T_in), outlet temperature (T",
+       "- Calculation: R_fouling = (T_out - T_in) / (m_dot * Cp) - (1 / (U_clean * A)) (DERIVED fr",
+       "- Primary indicator: R_fouling threshold = 0.001 m²·K/W (CALCULATED from historical trip d",
+       "- Secondary indicator: ΔP_norm = (P_observed - P_clean) / P_clean > 0.05 (CALCULATED from ",
+       "- Trigger: R_fouling > threshold AND ΔP_norm > 0.05 (simultaneous validation to reduce fal",
+       "- Installability: SAME (no new hardware; software-only update to existing BMS).",
+       "- Operability: SAME (automatic monitoring; no operator intervention).",
+       "- Maintenance: SAME (no additional maintenance; uses existing sensor feeds).",
+       "- Cost class: SAME (software update; no capital cost).",
+       "- Operational loss: ZERO (no throughput/energy trade; pure monitoring)."
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'mechanism' is not among the permitted measures/signals",
+       "derived feature input 'the heat transfer equation, providing a direct physics-based' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "77f856479ebb460f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Inputs: ALREADY-RECORDED condenser-water inlet temperature (T_in), outlet temperature (T; - Calculation: R_f",
+      "INPUT_UNAVAILABLE: required online signal 'mechanism' is not among the permitted measures/signals; derived feature input 'the hea"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3573,
+     "latency_s": 8.9,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Condenser-water inlet temperature (T_in) from existing sensor (problem statement)",
+       "- Condenser-water outlet temperature (T_out) from existing sensor (problem statement)",
+       "- Condenser-water flow rate (m_dot) from existing flow meter (problem statement)",
+       "- Compressor input power (W_dot) from existing power meter (problem statement)",
+       "- Clean-baseline normalized power (W_dot / (m_dot * Cp * ΔT_clean)): CALCULATED from state",
+       "- Fouling threshold: CALCULATED as 1.15 × clean baseline (15% increase, derived from head-",
+       "- Installability: Zero new hardware; uses existing BMS/PLC (SAME as standard practice).",
+       "- Operability: Real-time calculation (no operator action needed); same as standard practic",
+       "- Maintenance: Software-only updates (SAME as standard practice).",
+       "- Cost class: $0 (no new equipment; only software configuration), same as standard practic"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "0bfd26c8dd415eef",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Condenser-water inlet temperature (T_in) from existing sensor (problem statement); - Condenser-water outlet "
+     ]
+    }
+   ],
+   "final_sha256_16": "0bfd26c8dd415eef",
+   "final_chars": 3573
+  }
+ ]
+}

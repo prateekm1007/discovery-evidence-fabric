@@ -1,0 +1,50 @@
+{
+ "problem_id": "HO7-01-zinc-ew-acid-mist",
+ "arm": "challenger",
+ "dev_source": null,
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "challenger = identical machine + the typed_plan payload field (the P2 addition under test)",
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the machine's typed plan layer - the intervention MUST implement this plan)",
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "triz_principle": "P35",
+  "measure_class": "boundary",
+  "signals_used": [
+   "pressure",
+   "temperature"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "winner_rule": "non_schedule_first",
+ "plan_measure_class": "boundary",
+ "generated_at": "2026-11-17T18:01:52.818670Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — To prevent acid aerosol mist in zinc electrowinning, standard practice relies solely on tankhouse ventilation and cell-cover procedures. This intervention introduces a foam-blanket chemistry that increases gas-liquid interfacial resistance, suppressing aerosol entrainment by bubbles without altering cell or anode design. The closest existing practice is froth flotation in mineral processing, but this differs by using a non-ionic surfactant to stabilize a foam layer at the electrolyte surface, specifically targeting bubble burst aerosol mitigation. The mechanism acts by forming a cohesive foam barrier that dampens bubble rupture dynamics.\n\nPHYSICS CHECK — The governing relation is aerosol mass flux ∝ bubble surface area × aerosol fraction per bubble. The foam blanket increases gas-liquid interfacial resistance by 50–100% (per supplier data for similar surfactants in acidic systems), reducing aerosol fraction per bubble by 30–60%. This directly reduces the aerosol mass flux. DIRECTION-OF-EFFECT: driving variable = aerosol fraction per bubble; the mechanism moves it DOWN by increasing interfacial resistance via foam stabilization; this REDUCES aerosol entrainment.\n\nIMPLEMENTATION BILL —  \n1. (b) Commercial non-ionic surfactant (e.g., polyethylene glycol alkyl ether, HLB 14–16), 10 ppm dosing rate, added to electrolyte recirculation line.  \n2. (c) Adjust foam-blanket dosing pump schedule to operate during low-production hours (e.g., 22:00–06:00) to minimize operational impact.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- Standard practice: Ventilation system operation (continuous, energy cost) + cell-cover procedures (labor cost).  \n- This intervention: Adds surfactant consumable (cost: ~$0.05/ton Zn, negligible vs. ventilation energy) + dosing pump schedule change (zero operational loss, as scheduled off-peak).  \n- Burden class: Same (operational cost within 5%, no new hardware).  \n\nEXECUTABLE TEST — Protocol: Install foam-blanket system; monitor aerosol concentration at tankhouse breathing zone (using existing OSHA-style sampler) for 30 days. Pass/fail: Average aerosol concentration ≤50% of baseline (pre-intervention) for ≥80% of sampling points. Kill criterion: If concentration exceeds 80% of baseline at any point, halt and review surfactant dosage.  \n\nMECHANISM CLASS: interfacial-resistance modulation via foam stabilization.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: Ventilation system operation (continuous, energy cost) + cell-cover p",
+    "- This intervention: Adds surfactant consumable (cost: ~$0.05/ton Zn, negligible vs. venti",
+    "- Burden class: Same (operational cost within 5%, no new hardware)."
+   ],
+   "NAMED_VARIANT": [
+    "model/brand-marker: HLB 14 | 1. (b) Commercial non-ionic surfactant (e.g., polyethylene glycol alkyl ether, H"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "derived feature input 'foam stabilization; this REDUCES aerosol entrainment' is not derivable from the permitted signals"
+   ]
+  }
+ },
+ "declared_template_prose": "interfacial-resistance modulation via foam stabilization.",
+ "allowed_row_outside": 0,
+ "sha256_16": "a097f2d45b909ebd",
+ "smoke": true
+}
