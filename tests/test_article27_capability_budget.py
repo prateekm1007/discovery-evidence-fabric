@@ -115,3 +115,49 @@ def test_no_active_entry_sits_past_the_round_2_retire_clock():
                 f"ACTIVE entry '{str(e.get('variant'))[:48]}' sits at "
                 f"rounds_without_beating={rwb} — Art. 20: delete at 2 "
                 "(a zombie stage must not stay on the books)")
+
+
+# ---------------------------------------------------------------------------
+# v3.2.0 wiring (AM52/V49 ratification, claim c-0079): ENGINE-LINE SHARE
+# gate — the owner rule (auditor v1.3.0 Art. 5) as a CI check.
+# ---------------------------------------------------------------------------
+
+DISCLOSED_ROUND_TYPES = ("precision", "custody", "probe", "enforcement",
+                         "governance", "coordination", "infrastructure")
+
+
+def _latest_round_record():
+    import re as _re
+    best = None
+    for p in sorted((REPO / "eval").glob("r*_status.json")):
+        m = _re.match(r"r(\d+)(?:s(\d+))?_status\.json$", p.name)
+        if not m:
+            continue
+        n = (int(m.group(1)), int(m.group(2) or 0))
+        if best is None or n > best[0]:
+            best = (n, p)
+    return best
+
+
+def test_latest_round_holds_engine_line_share_gate():
+    """v3.2.0 Art. 27 CI (F63/owner rule): the latest round's changed-line
+    share in engine code is >=30% — OR the round types a disclosed
+    exception (a precision/custody/probe/enforcement round moves no
+    engine code and says so). Neither gate state = finding."""
+    hit = _latest_round_record()
+    assert hit, "no round status record found"
+    (n, p) = hit
+    art = json.loads(p.read_text(encoding="utf-8")).get(
+        "art27_capability_budget", {})
+    share = art.get("engine_line_share_measured")
+    note = (str(art.get("engine_diff", "")) + " "
+            + str(art.get("share_exception_reason", ""))).lower()
+    disclosed = any(t in note for t in DISCLOSED_ROUND_TYPES)
+    if isinstance(share, (int, float)):
+        assert share >= 30 or disclosed, (
+            f"{p.name}: engine-line share {share}% < 30 with no typed "
+            "exception — the owner rule (F63 class) reds")
+    else:
+        assert disclosed, (
+            f"{p.name}: no measured engine-line share and no typed "
+            "exception — disclose the round type (F63 class)")

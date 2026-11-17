@@ -1,0 +1,54 @@
+{
+ "record": "R58_RATIFICATION_STATUS/1.0.0",
+ "session": "builder-r58s2",
+ "work_id": "r58-ratify-epistemic-v3.2.0",
+ "claim": "c-0080",
+ "base_sha": "0ce0bf077",
+ "round": "R58 (builder ratification of EPISTEMIC v3.2.0 \u2014 AM52/V49 proposal)",
+ "protocol": [
+  "EPISTEMIC md5 unchanged (525536896f8000a17fab124fac845ca0 @ 0ce0bf077) \u2014 FULL reads stand; AUDITOR v1.3.0 NEW (d40a92a14854accfd558c7df4f29b9b0 @ 43e450e1c) \u2014 read in FULL this session BEFORE acting; AM52/V49 + the review + the proposal read in full",
+  "claim-before-work: builder-r58s1 registered BEFORE c-0079 (30 sessions / 76 claims)",
+  "the proposal enacted with ONE typed deviation: the prose-regex scanner DELETION rides the P2 gate (the v7.7 ablation baseline imports the r24-r30 layer; deleting now breaks baseline byte-identity) \u2014 as typed in the R55 census, unchanged by the amendment",
+  "COLLISION TYPED per Art. 29(e): the parallel session's machine-leg claim (r58-p2-dev-ablation-machine-leg) landed builder-r58s1/c-0079 first on the remote (bb5cb9755) while this lane worked under the same id locally; the lanes are disjoint (ratification vs ablation machine leg) \u2014 this lane YIELDED both identifiers and re-lands as builder-r58s2/c-0080; the peer's D2 read of 39157f700 (their commit message) also completed this round's R57 record recursion \u2014 acknowledged"
+ ],
+ "ratification": {
+  "constitution": "EPISTEMIC_CONSTITUTION.md bumped v3.1.0 -> v3.2.0; Art. 8 trimmed (commercial clauses retired, unknown/patent clauses kept); the v3.2.0 amendment record appended",
+  "ci_wirings": {
+   "Art3": "tests/test_article3_degenerate_inputs.py \u2014 degenerate battery over all 12 CHECKS relations: 12/12 typed REFUSED (guards were already whole-class after c-0073), 12/12 healthy companions compute, registry-completeness fail-closed",
+   "Art14": "tests/test_article14_confidentiality_probe.py \u2014 in-tree seal files ciphertext-only; burned v7/v8 rubrics absent",
+   "Art15": "tests/test_article15_cross_seed_determinism.py \u2014 4-seed subprocess determinism (green: the c-0071 remedy holds) + sorted-set/no-wall-clock statics",
+   "Art17": "tests/test_article17_message_scan.py \u2014 commit-message scan across all refs (detector battery reuse); exact-SHA attribution schema asserted; unbaselined = 0",
+   "Arts19/21": "schema-enum checks registered as the v3.2.0 mechanism (tests/test_candidate_schema.py pre-existing); scanner deletion typed P2-gated",
+   "Art22": "tests/test_article22_measured_path.py \u2014 route imports mechanism_space; r47 decision committed; MEASURED_PATH declared in scripts/r53_p2_ablation_criteria.py (the one edit to the evaluator)",
+   "Art27": "engine-line-share gate added to tests/test_article27_capability_budget.py (>=30% or typed disclosure)"
+  },
+  "ledgers": [
+   "eval/retirement_ledger.json + the Art. 8 split entry (successor = trimmed Art. 8)",
+   "eval/enforcement_flags.json + v3.2.0 mechanisms registered (map drift check green)",
+   ".github/workflows/r11_queue_surface.yml + the five new test files invoked (the v3.0.0 rule: cited tests must gate the push)"
+  ]
+ },
+ "art27_capability_budget": {
+  "engine_diff": "NONE \u2014 an enforcement/governance round (the amendment's own nature: CI checks + constitution text + ledgers); the two production-code touches are the MEASURED_PATH declaration in scripts/r53_p2_ablation_criteria.py (an instrument declaration, not capability logic) and none in discovery_fabric/engine/",
+  "primary_metric_delta": "NOT CLAIMED \u2014 enforcement round; no capability metric moved",
+  "engine_line_share_measured": "0% \u2014 disclosed: an enforcement round legitimately moves no engine code; the >=30% rule binds capability rounds (the new Art. 27 CI check enforces exactly this disclosure shape)",
+  "share_exception_reason": "enforcement round \u2014 the v3.2.0 ratification itself",
+  "deletions": "NONE (the scanner deletion rides the P2 gate, typed)"
+ },
+ "remote_ci": {
+  "pushed_sha": "filled at push",
+  "remote_ci_conclusion": "unreadable",
+  "read_at": "PENDING",
+  "check_runs": []
+ },
+ "battery": {
+  "ci_list": "GREEN \u2014 the EXACT queue-surface invocation (29 file args incl. the five new v3.2.0 files): 57/57 passed, EXIT=0, with pipefail; retally PASS; critic ACCEPTANCE_PASS",
+  "typed_findings": [
+   [
+    "the whole-tree tests/ sweep is OUT OF CONTRACT and errors host-side at ANY tree state: hundreds of setup errors (pytest tmp/asyncio fixture setup) across legacy R4xx/R5xx files under full-directory ordering; verified NOT a regression \u2014 test_r412_tvm_v2.py passes solo at BOTH the stashed baseline and with the v3.2.0 changes; the CI surface invokes a specific file list, not the whole tree",
+    "r392 live-server + r468 lookup-order: ordering-flaky on this host (pass solo, fail under battery load; the r392 family carries dated typed skips for exactly this host condition from R11); both outside the CI-invoked list; solo green evidence recorded"
+   ],
+   "INFRA: the sandbox disk hit 100% (/) mid-round \u2014 the sweep's setup errors were initially disk-full (pytest tmpdir creation failed); 6.5G freed (pip cache + stale pytest tmpdirs); any concurrent write during that window is suspect and was re-verified after the fix"
+  ]
+ }
+}

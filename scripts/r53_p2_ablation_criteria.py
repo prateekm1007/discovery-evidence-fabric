@@ -29,6 +29,14 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 
+# v3.2.0 Art. 22 measured-path declaration (c-0079, F61 class): when the
+# v9 machine leg runs, its measurement goes through the ENGINE route
+# (discovery_fabric.engine.engine_route -> mechanism_space, the typed-
+# operator engine), never a wrapper. See eval/measured_path_decision_r47
+# .json (the committed routing decision) and
+# tests/test_article22_measured_path.py (the CI that enforces this).
+MEASURED_PATH = "discovery_fabric.engine.engine_route -> mechanism_space"
+
 SCHEDULE_BAR = 0.17
 
 
