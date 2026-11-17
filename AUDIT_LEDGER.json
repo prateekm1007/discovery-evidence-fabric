@@ -1277,6 +1277,52 @@
     1,
     12
    ]
+  },
+  {
+   "id": "F60",
+   "severity": "HIGH",
+   "title": "PRIVATE rubric is PUBLICLY readable — custody is a convention, not access control. The audit branch lives in the PUBLIC repo prateekm1007/discovery-evidence-fabric (F45 visibility=public). Auditor UNAUTHENTICATED raw read of audit/holdout_v7/holdout_v7_rubric_PRIVATE.json returned HTTP 200 (8385 bytes); v8 rubric/problems on the same public branch. The selection_sha256 seal protects problem INTEGRITY, not rubric CONFIDENTIALITY. The builder LLM or training data could read the scoring key (cheating/contamination vector). Builder sessions honored 'never read rubric' (c-0060 verifier: rubric_path NEVER_READ) so no actual cheating occurred, but the vector is open. REMEDY (OWNER-side): move rubric to PRIVATE custody (private repo/gist) or encrypt at rest; canary+probe (D7) mitigates contamination not the cheating vector. NOTE: external researcher labeled this 'F57' — corrected to F60 (Art.8 stable IDs; F57=scan precision).",
+   "status": "OPEN-OWNER-URGENT",
+   "opened": "2026-11-17",
+   "last_checked": "88e693581",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "audit/r11-auditor-verdict-20261114",
+     "path": "audit/holdout_v7/holdout_v7_rubric_PRIVATE.json",
+     "note": "unauthenticated HTTP 200"
+    }
+   ],
+   "articles": [
+    7,
+    12
+   ]
+  },
+  {
+   "id": "F61",
+   "severity": "HIGH",
+   "title": "THE MEASURED MACHINE IS NOT THE ENGINE (byte-verified import graph). scripts/r40_machine_v77.py (559 lines) and scripts/r43_machine_v8.py (217 lines, imports v77) make one generation call + regex scanners + 3-repair loop + LLM direction check, with ZERO imports of discovery_fabric/mechanism_space. discovery_fabric/engine/mechanism_space.py (3716 lines) carries SIX typed operator contracts (direct_transfer, cross_domain, geometric_transform, boundary_condition, failure_path, knowledge_first; OPERATOR x199) — the TRIZ^a typed-transformation idea already written. NO measured-path script (r40_v77_firetest, r42_v7_one_shot, r43_machine_v8, r40_machine_v77) imports the engine. Therefore v6 (64.6%) and v7 (2.917) acceptance scores measure the WRAPPER, not the invention engine. DECISION REQUIRED: route the measured path through mechanism_space OR declare the wrapper the product and archive the unused engine surface; write the measured-path entry to the ledger.",
+   "status": "OPEN",
+   "opened": "2026-11-17",
+   "last_checked": "88e693581",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "88e693581",
+     "path": "scripts/r40_machine_v77.py",
+     "note": "0 discovery_fabric imports"
+    },
+    {
+     "sha": "88e693581",
+     "path": "discovery_fabric/engine/mechanism_space.py",
+     "note": "3716 lines, 6 typed operators"
+    }
+   ],
+   "articles": [
+    1,
+    5,
+    27
+   ]
   }
  ],
  "amendments": [
@@ -2093,6 +2139,18 @@
     "Chinese platform map: Gitee/GitCode/AtomGit/ModelScope + Gitee AI moark + CN AI4S (PaddleScience/MindSpore/DeepModeling). Public PHM datasets: CWRU/XJTU-SY/C-MAPSS/PHM-Vibench.",
     "8 ranked adoption directions D1-D8 + delete/replace + LICENSE RULE. Full survey: audit/CAPABILITY_SURVEY_R46_DEEP_2026-11-17.md. No capability delta measured (research)."
    ]
+  },
+  {
+   "id": "AM44",
+   "date": "2026-11-17",
+   "status": "ISSUED",
+   "reason": "R47 — external researcher report VERIFIED from bytes + 2 structural findings + license corrections",
+   "changes": [
+    "External report audited (Art.1 bytes-over-claims). CONFIRMED: F61 measured-machine!=engine (import graph; mechanism_space.py 3716 lines/6 operators; measured scripts import none). F60 PRIVATE rubric publicly readable (unauth HTTP 200; researcher's 'F57' label corrected to F60).",
+    "Licenses verified: ShinkaEvolve Apache-2.0 + shinka/core/novelty_judge.py EXISTS (8886 bytes, similarity+LLM-judge); GEPA standalone gepa-ai/gepa MIT (dspy integration Apache-2.0); triz-engine LICENSE + data/triz-matrix.json + triz-knowledge-base.json (MIT per researcher read); MOOSE-Chem MIT; InternAgent Apache-2.0 (researcher corrected 3rd-party 'no license'); DeepScientist Apache-2.0; AI-Scientist-v2 RESTRICTIVE custom 'AI Scientist Source Code License' (DO NOT COPY code — approach only; use AIDE MIT for copyable tree search); jataware open-coscientist MIT+Commons Clause (DO NOT COPY) BUT llnl/open-ai-co-scientist MIT (copyable alternative).",
+    "TRIZ^a typed transformation contracts converge with our mechanism_space operators (idea already written, unmeasured; no matched-budget ablation; code upon publication). QDAIF caution: diversity axes must be COMPUTED deterministically, not LLM-judged (validates F58).",
+    "Adoption directions reconciled (researcher 5 + auditor levers): D1 measured-path decision; D2 typed-operator population generation (triz-engine matrix + mechanism_space); D3 cheap novelty gate (TF-IDF first, ShinkaEvolve pattern); D4 executable falsifiers/computed physics; D5 GEPA DEV-only; D6 conformal+rubric+canary; D7 all-refs secret scan + rubric custody; D8 standard infra. Gitee coverage PARTIAL (search-indexed; researcher sandbox blocked gitee.com — owner allowlist for full coverage)."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -2902,6 +2960,18 @@
    "gate": "NOT_MET (v7 2.917 stands)",
    "capability_change": "NONE measured (research); 20 license-aware copy targets + 8 levers",
    "evidence_sha": "audit/CAPABILITY_SURVEY_R46_DEEP_2026-11-17.md"
+  },
+  {
+   "id": "V42",
+   "round": "R47 external report verification",
+   "commit": "88e693581",
+   "gate": "NOT_MET (v7 2.917 stands; F61: scores measure wrapper not engine)",
+   "capability_change": "NONE measured; 2 structural findings (F60/F61) + license corrections",
+   "new_findings": [
+    "F60",
+    "F61"
+   ],
+   "evidence_sha": "eval/r47_external_report_verification.json"
   }
  ],
  "gold_set": {
@@ -3107,7 +3177,7 @@
    ]
   }
  },
- "progress_note": "55-62% capability-weighted (gate NOT_MET; v7 72.9%). OSS survey (R45): we lead on epistemic integrity, lag on search diversity/physics grounding/principled ideation/prompt optimization/novelty/predictor calibration/canary/secret-scanning/eval-infra. 8 adoption levers (AIDE tree search, CoolProp/ht/fluids/thermo computed physics, AutoTRIZ, DSPy GEPA, PaECTER/SciMON novelty, MAPIE conformal, PaperBench rubric, BIG-bench canary, gitleaks all-refs, Inspect/Langfuse). v8 sealed (n=30) ready; adoptions measured at v8/v9.",
+ "progress_note": "55-62% capability-weighted (gate NOT_MET; v7 72.9% — but F61: that score measures the 559-line wrapper, NOT the 3716-line typed-operator engine). F60: PRIVATE rubric publicly readable (owner custody). External report verified: ShinkaEvolve/triz-engine/GEPA/MOOSE-Chem copy-safe; AI-Scientist-v2/open-coscientist(jataware) do-not-copy; llnl co-scientist MIT alternative. Top decision: measured-path (route through mechanism_space or archive engine). v8 sealed (n=30); ablations DEV-only on burned sets.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
