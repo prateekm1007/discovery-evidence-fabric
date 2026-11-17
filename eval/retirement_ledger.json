@@ -1,6 +1,6 @@
 {
  "record": "RETIREMENT_LEDGER/1.1.0",
- "at": "2026-11-17",
+ "at": "2026-11-17T19:40:00Z (sandbox clock)",
  "retirements": [
   {
    "retired": "V8.0 single-chain machine (scripts/r43_machine_v8.py as the EXECUTED machine)",
@@ -26,6 +26,14 @@
    "successor": "discovery_fabric/engine/candidate_schema.py (validate_candidate_schema) + engine/population_search.declared_domain_classes + engine/engine_route.py (the integrated path)",
    "scope": "RETIRED_FROM_MEASURED_PATH (effective now: the engine route never calls the scanners \u2014 structural, proven by the regression and the route code). PHYSICAL deletion of the scanner functions from scripts/r43_v8_binds.py is gated on the R53 machine-battery migration: r45_machine_v81 and its CI test suite (test_v81_binds) import the scanners today; the battery moves to schema-sourced checks in R53 and the functions delete with their importers. The retired V8.0 machine's bytes stay frozen (test-enforced). Zero active-path references after R53.",
    "at": "2026-11-17"
+  },
+  {
+   "round": "R55",
+   "claim": "c-0075",
+   "retired": "scripts/r44_f59_scan.py (the F59 per-branch live-token byte-grep driver)",
+   "reason": "superseded per Art. 16: the successor is scripts/r45_all_refs_secret_scan.py (tips-gate + full-history git-mode over provider-format batteries + the vault-value exact check), CI-wired as the push gate and pinned by tests/test_all_refs_secret_scan.py (14 tests). The F59 precision lesson (byte-grep governs) is carried by the successor's vault-value check; the R54 git-mode report (eval/r52_gitleaks_gitmode.json) + the credential bundle (eval/r54_credential_bundle.json) are its outputs. Zero importers (verified by import-statement scan; 3 docstring provenance mentions only).",
+   "successor": "scripts/r45_all_refs_secret_scan.py + tests/test_all_refs_secret_scan.py (CI tips gate)",
+   "p2_gated_note": "the r24-r30 prose-scanner layer (r24_constraint_scan, r26_catalog_scan, r27_standard_bill_scan, r29_conversion_scan, r29_operational_loss_scan, r30_allowed_class_scan, r30_physics_direction_scan) is typed P2-GATED, NOT deleted in R55: the v7.7 ablation baseline (scripts/r40_machine_v77.py) imports the entire layer at runtime (verified: 24-module import closure), and the P2 matched-budget ablation needs that baseline arm executable. The machine battery ALREADY carries the successor checks (v8 generation binds 23 tests; the P1.4 integrated-route regression 0/0/0 CI-gated; the P1 unit-checked measurement CI-gated; the engine clamp declared_domain_classes + physics_checks 12 relations). Physical deletion happens in the SAME change that retires the v7.7 path after the P2 ablation completes \u2014 Art. 16 same-change accounting, scheduled."
   }
  ]
 }

@@ -600,13 +600,33 @@ _CLASS_RULES = (
       "degradation", "aging", "ageing", "thermal")),
 )
 
+# F66 (R55): dew-point phrasing is ambiguous between frost_condensation
+# and desiccant_breakthrough. The typed disambiguation: when dew-point
+# language co-occurs with the desiccant-dryer context, the
+# moisture-load/breakthrough class governs (the dew point is the
+# dryer's OUTPUT metric, not a coil-surface regime); bare dew-point
+# phrasing stays frost_condensation. Checked BEFORE _CLASS_RULES.
+_DESICCANT_CONTEXT = ("desiccant", "dryer", "regeneration", "dry air")
+
+
+def _classify_disambiguation(low: str):
+    if ("dew point" in low or "dewpoint" in low) and any(
+            ctx in low for ctx in _DESICCANT_CONTEXT):
+        return "desiccant_breakthrough"
+    return None
+
 
 def classify_failure(text: str):
-    """Deterministic failure-text -> registry class. First match wins
+    """Deterministic failure-text -> registry class. The F66
+    disambiguation pre-rule runs first (dew-point + desiccant-dryer
+    context -> desiccant_breakthrough); then first keyword match wins
     (specific classes ordered before generic ones); None when no rule
     matches — the caller records PENDING_INPUTS rather than guessing a
     class. Zero LLM."""
     low = str(text).lower()
+    pre = _classify_disambiguation(low)
+    if pre is not None:
+        return pre
     for fclass, kws in _CLASS_RULES:
         if any(kw in low for kw in kws):
             return fclass

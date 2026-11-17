@@ -133,3 +133,60 @@ def test_units_are_pint_checked():
                      rho_kg_m3=988.0, suction_head_m=2.0,
                      friction_loss_m=1.5, npshr_m=3.0)
     assert r["verdict"] == "RUN" and r["unit"] == "m"
+
+
+# ---------------------------------------------------------------------------
+# F66 (R55): the dew-point disambiguation regression. Dew-point
+# phrasing with desiccant-dryer context routes breakthrough; bare
+# dew-point phrasing stays frost; the 12 labelled rows keep their
+# committed mapping (the P1 artifact's 36/36 stands).
+# ---------------------------------------------------------------------------
+def test_f66_dewpoint_with_dryer_context_routes_breakthrough():
+    assert pc.classify_failure(
+        "dew point rising after the desiccant dryer loses capacity") \
+        == "desiccant_breakthrough"
+    assert pc.classify_failure(
+        "dew point out of spec after incomplete regeneration") \
+        == "desiccant_breakthrough"
+    assert pc.classify_failure(
+        "compressed-air dew point spikes while the dryer ages") \
+        == "desiccant_breakthrough"
+
+
+def test_f66_bare_dewpoint_stays_frost():
+    assert pc.classify_failure(
+        "surface condensation when the dew point exceeds the coil "
+        "temperature") == "frost_condensation"
+    assert pc.classify_failure(
+        "frost builds unevenly; fixed-interval defrost wastes energy") \
+        == "frost_condensation"
+
+
+def test_f66_desiccant_keywords_unchanged():
+    assert pc.classify_failure(
+        "desiccant ageing and incomplete regeneration let moisture "
+        "break through") == "desiccant_breakthrough"
+
+
+def test_f66_all_12_labelled_rows_keep_their_mapping():
+    import json
+    rows = json.loads(
+        (REPO / "eval/r43_v7_problem_fields_burned.json")
+        .read_text())["problems"]
+    expected = {
+        "HO7-01-zinc-ew-acid-mist": "electrolytic_mist",
+        "HO7-02-rubber-extruder-scorch": "thermal_aging",
+        "HO7-03-hydro-partload-cavitation": "cavitation",
+        "HO7-04-freezer-demand-defrost": "frost_condensation",
+        "HO7-05-cu-ew-nodulation": "electrodeposition",
+        "HO7-06-ge-turbo-surge": "surge",
+        "HO7-07-gearbox-oil-varnish": "thermal_aging",
+        "HO7-08-conveyor-splice-fatigue": "fatigue",
+        "HO7-09-chiller-condenser-fouling": "fouling",
+        "HO7-10-desiccant-dryer-breakthrough": "desiccant_breakthrough",
+        "HO7-11-pitch-battery-degradation": "thermal_aging",
+        "HO7-12-digester-foaming": "foaming",
+    }
+    for p in rows:
+        got = pc.classify_failure(str(p.get("failure", "")))
+        assert got == expected[p["problem_id"]], (p["problem_id"], got)
