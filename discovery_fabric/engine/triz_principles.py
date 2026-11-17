@@ -12,7 +12,9 @@ associates with that contradiction family. The machine requires the
 selected candidates to carry DISTINCT principles (no two candidates on
 one principle) — the principled-diversity bind.
 """
+import json
 import re
+from pathlib import Path
 
 PRINCIPLES = {
     1: "Segmentation", 2: "Taking out", 3: "Local quality",
@@ -88,4 +90,41 @@ def distinct_principles(seeds: list) -> bool:
 
 
 __all__ = ["PRINCIPLES", "CONTRADICTION_MAP", "seed_for",
-           "distinct_principles", "DUTY_CYCLE_FAMILY_RX"]
+           "distinct_principles", "DUTY_CYCLE_FAMILY_RX",
+           "load_matrix", "matrix_principles"]
+
+
+# ---------------------------------------------------------------------------
+# The classical contradiction-matrix layer (P2, claim c-0071): the full
+# 39 engineering parameters x 39 -> recommended-principle lists, landed
+# as our own JSON under the MIT NOTICE (see NOTICE-triz-engine). The
+# CONTRADICTION_MAP above stays the problem-text keyword layer; this
+# matrix is the typed engineering-parameter layer.
+# ---------------------------------------------------------------------------
+_DATA_PATH = Path(__file__).resolve().parent / "data" /     "triz_classical_matrix.json"
+_MATRIX_CACHE = None
+
+
+def load_matrix() -> dict:
+    """The full classical matrix record (cached). Raises a typed
+    error naming the file when the data file is missing — a missing
+    data file never degrades into a fabricated recommendation."""
+    global _MATRIX_CACHE
+    if _MATRIX_CACHE is None:
+        if not _DATA_PATH.exists():
+            raise FileNotFoundError(
+                f"TRIZ matrix data missing: {_DATA_PATH}")
+        _MATRIX_CACHE = json.loads(_DATA_PATH.read_text(encoding="utf-8"))
+    return _MATRIX_CACHE
+
+
+def matrix_principles(improving: int, worsening: int) -> list:
+    """Recommended principle ids for the (improving, worsening)
+    parameter pair. Unknown parameters raise a typed error; an empty
+    cell returns [] (the classical matrix has no diagonal entries)."""
+    if improving not in range(1, 40) or worsening not in range(1, 40):
+        raise ValueError(
+            f"engineering parameters must be 1..39, got "
+            f"({improving}, {worsening})")
+    return list(load_matrix()["matrix"].get(f"{improving}_{worsening}",
+                                            []))

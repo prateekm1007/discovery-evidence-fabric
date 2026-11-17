@@ -82,3 +82,11 @@ this repository; no unlicensed repo code is copied.
 - AutoTRIZ-DETC24 casebase.json — no license (textbook cases): not copied;
   TRIZ encoded from public-domain methodology in scripts/triz_principles.py.
 - Gitee CWRU-1 and other unlicensed CN PHM repos — public data used, own loaders.
+
+## triz-engine data (MIT)
+
+The classical TRIZ contradiction matrix and the 39 engineering-parameter
+descriptions in `discovery_fabric/engine/data/triz_classical_matrix.json`
+are derived from the [triz-engine](https://github.com/SharathSPhD/triz-engine)
+project and are included under the MIT License. The full license text is
+preserved verbatim in [NOTICE-triz-engine](NOTICE-triz-engine).
