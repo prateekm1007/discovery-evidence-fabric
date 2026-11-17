@@ -7,12 +7,23 @@ calculation that RUNS here; the direction-of-effect is the SIGN of the
 computed result, never prose (the F57/F58 lesson: scanners reading
 prose cannot tell a correct direction from an inverted one).
 
-Unit discipline: every dimensional input is a pint Quantity — bare
-floats for dimensional inputs are a typed refusal (UNVERIFIABLE),
-never silently accepted. The heavier libraries (CoolProp, ht, fluids,
-thermo, tespy) are per-check optional imports: a check that needs one
-returns a typed UNAVAILABLE verdict when the library is absent — a
-missing library never degrades into a fabricated number.
+Unit discipline: every dimensional input is carried through pint —
+either as a pint Quantity (converted to the declared unit) or as a
+bare numeric whose unit is DECLARED BY THE REGISTRY SCHEMA at the
+call site (each check's signature names the unit per input — the
+schema is the unit authority, so a bare number is never ambiguous).
+Garbage inputs (None, non-numeric strings) are refused typed by the
+coercion (REFUSED/UNVERIFIABLE), never silently accepted. [R53/F-V4:
+this paragraph previously claimed bare floats are refused outright —
+contradicting _q's registry-schema rationale; corrected to describe
+the actual discipline.] Out-of-domain inputs return typed
+out_of_domain/REFUSED results instead of raising (the V8.1.2
+1995f7e75 lesson, applied after verifier F-V5 caught the re-incident:
+arrhenius could raise ZeroDivisionError at T2 = 0 K and OverflowError
+on an unclamped exponent). The heavier libraries (CoolProp, ht,
+fluids, thermo, tespy) are per-check optional imports: a check that
+needs one returns a typed UNAVAILABLE verdict when the library is
+absent — a missing library never degrades into a fabricated number.
 
 Rounds 2+ of P1 (R52, claim c-0069) bring the registry to the six
 roadmap-named relations: Arrhenius rate ratio, fouling U-degradation,
@@ -68,18 +79,52 @@ def arrhenius_rate_ratio(ea_kj_mol: float, t1_degC: float,
         ea = _q(ea_kj_mol, "kJ/mol").to("J/mol")
         t1 = _q(t1_degC, "degC").to("K")
         t2 = _q(t2_degC, "degC").to("K")
-        ratio = math.exp(-float(ea.magnitude / (R_GAS.magnitude * 1000))
-                         * (1.0 / t2.magnitude - 1.0 / t1.magnitude))
+        # F-V5 domain guard: absolute temperatures must be > 0 K (the
+        # 1/T terms divide by them; -273.15 degC = 0 K would raise
+        # ZeroDivisionError — typed out_of_domain instead, the V8.1.2
+        # 1995f7e75 lesson applied to the engine copy)
+        if float(t1.magnitude) <= 0.0 or float(t2.magnitude) <= 0.0:
+            return _result(
+                "arrhenius_rate_ratio", "thermal_aging", "REFUSED",
+                None, "dimensionless", "unavailable",
+                {"error": "out_of_domain: absolute temperatures must "
+                          "be > 0 K (got "
+                          f"T1={float(t1.magnitude)} K, "
+                          f"T2={float(t2.magnitude)} K) — typed "
+                          "refusal, never a raise (F-V5)"})
+        exponent = (-float(ea.magnitude / (R_GAS.magnitude * 1000))
+                    * (1.0 / t2.magnitude - 1.0 / t1.magnitude))
+        # F-V5 saturation bounds (the 1995f7e75 pattern): the exponent
+        # saturates beyond the double range instead of raising
+        # OverflowError — in-range values are unaffected, the clamp is
+        # disclosed in-band
+        saturated = None
+        if exponent > 709.78:
+            exponent, saturated = 709.78, "upper"
+        elif exponent < -745.0:
+            exponent, saturated = -745.0, "lower"
+        ratio = math.exp(exponent)
+        if saturated == "upper":
+            ratio = 1e308
+        elif saturated == "lower":
+            ratio = 0.0
         direction = "worsens" if ratio > 1.0 + 1e-12 else (
             "improves" if ratio < 1.0 - 1e-12 else "neutral")
+        detail = {
+            "ea": f"{ea}", "t1": f"{t1}", "t2": f"{t2}",
+            "basis": "k2/k1 = exp(-Ea/R (1/T2 - 1/T1)) — rate ratio "
+                     "> 1 means the proposed regime consumes life "
+                     "faster (accelerated-aging equivalence)"}
+        if saturated:
+            detail["saturated"] = (
+                f"exponent clamped at the {'upper' if saturated == 'upper' else 'lower'} "
+                "double-precision bound — the reported ratio is the "
+                "clamped value, disclosed in-band (F-V5, the V8.1.2 "
+                "1995f7e75 pattern)")
         return _result(
             "arrhenius_rate_ratio", "thermal_aging", "RUN", ratio,
-            "dimensionless", direction,
-            {"ea": f"{ea}", "t1": f"{t1}", "t2": f"{t2}",
-             "basis": "k2/k1 = exp(-Ea/R (1/T2 - 1/T1)) — rate ratio "
-                      "> 1 means the proposed regime consumes life "
-                      "faster (accelerated-aging equivalence)"})
-    except (TypeError, ValueError) as e:
+            "dimensionless", direction, detail)
+    except (TypeError, ValueError, ZeroDivisionError) as e:
         return _result("arrhenius_rate_ratio", "thermal_aging",
                        "REFUSED", None, "dimensionless", "unavailable",
                        {"error": f"{type(e).__name__}: {e}"})
@@ -178,6 +223,16 @@ def npsh_margin(patm_kpa: float, pvap_kpa: float, rho_kg_m3: float,
                 npshr_m: float) -> Dict[str, Any]:
     try:
         g = pint.Quantity(9.80665, "m/s**2")
+        # F-V5: the rho/pvap domain guard runs BEFORE the head division
+        # (rho = 0 would raise ZeroDivisionError inside pint)
+        if float(rho_kg_m3) <= 0 or float(pvap_kpa) <= 0:
+            return _result(
+                "npsh_margin", "cavitation", "REFUSED", None, "m",
+                "unavailable",
+                {"error": "out_of_domain: rho and vapour pressure must "
+                          "be > 0 (got "
+                          f"rho={rho_kg_m3}, pvap={pvap_kpa}) — typed "
+                          "refusal, never a raise (F-V5)"})
         dp = (_q(patm_kpa, "kPa") - _q(pvap_kpa, "kPa")).to("Pa")
         rho = _q(rho_kg_m3, "kg/m**3")
         head = dp / (rho * g)                       # m of fluid
@@ -186,8 +241,6 @@ def npsh_margin(patm_kpa: float, pvap_kpa: float, rho_kg_m3: float,
         npsha = head + hs - hf
         npshr = _q(npshr_m, "m")
         margin = float((npsha - npshr).to("m").magnitude)
-        if float(rho.magnitude) <= 0 or float(pvap_kpa) <= 0:
-            raise ValueError("rho and vapour pressure must be > 0")
         direction = ("worsens" if margin <= 0.0 else "improves")
         return _result(
             "npsh_margin", "cavitation", "RUN", round(margin, 4), "m",
@@ -218,7 +271,26 @@ def dewpoint_frost_margin(t_air_degC: float, rh_percent: float,
         if not (0.0 < rhs <= 100.0):
             raise ValueError("RH must be in (0, 100]")
         a, b = 17.625, 243.04          # Magnus-Tetens (over water)
+        # F-V5 domain guards (the V8.1.2 'absurd dry-bulb' guard,
+        # applied to the engine copy): b + t = 0 would divide by zero
+        # in the alpha term; a - alpha = 0 would divide by zero in the
+        # dewpoint term — typed refusal instead of a raise
+        if (b + t) <= 0.0:
+            return _result(
+                "dewpoint_frost_margin", "frost_condensation",
+                "REFUSED", None, "delta_degC", "unavailable",
+                {"error": f"out_of_domain: dry-bulb {t} degC is below "
+                          "the Magnus-Tetens validity floor "
+                          "(-243.04 degC) — typed refusal, never a "
+                          "raise (F-V5)"})
         alpha = math.log(rhs / 100.0) + a * t / (b + t)
+        if abs(a - alpha) < 1e-12:
+            return _result(
+                "dewpoint_frost_margin", "frost_condensation",
+                "REFUSED", None, "delta_degC", "unavailable",
+                {"error": "out_of_domain: degenerate Magnus solution "
+                          "(a == alpha) — typed refusal, never a "
+                          "raise (F-V5)"})
         td = b * alpha / (a - alpha)
         margin = ts - td
         direction = ("worsens" if margin <= 0.0 else "improves")
@@ -230,7 +302,7 @@ def dewpoint_frost_margin(t_air_degC: float, rh_percent: float,
                       "means condensation/frost regime — the "
                       "intervention's claimed surface-temperature "
                       "regime must keep the margin positive"})
-    except (TypeError, ValueError) as e:
+    except (TypeError, ValueError, ZeroDivisionError) as e:
         return _result("dewpoint_frost_margin", "frost_condensation",
                        "REFUSED", None, "delta_degC", "unavailable",
                        {"error": f"{type(e).__name__}: {e}"})

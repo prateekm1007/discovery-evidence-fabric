@@ -164,3 +164,65 @@ def test_every_check_refuses_garbage_rather_than_fabricating():
         assert r["verdict"] == "REFUSED", (cid, r)
         assert r["direction_of_effect"] == "unavailable"
         assert r["value"] is None
+
+
+# --- R53 (claim c-0073): the F-V5 regression pins — out-of-domain
+# inputs return TYPED refusals, never uncaught raises (the V8.1.2
+# 1995f7e75 lesson re-incident, caught live during the R53 P1-gate
+# measurement)
+def test_arrhenius_zero_kelvin_typed_refusal_not_raise():
+    # T2 = -273.15 degC = 0 K raised ZeroDivisionError through
+    # run_check before the F-V5 fix
+    r = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=80.0,
+                     t1_degC=60.0, t2_degC=-273.15)
+    assert r["verdict"] == "REFUSED"
+    assert r["value"] is None
+    assert "out_of_domain" in r["detail"]["error"]
+    # the same for the baseline side
+    r2 = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=80.0,
+                      t1_degC=-273.15, t2_degC=60.0)
+    assert r2["verdict"] == "REFUSED"
+
+
+def test_arrhenius_exponent_saturation_disclosed_in_band():
+    # synthetic stress inputs (disclosed as such): an absurd Ea with a
+    # large temperature step saturates the exponent at the
+    # double-precision bound instead of raising OverflowError; the
+    # clamp is disclosed in-band and the direction follows the clamped
+    # value (the 1995f7e75 pattern)
+    r = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=2.5e9,
+                     t1_degC=20.0, t2_degC=1000.0)
+    assert r["verdict"] == "RUN"
+    assert r["value"] == 1e308
+    assert r["direction_of_effect"] == "worsens"
+    assert "saturated" in r["detail"]
+    # the lower bound saturates to 0.0 = improves
+    r2 = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=2.5e9,
+                      t1_degC=1000.0, t2_degC=20.0)
+    assert r2["verdict"] == "RUN"
+    assert r2["value"] == 0.0
+    assert r2["direction_of_effect"] == "improves"
+    # in-range values are UNAFFECTED by the clamp (no saturation key)
+    ok = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=80.0,
+                      t1_degC=60.0, t2_degC=90.0)
+    assert "saturated" not in ok["detail"]
+    assert 1.0 < ok["value"] < 1.01
+
+
+def test_dewpoint_absurd_drybulb_typed_refusal_not_raise():
+    # a dry-bulb at/below the Magnus-Tetens floor (-243.04 degC) would
+    # divide by zero in the alpha term before the F-V5 guard
+    r = pc.run_check("dewpoint_frost_margin", t_air_degC=-243.04,
+                     rh_percent=60.0, t_surface_degC=-250.0)
+    assert r["verdict"] == "REFUSED"
+    assert "out_of_domain" in r["detail"]["error"]
+
+
+def test_npsh_zero_rho_typed_refusal_not_raise():
+    # rho = 0 raised ZeroDivisionError inside pint BEFORE the F-V5
+    # guard-order fix (the guard existed but ran after the division)
+    r = pc.run_check("npsh_margin", patm_kpa=101.3, pvap_kpa=2.3,
+                     rho_kg_m3=0.0, suction_head_m=2.0,
+                     friction_loss_m=0.3, npshr_m=0.5)
+    assert r["verdict"] == "REFUSED"
+    assert "out_of_domain" in r["detail"]["error"]

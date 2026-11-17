@@ -53,10 +53,19 @@ is public-domain factual knowledge and is encoded in our own files
 - SakanaAI/ShinkaEvolve (Apache-2.0; `shinka/core/novelty_judge.py`
   verified present) — TF-IDF novelty-gate pattern (D3, planned).
 - triz-engine (MIT; `data/triz-matrix.json` 39x39 +
-  `triz-knowledge-base.json` verified present) — candidate principle
-  mapping for D2 typed population; our own self-encoded families in
-  scripts/triz_principles.py remain the primary, the matrix JSON is
-  the cross-check (attribution carried here).
+  `triz-knowledge-base.json` verified present) — **LANDED (R53, claim
+  c-0073)**: `discovery_fabric/engine/triz_matrix.json` is our own
+  corpus (40 principles with self-authored descriptions/examples, the
+  classical 39 parameters with self-authored descriptions, and the
+  classical 39x39 contradiction matrix — 1,254 non-empty cells); the
+  matrix cells were verified cell-by-cell against SharathSPhD/
+  triz-engine @ 17d48dc0273c23bc8456e7369f2a298bd44131a3 at build
+  time (shape, range and count asserted by the build; the pinned
+  reference commit is recorded in the corpus provenance block); the
+  MIT attribution for that cross-check is carried HERE. The TRIZ
+  methodology itself is public-domain factual knowledge; nothing is
+  copied from the reference beyond the classical cell values, which
+  are Altshuller's published data.
 - llnl/open-ai-co-scientist (MIT) — Elo-tournament / proximity-dedup
   pattern (D8, planned; NOT jataware/open-coscientist, which is
   MIT + Commons Clause).
