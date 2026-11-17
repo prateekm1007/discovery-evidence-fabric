@@ -1,0 +1,57 @@
+{
+ "record": "R53_F65_REMEDIATION/1.0.0",
+ "session": "builder-r53s1",
+ "claim": "c-0072",
+ "finding": "F65 (MEDIUM, auditor AM48; verifier F-V2/F-V3 class): process-integrity misses in peer R50/R51 — the c-0067 lane executed without claim-before-work, session builder-r50s1 unregistered, phantom trailer-violation session refs, and the read_at-after-commit clock anomaly",
+ "remediation": {
+  "retro_registrations": [
+   {
+    "session": "builder-r50s1",
+    "covers": "the pushed R50 wave ebacc1c3a..7a7c820ff (5 commits, trailers present, work-id r50-p0-ci-p1-physics-slice)",
+    "misses_disclosed": [
+     "Art. 29(a): never registered in sessions{} before pushing",
+     "Art. 29(b): the c-0067-lane work pushed WITHOUT a registry claim (F-V3; the r50_status protocol line does not file a claim)"
+    ],
+    "identity_note": "the same id was used locally-never-pushed by this lineage's recycled r50 sandbox (claims 380b0d552 / fixes 7972ae068, stood down per pusher-wins, preserved on the local archive branch r50s1-unpushed-archive); the registration covers the PUSHED identity"
+   },
+   {
+    "session": "builder-r45s3",
+    "covers": "the V8.1.2 machine bump 1995f7e75 + row 9/30 392e71e92 (trailers present) + the two trailer-less R47 commits a57972828254/6327f461880d attributed by lineage adjacency",
+    "misses_disclosed": [
+     "Art. 29(a): never registered in sessions{} (the same class as builder-r50s1)"
+    ]
+   }
+  ],
+  "phantom_refs_corrected": [
+   {
+    "sha": "a57972828254",
+    "was": "builder-r47s1 (phantom — exists nowhere)",
+    "now": "builder-r45s3",
+    "evidence": "1995f7e75 + 392e71e92 carry Session: builder-r45s3 / Work-Id: holdout-v8-generation-v81; a57972828254 (09:29) declares 'claim c-0066 lineage', same lineage/morning; original value preserved in the registry correction note (Art. 4, no history rewrite)"
+   },
+   {
+    "sha": "6327f461880d",
+    "was": "builder-r47s2 (phantom)",
+    "now": "builder-r45s3",
+    "evidence": "same lineage adjacency (09:42, immediately following r45s3's trailed commits)"
+   }
+  ],
+  "c0069_flip": {
+   "from": "OPEN",
+   "to": "DONE",
+   "attribution": "c-0070 VERIFIER record (eval/r51_verifier_record.json, builder-r50s2) + auditor R53 verification (eval/r53_auditor_verification.json @ audit tip 520e43a54: F63 CLOSED, engine share 39.5%)",
+   "note": "the c-0068 flip precedent followed; the lane's F64 residual is remediated under c-0071 this round"
+  },
+  "claim_before_work_forward": "enforced by this session's own practice (c-0071/72/73 all filed in the claims commit ee331af20 BEFORE any build work) and structurally by the CI canonical-path checks; the push-as-mutex could not engage for this lineage's r50-round local work (push custody), which is why the misses happened — the custody situation is disclosed per round"
+ },
+ "clock_anomaly_typed_note": {
+  "finding": "F-V1/F-V10: committed read_at timestamps postdate their own commits (r50: read_at 11:35Z inside commit 7a7c820ff at 10:48:14Z; r52: 15:45Z in the 2de5c388a-lineage close) — systematic sandbox-clock skew, NOT fabricated evidence: every quoted VALUE verified TRUE by the verifier's independent authenticated check-run reads",
+  "forward_practice": "this session's records timestamp with the '(sandbox clock)' annotation on every registered_at/claimed_at/done_at field (the peer convention since R41) so clock-skewed values are never read as authoritative wall time; the anomaly stays disclosed, not 'fixed' — the committed history is evidence (Art. 4)"
+ },
+ "sweep_evidence": {
+  "method": "all Session trailers across the full post-adoption history enumerated and diffed against sessions{}",
+  "result": "exactly TWO real-but-unregistered sessions existed (builder-r45s3 x2 commits, builder-r50s1 x5 commits) + TWO phantom refs in trailer_violations (builder-r47s1/r47s2); all four remediated above; every Session trailer in history now resolves to a registered session",
+  "rerun_command": "git log --format=%(trailers:key=Session,valueonly) . | sort -u  # vs eval/work_claims.json sessions{}"
+ },
+ "art29_suite": "9/9 green post-remediation (verified pre-commit)"
+}
