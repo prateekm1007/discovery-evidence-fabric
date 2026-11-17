@@ -1,0 +1,429 @@
+{
+ "eval_version": "holdout-v8-rubric",
+ "PRIVATE": "auditor and owner only; never to builder/pipeline/judge",
+ "problems_selection_sha256": "f65b9d8bea2dd65589ff6b70d96ee318ffd59fefab96bffb344d8cf238597dd6",
+ "scoring": "per problem 0-4: question answered; key_elements; ALLOWED-MEASURES class fit; inputs restricted to permitted signals; numbers with labelled assumptions; testable falsifier; red-flag penalties. Direction CORRECTNESS is the auditor's read.",
+ "ACCEPTANCE_BAR": "mean>=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction AND 0 unavailable-input rows AND run_verdict==VALID; Art.14 RESOLVED requires 95% CI lower bound > 3.0",
+ "rubrics": [
+  {
+   "problem_id": "HO8-01-al-anodize-burning",
+   "tier": "K",
+   "key_elements": [
+    "burning from local current crowding + inadequate heat/mass transport at contact",
+    "complexant/additive chemistry or LOWER bath temperature or slower current ramp — CHEMISTRY/procedure, not a production duty cycle",
+    "falsification via burning incidence + contact resistance vs baseline"
+   ],
+   "red_flags": [
+    "current-density duty cycle cutting production without addressing crowding",
+    "changes rack or busbar design"
+   ],
+   "design_note": "MONOCULTURE_BREAK"
+  },
+  {
+   "problem_id": "HO8-02-paper-dryer-waterhammer",
+   "tier": "K",
+   "key_elements": [
+    "water hammer from condensate slug accelerated by rapid pressure change",
+    "SLOWER warm-up/blow-through ramp or pressure setpoint retuning",
+    "falsification via hammer pressure-pulse count across grade changes"
+   ],
+   "red_flags": [
+    "FASTER ramps or more aggressive blow-through (INVERTED)",
+    "redesigns dryer or piping"
+   ],
+   "design_note": "DIRECTION_TRAP"
+  },
+  {
+   "problem_id": "HO8-03-cement-kiln-ring",
+   "tier": "K",
+   "key_elements": [
+    "ring from coal-ash + liquid fluxing phase",
+    "raw-meal/coal chemistry moduli or burning-zone temperature retuning — CHEMISTRY",
+    "falsification via ring thickness/kiln torque + free-lime vs baseline"
+   ],
+   "red_flags": [
+    "kiln-speed duty cycle cutting production without addressing ash chemistry",
+    "redesigns kiln or burner"
+   ],
+   "design_note": "MONOCULTURE_BREAK"
+  },
+  {
+   "problem_id": "HO8-04-glass-crown-silica",
+   "tier": "K",
+   "key_elements": [
+    "silica drip from crown condensation at cold spots",
+    "batch/cullet chemistry or crown temperature setpoint retuning — CHEMISTRY/thermal",
+    "falsification via drip incidence + crown temperature profile vs baseline"
+   ],
+   "red_flags": [
+    "firing-rate duty cycle without addressing condensation",
+    "redesigns crown or furnace"
+   ],
+   "design_note": "MONOCULTURE_BREAK"
+  },
+  {
+   "problem_id": "HO8-05-caster-mold-breakout",
+   "tier": "K",
+   "key_elements": [
+    "sticker breakout from inadequate mold flux lubrication",
+    "mold-flux chemistry (viscosity/basicity) or casting-speed setpoint retuning — CHEMISTRY",
+    "falsification via sticker rate + oscillation-mark depth vs baseline"
+   ],
+   "red_flags": [
+    "casting-speed duty cycle cutting production instead of flux chemistry",
+    "redesigns mold or oscillation"
+   ],
+   "design_note": "MONOCULTURE_BREAK"
+  },
+  {
+   "problem_id": "HO8-06-pharma-tablet-capping",
+   "tier": "K",
+   "key_elements": [
+    "capping from elastic recovery/air entrapment on ejection",
+    "precompression force/dwell retuning or binder/lubricant formulation",
+    "falsification via capping rate + hardness/friability vs baseline"
+   ],
+   "red_flags": [
+    "redesigns tooling or press",
+    "ignores precompression/dwell"
+   ],
+   "design_note": "PRICING_NEGATIVE_CONTROL: precompression retuning ZERO throughput loss; pricing bind must NOT fire"
+  },
+  {
+   "problem_id": "HO8-07-brewery-diacetyl",
+   "tier": "K",
+   "key_elements": [
+    "diacetyl reduced by yeast re-assimilation during a WARMER rest (Arrhenius)",
+    "diacetyl-rest temperature RAISED (12->16 C) or rest-timing extended — never colder",
+    "falsification via GC diacetyl ppm vs threshold across rest profiles"
+   ],
+   "red_flags": [
+    "COLDER rest or cooling to 'preserve' (INVERTED — slows reduction)",
+    "redesigns fermenter"
+   ],
+   "design_note": "DIRECTION_TRAP"
+  },
+  {
+   "problem_id": "HO8-08-membrane-fouling",
+   "tier": "K",
+   "key_elements": [
+    "irreversible fouling from cake/gel consolidation at high flux",
+    "flux/aeration setpoint retuning or coagulant/antifoulant chemistry or backwash scheduling",
+    "falsification via flux decline rate + TMP trend vs baseline"
+   ],
+   "red_flags": [
+    "redesigns membrane or module",
+    "ignores flux/aeration"
+   ],
+   "design_note": "PRICING_POSITIVE_CONTROL: lower flux/aeration costs throughput/energy — MUST price"
+  },
+  {
+   "problem_id": "HO8-09-diesel-egr-fouling",
+   "tier": "K",
+   "key_elements": [
+    "EGR cooler soot from thermophoretic deposition at cool walls",
+    "EGR-rate/boost setpoint retuning or regeneration/load-ramp procedure or fuel additive",
+    "falsification via cooler effectiveness + intake temperature vs baseline"
+   ],
+   "red_flags": [
+    "redesigns cooler or engine",
+    "ignores deposition driver"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO8-10-cooling-tower-scale",
+   "tier": "K",
+   "key_elements": [
+    "CaCO3 scaling from supersaturation at high cycles",
+    "antiscalant/acid chemistry or cycles/blowdown setpoint retuning",
+    "falsification via condenser approach + scale coupon mass vs baseline"
+   ],
+   "red_flags": [
+    "redesigns tower or condenser",
+    "ignores cycles/supersaturation"
+   ],
+   "design_note": "PRICING_POSITIVE_CONTROL: more blowdown costs water/chemical/energy — MUST price"
+  },
+  {
+   "problem_id": "HO8-11-cereal-extruder-puff",
+   "tier": "K",
+   "key_elements": [
+    "puff expansion from moisture flash at die",
+    "formulation/moisture chemistry or barrel/die temperature setpoint retuning or screw-speed/feed procedure",
+    "falsification via expansion ratio + bulk density CV vs baseline"
+   ],
+   "red_flags": [
+    "redesigns screw or die",
+    "ignores moisture/temperature driver"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO8-12-cmp-pad-glazing",
+   "tier": "K",
+   "key_elements": [
+    "pad glazing from pore closure reducing removal rate",
+    "conditioner selection or conditioning sweep scheduling or downforce/platen-speed retuning",
+    "falsification via removal-rate decay + pad roughness vs baseline"
+   ],
+   "red_flags": [
+    "redesigns pad or platen",
+    "ignores conditioning"
+   ],
+   "design_note": "PRICING_NEGATIVE_CONTROL: conditioning sweep retuning near-ZERO loss; pricing bind must NOT fire"
+  },
+  {
+   "problem_id": "HO8-13-li-formation-sei",
+   "tier": "K",
+   "key_elements": [
+    "uneven SEI from non-uniform first-cycle current/temperature",
+    "electrolyte additive chemistry or formation temperature setpoint retuning or current-step/soak scheduling",
+    "falsification via first-cycle capacity spread + coulombic efficiency vs baseline"
+   ],
+   "red_flags": [
+    "formation current duty cycle cutting throughput instead of SEI chemistry",
+    "redesigns cell or fixture"
+   ],
+   "design_note": "MONOCULTURE_BREAK"
+  },
+  {
+   "problem_id": "HO8-14-textile-traveler-wear",
+   "tier": "K",
+   "key_elements": [
+    "traveler wear from frictional heat at high speed",
+    "traveler mass/coating selection or spindle-speed setpoint retuning or doffing/ramp procedure",
+    "falsification via traveler wear rate + yarn hairiness vs baseline"
+   ],
+   "red_flags": [
+    "redesigns ring or spindle",
+    "ignores speed/heat driver"
+   ],
+   "design_note": null
+  },
+  {
+   "problem_id": "HO8-15-boiler-lowNOx-co",
+   "tier": "K",
+   "key_elements": [
+    "CO spike from incomplete combustion during staging transients at low O2",
+    "fuel/air staging or O2/CO trim retuning (MORE air during ramp) or load-ramp procedure",
+    "falsification via CO ppm during ramps + NOx vs baseline"
+   ],
+   "red_flags": [
+    "LESS air or deeper staging during ramps (INVERTED — raises CO)",
+    "redesigns burner or furnace"
+   ],
+   "design_note": "DIRECTION_TRAP"
+  },
+  {
+   "problem_id": "HO8-16-transformer-hotspot",
+   "tier": "K",
+   "key_elements": [
+    "Arrhenius-weighted load/ambient hot-spot proxy from top-oil temp + load current",
+    "relative-to-baseline threshold + persistence",
+    "validation against top-oil trip/ageing records"
+   ],
+   "red_flags": [
+    "requires DGA or oil lab assay (NOT permitted)",
+    "fixed absolute temperature threshold"
+   ],
+   "design_note": "INPUT_TRAP: oil chemistry NOT permitted"
+  },
+  {
+   "problem_id": "HO8-17-pump-seal-fail",
+   "tier": "K",
+   "key_elements": [
+    "seal-face friction proxy from motor current + casing vibration + product temp",
+    "relative-to-baseline threshold + persistence",
+    "validation against seal-leak/change-out records"
+   ],
+   "red_flags": [
+    "requires seal-flush pressure tap (NOT permitted)",
+    "ignores temperature normalisation"
+   ],
+   "design_note": "INPUT_TRAP: flush pressure NOT permitted"
+  },
+  {
+   "problem_id": "HO8-18-bearing-spall",
+   "tier": "K",
+   "key_elements": [
+    "vibration-envelope/current sideband spall proxy from housing vibration + motor current",
+    "relative-to-baseline threshold + persistence",
+    "validation against bearing change-out/spall records"
+   ],
+   "red_flags": [
+    "requires oil debris sensor (NOT permitted)",
+    "fixed absolute vibration threshold"
+   ],
+   "design_note": "INPUT_TRAP: oil debris NOT permitted"
+  },
+  {
+   "problem_id": "HO8-19-hx-tube-leak",
+   "tier": "K",
+   "key_elements": [
+    "thermal-resistance/effectiveness deviation from water temps + flow + pressure",
+    "relative-to-baseline threshold + persistence",
+    "validation against tube-leak/conductivity-trip records"
+   ],
+   "red_flags": [
+    "requires process-side conductivity probe (NOT permitted)",
+    "ignores flow normalisation"
+   ],
+   "design_note": "INPUT_TRAP: process conductivity NOT permitted"
+  },
+  {
+   "problem_id": "HO8-20-compressor-valve",
+   "tier": "K",
+   "key_elements": [
+    "interstage pressure/discharge-temp deviation proxy for valve efficiency",
+    "relative-to-baseline threshold + persistence",
+    "validation against valve change-out/efficiency-trip records"
+   ],
+   "red_flags": [
+    "requires valve accelerometer (NOT permitted)",
+    "fixed absolute threshold"
+   ],
+   "design_note": "INPUT_TRAP: valve accelerometer NOT permitted"
+  },
+  {
+   "problem_id": "HO8-21-motor-insulation",
+   "tier": "K",
+   "key_elements": [
+    "Arrhenius-weighted thermal-ageing proxy from stator current + winding RTD + run-hours",
+    "relative-to-baseline threshold + persistence",
+    "validation against insulation-resistance/megger records"
+   ],
+   "red_flags": [
+    "requires partial-discharge or megger test (NOT permitted)",
+    "ignores thermal ageing weighting"
+   ],
+   "design_note": "INPUT_TRAP: PD/megger NOT permitted"
+  },
+  {
+   "problem_id": "HO8-22-gear-pitting",
+   "tier": "K",
+   "key_elements": [
+    "vibration/oil-temp pitting proxy from housing vibration + sump temp + shaft speed",
+    "relative-to-baseline threshold + persistence",
+    "validation against gear inspection/pitting records"
+   ],
+   "red_flags": [
+    "requires oil particle counter (NOT permitted)",
+    "fixed absolute threshold"
+   ],
+   "design_note": "INPUT_TRAP: oil particle counter NOT permitted"
+  },
+  {
+   "problem_id": "HO8-23-boiler-tube-creep",
+   "tier": "K",
+   "key_elements": [
+    "Larson-Miller creep-damage proxy from steam temp + pressure + attemperator spray",
+    "relative-to-baseline threshold + persistence",
+    "validation against tube-creep/rupture records"
+   ],
+   "red_flags": [
+    "requires tube-wall thickness or oxide-scale measurement (NOT permitted)",
+    "ignores attemperator spray normalisation"
+   ],
+   "design_note": "INPUT_TRAP: wall thickness/oxide NOT permitted"
+  },
+  {
+   "problem_id": "HO8-24-fan-imbalance",
+   "tier": "K",
+   "key_elements": [
+    "1x vibration/current imbalance proxy from bearing vibration + motor current + speed",
+    "relative-to-baseline threshold + persistence",
+    "validation against balance/dust-cleaning records"
+   ],
+   "red_flags": [
+    "requires proximity probe (NOT permitted)",
+    "fixed absolute vibration threshold"
+   ],
+   "design_note": "INPUT_TRAP: proximity probe NOT permitted"
+  },
+  {
+   "problem_id": "HO8-25-baghous-breakthrough",
+   "tier": "K",
+   "key_elements": [
+    "compartment dP/flow deviation + pulse-cycle proxy for bag integrity",
+    "relative-to-baseline threshold + persistence",
+    "validation against bag change-out/opacity-trip records"
+   ],
+   "red_flags": [
+    "requires triboelectric dust sensor (NOT permitted)",
+    "fixed absolute dP threshold"
+   ],
+   "design_note": "INPUT_TRAP: triboelectric sensor NOT permitted"
+  },
+  {
+   "problem_id": "HO8-26-conveyor-roller",
+   "tier": "K",
+   "key_elements": [
+    "load-cycle-weighted drive-current/belt-scale roller-drag proxy",
+    "relative-to-baseline threshold + persistence",
+    "validation against roller change-out/seizure records"
+   ],
+   "red_flags": [
+    "requires roller temperature scanner (NOT permitted)",
+    "ignores load-cycle weighting"
+   ],
+   "design_note": "INPUT_TRAP: roller temp scanner NOT permitted"
+  },
+  {
+   "problem_id": "HO8-27-reactor-agitator-seal",
+   "tier": "K",
+   "key_elements": [
+    "agitator current/temperature seal-friction proxy from motor current + vessel temp + speed",
+    "relative-to-baseline threshold + persistence",
+    "validation against seal change-out/leak records"
+   ],
+   "red_flags": [
+    "requires barrier-fluid pressure tap (NOT permitted)",
+    "ignores temperature normalisation"
+   ],
+   "design_note": "INPUT_TRAP: barrier pressure NOT permitted"
+  },
+  {
+   "problem_id": "HO8-28-crusher-liner-wear",
+   "tier": "K",
+   "key_elements": [
+    "power/speed/feed-rate liner-wear proxy (specific energy trend)",
+    "relative-to-baseline threshold + persistence",
+    "validation against liner change-out/profile records"
+   ],
+   "red_flags": [
+    "requires liner profile scan (NOT permitted)",
+    "fixed absolute power threshold"
+   ],
+   "design_note": "INPUT_TRAP: liner scan NOT permitted"
+  },
+  {
+   "problem_id": "HO8-29-evaporator-scaling",
+   "tier": "K",
+   "key_elements": [
+    "per-effect thermal-resistance/U degradation from steam pressure + liquor temp + vapor flow",
+    "relative-to-baseline threshold + persistence",
+    "validation against clean/capacity-trip records"
+   ],
+   "red_flags": [
+    "requires liquor density/concentration lab assay (NOT permitted)",
+    "ignores flow/temperature normalisation"
+   ],
+   "design_note": "INPUT_TRAP: liquor lab assay NOT permitted"
+  },
+  {
+   "problem_id": "HO8-30-chiller-refrigerant-leak",
+   "tier": "K",
+   "key_elements": [
+    "capacity/COP deviation from chilled-water temps + compressor current + ambient (charge proxy)",
+    "relative-to-baseline threshold + persistence",
+    "validation against recharge/low-pressure-trip records"
+   ],
+   "red_flags": [
+    "requires refrigerant pressure or leak detector (NOT permitted)",
+    "ignores ambient/load normalisation"
+   ],
+   "design_note": "INPUT_TRAP: refrigerant pressure/leak detector NOT permitted"
+  }
+ ]
+}
