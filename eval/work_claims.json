@@ -62,6 +62,11 @@
    "registered_at": "2026-11-17T10:05:00Z (sandbox clock)",
    "role": "builder",
    "note": "R42 lane: F56 CI wiring (c-0056) + the holdout-v7 one-shot generation (c-0057, the auditor's AM39 D2; claim registered BEFORE any v7 problem read; the PRIVATE rubric is never opened by this session). Identity at first push per Art. 29(a)."
+  },
+  "builder-r42s1": {
+   "registered_at": "2026-11-17T00:15:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R42 lane, VERIFIER role this round (Art. 29(b): the peer builder-r20s4 pushed the c-0056/c-0057 claims first — pusher-wins, this session stood down to verifier). Lineage: this sandbox was previously keyed builder-r35s1/builder-r39s1 (F49-precedent re-key; sandbox recycled between rounds — worktree and credential custody restored, disclosed in eval/r42_verifier_c0056.json)."
   }
  },
  "claims": [
@@ -1145,7 +1150,7 @@
    "claim_id": "c-0056",
    "work_id": "f56-wire-guards-into-ci",
    "title": "F56 fix: wire tests/test_remote_ci_rule.py + tests/test_v77_bind_controls.py into the queue zero-LLM CI block and cite them WIRED in the enforcement map; refusal path proven in-suite",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-17T10:05:00Z (sandbox clock)",
    "session_id": "builder-r20s4",
    "role": "EXECUTOR",
@@ -1160,7 +1165,8 @@
     "eval/work_claims.json",
     "LOG.md"
    ],
-   "scope": "AM39 F56 (the 7th exists-but-does-not-gate instance): both R41 guard suites join the zero-LLM pytest block of .github/workflows/r11_queue_surface.yml and are cited WIRED in eval/enforcement_flags.json (Art. 18 / Art. 6); test_guard_activation gains its map citation (same class, already CI-gated by c-0053); the Art. 27 map text is corrected from stale PARTIAL to WIRED (the standalone test has gated since c-0050). Refusal path: _validate_remote_ci is the single validator; four negative tests prove deliberately broken records (no block / fake conclusion / unquoted success / partial success) RED the suite. Acceptance per AM39: both files in workflow + map; test_article_map_completeness green; pushed surface=SUCCESS API-read with check_runs quoted."
+   "scope": "AM39 F56 (the 7th exists-but-does-not-gate instance): both R41 guard suites join the zero-LLM pytest block of .github/workflows/r11_queue_surface.yml and are cited WIRED in eval/enforcement_flags.json (Art. 18 / Art. 6); test_guard_activation gains its map citation (same class, already CI-gated by c-0053); the Art. 27 map text is corrected from stale PARTIAL to WIRED (the standalone test has gated since c-0050). Refusal path: _validate_remote_ci is the single validator; four negative tests prove deliberately broken records (no block / fake conclusion / unquoted success / partial success) RED the suite. Acceptance per AM39: both files in workflow + map; test_article_map_completeness green; pushed surface=SUCCESS API-read with check_runs quoted.",
+   "verifier": "eval/r42_verifier_c0056.json — VERIFIED (c-0058, builder-r42s1): both suites wired + cited at 069a16430 (rendered step executed locally: 64 tests, exit 0; map-completeness 4/4; refusal path 4 negative controls in-suite; determinism pin stressed 5/5 random seeds; pushed CI API-read: fd28fecb6=FAILURE preserved, 069a16430=SUCCESS; secret-grep 0; v6 byte-frozen). The initial wiring commit fd28fecb6 was RED (comment-inside-continuation truncated the pytest list, exit 126; the suites never ran remotely there — the 8th exists-but-does-not-gate instance, inside the F56 fix) — executor-disclosed, fixed forward-only, the honest FAILURE kept as fact."
   },
   {
    "claim_id": "c-0057",
@@ -1184,6 +1190,22 @@
    ],
    "pre_registration_note": "Art. 29(b) + the v7 PREREGISTRATION one_shot_protocol step 1: this claim is committed and pushed BEFORE any v7 problem is read. The problems come ONLY from audit/holdout_v7/holdout_v7_problems.json (seal c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b); the PRIVATE rubric is never read by this session; ONE generation, frozen V7.7 (V77_REQUEST_MODEL=glm-4-plus), zero re-generation; the attestation gate runs PRE-SCORING.",
    "scope": "Per audit/holdout_v7/PREREGISTRATION.json (SEALED_REGISTERED, AM39 D2): generate bills for the 12 sealed problems (6 intervention + 6 predictor) with the frozen V7.7 machine; commit 12 pair rows + the gateway-log slice (requested+served per call over the run window) + the durable all-row events ledger + the run ledger (run_verdict, seal_anchor, serving_evidence_full); attestation gate PRE-SCORING: 12/12 served_model == registered glm-4-plus, seal recompute EXACT, ONE executor id, green pushed CI read from the check-run API. BURN is the post-scoring act (prereg step 5 follows step 4 scoring) — not this session's."
+  },
+  {
+   "claim_id": "c-0058",
+   "work_id": "f56-wire-guards-into-ci",
+   "session_id": "builder-r42s1",
+   "role": "VERIFIER",
+   "kind": "task",
+   "base_sha": "069a16430",
+   "claimed_at": "2026-11-17T00:15:00Z (sandbox clock)",
+   "lease_expiry": "2026-11-17T06:15:00Z",
+   "status": "DONE",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r42_verifier_c0056.json"
+   ],
+   "notes": "VERIFIER for c-0056 (EXECUTOR builder-r20s4). Zero-LLM recompute from committed bytes only (Art. 13/29(c)): full queue surface re-executed locally at the verified tips; the rendered constitution step extracted from the committed YAML and run as bash (64 tests, exit 0); the pushed CI read from the check-run API (fd28fecb6=FAILURE preserved; 069a16430=SUCCESS); refusal-path negative controls re-run; determinism stress 5/5 random hash seeds; map citations checked; c-0055 flip + citation verified on the audit branch @1dad86c14; secret-grep 0 on both diff segments; v6 byte-frozen. One DEFECT found at the wiring commit (the comment-in-continuation break), typed in the record — executor-disclosed and fixed forward-only before this verification."
   }
  ],
  "trailer_violations": [

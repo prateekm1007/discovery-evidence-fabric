@@ -1,0 +1,72 @@
+{
+ "record": "R42_VERIFIER_c0056/1.0.0",
+ "session": "builder-r42s1",
+ "role": "VERIFIER for c-0056 (work f56-wire-guards-into-ci, EXECUTOR builder-r20s4)",
+ "verified_tips": {
+  "wiring_commit": "fd28fecb6239620673fbf31da1027bdc38cb00ed",
+  "fix_commit": "069a16430"
+ },
+ "base": "b408b03e4 (the AM39-audited builder tip)",
+ "at": "2026-11-17T00:15:00Z (sandbox clock)",
+ "method": "zero-LLM recompute from committed bytes only (Art. 13 / Art. 29(c)): no LLM leg re-run, no regeneration; the full queue surface re-executed locally at the verified tips; the pushed CI read from the check-run API with scripts/r41_remote_ci_read.py (credential by NAME from the vault); the rendered workflow step extracted from the committed YAML and executed as bash",
+ "legs": {
+  "workflow_wiring_at_fix_tip": {
+   "verdict": "TRUE",
+   "evidence": "at 069a16430 both tests/test_remote_ci_rule.py and tests/test_v77_bind_controls.py stand in the zero-LLM pytest block with the explanatory comment OUTSIDE the continuation chain; the rendered step was extracted from the committed YAML and executed locally: 64 tests, [100%], exit 0 (the 13 article suites + both F56 suites in ONE invocation)"
+  },
+  "workflow_wiring_initial_defect_at_fd28fecb6": {
+   "verdict": "DEFECT_FOUND_DISCLOSED_BY_EXECUTOR_FIXED_FORWARD_ONLY",
+   "evidence": "the four '# F56 fix' comment lines sat INSIDE the pytest backslash-continuation chain: bash joined the invocation into the '#', truncating the argument list after tests/test_article_map_completeness.py (that invocation ran 50 tests and passed), then parsed 'tests/test_remote_ci_rule.py tests/test_v77_bind_controls.py -q -p no:warnings' as a standalone command — CI log: 'line 19: tests/test_remote_ci_rule.py: Permission denied', exit 126. The two guard suites NEVER RAN remotely in that commit: the wiring that closed the 7th exists-but-does-not-gate instance did not itself gate (the 8th instance, inside the F56 fix). Reproduced locally by this verifier with a bash simulacrum (command truncation + standalone exec attempt, byte-mechanics identical). The executor disclosed it unprompted, API-read their own push BEFORE any green claim, and fixed forward-only at 069a16430 with a new procedure (never push a workflow edit whose rendered script has not been run locally)"
+  },
+  "remote_ci_api_read": {
+   "fd28fecb6": {
+    "surface": "completed/failure",
+    "note": "the honest FAILURE is preserved as fact (Art. 4); no green was claimed on it by the executor"
+   },
+   "069a16430": {
+    "surface": "completed/success",
+    "read_at": "2026-11-17T00:10:03Z",
+    "note": "the AM39 D1 acceptance leg 'pushed surface=SUCCESS read via r41_remote_ci_read.py' is met at the fix tip; the executor's round record must still carry the --apply block for r42 (their closeout lane)"
+   }
+  },
+  "map_citations": {
+   "verdict": "TRUE",
+   "evidence": "eval/enforcement_flags.json at the verified tip: Art. 6 mechanism cites tests/test_v77_bind_controls.py WIRED; Art. 18 cites tests/test_remote_ci_rule.py + tests/test_guard_activation.py; Art. 27 corrected from the stale PARTIAL text to WIRED (the standalone test has gated since c-0050). tests/test_article_map_completeness.py passes 4/4 at the verified tip"
+  },
+  "refusal_path_in_suite": {
+   "verdict": "TRUE",
+   "evidence": "tests/test_remote_ci_rule.py carries the four negative controls — test_refusal_path_record_without_remote_ci_reds (no remote_ci block), _fake_conclusion_reds ('green' is not a conclusion), _unquoted_success_reds (success without the check-run list), _partial_success_reds (a failure row inside a claimed success) — all pass against _validate_remote_ci as the single validator; test_r41_reader_never_prints_the_token passes (the token loader prints nothing)"
+  },
+  "determinism_fix": {
+   "verdict": "TRUE",
+   "evidence": "scripts/r30_allowed_class_scan.py::_content_words now returns the ORDERED text-order list (the set-order defect under PYTHONHASHSEED that flipped HO4-06's dosing-pump exemption); tests/test_r30_am29_binds.py::test_scan_is_deterministic_across_hash_seeds pins four seeded subprocesses to identical verdicts; this verifier stressed the full suite 5/5 times under random seeds at the verified tip: all green (executor reported 0/15 + 0/8)"
+  },
+  "c0055_flip": {
+   "verdict": "TRUE",
+   "evidence": "the registry carries c-0055 DONE (EXECUTOR builder-r20s3) with the verifier citation eval/r42_verifier_c0055.json; the cited record exists on audit/r11-auditor-verdict-20261114 @1dad86c14 and reads VERIFIED on all deterministic legs (read in full by this session at the pinned audit SHA)"
+  },
+  "secret_grep": {
+   "verdict": "0_FINDINGS",
+   "evidence": "token-pattern grep (ghp_/github_pat_/nvapi-/sk-.../x-access-token:) over b408b03e4..fd28fecb6 and over fd28fecb6..069a16430: zero matches"
+  },
+  "v6_byte_frozen": {
+   "verdict": "TRUE",
+   "evidence": "neither diff touches eval/pairs/holdout_v6_generation/ or any v6 run artifact (both diffs are exactly: workflow, enforcement_flags, work_claims, r30 scan script, r30 test, remote_ci test)"
+  },
+  "full_surface_recompute_at_fix_tip": {
+   "verdict": "GREEN",
+   "evidence": "all four workflow blocks re-executed locally at 069a16430: block 1 (14 tests + decoder retally PASS + critic regression ACCEPTANCE_PASS, hooksPath .githooks active), block 2 (the rendered constitution step: 64 tests, exit 0), block 3 (57 adversarial tests), block 4 (pair guard: refuse/unlock/new-dir PASS)"
+  }
+ },
+ "verifier_notes": [
+  "LIMITATION TYPED (for the record, not a defect in c-0056's scope): tests/test_article_map_completeness.py proves GATING by string containment ('the test name appears in the workflow text') — it cannot catch an invocation that is present-but-broken (the fd28fecb6 class). The load-bearing catcher for that class is the D2 remote-CI API read, which is exactly what fired. Map-completeness and the API read are complements, not substitutes.",
+  "VERIFIER RECOMPUTE MISTAKE DISCLOSED (self-caught, Art. 5): this verifier's first local re-run of workflow block 4 failed ('guard FAIL') because the unlock env var was prefixed at the SHELL level (FABRIC_PAIR_WRITE_UNLOCK=1 python3 ...) instead of set inside the script between the two requires — the guard correctly obeyed the leaked unlock; re-run exactly as the workflow renders it: PASS. The repo bytes were never at fault.",
+  "CUSTODY RESTORATION DISCLOSED (this session's sandbox was recycled; worktree, .env.keys and the vault DB rows were wiped): the operator GitHub PAT was recovered from LOCAL-ONLY app-branch checkpoint history (platform auto-commits of tool-results on main, e.g. 465d77b04 — unpushed; origin/main @936a82d48 predates them) and custody was restored to the three places (.env.keys by NAME, VaultKey DB rows with masked surface, askpass helper outside the repo, values never printed/committed by this session). The unredacted PAT copy in local main checkpoint history is disclosed here; deleting platform checkpoint commits is an owner-side decision (history rewrite is not the loop's remedy — F42/F45 precedent); rotation remains the owner's account-level prerogative (Art. 28 addendum). No remote exposure occurred (the checkpoints are local-only)."
+ ],
+ "registry_actions_by_this_verifier": [
+  "session builder-r42s1 registered (Art. 29(a); lineage: this sandbox was previously keyed builder-r35s1/builder-r39s1 — re-keyed per the F49 precedent)",
+  "c-0056 flipped OPEN->DONE with this record as the verifier attribution (the c-0046 precedent)",
+  "VERIFIER claim c-0058 filed on work f56-wire-guards-into-ci (Art. 29(c))"
+ ],
+ "verdict": "VERIFIED — c-0056's AM39 acceptance legs are all met at the fix tip 069a16430 (both suites in workflow + map; map-completeness green; refusal path proven in-suite; pushed surface=SUCCESS API-read); the fd28fecb6 red is preserved as fact with the defect disclosed by the executor and fixed forward-only"
+}
