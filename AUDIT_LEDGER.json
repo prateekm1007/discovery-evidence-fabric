@@ -1023,7 +1023,8 @@
    "articles": [
     12,
     17
-   ]
+   ],
+   "precision_note": "HF_SPACE_SECRETS*.json / SECRETS_R491.json in queue tree are REGISTRIES (boolean probe: no raw hf_/sk_/ghp_ tokens) — NOT raw exposures; values sealed server-side. Confirmed raw exposure remains the PAT on r448/visual-lab. .secrets.baseline.json (detect-secrets) + tests/test_secret_scanning.py exist; all-refs gitleaks enumeration still required (Phase 0)."
   },
   {
    "id": "F46",
@@ -1284,7 +1285,7 @@
    "title": "PRIVATE rubric is PUBLICLY readable — custody is a convention, not access control. The audit branch lives in the PUBLIC repo prateekm1007/discovery-evidence-fabric (F45 visibility=public). Auditor UNAUTHENTICATED raw read of audit/holdout_v7/holdout_v7_rubric_PRIVATE.json returned HTTP 200 (8385 bytes); v8 rubric/problems on the same public branch. The selection_sha256 seal protects problem INTEGRITY, not rubric CONFIDENTIALITY. The builder LLM or training data could read the scoring key (cheating/contamination vector). Builder sessions honored 'never read rubric' (c-0060 verifier: rubric_path NEVER_READ) so no actual cheating occurred, but the vector is open. REMEDY (OWNER-side): move rubric to PRIVATE custody (private repo/gist) or encrypt at rest; canary+probe (D7) mitigates contamination not the cheating vector. NOTE: external researcher labeled this 'F57' — corrected to F60 (Art.8 stable IDs; F57=scan precision).",
    "status": "OPEN-OWNER-URGENT",
    "opened": "2026-11-17",
-   "last_checked": "88e693581",
+   "last_checked": "a57972828",
    "rounds_open": 1,
    "evidence": [
     {
@@ -1296,7 +1297,8 @@
    "articles": [
     7,
     12
-   ]
+   ],
+   "note_v8": "v8 rubric CONFIRMED public (unauth API HTTP 200, 15309 bytes). Builder gate eval/v8_execution_gate.json BLOCKED v8 scoring/rows10-30 pending OWNER custody. v8 is DEV-only (confidentiality compromised); acceptance requires a NEW confidential set after custody fix."
   },
   {
    "id": "F61",
@@ -1322,6 +1324,19 @@
     1,
     5,
     27
+   ]
+  },
+  {
+   "id": "F62",
+   "severity": "MEDIUM",
+   "title": "v8 one-shot is INVALID as an acceptance set: (a) rubric public at generation time (F60); (b) machine bumped V8.1.1->V8.1.2 mid-run (commit 1995f7e75) violating the frozen-machine invariant; (c) incomplete 23/30 rows (executor builder-r44s1). Builder correctly gated scoring (eval/v8_execution_gate.json). v8 rows are DEV-ablation material only. A fresh confidential set (v9) under a frozen engine-route machine is required for acceptance.",
+   "status": "OPEN",
+   "opened": "2026-11-17",
+   "last_checked": "a57972828",
+   "rounds_open": 1,
+   "articles": [
+    7,
+    22
    ]
   }
  ],
@@ -2151,6 +2166,18 @@
     "TRIZ^a typed transformation contracts converge with our mechanism_space operators (idea already written, unmeasured; no matched-budget ablation; code upon publication). QDAIF caution: diversity axes must be COMPUTED deterministically, not LLM-judged (validates F58).",
     "Adoption directions reconciled (researcher 5 + auditor levers): D1 measured-path decision; D2 typed-operator population generation (triz-engine matrix + mechanism_space); D3 cheap novelty gate (TF-IDF first, ShinkaEvolve pattern); D4 executable falsifiers/computed physics; D5 GEPA DEV-only; D6 conformal+rubric+canary; D7 all-refs secret scan + rubric custody; D8 standard infra. Gitee coverage PARTIAL (search-indexed; researcher sandbox blocked gitee.com — owner allowlist for full coverage)."
    ]
+  },
+  {
+   "id": "AM45",
+   "date": "2026-11-17",
+   "status": "ISSUED",
+   "reason": "R48 — owner phased roadmap ADOPTED as governing plan + auditor self-corrections (Art.9) + builder R47 verified",
+   "changes": [
+    "Owner roadmap Phases 0-5 (scores 4-9) adopted: audit/ROADMAP_PHASES_R48_2026-11-17.md. Rules: no rented compute, no new guard/claim kinds, >=30% engine lines/round. Ceiling ~7 without expert/real-world access.",
+    "SELF-CORRECTIONS (Art.9): v8 'sealed/ready' WITHDRAWN — v8 confidentiality-compromised (F60), DEV-only. PaperBench copy source = openai/preparedness (MIT, verified /license); EnvCommons/PaperBench has NO license (404). dspy=MIT (not Apache-2.0, verified). telemanom=NOASSERTION (not clean Apache; researcher reads BSD-3). '4x medals' = AIDE README claim (unverified). Sequencing: computed physics (P1) BEFORE population search (P2/P3) — searching a noisy scan metric searches noise. Gateway proxy swap INAPPLICABLE (generation via z-ai CLI subprocess, verified). Scope: focus P0-P2 capability; defer rubric-calibration/canary/gateway governance.",
+    "Builder R47 VERIFIED: D1 measured-path decision ROUTE through mechanism_space (eval/measured_path_decision_r47.json; engine smoke 6/6 operators; honest weak-probe caveat). F60 gate BLOCKED v8 scoring. License corrections applied to NOTICE.md. F62 opened (v8 invalid-as-acceptance). CI RED at a57972828 — builder must fix forward (D2).",
+    "Phase 0 status: measured-path recorded DONE; custody (rubric+token off public refs) OWNER-PENDING; all-refs scan CODER-PENDING."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -2972,6 +2999,17 @@
     "F61"
    ],
    "evidence_sha": "eval/r47_external_report_verification.json"
+  },
+  {
+   "id": "V43",
+   "round": "R48 roadmap adoption + self-corrections + R47 verification",
+   "commit": "a57972828",
+   "gate": "NOT_MET (no holdout accepted; v8 DEV-only)",
+   "capability_change": "NONE measured; measured-path DECIDED (engine route); roadmap adopted",
+   "new_findings": [
+    "F62"
+   ],
+   "evidence_sha": "eval/r48_roadmap_audit.json"
   }
  ],
  "gold_set": {
@@ -3177,7 +3215,7 @@
    ]
   }
  },
- "progress_note": "55-62% capability-weighted (gate NOT_MET; v7 72.9% — but F61: that score measures the 559-line wrapper, NOT the 3716-line typed-operator engine). F60: PRIVATE rubric publicly readable (owner custody). External report verified: ShinkaEvolve/triz-engine/GEPA/MOOSE-Chem copy-safe; AI-Scientist-v2/open-coscientist(jataware) do-not-copy; llnl co-scientist MIT alternative. Top decision: measured-path (route through mechanism_space or archive engine). v8 sealed (n=30); ablations DEV-only on burned sets.",
+ "progress_note": "Score 4 (owner scale): strong eval discipline, no holdout accepted. Measured-path DECIDED (ROUTE through mechanism_space engine; smoke 6/6 operators) but not yet integrated. v8 DEV-only (F60 exposed + F62 machine-bump/incomplete). Phase 0: measured-path recorded DONE; custody OWNER-PENDING (rubric+PAT off public refs); all-refs scan CODER-PENDING. Next: P1 computed physics + structured output + engine route. Ceiling ~7 without expert/real-world access.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
