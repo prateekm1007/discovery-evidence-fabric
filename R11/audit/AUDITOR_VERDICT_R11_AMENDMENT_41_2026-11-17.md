@@ -1,0 +1,12 @@
+# AUDITOR VERDICT — R11 AMENDMENT 41 (2026-11-17) — R44
+Session: auditor-r44s1 · Builder SHA 88e693581 · Audit base 1dad86c14
+## VERDICT
+Gate NOT_MET (v7 acceptance 2.917/4 stands, NOT_GRANTED). c-0060 (V8 generation binds) VERIFIED. Capability delta UNMEASURED (v8 one-shot pending). **CRITICAL SECURITY CORRECTION (Art.9): the live operator PAT IS remotely exposed.**
+## CORRECTION + CRITICAL FINDING (F45 escalated)
+R42's 'no remote exposure' was scoped to the R42 diff/queue tree/main and missed side-branch history. AUDITOR BYTE-VERIFIED: the LIVE PAT (ghp_agX…ZarT, masked) is present in origin-reachable **r448/visual-lab: scripts/r447_hf_deploy.py + scripts/r447_canonical_space_record.py** (public repo). The builder's named files (r446_round_record.py, R451/CREDENTIAL_SCAN_*) and the peer's 'main/audit reachable' claim are IMPRECISE — those do NOT carry the live PAT (F59). **Rotation is OWNER-SIDE and URGENT**; history rewrite is NOT the remedy (F42). Disclosed once; not re-asked.
+## VERIFIED / CREDITED (c-0060)
+F58 CLOSED by source: counted_class returns declared-or-INFERRED class; the cap binds on it (omitted declaration no longer escapes). Pricing phrase-only escape closed (number must sit on the cost line; explicit zero needs off-production reason). Structured extraction (SIGNALS USED/INPUT INVENTORY + closure) replaces free-prose regex (retired, Art.16 ledger); P/R 1.0 on labelled corpus (peer zero-LLM recompute + remote CI). 23 tests wired + cited WIRED. CI 29dc8af66 FAILURE (record-before-remote_ci + missing deletions key, D2 gate self-caught) -> f70b95160/a792a6a97/88e693581 SUCCESS API-read. Registry c-0060 EXECUTOR + c-0061 VERIFIER DONE; race disclosed (pusher-wins).
+## DIRECTIONS
+D1 (auditor): author+seal v8, n~30, power basis, domain-disjoint. D2 (builder): v8 one-shot under claim-before-read, frozen V8.0, green API-read CI, 30/30 served==registered, seal EXACT. D3: auditor scores v8 (mean>=3.0, 0/0/0, n met, CI excludes 3.0). D4 (OWNER, URGENT): rotate the exposed live PAT + the 2 Aug-18 keys. Delete: nothing new; free-prose scans already retired.
+## STANDING
+Both constitutions FULL-read. v1-v7 burned. F54 frontier measured at v8. Loop-owned (Art.28).
