@@ -68,7 +68,7 @@ V81_CANDIDATE_DIRECTIVE = (
     "physics layer can verify your magnitude from your own inputs.")
 
 MACHINE_DESCRIPTOR = {
-    "machine": "V8.1.1",
+    "machine": "V8.1.2",
     "base": "V8.0 (r43_machine_v8, frozen) + AM42 D1 computed-physics "
             "layer (scripts/v81_physics.py) + D2 population search "
             "with TRIZ seeding (scripts/triz_principles.py)",
@@ -82,6 +82,15 @@ MACHINE_DESCRIPTOR = {
                  "first row (HO8-01) — that run was stopped and its "
                  "single row VOIDED-BUILD-DEFECT "
                  "(eval/v81_run_voided_v81_defect/)",
+    "v81_2_fix": "D1 computed-physics degenerate-input hardening: all "
+                 "five relations return typed out_of_domain notes "
+                 "instead of raising, and the Arrhenius exponent is "
+                 "saturated beyond the double range — the V8.1.1 "
+                 "unclamped math.exp crashed the transport "
+                 "(OverflowError: math range error) on the first "
+                 "resume attempt when a row text carried a near-zero "
+                 "absolute temperature; in the sane regime the values "
+                 "are bit-identical (rows 1-8 unaffected)",
 }
 
 

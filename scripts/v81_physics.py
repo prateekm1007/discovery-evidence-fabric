@@ -44,15 +44,34 @@ except Exception:
 def arrhenius_ratio(ea_j_mol: float, t1_k: float, t2_k: float) -> dict:
     """Acceleration factor k(T2)/k(T1) = exp(-Ea/R (1/T2 - 1/T1)).
     THE scorch/thermal-aging relation (Arrhenius)."""
+    # V8.1.2 fix: degenerate inputs return a typed out-of-domain note
+    # instead of raising (the V8.1.1 unclamped math.exp crashed the
+    # transport with OverflowError on a row text carrying a near-zero
+    # absolute temperature; caught on the first V8.1.1 resume attempt,
+    # transport outer-attempt 1/12)
     if t1_k <= 0 or t2_k <= 0:
-        raise ValueError("temperatures must be kelvin")
-    ratio = math.exp(-ea_j_mol / R_GAS * (1.0 / t2_k - 1.0 / t1_k))
-    return {"relation": "arrhenius_acceleration_factor",
+        return {"relation": "arrhenius_acceleration_factor",
+                "typed": "out_of_domain: temperatures must be kelvin "
+                         f"(got T1={t1_k}, T2={t2_k})",
+                "inputs": {"Ea": ea_j_mol, "T1": t1_k, "T2": t2_k},
+                "source": "pure-python (closed form)"}
+    x = -ea_j_mol / R_GAS * (1.0 / t2_k - 1.0 / t1_k)
+    if x > 709.0:          # math.exp overflows near 709.78
+        ratio, saturated = 1e308, True
+    elif x < -745.0:       # deep underflow; exp would give 0.0
+        ratio, saturated = 0.0, True
+    else:
+        ratio, saturated = math.exp(x), False
+    out = {"relation": "arrhenius_acceleration_factor",
             "formula": "k2/k1 = exp[-Ea/R * (1/T2 - 1/T1)]",
             "inputs": {"Ea": ea_j_mol, "T1": t1_k, "T2": t2_k},
             "units": {"Ea": "J/mol", "T1": "K", "T2": "K",
                       "value": "dimensionless"},
             "value": ratio, "source": "pure-python (closed form)"}
+    if saturated:
+        out["saturated"] = ("exponent beyond double range; value "
+                            "clamped (V8.1.2 transport-crash fix)")
+    return out
 
 
 def npsh_available(p_atm_pa: float, p_vap_pa: float, rho: float,
@@ -61,7 +80,10 @@ def npsh_available(p_atm_pa: float, p_vap_pa: float, rho: float,
     THE cavitation margin relation (fluids-library cross-check when
     present)."""
     if rho <= 0:
-        raise ValueError("rho must be positive")
+        return {"relation": "npsh_available",
+                "typed": f"out_of_domain: rho must be positive "
+                         f"(got {rho})",
+                "source": "pure-python (closed form)"}
     head = ((p_atm_pa - p_vap_pa) / (rho * G)) + z_static_m - h_loss_m
     src = "pure-python (closed form)"
     if _LIBS["fluids"]:
@@ -108,7 +130,10 @@ def carnot_cop(t_cold_k: float, t_hot_k: float) -> dict:
     respect; also the primary direction check for refrigeration
     mechanisms."""
     if t_hot_k <= t_cold_k:
-        raise ValueError("T_hot must exceed T_cold")
+        return {"relation": "carnot_cop_ceiling",
+                "typed": "out_of_domain: T_hot must exceed T_cold "
+                         f"(got T_c={t_cold_k}, T_h={t_hot_k})",
+                "source": "pure-python (closed form)"}
     cop = t_cold_k / (t_hot_k - t_cold_k)
     return {"relation": "carnot_cop_ceiling",
             "formula": "COP_carnot = T_c / (T_h - T_c)",
@@ -122,7 +147,10 @@ def larson_miller_parameter(t_k: float, t_hours: float, c: float = 20.0
     """LMP = T(K) * (C + log10(t_h)) — THE creep-life equivalence
     relation (C=20 for Cr-Mo steels, the standard default)."""
     if t_hours <= 0:
-        raise ValueError("time must be positive")
+        return {"relation": "larson_miller_parameter",
+                "typed": "out_of_domain: time must be positive "
+                         f"(got t={t_hours} h)",
+                "source": "pure-python (closed form)"}
     lmp = t_k * (c + math.log10(t_hours))
     return {"relation": "larson_miller_parameter",
             "formula": "LMP = T(K) * (C + log10(t))",
@@ -139,6 +167,11 @@ def dewpoint_frost_threshold(t_db_c: float, rh_pct: float) -> dict:
     meterological range; the library cross-checks when present)."""
     rh = min(max(rh_pct, 1e-6), 100.0)
     a, b = 17.62, 243.12  # degC, degC (Magnus-Tetens, WMO-respected)
+    if t_db_c <= -b + 1.0:   # denominator regime; degenerate input
+        return {"relation": "dewpoint_threshold",
+                "typed": "out_of_domain: dry-bulb temperature below "
+                         f"the Magnus-Tetens domain (got {t_db_c} degC)",
+                "source": "pure-python (Magnus-Tetens closed form)"}
     gamma = math.log(rh / 100.0) + a * t_db_c / (b + t_db_c)
     td = b * gamma / (a - gamma)
     src = "pure-python (Magnus-Tetens closed form)"
@@ -161,8 +194,11 @@ def fouling_resistance_growth(r_f_inf_m2k_w: float, tau_h: float,
                               t_h: float) -> dict:
     """Kern-Seaton asymptotic fouling: R_f(t) = R_f_inf (1 - exp(-t/tau))
     — the fouling-resistance growth used in duty/pricing checks."""
-    if tau_h <= 0:
-        raise ValueError("tau must be positive")
+    if tau_h <= 0 or t_h < 0:
+        return {"relation": "kern_seaton_fouling_growth",
+                "typed": "out_of_domain: tau must be positive and t "
+                         f"non-negative (got tau={tau_h}, t={t_h})",
+                "source": "pure-python (closed form)"}
     rf = r_f_inf_m2k_w * (1.0 - math.exp(-t_h / tau_h))
     return {"relation": "kern_seaton_fouling_growth",
             "formula": "R_f(t) = R_f_inf (1 - exp(-t/tau))",

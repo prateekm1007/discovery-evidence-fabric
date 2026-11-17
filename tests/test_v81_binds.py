@@ -56,11 +56,10 @@ def test_lsi_sign_direction():
 def test_carnot_cop_ceiling():
     r = carnot_cop(273.15, 308.15)
     assert abs(r["value"] - 273.15 / 35.0) < 1e-9
-    try:
-        carnot_cop(300.0, 300.0)
-        raise AssertionError("T_hot == T_cold must raise (typed)")
-    except ValueError:
-        pass
+    # V8.1.2 contract: degenerate inputs return a typed out_of_domain
+    # note instead of raising (an uncaught raise crashed the transport)
+    r2 = carnot_cop(300.0, 300.0)
+    assert r2.get("typed", "").startswith("out_of_domain")
 
 
 def test_larson_miller_known_value():
