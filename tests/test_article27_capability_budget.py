@@ -25,7 +25,7 @@ ART27_KEYS = ("engine_diff", "primary_metric_delta", "deletions")
 def _round_status_files():
     out = []
     for p in sorted((REPO / "eval").glob("r*_status.json")):
-        m = re.match(r"r(\d+)_status\.json$", p.name)
+        m = re.match(r"r(\d+)(?:s(\d+))?_status\.json$", p.name)
         if m and int(m.group(1)) >= 16:
             out.append((int(m.group(1)), p))
     return sorted(out)

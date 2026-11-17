@@ -60,7 +60,7 @@ def _validate_remote_ci(rec: dict, name: str) -> None:
 def _records():
     out = []
     for p in sorted((REPO / "eval").glob("r*_status.json")):
-        m = re.match(r"r(\d+)_status\.json$", p.name)
+        m = re.match(r"r(\d+)(?:s(\d+))?_status\.json$", p.name)
         if m and int(m.group(1)) >= RULE_FROM:
             out.append((int(m.group(1)), p))
     return out
