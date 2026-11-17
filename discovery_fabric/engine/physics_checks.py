@@ -269,6 +269,209 @@ def larson_miller_lmp(t1_degC: float, t1_h: float, t2_degC: float,
                        {"error": f"{type(e).__name__}: {e}"})
 
 
+# ---------------------------------------------------------------------------
+# check 7: compressor surge margin (HO7-06 class: turbo surge)
+#   margin = (P_surge - P_op) / P_surge at the operating point.
+#   The anti-surge control convention keeps >=10% margin; at or below
+#   it the operating point is in/near the surge regime (worsens).
+# ---------------------------------------------------------------------------
+def surge_margin(p_surge_kpa: float, p_op_kpa: float) -> Dict[str, Any]:
+    try:
+        ps_ = _q(p_surge_kpa, "kPa").to("kPa").magnitude
+        po = _q(p_op_kpa, "kPa").to("kPa").magnitude
+        if min(ps_, po) <= 0:
+            raise ValueError("pressures must be > 0")
+        margin = (ps_ - po) / ps_
+        direction = ("worsens" if margin <= 0.10 else "improves")
+        return _result(
+            "surge_margin", "surge", "RUN", round(margin, 4),
+            "dimensionless", direction,
+            {"p_surge_kpa": ps_, "p_op_kpa": po,
+             "basis": "surge margin = (P_surge - P_op)/P_surge; the "
+                      "anti-surge convention keeps >=10% — at or below "
+                      "it the load-rejection excursion reaches the "
+                      "surge line (worsens)"})
+    except (TypeError, ValueError) as e:
+        return _result("surge_margin", "surge", "REFUSED", None,
+                       "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 8: Miner fatigue damage on a Basquin S-N basis (HO7-08 class)
+#   N(S) = A * S^-b;  D = n / N.  D > 1 = the unity bound is exceeded
+#   (the failure materializes); within it the duty consumes life
+#   (value carries the fraction; direction neutral by convention —
+#   no improvement is claimed from damage arithmetic alone).
+# ---------------------------------------------------------------------------
+def fatigue_miner(n_cycles: float, stress_amp_mpa: float,
+                  sn_a_mpa_pow_b: float, sn_b: float) -> Dict[str, Any]:
+    try:
+        n = float(n_cycles)
+        s = _q(stress_amp_mpa, "MPa").magnitude
+        a = float(sn_a_mpa_pow_b)
+        b = float(sn_b)
+        if n <= 0 or s <= 0 or a <= 0 or b <= 0:
+            raise ValueError("cycles, stress, and S-N constants must "
+                             "be > 0")
+        big_n = a * float(s) ** (-b)
+        damage = n / big_n
+        direction = "worsens" if damage > 1.0 else "neutral"
+        return _result(
+            "fatigue_miner", "fatigue", "RUN", round(damage, 4),
+            "dimensionless", direction,
+            {"N_cycles": round(big_n, 1), "n_cycles": n,
+             "basis": "Miner damage D = n/N(S), Basquin N = A S^-b; "
+                      "D > 1 = the unity bound is exceeded (splice "
+                      "fatigue/pull-out regime)"})
+    except (TypeError, ValueError) as e:
+        return _result("fatigue_miner", "fatigue", "REFUSED", None,
+                       "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 9: desiccant breakthrough utilization (HO7-10 class)
+#   U = m_air * (w_in - w_out) / (m_desiccant * q_e) — the moisture
+#   load against the committed dynamic capacity. U >= 1 = the load
+#   exceeds capacity: moisture breaks through (worsens).
+# ---------------------------------------------------------------------------
+def breakthrough_capacity(m_air_kg: float, w_in_kg_kg: float,
+                          w_out_kg_kg: float, m_desiccant_kg: float,
+                          q_e_kg_kg: float) -> Dict[str, Any]:
+    try:
+        m_air = _q(m_air_kg, "kg")
+        m_des = _q(m_desiccant_kg, "kg")
+        w_in = _q(w_in_kg_kg, "kg/kg")
+        w_out = _q(w_out_kg_kg, "kg/kg")
+        q_e = _q(q_e_kg_kg, "kg/kg")
+        if float(m_air.magnitude) <= 0 or float(m_des.magnitude) <= 0:
+            raise ValueError("air and desiccant masses must be > 0")
+        if float((w_in - w_out).magnitude) < 0:
+            raise ValueError("w_in must be >= w_out")
+        if float(q_e.magnitude) <= 0:
+            raise ValueError("equilibrium capacity must be > 0")
+        u = float((m_air * (w_in - w_out) / (m_des * q_e)).magnitude)
+        direction = "worsens" if u >= 1.0 else "improves"
+        return _result(
+            "breakthrough_capacity", "desiccant_breakthrough", "RUN",
+            round(u, 4), "dimensionless", direction,
+            {"basis": "U = m_air (w_in - w_out) / (m_desiccant q_e); "
+                      "U >= 1 = the moisture load exceeds the "
+                      "committed dynamic capacity — breakthrough "
+                      "regime (ageing/incomplete regeneration)"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("breakthrough_capacity", "desiccant_breakthrough",
+                       "REFUSED", None, "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 10: electrolytic gas evolution (Faraday) (HO7-01 class)
+#   m_dot = I * M / (z * F) at each electrode — the evolved-gas rate
+#   that drives bubble-burst aerosol (acid mist) entrainment. Delta
+#   form: the proposed operating change's sign on the mist driver is
+#   the sign of the computed rate change.
+# ---------------------------------------------------------------------------
+F_FARADAY = 96485.33212          # C/mol (CODATA exact)
+
+
+def faraday_gas_rate(current_after_a: float, current_before_a: float,
+                     molar_mass_g_mol: float, z_electrons: float
+                     ) -> Dict[str, Any]:
+    try:
+        ia = _q(current_after_a, "A")
+        ib = _q(current_before_a, "A")
+        m = _q(molar_mass_g_mol, "g/mol").to("kg/mol")
+        z = float(z_electrons)
+        if z <= 0:
+            raise ValueError("electron count z must be > 0")
+        f = pint.Quantity(F_FARADAY, "C/mol")
+        rate_a = (ia * m / (z * f)).to("kg/h")
+        rate_b = (ib * m / (z * f)).to("kg/h")
+        delta = float((rate_a - rate_b).magnitude)
+        direction = ("worsens" if delta > 1e-12 else
+                     "improves" if delta < -1e-12 else "neutral")
+        return _result(
+            "faraday_gas_rate", "electrolytic_mist", "RUN",
+            round(delta, 6), "kg/h", direction,
+            {"rate_after_kg_h": round(float(rate_a.magnitude), 6),
+             "rate_before_kg_h": round(float(rate_b.magnitude), 6),
+             "basis": "Faraday m_dot = I M / (z F); the evolved-gas "
+                      "rate is the bubble-burst aerosol (acid mist) "
+                      "driver at the anode — a rate increase worsens "
+                      "the tankhouse exposure"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("faraday_gas_rate", "electrolytic_mist",
+                       "REFUSED", None, "kg/h", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 11: Wagner number — secondary current distribution (HO7-05)
+#   Wa = kappa * |dV/di| / L. Wa >= 1 = polarization smooths the
+#   current distribution (uniform deposition); Wa < 1 = solution-
+#   resistance-dominated nonuniformity: the nodulation/dendrite regime.
+# ---------------------------------------------------------------------------
+def wagner_number(conductivity_s_m: float,
+                  polarization_slope_v_m2_a: float,
+                  characteristic_length_m: float) -> Dict[str, Any]:
+    try:
+        kappa = _q(conductivity_s_m, "S/m")
+        dvdi = _q(polarization_slope_v_m2_a, "V*m**2/A")
+        length = _q(characteristic_length_m, "m")
+        if float(length.magnitude) <= 0:
+            raise ValueError("characteristic length must be > 0")
+        wa = float((kappa * dvdi / length).to("dimensionless").magnitude)
+        direction = ("improves" if wa >= 1.0 else "worsens")
+        return _result(
+            "wagner_number", "electrodeposition", "RUN", round(wa, 4),
+            "dimensionless", direction,
+            {"kappa_S_m": float(kappa.magnitude),
+             "dV_di_V_m2_A": float(dvdi.magnitude),
+             "L_m": float(length.magnitude),
+             "basis": "Wa = kappa |dV/di| / L — the secondary/current "
+                      "distribution uniformity criterion; Wa < 1 is "
+                      "the nonuniform (nodulation/dendrite) regime"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("wagner_number", "electrodeposition", "REFUSED",
+                       None, "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 12: surface-tension foam index (HO7-12 class)
+#   phi = (sigma_ref - sigma_sludge) / sigma_ref — the fractional
+#   surface-tension depression. Convention: phi >= 0.2 is the
+#   foam-stable regime (filamentous/organic-load slurries depress
+#   sigma from ~72 mN/m toward 45-55 mN/m), foaming carries sludge.
+# ---------------------------------------------------------------------------
+def foam_index(sigma_ref_mn_m: float, sigma_sludge_mn_m: float
+               ) -> Dict[str, Any]:
+    try:
+        s_ref = _q(sigma_ref_mn_m, "mN/m")
+        s_sl = _q(sigma_sludge_mn_m, "mN/m")
+        if float(s_ref.magnitude) <= 0 or float(s_sl.magnitude) <= 0:
+            raise ValueError("surface tensions must be > 0")
+        phi = float(((s_ref - s_sl) / s_ref).to("dimensionless")
+                    .magnitude)
+        direction = "worsens" if phi >= 0.2 else (
+            "improves" if phi > 0.0 else "neutral")
+        return _result(
+            "foam_index", "foaming", "RUN", round(phi, 4),
+            "dimensionless", direction,
+            {"sigma_ref_mN_m": float(s_ref.magnitude),
+             "sigma_sludge_mN_m": float(s_sl.magnitude),
+             "basis": "phi = (sigma_ref - sigma_sludge)/sigma_ref — "
+                      "the surface-tension depression; phi >= 0.2 is "
+                      "the foam-stable regime that carries sludge "
+                      "into the gas dome"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("foam_index", "foaming", "REFUSED", None,
+                       "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
 CHECKS = {
     "arrhenius_rate_ratio": arrhenius_rate_ratio,
     "fouling_u_degradation": fouling_u_degradation,
@@ -276,6 +479,12 @@ CHECKS = {
     "npsh_margin": npsh_margin,
     "dewpoint_frost_margin": dewpoint_frost_margin,
     "larson_miller_lmp": larson_miller_lmp,
+    "surge_margin": surge_margin,
+    "fatigue_miner": fatigue_miner,
+    "breakthrough_capacity": breakthrough_capacity,
+    "faraday_gas_rate": faraday_gas_rate,
+    "wagner_number": wagner_number,
+    "foam_index": foam_index,
 }
 
 CHECKS_BY_FAILURE_CLASS = {
@@ -285,6 +494,93 @@ CHECKS_BY_FAILURE_CLASS = {
     "cavitation": ["npsh_margin"],
     "frost_condensation": ["dewpoint_frost_margin"],
     "creep": ["larson_miller_lmp", "arrhenius_rate_ratio"],
+    "surge": ["surge_margin"],
+    "fatigue": ["fatigue_miner"],
+    "desiccant_breakthrough": ["breakthrough_capacity"],
+    "electrolytic_mist": ["faraday_gas_rate"],
+    "electrodeposition": ["wagner_number"],
+    "foaming": ["foam_index"],
+}
+
+
+
+# ---------------------------------------------------------------------------
+# R54 (claim c-0072): the deterministic failure-class router + the
+# committed reference scenarios. The router maps failure TEXT to a
+# registry class by keyword rules (first match wins, specific before
+# generic, None when nothing matches — typed, never a prose fallback);
+# the reference scenarios are the per-check committed input sets the
+# P1 measurement runs to prove each relation RUNS with real units
+# (the labelled DEV rows carry no numeric context — on-row claims
+# stay PENDING_INPUTS; the scenarios are wiring proofs, not data).
+# ---------------------------------------------------------------------------
+_CLASS_RULES = (
+    ("electrolytic_mist",
+     ("acid aerosol", "oxygen evolution", "bubble", "tankhouse air",
+      "electrowinning mist")),
+    ("cavitation",
+     ("cavitation", "vortex rope", "draft-tube", "npsh")),
+    ("frost_condensation",
+     ("frost", "defrost", "condensation", "dew point", "dewpoint")),
+    ("electrodeposition",
+     ("nodulation", "dendrite", "electrodeposition", "cathode",
+      "plating")),
+    ("surge", ("surge", "compressor stall", "anti-surge")),
+    ("desiccant_breakthrough",
+     ("desiccant", "breakthrough", "regeneration")),
+    ("foaming", ("foam",)),
+    ("fatigue", ("fatigue", "splice", "pull-out")),
+    ("creep", ("creep", "larson", "long-term stress")),
+    ("scaling", ("scale ", "scaling", "lsi", "mineral deposit")),
+    ("fouling", ("fouling", "fouls", "tube deposit", "slime")),
+    ("thermal_aging",
+     ("scorch", "crosslink", "oxidation", "varnish", "capacity fade",
+      "degradation", "aging", "ageing", "thermal")),
+)
+
+
+def classify_failure(text: str):
+    """Deterministic failure-text -> registry class. First match wins
+    (specific classes ordered before generic ones); None when no rule
+    matches — the caller records PENDING_INPUTS rather than guessing a
+    class. Zero LLM."""
+    low = str(text).lower()
+    for fclass, kws in _CLASS_RULES:
+        if any(kw in low for kw in kws):
+            return fclass
+    return None
+
+
+REFERENCE_SCENARIOS = {
+    "arrhenius_rate_ratio": {"ea_kj_mol": 80.0, "t1_degC": 60.0,
+                             "t2_degC": 80.0},
+    "fouling_u_degradation": {"u_clean_w_m2k": 2000.0,
+                              "rf_after_m2k_w": 0.0004,
+                              "rf_before_m2k_w": 0.0002},
+    "langelier_lsi": {"tds_mg_l": 500.0, "temp_degC": 25.0,
+                      "ph": 7.8, "ca_hardness_mg_l_caco3": 80.0,
+                      "alkalinity_mg_l_caco3": 100.0},
+    "npsh_margin": {"patm_kpa": 101.325, "pvap_kpa": 12.3,
+                    "rho_kg_m3": 988.0, "suction_head_m": 2.0,
+                    "friction_loss_m": 1.5, "npshr_m": 3.0},
+    "dewpoint_frost_margin": {"t_air_degC": 25.0, "rh_percent": 60.0,
+                              "t_surface_degC": 10.0},
+    "larson_miller_lmp": {"t1_degC": 550.0, "t1_h": 100000.0,
+                          "t2_degC": 570.0, "t2_h": 100000.0},
+    "surge_margin": {"p_surge_kpa": 420.0, "p_op_kpa": 360.0},
+    "fatigue_miner": {"n_cycles": 100000.0, "stress_amp_mpa": 120.0,
+                      "sn_a_mpa_pow_b": 1.0e12, "sn_b": 3.0},
+    "breakthrough_capacity": {"m_air_kg": 100.0, "w_in_kg_kg": 0.010,
+                              "w_out_kg_kg": 0.001,
+                              "m_desiccant_kg": 10.0,
+                              "q_e_kg_kg": 0.125},
+    "faraday_gas_rate": {"current_after_a": 10000.0,
+                         "current_before_a": 8000.0,
+                         "molar_mass_g_mol": 32.0, "z_electrons": 4},
+    "wagner_number": {"conductivity_s_m": 40.0,
+                      "polarization_slope_v_m2_a": 0.02,
+                      "characteristic_length_m": 0.3},
+    "foam_index": {"sigma_ref_mn_m": 72.0, "sigma_sludge_mn_m": 45.0},
 }
 
 

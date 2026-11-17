@@ -108,6 +108,7 @@ jobs:
             tests/test_engine_route.py \
             tests/test_novelty_gate_engine.py \
             tests/test_triz_data.py \
+            tests/test_physics_checks_r54.py \
             tests/test_all_refs_secret_scan.py \
             -q -p no:warnings
       # F64 remedy (R53, c-0071): the P1.4 labelled regression runs IN
@@ -121,6 +122,17 @@ jobs:
           python3 scripts/r52_labelled_regression.py | tee /tmp/r53_regression.log
           grep -q '"verdict":"PASS 0/0/0"' /tmp/r53_regression.log \
             || grep -q '"verdict": "PASS 0/0/0"' /tmp/r53_regression.log
+      # The P1 >=80% numeric-claims-unit-checked leg (R54, c-0072):
+      # every numeric-direction claim on the labelled DEV rows must
+      # carry an applicable registry relation that RUNS with a pint
+      # value on its committed reference scenario. Below 0.80 the
+      # push reds; eval/r54_p1_unit_checked.json is the CI-checkable
+      # evidence (measured fraction 1.0 at c-0072 finalize).
+      - name: P1 unit-checked measurement on labelled DEV outputs (c-0072)
+        run: |
+          set -e
+          python3 scripts/r54_p1_unit_checked_measurement.py | tee /tmp/r54_p1.log
+          grep -q 'P1_UNIT_CHECKED_PASS' /tmp/r54_p1.log
       # Anti-gaming / independence / infra-separation suites (the Art.
       # 2/3/6 WIRED mechanisms in eval/enforcement_flags.json) — the
       # map-completeness test fails any WIRED citation whose test is

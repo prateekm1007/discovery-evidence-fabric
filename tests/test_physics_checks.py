@@ -149,13 +149,30 @@ BAD_INPUTS = {
                         npshr_m=0.5),
     "dewpoint_frost_margin": dict(t_air_degC=None, rh_percent=60.0,
                                   t_surface_degC=25.0),
+    "surge_margin": dict(p_surge_kpa=None, p_op_kpa=360.0),
+    "fatigue_miner": dict(n_cycles=None, stress_amp_mpa=120.0,
+                          sn_a_mpa_pow_b=1.0e12, sn_b=3.0),
+    "breakthrough_capacity": dict(m_air_kg=None, w_in_kg_kg=0.010,
+                                  w_out_kg_kg=0.001, m_desiccant_kg=10.0,
+                                  q_e_kg_kg=0.125),
+    "faraday_gas_rate": dict(current_after_a=None,
+                             current_before_a=8000.0,
+                             molar_mass_g_mol=32.0, z_electrons=4),
+    "wagner_number": dict(conductivity_s_m=None,
+                          polarization_slope_v_m2_a=0.02,
+                          characteristic_length_m=0.3),
+    "foam_index": dict(sigma_ref_mn_m=None, sigma_sludge_mn_m=45.0),
     "larson_miller_lmp": dict(t1_degC=None, t1_h=40000, t2_degC=600.0,
                               t2_h=60000),
 }
 
 
-def test_registry_has_six_relations():
-    assert len(pc.CHECKS) == 6, sorted(pc.CHECKS)
+def test_registry_has_twelve_relations():
+    # R54 (claim c-0072): the registry expanded 6 -> 12 relations /
+    # 12 failure classes to close the P1 unit-checked coverage on the
+    # labelled DEV rows; the completeness pin moves with it.
+    assert len(pc.CHECKS) == 12, sorted(pc.CHECKS)
+    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 12
 
 
 def test_every_check_refuses_garbage_rather_than_fabricating():
