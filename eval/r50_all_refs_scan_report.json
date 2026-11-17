@@ -1,0 +1,93 @@
+{
+ "record": "R50_ALL_REFS_SECRET_SCAN/1.0.0",
+ "mode": "all",
+ "detector": {
+  "token_rules": [
+   "github-pat",
+   "github-token-classic",
+   "gitlab-pat",
+   "aws-access-key",
+   "google-api-key",
+   "slack-token",
+   "private-key-block",
+   "jwt"
+  ],
+  "generic_rule": "secret-vocabulary key + quoted value with Shannon entropy >= 3.5",
+  "excluded_shapes": {
+   "hex64-digest": "the house sha256 seal corpus (21043 seals triaged non-secret, R45 detect-secrets sweep, commit 1995f7e75) \u2014 a documented repo integrity mechanism, not a secret class",
+   "hex40-blobsha": "git object sha shape",
+   "uuid-value": "versioned uuid shape, no secret content class"
+  },
+  "discovery_regex": "github_pat_[0-9A-Za-z_]+|gh[pousr]_[0-9A-Za-z]+|glpat-[0-9A-Za-z_-]+|AKIA[0-9A-Z]+|AIza[0-9A-Za-z_-]+|xox[baprs]-[0-9A-Za-z-]+|BEGIN [A-Za-z ]*PRIVATE KEY|eyJ[A-Za-z0-9_-]+[.]|api[_-]?key|apikey|auth[_-]?token|access[_-]?token|secret[_-]?key|client[_-]?secret|secret|credential|passwo?r?d|passwd|bearer",
+  "fingerprint": "sha256(rule|secret) \u2014 secret values are never printed or written"
+ },
+ "refs_scanned": [
+  "origin",
+  "origin/archive/rounds-R309-R383",
+  "origin/arena/01a0ab36-discovery-evidence-fabric",
+  "origin/audit/r11-auditor-verdict-20261114",
+  "origin/main",
+  "origin/queue/dev12_r7",
+  "origin/r401/empirical-canonicalization",
+  "origin/r412/gradient-v2",
+  "origin/r412/gradient-v3",
+  "origin/r412/tvm-v2-instrument",
+  "origin/r415/discovery-availability-v1",
+  "origin/r416/honest-causes-evolution-v1",
+  "origin/r448/visual-lab",
+  "origin/r449-c2/visual-benchmark",
+  "origin/r450-c2/visual-feedback-layer",
+  "origin/r452-coder1-discovery-engineering-organ",
+  "origin/r453-c2/claude-class-ui",
+  "origin/r454-c2/conversational-ui",
+  "origin/r454-c2/visual-deadweight",
+  "origin/r456-lean-2",
+  "origin/r513-closure",
+  "origin/runtime-state",
+  "origin/runtime-state-hf",
+  "origin/runtime-state-hf-c2"
+ ],
+ "n_refs": 24,
+ "tips_stats": {
+  "method": "git grep -n -I -i -E per remote ref",
+  "grep_lines_total": 63267,
+  "refs": {
+   "origin": 3953,
+   "origin/archive/rounds-R309-R383": 2230,
+   "origin/arena/01a0ab36-discovery-evidence-fabric": 4799,
+   "origin/audit/r11-auditor-verdict-20261114": 4133,
+   "origin/main": 3953,
+   "origin/queue/dev12_r7": 5039,
+   "origin/r401/empirical-canonicalization": 1338,
+   "origin/r412/gradient-v2": 1705,
+   "origin/r412/gradient-v3": 1739,
+   "origin/r412/tvm-v2-instrument": 1510,
+   "origin/r415/discovery-availability-v1": 1838,
+   "origin/r416/honest-causes-evolution-v1": 1840,
+   "origin/r448/visual-lab": 2356,
+   "origin/r449-c2/visual-benchmark": 2864,
+   "origin/r450-c2/visual-feedback-layer": 2367,
+   "origin/r452-coder1-discovery-engineering-organ": 2240,
+   "origin/r453-c2/claude-class-ui": 2935,
+   "origin/r454-c2/conversational-ui": 2977,
+   "origin/r454-c2/visual-deadweight": 2913,
+   "origin/r456-lean-2": 3031,
+   "origin/r513-closure": 6331,
+   "origin/runtime-state": 351,
+   "origin/runtime-state-hf": 825,
+   "origin/runtime-state-hf-c2": 0
+  }
+ },
+ "history_stats": {
+  "method": "git log --all -i -G<regex> -p -U0",
+  "commits_matched": 1359,
+  "diff_lines_parsed": 2694994,
+  "truncated": false,
+  "cap_bytes": 2147483648
+ },
+ "verdict": "PASS",
+ "findings_total_raw": 58,
+ "findings_baselined": 58,
+ "unbaselined": [],
+ "n_unbaselined": 0
+}

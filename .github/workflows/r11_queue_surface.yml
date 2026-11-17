@@ -107,6 +107,7 @@ jobs:
             tests/test_candidate_schema.py \
             tests/test_engine_route.py \
             tests/test_novelty_gate_engine.py \
+            tests/test_all_refs_secret_scan.py \
             -q -p no:warnings
       # Anti-gaming / independence / infra-separation suites (the Art.
       # 2/3/6 WIRED mechanisms in eval/enforcement_flags.json) — the
@@ -143,3 +144,17 @@ jobs:
           require_pair_write(Path('eval/pairs/r11_a1_ci_probe/x.json'))
           print('pair guard: PASS')
           PY
+      # AM42 D8 (claim c-0067, ROADMAP P0.3): the all-refs secret-scan
+      # GATE on every queue push. Tips mode scans every remote branch
+      # tip tree (git grep, C-speed) against the committed
+      # fingerprint-keyed baseline (eval/secret_scan_baseline.json) —
+      # 0 unbaselined findings or the push REDS. The full-history
+      # pickaxe pass (mode=all) is the committed enumeration report
+      # (eval/r50_all_refs_scan_report.json), re-run per round; the
+      # tips gate + detect-secrets pre-commit + the report are three
+      # independent layers on one acceptance.
+      - name: All-refs secret-scan gate (D8 — tips surface, baseline gate)
+        run: |
+          set -e
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune --quiet
+          python3 scripts/r45_all_refs_secret_scan.py --mode tips
