@@ -1,7 +1,7 @@
 {
  "schema": "work-claims/v1",
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
- "at": "2026-11-17T20:05:00Z (sandbox clock)",
+ "at": "2026-11-17T20:30:00Z (sandbox clock)",
  "sessions": {
   "builder-r20s2": {
    "registered_at": "2026-11-15T15:21:34Z",
@@ -2097,6 +2097,13 @@
    "finding": "F65: trailer-violation entries in the R50b record cite sessions builder-r47s1 and builder-r47s2, which do NOT exist in sessions[] \u2014 the R47 work was executed under builder-r47 (single session). The citations were assembled from memory, not from the registry.",
    "correction": "the registry is the source of truth for session identity; trailer texts on pushed commits are NOT rewritten (history stays), this typed correction is the record. Any future trailer citing a session MUST copy the id from sessions[] verbatim.",
    "also_typed": "the remote_ci.read_at-after-commit clock anomaly (F65): sandbox clock skew makes read_at timestamps unreliable as ordering evidence; ordering is proven by commit ancestry, not timestamps."
+  },
+  {
+   "id": "CORR-2",
+   "at": "2026-11-17T20:30:00Z (sandbox clock)",
+   "finding": "the R54 credential bundle (eval/r54_credential_bundle.json, claim c-0072) attributes the OpenRouter full-key exposure to 'commit MESSAGE of 35642149a5 (2026-08-19, firewall v28), corroborated by 76c23fef78 / 0ca3ac4f0e'. The verifier's byte check contradicts the attribution: the full sk-or-v1 key shape appears in the commit MESSAGE of 76c23fef7 (2026-08-18, 'feat: epistemic firewall v26 \u2014 post-scrub revalidation + historical artifact audit + credential audit split + attestation binding') and NOWHERE else in commit messages (--all refs); the 35642149a5 (v28) and 0ca3ac4f0e (v27) messages contain ZERO sk-or- occurrences. Root cause: the underlying scan artifact (eval/r52_gitleaks_gitmode.json) stores the commit_message_hits[0].commit field as the SUBJECT PREFIX 'feat: episte...' \u2014 ambiguous across the firewall series \u2014 and the bundle builder resolved it to v28 instead of v26. The remaining three commit-message 'sk-or-' hits (6d6c4de70, ebacc1c3a, 88e693581) are PATTERN MENTIONS inside R43/R50-era scan-report texts (no full shape) \u2014 benign, typed so the rotation act is not mis-scoped.",
+   "correction": "the owner action is UNCHANGED in substance (rotate the OpenRouter key \u2014 exactly one live key shape, one commit message, 76c23fef7 @ 2026-08-18); the ATTRIBUTION is corrected to 76c23fef7. Values were never printed by the verifier (shape-count greps only). The bundle artifact itself is NOT rewritten (Art. 4: committed records stay); this correction is the record. The scan artifact's commit-field convention (subject prefix instead of SHA) should be fixed forward-only in any next scan revision.",
+   "also_typed": "the c-0073 commit message understates its own total diff (+201/-14 quoted vs +180/-14 actual \u2014 the fv5 record was 35 lines, not the estimated 56; the engine .py +73/-11 figures were correct): the true engine share is 40.6% raw-insertions (73/180), 43.3% changed-lines (84/194) \u2014 the committed 36.3%/38.7% UNDERSTATES, still >= 30%; corrected here, the original quoted values preserved in this note."
   }
  ]
 }
