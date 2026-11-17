@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "e44ba36f0",
+  "queue/dev12_r7": "ebd55822e",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1286,7 +1286,7 @@
    "title": "PRIVATE rubric is PUBLICLY readable — custody is a convention, not access control. The audit branch lives in the PUBLIC repo prateekm1007/discovery-evidence-fabric (F45 visibility=public). Auditor UNAUTHENTICATED raw read of audit/holdout_v7/holdout_v7_rubric_PRIVATE.json returned HTTP 200 (8385 bytes); v8 rubric/problems on the same public branch. The selection_sha256 seal protects problem INTEGRITY, not rubric CONFIDENTIALITY. The builder LLM or training data could read the scoring key (cheating/contamination vector). Builder sessions honored 'never read rubric' (c-0060 verifier: rubric_path NEVER_READ) so no actual cheating occurred, but the vector is open. REMEDY (OWNER-side): move rubric to PRIVATE custody (private repo/gist) or encrypt at rest; canary+probe (D7) mitigates contamination not the cheating vector. NOTE: external researcher labeled this 'F57' — corrected to F60 (Art.8 stable IDs; F57=scan precision).",
    "status": "OPEN-OWNER-URGENT",
    "opened": "2026-11-17",
-   "last_checked": "e44ba36f0",
+   "last_checked": "ebd55822e",
    "rounds_open": 1,
    "evidence": [
     {
@@ -1300,7 +1300,7 @@
     12
    ],
    "note_v8": "v8 rubric CONFIRMED public (unauth API HTTP 200, 15309 bytes). Builder gate eval/v8_execution_gate.json BLOCKED v8 scoring/rows10-30 pending OWNER custody. v8 is DEV-only (confidentiality compromised); acceptance requires a NEW confidential set after custody fix.",
-   "reprobe": "auditor fresh unauth probe @604c3efc4: HTTP 200, 8385 bytes — still public; builder R51 re-verified identical."
+   "reprobe": "established by prior independent unauth reads (R47/R48/R52: 200/8385) + builder R51 + verifier R50b re-confirmations; still public; OWNER act pending."
   },
   {
    "id": "F61",
@@ -1327,7 +1327,7 @@
     5,
     27
    ],
-   "progress": "D2a contract negative-case probe 14/14 (real rejection semantics fixed); v82 population/novelty import the engine but live in scripts/; P1.3 integration pending (F63)."
+   "progress": "INTEGRATED: engine_route.run_row = knowledge_first -> population_search -> assemble_candidate 1.0.0 -> extend_to_1_1 -> validate -> physics sign-of-result -> novelty; measured DEV path through engine; test_engine_route CI-wired. P1.4 regression evidence sandbox-bound (F64) — gate not yet validly passed."
   },
   {
    "id": "F62",
@@ -1346,12 +1346,50 @@
    "id": "F63",
    "severity": "MEDIUM",
    "title": ">=30% engine-lines rule violated 3 consecutive rounds: R47-cont (6327f4618) 0/3406=0%, R50 193/2922=6.6%, R51 147/592=24.8%; cumulative 340/6920=4.9%. D2c typed-plan population + D3 novelty gate (which DO import discovery_fabric) are housed in scripts/v82_* — capability logic outside the engine, measured DEV path still script-driven (F61 pattern persisting at the housing level). R52 MUST migrate v82 population+novelty into discovery_fabric/engine/ modules wired after assemble_candidate (P1.3), hit >=30% engine lines, and report cumulative catch-up.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-17",
    "last_checked": "e44ba36f0",
    "rounds_open": 1,
    "articles": [
     27
+   ],
+   "resolution": "R52 (b7a2e5eb0) engine share 39.5% (736/1861) >=30%; capability logic migrated INTO discovery_fabric/engine/ (population_search 245, engine_route 167, novelty_gate 114, triz_principles 91, physics_checks 304); v82 scripts rewired as delegates; test_engine_route CI-wired. Per-round rule satisfied."
+  },
+  {
+   "id": "F64",
+   "severity": "HIGH",
+   "title": "P1.4 labelled-regression evidence is SANDBOX-BOUND and not CI-gated (auditor independent confirm of verifier F-V9): scripts/r52_labelled_regression.py hardcodes REPO = Path('/home/z/my-project/discovery-evidence-fabric'); the committed eval/r52_labelled_regression.json 'PASS 0/0/0' cannot be reproduced from a fresh clone or CI; the driver is NOT in the workflow. The driver is zero-LLM (verified) so it IS CI-wirable. Until fixed, the P1 gate (0 allowed-measures / 0 false input-flags / 0 inverted) is NOT validly demonstrated. FIX: REPO = Path(__file__).resolve().parents[1]; re-run from committed bytes; wire into CI zero-LLM block; commit reproducible report.",
+   "status": "OPEN",
+   "opened": "2026-11-17",
+   "last_checked": "ebd55822e",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "ebd55822e",
+     "path": "scripts/r52_labelled_regression.py",
+     "note": "hardcoded sandbox REPO"
+    },
+    {
+     "sha": "ebd55822e",
+     "path": ".github/workflows/r11_queue_surface.yml",
+     "note": "regression driver absent"
+    }
+   ],
+   "articles": [
+    22,
+    27
+   ]
+  },
+  {
+   "id": "F65",
+   "severity": "MEDIUM",
+   "title": "Process-integrity misses in peer R50/R51 (verifier F-V3 class): executed the c-0067 lane WITHOUT claim-before-work and with session builder-r50s1 UNREGISTERED (Art.29(a)/(b)); builder-r50s1 still absent from registry sessions. Also typed: remote_ci.read_at 11:35Z cited inside commit 7a7c820ff (10:48:14Z) = sandbox-clock anomaly; trailer-violation entries cite non-existent sessions builder-r47s1/r47s2. Partially remediated (builder-r50s2/r52s1 registered; verifier attribution gap documented via c-0070 sharing c-0069 work_id). FIX: retro-register builder-r50s1 with typed late note; correct trailer session refs; enforce claim-before-work.",
+   "status": "OPEN",
+   "opened": "2026-11-17",
+   "last_checked": "ebd55822e",
+   "rounds_open": 1,
+   "articles": [
+    29
    ]
   }
  ],
@@ -2215,6 +2253,18 @@
     "F63 OPENED: engine-lines rule 0%/6.6%/24.8% (cumulative 4.9%); v82 capability logic must migrate into engine (P1.3). Commit-message secret scope gap noted (gitleaks git-mode R52).",
     "c-0067/c-0068 auditor-verified deterministically; builder flips DONE with attribution to eval/r52_auditor_verification.json. P0 gate STILL BLOCKED on owner custody (escalation #2 filed by builder; #3 due)."
    ]
+  },
+  {
+   "id": "AM48",
+   "date": "2026-11-17",
+   "status": "ISSUED",
+   "reason": "R53 auditor audit of R52 engine migration + R50b verifier secret-gate (e44ba36f0..ebd55822e)",
+   "changes": [
+    "R52 VERIFIED: engine migration real (F63 CLOSED, 39.5% engine share); engine_route integrated path CI-wired; physics registry 6 relations (arrhenius/fouling_U/LSI/NPSH/dewpoint_frost/Larson_Miller) pint-checked; triz_principles partial (13-entry subset, full 40+matrix pending).",
+    "R50b verifier VERIFIED: c-0067 residual CI-gate landed (r45_all_refs_secret_scan.py + 8-fingerprint baseline + 58-finding report 0-unbaselined + 14 tests + tips-gate CI step); fail-closed evidenced (301b6deaa red on own synthetics -> ebd55822e green). CI chain API-confirmed.",
+    "F64 OPENED (HIGH): P1.4 regression sandbox-bound + not CI-gated — P1 gate NOT validly passed until fixed (one-line path + CI wire + re-run). F65 OPENED (MEDIUM): R50/R51 claim-before-work + session-registration misses + clock/trailer anomalies.",
+    "c-0067 DONE (residual landed); c-0069 OPEN awaiting flip with c-0070 verifier attribution; c-0070 DONE VERIFIER. P0 coder-side COMPLETE; OWNER custody+rotation still the hard gate-blocker (escalation #4)."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3058,6 +3108,21 @@
     "F63"
    ],
    "evidence_sha": "eval/r52_auditor_verification.json"
+  },
+  {
+   "id": "V45",
+   "round": "R53 audit of R52 migration + R50b secret-gate",
+   "commit": "ebd55822e",
+   "gate": "NOT_MET (P0 owner-blocked; P1 evidence sandbox-bound F64)",
+   "capability_change": "engine route integrated + physics 6 + secret CI-gate landed; P1 gate pending F64 fix",
+   "new_findings": [
+    "F64",
+    "F65"
+   ],
+   "closed_findings": [
+    "F63"
+   ],
+   "evidence_sha": "eval/r53_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3263,7 +3328,7 @@
    ]
   }
  },
- "progress_note": "Score 4. P0: CI fixed, all-refs prefix+content verification DONE (F45 1 token/2 paths; F60 public), detect-secrets wired; OWNER custody+rotation PENDING (gate blocked). P1: physics_checks slice (pint+CoolProp) + candidate_schema 1.1.0 (enums, wrap-only) landed CI-wired; contract negative cases 14/14; P1.3 engine integration NEXT (F63: migrate v82 into engine, >=30% engine lines). P2 scaffolds (population/novelty) exist as DEV scripts; ablation pending. AM46 agent-loop landed; goal 9/10 fully agent-run.",
+ "progress_note": "Score 4. P0 coder-side COMPLETE (all-refs scan + content verify + 8-fingerprint baseline + CI gate + fail-closed evidence); OWNER custody+rotation PENDING (hard gate-blocker, escalation #4). P1 ~90% built: engine_route integrated (F61/F63 remediated), physics 6 relations, schema enums, contract negatives 14/14 — BUT P1.4 regression evidence sandbox-bound + not CI-gated (F64): one-line fix + CI wire unlocks P1 gate. P2: TRIZ partial (13/40), ablation pending. Secret-scan CI gate live. Next: F64 fix -> P1 gate -> TRIZ full + ablation -> v9 (needs P0).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
