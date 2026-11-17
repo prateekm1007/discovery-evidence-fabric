@@ -892,7 +892,14 @@ def assemble_candidate(operator: Dict[str, Any],
         # REAL batch call's — never mistakable for N separate calls).
         "batch_served": llm_meta.get("batch_served"),
         "source_item_id": structured_item.get("item_id"),
-        "derived_at": utc_now(),
+        # F64 remediation (R53, claim c-0071): derived_at REMOVED from
+        # the hashed trace — candidate identity is CONTENT-ADDRESSED
+        # (the same inputs assemble to the same id/hash on every clone
+        # and in CI; run provenance rides the run ledger, not the id).
+        # The wall-clock value itself is preserved UN-hashed as the
+        # top-level cand["derived_at"] below (r510_dryrun_repeat's
+        # by-design note is superseded by the roadmap's reproducible-
+        # evidence rule; its exclusion logic tolerates the move).
     }
     cand = {
         "candidate_schema": "mechanism_candidate/1.0.0",
@@ -951,6 +958,9 @@ def assemble_candidate(operator: Dict[str, Any],
         "candidate_state": "CANDIDATE" if testable["testable"] else
         "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
     }
+    # F64: un-hashed wall-clock provenance (see the trace note above) —
+    # recorded on the record, excluded from identity
+    cand["derived_at"] = utc_now()
     cand["candidate_id"] = (
         f"cand:MS:{operator['operator_id']}:"
         f"{sha256_obj({k: cand[k] for k in CANDIDATE_REQUIRED_FIELDS})[:12]}"

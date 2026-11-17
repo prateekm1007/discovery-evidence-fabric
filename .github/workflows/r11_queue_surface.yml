@@ -63,6 +63,24 @@ jobs:
           python3 -B scripts/r11_decoder_retally.py
           python3 -B scripts/r11_critic_regression.py || true
           python3 -B scripts/r11_critic_regression_r2.py
+      # F64 fix (R53, claim c-0071): the P1.4 labelled regression is
+      # now REPRODUCIBLE FROM COMMITTED BYTES — the driver resolves
+      # REPO from its own location (Path(__file__).resolve().
+      # parents[1]), so a fresh clone or CI checkout runs it
+      # identically to the authoring sandbox. The step gates on BOTH
+      # the verdict (the driver exits non-zero unless PASS 0/0/0) and
+      # BYTE-REPRODUCIBILITY: the regenerated report must equal the
+      # committed eval/r52_labelled_regression.json (git diff
+      # --exit-code). The byte-gate is what caught the wall-clock id
+      # defect (derived_at inside the hashed candidate trace — every
+      # report regeneration produced fresh candidate ids; fixed by
+      # moving the timestamp out of the hashed set, mechanism_space
+      # assemble_candidate) on first contact in this same lane.
+      - name: P1.4 labelled regression (F64 — reproducible, verdict + byte-identity gated)
+        run: |
+          set -e
+          python3 -B scripts/r52_labelled_regression.py
+          git diff --exit-code -- eval/r52_labelled_regression.json
       # Constitution v3.1.0 enforcement articles — wired into the QUEUE
       # surface (F32 fix, R18 audit AM18; R20 AM20 D2 adds Arts. 20 +
       # the Art. 25 record + the article map + the adversarial suites;

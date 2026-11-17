@@ -26,6 +26,13 @@ What the regression verifies, typed:
 4. novelty gate runs per row (the F54 near-duplicate kill).
 
 Output: eval/r52_labelled_regression.json. Zero LLM, zero network.
+
+F64 remediation (R53, claim c-0071): REPO resolves from THIS FILE's
+location (Path(__file__).resolve().parents[1]) — the driver runs
+identically on a fresh clone or in CI (the 1.0.0 sandbox-absolute
+hardcode is gone); the driver exits non-zero unless the gate verdict
+is PASS 0/0/0, and the CI step additionally byte-gates the
+regenerated report against the committed one (git diff --exit-code).
 """
 from __future__ import annotations
 
@@ -33,7 +40,7 @@ import json
 import sys
 from pathlib import Path
 
-REPO = Path("/home/z/my-project/discovery-evidence-fabric")
+REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 from discovery_fabric.engine import engine_route as er      # noqa: E402
@@ -94,9 +101,15 @@ def main() -> None:
                                  for r in row["results"]],
         })
     out = {
-        "record": "R52_LABELLED_REGRESSION/1.0.0",
+        "record": "R52_LABELLED_REGRESSION/1.1.0",
         "session": "builder-r52s1",
         "claim": "c-0069",
+        "instrument_changes_1_1_0": (
+            "F64 remediation (builder-r53s1, claim c-0071): REPO is "
+            "repo-relative (was the authoring sandbox's absolute path); "
+            "driver exits non-zero unless PASS 0/0/0; CI step runs the "
+            "driver and byte-gates the regenerated report against the "
+            "committed one. Row semantics unchanged from 1.0.0."),
         "path": "integrated engine route (engine_route.run_row): "
                 "knowledge_first_item anchor -> typed plans "
                 "(population_search, domain clamp) -> "
@@ -127,6 +140,12 @@ def main() -> None:
     print(json.dumps(out["gate"], indent=1))
     print(f"rows: {len(rows_out)}; labelled negatives: {len(fp_rows)}")
     print(f"wrote {dest}")
+    # F64: fail-closed driver — a non-PASS verdict is a CI failure,
+    # never a silent report
+    if out["gate"]["verdict"] != "PASS 0/0/0":
+        print("GATE FAILED — exiting non-zero (the report above is "
+              "committed evidence of the failure)")
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

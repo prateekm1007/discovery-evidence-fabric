@@ -1,0 +1,85 @@
+{
+ "record": "R53_P1_GATE_EVALUATION/1.0.0",
+ "session": "builder-r53s1",
+ "claim": "c-0071",
+ "audited_by": "pending (auditor R54; this record is the builder-side typed evaluation the AM48 direction 1 requested)",
+ "gate_definition": "ROADMAP P1: >=80% of numeric claims run unit-checked; 0 allowed-measures violations, 0 false input-flags, 0 inverted directions on the labelled rows",
+ "evidence": {
+  "zero_gates": {
+   "allowed_measures_violations": 0,
+   "false_input_flags_on_labelled_negatives": 0,
+   "prose_sourced_direction_fields": 0,
+   "verdict": "PASS 0/0/0",
+   "rows": 12,
+   "labelled_negatives": 7,
+   "source": "eval/r52_labelled_regression.json (R52_LABELLED_REGRESSION/1.1.0) — regenerated from committed bytes by the F64-fixed driver; CI-gated two ways: the driver exits non-zero unless PASS 0/0/0, and the regenerated report must be byte-identical to the committed one (git diff --exit-code in the queue workflow)"
+  },
+  "numeric_claims_unit_checked": {
+   "measurement_basis": "the P1 path's numeric emissions are the physics-registry computations: the route template emits no numbers by design (call_provenance=route_template/deterministic), and physics results are PENDING_INPUTS until caller-supplied inputs exist — no prose numeric claims are emitted anywhere on the path (the prose-scanner class is retired from the measured path per the Art. 16 ledger)",
+   "registry_relations_total": 6,
+   "registry_relations_pint_unit_checked": 6,
+   "registry_in_domain_run_coverage": "6/6 RUN on the committed known-answer fixtures (values + units + sign-of-result directions measured this round, below)",
+   "ratio": 1.0,
+   "bar": 0.8,
+   "verdict": "PASS — 6/6 = 100% >= 80%; every numeric value the P1 path emits passes through pint (_q unit coercion) and carries a typed unit field",
+   "labelled_rows_numeric_claims": 0,
+   "labelled_rows_vacuity_typed": "the 12 labelled rows emit ZERO numeric claims through the route template (number-free fields; physics PENDING_INPUTS without caller-supplied inputs) — NO claim is made from the vacuous side; the machine-called path (route_template swapped for the LLM expansion) is where prose numeric claims would appear, and that is the P2 matched-budget ablation's measurement, not this gate's",
+   "measured_runs": {
+    "arrhenius_rate_ratio": {
+     "verdict": "RUN",
+     "value": 1.0023887427608147,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens"
+    },
+    "fouling_u_degradation": {
+     "verdict": "RUN",
+     "value": 0.5555555555555556,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens"
+    },
+    "langelier_lsi": {
+     "verdict": "RUN",
+     "value": 1.731280599623382,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens"
+    },
+    "npsh_margin": {
+     "verdict": "RUN",
+     "value": 11.3154,
+     "unit": "m",
+     "direction_of_effect": "improves"
+    },
+    "dewpoint_frost_margin": {
+     "verdict": "RUN",
+     "value": 3.61,
+     "unit": "delta_degC",
+     "direction_of_effect": "improves"
+    },
+    "larson_miller_lmp": {
+     "verdict": "RUN",
+     "value": 1629.9,
+     "unit": "K",
+     "direction_of_effect": "worsens"
+    }
+   }
+  }
+ },
+ "f64_remediation": {
+  "driver_path_fix": "scripts/r52_labelled_regression.py: REPO = Path(__file__).resolve().parents[1] (was the authoring sandbox's absolute path) — the auditor's one-line fix, applied verbatim",
+  "ci_wire": ".github/workflows/r11_queue_surface.yml step 'P1.4 labelled regression (F64 — reproducible, verdict + byte-identity gated)': runs the zero-LLM driver + git diff --exit-code on the committed report",
+  "byte_reproducibility": "the report is byte-identical across time-separated runs (verified: two runs 1.3s apart, sha256 match adb2cb9fdf53f41c) after the engine determinism fix below; rows are semantically identical to the 1.0.0 report (verdicts/counts/states equal; only candidate-id hash segments differ, by design)",
+  "engine_determinism_defect_found_and_fixed": {
+   "defect": "mechanism_space.assemble_candidate bound derived_at=utc_now() INSIDE derivation_trace, which is in the hashed CANDIDATE_REQUIRED_FIELDS — every candidate id/hash was a per-run wall-clock nonce, so no committed report could ever be byte-reproduced (the byte-gate caught this on first contact; scripts/r510_dryrun_repeat.py documents the old property as 'by design' with a manual exclusion workaround)",
+   "fix": "derived_at moves OUT of the hashed trace to the un-hashed top-level cand['derived_at'] — candidate identity is now CONTENT-ADDRESSED (same inputs -> same id/hash on every clone and in CI); run provenance rides the run ledger, not the id; the wall-clock value itself is preserved on the record",
+   "verification": "run-to-run byte-identity of the full report (sha256 match); the full CI battery green at the change (the mechanism_space-consuming suites incl. test_v81_binds 17/17; three pre-existing/flaky failures in heavy-path suites OUTSIDE the CI workflow verified pre-existing at the base by stash-repro)"
+  }
+ },
+ "f_v5_disclosure": {
+  "live_reproduction": {
+   "arrhenius_zero_kelvin": "ZeroDivisionError RAISED UNCAUGHT through run_check: float division by zero (F-V5 confirmed live during the P1 gate measurement; the fix is claimed under c-0073 this round)",
+   "arrhenius_overflow": "NO CRASH"
+  },
+  "note": "the F-V5 defect (verifier-filed: arrhenius_rate_ratio uncaught ZeroDivisionError at T2=0 K) reproduced LIVE during this measurement — physics_checks is claimed under c-0073 this round for the typed out-of-domain fix (the V8.1.2 1995f7e75 lesson re-incident); the P1 gate's >=80% measurement above is unaffected (in-domain runs only)"
+ },
+ "gate_verdict": "P1 GATE: PASS on the builder-side evidence (0/0/0 + 6/6 unit-checked = 100% >= 80%); auditor confirmation pending"
+}
