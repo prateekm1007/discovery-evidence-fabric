@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "c96e44078",
+  "queue/dev12_r7": "5a54f362f",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1399,11 +1399,26 @@
    "id": "F66",
    "severity": "LOW",
    "title": "classify_failure router dew-point ambiguity: auditor recompute routed shorthand 'desiccant dew point breakthrough capacity' to frost_condensation (dew-point keyword shared with frost). The committed P1 measurement used the real labelled row texts and mapped 36/36 correctly, so the gate stands; but add a disambiguation regression test (breakthrough_capacity vs frost_condensation) to harden the router against dew-point phrasing.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-17",
    "last_checked": "c96e44078",
    "rounds_open": 1,
    "articles": [
+    19
+   ],
+   "resolution": "R55 (c-0075, 8d410fbc5): classify_failure disambiguation pre-rule + 4 regression tests; auditor recompute: 'desiccant dew point breakthrough capacity' -> desiccant_breakthrough, 'evaporator frost buildup' -> frost_condensation (both correct)."
+  },
+  {
+   "id": "F67",
+   "severity": "MEDIUM",
+   "title": "Physics degenerate-input crashes (verifier F-V5 class): remote physics_checks.py lacked out-of-domain guards — arrhenius T2=0K and npsh rho=0 raised uncaught ZeroDivisionError through run_check (Art.3 typed-refusal violation); dewpoint Magnus-floor guard also added. FIXED c-0073 (807b54cac): guards BEFORE division, typed REFUSED out_of_domain. AUDITOR LIVE RECOMPUTE: pre-fix c96e44078 arrhenius/npsh CRASH:ZeroDivisionError -> post-fix 5a54f362f REFUSED; 12/12 reference-scenario values BIT-IDENTICAL pre==post (content-preserving). 4 regression pins, 14/14 physics tests.",
+   "status": "CLOSED",
+   "opened": "2026-11-17",
+   "closed_at": "2026-11-17",
+   "last_checked": "5a54f362f",
+   "resolution": "c-0073 guards ported + auditor live-verified (2/3 crash classes reproduced pre-fix, dewpoint guard source-confirmed; content preserved 12/12).",
+   "articles": [
+    3,
     19
    ]
   }
@@ -2306,6 +2321,19 @@
     "F66 LOW opened: router dew-point ambiguity (breakthrough vs frost) — add disambiguation test; gate stands (real rows mapped 36/36).",
     "SCORE 4->5. Next frontier P2 (->6): confidential v9 sealed acceptance needs P0 custody (owner) + LLM credential; ablation criteria evaluator pre-registered. P0 coder-side complete; owner custody the acceptance gate-blocker."
    ]
+  },
+  {
+   "id": "AM51",
+   "date": "2026-11-17",
+   "status": "ISSUED",
+   "reason": "R56 auditor audit of R54S2 (F-V5 hardening + c-0072 verify + CORR-2) and R55 (F66 closure), c96e44078..5a54f362f",
+   "changes": [
+    "F67 (verifier F-V5) CLOSED + AUDITOR LIVE-VERIFIED: pre-fix arrhenius T2=0K / npsh rho=0 CRASH ZeroDivisionError through run_check -> post-fix typed REFUSED; 12/12 scenario values bit-identical (content-preserving); guards before division; 4 pins, 14/14 tests. Physics layer now Art.3 typed-refusal compliant.",
+    "F66 CLOSED (c-0075): router disambiguation verified (desiccant_breakthrough vs frost_condensation correct). c-0072 DONE (P1 measurement byte-identical recompute, c-0074 VERIFIER 7 legs); c-0073/c-0074 DONE; c-0075 OPEN awaiting verifier.",
+    "CORR-2 CONFIRMED by auditor byte-probe: full OpenRouter sk-or-v1 shape in commit MESSAGE 76c23fef7 (firewall v26, 2026-08-18) = True; 35642149a5 (v28) = False. Bundle's original v28 attribution wrong; corrected to v26. Owner rotation surface precisely scoped.",
+    "History divergence handled lawfully (Art.29(e)): builder-r54s2 archived 5 unpushed local R53 commits, reset to remote, re-landed only disjoint residual (F-V5 hardening the relay never carried). Engine share R54S2 40.6%/43.3% (>=30%); R55 7.7% (<30%, disclosed precision/retirement round).",
+    "Score stays 5 (P1 passed R55; this round = physics robustness + F66 + credential precision, no new gate). P2 (->6) critical path: v9 confidential sealed acceptance needs P0 custody + LLM credential. P0 owner acts: OpenRouter 76c23fef7 + GitHub creds + R451 shapes + NVIDIA absence (4th round) + F60 rubric custody."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3188,6 +3216,18 @@
    ],
    "p1_gate": "PASSED",
    "evidence_sha": "eval/r55_auditor_verification.json"
+  },
+  {
+   "id": "V48",
+   "round": "R56 audit of R54S2 hardening + R55 F66",
+   "commit": "5a54f362f",
+   "gate": "P1 PASSED (score 5); acceptance NOT_MET (no sealed set accepted)",
+   "capability_change": "physics typed-refusal hardened (live-verified, content-preserving); F66 router fixed; credential attribution corrected",
+   "closed_findings": [
+    "F66",
+    "F67"
+   ],
+   "evidence_sha": "eval/r56_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3393,7 +3433,7 @@
    ]
   }
  },
- "progress_note": "SCORE 5/10 (P1 GATE PASSED, auditor-verified). P0 coder-side complete; OWNER custody+rotation the acceptance gate-blocker (credential bundle: 5 actions, 0 full tokens). P1: engine route integrated + deterministic + physics 12 relations (12/12 RUN verified) + schema enums + 0/0/0 CI-gated + >=80% unit-checked=1.0 CI-gated. P2 frontier: TRIZ full matrix + zero-LLM criteria evaluator landed; ablation run + v9 sealed acceptance (->6) need P0 custody + LLM credential. F66 LOW router dew-point disambiguation. P3-P5 per roadmap; goal 9/10.",
+ "progress_note": "SCORE 5/10 (P1 passed). Physics layer hardened: 12 relations, deterministic, typed refusals on degenerate inputs (F67 live-verified content-preserving), F66 router disambiguation closed. Credential bundle precise (OpenRouter 76c23fef7 v26 message; CORR-2). P0 coder-side complete; OWNER custody+rotation the acceptance gate-blocker. P2 frontier (->6): v9 confidential sealed acceptance + matched-budget ablation need P0 custody + LLM credential; criteria evaluator pre-registered. c-0075 OPEN awaiting verifier. P3-P5 per roadmap; goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
