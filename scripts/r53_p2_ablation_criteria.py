@@ -36,6 +36,25 @@ DELETE; criteria 1/2 unmet -> the pre-registered bar says the
 addition does not survive. No numeric bar (SCHEDULE_BAR, the 0/0
 legs, the mean comparison) is touched by this amendment.
 
+AMENDMENT — R60 (2026-11-18, session builder-r60s1, dated BEFORE the
+arms-complete criteria evaluation runs): the row SHAPE is now checked
+and refused TYPED (Art. 3 — fail closed, refusals typed never silent).
+Empirical basis: the R59 verifier record's non-blocking Art. 3
+observation (590fac029), reproduced live from committed bytes this
+round — feeding RAW run-records (the per-row files under
+rows_<arm>/) crashed v1.1.0 with an untyped AttributeError ('str'
+object has no attribute 'get'), and a partial dict silently defaulted
+allowed_row_outside to 0 (a silent pass path). v1.2.0 validates the
+normalizer's shape BEFORE any computation: top level a non-empty JSON
+object keyed by problem_id; every value an object; the required
+fields present with legal types (mean_score number-or-None,
+measure_classes list[str], allowed_row_outside int, bools refused —
+never a silent .get default). A violation returns verdict
+EVALUATION_REFUSED with a typed row_shape reason naming the offending
+key and the fix (run the driver's --normalize step). The MEASURED
+paths on well-shaped inputs are byte-equivalent to v1.1.0: no numeric
+bar, no verdict-ladder rung, no aggregation changed.
+
 Zero LLM, zero network.
 """
 from __future__ import annotations
@@ -56,14 +75,95 @@ MEASURED_PATH = "discovery_fabric.engine.engine_route -> mechanism_space"
 
 SCHEDULE_BAR = 0.17
 
+# The normalizer's row shape, typed (v1.2.0): the ONLY legal input to
+# evaluate() is the driver's --normalize output. Raw run-records (the
+# per-row files under rows_<arm>/) carry these field-name keys at the
+# TOP level; a normalized dict never does (its keys are problem ids).
+RAW_RUN_RECORD_MARKERS = ("a1_answer", "final_meta", "arm_design",
+                          "declared_template_prose", "sha256_16")
+_ROW_FIELDS = {"mean_score": "number-or-None",
+               "measure_classes": "list[str]",
+               "allowed_row_outside": "int"}
+
+
+def _is_number(v) -> bool:
+    # bool is an int subclass in Python — a boolean is NOT a legal
+    # score/outside count (typed shape, never a silent 0/1 pass)
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def _shape_violation(rows, which: str):
+    """Typed shape check (Art. 3, v1.2.0). Returns None when the rows
+    match the normalizer shape; else a one-line typed reason. Never
+    raises on bad shape — an untyped crash was the observed v1.1.0
+    defect (AttributeError on raw run-records) and a silent .get
+    default was the other (allowed_row_outside -> 0)."""
+    if not isinstance(rows, dict):
+        return (f"{which}: top level is {type(rows).__name__}, "
+                "expected a JSON object keyed by problem_id (the "
+                "driver's --normalize output)")
+    if not rows:
+        return f"{which}: empty rows object — nothing to evaluate"
+    for pid, row in rows.items():
+        if not isinstance(row, dict):
+            return (f"{which}: row '{pid}' is {type(row).__name__}, "
+                    "expected an object — RAW RUN-RECORD shape (the "
+                    "per-row files under rows_<arm>/ are NOT the "
+                    "evaluator input; run the driver's --normalize "
+                    "step first)")
+        raw_hits = [k for k in RAW_RUN_RECORD_MARKERS if k in row]
+        if raw_hits:
+            return (f"{which}: row '{pid}' carries raw run-record "
+                    f"fields {raw_hits} — normalize first (the "
+                    "evaluator input is the --normalize output shape)")
+        for f, want in _ROW_FIELDS.items():
+            if f not in row:
+                return (f"{which}: row '{pid}' is missing required "
+                        f"field '{f}' — a partial dict is refused, "
+                        "never silently defaulted (v1.1.0 defaulted "
+                        "allowed_row_outside to 0)")
+        if not (_is_number(row["mean_score"]) or
+                row["mean_score"] is None):
+            return (f"{which}: row '{pid}' mean_score is "
+                    f"{type(row['mean_score']).__name__}, expected "
+                    "number or null")
+        if not (isinstance(row["measure_classes"], list) and all(
+                isinstance(c, str) for c in row["measure_classes"])):
+            return (f"{which}: row '{pid}' measure_classes is not a "
+                    "list of strings")
+        if not (isinstance(row["allowed_row_outside"], int) and
+                not isinstance(row["allowed_row_outside"], bool)):
+            return (f"{which}: row '{pid}' allowed_row_outside is "
+                    f"{type(row['allowed_row_outside']).__name__} "
+                    f"({row['allowed_row_outside']!r}), expected int")
+    return None
+
 
 def evaluate(rows_path: Path, baseline_path: Path) -> dict:
     """Evaluate the three criteria. Row files are dicts keyed by
     problem_id -> {"mean_score": float|None, "measure_classes":
     [..], "allowed_row_outside": int} — the machine run's normalizer
-    emits this shape; the evaluator refuses to guess."""
+    emits this shape; the evaluator refuses to guess (v1.2.0: the
+    refusal is now TYPED and comes BEFORE any computation — a raw
+    run-record or partial dict is EVALUATION_REFUSED, never an
+    untyped crash and never a silent default)."""
     rows = json.loads(rows_path.read_text())
     base = json.loads(baseline_path.read_text())
+    # Art. 3 (v1.2.0): typed shape refusal before computation
+    bad = _shape_violation(rows, "candidate rows") \
+        or _shape_violation(base, "baseline rows")
+    if bad:
+        return {"record": "R53_P2_ABLATION_CRITERIA/1.2.0",
+                "verdict": "EVALUATION_REFUSED",
+                "refusal": "row_shape",
+                "reason": bad,
+                "expected_shape": {"<problem_id>": {
+                    "mean_score": "number|null",
+                    "measure_classes": "[str, ..]",
+                    "allowed_row_outside": "int"},
+                    "producer": "scripts/r58_p2_ablation_driver.py "
+                                "--normalize (the evaluator never "
+                                "guesses a missing field)"}}
     common = sorted(set(rows) & set(base))
     if not common:
         return {"verdict": "EVALUATION_REFUSED",
@@ -109,14 +209,16 @@ def evaluate(rows_path: Path, baseline_path: Path) -> dict:
                else "DELETE" if crit1["met"] and crit2["met"] else
                "INCOMPLETE — criteria unmet; the pre-registered "
                "bar says the addition does not survive")
-    return {"record": "R53_P2_ABLATION_CRITERIA/1.1.0",
+    return {"record": "R53_P2_ABLATION_CRITERIA/1.2.0",
             "schedule_bar": SCHEDULE_BAR,
             "overlapping_rows": len(common),
             "criteria": [crit1, crit2, crit3],
             "verdict": verdict,
             "note": "evaluator only; the RUN defers (see module "
                      "docstring); v1.1.0 = the R58 UNMEASURABLE-"
-                     "verdict amendment (dated in the docstring)"}
+                     "verdict amendment; v1.2.0 = the R60 typed "
+                     "row-shape refusal (Art. 3; amendments dated in "
+                     "the docstring)"}
 
 
 def main() -> None:

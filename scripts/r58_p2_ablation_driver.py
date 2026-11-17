@@ -466,7 +466,7 @@ def dry_run() -> int:
         (td / "c4.json").write_text(json.dumps(fake4))
         out4 = evaluate(td / "c4.json", td / "b2.json")
         assert out4["verdict"].startswith("INCOMPLETE"), out4["verdict"]
-        print(f"[dry-run] evaluator v1.1.0 all paths OK "
+        print(f"[dry-run] evaluator all paths OK "
               f"(deferred/adopt/delete/incomplete)")
     print("[dry-run] PASS (zero LLM, zero network)")
     return 0
