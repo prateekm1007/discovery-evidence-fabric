@@ -38,10 +38,21 @@
   "vault_gitignored": true
  },
  "remote_ci": {
-  "pushed_sha": "filled at push",
-  "remote_ci_conclusion": "unreadable",
-  "read_at": "PENDING",
-  "check_runs": []
+  "pushed_sha": "c1ee1ac1a",
+  "remote_ci_conclusion": "failure",
+  "read_at": "2026-11-17T22:20:00Z",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "failure",
+    "head": "c1ee1ac1a"
+   }
+  ],
+  "failure_account": "QUOTED from the check-runs API: surface=failure at c1ee1ac1a, failed step 'Constitution v3.1.0 enforcement' \u2014 test_round_records_carry_the_remote_conclusion red because THIS record's remote_ci carried the placeholder 'filled at push' (not hex) at that run's bytes. The work commit 790ad75d4's own run failed on the same test for the additional reason that the art27_capability_budget block was missing (the pre-commit pytest exit was masked by `| tail -1` \u2014 typed in the fix commit). This honest-failure record IS the fix; the round-closing r41_remote_ci_read.py --apply after the next push carries the corrected run's conclusion.",
+  "push_sequence": [
+   "790ad75d4 (work, ran red: record incomplete)",
+   "c1ee1ac1a (art27 fix-forward, ran red: remote_ci placeholder)"
+  ]
  },
  "art27_capability_budget": {
   "engine_diff": "NONE \u2014 a pure custody round: one vault append (gitignored), one masked status record, one registry flip (c-0076). Zero engine lines touched.",
