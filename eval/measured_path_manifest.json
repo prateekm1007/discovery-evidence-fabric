@@ -1,0 +1,48 @@
+{
+ "record": "R59_MEASURED_PATH_MANIFEST/1.0.0",
+ "constitution": "EPISTEMIC v3.2.0 Art. 22 CI addition (F61), claim c-0080",
+ "clause": "every measurement/holdout driver is manifested naming the discovery_fabric/engine modules it imports; the CI import check flags a wrapper-only measurement - a driver whose measured path never enters the engine",
+ "f61_provenance": "F61 (auditor): the holdouts measured a 559-line wrapper, not the 3716-line engine; the remedy moved the measured path through engine_route and this manifest makes the declaration CI-checkable",
+ "entries": [
+  {
+   "work_id": "r53-p1-labelled-regression",
+   "driver": "scripts/r52_labelled_regression.py",
+   "ledger": "eval/r52_labelled_regression.json",
+   "engine_imports": [
+    "discovery_fabric.engine.engine_route",
+    "discovery_fabric.engine.population_search",
+    "discovery_fabric.engine.candidate_schema"
+   ],
+   "role": "the P1 Leg-A gate measurement (PASS 0/0/0) - the F64 CI proof"
+  },
+  {
+   "work_id": "r54-p1-unit-checked-measurement",
+   "driver": "scripts/r54_p1_unit_checked_measurement.py",
+   "ledger": "eval/r54_p1_unit_checked.json",
+   "engine_imports": [
+    "discovery_fabric.engine.engine_route",
+    "discovery_fabric.engine.physics_checks"
+   ],
+   "role": "the P1 Leg-B >=80% unit-checked measurement (36/36 = 1.0)"
+  },
+  {
+   "work_id": "r58-p2-dev-ablation-machine-leg",
+   "driver": "scripts/r58_p2_ablation_driver.py",
+   "ledger": "eval/r58_ablation/criteria_result.json",
+   "engine_imports": [
+    "discovery_fabric.engine.route_adapter"
+   ],
+   "role": "the P2 matched-budget DEV ablation (both arms; the measured-path declaration runs through the engine route registry - require_registered_model(V77_REQUEST_MODEL) refuses typed before any call)"
+  },
+  {
+   "work_id": "r59-seed-hash-probe",
+   "driver": "scripts/r59_seed_hash_probe.py",
+   "ledger": "tests/test_article15_determinism.py",
+   "engine_imports": [
+    "discovery_fabric.engine.engine_route",
+    "discovery_fabric.engine.candidate"
+   ],
+   "role": "the Art. 15 cross-seed determinism probe substrate (the integrated engine route + the canonical sha256_obj over one committed DEV problem)"
+  }
+ ]
+}

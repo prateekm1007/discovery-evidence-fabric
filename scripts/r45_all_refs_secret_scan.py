@@ -73,6 +73,15 @@ TOKEN_RULES = [
     ("aws-access-key", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
     ("google-api-key", re.compile(r"\bAIza[0-9A-Za-z_\-]{35}\b")),
     ("slack-token", re.compile(r"\bxox[baprs]-[0-9A-Za-z\-]{10,250}\b")),
+    # v3.2.0 Art. 17 addition (CORR-2): the OpenRouter key shape. The
+    # R50 v1.0.0 battery MISSED it — the live sk-or-v1-64hex key in
+    # the 76c23fef7 commit message was found by the AUDITOR's
+    # byte-probe, not by this scanner (the exact gap CORR-2 records).
+    # Exact shape (64 lowercase hex after the prefix) so benign prose
+    # mentions of "sk-or-v1-..." never match — the 3 other message
+    # mentions are pattern references, typed benign by the CORR-2
+    # correction, and MUST stay undetected by this rule.
+    ("openrouter-key", re.compile(r"\bsk-or-v1-[0-9a-f]{64}\b")),
     ("private-key-block", re.compile(
         r"-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP |)PRIVATE KEY( BLOCK)?-----")),
     ("jwt", re.compile(r"\beyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\b")),
@@ -102,6 +111,7 @@ EXCLUDED_SHAPES = {
 GIT_GREP_PATTERN = (
     "github_pat_[0-9A-Za-z_]+|gh[pousr]_[0-9A-Za-z]+|glpat-[0-9A-Za-z_-]+|"
     "AKIA[0-9A-Z]+|AIza[0-9A-Za-z_-]+|xox[baprs]-[0-9A-Za-z-]+|"
+    "sk-or-v1-[0-9a-fA-F]+|"
     "BEGIN [A-Za-z ]*PRIVATE KEY|eyJ[A-Za-z0-9_-]+[.]|"
     "api[_-]?key|apikey|auth[_-]?token|access[_-]?token|secret[_-]?key|"
     "client[_-]?secret|secret|credential|passwo?r?d|passwd|bearer")
@@ -282,6 +292,69 @@ def scan_history_pickaxe(refs: list) -> tuple:
     return findings, stats
 
 
+def scan_commit_messages(refs: list) -> tuple:
+    """v3.2.0 Art. 17 addition (F45/CORR-2): FULL-HISTORY COMMIT-MESSAGE
+    scan. The v1.0.0 history leg pickaxes DIFFS only (`git log -p`) —
+    commit MESSAGES never enter the diff surface, which is exactly how
+    the OpenRouter key embedded in the 76c23fef7 message evaded the
+    R50 instrument (CORR-2: the auditor found it by byte-probe; the
+    bundle's original attribution was then mis-assigned by subject
+    prefix to v28). This leg enumerates every reachable commit's
+    message (`git log --all` with %H + %B), scans it line-by-line
+    with the SAME classifier battery, and attributes every finding to
+    the EXACT commit SHA (never a subject prefix).
+    Returns (findings, stats)."""
+    findings = []
+    stats = {"method": "git log --all --format=<RS><H><US><B>",
+             "commits_scanned": 0, "message_lines_scanned": 0,
+             "truncated": False, "cap_bytes": HISTORY_DIFF_CAP}
+    # RS (\x1e) starts a record; US (\x1f) separates the SHA from the
+    # raw body (%B). The pickaxe is NOT used here: messages are read
+    # directly, every commit, no regex pre-filter (the discovery regex
+    # would ALSO miss message-embedded keys whose shape differs from
+    # the -G pattern; the classifier battery is the detector).
+    p = subprocess.Popen(
+        ["git", "log", "--all", "--format=%x1e%H%x1f%B"],
+        cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    commit, in_body, line_no = None, False, 0
+    total = 0
+    for raw in p.stdout:
+        total += len(raw)
+        if total > HISTORY_DIFF_CAP:
+            stats["truncated"] = True
+            break
+        ln = raw.decode(errors="replace").rstrip("\n")
+        if ln.startswith("\x1e"):
+            commit = ln[1:].split("\x1f", 1)[0]
+            body = ln[1:].split("\x1f", 1)[1] if "\x1f" in ln else ""
+            stats["commits_scanned"] += 1
+            in_body = True
+            line_no = 0
+            lines = [body]
+        elif in_body and commit:
+            lines = [ln]
+        else:
+            continue
+        for msg_ln in lines:
+            line_no += 1
+            if not msg_ln.strip():
+                continue
+            stats["message_lines_scanned"] += 1
+            for f in scan_text(msg_ln, "<commit-message>"):
+                f["ref"] = "history-messages"
+                f["surface"] = "commit_message"
+                f["commit"] = commit  # EXACT SHA attribution (CORR-2)
+                f["message_line"] = line_no
+                findings.append(f)
+    p.terminate()
+    p.wait()
+    if stats["truncated"]:
+        stats["note"] = ("the message stream hit the typed cap — the "
+                         "remaining commits' messages were NOT "
+                         "parsed (disclosed, Art. 9)")
+    return findings, stats
+
+
 def scan_staged() -> list:
     """Added lines of the staged diff, per path. Any hit is a refusal
     (the pre-commit layer has NO baseline — history/tips are the
@@ -332,14 +405,15 @@ def gate(findings: list, baseline: dict) -> tuple:
 
 def _redact_finding(f: dict) -> dict:
     keys = ("rule", "surface", "ref", "path", "line", "commit",
-            "fingerprint")
+            "message_line", "fingerprint")
     return {k: f[k] for k in keys if k in f}
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["all", "tips", "history",
-                                       "staged"], default="all")
+                                       "messages", "staged"],
+                    default="all")
     ap.add_argument("--report", type=Path, default=None,
                     help="write the machine report JSON here")
     ap.add_argument("--gitleaks", type=str, default=None,
@@ -347,8 +421,11 @@ def main() -> int:
     args = ap.parse_args()
 
     report = {
-        "record": "R50_ALL_REFS_SECRET_SCAN/1.0.0",
+        "record": "R50_ALL_REFS_SECRET_SCAN/1.1.0",
         "mode": args.mode,
+        "v1_1_0_note": "the messages leg (commit messages, exact-SHA "
+                       "attribution) joins tips+history per the "
+                       "epistemic v3.2.0 Art. 17 addition (F45/CORR-2)",
         "detector": {
             "token_rules": [r for r, _ in TOKEN_RULES],
             "generic_rule": "secret-vocabulary key + quoted value with "
@@ -377,6 +454,10 @@ def main() -> int:
                 hist_findings, hist_stats = scan_history_pickaxe(refs)
                 findings += hist_findings
                 report["history_stats"] = hist_stats
+            if args.mode in ("all", "messages"):
+                msg_findings, msg_stats = scan_commit_messages(refs)
+                findings += msg_findings
+                report["messages_stats"] = msg_stats
     except Exception as e:  # fail closed, typed
         print(f"SECRET SCAN INSTRUMENT FAILURE (typed, fail-closed): {e}",
               file=sys.stderr)

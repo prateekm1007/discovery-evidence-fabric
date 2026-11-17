@@ -175,3 +175,79 @@ def test_missing_baseline_is_typed_instrument_failure():
             S.load_baseline()
     finally:
         S.BASELINE = orig
+
+
+# ---------------------------------------------------------------------------
+# (6) v3.2.0 Art. 17 addition: the MESSAGES leg (F45/CORR-2).
+#     Commit MESSAGES never enter the diff pickaxe (`git log -p`) —
+#     that is exactly how the OpenRouter key embedded in the
+#     76c23fef7 message evaded the v1.0.0 instrument and was found by
+#     the auditor's byte-probe instead (CORR-2). The messages leg
+#     enumerates every reachable commit's message and attributes
+#     findings to the EXACT SHA.
+# ---------------------------------------------------------------------------
+
+def test_openrouter_rule_fires_on_exact_shape():
+    fake = 'sk-or-v1-' + 'a1b2c3d4' * 8  # 64 hex chars, synthetic
+    f = S.scan_text(f'key = "{fake}"', "<commit-message>")
+    assert any(x["rule"] == "openrouter-key" for x in f), (
+        "the openrouter-key rule must fire on the exact 64-hex shape "
+        "(the CORR-2 detection gap)")
+
+
+def test_openrouter_rule_stays_silent_on_benign_mentions():
+    # the CORR-2 correction typed the 3 other sk-or- message mentions
+    # benign prose pattern references — the exact-shape rule must NOT
+    # fire on them (truncated / non-hex / short tails).
+    benign = [
+        'rotate the OpenRouter sk-or-v1 key',
+        'key shape sk-or-v1-897ac0e3 (prefix only, CORR-2 record)',
+        'sk-or-v1-<redacted>',
+        'sk-or-v1-ZzzzNotHex1234567890abcdef12345678',
+    ]
+    for ln in benign:
+        assert not any(x["rule"] == "openrouter-key"
+                       for x in S.scan_text(ln, "<commit-message>")), (
+            f"benign mention fired the rule: {ln}")
+
+
+def test_messages_leg_scans_every_commit_and_attributes_exact_sha():
+    findings, stats = S.scan_commit_messages([])
+    assert stats["commits_scanned"] > 500, (
+        f"messages leg scanned only {stats['commits_scanned']} commits — "
+        "the full history is the surface")
+    assert stats["message_lines_scanned"] > 1000
+    # the CORR-2 finding is in the live history, caught by the messages
+    # leg, attributed to the EXACT SHA (never a subject prefix)
+    corr2 = [f for f in findings if f["rule"] == "openrouter-key"]
+    assert len(corr2) == 1, (
+        f"expected exactly 1 openrouter-key finding in messages "
+        f"(the CORR-2 key), got {len(corr2)}")
+    assert corr2[0]["commit"] == (
+        "76c23fef787e4d6e7f04eb62e1b6e2f400af8a45"), (
+        "attribution must be the EXACT commit SHA (Art. 17 v3.2.0)")
+    assert corr2[0]["surface"] == "commit_message"
+
+
+def test_corr2_finding_is_baselined_by_fingerprint():
+    baseline = S.load_baseline()
+    entry = [e for e in baseline["baseline"]
+             if e["rule"] == "openrouter-key"]
+    assert len(entry) == 1, "the CORR-2 finding must be baselined once"
+    e = entry[0]
+    assert e["disposition"].startswith("KNOWN-CORR-2-LIVE-LEAK")
+    assert "76c23fef787e4d6e7f04eb62e1b6e2f400af8a45" in e["provenance"], (
+        "baseline provenance carries the EXACT SHA (never a subject "
+        "prefix — the CORR-2 lesson)")
+    # fingerprint-only: no secret value anywhere in the baseline entry
+    assert "sk-or-v1-" not in e["disposition"] + e["provenance"] + json.dumps(
+        e.get("enumeration", {}))
+
+
+def test_full_gate_on_messages_mode_passes():
+    findings, _ = S.scan_commit_messages([])
+    baseline = S.load_baseline()
+    un, ok = S.gate(findings, baseline)
+    assert not un, (
+        "the messages-mode gate must PASS on the committed baseline")
+    assert ok >= 1

@@ -96,6 +96,12 @@ jobs:
             tests/test_article25_disconfirming_record.py \
             tests/test_article26_provider_spread.py \
             tests/test_article27_capability_budget.py \
+            tests/test_article27_engine_share.py \
+            tests/test_article3_degenerate_probes.py \
+            tests/test_article14_confidentiality_probe.py \
+            tests/test_article15_determinism.py \
+            tests/test_article19_21_schema_enum.py \
+            tests/test_article22_measured_path.py \
             tests/test_article28_owner_dependency.py \
             tests/test_article29_parallel_coordination.py \
             tests/test_article_process_wiring.py \
@@ -111,6 +117,27 @@ jobs:
             tests/test_physics_checks_r54.py \
             tests/test_all_refs_secret_scan.py \
             -q -p no:warnings
+      # EPISTEMIC v3.2.0 Art. 14 (F60): the LIVE confidentiality probe
+      # — an UNAUTHENTICATED read of any *_PRIVATE.json rubric must NOT
+      # return 200 unless the path is typed BURNED-PUBLIC in the
+      # committed burn registry (the F60 disclosure stays visible; a
+      # non-disclosed 200 REDS the push). The static layer runs in the
+      # pytest block above; this is the live unauth-HTTP half.
+      - name: Confidentiality probe — live unauth rubric reads (Art. 14 v3.2.0, F60)
+        run: |
+          set -e
+          python3 scripts/r59_confidentiality_probe.py --mode live
+      # EPISTEMIC v3.2.0 Art. 17 (F45/CORR-2): the MESSAGES leg of the
+      # secret-scan gate — commit messages are a secret surface the
+      # blob/diff pickaxe never sees (the OpenRouter key in the
+      # 76c23fef7 message was found by the auditor, not the v1.0.0
+      # instrument). 0 unbaselined findings or the push REDS; the
+      # CORR-2 finding is baselined by fingerprint with EXACT-SHA
+      # provenance (owner rotation pending).
+      - name: Secret-scan gate — commit messages, exact-SHA attribution (Art. 17 v3.2.0, F45/CORR-2)
+        run: |
+          set -e
+          python3 scripts/r45_all_refs_secret_scan.py --mode messages
       # F64 remedy (R53, c-0071): the P1.4 labelled regression runs IN
       # CI from committed bytes — the gate verdict must be PASS 0/0/0
       # or the push reds. The driver is zero-LLM (deterministic,

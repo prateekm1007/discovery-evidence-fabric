@@ -1,6 +1,6 @@
 {
- "record": "ENFORCEMENT_MAP/2.0.0 (v3.1.0: every article is queue-gated by a passing CI check, or CI-pinned-flagged with the gap typed — no silent gaps; 29/29 articles after the owner-added Art. 29)",
- "at": "2026-11-17T03:20:00Z (sandbox clock, R43 c-0060 append)",
+ "record": "ENFORCEMENT_MAP/2.1.0 (v3.2.0: the auditor R57 proposal RATIFIED by builder-r58s1 c-0080 — every article is queue-gated by a passing CI check or CI-pinned-flagged with the gap typed — no silent gaps, 29/29 articles; the 7 empirical failure modes (F45/CORR-2, F57/58/59, F60, F61, F63, F64, F67) became CI checks; Art. 8 commercial clauses retired (retirement ledger))",
+ "at": "2026-11-17T18:30:00Z (sandbox clock, R58 c-0080 ratification append)",
  "article_map": {
   "1": {
    "article": "Evidence & provenance",
@@ -18,7 +18,11 @@
   "3": {
    "article": "Fail closed",
    "status": "WIRED",
-   "mechanism": "typed refusals asserted in tests/test_adversarial_infra_separation.py; drivers fail closed on incomplete pools (battery drivers' assert gates)"
+   "mechanism": "typed refusals asserted in tests/test_adversarial_infra_separation.py; v3.2.0 adds the DEGENERATE-INPUT probe battery over EVERY physics relation (derived matrix: zero/negative/NaN per input + absolute-zero for degC inputs; no uncaught exception, typed verdicts, >=1 REFUSED probe per relation) - queue-gated [tests/test_article3_degenerate_probes.py] + adversarial suites [tests/test_adversarial_infra_separation.py]",
+   "tests": [
+    "tests/test_article3_degenerate_probes.py",
+    "tests/test_adversarial_infra_separation.py"
+   ]
   },
   "4": {
    "article": "History & corrections",
@@ -47,12 +51,13 @@
    "mechanism": "tests/test_audit_branch_guard.py + cemetery preservation suites"
   },
   "8": {
-   "article": "Unknown & commercial honesty",
+   "article": "Unknown & patent honesty (v3.2.0 trimmed)",
    "status": "WIRED",
-   "mechanism": "the label taxonomy (USER CONSTRAINT / CALCULATED / ASSUMPTION) exists in the contract family the critic enforces, with the no-development rule kept in the V-contract line — queue-gated [tests/test_article_process_wiring.py]",
+   "mechanism": "v3.2.0 RETIRED the buyer-distribution/commercial-figures clauses (retirement ledger entry, successor = Art. 8 trimmed); the kept clauses (unknown stays unknown; patent evidence != patent truth) stay enforced by the label taxonomy in the contract family - queue-gated [tests/test_article_process_wiring.py]; the retired clauses are dead prose no gate may cite",
    "tests": [
     "tests/test_article_process_wiring.py"
-   ]
+   ],
+   "retirement_ledger": "eval/retirement_ledger.json"
   },
   "9": {
    "article": "Thresholds",
@@ -89,12 +94,18 @@
   "14": {
    "article": "The Invention Gate",
    "status": "WIRED",
-   "mechanism": "AM14_D5_point_estimate + r7_comparable_CI computed in the shared metric core (eval/battery_metrics.summarize) on every battery"
+   "mechanism": "AM14_D5_point_estimate + r7_comparable_CI computed in the shared metric core (eval/battery_metrics.summarize) on every battery; v3.2.0 adds the CONFIDENTIALITY probe: unauth read of any *_PRIVATE.json rubric must NOT be 200 unless typed BURNED-PUBLIC in the committed burn registry (F60: seal = integrity only) - static layer queue-gated [tests/test_article14_confidentiality_probe.py], live unauth-HTTP layer a workflow step [scripts/r59_confidentiality_probe.py --mode live]",
+   "tests": [
+    "tests/test_article14_confidentiality_probe.py"
+   ]
   },
   "15": {
    "article": "Infra failure & reproducibility",
    "status": "WIRED",
-   "mechanism": "partial-record resume discipline in every battery driver + AM19 sec.2 determinism finding recorded"
+   "mechanism": "partial-record resume discipline in every battery driver + v3.2.0 CROSS-SEED DETERMINISM (candidate_id/candidate_hash content hashes byte-identical across PYTHONHASHSEED 1/2/3/random through the integrated engine route) + BYTE-IDENTICAL FRESH-CLONE reproduction of the committed P1 artifact - queue-gated [tests/test_article15_determinism.py] (probe substrate scripts/r59_seed_hash_probe.py)",
+   "tests": [
+    "tests/test_article15_determinism.py"
+   ]
   },
   "16": {
    "article": "Retirement",
@@ -107,7 +118,10 @@
   "17": {
    "article": "Secrets & credential custody",
    "status": "WIRED",
-   "mechanism": "vault-only custody (.env.keys, names-only echo); F33 recorded; remote moved off embedded-token URL this round"
+   "mechanism": "vault-only custody (.env.keys, names-only echo); v3.2.0 ALL-REFS + FULL-HISTORY scan INCLUDING COMMIT MESSAGES with EXACT-SHA attribution (F45/CORR-2: the openrouter-key rule + the messages leg in scripts/r45_all_refs_secret_scan.py --mode messages; the CORR-2 finding baselined by fingerprint @ exact SHA 76c23fef7) - queue-gated [tests/test_all_refs_secret_scan.py]",
+   "tests": [
+    "tests/test_all_refs_secret_scan.py"
+   ]
   },
   "18": {
    "article": "Durable execution & push",
@@ -122,7 +136,11 @@
   "19": {
    "article": "Metric unit tests",
    "status": "WIRED",
-   "mechanism": "tests/test_article19_metric_unit_tests.py"
+   "mechanism": "tests/test_article19_metric_unit_tests.py; v3.2.0 adds STRUCTURED-SCHEMA-ENUM validation of committed structured records (measure_class/signals_used/principle_id vs the engine enums + the classical TRIZ registry) and deterministic diversity axes - queue-gated [tests/test_article19_21_schema_enum.py]",
+   "tests": [
+    "tests/test_article19_metric_unit_tests.py",
+    "tests/test_article19_21_schema_enum.py"
+   ]
   },
   "20": {
    "article": "Incumbent challenge",
@@ -132,12 +150,20 @@
   "21": {
    "article": "Label integrity",
    "status": "WIRED",
-   "mechanism": "tests/test_article21_label_integrity.py"
+   "mechanism": "tests/test_article21_label_integrity.py; v3.2.0: the enum fields validate schema-sourced (the prose-regex scanners RETIRED from the validation role; the engine validation path is scanner-free by AST check) - queue-gated [tests/test_article19_21_schema_enum.py]",
+   "tests": [
+    "tests/test_article21_label_integrity.py",
+    "tests/test_article19_21_schema_enum.py"
+   ]
   },
   "22": {
    "article": "Real-bytes acceptance",
-   "status": "PARTIAL",
-   "mechanism": "tests/test_article22_real_bytes.py (committed-bytes half); fresh-held-out half FLAGGED pending holdout v2; fixtures labeled mechanics-only"
+   "status": "WIRED",
+   "mechanism": "tests/test_article22_real_bytes.py (committed-bytes half) + fresh-held-out half; v3.2.0 adds the MEASURED-PATH declaration: eval/measured_path_manifest.json names every measurement driver's engine imports, the AST check flags a wrapper-only measurement both directions (F61) - queue-gated [tests/test_article22_measured_path.py]",
+   "tests": [
+    "tests/test_article22_real_bytes.py",
+    "tests/test_article22_measured_path.py"
+   ]
   },
   "23": {
    "article": "Clean delivery",
@@ -165,7 +191,11 @@
   "27": {
    "article": "Capability budget",
    "status": "WIRED",
-   "mechanism": "tests/test_article27_capability_budget.py gates the Art. 27 ledger schema on every round record from r16 on + the Art. 20 registry recompute (c-0050 completed the ledger r30..r39; the map text is corrected from the stale PARTIAL note — the standalone test has existed and run in the queue CI since c-0050)"
+   "mechanism": "tests/test_article27_capability_budget.py gates the Art. 27 ledger schema; v3.2.0 adds ENGINE-LINE SHARE: every round record from R58 on declares art27_capability_budget.engine_share_declaration over its diff range, the CI recompute (scripts/r59_engine_share.py) must MATCH, sub-30% requires a typed below-rule disclosure (F63) - queue-gated [tests/test_article27_engine_share.py]",
+   "tests": [
+    "tests/test_article27_capability_budget.py",
+    "tests/test_article27_engine_share.py"
+   ]
   },
   "28": {
    "article": "Owner-dependency timeout & escalation",

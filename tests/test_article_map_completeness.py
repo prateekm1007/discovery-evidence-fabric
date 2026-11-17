@@ -55,8 +55,16 @@ def test_wired_tests_exist_and_gate_the_queue_ci():
 
 def test_no_silent_gaps():
     flags = json.loads(FLAGS.read_text(encoding="utf-8"))
-    assert flags["record"].startswith("ENFORCEMENT_MAP/2.0.0"), \
+    # the CONTRACT is pinned, not the version (the R55 instrument-pin
+    # churn lesson): any map version must state the no-silent-gaps
+    # rule — every article queue-gated or CI-pinned-flagged, 29/29.
+    rec = flags["record"]
+    assert rec.startswith("ENFORCEMENT_MAP/"), \
+        "the map record must be an ENFORCEMENT_MAP record"
+    assert "no silent gaps" in rec, \
         "map version must carry the no-silent-gaps contract"
+    assert "29/29" in rec, \
+        "map version must carry the 29/29 coverage statement"
     legacy = flags["legacy_flags"]
     assert "article22_fresh_heldout" in legacy, \
         "the held-out half flag must stay visible until holdout v2"
