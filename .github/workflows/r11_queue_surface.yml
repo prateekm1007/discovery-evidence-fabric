@@ -34,7 +34,13 @@ jobs:
       - name: Install test deps
         run: |
           set -e
-          python3 -m pip install --quiet pytest py pygments
+          # R50 (c-0066 lineage): pint joins the install list —
+          # tests/test_physics_checks.py imports pint through
+          # discovery_fabric.engine.physics_checks (the P1.1 computed-
+          # physics slice); without it the step-2 collection dies with
+          # exit 2 BEFORE any test runs (the 6d6c4de70 remote failure,
+          # diagnosed by the same symptom locally).
+          python3 -m pip install --quiet pytest py pygments pint
       - name: Deterministic regression surfaces (zero LLM)
         run: |
           set -e
