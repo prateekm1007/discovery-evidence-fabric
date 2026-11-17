@@ -1,0 +1,22 @@
+{
+ "record": "R59_VERIFIER_C0079/1.0.0",
+ "verifier_session": "builder-r59s1",
+ "claim": "c-0079",
+ "work_id": "r58-p2-dev-ablation-machine-leg",
+ "executor_session": "builder-r58s1",
+ "verified_at_tree_sha": "5bc495a84 (machine-leg bytes = e38d8fa7b; verifier D2 record rebased disjoint on top per Art. 29(e))",
+ "role_discipline": "VERIFIER never re-runs (Art. 29(c)): the quota-consuming one-shot was NOT executed by the verifier; every check below recomputes from committed bytes or runs committed TESTS only.",
+ "checks": {
+  "route_adapter_tests": "tests/test_r58_route_adapter.py + tests/test_all_refs_secret_scan.py: 29 pass / 0 fail, EXIT=0 (pipefail) — the engine route layer and the scanner messages-leg residual hold on the committed bytes",
+  "v7_7_loop_byte_identity": "STRUCTURAL PASS — git diff --name-only 9906ee067..e38d8fa7b touches ZERO V7.7 loop files; the loop is imported byte-unchanged and the P2 addition rides the typed_plan payload field exactly as claimed (the driver, route adapter, criteria and scanner files are the only code changes)",
+  "matched_budget": "VERIFIED from committed row bytes (rows_smoke_{baseline,challenger}/HO7-01+HO7-09): machine SAME, attempts_n SAME, executor/model identical (glm-4-plus, R36-registered zai-gateway route); the ONLY arm diffs are the intended treatment variables (typed_plan/winner_rule/plan_measure_class set on challenger, null on baseline) — ablation isolation holds",
+  "criteria_script_mechanics": "r53_p2_ablation_criteria.py correctly refuses to guess: it requires the normalizer's shape (problem_id -> {mean_score, measure_classes, allowed_row_outside}) and returns typed EVALUATION_REFUSED on non-overlap. OBSERVATION (non-blocking, executor's claimed path): feeding a RAW run-record (field-keyed dict) produces an untyped AttributeError at line 76 instead of the typed refusal — recommend hardening the shape check before the one-shot normalization is scored (Art. 3: refusals are typed, never silent)."
+ },
+ "criteria_state": {
+  "criterion_1_schedule_share": "UNCOMPUTED — one-shot in flight (executor record: baseline row 1/36 CLEAN committed); lands on completion, never projected",
+  "criterion_2_allowed_row_outside": "UNCOMPUTED — same",
+  "criterion_3_mean_no_drop": "UNMEASURABLE — requires the F60-compliant confidential instrument (auditor-authored, encrypted custody); absent scores are never fabricated"
+ },
+ "verdict": "MACHINERY_VERIFIED — the machine leg is sound and matched-budget; the one-shot may proceed under the executor's live lease (expiry 2026-11-19T00:00:00Z); c-0079 status flip remains the executor's act",
+ "provenance": "all checks from committed remote bytes at the named SHAs; no local-only evidence; CI on the custody lane (9906ee067) read green from the check-run API via scripts/r41_remote_ci_read.py"
+}
