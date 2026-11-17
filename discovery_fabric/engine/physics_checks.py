@@ -14,10 +14,12 @@ thermo, tespy) are per-check optional imports: a check that needs one
 returns a typed UNAVAILABLE verdict when the library is absent — a
 missing library never degrades into a fabricated number.
 
-Rounds 2+ of P1 add checks (NPSH/surge margin, frost psychrometrics,
-Larson-Miller, COP/charge proxy); this slice lands the harness plus
-the first three relations, each unit-tested in
-tests/test_physics_checks.py.
+Rounds 2+ of P1 (R52, claim c-0069) bring the registry to the six
+roadmap-named relations: Arrhenius rate ratio, fouling U-degradation,
+Langelier LSI, NPSH cavitation margin, Magnus dewpoint/frost margin,
+and the Larson-Miller creep comparator — each unit-checked in
+tests/test_physics_checks.py; the direction-of-effect is the SIGN of
+the computed result on every one.
 """
 from __future__ import annotations
 
@@ -164,16 +166,125 @@ def langelier_lsi(tds_mg_l: float, temp_degC: float,
                        {"error": f"{type(e).__name__}: {e}"})
 
 
+# ---------------------------------------------------------------------------
+# check 4: NPSH margin (cavitation)
+#   NPSHa = (P_atm - P_vap)/(rho*g) + h_suction - h_friction
+#   margin = NPSHa - NPSHr; sign of the margin is the direction:
+#   <= 0 the suction side sits in the cavitation regime (worsens),
+#   > 0 it clears onset (improves relative to cavitation onset).
+# ---------------------------------------------------------------------------
+def npsh_margin(patm_kpa: float, pvap_kpa: float, rho_kg_m3: float,
+                suction_head_m: float, friction_loss_m: float,
+                npshr_m: float) -> Dict[str, Any]:
+    try:
+        g = pint.Quantity(9.80665, "m/s**2")
+        dp = (_q(patm_kpa, "kPa") - _q(pvap_kpa, "kPa")).to("Pa")
+        rho = _q(rho_kg_m3, "kg/m**3")
+        head = dp / (rho * g)                       # m of fluid
+        hs = _q(suction_head_m, "m")
+        hf = _q(friction_loss_m, "m")
+        npsha = head + hs - hf
+        npshr = _q(npshr_m, "m")
+        margin = float((npsha - npshr).to("m").magnitude)
+        if float(rho.magnitude) <= 0 or float(pvap_kpa) <= 0:
+            raise ValueError("rho and vapour pressure must be > 0")
+        direction = ("worsens" if margin <= 0.0 else "improves")
+        return _result(
+            "npsh_margin", "cavitation", "RUN", round(margin, 4), "m",
+            direction,
+            {"npsha_m": round(float(npsha.to("m").magnitude), 4),
+             "npshr_m": float(npshr.magnitude),
+             "basis": "NPSHa = (P_atm - P_vap)/(rho g) + h_suction - "
+                      "h_friction; margin <= 0 means cavitation "
+                      "regime — an 'improves' prose claim on a "
+                      "non-positive margin cannot survive this check"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("npsh_margin", "cavitation", "REFUSED", None,
+                       "m", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 5: frost/condensation psychrometric margin
+#   Magnus dewpoint from (T, RH); margin = T_surface - T_dewpoint.
+#   margin <= 0 = condensation/frost regime (worsens), > 0 clears it.
+# ---------------------------------------------------------------------------
+def dewpoint_frost_margin(t_air_degC: float, rh_percent: float,
+                          t_surface_degC: float) -> Dict[str, Any]:
+    try:
+        t = _q(t_air_degC, "degC").to("degC").magnitude
+        rhs = _q(rh_percent, "percent").to("percent").magnitude
+        ts = _q(t_surface_degC, "degC").to("degC").magnitude
+        if not (0.0 < rhs <= 100.0):
+            raise ValueError("RH must be in (0, 100]")
+        a, b = 17.625, 243.04          # Magnus-Tetens (over water)
+        alpha = math.log(rhs / 100.0) + a * t / (b + t)
+        td = b * alpha / (a - alpha)
+        margin = ts - td
+        direction = ("worsens" if margin <= 0.0 else "improves")
+        return _result(
+            "dewpoint_frost_margin", "frost_condensation", "RUN",
+            round(margin, 3), "delta_degC", direction,
+            {"dewpoint_degC": round(td, 3), "t_surface_degC": ts,
+             "basis": "Magnus dewpoint; T_surface - T_dewpoint <= 0 "
+                      "means condensation/frost regime — the "
+                      "intervention's claimed surface-temperature "
+                      "regime must keep the margin positive"})
+    except (TypeError, ValueError) as e:
+        return _result("dewpoint_frost_margin", "frost_condensation",
+                       "REFUSED", None, "delta_degC", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# ---------------------------------------------------------------------------
+# check 6: Larson-Miller creep-life comparator
+#   LMP = T_K * (C + log10(t_h)), C = 20 (classical steels).
+#   delta = LMP(proposed) - LMP(baseline): the monotone parameter means
+#   delta > 0 consumes creep life faster (worsens), delta < 0 improves.
+# ---------------------------------------------------------------------------
+def larson_miller_lmp(t1_degC: float, t1_h: float, t2_degC: float,
+                      t2_h: float, c_const: float = 20.0
+                      ) -> Dict[str, Any]:
+    try:
+        tk1 = _q(t1_degC, "degC").to("K").magnitude
+        tk2 = _q(t2_degC, "degC").to("K").magnitude
+        if min(t1_h, t2_h) <= 0 or min(tk1, tk2) <= 0:
+            raise ValueError("times and temperatures must be > 0")
+        lmp1 = tk1 * (c_const + math.log10(t1_h))
+        lmp2 = tk2 * (c_const + math.log10(t2_h))
+        delta = lmp2 - lmp1
+        direction = ("worsens" if delta > 1e-9 else
+                     "improves" if delta < -1e-9 else "neutral")
+        return _result(
+            "larson_miller_lmp", "creep", "RUN", round(delta, 1),
+            "K", direction,
+            {"lmp_baseline": round(lmp1, 1), "lmp_proposed":
+             round(lmp2, 1), "c_const": c_const,
+             "basis": "LMP = T_K (C + log10 t) — monotone in both T "
+                      "and time at temperature; delta > 0 means the "
+                      "proposed regime is harsher on creep life"})
+    except (TypeError, ValueError) as e:
+        return _result("larson_miller_lmp", "creep", "REFUSED", None,
+                       "K", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
 CHECKS = {
     "arrhenius_rate_ratio": arrhenius_rate_ratio,
     "fouling_u_degradation": fouling_u_degradation,
     "langelier_lsi": langelier_lsi,
+    "npsh_margin": npsh_margin,
+    "dewpoint_frost_margin": dewpoint_frost_margin,
+    "larson_miller_lmp": larson_miller_lmp,
 }
 
 CHECKS_BY_FAILURE_CLASS = {
     "thermal_aging": ["arrhenius_rate_ratio"],
     "fouling": ["fouling_u_degradation"],
     "scaling": ["langelier_lsi", "fouling_u_degradation"],
+    "cavitation": ["npsh_margin"],
+    "frost_condensation": ["dewpoint_frost_margin"],
+    "creep": ["larson_miller_lmp", "arrhenius_rate_ratio"],
 }
 
 

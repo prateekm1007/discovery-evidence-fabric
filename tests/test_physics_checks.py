@@ -91,3 +91,76 @@ def test_failure_class_routing():
     assert "arrhenius_rate_ratio" in pc.check_for_failure_class(
         "thermal_aging")
     assert pc.check_for_failure_class("unknown_class") == []
+
+
+def test_npsh_margin_sign_and_refusal():
+    # healthy suction: big atmospheric head, flooded suction -> RUN, > 0
+    ok = pc.run_check("npsh_margin", patm_kpa=101.3, pvap_kpa=2.3,
+                      rho_kg_m3=998.0, suction_head_m=2.0,
+                      friction_loss_m=0.3, npshr_m=0.5)
+    assert ok["verdict"] == "RUN" and ok["value"] > 0
+    assert ok["direction_of_effect"] == "improves"
+    # starving suction: hot fluid, deep lift, heavy friction — the
+    # atmospheric head (~5.8 m for 80 C water) is consumed -> <= 0
+    bad = pc.run_check("npsh_margin", patm_kpa=101.3, pvap_kpa=47.0,
+                       rho_kg_m3=958.0, suction_head_m=-5.0,
+                       friction_loss_m=1.5, npshr_m=1.0)
+    assert bad["verdict"] == "RUN" and bad["value"] <= 0
+    assert bad["direction_of_effect"] == "worsens"
+
+
+def test_dewpoint_frost_margin_known_answer():
+    # air 30 C at 60 % RH -> dewpoint ~ 21.4 C; a 25 C surface clears
+    ok = pc.run_check("dewpoint_frost_margin", t_air_degC=30.0,
+                      rh_percent=60.0, t_surface_degC=25.0)
+    assert ok["verdict"] == "RUN"
+    assert 3.0 < ok["value"] < 4.5
+    assert ok["direction_of_effect"] == "improves"
+    # the same surface under saturated air condenses -> worsens
+    bad = pc.run_check("dewpoint_frost_margin", t_air_degC=30.0,
+                       rh_percent=95.0, t_surface_degC=25.0)
+    assert bad["value"] < 0
+    assert bad["direction_of_effect"] == "worsens"
+
+
+def test_larson_miller_comparator_sign():
+    # hotter + longer at temperature = harsher creep regime
+    harsh = pc.run_check("larson_miller_lmp", t1_degC=540.0, t1_h=40000,
+                         t2_degC=600.0, t2_h=60000)
+    assert harsh["verdict"] == "RUN" and harsh["value"] > 0
+    assert harsh["direction_of_effect"] == "worsens"
+    cool = pc.run_check("larson_miller_lmp", t1_degC=600.0, t1_h=60000,
+                        t2_degC=540.0, t2_h=40000)
+    assert cool["value"] < 0
+    assert cool["direction_of_effect"] == "improves"
+
+
+BAD_INPUTS = {
+    "arrhenius_rate_ratio": dict(ea_kj_mol=None, t1_degC=60.0,
+                                 t2_degC=90.0),
+    "fouling_u_degradation": dict(u_clean_w_m2k=None,
+                                  rf_after_m2k_w=0.0,
+                                  rf_before_m2k_w=0.0),
+    "langelier_lsi": dict(tds_mg_l=None, temp_degC=25.0,
+                          ca_hardness_mg_l_caco3=100.0,
+                          alkalinity_mg_l_caco3=80.0, ph=7.5),
+    "npsh_margin": dict(patm_kpa=None, pvap_kpa=2.3, rho_kg_m3=998.0,
+                        suction_head_m=2.0, friction_loss_m=0.3,
+                        npshr_m=0.5),
+    "dewpoint_frost_margin": dict(t_air_degC=None, rh_percent=60.0,
+                                  t_surface_degC=25.0),
+    "larson_miller_lmp": dict(t1_degC=None, t1_h=40000, t2_degC=600.0,
+                              t2_h=60000),
+}
+
+
+def test_registry_has_six_relations():
+    assert len(pc.CHECKS) == 6, sorted(pc.CHECKS)
+
+
+def test_every_check_refuses_garbage_rather_than_fabricating():
+    for cid, bad in BAD_INPUTS.items():
+        r = pc.run_check(cid, **bad)
+        assert r["verdict"] == "REFUSED", (cid, r)
+        assert r["direction_of_effect"] == "unavailable"
+        assert r["value"] is None
