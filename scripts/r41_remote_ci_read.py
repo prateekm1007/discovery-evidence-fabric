@@ -83,6 +83,7 @@ def read_check_runs(sha: str) -> dict:
 
 def conclude(block: dict) -> int:
     if "read_error" in block:
+        block["remote_ci_conclusion"] = "unreadable"
         print(json.dumps(block, indent=1))
         print("REMOTE-CI: UNREADABLE — no green may be claimed "
               "(typed; fix the read, never the claim)", flush=True)
@@ -93,10 +94,12 @@ def conclude(block: dict) -> int:
             return _pending(r)
         concl.append(r["conclusion"])
     if any(c in _BAD or c is None for c in concl):
+        block["remote_ci_conclusion"] = "failure"
         print(json.dumps(block, indent=1))
         print("REMOTE-CI: FAILURE — the pushed gate is red; fix "
               "forward-only, never the claim", flush=True)
         return 1
+    block["remote_ci_conclusion"] = "success"
     print(json.dumps(block, indent=1))
     print("REMOTE-CI: SUCCESS (read from the check-run API — the "
           "green is the remote's, not a local pytest run)", flush=True)
