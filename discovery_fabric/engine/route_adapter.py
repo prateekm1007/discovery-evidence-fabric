@@ -2,71 +2,85 @@
 LLM route layer (R58, claim c-0079; the P2 machine-leg transport).
 
 WHAT THIS IS: the typed route registry + the alternate-provider
-transports the P2/v9 one-shot needs for Art. 26 provider spread, with
-the R57s2 qualification (eval/r57s2_probe.json, claim c-0078) and
-this round's custody probes as the provenance for every route fact
-recorded here. No route in this module is ever wired as a judge
-(the r30_nvidia_route role discipline: generator-leg only).
+transports the P2/v9/v10 one-shots need for Art. 26 provider spread,
+with the R57s2 qualification (eval/r57s2_probe.json, claim c-0078),
+the R58/R64s4/R81 custody probes and the AM73 prereg amendment as the
+provenance for every route fact recorded here. No route in this
+module is ever wired as a judge (the r30_nvidia_route role
+discipline: generator-leg only).
 
 ROUTE REGISTRY (typed, provenance-tagged):
-  registered  zai-gateway  glm-4-plus  the R36 auditor registration
-                                       ("the frozen-machine generator
-                                       registration is corrected to
-                                       the exact servable id
-                                       glm-4-plus on the loop-local
-                                       zai gateway"); live-probed R58
-                                       by builder-r58s1 (HTTP 200,
-                                       model glm-4-plus, content
-                                       returned). The P2 ablation
-                                       (both arms, matched identity)
-                                       and the v9 one-shot generate
-                                       HERE. Transport: the loop-local
-                                       OpenAI-compatible gateway
-                                       (scripts/zai_gateway.mjs)
-                                       backed by the sandbox z-ai
-                                       CLI; 429-AIMD paced.
-  alternate   xkiro        69 models   OpenAI-compatible aggregator,
-                                       base https://api.xkiro.com/v1
-                                       (c-0078 verified end-to-end:
-                                       auth 200, generation 200 on
-                                       mistralai/ministral-14b; R58
-                                       custody probe: roster 69
-                                       matches). NO glm family in
-                                       the roster (R58 verified) —
-                                       an alternate FAMILY, never the
-                                       registered id.
-                                       TRANSPORT FACT (R58, typed):
-                                       the endpoint sits behind
-                                       Cloudflare and BANS the
-                                       python-urllib default
-                                       User-Agent (HTTP 403 "error
-                                       code: 1010"); a browser-like
-                                       User-Agent is REQUIRED (same
-                                       key: urllib 403 -> browser-UA
-                                       200).
-  alternate   agnes        10 models   OpenAI-compatible, base
-                                       https://apihub.agnes-ai.com/v1
-                                       (c-0078 verified end-to-end;
-                                       R58 custody probe: roster 10
-                                       matches, agnes-2.5-pro/flash
-                                       tiers). BUDGET FACT (c-0078,
-                                       measured): the flash tier
-                                       spends the token budget on
-                                       reasoning FIRST — at
-                                       max_tokens=16 the entire budget
-                                       went to reasoning tokens
-                                       (empty visible text); visible
-                                       text appeared at max_tokens=64
-                                       (309 total tokens). Every
-                                       agnes call must size
-                                       max_tokens >= visible_target +
-                                       REASONING_HEADROOM.
-  dead        deepai       402         key authenticates; account not
-                                       Pro in good standing (typed
-                                       R56 c-0076, R57 c-0077, R58
-                                       re-probe unchanged).
-  dead        nvidia       no key      the vault absence typed every
-                                       custody round since mid-R52.
+  registered  xkiro    cohere/command-a  AM73 (audit 227e9e97b): the
+                                        v10 model pin amended to R81's
+                                        fire-now registered id — the
+                                        frontier flagship, probe-proven
+                                        servable at the exact v10
+                                        contract shape (R81 full-
+                                        contract probe: finish=stop,
+                                        chars=3791, completion_tokens
+                                        =978, latency 17.7s,
+                                        deliverable_class_findings=[],
+                                        served==requested). Transport:
+                                        the loop-local gateway
+                                        (scripts/zai_gateway.mjs) with
+                                        ZAI_GATEWAY_UPSTREAM=xkiro +
+                                        XKIRO_MODEL_ID=cohere/command-a,
+                                        vault key XKIRO_API_KEY; the
+                                        browser UA + 1024 headroom are
+                                        the gateway's xkiro transport
+                                        contract. The v10 one-shot
+                                        generates HERE. Supersedes the
+                                        agnes-3.0-flash v9 pin
+                                        (r64s4/AM60) and, before that,
+                                        R36's glm-4-plus.
+  alternate   agnes    10 models        OpenAI-compatible, base
+                                        https://apihub.agnes-ai.com/v1
+                                        (c-0078 verified end-to-end;
+                                        R58 custody probe: roster 10
+                                        matches, agnes-2.5-pro/flash
+                                        tiers). Served the v9 one-shot
+                                        (30/30 served==requested==
+                                        registered agnes-3.0-flash; v9
+                                        mean 3.000 UNRESOLVED).
+                                        BUDGET FACT (c-0078,
+                                        measured): the flash tier
+                                        spends the token budget on
+                                        reasoning FIRST — at
+                                        max_tokens=16 the entire budget
+                                        went to reasoning tokens
+                                        (empty visible text); visible
+                                        text appeared at max_tokens=64
+                                        (309 total tokens). Every
+                                        agnes call must size
+                                        max_tokens >= visible_target +
+                                        REASONING_HEADROOM. Multi-key
+                                        429 rotation (R67s2):
+                                        AGNES_API_KEY +
+                                        AGNES_API_KEY_2 are per-key
+                                        quota buckets.
+  alternate   xkiro-transport-facts     The registered route's
+                                        transport ledger (kept as an
+                                        entry for the R58/R81 facts):
+                                        base https://api.xkiro.com/v1,
+                                        roster 69; Cloudflare BANS the
+                                        python-urllib default
+                                        User-Agent (HTTP 403 "error
+                                        code: 1010") — a browser-like
+                                        UA is REQUIRED; gateway
+                                        headroom 1024 (command-a-plus
+                                        measured ~1000 invisible
+                                        reasoning tokens; command-a
+                                        measured 978 completion tokens
+                                        with clean stop at the full
+                                        19K-char contract — the
+                                        headroom is insurance, sized
+                                        by the r64s4 probe).
+  dead        deepai   402              key authenticates; account not
+                                        Pro in good standing (typed
+                                        R56 c-0076, R57 c-0077, R58
+                                        re-probe unchanged).
+  dead        nvidia   no key           the vault absence typed every
+                                        custody round since mid-R52.
 
 REFUSAL TYPING (Art. 3): a transport that cannot serve returns a
 typed RouteRefused (kind: missing_key | auth | rate_limited |
@@ -86,7 +100,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-ROUTE_ADAPTER_VERSION = "route_adapter/1.0.0"
+ROUTE_ADAPTER_VERSION = "route_adapter/2.0.0"
 
 REPO = Path(__file__).resolve().parents[2]
 VAULT = REPO / ".env.keys"
@@ -104,31 +118,31 @@ REASONING_HEADROOM = 512
 
 ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
     "registered": {
-        "name": "agnes",
-        "base_url": "https://apihub.agnes-ai.com/v1",
-        "model": "agnes-3.0-flash",
-        "provenance": "OWNER-DIRECTED registration (2026-11-18): "
-                      "supersedes R36 by owner order + AM60 (v9 "
-                      "prereg glm-4-plus pin superseded); the "
-                      "contract-fit decision chain (r64s4, all "
-                      "measured under the REAL 19K-char expansion "
-                      "contract): xkiro/command-a-plus FALSIFIED "
-                      "(the full 3624-token budget consumed by "
-                      "invisible reasoning, zero visible chars; the "
-                      "small-prompt flagship promise did not "
-                      "survive the contract), sensenova-6.8-flash-"
-                      "lite HUNG >200 s, agnes-3.0-flash COMPLETED "
-                      "(31 s, 12,238 visible chars, correct "
-                      "NOVELTY-STATEMENT shape) — the strongest id "
-                      "that serves AND completes under the machine's "
-                      "token contract today; served via the "
-                      "loop-local gateway (ZAI_GATEWAY_UPSTREAM="
-                      "agnes, R458-C1 id semantics, +512 "
-                      "REASONING_HEADROOM per c-0078); the formal "
-                      "prereg file amendment stays audit-branch "
-                      "(AM60 supersedes the pin; Art. 28)",
+        "name": "xkiro",
+        "base_url": "https://api.xkiro.com/v1",
+        "model": "cohere/command-a",
+        "vault_key_name": "XKIRO_API_KEY",
+        "provenance": "AM73 (audit 227e9e97b, R84 verification): "
+                      "the v10 model pin amended to R81's fire-now "
+                      "registered id (cohere/command-a — the "
+                      "frontier flagship; probe-proven servable at "
+                      "the exact v10 contract shape: finish=stop, "
+                      "chars=3791, completion_tokens=978, latency "
+                      "17.7s, deliverable_class_findings=[], "
+                      "served==requested). Supersedes the v9 pin "
+                      "agnes-3.0-flash (r64s4/AM60) and R36's "
+                      "glm-4-plus. Transport: the loop-local gateway "
+                      "with ZAI_GATEWAY_UPSTREAM=xkiro + "
+                      "XKIRO_MODEL_ID=cohere/command-a (R458-C1 id "
+                      "semantics: the gateway serves the registered "
+                      "id; requested+served are both logged and the "
+                      "attestation requires served==requested=="
+                      "registered); vault key XKIRO_API_KEY; browser "
+                      "UA + 1024 headroom per the gateway's xkiro "
+                      "transport contract. The v10 one-shot "
+                      "generates HERE.",
         "role": "generator (the ONLY registered generator id; the "
-                "P2 ablation + v9 one-shot route)",
+                "v10 one-shot route)",
     },
     "retired": [
         {
@@ -151,24 +165,66 @@ ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
                       "ZERO visible chars (measured at 2600/3624) — "
                       "unusable under the machine's token contract; "
                       "the small-prompt sized probe did not "
-                      "transfer",
+                      "transfer; EXCLUDED from the R81 re-probe by "
+                      "the runbook (c8cc5deb2)",
+        },
+        {
+            "name": "agnes / agnes-3.0-flash (the v9 registered pin)",
+            "reason": "AM73 (R84): superseded as the registered "
+                      "generator by cohere/command-a for v10 — the "
+                      "owner-directed frontier flag (R81 fire-now "
+                      "probe registered the stronger serving id; "
+                      "AM62/AM70 lineage). agnes-3.0-flash's v9 "
+                      "attestation stands (30/30 served==requested=="
+                      "registered; v9 mean 3.000 UNRESOLVED); the "
+                      "route moves to alternates (still qualified, "
+                      "still custody-backed — a provider-spread "
+                      "alternate, never the registered id)",
         },
     ],
     "alternates": [
         {
-            "name": "xkiro",
+            "name": "agnes",
+            "base_url": "https://apihub.agnes-ai.com/v1",
+            "n_models": 10,
+            "provenance": "c-0078 end-to-end qualification; R58 "
+                          "custody probe (roster match); R67s2 "
+                          "multi-key custody (owner delivery "
+                          "2026-11-18, both keys live-probed 200 / "
+                          "served==requested before admission); "
+                          "served the v9 one-shot 30/30",
+            "transport_facts": [
+                "reasoning budgets FIRST: size max_tokens >= "
+                "visible_target + REASONING_HEADROOM (c-0078 "
+                "measured)",
+                "free-user 429 quota is PER KEY: AGNES_API_KEY + "
+                "AGNES_API_KEY_2 rotate with no sleep (R67s2 "
+                "measured mid-run)",
+            ],
+            "vault_key_name": "AGNES_API_KEY (ordered: "
+                              "AGNES_API_KEY, AGNES_API_KEY_2)",
+        },
+        {
+            "name": "xkiro-transport-facts (the registered route's "
+                    "ledger entry)",
             "base_url": "https://api.xkiro.com/v1",
             "n_models": 69,
             "provenance": "c-0078 end-to-end qualification; R58 "
-                          "custody probe (roster match); r64s4 "
-                          "owner-key verification (roster OK)",
+                          "custody probe (roster match); r64s4 + R81 "
+                          "probes (frontier tier serving verified; "
+                          "command-a-plus falsified under contract, "
+                          "command-a clean at the full 19K-char "
+                          "contract)",
             "transport_facts": [
                 "browser User-Agent REQUIRED (urllib default UA "
                 "banned: Cloudflare 403 error 1010, R58 typed)",
-                "frontier tier 503-maintenance until "
-                "2026-11-19T16:25Z / 403 pay-only (r64s4 + r65 "
-                "probes agree); cohere/command-a-plus falsified "
-                "under contract (see retired)",
+                "gateway xkiro headroom 1024 (command-a-plus "
+                "measured ~1000 invisible reasoning tokens; the "
+                "registered command-a measured 978 completion tokens "
+                "with clean stop — headroom is insurance)",
+                "generation identity lives in the REGISTERED block "
+                "since AM73 — this entry is the transport-facts "
+                "ledger only",
             ],
             "vault_key_name": "XKIRO_API_KEY",
         },
@@ -178,7 +234,8 @@ ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
                         "upstream = z-ai CLI grant)",
             "n_models": 1,
             "provenance": "R36 auditor registration ruling (now "
-                          "superseded); live-probed R58",
+                          "superseded twice — agnes r64s4/AM60, then "
+                          "xkiro AM73); live-probed R58",
             "transport_facts": [
                 "429-dark since R64 (Art. 15 typed window); the "
                 "gateway's CLI upstream serves the grant's single "
@@ -304,7 +361,7 @@ def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
 
 
 def registered_route() -> Dict[str, Any]:
-    """The registered generator route (R36): identity evidence for
+    """The registered generator route (AM73): identity evidence for
     every generation ledger that must name its route."""
     return dict(ROUTE_REGISTRY["registered"])
 
@@ -316,9 +373,10 @@ def require_registered_model(model: str) -> None:
     reg = ROUTE_REGISTRY["registered"]["model"]
     if model != reg:
         raise RouteRefused(
-            "unregistered_route", "xkiro-gateway",
+            "unregistered_route", "xkiro",
             f"requested '{model}' but the registered generator id is "
-            f"'{reg}' (R36 superseded by owner order r64s4/AM60) — a "
+            f"'{reg}' (AM73: R81's fire-now registration supersedes "
+            f"the agnes v9 pin r64s4/AM60 and R36's glm-4-plus) — a "
             f"silent model swap is forbidden")
 
 
