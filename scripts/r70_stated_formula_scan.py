@@ -183,6 +183,7 @@ def scan_stated_formula_direction(answer: str) -> dict:
         if len(out) >= 3:
             break
     out.update(scan_reaction_conservation(answer))
+    out.update(scan_equilibrium_direction(answer))
     return out
 
 
@@ -237,6 +238,17 @@ _CHEM_TO = re.compile(
     r"\b(?:oxidiz\w+|reduc\w+|conver\w+|burn\w*|combust\w*|decompos\w+"
     r"|dissolv\w+|hydrolyz\w+|hydrat\w+|react\w*|translat\w+)"
     r"[^.;!?]{0,60}?\b(?:into|to)\b", re.I)
+
+# R89 (exposed by the equilibrium-direction control equil_n1_lower_t_oxide,
+# pinned): the AGENT-NOUN forms of the verb stems — "the oxidizer wall
+# temperature setpoint ... to slow" — parse as a chemistry verb and a
+# later "to" opens a phantom product window over an ordinary process
+# sentence. Device nouns are never reaction relations (typed skip).
+_DEVICE_NOUNS = {
+    "oxidizer", "oxidizers", "oxidiser", "oxidisers",
+    "reducer", "reducers", "converter", "converters",
+    "reactor", "reactors", "translator", "translators",
+}
 
 # formation verbs taking the product directly; the process NOUNS
 # (formation/generation/production/creation) are NOT relations — their
@@ -323,6 +335,10 @@ def _product_spans(text: str) -> list:
     for anchor in list(_ARROW.finditer(text)) + \
             list(_CHEM_TO.finditer(text)) + \
             list(_FORMATION_VERB.finditer(text)):
+        if anchor.re is _CHEM_TO:
+            vm = re.match(r"[A-Za-z]+", anchor.group(0))
+            if vm and vm.group(0).lower() in _DEVICE_NOUNS:
+                continue  # the device noun, never a reaction relation
         start = anchor.end()
         end = min(len(text), start + _WINDOW)
         cut = re.search(r"[.;!?]", text[start:end])
@@ -400,4 +416,269 @@ def scan_reaction_conservation(answer: str) -> dict:
             f"the answer: ...{ev[:150]}")
         if len(out[CONSERV_KEY]) >= 2:
             break
+    return out
+
+
+# ---------------------------------------------------------------------------
+# R89: the stated-reaction EQUILIBRIUM-DIRECTION leg (the HO10-03 class;
+# the AM76/V76 auditor direction 1 — the fifth bind).
+# ---------------------------------------------------------------------------
+# The AM76 verdict's key remaining defect: reaction-equilibrium direction
+# INVERSION. The element-conservation leg catches phantom elements but not
+# direction inversion (HO10-03: Ti/O/Cl all present; the error is the
+# claimed response of the equilibrium to the operating change):
+#   (a) "raising the wall temperature ... to thermally desorb and
+#       volatilize accumulating TiO2 species" — TiO2 is refractory
+#       (mp 1843 C), non-volatile at the 1050 C operating point; the
+#       oxidation deposition ACCELERATES with temperature;
+#   (b) "a transient increase in the O2:TiCl4 ratio ... any volatilized
+#       Ti species are rapidly oxidized to volatile TiCl4" — oxidation
+#       supplies oxygen: it yields the SOLID oxide, never the chloride;
+#   (c) "maintaining an excess P_O2 ... shifts the equilibrium constant
+#       for the formation of volatile TiCl4 over solid TiO2, reducing
+#       the thermodynamic driving force for R_dep" — excess oxidant
+#       drives the equilibrium TOWARD solid TiO2 (more deposit).
+# Deterministic, conservative, zero LLM: every leg fires ONLY on the
+# conjunction of (i) an explicit operating-variable trend, (ii) an
+# explicit claimed direction (volatilize / shift toward gas / volatile
+# chloride outcome / deposition driving-force reduction), and (iii) a
+# REGISTRY-known species (strict formula token or registered word
+# form). Volatile deposits (NH4Cl class) where T-up removal is
+# sign-CONSISTENT chemistry are exempt. Anything outside the registry
+# stays SILENT — typed honest, the authoritative chemistry read remains
+# the auditor's/judge's. Findings feed the machine's NEUTRAL repair
+# directive (quoted back, never hidden); residuals are disclosed
+# (Art. 5).
+
+EQUIL_KEY = "INVERTED_EQUILIBRIUM"
+
+# Refractory oxides: non-volatile in any industrial process window
+# (melting points 1500-2900 C vs the ~700-1600 C operating band).
+_REFRACTORY_OXIDES = {
+    "TiO2": ("titanium dioxide", "titania"),
+    "ZrO2": ("zirconium dioxide", "zirconia"),
+    "Al2O3": ("aluminum oxide", "aluminium oxide", "alumina"),
+    "SiO2": ("silicon dioxide", "silica"),
+    "Cr2O3": ("chromium oxide", "chromia"),
+    "MgO": ("magnesium oxide", "magnesia"),
+    "CaO": ("calcium oxide", "quicklime"),
+    "HfO2": ("hafnium dioxide", "hafnia"),
+    "Fe2O3": ("ferric oxide", "iron oxide", "hematite"),
+    "Fe3O4": ("magnetite",),
+    "NiO": ("nickel oxide",),
+}
+_REFR_FORMULA_RX = re.compile(
+    r"\b(" + "|".join(_REFRACTORY_OXIDES) + r")\b")
+
+# Volatile / sublimable deposits: raising T to remove THESE is
+# sign-consistent chemistry — the E1 leg NEVER fires on them (the
+# ammonium-chloride sublimation control).
+_VOLATILE_DEPOSITS = {
+    "NH4Cl": ("ammonium chloride",),
+    "NH4HS": ("ammonium hydrosulfide", "ammonium hydrosulphide"),
+    "S8": ("elemental sulfur", "elemental sulphur"),
+}
+
+# Oxidation families (volatile-chloride precursor -> refractory-oxide
+# product): the E2 leg's triples. Excess O2/air drives the oxidation
+# toward the SOLID oxide (more deposit); oxidation supplies oxygen and
+# cannot chlorinate.
+_OX_FAMILIES = [
+    ("TiCl4", ("titanium tetrachloride",), "TiO2",
+     ("titanium dioxide", "titania")),
+    ("SiCl4", ("silicon tetrachloride",), "SiO2",
+     ("silicon dioxide", "silica")),
+    ("AlCl3", (), "Al2O3", ("aluminum oxide", "alumina")),
+    ("ZrCl4", ("zirconium tetrachloride",), "ZrO2",
+     ("zirconium dioxide", "zirconia")),
+    ("HfCl4", ("hafnium tetrachloride",), "HfO2",
+     ("hafnium dioxide", "hafnia")),
+]
+
+# an explicit UP trend on temperature: trend verb -> (optional short
+# object gap) -> a temperature noun. The gap stoplist kills the
+# "raising concerns about tube temperature" word-order trap.
+_TEMP_UP = re.compile(
+    r"\b(?:rais\w+|increas\w+|elevat\w+|ramp\w*\s+up|jump\w*|"
+    r"step\w*\s+up|transient\w*\s+increas\w+)\s+(?:\w+\s+){0,3}?"
+    r"(?:the\s+|its\s+|their\s+|a\s+)?"
+    r"(?:wall|tube|skin|metal|operating|reactor|furnace|oxidizer|"
+    r"reformer|duct|coil|firebox|pyrolysis|cracker)?\s*"
+    r"(?:temperature|setpoint|set-point|temp\b|thermal\b)", re.I)
+_TEMP_UP_GAP_STOP = re.compile(r"concern|risk|awareness|doubt", re.I)
+
+# an explicit UP trend on oxidant excess: "excess O2/oxygen/air",
+# "higher/increased O2:<metal> ratio", "stoichiometric excess oxygen".
+_EXCESS_OXIDANT = re.compile(
+    r"\bexcess\b[^.;]{0,60}?\b(?:o2|oxygen|air|po2|p_o2)\b|"
+    r"\b(?:increas\w+|rais\w+|higher|maintain\w*)\b[^.;]{0,60}?"
+    r"\bo2\s*[:/]\s*[A-Za-z0-9]+\s*(?:feed\s+)?ratio|"
+    r"\bo2-?rich\b|stoichiometric\s+excess", re.I)
+
+# the claimed removal-by-phase-change / gas-shift direction
+_VOLAT_CLAIM = re.compile(
+    r"\b(?:volatil\w+|vaporiz\w+|vaporis\w+|evaporat\w+|sublim\w+)\b",
+    re.I)
+_SHIFT_GAS = re.compile(
+    r"shift\w*[^.;]{0,160}?(?:toward[s]?\s+(?:the\s+)?(?:gas|vapor|"
+    r"vapour|volatile)|away\s+from\s+(?:the\s+)?(?:solid|deposition))",
+    re.I)
+
+# the claimed volatile-CHLORIDE outcome / deposition driving-force
+# reduction (the E2 direction claim)
+_CHLORIDE_OUTCOME_RX = lambda chlor: re.compile(
+    r"oxidiz\w+[^.;]{0,80}?(?:to|into)\s+(?:volatile\s+)?" + chlor +
+    r"\b|\bvolatile\s+" + chlor +
+    r"\b|formation\s+of\s+(?:volatile\s+)?" + chlor +
+    r"\b|shift\w*[^.;]{0,140}?toward[s]?\s+(?:the\s+)?(?:volatile\s+)?"
+    + chlor + r"\b", re.I)
+_DEP_DRIVING_FORCE = re.compile(
+    r"(?:reduc\w+|lower\w*|eliminat\w+|suppress\w*)[^.;]{0,40}?"
+    r"(?:the\s+)?(?:thermodynamic\s+)?driving\s+force\s+for[^.;]{0,60}?"
+    r"(?:R_?dep\b|deposition|solid\s+deposit\w*|fouling)", re.I)
+
+# deliberate burn-off / regeneration of ALREADY-FORMED coke is
+# sign-consistent at high T — the E3 leg stays silent there
+_COKE_BURN_GUARD = re.compile(
+    r"\b(?:burn\w*|combust\w*|regenerat\w+|decok\w+|steam-air|"
+    r"air\s+(?:sta|purge|blow))\b", re.I)
+_COKE = re.compile(r"\b(?:coke|coking)\b", re.I)
+_COKE_DOWN_CLAIM = re.compile(
+    r"\b(?:reduc\w+|lower\w*|prevent\w*|mitigat\w+|suppress\w*|"
+    r"limit\w*|slow\w*)\b[^.;]{0,90}?\b(?:coke|coking)\b", re.I)
+
+# chlorinating-agent context: an equilibrium shift toward the chloride
+# attributed to Cl2/carbon feed is the CHLORINATOR (correct chemistry)
+# — the E2 leg stays silent when the chlorinating agent is named
+_CHLORINATION_AGENT = re.compile(r"\bcl2\b|chlorinat\w+|chlorine\b",
+                                 re.I)
+
+_EQUIL_WINDOW = 260  # the sibling legs' statement span
+
+
+def _equil_normalize(text: str) -> str:
+    """The species normalization WITHOUT the letter-subscript masking:
+    P_O2 / T_w are legitimate operating-variable notations here, so
+    only subscripts, LaTeX \\text, temperatures and arrows normalize."""
+    text = _normalize(text)
+    text = re.sub(r"\\text\s*\{([^}]*)\}", r"\1", text)
+    text = text.replace("\\(", "").replace("\\)", "")
+    for k, v in _SUBSCRIPTS.items():
+        text = text.replace(k, v)
+    text = text.replace("_", "")
+    text = re.sub(r"\d+\s*°\s*C\b", " tempC ", text)
+    text = re.sub(r"\b\d+\s+C\b", " tempC ", text)
+    return text
+
+
+def scan_equilibrium_direction(answer: str) -> dict:
+    """The HO10-03 class: a stated formation/removal claim whose
+    claimed response to a stated operating-variable change inverts the
+    registry physics. Legs:
+      E1 — T-up claimed to VOLATILIZE / gas-shift a REFRACTORY species;
+      E2 — excess oxidant claimed to drive the equilibrium toward the
+           VOLATILE CHLORIDE or to reduce the deposition driving force;
+      E3 — T-up claimed to REDUCE coke formation/deposition.
+    Every leg: explicit trend AND explicit claimed direction AND a
+    registry-known species; anything ambiguous stays silent."""
+    if not answer:
+        return {}
+    text = _equil_normalize(answer)
+    out: dict = {}
+
+    def _fire(msg: str) -> None:
+        out.setdefault(EQUIL_KEY, []).append(msg)
+        if len(out[EQUIL_KEY]) >= 3:
+            raise _EquilDone()
+
+    class _EquilDone(Exception):
+        pass
+
+    try:
+        # ---- E1: refractory volatilization / gas-shift inversion ----
+        # the claim must TARGET the refractory species: the trend+claim
+        # sits immediately BEFORE it (volatilize ... TiO2) or the
+        # species is named INSIDE the shift claim (away from solid
+        # TiO2 deposition) or the volat verb directly follows it. A
+        # mere co-occurrence in the +-260 span is NOT enough — the
+        # correct chlorinator statement ("raising the chlorination
+        # temperature shifts the equilibrium toward volatile TiCl4"
+        # with TiO2 as the FEED) must stay silent.
+        spans = list(_REFR_FORMULA_RX.finditer(text))
+        for form, words in _REFRACTORY_OXIDES.items():
+            for w in words:
+                spans.extend(re.finditer(r"\b" + w + r"\b", text, re.I))
+        for m in spans:
+            lo = max(0, m.start() - _EQUIL_WINDOW)
+            hi = min(len(text), m.end() + _EQUIL_WINDOW)
+            w = text[lo:hi]
+            tup = [t for t in _TEMP_UP.finditer(w)
+                   if not _TEMP_UP_GAP_STOP.search(t.group(0))]
+            if not tup:
+                continue
+            pre = text[max(0, m.start() - 140):m.start()]
+            post = text[m.start():m.start() + 140]
+            targeted = (bool(_VOLAT_CLAIM.search(pre))
+                        or bool(_SHIFT_GAS.search(pre))
+                        or bool(_VOLAT_CLAIM.search(post[:40])))
+            if not targeted:
+                continue
+            sp = m.group(0)
+            _fire(
+                f"T-up claimed to volatilize/gas-shift the refractory "
+                f"species '{sp}' (non-volatile in the process window; "
+                f"oxidation/deposition kinetics ACCELERATE with "
+                f"temperature): ..."
+                f"{w[max(0, tup[0].start() - 40):tup[0].start() + 130]}")
+            break
+        # ---- E2: excess-oxidant direction inversion ----
+        for chlor, chlor_words, oxide, oxide_words in _OX_FAMILIES:
+            hits = list(re.finditer(r"\b" + chlor + r"\b", text))
+            for cw in chlor_words:
+                hits.extend(re.finditer(r"\b" + cw + r"\b", text, re.I))
+            fired = False
+            for hm in hits:
+                lo = max(0, hm.start() - _EQUIL_WINDOW)
+                hi = min(len(text), hm.end() + _EQUIL_WINDOW)
+                w = text[lo:hi]
+                if not _EXCESS_OXIDANT.search(w):
+                    continue
+                if _CHLORINATION_AGENT.search(w):
+                    continue  # the chlorinator's own chemistry: silent
+                outcome = _CHLORIDE_OUTCOME_RX(chlor).search(w)
+                if not outcome and not (
+                        _DEP_DRIVING_FORCE.search(w)
+                        and re.search(r"\b" + oxide + r"\b", w)):
+                    continue
+                _fire(
+                    f"excess oxidant claimed to drive the "
+                    f"{chlor}/{oxide} equilibrium toward the volatile "
+                    f"chloride / away from deposition — inversion: "
+                    f"excess O2 drives the oxidation toward the SOLID "
+                    f"oxide {oxide} (more deposit) and oxidation "
+                    f"supplies oxygen, it cannot chlorinate: "
+                    f"...{w[:170]}")
+                fired = True
+                break
+            if fired:
+                break
+        # ---- E3: T-up claimed to REDUCE coke formation ----
+        for cm in _COKE.finditer(text):
+            lo = max(0, cm.start() - _EQUIL_WINDOW)
+            hi = min(len(text), cm.end() + _EQUIL_WINDOW)
+            w = text[lo:hi]
+            if _COKE_BURN_GUARD.search(w):
+                continue
+            tup = [t for t in _TEMP_UP.finditer(w)
+                   if not _TEMP_UP_GAP_STOP.search(t.group(0))]
+            if not tup or not _COKE_DOWN_CLAIM.search(w):
+                continue
+            _fire(
+                f"T-up claimed to REDUCE coke formation/deposition — "
+                f"inversion: pyrolytic coke deposition ACCELERATES "
+                f"with temperature (the standard remedy lowers T / "
+                f"residence time): ...{w[:170]}")
+            break
+    except _EquilDone:
+        pass
     return out
