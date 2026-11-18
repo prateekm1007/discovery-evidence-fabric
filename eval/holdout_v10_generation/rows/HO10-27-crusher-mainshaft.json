@@ -1,0 +1,192 @@
+{
+ "problem_id": "HO10-27-crusher-mainshaft",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r85s1@holdout-v10-generation",
+ "machine": "r85_v10_one_shot/1.1.0 (AM75 re-freeze) — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; the AM75 identity binding asserts the request id 'agnes-3.0-flash'; the frozen module file constant 'agnes-3.0-flash' is untouched — the freeze guard pins it)",
+ "run": "holdout-v10-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    40,
+    4,
+    16
+   ],
+   "P1"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "geometry",
+   "geometry"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b2f61e749df8": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 6,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      2830,
+      2836
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3266,
+      3272
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3621,
+      3627
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 100.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4698,
+      4702
+     ],
+     "unit": "percent",
+     "quantity": "100.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-5",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      5010,
+      5016
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-6",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      5147,
+      5153
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T19:31:26.146502Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme: it deploys a new high-frequency load or temperature probe to detect micro-cracking or thermal spikes. My departure delivers the same class (predictive warning) using a FIRMWARE-ONLY LOGICAL COMBINATION of three existing signals (motor power, eccentric speed, lube-oil temperature) to infer bearing drag, without installing any new sensors or modifying the deployed part. The physics is that bearing wear increases frictional torque, which increases motor power at constant speed, but only after a thermal lag defined by the lube-oil temperature dynamics.\n\nPHYSICS CHECK\nThe governing physical relation is the power balance at the bearing: $P_{motor} = P_{crushing} + P_{friction}$. As bearing wear progresses, $P_{friction}$ rises. The eccentric speed $\\omega$ is the drive frequency; if the drive maintains $\\omega$ constant, $P_{motor}$ rises linearly with wear depth $d$: $P_{friction} \\propto \\mu(d) \\cdot \\omega \\cdot R_{bearing}$. Lube-oil temperature $T_{oil}$ lags $P_{friction}$ by a thermal time constant $\\tau$.\n**DIRECTION-OF-EFFECT:** driving variable = bearing frictional torque; the mechanism moves it **up** by **wear accumulation**; this **raises** the seizure risk. *Correction:* The mechanism does not move the variable; it MONITORS the variable's rise. The active ingredient is the inference of $P_{friction}$ from $P_{motor} - P_{crushing}(\\text{input load})$.\n*Revised Physics Check for Falsification:* The predictor relies on the fact that $P_{motor}$ exceeds the baseline crushing power requirement by a delta $\\Delta P$ that correlates with wear. The \"direction\" of the *signal* is an upward drift in $P_{motor}$ at stable $\\omega$. The threshold is a derived value from the seizure torque.\nCalculation of Threshold: Seizure occurs when oil film breaks. Critical condition: $T_{oil} > T_{flash}$. Leading indicator: $\\Delta P > P_{crit}$, where $P_{crit} = P_{seizure\\_torque} / R_{bearing} \\cdot \\omega_{max}$. Since $P_{seizure\\_torque}$ is unknown, we use the *anomaly* relative to the historical minimum of $P_{motor}$ at same $\\omega$ and input load.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Firmware Logic on Existing VFD/PLC\n\n(a) **VFD/PLC Firmware Module:**\n- **Action:** Configure existing Variable Frequency Drive (VFD) or PLC logic to log: Motor Power ($kW$), Eccentric Speed ($rpm$), Lube-Oil Temperature ($^\\circ C$) at 1-second resolution.\n- **Procurement Tag:** (a) - No hardware; uses existing control system.\n- **Input Source:** ALREADY-RECORDED (Problem states: \"use only the existing crusher motor power, eccentric speed and lube-oil temperature\").\n\n(b) **Baseline Derivation Logic:**\n- **Action:** Compute \"Crushing Power Baseline\" as the 95th percentile of $P_{motor}$ vs. $\\omega$ scatter plot over the first 30 days of operation (commissioning baseline). Subtract this from real-time $P_{motor}$ to get \"Excess Power\" $P_{excess}$.\n- **Reference Tag:** DERIVED (from stated physics: $P_{excess} \\approx P_{friction}$).\n\n(c) **Warning Algorithm:**\n- **Action:** Implement a sliding window average of $P_{excess}$ over 1 hour. Trigger \"PRE-ALERT\" when $P_{excess}$ exceeds $2 \\sigma$ of baseline variance for 6 hours. Trigger \"ALARM\" (Warning >= 30 days) when $P_{excess}$ exceeds a threshold $P_{th}$ calculated as: $P_{th} = P_{seizure\\_power} \\times 0.8$.\n- **Threshold Derivation:** $P_{seizure\\_power}$ is derived from the maximum allowable oil temperature $T_{max}$ (stated in lube spec) and known thermal resistance. $P_{th}$ is the power dissipation that would raise $T_{oil}$ to $T_{max}$ in 30 days of operation. Since $T_{oil}$ is measured, $P_{th}$ is the power level where $dT/dt$ begins to accelerate (second derivative of temperature vs. time > 0 for 24 hours).\n- **Procurement Tag:** (a) - No hardware; uses existing data.\n\n(d) **No New Sensors:**\n- **Action:** Verify that no new sensors are installed. The system uses only the existing motor power readout, speed readout, and lube temperature probe.\n- **Procurement Tag:** (a) - Constraint compliance.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability:** Standard practice requires installing a strain gauge or new temp sensor (Class B). This solution requires ZERO hardware changes (Class A).\n- **Operability:** Standard practice adds a data logger. This solution adds a firmware block. No additional operator training needed beyond acknowledging alarms.\n- **Maintenance:** No new parts to maintain. Existing VFD/PLC maintenance cycle applies.\n- **Cost:** ~$0 for hardware. ~$500-$1,000 for firmware engineering (one-time).\n- **Operational Loss:** None. No duty cycle change. Throughput remains at 100%.\n\nEXECUTABLE TEST\nProtocol:\n1. Simulate bearing wear by injecting noise into the Motor Power signal on a test rig: $P_{sim} = P_{baseline} + t/10000$ (slow linear rise).\n2. Simulate Lube Temp rise proportional to $P_{sim}$.\n3. Run the firmware logic.\n4. **Pass/Fail:** The system must trigger a \"PRE-ALERT\" 30 days before the simulated \"Seizure\" point (where $P_{excess}$ reaches $P_{th}$).\n5. **Falsification:** If the system does not trigger 30 days prior, or if it triggers on normal crushing load variations (false positive > 1/year), it fails.\n6. **Kill Criterion:** If $P_{excess}$ cannot be distinguished from crushing load variance in the existing data, the predictor is invalid for this specific crusher class.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: **Motor Power** (anomaly).\nSecondary Indicators: **Lube-Oil Temperature** (thermal lag confirmation), **Eccentric Speed** (normalization factor).\nReasoning: Motor power is the direct mechanical proxy for bearing friction. Lube temp is the thermal proxy. Speed is the operational context. The warning is based on the *trend* of excess power, validated by thermal lag.\n\nMECHANISM-DIVERSITY CLAUSE COMPLIANCE\nThe bill contains only one mechanism class (Firmware Logic). It does not exceed the limit of 2 rows for the same class in a multi-intervention set, as this is a single-intervention predictor design.\n\nDEPLOYED-PART CLAUSE COMPLIANCE\nNo modification to the mainshaft, bearing, or bushing. All actions are in the control/firmware layer.\n\nPERMITTED-SET CLAUSE COMPLIANCE\nThe problem states \"use only the existing crusher motor power, eccentric speed and lube-oil temperature\". The solution uses ONLY these three existing signals. No new hardware. No new consumables.\n\nDIRECTION-OF-EFFECT CLAUSE COMPLIANCE\nThe mechanism does not attempt to *reduce* wear (which would be a maintenance intervention); it *predicts* wear. The \"driving variable\" for the *failure* is friction. The mechanism monitors the rise in the driving variable. The direction is correct: it detects the *upward* drift that leads to seizure.\n\nINPUT-AVAILABILITY CLAUSE COMPLIANCE\nAll inputs (Power, Speed, Temp) are stated to exist and be recorded in the problem (\"use only the existing...\").\n\nCOST-PRICING CLAUSE COMPLIANCE\nNo setpoint modulation or duty cycle change. Operational cost is zero. The trade is purely informational.\n\nEXEMPLAR-REALITY CLAUSE COMPLIANCE\nNo commercial exemplars named. The solution is a standard firmware engineering task using generic PLC/VFD features.\n\nPREMISE-VALIDITY CLAUSE COMPLIANCE\nThe problem states the topology includes motor power, eccentric speed, and lube oil temperature sensors. The mechanism references only these.\n\nCERTIFIED-SYSTEM-AS-SOLD CLAUSE COMPLIANCE\nNo new hardware or consumables. Uses existing certified control system.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Action:** Configure existing Variable Frequency Drive (VFD) or PLC logic to log: Motor",
+    "- **Input Source:** ALREADY-RECORDED (Problem states: \"use only the existing crusher motor",
+    "- **Action:** Compute \"Crushing Power Baseline\" as the 95th percentile of $P_{motor}$ vs. ",
+    "- **Reference Tag:** DERIVED (from stated physics: $P_{excess} \\approx P_{friction}$).",
+    "- **Action:** Implement a sliding window average of $P_{excess}$ over 1 hour. Trigger \"PRE",
+    "- **Threshold Derivation:** $P_{seizure\\_power}$ is derived from the maximum allowable oil",
+    "- **Action:** Verify that no new sensors are installed. The system uses only the existing ",
+    "- **Installability:** Standard practice requires installing a strain gauge or new temp sen",
+    "- **Operability:** Standard practice adds a data logger. This solution adds a firmware blo",
+    "- **Maintenance:** No new parts to maintain. Existing VFD/PLC maintenance cycle applies.",
+    "- **Cost:** ~$0 for hardware. ~$500-$1,000 for firmware engineering (one-time).",
+    "- **Operational Loss:** None. No duty cycle change. Throughput remains at 100%."
+   ],
+   "REASONING_THRASH_LEAK": [
+    "*Correction:* The mechanism does not move the variable; it MONITORS the variable's rise. The active ingredient is the inference of $P"
+   ]
+  }
+ },
+ "declared_template_prose": "firmware logic on existing vfd/plc",
+ "allowed_row_outside": 0,
+ "sha256_16": "486c895d478a437c",
+ "smoke": false
+}
