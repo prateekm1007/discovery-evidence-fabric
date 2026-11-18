@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "590fac029",
+  "queue/dev12_r7": "5d55de556",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1422,6 +1422,37 @@
     3,
     19
    ]
+  },
+  {
+   "id": "F68",
+   "severity": "MEDIUM",
+   "title": "QUEUE TIP RED (5d55de556 + dc9a6d5d5 CI surface=failure). Root cause = the executor's eval/r60_status.json violates TWO now-wired v3.2.0 CI gates: (a) test_article27 engine-share: r60 share 0.0% < 30% with NO typed exception in the gate-read field (engine_diff='NONE' explained in prose but not as the disclosed/exception flag); (b) test_remote_ci_rule D2: remote_ci.pushed_sha missing/malformed (record uses pushed_shas dict, not the pushed_sha hex the rule requires). The gates are WORKING (they caught the record). FIX forward (c-0079 lane): type the engine-share exception (freeze/verifier/infra round, 0 capability lines) in the gate-read field + set remote_ci.pushed_sha to the work-commit hex. Substance is present; only the record field-format is wrong.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "5d55de556",
+   "rounds_open": 1,
+   "evidence": [
+    {
+     "sha": "5d55de556",
+     "path": "eval/r60_status.json",
+     "note": "engine_diff NONE no typed exception; remote_ci.pushed_shas dict not pushed_sha hex"
+    }
+   ],
+   "articles": [
+    27
+   ]
+  },
+  {
+   "id": "F69",
+   "severity": "LOW",
+   "title": "Stale version pin + CI coverage gap (builder R60-F1, auditor-confirmed): tests/test_r58_route_adapter.py:166 asserts record == R53_P2_ABLATION_CRITERIA/1.1.0 but the shape-hardening (4db375c3a) bumped it to 1.2.0 — deterministic local red. The file is OUTSIDE the workflow test surface, so remote CI stayed green (coverage gap). FIX: version-agnostic pin (or 1.2.0) + add the file to the workflow list; rides the challenger-resume commit (c-0079 artifact).",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "5d55de556",
+   "rounds_open": 1,
+   "articles": [
+    27
+   ]
   }
  ],
  "amendments": [
@@ -2381,6 +2412,18 @@
     "Custody lesson recorded: confidential custody requires ACCESS CONTROL (private repo) or ENCRYPTION, never a secret gist (security-by-obscurity).",
     "v9 problems seal 502e93d8 unchanged (recomputed EXACT from pushed bytes); rubric content preserved in private repo; one-shot protocol + bar unchanged."
    ]
+  },
+  {
+   "id": "AM56",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R61 auditor audit of R60 (590fac029..5d55de556): v9 freeze + shape hardening + verifier lane",
+   "changes": [
+    "VERIFIED: epistemic byte-identity (md5 9a5ae1cd at 590fac029/dc9a6d5d5/5d55de556 — unchanged). v9 freeze (6f1a87913, 612 lines) rubric isolation STRUCTURAL — auditor read every rubric/gist/custody mention: all are comments/docstrings asserting NEVER-read; NO file-read/HTTP of the rubric; private-repo name not referenced; reads problems ONLY from audit branch; require_registered_model gates transport before gateway; MEASURED_PATH = engine_route.run_row -> mechanism_space; c-0082 (holdout-v9-generation) pre-staked by name, lands after c-0079. Builder-never-reads is provable from the instrument.",
+    "Shape hardening (4db375c3a) green: the R59 Art.3 observation (criteria evaluator crashes untyped on raw run-records) reproduced + fixed typed (shape validation before computation, missing fields refused never defaulted), regression-pinned. Rows: baseline 36/36 sha256-pinned (30 CLEAN/1 KILL/5 FLAG; 7 allowed-outside = baseline input context not gate breach), challenger 4/36; criteria 1+2 UNCOMPUTED, 3 UNMEASURABLE — never projected. Verifier lane (builder-r60s2) claimed nothing (c-0082 pre-staked, Art.29(e) collision avoided).",
+    "F68 OPENED (MEDIUM): queue tip RED — r60_status.json violates engine-share gate (0% no typed exception) + D2 remote_ci.pushed_sha malformed. The v3.2.0 gates are working. F69 OPENED (LOW): stale 1.1.0 pin in test_r58_route_adapter.py:166 + file outside workflow surface.",
+    "z-ai grant 429 outage (Art.15 typed infra failure, ~2h15m sustained) gates challenger resume -> criteria -> c-0082 -> v9 one-shot; lease live to 2026-11-19; resume point committed. Score stays 5; P2 (->6) gated on the 429 window + F68 record fix."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3300,6 +3343,18 @@
    "capability_change": "v9 confidential instrument authored (F60 solved); R59 custody+machinery verified",
    "evidence_sha": "audit/holdout_v9/PREREGISTRATION.json",
    "custody": "v9 rubric private repo (access-controlled, unauth 404); CORR-3 gist->private repo"
+  },
+  {
+   "id": "V54",
+   "round": "R61 audit of R60 freeze/hardening/verifier",
+   "commit": "5d55de556",
+   "gate": "P1 PASSED (score 5); acceptance NOT_MET; queue tip RED (F68)",
+   "capability_change": "v9 freeze rubric-isolation structural (verified); shape hardening landed; no new gate (429-gated)",
+   "new_findings": [
+    "F68",
+    "F69"
+   ],
+   "evidence_sha": "eval/r61_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3515,7 +3570,7 @@
    "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
   }
  },
- "progress_note": "SCORE 5/10. R59 verified. HOLDOUT v9 AUTHORED with confidential custody (rubric private gist, F60 SOLVED for v9; problems public; seal 502e93d8; n=30 power-pre-registered). P2 (->6) unblocked: builder runs v9 one-shot on the integrated engine route after the ablation completes; auditor scores vs private rubric (mean>=3.0, 0/0/0, CI>3.0). Ablation in flight (c-0079, lease 2026-11-19). Goal 9/10.",
+ "progress_note": "SCORE 5/10. R60 verified: v9 freeze rubric-isolation STRUCTURAL (builder-never-reads provable; no rubric read/HTTP, require_registered_model gate, MEASURED_PATH through engine, c-0082 pre-staked); shape hardening green (R59 obs fixed); baseline 36/36 + challenger 4/36, criteria honest UNCOMPUTED/UNMEASURABLE. QUEUE TIP RED (F68): r60_status.json engine-share 0% no typed exception + remote_ci.pushed_sha malformed — v3.2.0 gates working, executor must fix forward. F69 stale pin + coverage gap. z-ai 429 outage gates the v9 one-shot (lease 2026-11-19). P2 (->6) next point = v9 sealed acceptance once 429 clears + F68 fixed. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
