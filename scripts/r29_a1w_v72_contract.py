@@ -59,6 +59,7 @@ REPAIR_BUDGET=2, K_GEN=1, judge-blind — no outcome feedback, no
 judged numbers in any prompt; the AM27 direction is a structural
 bind). Predictor side: UNCHANGED (SYS_A1F_V5, holdout-v3-proven).
 """
+from r70_v75_deliverable_bind import V75_DELIVERABLE_BIND  # noqa: E402
 from r27_a1w_v71_contract import (  # noqa: F401
     SYS_A1_INT_V71, V71_REPAIR_DIRECTIVE)
 from r27_a1w_v71_contract import SYS_A1F_V5  # noqa: F401
@@ -135,7 +136,8 @@ L. OPERATIONAL-LOSS PRICING (the burden ledger prices LOSSES, not
    cycle; an unpriced curtailment is a typed defect.
 """
 
-SYS_A1_INT_V72 = SYS_A1_INT_V71 + V72_CONVERSION_BIND
+SYS_A1_INT_V72 = (SYS_A1_INT_V71 + V72_CONVERSION_BIND
+                   + V75_DELIVERABLE_BIND)  # F75 (AM63 d1)
 
 # The V7.2 repair directive EXTENDS the V71 neutral directive with the
 # conversion + premise-validity + pricing relocations (still NEUTRAL:

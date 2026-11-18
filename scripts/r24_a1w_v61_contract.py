@@ -32,6 +32,7 @@ Machine path: byte-unchanged (critic + gate + NEUTRAL typed repairs,
 budget 2). No selection (K_GEN=1). Canonical metric unchanged
 (Art. 16/19).
 """
+from r70_v75_deliverable_bind import V75_DELIVERABLE_BIND  # noqa: E402
 from r23_a1w_v6_contract import SYS_A1_INT_V6  # noqa: F401
 from r19_a1w_v4_contract import SYS_A1F_V4  # noqa: F401
 
@@ -69,7 +70,8 @@ one — never replace it — and the answer must say explicitly which
 stated indicator is primary and why.
 """
 
-SYS_A1F_V5 = SYS_A1F_V4 + PREDICTOR_CONSTRAINT
+SYS_A1F_V5 = (SYS_A1F_V4 + PREDICTOR_CONSTRAINT
+              + V75_DELIVERABLE_BIND)  # F75 (AM63 d1)
 
 MACHINE_REPAIR_DIRECTIVE = """MACHINE REPAIR PASS (typed findings on your draft below):
 {findings}

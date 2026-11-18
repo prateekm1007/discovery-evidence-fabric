@@ -82,10 +82,33 @@ from r11_a1f_v3_generate import start_gateway  # noqa: E402
 from r13_a1t_generate import critic  # noqa: E402
 from r30_nvidia_route import gen_with_fallback  # noqa: E402
 from r13_question_type_gate import gate_question_type  # noqa: E402
+from r70_deliverable_class_scan import (  # noqa: E402
+    scan_deliverable_class, F75_HARD_KEYS)
+from r70_stated_formula_scan import scan_stated_formula_direction  # noqa: E402
 
 REPAIR_BUDGET = 3
 V77_REQUEST_MODEL = "agnes-3.0-flash"  # R-REQID forward-only \
     # (AM37 §2; R36 superseded by owner order + AM60, r64s4)
+
+# F75 binds (AM63 directives 1+4): refusal-shaped answers, identity
+# preambles, reasoning-thrash leakage and self-contradicting stated
+# formulas are typed FAIL classes — the recorded verdict can never be
+# CLEAN while one carries evidence (the HO9-14 type-gate false-pass
+# class; the bind is deterministic and the forcing keys are disclosed).
+F75_KEYS = tuple(F75_HARD_KEYS) + \
+    ("STATED_FORMULA_DIRECTION_CONTRADICTION",)
+
+
+def effective_critic_verdict(cr_verdict: str, vio: dict) -> tuple:
+    """The F75 verdict bind: return the verdict to RECORD plus the
+    typed forcing note (None when nothing was forced)."""
+    hits = [k for k in F75_KEYS if (vio or {}).get(k)]
+    if cr_verdict == "CLEAN" and hits:
+        return "FLAG", {"f75_type_gate": {
+            "forced_by": hits,
+            "note": "the deliverable-class / stated-formula scans "
+                    "refuse a CLEAN record (AM63 d1/d4)"}}
+    return cr_verdict, None
 
 DIRECTION_CONTRACT = (
     "You are a typed physics-direction checker inside a machine that "
@@ -459,6 +482,12 @@ def machine_generate_v77(prob: dict, gw_key: str,
         tg = gate_question_type(final, prob)
         vio: dict = {}
         vio.update(base_scan(final))
+        # F75 (AM63 d1/d4): deliverable-class + stated-formula scans
+        # run on BOTH question types — refusals, identity leaks,
+        # deliberation leakage and self-contradicting stated formulas
+        # are deliverable-class errors, not question-type-bound.
+        vio.update(scan_deliverable_class(final))
+        vio.update(scan_stated_formula_direction(final))
         vio.update(scan_constraint_fit(prob, final))
         if not qt.startswith("predictor"):
             vio.update(scan_catalog(prob, final))
@@ -503,6 +532,8 @@ def machine_generate_v77(prob: dict, gw_key: str,
             vio.update(scan_input_availability(prob, final))
         findings = [f"{k}: {'; '.join(map(str, v))[:110]}"
                     for k, v in vio.items() if v]
+        verdict_eff, f75_note = effective_critic_verdict(
+            cr["verdict"], vio)
         problems: list = []
         if cr["verdict"] != "CLEAN":
             problems += [c.get("anchor") for c in cr["checks"]
@@ -518,7 +549,8 @@ def machine_generate_v77(prob: dict, gw_key: str,
                "route": gen_meta.get("route"),
                "route_model": gen_meta.get("model"),
                "fallback_reason": gen_meta.get("fallback_reason"),
-               "critic_verdict": cr["verdict"], "type_gate": tg,
+               "critic_verdict": verdict_eff, "type_gate": tg,
+               **(f75_note or {}),
                "scan": {k: list(v) for k, v in vio.items()},
                "direction_check": (dc if not qt.startswith("predictor")
                                    else None),
@@ -527,15 +559,17 @@ def machine_generate_v77(prob: dict, gw_key: str,
             att["findings_disclosed"] = [p for p in problems if p]
         attempts.append(att)
         if not [p for p in problems if p]:
-            final_meta = {"critic_verdict": cr["verdict"],
+            final_meta = {"critic_verdict": verdict_eff,
                           "type_gate": tg, "repairs": rep,
                           "direction_check": dc,
+                          **(f75_note or {}),
                           "residual_findings": {}}
             return final, attempts, final_meta
         if rep == REPAIR_BUDGET:
-            final_meta = {"critic_verdict": cr["verdict"],
+            final_meta = {"critic_verdict": verdict_eff,
                           "type_gate": tg, "repairs": rep,
                           "direction_check": dc,
+                          **(f75_note or {}),
                           "residual_findings":
                               {k: list(v) for k, v in vio.items()}}
             return final, attempts, final_meta

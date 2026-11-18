@@ -223,9 +223,56 @@ def enumerate_plans(problem: dict) -> list:
             if alts:
                 p["principle_id"] = alts[0]
         seen.add(p["principle_id"])
+    # 6. chemistry elicitation (AM63 directive 2): when the failure
+    #    class admits chemical mechanisms and no plan carries the
+    #    chemistry class, PROMOTE the last plan to it (flagged —
+    #    never silent, Art. 4) and lead the population order with
+    #    chemistry plans (stable): the pre-registered winner rule
+    #    takes the first contract-satisfied non-duty_cycle plan in
+    #    population order, so population order is the elicitation
+    #    lever — the rule itself stays byte-identical.
+    if (chemistry_admitted(problem)
+            and not any(p["measure_class"] == "chemistry"
+                        for p in plans)):
+        p = plans[-1]
+        taken = {q["principle_id"] for q in plans[:-1]}
+        p["measure_class"] = "chemistry"
+        p["principle_id"] = next(
+            (c for c in CLASS_PRINCIPLES["chemistry"] if c not in taken),
+            CLASS_PRINCIPLES["chemistry"][0])
+        p["signals_used"] = CLASS_SIGNALS["chemistry"]
+        p["chemistry_elicited"] = True
+    plans.sort(key=lambda q: 0 if q["measure_class"] == "chemistry"
+               else 1)
     for p in plans:
         p.pop("_kf_pool", None)
     return plans[:K]
+
+
+# AM63 directive 2 (F75-adjacent, the HO9-01/05/08 monoculture-break
+# class): chemistry elicitation fires on the problem's OWN vocabulary
+# admitting chemical mechanisms — scale/deposit/corrosion/froth/
+# dosing/lubricant classes — while the declared domain does not
+# exclude chemistry. The elicitation only adds/plans-orders at the
+# PLAN layer; the pre-registered winner rule stays byte-identical.
+CHEMISTRY_ADMITS_RX = re.compile(
+    r"scal(?:e|ing)|deposit|corros|fouling|froth|flotat|collect(?:or|ion)"
+    r"|floccul|coagul|dissolut|precipitat|oxid|reduc(?:tion|ing) agent"
+    r"|acids?|alkali|caustic|chloride|sulfide|sulphide|lime|soda|ash"
+    r"|inhibit\w*|passivat|chelat|sequest|antiscalant|lubric\w*|grease"
+    r"|oil\s+film|emuls|biocid|contaminant|leach|ph\b|dosage|dosing",
+    re.IGNORECASE)
+
+
+def chemistry_admitted(problem: dict) -> bool:
+    """True when the problem's own text admits chemical mechanisms and
+    the declared domain (P1.4 clamp) does not exclude them."""
+    txt = " ".join(str(problem.get(k) or "") for k in
+                   ("device", "failure", "failure_mode", "constraint"))
+    if not CHEMISTRY_ADMITS_RX.search(txt):
+        return False
+    domain = declared_domain_classes(problem)
+    return domain is None or "chemistry" in domain
 
 
 def seed_class(family) -> str:
