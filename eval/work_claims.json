@@ -220,6 +220,11 @@
    "registered_at": "2026-11-18T14:58:52Z (sandbox clock)",
    "role": "builder",
    "note": "R75 second session (continuation lineage of builder-r75s1's sandbox; custody restored per Art. 17 v3.3.0 BEFORE any work: HF 33bc7af22c62 digest-verified from the owner-delivered master token (absent from this session's working copy, restored) + GH_PAT f1ebca5f9b62 digest-match; keyfile mode tightened 755->600; gitignored throughout)."
+  },
+  "builder-r77s1": {
+   "registered_at": "2026-11-18T15:20:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R77 session (fresh-sandbox reprovision #3): custody bootstrap FIRST per Art. 17 v3.3.0 \u2014 owner-delivered HF token digest 33bc7af22c62 (login prateekm1, repo.write, inference.serverless.write) + GH_PAT f1ebca5f9b62; both digest-match the committed custody records; vault operator-keys-vault fetched read-only, 6/6 key digests self-consistent (XKIRO f6c09bee9bde present). Lane: durable-execution staging for the window-gated frontier round \u2014 commit the general vault-restore tool (the reprovision-recovery path died with prior sandboxes; Art. 18), live-drill it, schedule the one-shot cron that fires the frontier re-probe round at window open 2026-11-19T16:25Z."
   }
  },
  "claims": [
@@ -2188,6 +2193,29 @@
    "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 tip 959a21662 == local HEAD (fast-forward); the round's DIRECTION (F78) was found already claimed AND landed by builder-r75s1 (c-0093, base f8b2e0bc4) between the owner's instruction and this fetch \u2014 so this claim is for the DISJOINT verification/closure lane (work_id r75-c0093-verify-close unused in claims[]; grep clean), never a duplicate of r75-freeze-guard-ci",
    "completed_at": "2026-11-18T15:00:26Z (sandbox clock)",
    "completion_note": "DONE: verification complete \u2014 read receipts + byte checks + live fail-closed drill + independent remote_ci read (success, 14:54:39Z); the c-0093 lifecycle completion and the D2 apply landed via the EXECUTOR\u2019s own round-close 39d12577e (their bytes verbatim, kept in the rebase; this chain\u2019s duplicate closure parts dropped per Art. 29(e)), so the rebased work commit carries only the additive verification bytes (verifier_addendum + eval/r75_c0093_verification.json); the final apply commit quoting THIS chain\u2019s own push CI follows per the D2 round-closing procedure."
+  },
+  {
+   "claim_id": "c-0095",
+   "claimed_at": "2026-11-18T15:20:00Z (sandbox clock)",
+   "work_id": "r77-vault-restore-custody",
+   "title": "Durable-execution staging for the window-gated frontier round: (1) commit scripts/r77_vault_restore.py \u2014 the general, digest-verifying, fail-closed HF-vault restore path (Art. 17 v3.3.0 'look it up there' made operational; prior restore tooling was session-local and died with the sandbox, Art. 18 class) + zero-network test wired into CI; (2) live drill the restore in this session; (3) schedule the one-shot cron (2026-11-19T16:40Z, after the 16:25Z gate) that fires the full frontier re-probe round per the runbook's next_gates; (4) typed round record",
+   "status": "OPEN",
+   "registered_at": "2026-11-18T15:20:00Z (sandbox clock)",
+   "session_id": "builder-r77s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "d05904dbf54668bf3a091c5ea403e8ee4bcce2fa",
+   "lease_expiry": "2026-11-19T15:20:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "scripts/r77_vault_restore.py",
+    "tests/test_r77_vault_restore.py",
+    ".github/workflows/r11_queue_surface.yml",
+    "eval/r77_vault_restore_status.json"
+   ],
+   "no_probes_note": "zero LLM probes; zero inference/quota consumption; the only network actions are read-only git fetch + the HF vault GET (metadata custody, not inference)",
+   "custody_note": "credential values ride the session-local gitignored .env.keys and the owner-delivered channel only; the cron payload embeds the two owner-delivered credentials as session-transient custody bootstrap (digest-verified on arrival, never committed, one-shot consumed) \u2014 the alternative is a credential-less fired session and an idled window round, which Art. 28 addendum forbids (the loop never idles waiting on a delegated action)",
+   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == d05904dbf == local HEAD; no competing OPEN claim for work_id r77-vault-restore-custody; claim ids monotonic (next after c-0094)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
