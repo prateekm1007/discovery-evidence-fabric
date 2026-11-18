@@ -2199,7 +2199,7 @@
    "claimed_at": "2026-11-18T15:20:00Z (sandbox clock)",
    "work_id": "r77-vault-restore-custody",
    "title": "Durable-execution staging for the window-gated frontier round: (1) commit scripts/r77_vault_restore.py \u2014 the general, digest-verifying, fail-closed HF-vault restore path (Art. 17 v3.3.0 'look it up there' made operational; prior restore tooling was session-local and died with the sandbox, Art. 18 class) + zero-network test wired into CI; (2) live drill the restore in this session; (3) schedule the one-shot cron (2026-11-19T16:40Z, after the 16:25Z gate) that fires the full frontier re-probe round per the runbook's next_gates; (4) typed round record",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-18T15:20:00Z (sandbox clock)",
    "session_id": "builder-r77s1",
    "role": "EXECUTOR",
@@ -2215,7 +2215,8 @@
    ],
    "no_probes_note": "zero LLM probes; zero inference/quota consumption; the only network actions are read-only git fetch + the HF vault GET (metadata custody, not inference)",
    "custody_note": "credential values ride the session-local gitignored .env.keys and the owner-delivered channel only; the cron payload embeds the two owner-delivered credentials as session-transient custody bootstrap (digest-verified on arrival, never committed, one-shot consumed) \u2014 the alternative is a credential-less fired session and an idled window round, which Art. 28 addendum forbids (the loop never idles waiting on a delegated action)",
-   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == d05904dbf == local HEAD; no competing OPEN claim for work_id r77-vault-restore-custody; claim ids monotonic (next after c-0094)"
+   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == d05904dbf == local HEAD; no competing OPEN claim for work_id r77-vault-restore-custody; claim ids monotonic (next after c-0094)",
+   "completion_note": "typed completion (pushed): claim 27fd50949 -> work 28fd0b9d9, fast-forward push, remote surface CI completed success (authenticated check-runs read, D2 convention). Deliverables: scripts/r77_vault_restore.py (the committed Art.17 v3.3.0 restore path, fail-closed, digests-only) + 7 zero-network tests wired into the queue CI + LIVE DRILL PASS (6/6 vault keys digest-verified, custody fully restored incl. the runbook's XKIRO dependency) + one-shot cron job 537019 scheduled 2026-11-19T16:40Z firing the frontier re-probe round (Art. 28 addendum: loop-owned, never idles). The live drill caught a test-hygiene defect in the tool's first draft (ENV_KEYS patched with itself -> the session vault writeable from tests); fixed before landing \u2014 the landed suite runs on a temp path only, disclosed in the round record. Zero probes; 0.0 engine lines typed (custody/infra class)."
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",

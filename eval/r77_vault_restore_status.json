@@ -25,7 +25,8 @@
  "durable_execution": {
   "mechanism": "one-shot cron job scheduled 2026-11-19T16:40:00Z UTC (15 min after the 16:25Z maintenance-exit gate) firing the complete frontier re-probe round: custody bootstrap (the two owner-delivered credentials embedded as session-transient custody bootstrap, digest-verified on arrival, never committed, one-shot consumed) -> round protocol (fetch, FULL constitutional reads, claim-before-work FIRST) -> fire scripts/r70_frontier_reprobe_runbook.py (the runbook's own gate is authoritative; a pre-window refusal is obeyed typed) -> register the strongest serving id -> push + remote CI verify (D2) -> typed handoff to the auditor lane (prereg amend + v10 authoring are the auditor's; re-freeze only after the prereg amend lands, CI-gated)",
   "authority": "Art. 28 addendum (delegated owner actions are LOOP-OWNED; the loop never idles waiting on a delegated action) + Art. 18 (durable execution; observer-independent). The alternative was a credential-less fired session and an idled window round.",
-  "custody_note": "credential values ride the owner-delivered channel (the same channel that delivered them) and the gitignored session vault; zero credential bytes enter the tracked repo \u2014 the commit carries digests only (Art. 17)"
+  "custody_note": "credential values ride the owner-delivered channel (the same channel that delivered them) and the gitignored session vault; zero credential bytes enter the tracked repo \u2014 the commit carries digests only (Art. 17)",
+  "cron_job_id": 537019
  },
  "frontier_window": {
   "gate": "2026-11-19T16:25Z",
@@ -33,5 +34,14 @@
   "state": "CLOSED (~25h remain) \u2014 Art. 3 typed refusal; zero probes consumed this round; the runbook's own gate is the enforcement surface"
  },
  "engine_line_share": "0.0 \u2014 typed disclosure (Art. 27 custody/infra class): this round ships custody tooling + durable-execution staging, zero engine lines; the capability budget is spent AT the window round (the probe + v10 are the capability events)",
- "score_note": "score stays 5; the path to 6 is unchanged: frontier model + binds on fresh sealed v10, mean>=3.25 CI>3.0 (Art. 14)"
+ "score_note": "score stays 5; the path to 6 is unchanged: frontier model + binds on fresh sealed v10, mean>=3.25 CI>3.0 (Art. 14)",
+ "remote_ci": {
+  "head": "28fd0b9d9",
+  "check": "surface",
+  "status": "completed",
+  "conclusion": "success",
+  "read": "authenticated Bearer check-runs API \u2014 the green is the remote's (D2 convention)",
+  "note": "the passing workflow includes tests/test_r77_vault_restore.py \u2014 the custody tool is verified gating from the remote's own execution"
+ },
+ "push_range": "27fd50949..28fd0b9d9 (fast-forward on the mutex commit 27fd50949)"
 }
