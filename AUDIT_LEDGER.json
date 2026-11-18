@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "38ed0b312",
+  "queue/dev12_r7": "ee9e080cb",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2797,6 +2797,17 @@
     "F80 CLOSED: the answer's OWN numbers are now computable on-row. numeric_claims.py + onrow_physics.py + schema numeric_claims field; P1 r54_p1_unit_checked v2.0.0 (36/36 on-row, 0 sign contradictions, 30 own numbers extracted / 6 ROW_CLAIM bindings / 117 typed assumptions). Frozen-safe (15/15 baselines hold at F80 tip, r52 byte-identity). 20-test suite CI-gated; c-0099 DONE; CI green. The P1 gate now measures the output's own physics, not reference scenarios — the external-assessor core gap is closed.",
     "Score stays 5 until v10 acceptance. Path to 6 now unblocked: model pin amended (cohere/command-a); builder flips route_adapter + runs sealed v10 one-shot; auditor scores."
    ]
+  },
+  {
+   "id": "AM75",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "OWNER DIRECTIVE: use agnes-3.0-flash as the DEFAULT generator (supersedes AM73 cohere/command-a)",
+   "changes": [
+    "OWNER: agnes-3.0-flash is the default generator. v10 model_pin AMENDED back to agnes-3.0-flash (supersedes AM73 cohere/command-a). Rationale: xkiro free-model daily token quota (~150K/day empirical ceiling) cannot carry the ~870K v10 run (R85 typed infra block, reset 2026-11-19T00:00Z); agnes-3.0-flash served v9 reliably and has 2-key ordered rotation (AGNES_API_KEY + AGNES_API_KEY_2 already in route_adapter).",
+    "Builder next: (1) re-freeze the v10 instrument scripts/r85_v10_one_shot.py with V10_REQUEST_MODEL=agnes-3.0-flash (the frozen r40 file constant is already agnes-3.0-flash, so the binding becomes identity) — conscious re-freeze, CI-gated by the freeze guard; (2) flip route_adapter registered block to agnes/agnes-3.0-flash + ZAI_GATEWAY_UPSTREAM=agnes (route_adapter NOT frozen); (3) update test_r58 pins riding the flip; (4) re-smoke on BURNED v7 (agnes); (5) run the sealed v10 one-shot (all four binds + on-row physics leg), 30/30 served==requested==registered agnes-3.0-flash; (6) push+CI+handoff; auditor scores mean>=3.25 CI>3.0 -> score 6 -> BURN.",
+    "R85 verified: AM73 flip + v10 machine freeze (beb3e29c0) + claim c-0100 before read + smoke 12/12 cohere/command-a on burned v7 + typed xkiro quota block (ee9e080cb CI green). The one-shot integrity intact; zero v10 rows generated under the blocked route. The agnes switch resolves the quota block without owner spend."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3916,6 +3927,14 @@
     "F80"
    ],
    "evidence_sha": "eval/r84_auditor_verification.json"
+  },
+  {
+   "id": "V75",
+   "round": "R86 owner agnes-default directive + R85 verification",
+   "commit": "ee9e080cb",
+   "gate": "NOT_MET (score 5); v10 pin -> agnes-3.0-flash, one-shot pending re-freeze",
+   "capability_change": "owner default agnes-3.0-flash; v10 pin amended; xkiro quota block resolved by route switch",
+   "evidence_sha": "eval/r86_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4147,7 +4166,7 @@
    "design": "chemistry monoculture-break + direction traps HO10-06/08/12/13 + pricing pos HO10-02/10 neg HO10-05/15 + 15 input traps"
   }
  },
- "progress_note": "SCORE 5/10. F80 CLOSED (on-row physics: answer's own numbers computed, 36/36, 0 sign contradictions, frozen-safe, CI-gated). v10 model pin AMENDED to cohere/command-a (R81 fire-now frontier flagship). Path to 6 unblocked: builder flips route_adapter to xkiro/cohere/command-a + claims v10 before read + sealed one-shot (all four binds + on-row leg) -> auditor scores mean>=3.25 CI>3.0 -> score 6 -> BURN. Goal 9/10.",
+ "progress_note": "SCORE 5/10. OWNER DIRECTIVE (AM75): agnes-3.0-flash default generator; v10 pin amended back from cohere/command-a (xkiro quota-blocked ~150K/day vs ~870K needed). R85 verified (AM73 flip + v10 freeze + claim c-0100 + smoke 12/12 + typed quota block). Builder: re-freeze v10 instrument to agnes-3.0-flash + flip route_adapter to agnes (2-key rotation) + re-smoke + sealed v10 one-shot (all binds + on-row) -> mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
