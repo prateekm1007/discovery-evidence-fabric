@@ -1955,7 +1955,7 @@
    "claim_id": "c-0087",
    "work_id": "r64-v9-preflight-pack",
    "title": "R64: v9 one-shot pre-flight pack (direction 5 readiness) \u2014 read-only, zero-LLM verification that the sealed run's inputs and plumbing are intact at the audit tip: the published-recipe seal verification (project -> sort -> canonical JSON -> sha256 == doc == prereg == EXPECTED_SEAL), n=30 with the 15/15 question-type mix, per-problem schema fields, the rubric-isolation structural proof (the instrument bytes carry NO rubric access beyond the custody contract), the served==registered attestation plumbing, and freeze byte-baselines for the V7.7 loop + instrument; a CI-gated test keeps the invariants true until the run window",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-18 (sandbox clock)",
    "session_id": "builder-r64s1",
    "role": "EXECUTOR",
@@ -1971,7 +1971,9 @@
    ],
    "secrets_note": "no credential work; the pre-flight never touches the rubric repo or any access-controlled surface (custody: builder NEVER_READ pre-generation \u2014 the script only asserts the instrument's OWN bytes contain no rubric access)",
    "collision_note": "read-only verification + guard on the queue branch; the c-0079 challenger lane is the lease-holder's (lease live to 2026-11-19T00:00:00Z); c-0082 NOT claimed (adoption verdict first per Finding 2 sequencing); no competing pre-flight claim exists (checked at dade20f9c)",
-   "no_probes_note": "direction 1: zero z-ai probes \u2014 every check reads committed bytes via git show; nothing calls any gateway"
+   "no_probes_note": "direction 1: zero z-ai probes \u2014 every check reads committed bytes via git show; nothing calls any gateway",
+   "done_at": "2026-11-18 (sandbox clock)",
+   "done_note": "landed @ f6cff5eb8: pre-flight module + record (PREFLIGHT_PASS: seal replica verified, n=30 15/15, rubric-isolated, plumbing complete, 15 freeze baselines) + 7/7 CI-gated guard tests; CI surface success; zero probes; the one-shot stays sealed for the run window"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
