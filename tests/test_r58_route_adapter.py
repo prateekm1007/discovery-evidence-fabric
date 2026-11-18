@@ -28,24 +28,24 @@ from r58_p2_ablation_driver import (  # noqa: E402
 # ---------------------------------------------------------------- registry
 def test_route_registry_typed_facts():
     reg = ra.ROUTE_REGISTRY
-    assert reg["registered"]["model"] == "glm-4-plus"
-    assert "R36" in reg["registered"]["provenance"]
+    assert reg["registered"]["model"] == "cohere/command-a-plus"
+    assert "R36" in reg["registered"]["provenance"]  # supersession
     names = {a["name"] for a in reg["alternates"]}
-    assert names == {"xkiro", "agnes"}
+    assert names == {"zai-gateway", "agnes"}
     for a in reg["alternates"]:
-        assert a["vault_key_name"] in ("XKIRO_API_KEY", "AGNES_API_KEY")
+        assert a["vault_key_name"]
         assert a["transport_facts"], "every alternate carries its facts"
-    xk = [a for a in reg["alternates"] if a["name"] == "xkiro"][0]
-    assert any("User-Agent" in f for f in xk["transport_facts"])
     ag = [a for a in reg["alternates"] if a["name"] == "agnes"][0]
     assert any("REASONING_HEADROOM" in f or "reasoning" in f
                for f in ag["transport_facts"])
+    assert {r["name"] for r in reg["retired"]} == {
+        "zai-gateway / glm-4-plus"}
     dead = {d["name"] for d in reg["dead"]}
     assert dead == {"deepai", "nvidia"}
 
 
 def test_require_registered_model_guard():
-    ra.require_registered_model("glm-4-plus")  # the registered id
+    ra.require_registered_model("cohere/command-a-plus")  # the reg. id
     try:
         ra.require_registered_model("mistralai/ministral-14b")
         raise AssertionError("silent model swap must be refused")

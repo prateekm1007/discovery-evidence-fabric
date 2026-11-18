@@ -52,14 +52,14 @@
    "complete": true
   },
   "preregistration": {
-   "status": "SEALED_REGISTERED — builder may claim the one-shot generation",
+   "status": "SEALED_REGISTERED \u2014 builder may claim the one-shot generation",
    "n_problems": 30,
    "burn_after_use": true,
    "acceptance_bar": "mean>=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction AND 0 unavailable-input rows AND run_verdict==VALID; Art.14 CI lower bound > 3.0 for RESOLVED"
   },
   "freeze_baselines_sha16": {
-   "scripts/r60_v9_one_shot.py": "e5f57574d4a55f76",
-   "scripts/r40_machine_v77.py": "3d8b2512811d84eb",
+   "scripts/r60_v9_one_shot.py": "15e7e712fa8a1a57",
+   "scripts/r40_machine_v77.py": "0ccdf8fd9ee166d0",
    "scripts/r40_v77_directive.py": "2ef8c9ffa32dd7c8",
    "scripts/r29_a1w_v72_contract.py": "e7949579a5b850fa",
    "scripts/r22_a1w_v5_repair.py": "97fe7740563c6d82",
@@ -76,5 +76,16 @@
   }
  },
  "zero_probes": "every check reads committed bytes via git show; no gateway, no rubric repo, no instrument execution",
- "verdict": "PREFLIGHT_PASS — the sealed one-shot's inputs and plumbing are intact; start-blocker risk cleared for the run window"
+ "verdict": "PREFLIGHT_PASS \u2014 the sealed one-shot's inputs and plumbing are intact; start-blocker risk cleared for the run window",
+ "re_freeze_note": {
+  "act": "CONSCIOUS RE-FREEZE (r64s4, owner-directed)",
+  "changed_files": {
+   "scripts/r40_machine_v77.py": {
+    "was": "f81f7fded6de",
+    "now": "0ccdf8fd9ee1"
+   }
+  },
+  "reason": "the owner-directed registration superseding R36: V77_REQUEST_MODEL glm-4-plus -> cohere/command-a-plus in r40_machine_v77.py (constant + docstring), the byte-reuse assert in r60_v9_one_shot.py, and the guard/pre-flight plumbing strings; the engine route_adapter registry flip + gateway upstream switch are infra (not frozen) and are disclosed in the same commit",
+  "basis": "auditor channel ruling quoted verbatim: 'Update V77_REQUEST_MODEL in scripts/r60_v9_one_shot.py to match the new registered model. The 30/30 served==registered attestation must reflect the new model'; pre-registration reachability probe r64s4 (R36 lesson honored); prereg amendment flagged for audit-branch codification"
+ }
 }

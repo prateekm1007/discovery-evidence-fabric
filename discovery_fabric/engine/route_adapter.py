@@ -104,35 +104,60 @@ REASONING_HEADROOM = 512
 
 ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
     "registered": {
-        "name": "zai-gateway",
-        "base_url": "http://127.0.0.1:8787/v1",
-        "model": "glm-4-plus",
-        "provenance": "R36 auditor registration ruling; live-probed "
-                      "R58 (builder-r58s1)",
+        "name": "xkiro",
+        "base_url": "https://api.xkiro.com/v1",
+        "model": "cohere/command-a-plus",
+        "provenance": "OWNER-DIRECTED registration (2026-11-18): "
+                      "supersedes R36 by owner order (glm-4-plus "
+                      "retired as insufficient capability; keys "
+                      "supplied in-channel); prereg attestation "
+                      "semantics amended by the auditor channel "
+                      "ruling 'the 30/30 served==registered "
+                      "attestation must reflect the new model'; "
+                      "reachability PROBED pre-registration "
+                      "(r64s4: served string exact, sized-probe "
+                      "finish=stop); served via the loop-local "
+                      "gateway (ZAI_GATEWAY_UPSTREAM=xkiro, R458-C1 "
+                      "id semantics, +1024 typed reasoning headroom)",
         "role": "generator (the ONLY registered generator id; the "
                 "P2 ablation + v9 one-shot route)",
     },
+    "retired": [
+        {
+            "name": "zai-gateway / glm-4-plus",
+            "reason": "OWNER ORDER 2026-11-18: retired as "
+                      "insufficient capability ('too low level a "
+                      "model'); served R58's 61/61 run and the v7 "
+                      "history; the z-ai grant stays 429-dark "
+                      "(Art. 15 typed) — historical records keep "
+                      "their glm-4-plus attestations untouched",
+        },
+    ],
     "alternates": [
         {
-            "name": "xkiro",
-            "base_url": "https://api.xkiro.com/v1",
-            "n_models": 69,
-            "provenance": "c-0078 end-to-end qualification; R58 "
-                          "custody probe (roster match)",
+            "name": "zai-gateway",
+            "base_url": "http://127.0.0.1:8787/v1 (loop-local proxy; "
+                        "upstream = z-ai CLI grant)",
+            "n_models": 1,
+            "provenance": "R36 auditor registration ruling (now "
+                          "superseded); live-probed R58",
             "transport_facts": [
-                "browser User-Agent REQUIRED (urllib default UA "
-                "banned: Cloudflare 403 error 1010, R58 typed)",
-                "no glm family in the roster — alternate family, "
-                "never the registered id",
+                "429-dark since R64 (Art. 15 typed window); the "
+                "gateway's CLI upstream serves the grant's single "
+                "embedded model regardless of the request id "
+                "(R458-C1)",
             ],
-            "vault_key_name": "XKIRO_API_KEY",
+            "vault_key_name": "ZAI_GATEWAY_KEY (session-local, "
+                              "start_gateway-generated)",
         },
         {
             "name": "agnes",
             "base_url": "https://apihub.agnes-ai.com/v1",
             "n_models": 10,
             "provenance": "c-0078 end-to-end qualification; R58 "
-                          "custody probe (roster match)",
+                          "custody probe (roster match); r64s4 "
+                          "owner-key verification (roster OK, "
+                          "agnes-2.5-flash live 0.4s)",
             "transport_facts": [
                 "reasoning-first budgeting: max_tokens must be sized "
                 ">= visible_target + REASONING_HEADROOM (c-0078 "
@@ -268,9 +293,10 @@ def require_registered_model(model: str) -> None:
     reg = ROUTE_REGISTRY["registered"]["model"]
     if model != reg:
         raise RouteRefused(
-            "unregistered_route", "zai-gateway",
+            "unregistered_route", "xkiro-gateway",
             f"requested '{model}' but the registered generator id is "
-            f"'{reg}' (R36) — a silent model swap is forbidden")
+            f"'{reg}' (R36 superseded by owner order r64s4/AM60) — a "
+            f"silent model swap is forbidden")
 
 
 __all__ = ["ROUTE_ADAPTER_VERSION", "ROUTE_REGISTRY", "RouteRefused",

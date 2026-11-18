@@ -71,6 +71,7 @@ def test_ci_gates_the_bind_suites():
 
 def test_v7_request_id_is_the_corrected_registration():
     from r40_machine_v77 import V77_REQUEST_MODEL  # noqa: E402
-    assert V77_REQUEST_MODEL == "glm-4-plus", (
-        "the v7 transport must request the corrected R-REQID id "
-        "glm-4-plus (forward-only per AM37 section 2)")
+    assert V77_REQUEST_MODEL == "cohere/command-a-plus", (
+        "the transport must request the registered id "
+        "(forward-only per AM37 section 2; the r64s4 owner-directed "
+        "registration superseding R36)")

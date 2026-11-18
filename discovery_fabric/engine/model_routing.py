@@ -261,13 +261,19 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
 #:          gateway (69-model catalog, fetched live 2026-11-13); the
 #:          owner's 'Mercury 3' name resolves to nothing servable here.
 ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
-    "synthesis": ("zai", "glm-4-plus"),
-    "attack": ("zai", "glm-4-plus"),
-    "composer": ("zai", "glm-4-plus"),
+    # r64s4 OWNER-DIRECTED re-registration (supersedes R36 per AM60):
+    # the zai/glm-4-plus route is RETIRED (Art. 16 ledger); the live
+    # purposes re-pin to the registered route (xkiro /
+    # cohere/command-a-plus) — the engine's transports route through
+    # the loop-local gateway either way, so this is an id re-pin, not
+    # a transport change.
+    "synthesis": ("xkiro", "cohere/command-a-plus"),
+    "attack": ("xkiro", "cohere/command-a-plus"),
+    "composer": ("xkiro", "cohere/command-a-plus"),
     # bulk = the fast LOCAL rung for the high-volume short steps
-    "bulk": ("zai", "glm-4-plus"),
+    "bulk": ("xkiro", "cohere/command-a-plus"),
     "judge": ("xkiro", "mistralai/ministral-14b"),
-    "judge_last_resort": ("zai", "glm-4-plus"),
+    "judge_last_resort": ("xkiro", "cohere/command-a-plus"),
 }
 #: Retirement/availability notes THIS WINDOW (measured; the routing
 #: authority is provider_health.RETIRED_ROUTE_PROVIDERS + the spec

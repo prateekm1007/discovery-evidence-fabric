@@ -134,10 +134,29 @@ run it: protocol, instruments, pass/fail thresholds, duration, kill
 criterion."""
 
 
+def _vault_env(env: dict) -> dict:
+    """R64s4: pass the gitignored vault (.env.keys, NAME=VALUE lines)
+    through to the gateway child process — the xkiro upstream needs
+    XKIRO_API_KEY at call time. Values are never printed or logged;
+    existing os.environ entries win (explicit overrides the vault)."""
+    v = REPO / ".env.keys"
+    if not v.exists():
+        return env
+    for line in v.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, _, value = line.partition("=")
+        name = name.strip()
+        if name and name == name.upper() and name not in env:
+            env[name] = value.strip()
+    return env
+
+
 def start_gateway():
     key = "gwkey-" + hashlib.sha256(
         str(time.time()).encode()).hexdigest()[:12]
-    env = dict(os.environ, ZAI_GATEWAY_KEY=key)
+    env = _vault_env(dict(os.environ, ZAI_GATEWAY_KEY=key))
     p = subprocess.Popen(
         ["node", str(REPO / "scripts" / "zai_gateway.mjs"), "8787"],
         stdout=open("/tmp/gw_a1fv3.log", "wb"), stderr=subprocess.STDOUT,
@@ -159,7 +178,11 @@ def gen_call(prompt, key, max_tokens=2600):
     # prior id zai-org/GLM-5.3 is servable on zero reachable paths —
     # the machine now requests the registered id it is attested against.
     body = json.dumps({
-        "model": "glm-4-plus",
+        # r64s4: the R36-corrected id is itself retired now (owner
+        # order, AM60) — the request label follows the registration
+        # (the gateway serves the registered upstream id regardless,
+        # R458-C1; the served identity stays the evidence)
+        "model": "cohere/command-a-plus",
         "messages": [{"role": "system", "content": SYS_A1F_V3},
                      {"role": "user", "content": prompt}],
         "max_tokens": max_tokens, "temperature": 0.0}).encode()

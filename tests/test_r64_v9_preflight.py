@@ -75,10 +75,12 @@ def test_instrument_constants_undrifted():
         "ddec082e10f34ce")
     assert instrument_constant(src, "EXPECTED_N") == "30"
     # the registered model is OWNED by the frozen machine module and
-    # re-asserted by the instrument at run time (byte-reuse)
-    assert re.search(r'^V77_REQUEST_MODEL\s*=\s*"glm-4-plus"',
-                     machine, re.M), "registered model drifted"
-    assert 'm.V77_REQUEST_MODEL == "glm-4-plus"' in src, (
+    # re-asserted by the instrument at run time (byte-reuse) — the
+    # r64s4 owner-directed registration superseding R36
+    assert re.search(
+        r'^V77_REQUEST_MODEL\s*=\s*"cohere/command-a-plus"',
+        machine, re.M), "registered model drifted"
+    assert ('m.V77_REQUEST_MODEL == "cohere/command-a-plus"' in src), (
         "the instrument's byte-reuse assertion went missing")
     assert "engine_route" in instrument_constant(src, "MEASURED_PATH")
 

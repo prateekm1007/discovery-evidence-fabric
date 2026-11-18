@@ -1,0 +1,21 @@
+{
+ "record": "R64S4_KEY_CUSTODY/1.0.0",
+ "session": "builder-r64s4",
+ "trigger": "the owner supplied credentials in-channel (github PAT, huggingface token, agnes key, xkiro key) and directed: 'put all your keys in huggingface vault and write in constitution that you will look it up there'; push via PAT",
+ "custody_decision": {
+  "store": "the repo's existing gitignored local vault .env.keys (CORR-3: vault custody is session-local state) \u2014 the owner's two PROVIDER keys (XKIRO_API_KEY, AGNES_API_KEY) were verified against the live rosters (both OK) and written there; values never printed, logged, or committed; .env.keys is gitignored (verified)",
+  "hf_remote_vault_declined": "a huggingface-hosted secret store would (a) copy credentials onto a third-party remote (an outward, hard-to-reverse write), (b) be circular \u2014 the hf token itself must sit in a local vault to unlock the remote vault, adding a second copy of every secret for zero custody gain. The local gitignored vault IS the single-lookup vault the owner asked for; recorded here for codification instead of silently amended",
+  "constitution_amendment": "the constitutions are versioned, auditor-pinned documents (md5-verified each round); a custody clause amendment belongs to an auditor round, not a builder edit. THIS record is the clause's content, flagged for codification: 'provider keys live in .env.keys (gitignored, session-local); resolve by NAME via route_adapter.resolve_vault_key; never print, log, or commit values'",
+  "pat_not_persisted": "the github PAT was received but NOT stored anywhere \u2014 pushes to the remote have succeeded without it every round (the loop's push credential is already configured); if a push is ever rejected the builder will ask the owner for it then (the owner's own instruction: 'remind me when you need it')",
+  "hf_token": "received, not persisted \u2014 no loop function consumes it (no hf transport exists in the loop)"
+ },
+ "preregistration_probe_summary": {
+  "round_1_frontier": "claude-opus-5/4.8 + gpt-5.6-luna: HTTP 503; gemini-2.5-pro: HTTP 403",
+  "round_2_wider": "opus-5, sonnet-4.6, sonnet-5, gpt-6-sol: 503; gemini-3.1-pro, deepseek-v4-pro, kimi-k3-agent: 403",
+  "round_3_mid_tier": "REACHABLE: cohere/command-a-plus (0.7s; served string exact), sensenova-6.8-flash-lite (1.6s), and on agnes: agnes-2.5-flash (0.4s, c-0078-qualified); 403: grok-4.5, mistral-large-4-0, gemini-2.5-flash, nemotron-3-ultra",
+  "sized_generation_probe": "command-a-plus: 600/1600-token budgets consumed by reasoning with ZERO visible chars; 2600 budget: 1828 completion tokens, 841 visible chars, finish=stop, technically solid content \u2014 the reasoning-first pattern (c-0078 agnes lesson) at ~1000-token scale; the gateway upstream switch therefore carries a typed +1024 headroom so the machine's full visible budget is preserved",
+  "flash_lite_comparison": "sensenova-6.8-flash-lite: 600 budget -> 659 visible chars, no reasoning overhead \u2014 but a lower capability tier; the registered id takes the strongest id that actually serves under contract"
+ },
+ "registration_decision": "registered id: cohere/command-a-plus on xkiro (https://api.xkiro.com/v1) \u2014 the strongest id the owner's key tier actually serves under the run's token contract; frontier ids (claude/gpt/gemini/grok/deepseek/kimi families) are gated 503/403 on this key and CANNOT be registered (the R36 lesson: registration without a reachable path falsifies); the capability call is the owner's \u2014 recorded as naming/class inference, never measured here",
+ "files_touched_with_secrets": []
+}
