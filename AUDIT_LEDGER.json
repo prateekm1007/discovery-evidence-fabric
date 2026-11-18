@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "dade20f9c",
+  "queue/dev12_r7": "53913e455",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1492,6 +1492,19 @@
     15,
     29
    ]
+  },
+  {
+   "id": "F73",
+   "severity": "INFO",
+   "title": "R66 builder refusal VERIFIED as lawful: builder refused to execute owner directive (run v9 on new model) because (a) no AM superseding the prereg's glm-4-plus pin existed on audit branch; (b) 'qwen 3.8' not in live roster (0/79 ids); (c) prereg pins glm-4-plus by name; (d) adoption verdict sequencing (Finding 2) not waived. Builder filed c-0089 intake record with capability evidence (xkiro 18 frontier ids vs agnes 0 flagship hints). Auditor issued AM60 to unblock.",
+   "status": "CLOSED",
+   "opened": "2026-11-18",
+   "closed_at": "2026-11-18",
+   "last_checked": "53913e455",
+   "resolution": "AM60 issued; builder's refusal was lawful Art. 29(b)/(c) discipline (no authorization bytes existed for the directive).",
+   "articles": [
+    29
+   ]
   }
  ],
  "amendments": [
@@ -2500,6 +2513,19 @@
     "FRONTIER UNCHANGED: P2 v9 sealed acceptance. Blockers: (a) 429 transport outage (environmental, Art. 15); (b) c-0079 lease (expires 2026-11-19T00:00:00Z, Art. 29(d) takeover lawful only after expiry+dead lease); (c) adoption verdict sequencing (Finding 2: ADOPT/DELETE on plan layer precedes c-0082 claim).",
     "SCORE STAYS 6: P1 gate passed (108/108=1.0 on full corpus). Next point: sealed acceptance at mean>=3.0, 0/0/0, CI>3.0 (Art. 14 power-pre-registered n=30). Goal 9/10; capability, not governance."
    ]
+  },
+  {
+   "id": "AM60",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "Owner directive to unblock v9 one-shot: z-ai 429 outage + glm-4-plus retired. Supersedes v9 prereg glm-4-plus pin.",
+   "changes": [
+    "OWNER DIRECTIVE RECEIVED: 'if zai provider doesnt work use xiro or agnes. the provider should not be blocking us. and glm 4 too low level a model to use. retire it' — this directive supersedes the builder's Art. 15 'wait out the 429' discipline and the v9 prereg's glm-4-plus pin.",
+    "V9 PREREG AMENDED: MANDATORY_RUN_ARTIFACTS[1] '30/30 served_model==registered glm-4-plus attestation PRE-SCORING' is REPLACED with '30/30 served_model==registered <NEW_MODEL> attestation PRE-SCORING' where <NEW_MODEL> is the model id the builder registers after probing (per the R36 lesson: register nothing without a reachable path).",
+    "SEQUENCE AUTHORIZED: (1) builder probes xkiro/agnes rosters for a reachable frontier model id (claude-opus-4.5, gpt-5.6-*, gemini-2.5-pro, or grok-4.x preferred per c-0089 capability evidence); (2) registers it in ROUTE_REGISTRY['registered']; (3) updates V77_REQUEST_MODEL in scripts/r60_v9_one_shot.py; (4) re-freezes if engine changes; (5) adoption verdict (Finding 2) may be waived or filed after the run (owner directive overrides the prior sequencing); (6) claims c-0082; (7) runs the one-shot; (8) auditor scores vs private-repo rubric.",
+    "RETIREMENT: glm-4-plus is RETIRED from ROUTE_REGISTRY['registered'] and the generation roster. Recorded in the capability ledger (Art. 16). Reason: z-ai 429 outage (4h+ sustained, environmental) + owner directive on capability (too low level).",
+    "SCORE STAYS 6: this AM is an authorization, not a gate. The v9 one-shot runs on the new model, auditor scores, acceptance decision at mean>=3.0 with CI>3.0. Goal 9/10; capability, not governance."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3468,6 +3494,14 @@
     "F72"
    ],
    "evidence_sha": "eval/r65_auditor_verification.json"
+  },
+  {
+   "id": "V59",
+   "round": "R66 owner directive execution",
+   "commit": "53913e455",
+   "gate": "P1 PASSED (score 6); acceptance NOT_MET (v9 one-shot pending)",
+   "capability_change": "v9 unblocked: owner directive supersedes glm-4-plus pin + 429 wait discipline",
+   "evidence_sha": "eval/r66_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3683,7 +3717,7 @@
    "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
   }
  },
- "progress_note": "SCORE 6/10 (P1 gate passed on full corpus at R63). R65 session-log re-delivery VERIFIED: c-0084 verifier record present (C0083_VERIFIED); recovery monitor/cron are session-local (not in repo, not required). Current state: R63/R64 complete. Frontier: P2 v9 sealed acceptance. Blockers: 429 outage (Art. 15) + c-0079 lease (2026-11-19T00:00:00Z) + adoption verdict sequencing. Next: wait for 429 window OR lease expiry, then resume/challenge c-0079, adoption verdict, claim c-0082, run v9 one-shot, auditor scoring (mean>=3.0, 0/0/0, CI>3.0). Goal 9/10.",
+ "progress_note": "SCORE 6/10 (P1 gate passed on full corpus at R63). R66: owner directive received (switch models, retire glm-4-plus). Builder refused lawfully (no AM superseding prereg pin). Auditor issued AM60 to unblock: v9 prereg glm-4-plus pin superseded, sequence authorized (probe → register → re-freeze → c-0082 → one-shot → scoring). Frontier: P2 v9 sealed acceptance on the new model. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
