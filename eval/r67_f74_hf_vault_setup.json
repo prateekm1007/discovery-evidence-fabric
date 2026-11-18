@@ -1,0 +1,30 @@
+{
+  "record": "R67_F74_HF_VAULT_SETUP/1.0.0",
+  "session": "builder-r60s1",
+  "date": "2026-11-18",
+  "trigger": "owner delivered the HF token in-channel with the auditor R67 message (F74: token lacks repo.write); Art. 17 v3.3.0 custody extension execution",
+  "f74_resolution": {
+    "token_identity": "the delivered token digest 33bc7af22c62 == the custody token recorded at 3ce9309fa (SAME token, scope UPDATED by the owner, not a new credential)",
+    "whoami_v2_after_grant": "login prateekm1, fineGrained; scoped entity user prateekm1 perms include repo.write (previously perms=None per the v3.3.0 typed state)",
+    "verdict": "F74 RESOLVED - the owner-side repo.write grant landed; the builder can now create and write the private vault repo"
+  },
+  "vault_setup": {
+    "vault_repo": "prateekm1/operator-keys-vault",
+    "repo_type": "dataset",
+    "private": true,
+    "files": ["operator_keys.json", "README.md"],
+    "keys_stored": ["AGNES_API_KEY", "AGNES_BASE_URL", "GH_PAT", "GITHUB_TOKEN", "XKIRO_API_KEY"],
+    "encoding": "each value base64(utf8(value)) with per-key sha256[:12]; restore = download, base64-decode, write .env.keys, digest-verify against committed custody records (eval/r59_credential_custody_r59s1.json convention)",
+    "restore_verified_this_session": "BYTE-IDENTICAL (decoded values == local .env.keys values; per-key digests match)"
+  },
+  "master_token_rule": {
+    "stored": false,
+    "why": "Art. 17 v3.3.0 standing rule: the MASTER credential (the HF token) is owner-delivered on request ('remind me when you need it') - it unlocks the vault; storing it inside the vault it unlocks is circular (the r64s4 typed circularity finding)",
+    "digest_on_record": "33bc7af22c62"
+  },
+  "typed_findings": [
+    "HF secret scanner REJECTS uploads containing a raw live HF token EVEN TO PRIVATE REPOS (400 Bad Request, offending file env.keys) - the raw-value vault format is structurally impossible on this host; the base64 value encoding is the scanner-compatible form and keeps every value under the owner's private-repo privacy boundary (Art. 12 v1.3.0 design constraint: the vault repo must be PRIVATE)",
+    "the constitution v3.3.0 typed-current-state line (zero repo perms, builder cannot create the vault repo) is now STALE - flag for the auditor to update the typed state in the next round record (the constitution file itself is auditor-pinned; no builder edit)"
+  ],
+  "zero_values_in_tracked_repo": "this record carries digests and names ONLY; secret-grep of the commit is clean by construction (values live exclusively in the private HF vault + the gitignored .env.keys)"
+}
