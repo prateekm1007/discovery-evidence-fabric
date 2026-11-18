@@ -1,0 +1,149 @@
+{
+ "record": "R64S4_RUN_STATE/1.0.0",
+ "session": "builder-r64s4",
+ "at": "2026-11-18 (sandbox clock, turn cut-off)",
+ "authorization": "AM60/R66: 'v9 prereg glm-4-plus pin superseded, sequence authorized (probe -> register -> re-freeze -> c-0082 -> one-shot -> scoring)' \u2014 F73 closed (the r64s3 refusal was verified lawful)",
+ "lane_ownership": "c-0082 (holdout-v9-generation) is CLAIMED by builder-r60s1 (5b47d4cb0) \u2014 their typed path (b): 'the keyed parallel session executes; the c-0082 claim push is the lock (Art. 29(b))'. THIS session (keyed) executes the run under their claim; the adoption/attestation record must credit the lock-holder and disclose the executor",
+ "registration_state": {
+  "registered_id": "agnes-3.0-flash",
+  "via": "loop-local gateway, ZAI_GATEWAY_UPSTREAM=agnes",
+  "commits": [
+   "61d94b2a9 (first re-freeze: command-a-plus)",
+   "132b97947 (contract-fit re-registration: agnes)"
+  ],
+  "remote_ci": "SUCCESS on 132b97947 (read from the check-run API)",
+  "evidence": "contract-fit probe (command-a-plus falsified: 3624 tokens all-reasoning zero visible; sensenova hung >200s; agnes-3.0-flash 31s/12,238 chars correct shape) + LIVE SMOKE 2/2 burned HO7 rows critic=CLEAN"
+ },
+ "run_state": {
+  "rows_done": 23,
+  "critic_clean": 21,
+  "critic_flag": 2,
+  "rows": [
+   {
+    "n": 1,
+    "pid": "HO9-01-chloralkali-brine-hardness",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 2,
+    "pid": "HO9-02-bayer-digestion-scale",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 3,
+    "pid": "HO9-03-pulp-kappa-uniformity",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 4,
+    "pid": "HO9-04-sugar-massecuite-crystallization",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 5,
+    "pid": "HO9-05-ammonia-catalyst-poisoning",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 6,
+    "pid": "HO9-06-ethylene-cracker-coke",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 7,
+    "pid": "HO9-07-hydrotreater-sulfiding",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 8,
+    "pid": "HO9-08-flotation-bubble-coalescence",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 9,
+    "pid": "HO9-09-thickener-bed-compaction",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 10,
+    "pid": "HO9-10-rotary-dryer-flight-lifting",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 11,
+    "pid": "HO9-11-ball-mill-liner-wear",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 12,
+    "pid": "HO9-12-cyclone-overflow-roping",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 13,
+    "pid": "HO9-13-filter-press-cake-moisture",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 14,
+    "pid": "HO9-14-centrifuge-scroll-wear",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 15,
+    "pid": "HO9-15-scrubber-droplet-entrainment",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 16,
+    "pid": "HO9-16-transformer-bushing-cap",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 17,
+    "pid": "HO9-17-generator-stator-vibration",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 18,
+    "pid": "HO9-18-turbine-blade-creep",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 19,
+    "pid": "HO9-19-pump-impeller-cavitation",
+    "critic": "FLAG"
+   },
+   {
+    "n": 20,
+    "pid": "HO9-20-compressor-intercooler-fouling",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 21,
+    "pid": "HO9-21-gearbox-bearing-spall",
+    "critic": "FLAG"
+   },
+   {
+    "n": 22,
+    "pid": "HO9-22-motor-rotor-bar",
+    "critic": "CLEAN"
+   },
+   {
+    "n": 23,
+    "pid": "HO9-23-hx-gasket-leak",
+    "critic": "CLEAN"
+   }
+  ],
+  "process_pid": 3613,
+  "log": "/tmp/v9run.log",
+  "note": "the run process dies at turn end; the instrument is RESUME-SAFE (durable per-row files)"
+ },
+ "resume_command": "cd /home/z/my-project/discovery-evidence-fabric && export ZAI_GATEWAY_UPSTREAM=agnes && nohup python3 scripts/r60_v9_one_shot.py run > /tmp/v9run.log 2>&1 &   # committed rows are skipped (resume-safe); then poll",
+ "after_run": [
+  "python3 scripts/r60_v9_one_shot.py attest (the served==registered attestation over the committed rows)",
+  "the adoption/attestation record (Finding 2) crediting the c-0082 lock-holder builder-r60s1, executor builder-r64s4, AM60 as the authorization basis",
+  "commit + push (PAT is vaulted as GH_PAT; the CI reader consumes it by name) + CI read + D2"
+ ],
+ "vault_note": ".env.keys (gitignored): XKIRO_API_KEY, AGNES_API_KEY, GH_PAT (owner-delivered this turn; used for pushes transiently + CI reads by name). The earlier vault rewrite dropped unrelated names (INCEPTION/OPENROUTER/CROWLLM) \u2014 restore-from-custody-records if a lane needs them (constitution v3.3.0 digest convention)"
+}
