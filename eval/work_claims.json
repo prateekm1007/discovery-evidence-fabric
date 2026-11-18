@@ -170,6 +170,11 @@
    "registered_at": "2026-11-18 (sandbox clock)",
    "role": "builder",
    "note": "R60 verifier lane: mandated reads (EPISTEMIC byte-identity verified; AUDITOR v1.3.0 @04b5e0983 FULL; v9 prereg + AM54/55 + CORR-3 FULL); verified the peer R60 lane from committed bytes (hardening typed+green, freeze isolation structural, c-0082 pre-staked post-ablation \u2014 no claim made by this lane per Art. 29(e)); R60-F1 stale-pin finding filed; peer verifier per prereg protocol step 2"
+  },
+  "builder-r61s1": {
+   "registered_at": "2026-11-18 (sandbox clock)",
+   "role": "builder",
+   "note": "R61 session 1 (CI-restore + verifier-infra lane, auditor-directed): F68 fix-forward (the r60_status gate-read fields \u2014 typed engine-share exception + remote_ci schema), F69 (stale 1.1.0 pin + workflow coverage), direction 5 (If-None-Match conditional CI reads, poll once per push), direction 4 (P1 computed-magnitudes on the 36 baseline rows, zero-LLM). The challenger resume stays the c-0079 lease-holder's (lease live to 2026-11-19T00:00:00Z)."
   }
  },
  "claims": [
@@ -1833,6 +1838,31 @@
    "secrets_note": "values vault-only (.env.keys, gitignored, mode 600); receipts carry truncated digests + HTTP statuses only; no rotation nagged (owner directive); Art. 17 look-up-never-re-ask satisfied \u2014 future rounds read the vault",
    "collision_note": "AGNES/PAT custody sub-parts sit inside c-0079's claim title (builder-r58s1, OPEN, lease 2026-11-19): this lane touches DISJOINT artifacts (masked receipt + transport config + registry), acts as verifier-role confirmation of that custody (independent probes 200/200 both copies), and does NOT touch the claimed machine-leg machinery",
    "done_note": "custody receipt committed (eval/r59_credential_custody_r59s1.json: GH PAT owner+vault probe 200 prateekm1007; AGNES owner+vault probe 200 / 10 models; digests match vault; vault mode 600, 9 entries, AGNES_BASE_URL added); secret-grep tracked files = 0; PAT push exercise green via helper (claim push + done push); registry battery green incl. Art. 29 coordination checks"
+  },
+  {
+   "claim_id": "c-0083",
+   "work_id": "r61-ci-restore-verifier-infra",
+   "title": "R61: CI-restore fix-forward \u2014 F68 (r60_status.json: typed engine-share exception in the gate-read field per the DISCLOSED_ROUND_TYPES contract; remote_ci restructured to the D2 schema {pushed_sha, remote_ci_conclusion, check_runs} from the peer's quoted API reads) + F69 (test_r58_route_adapter.py pin 1.1.0->1.2.0, file added to the workflow surface) + direction 5 (r41 If-None-Match conditional reads, poll-once) + direction 4 (P1 magnitudes on the 36 baseline rows)",
+   "status": "OPEN",
+   "registered_at": "2026-11-18 (sandbox clock)",
+   "session_id": "builder-r61s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "5d55de556",
+   "claimed_at": "2026-11-18 (sandbox clock)",
+   "lease_expiry": "2026-11-20T00:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r60_status.json",
+    "tests/test_r58_route_adapter.py",
+    ".github/workflows/r11_queue_surface.yml",
+    "scripts/r41_remote_ci_read.py",
+    "scripts/r61_p1_baseline_rows.py",
+    "eval/r61_p1_baseline_rows.json",
+    "eval/r61_status.json"
+   ],
+   "secrets_note": "no credential work in this lane; vault untouched",
+   "collision_note": "the touched record/tests are the c-0079 lane's artifacts but the fixes are AUDITOR-DIRECTED (R61 verdict direction 1: turn the queue green first; direction 2's test: 'If the freeze must change, re-freeze before claiming'); the c-0079 lane is quota-gated (z-ai 429) and its lease-holder typed no competing CI-restore item; fix-forward, no history rewrite"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
