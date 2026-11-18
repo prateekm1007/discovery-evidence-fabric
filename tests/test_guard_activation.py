@@ -71,7 +71,7 @@ def test_ci_gates_the_bind_suites():
 
 def test_v7_request_id_is_the_corrected_registration():
     from r40_machine_v77 import V77_REQUEST_MODEL  # noqa: E402
-    assert V77_REQUEST_MODEL == "cohere/command-a-plus", (
+    assert V77_REQUEST_MODEL == "agnes-3.0-flash", (
         "the transport must request the registered id "
         "(forward-only per AM37 section 2; the r64s4 owner-directed "
-        "registration superseding R36)")
+        "registration superseding R36 per AM60)")

@@ -263,17 +263,18 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
 ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
     # r64s4 OWNER-DIRECTED re-registration (supersedes R36 per AM60):
     # the zai/glm-4-plus route is RETIRED (Art. 16 ledger); the live
-    # purposes re-pin to the registered route (xkiro /
-    # cohere/command-a-plus) — the engine's transports route through
-    # the loop-local gateway either way, so this is an id re-pin, not
-    # a transport change.
-    "synthesis": ("xkiro", "cohere/command-a-plus"),
-    "attack": ("xkiro", "cohere/command-a-plus"),
-    "composer": ("xkiro", "cohere/command-a-plus"),
+    # purposes re-pin to the registered route (agnes-3.0-flash — the
+    # contract-fit winner measured under the real expansion
+    # contract); the engine's transports route through the loop-local
+    # gateway either way, so this is an id re-pin, not a transport
+    # change.
+    "synthesis": ("agnes", "agnes-3.0-flash"),
+    "attack": ("agnes", "agnes-3.0-flash"),
+    "composer": ("agnes", "agnes-3.0-flash"),
     # bulk = the fast LOCAL rung for the high-volume short steps
-    "bulk": ("xkiro", "cohere/command-a-plus"),
+    "bulk": ("agnes", "agnes-3.0-flash"),
     "judge": ("xkiro", "mistralai/ministral-14b"),
-    "judge_last_resort": ("xkiro", "cohere/command-a-plus"),
+    "judge_last_resort": ("agnes", "agnes-3.0-flash"),
 }
 #: Retirement/availability notes THIS WINDOW (measured; the routing
 #: authority is provider_health.RETIRED_ROUTE_PROVIDERS + the spec

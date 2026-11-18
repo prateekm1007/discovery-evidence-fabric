@@ -104,21 +104,29 @@ REASONING_HEADROOM = 512
 
 ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
     "registered": {
-        "name": "xkiro",
-        "base_url": "https://api.xkiro.com/v1",
-        "model": "cohere/command-a-plus",
+        "name": "agnes",
+        "base_url": "https://apihub.agnes-ai.com/v1",
+        "model": "agnes-3.0-flash",
         "provenance": "OWNER-DIRECTED registration (2026-11-18): "
-                      "supersedes R36 by owner order (glm-4-plus "
-                      "retired as insufficient capability; keys "
-                      "supplied in-channel); prereg attestation "
-                      "semantics amended by the auditor channel "
-                      "ruling 'the 30/30 served==registered "
-                      "attestation must reflect the new model'; "
-                      "reachability PROBED pre-registration "
-                      "(r64s4: served string exact, sized-probe "
-                      "finish=stop); served via the loop-local "
-                      "gateway (ZAI_GATEWAY_UPSTREAM=xkiro, R458-C1 "
-                      "id semantics, +1024 typed reasoning headroom)",
+                      "supersedes R36 by owner order + AM60 (v9 "
+                      "prereg glm-4-plus pin superseded); the "
+                      "contract-fit decision chain (r64s4, all "
+                      "measured under the REAL 19K-char expansion "
+                      "contract): xkiro/command-a-plus FALSIFIED "
+                      "(the full 3624-token budget consumed by "
+                      "invisible reasoning, zero visible chars; the "
+                      "small-prompt flagship promise did not "
+                      "survive the contract), sensenova-6.8-flash-"
+                      "lite HUNG >200 s, agnes-3.0-flash COMPLETED "
+                      "(31 s, 12,238 visible chars, correct "
+                      "NOVELTY-STATEMENT shape) — the strongest id "
+                      "that serves AND completes under the machine's "
+                      "token contract today; served via the "
+                      "loop-local gateway (ZAI_GATEWAY_UPSTREAM="
+                      "agnes, R458-C1 id semantics, +512 "
+                      "REASONING_HEADROOM per c-0078); the formal "
+                      "prereg file amendment stays audit-branch "
+                      "(AM60 supersedes the pin; Art. 28)",
         "role": "generator (the ONLY registered generator id; the "
                 "P2 ablation + v9 one-shot route)",
     },
@@ -132,10 +140,40 @@ ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
                       "(Art. 15 typed) — historical records keep "
                       "their glm-4-plus attestations untouched",
         },
+        {
+            "name": "xkiro / cohere/command-a-plus (r64s4 first "
+                    "candidate)",
+            "reason": "CONTRACT-FIT FALSIFIED (r64s4): flagship-class "
+                      "by naming and the strongest id the key tier "
+                      "rosters, but under the real 19K-char "
+                      "expansion contract it consumed the entire "
+                      "3624-token budget on invisible reasoning with "
+                      "ZERO visible chars (measured at 2600/3624) — "
+                      "unusable under the machine's token contract; "
+                      "the small-prompt sized probe did not "
+                      "transfer",
+        },
     ],
     "alternates": [
         {
-            "name": "zai-gateway",
+            "name": "xkiro",
+            "base_url": "https://api.xkiro.com/v1",
+            "n_models": 69,
+            "provenance": "c-0078 end-to-end qualification; R58 "
+                          "custody probe (roster match); r64s4 "
+                          "owner-key verification (roster OK)",
+            "transport_facts": [
+                "browser User-Agent REQUIRED (urllib default UA "
+                "banned: Cloudflare 403 error 1010, R58 typed)",
+                "frontier tier 503-maintenance until "
+                "2026-11-19T16:25Z / 403 pay-only (r64s4 + r65 "
+                "probes agree); cohere/command-a-plus falsified "
+                "under contract (see retired)",
+            ],
+            "vault_key_name": "XKIRO_API_KEY",
+        },
+        {
+            "name": "zai-gateway (retired upstream)",
             "base_url": "http://127.0.0.1:8787/v1 (loop-local proxy; "
                         "upstream = z-ai CLI grant)",
             "n_models": 1,
@@ -149,21 +187,6 @@ ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
             ],
             "vault_key_name": "ZAI_GATEWAY_KEY (session-local, "
                               "start_gateway-generated)",
-        },
-        {
-            "name": "agnes",
-            "base_url": "https://apihub.agnes-ai.com/v1",
-            "n_models": 10,
-            "provenance": "c-0078 end-to-end qualification; R58 "
-                          "custody probe (roster match); r64s4 "
-                          "owner-key verification (roster OK, "
-                          "agnes-2.5-flash live 0.4s)",
-            "transport_facts": [
-                "reasoning-first budgeting: max_tokens must be sized "
-                ">= visible_target + REASONING_HEADROOM (c-0078 "
-                "measured: max_tokens=16 -> empty visible text)",
-            ],
-            "vault_key_name": "AGNES_API_KEY",
         },
     ],
     "dead": [

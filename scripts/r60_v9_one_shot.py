@@ -577,7 +577,7 @@ def dry_run() -> int:
           f"winner rules: {dict(rules)}; payload construction OK")
     # (3) the machine import surface is byte-reused (the frozen loop)
     import r40_machine_v77 as m  # noqa: F401 — import-time check only
-    assert m.V77_REQUEST_MODEL == "cohere/command-a-plus"
+    assert m.V77_REQUEST_MODEL == "agnes-3.0-flash"
     print(f"[dry-run] frozen V7.7 expansion loop importable, "
           f"V77_REQUEST_MODEL={m.V77_REQUEST_MODEL}")
     print("[dry-run] PASS (zero LLM, zero network)")

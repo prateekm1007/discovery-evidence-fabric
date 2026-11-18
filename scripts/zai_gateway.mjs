@@ -78,20 +78,45 @@ const KEY = process.env.ZAI_GATEWAY_KEY || "";
 // evidence (AM37 section 2).
 const UPSTREAM = (process.env.ZAI_GATEWAY_UPSTREAM || "zai-cli")
   .trim().toLowerCase();
-const XKIRO_BASE = (process.env.XKIRO_BASE_URL ||
-                    "https://api.xkiro.com/v1").replace(/\/+$/, "");
-const XKIRO_MODEL_ID = process.env.XKIRO_MODEL_ID ||
-  "cohere/command-a-plus";
-// Transport contract (R58 typed): the xkiro endpoint bans the default
-// tool UAs (Cloudflare 403 error 1010) — a browser UA is REQUIRED.
-const XKIRO_UA = "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) " +
-  "Gecko/20100101 Firefox/132.0";
-// Typed reasoning headroom (r64s4 probe, disclosed): command-a-plus
-// budgets ~1000 tokens of invisible reasoning BEFORE visible text
-// (600/1600-token budgets -> zero visible chars; 2600 -> 1828 used,
-// 841 visible, finish=stop). The headroom preserves the caller's
-// FULL visible budget; the caller-visible contract is unchanged.
+// Typed reasoning headrooms (measured, disclosed):
+//  - xkiro command-a-plus: ~1000-token invisible reasoning (r64s4
+//    sized probe) — BUT the contract-fit probe (r64s4, real 19K-char
+//    expansion contract) FALSIFIED it under the machine's token
+//    contract: the full budget consumed, zero visible chars.
+//  - agnes flash tier: 512 (c-0078 measured); agnes-3.0-flash on the
+//    REAL contract: 31 s, 12,238 visible chars, correct output shape
+//    — the registered id (r64s4 contract-fit decision).
 const XKIRO_HEADROOM = 1024;
+const AGNES_HEADROOM = 512;
+// The alternate-upstream config table (typed; env-selected). The
+// transport contracts are the c-0078/R58 measured ones.
+const ALT_UPSTREAMS = {
+  xkiro: {
+    base: (process.env.XKIRO_BASE_URL ||
+           "https://api.xkiro.com/v1").replace(/\/+$/, ""),
+    model: process.env.XKIRO_MODEL_ID || "cohere/command-a-plus",
+    keyEnv: "XKIRO_API_KEY",
+    // Cloudflare 1010 bans tool UAs — browser UA REQUIRED (R58).
+    ua: "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) "
+        + "Gecko/20100101 Firefox/132.0",
+    headroom: XKIRO_HEADROOM,
+  },
+  agnes: {
+    base: (process.env.AGNES_BASE_URL ||
+           "https://apihub.agnes-ai.com/v1").replace(/\/+$/, ""),
+    model: process.env.AGNES_MODEL_ID || "agnes-3.0-flash",
+    keyEnv: "AGNES_API_KEY",
+    ua: "agnes-route-adapter/1.0",
+    headroom: AGNES_HEADROOM,
+  },
+};
+const ALT = ALT_UPSTREAMS[UPSTREAM] || null;
+if (UPSTREAM !== "zai-cli" && !ALT) {
+  console.error("[zai-gateway] unknown ZAI_GATEWAY_UPSTREAM="
+                + UPSTREAM + " (known: zai-cli, "
+                + Object.keys(ALT_UPSTREAMS).join(", ") + ")");
+  process.exit(2);
+}
 // R58 fix (F64-class, typed): the default log path was HARDCODED to a
 // foreign clone's absolute path (/home/z/my-project/discovery-evidence-
 // fabric/...) — a sandbox-path-bound artifact location (auditor Art. 1
@@ -115,39 +140,38 @@ function logCall(entry) {
   try { fs.appendFileSync(LOG, JSON.stringify(entry) + "\n"); } catch (_) {}
 }
 
-/** One completion through the xkiro HTTP upstream (R64s4). Same
+/** One completion through an alternate HTTP upstream (R64s4). Same
  *  resolve shape as zaiComplete: {content, model, finish_reason,
- *  usage, latency_ms}. Serves XKIRO_MODEL_ID regardless of the
- *  requested id (R458-C1 precedent); one bounded 30 s retry on
- *  429/5xx before surfacing a typed error to the caller's own
- *  retry ladder. */
-function xkiroComplete(messages, requestedModel, callerMaxTokens,
-                       timeoutMs) {
+ *  usage, latency_ms}. Serves cfg.model regardless of the requested
+ *  id (R458-C1 precedent); one bounded 30 s retry on 429/5xx before
+ *  surfacing a typed error to the caller's own retry ladder. */
+function altComplete(cfg, messages, requestedModel, callerMaxTokens,
+                     timeoutMs) {
   return new Promise((resolve, reject) => {
-    const key = process.env.XKIRO_API_KEY || "";
+    const key = process.env[cfg.keyEnv] || "";
     if (!key) {
       return reject(new Error(
-        "[no-xkiro-key] XKIRO_API_KEY unset (vault custody — "
-        + "start_gateway must pass the vault env through)"));
+        "[no-upstream-key] " + cfg.keyEnv + " unset (vault custody "
+        + "— start_gateway must pass the vault env through)"));
     }
     const mt = (Number(callerMaxTokens) > 0
-                ? Number(callerMaxTokens) : 512) + XKIRO_HEADROOM;
+                ? Number(callerMaxTokens) : 512) + cfg.headroom;
     const payload = JSON.stringify({
-      model: XKIRO_MODEL_ID,
+      model: cfg.model,
       messages,
       max_tokens: mt,
       temperature: 0.0,
     });
     const attempt = (triesLeft) => {
       const t0 = Date.now();
-      const u = new URL(XKIRO_BASE + "/chat/completions");
+      const u = new URL(cfg.base + "/chat/completions");
       const req = https.request({
         hostname: u.hostname, port: 443, path: u.pathname,
         method: "POST",
         headers: {
           "Authorization": "Bearer " + key,
           "Content-Type": "application/json",
-          "User-Agent": XKIRO_UA,
+          "User-Agent": cfg.ua,
           "Content-Length": Buffer.byteLength(payload),
         },
       }, (res) => {
@@ -162,9 +186,9 @@ function xkiroComplete(messages, requestedModel, callerMaxTokens,
               ts: new Date().toISOString(),
               status: retryable && triesLeft > 0
                 ? "RATE_LIMITED_RETRY" : "UPSTREAM_ERROR",
-              upstream: "xkiro", http_status: res.statusCode,
+              upstream: UPSTREAM, http_status: res.statusCode,
               requested_model: requestedModel,
-              model: XKIRO_MODEL_ID,
+              model: cfg.model,
               body_head: data.slice(0, 200),
             });
             if (retryable && triesLeft > 0) {
@@ -172,12 +196,13 @@ function xkiroComplete(messages, requestedModel, callerMaxTokens,
                                 30_000);
             }
             return reject(new Error(
-              "xkiro HTTP " + res.statusCode + ": "
+              UPSTREAM + " HTTP " + res.statusCode + ": "
               + data.slice(0, 200)));
           }
           let parsed;
           try { parsed = JSON.parse(data); } catch (e) {
-            return reject(new Error("xkiro parse: " + e.message));
+            return reject(new Error(
+              UPSTREAM + " parse: " + e.message));
           }
           const ch = (parsed.choices || [{}])[0] || {};
           const content = String(
@@ -191,7 +216,7 @@ function xkiroComplete(messages, requestedModel, callerMaxTokens,
           }
           resolve({
             content,
-            model: parsed.model || XKIRO_MODEL_ID,
+            model: parsed.model || cfg.model,
             finish_reason: ch.finish_reason || "stop",
             usage: parsed.usage || null,
             latency_ms: latencyMs,
@@ -200,7 +225,7 @@ function xkiroComplete(messages, requestedModel, callerMaxTokens,
       });
       req.setTimeout(timeoutMs, () => {
         req.destroy(new Error(
-          "xkiro timeout after " + timeoutMs + " ms"));
+          UPSTREAM + " timeout after " + timeoutMs + " ms"));
       });
       req.on("error", (e) => reject(e));
       req.write(payload);
@@ -396,9 +421,9 @@ const server = http.createServer(async (req, res) => {
     const t0 = Date.now();
     try {
       const callerMt = Number(payload?.max_tokens || 0);
-      const out = UPSTREAM === "xkiro"
-        ? await xkiroComplete(messages, requestedModel, callerMt,
-                              400_000)
+      const out = ALT
+        ? await altComplete(ALT, messages, requestedModel, callerMt,
+                            400_000)
         : await zaiComplete(messages, 400_000, thinkingMode);
       const entry = {
         ts: new Date().toISOString(),
@@ -451,9 +476,8 @@ server.headersTimeout = 55_000;   // headers only (must be < requestTimeout)
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`[zai-gateway] listening on 127.0.0.1:${PORT}`);
   console.log(`[zai-gateway] upstream=${UPSTREAM}`
-    + (UPSTREAM === "xkiro"
-       ? ` (${XKIRO_BASE}, model=${XKIRO_MODEL_ID}, `
-         + `headroom=${XKIRO_HEADROOM})` : ""));
+    + (ALT ? ` (${ALT.base}, model=${ALT.model}, `
+           + `headroom=${ALT.headroom})` : ""));
   console.log(`[zai-gateway] call log: ${LOG}`);
   console.log(`[zai-gateway] R6 pacing: start=${PACING_START_S}s ` +
     `max=${PACING_MAX_S}s backoff=${PACING_429_BACKOFF_S}s (AIMD, ` +

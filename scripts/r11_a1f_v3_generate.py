@@ -179,10 +179,10 @@ def gen_call(prompt, key, max_tokens=2600):
     # the machine now requests the registered id it is attested against.
     body = json.dumps({
         # r64s4: the R36-corrected id is itself retired now (owner
-        # order, AM60) — the request label follows the registration
+        # order + AM60) — the request label follows the registration
         # (the gateway serves the registered upstream id regardless,
         # R458-C1; the served identity stays the evidence)
-        "model": "cohere/command-a-plus",
+        "model": "agnes-3.0-flash",
         "messages": [{"role": "system", "content": SYS_A1F_V3},
                      {"role": "user", "content": prompt}],
         "max_tokens": max_tokens, "temperature": 0.0}).encode()

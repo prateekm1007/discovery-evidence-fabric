@@ -39,11 +39,12 @@ R-REQID forward-only transport fix:
      per template).
 
   6. TRANSPORT (R-REQID forward-only): the v7 primary requests
-     V77_REQUEST_MODEL = "cohere/command-a-plus" (AM37 section 2: the
+     V77_REQUEST_MODEL = "agnes-3.0-flash" (AM37 section 2: the
      served model is the identity evidence; the legacy request string
      is a label — R36's glm-4-plus registration superseded by OWNER
-     ORDER 2026-11-18, r64s4; the z-ai history's v6/v7 rows are
-     untouched).
+     ORDER 2026-11-18 + AM60, r64s4; the id is the contract-fit
+     winner measured under the real expansion contract; the z-ai
+     history's v6/v7 rows are untouched).
 
 All findings feed the machine's NEUTRAL repair directive (quoted
 back, never hidden); residuals are disclosed. No outcome feedback,
@@ -83,8 +84,8 @@ from r30_nvidia_route import gen_with_fallback  # noqa: E402
 from r13_question_type_gate import gate_question_type  # noqa: E402
 
 REPAIR_BUDGET = 3
-V77_REQUEST_MODEL = "cohere/command-a-plus"  # R-REQID forward-only \
-    # (AM37 §2; R36 superseded by owner order, r64s4)
+V77_REQUEST_MODEL = "agnes-3.0-flash"  # R-REQID forward-only \
+    # (AM37 §2; R36 superseded by owner order + AM60, r64s4)
 
 DIRECTION_CONTRACT = (
     "You are a typed physics-direction checker inside a machine that "

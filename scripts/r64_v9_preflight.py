@@ -26,8 +26,9 @@ repo — that the run's inputs and plumbing are intact:
   4. ATTESTATION PLUMBING: the served==registered attestation fields,
      the durable events ledger writer, the RESUME SAFETY one-file-per-
      row mechanism, the registered model (V77_REQUEST_MODEL ==
-     "cohere/command-a-plus", the r64s4 owner-directed registration
-     superseding R36) and the MEASURED_PATH constant are present.
+     "agnes-3.0-flash", the r64s4 owner-directed registration
+     superseding R36 per AM60, contract-fit decided) and the
+     MEASURED_PATH constant are present.
   5. FREEZE BASELINES: sha256-16 of the frozen loop + instrument +
      directive + the scan stack the run imports, recorded here so the
      run window can prove byte-stability since this pre-flight.
@@ -165,7 +166,7 @@ def attestation_plumbing(src: str) -> dict:
         "measured_path_constant": ("MEASURED_PATH = " in src
                                    and "engine_route" in src),
         "registered_model_assert": (
-            'V77_REQUEST_MODEL == "cohere/command-a-plus"' in src),
+            'V77_REQUEST_MODEL == "agnes-3.0-flash"' in src),
         "legality_bind_present": (
             "def contract_satisfied" in src
             and "MEASURE_CLASS_NOT_ALLOWED" in src
