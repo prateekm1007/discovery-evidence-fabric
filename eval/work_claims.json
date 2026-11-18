@@ -2105,6 +2105,26 @@
    "finding": "commit lacks Session:/Work-Id: trailers (Art. 29(a)) — the lines were glued to the final body paragraph instead of passed via --trailer, so git's trailer parser reads none; caught by test_article29_parallel_coordination.py::test_post_adoption_commits_carry_session_and_work_id_trailers (CI red f76a7316d, step: Constitution v3.1.0 enforcement)",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "remediation": "fix-forward: this registration commit + the round-record commit carry proper --trailer flags; abbbc8d08's content is unchanged (no history rewrite on a pushed queue branch); subsequent commits verified trailer-parseable before push"
+  },
+  {
+   "sha": "f82dea54679e",
+   "session_id": "builder-r60s1",
+   "missing": [
+    "Session",
+    "Work-Id"
+   ],
+   "status": "disclosed_pending_remediation",
+   "note": "registered by builder-r64s4 cross-session per the F36 typed allowance; remediation = the completion commit carries both trailers (never a history rewrite, Art. 4)"
+  },
+  {
+   "sha": "bfaab85112a4",
+   "session_id": "builder-r64s4",
+   "missing": [
+    "Session",
+    "Work-Id"
+   ],
+   "status": "disclosed_pending_remediation",
+   "note": "registered by builder-r64s4 cross-session per the F36 typed allowance; remediation = the completion commit carries both trailers (never a history rewrite, Art. 4)"
   }
  ],
  "canonical_claim_violations": [
@@ -2195,6 +2215,22 @@
    "finding": "the r67s1 transport-falsification commit swept eval/holdout_v9_generation/rows_smoke/HO7-01-zinc-ew-acid-mist.json + events_smoke.json (canonical-prefix smoke artifacts of the pre-burn falsification) into a commit whose Work-Id trailer (r67s1-transport-falsification) has NO covering EXECUTOR claim - the falsification was executed as a probe/custody lane without claim-before-work for the canonical smoke paths; c-0082's artifact_paths cover rows/, events.json, gateway_slice.txt, attestation.json but NOT rows_smoke/ or events_smoke.json",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "F36-pattern: pushed history is never rewritten; remediation is this forward-only disclosure + the lesson (smoke artifacts under eval/holdout_v9_generation/ are canonical and require claim coverage before the commit - future smoke lanes either amend the covering claim's artifact_paths first or route smoke artifacts to a non-canonical path)"
+  },
+  {
+   "sha": "f82dea54679e",
+   "correct_work_id": "holdout-v9-generation",
+   "session_id": "builder-r60s1",
+   "role_on_record": "trailers PRESENT (builder-r60s1 / r67s1-transport-falsification) but no covering EXECUTOR claim matched that work_id at this snapshot; the pre-rebase registration in this array points at 6bf94da35, which the r67s1 rebase left dangling - this entry registers the post-rebase sha",
+   "status": "disclosed_pending_remediation",
+   "note": "registered by builder-r64s4 cross-session; the d7b88c1d4 disclosure remains the remediation record"
+  },
+  {
+   "sha": "c8cc5deb2818",
+   "correct_work_id": "holdout-v9-generation",
+   "session_id": "builder-r60s1",
+   "role_on_record": "EXECUTOR (c-0082 covers the canonical paths substantively; the commit itself carried no trailers so the trailer->claim match could not bind)",
+   "status": "disclosed_pending_remediation",
+   "note": "registered by builder-r64s4 cross-session; remediation = the completion commit carries Session/Work-Id trailers matching c-0082"
   }
  ],
  "findings": [

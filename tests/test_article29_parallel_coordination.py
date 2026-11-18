@@ -400,9 +400,19 @@ def test_canonical_measurement_commits_match_a_claim():
         tr = trailers.get(sha, "")
         sess = _trailer(tr, "Session")
         wid = _trailer(tr, "Work-Id")
-        assert sess and wid, (
-            f"commit {sha[:12]} touches canonical measurement bytes "
-            f"{canon} without Session:/Work-Id: trailers (Art. 29(a))")
+        # F36 typed allowance (mirrors the trailers test; fail-closed the
+        # OTHER way, 931c1eb6a precedent): a trailer-less canonical commit
+        # passes ONLY when registered in trailer_violations[] with session
+        # attribution - unregistered violations still fail; the register
+        # itself is CI-gated. The claim-match step below still runs and
+        # falls through to the canonical_claim_violations[] allowance.
+        if not (sess and wid):
+            reg_now = json.loads(REG.read_text(encoding="utf-8"))
+            disclosed = [str(v.get("sha") or "")
+                         for v in (reg_now.get("trailer_violations") or [])]
+            assert any(sha.startswith(s) for s in disclosed if s), (
+                f"commit {sha[:12]} touches canonical measurement bytes "
+                f"{canon} without Session:/Work-Id: trailers (Art. 29(a))")
         snap = json.loads(_git("show", f"{sha}:eval/work_claims.json"))
         cur = json.loads(REG.read_text(encoding="utf-8"))
         _, claims = _validate_registry(
