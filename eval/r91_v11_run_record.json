@@ -1,0 +1,151 @@
+{
+ "record": "R91_V11_ONE_SHOT_RUN/1.0.0",
+ "session": "builder-r91s1",
+ "claim": "c-0102",
+ "work_id": "holdout-v11-generation",
+ "status": "EXECUTOR COMPLETE — generation + attestation + handoff landed; the claim stays OPEN pending the peer VERIFIER record (the DONE-without-verifier CI rule) and the auditor's scoring vs the PRIVATE rubric",
+ "prereg": {
+  "path": "audit/holdout_v11/PREREGISTRATION.json",
+  "audit_ref_sha_at_run": "origin/audit/r11-auditor-verdict-20261114 @ 71cde9b2f (prereg+problems byte-identical to the pinned ca2625c15 — diff empty, verified)",
+  "selection_sha256": "1493bb84cccf027fdad8e181b8a636f0edef084f2052acf90bb4429cc30a1516",
+  "seal_verified_at_run": "EXACT (the published canonical-tuple recipe, fail-closed, verified in EVERY run window)",
+  "n_problems": 30,
+  "intervention": 15,
+  "predictor": 15,
+  "observed_question_types": {
+   "intervention-proposal": 15,
+   "predictor-design": 15
+  },
+  "power_preregistered": "n=30, SD 0.55 (v10 scored rows), one-sample t vs 3.0, alpha 0.05; Art.14 resolved only when CI95 lower bound > 3.0",
+  "burn_after_use": true
+ },
+ "frozen_machine": {
+  "commit": "eab238cd0641adc9c470c9aaf8f9f6416689c15d",
+  "instrument": "scripts/r91_v11_one_shot.py",
+  "sha256_16": "798f6d5619ac2022",
+  "authored_committed_before_claim": true,
+  "v11_problem_bytes_read_before_claim": 0,
+  "frozen_loop_module": "scripts/r40_machine_v77.py @ ff43c6056d7e4163 (verified untouched this session; 15/15 freeze baselines)"
+ },
+ "model_pin": {
+  "registered_id": "agnes-3.0-flash",
+  "served": "agnes-3.0-flash",
+  "upstream": "agnes (apihub.agnes-ai.com/v1)",
+  "identity_chain": "prereg model_pin == instrument id == route registry id == frozen machine file constant == runtime binding (asserted at import, dry-run, every row)",
+  "serving_key_digests": [
+   "5c4dffd28fe4",
+   "d0c666a3842f"
+  ],
+  "key_rotation": "AGNES_API_KEY + AGNES_API_KEY_2 ordered rotation (R67s2); both keys served (digests match the committed custody records)"
+ },
+ "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space (declared; require_registered_model gated BEFORE gateway start; Art.22 v3.2.0)",
+ "binds_active": [
+  "F75_deliverable_class",
+  "chemistry_elicitation",
+  "formula_direction",
+  "element_conservation",
+  "equilibrium_direction"
+ ],
+ "attestation": {
+  "rows_committed": 30,
+  "rows_30_30_attestation": true,
+  "gateway_completed_calls": 167,
+  "gateway_error_lines": 0,
+  "all_calls_requested_registered": true,
+  "all_calls_served_registered": true,
+  "all_calls_upstream_registered": true,
+  "recomputable": "scripts/r91_v11_one_shot.py attest (from committed bytes; the verifier lane never re-runs)"
+ },
+ "generation_summary": {
+  "rows": 30,
+  "one_generation_per_problem": true,
+  "winner_rules": {
+   "non_schedule_first": 30
+  },
+  "critic_clean_at_delivery": 24,
+  "critic_flag_rows": [
+   {
+    "problem_id": "HO11-16-transformer-winding-deform",
+    "repairs": 3,
+    "residual_finding_keys": [
+     "BILL_UNTAGGED",
+     "PREDICTOR_VIOLATION",
+     "REASONING_THRASH_LEAK"
+    ]
+   },
+   {
+    "problem_id": "HO11-20-compressor-valve",
+    "repairs": 3,
+    "residual_finding_keys": [
+     "BILL_UNTAGGED",
+     "PREDICTOR_VIOLATION",
+     "REASONING_THRASH_LEAK"
+    ]
+   },
+   {
+    "problem_id": "HO11-21-gearbox-planetary",
+    "repairs": 3,
+    "residual_finding_keys": [
+     "BILL_UNTAGGED"
+    ]
+   },
+   {
+    "problem_id": "HO11-25-cooling-tower-basin",
+    "repairs": 3,
+    "residual_finding_keys": [
+     "BILL_UNTAGGED",
+     "REASONING_THRASH_LEAK"
+    ]
+   },
+   {
+    "problem_id": "HO11-26-conveyor-drive-gearbox",
+    "repairs": 3,
+    "residual_finding_keys": [
+     "BILL_UNTAGGED"
+    ]
+   },
+   {
+    "problem_id": "HO11-29-mill-liner-bolt",
+    "repairs": 3,
+    "residual_finding_keys": [
+     "BILL_UNTAGGED"
+    ]
+   }
+  ],
+  "onrow_sign_contradictions_total": 0,
+  "allowed_row_outside_rows": 0
+ },
+ "repair_loop_convergence": {
+  "measured_from": "eval/holdout_v11_generation/events.json (committed bytes; per-row repairs + residual_finding_keys + repair_budget_burned_full)",
+  "repairs_histogram": {
+   "1": 3,
+   "2": 1,
+   "3": 26
+  },
+  "full_budget_burn": "26/30 = 86.7% (v10 measured 27/30 = 90% — the prototype guards did NOT materially short-circuit non-improving repairs; the AM78-P2 concern CONFIRMED on v11)",
+  "zero_residual_findings": "5/30 = 16.7%",
+  "converged_early_le1_repair": "3/30 = 10.0%",
+  "verdict": "TYPED DEFECT-CLASS EVIDENCE (Art. 5, disclosed never hidden): the repair loop still burns the full budget on ~87% of rows; the convergence gate (AM78-P2 proposal) has a measured basis on fresh sealed rows"
+ },
+ "custody": {
+  "vault_restored": "scripts/r77_vault_restore.py exit 0; 6/6 keys digest-verified vs committed records (HF token 33bc7af22c62 MATCH — the owner-delivered bootstrap, digest-verified BEFORE use, Art. 17 v3.3.0)",
+  "private_rubric_read": "NEVER (zero bytes; the rubric lives in prateekm1007/def-rubric-custody, auditor+owner custody; the instrument cannot read it)",
+  "problems_read": "ONLY from the audit ref, at RUN time, after the claim push (seal fail-closed)"
+ },
+ "heartbeats": "6 chunks (5 rows each) with stage-push heartbeats: eab238cd0 machine -> ee7225dc5 claim -> ea06a35d3 (5) -> cd4a7791b (10) -> 1acbaab83 (15) -> ee69ea9c7 (20) -> 33ebcdf6c (25) -> this close (30)",
+ "handoff_to_auditor": {
+  "next": "score the 30 committed rows vs the PRIVATE-repo rubric (holdout_v11_rubric_PRIVATE.json)",
+  "acceptance_bar": "mean >= 3.0 AND 0 allowed-measures AND 0 inverted-direction AND 0 unavailable-input AND run_verdict == VALID; Art. 14 resolved only when CI95 lower bound > 3.0 (mean >~ 3.2 at n=30, SD 0.55)",
+  "on_pass": "score 6 -> BURN v11 (burn_after_use); the EQUILIBRIUM_TRAP rows HO11-03/HO11-11 exercise the fifth bind on live sealed generation (delivered CLEAN — the bind did not fire on the delivered answers; the direction verdict is the auditor's)",
+  "on_fail": "typed NOT_GRANTED with defect classes; v12 next"
+ },
+ "artifacts": [
+  "eval/holdout_v11_generation/rows/ (30 files)",
+  "eval/holdout_v11_generation/events.json",
+  "eval/holdout_v11_generation/gateway_slice.txt",
+  "eval/holdout_v11_generation/attestation.json",
+  "eval/holdout_v11_generation/rows_smoke/ + events_smoke.json + gateway_slice_smoke.txt + attestation_smoke.json (mechanics-only, BURNED v7 packet, excluded from every measurement)"
+ ],
+ "registry_disclosure": "the v9/v10 holdout claims (c-0082 builder-r60s1, c-0100 builder-r85s1) remain stale-OPEN — both runs completed, attested 30/30 and auditor-scored+burned; cross-lane status fields NOT edited from this executor lane (Art. 29(e); the verifier lane may flip them with credit per the R75 precedent). The v11 claim c-0102 stays OPEN pending its VERIFIER record + auditor scoring (the DONE-without-verifier CI rule).",
+ "generated_at": "2026-11-18T22:35:06.811508Z"
+}
