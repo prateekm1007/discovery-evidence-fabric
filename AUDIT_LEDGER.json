@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "17eef70bb",
+  "queue/dev12_r7": "38ed0b312",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1597,14 +1597,16 @@
    "id": "F80",
    "severity": "MEDIUM",
    "title": "On-row physics computation gap (external-assessor core valid point, auditor-confirmed): candidate_schema.py captures measure_class/signals_used/principle_id/mechanism_class enums but NO stated-magnitude/assumption/numeric_claim fields. physics_checks runs on REFERENCE_SCENARIOS, not the generated answer's own numbers; engine_route does not extract on-row magnitudes. So the P1 gate (108/108) measures registry coverage + reference-scenario runs, NOT the answer's own computed physics. The generated answers' own assumptions/magnitudes remain unchecked. FIX: extend the schema with typed numeric_claim fields (value+units+assumption), feed them to physics_checks for on-row computation + sign-check; P1 then measures actual output physics.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-18",
    "last_checked": "17eef70bb",
    "rounds_open": 1,
    "articles": [
     19,
     27
-   ]
+   ],
+   "closed_at": "2026-11-18",
+   "resolution": "R83 (620fa6d35, c-0099): numeric_claims.py (178) + onrow_physics.py (307) + candidate_schema numeric_claims field (additive). P1 measurement r54_p1_unit_checked v2.0.0: carrying=RUNS ON THE ROW, fraction 1.0 (36/36), 0 sign contradictions, own_numbers_totals extracted=30/bound=6/assumptions=117. ROW_CLAIM wins over reference; dimension-only binding (kA/m2 cannot bind A); typed Art.9 assumptions; FUNCTION_DEFAULT never fabricated; unambiguous direction words only. Frozen-safe (15/15 baselines, r52 byte-identity). 20-test suite CI-gated. Auditor verified modules + committed v2.0.0 record + CI green (independent full recompute limited by sandbox pint absence; committed measurement + CI gate authoritative)."
   }
  ],
  "amendments": [
@@ -2775,6 +2777,26 @@
     "Fastest path to 6 (reconciled): (1) fire-now probe (c-0098 staked) -> register strongest serving id -> auditor amends v10 model pin -> sealed v10 one-shot (all four binds) -> mean>=3.25 CI>3.0 -> score 6; (2) F80 on-row computation (schema numeric_claim fields -> physics_checks) makes the physics gate measure actual outputs, strengthening 5->6 and beyond.",
     "v10 already authored+sealed (AM71, seal 102a33bb, rubric private custody). Builder c-0098 (fire-now reprobe) staked at 17eef70bb."
    ]
+  },
+  {
+   "id": "AM73",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R84 auditor: v10 model-pin amended to R81 fire-now registered id (cohere/command-a)",
+   "changes": [
+    "v10 PREREG model_pin AMENDED: agnes-3.0-flash -> cohere/command-a (R81 fire-now probe registered id; frontier flagship, clean full-contract completion, served==requested, deliverable_class_findings=[]). Upstream xkiro, vault key XKIRO_API_KEY.",
+    "Builder next: flip route_adapter registered block to xkiro/cohere/command-a (route_adapter NOT frozen — direct edit, no re-freeze act) + ZAI_GATEWAY_UPSTREAM=xkiro; claim holdout-v10-generation BEFORE any problem read; sealed one-shot with all four binds + on-row physics leg; 30/30 served==requested==registered cohere/command-a attestation; push+CI; auditor scores (mean>=3.25 CI>3.0 -> score 6) then BURN."
+   ]
+  },
+  {
+   "id": "AM74",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R84 auditor: F80 on-row physics lane VERIFIED, closed",
+   "changes": [
+    "F80 CLOSED: the answer's OWN numbers are now computable on-row. numeric_claims.py + onrow_physics.py + schema numeric_claims field; P1 r54_p1_unit_checked v2.0.0 (36/36 on-row, 0 sign contradictions, 30 own numbers extracted / 6 ROW_CLAIM bindings / 117 typed assumptions). Frozen-safe (15/15 baselines hold at F80 tip, r52 byte-identity). 20-test suite CI-gated; c-0099 DONE; CI green. The P1 gate now measures the output's own physics, not reference scenarios — the external-assessor core gap is closed.",
+    "Score stays 5 until v10 acceptance. Path to 6 now unblocked: model pin amended (cohere/command-a); builder flips route_adapter + runs sealed v10 one-shot; auditor scores."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3883,6 +3905,17 @@
     "F80"
    ],
    "evidence_sha": "eval/r82_auditor_verification.json"
+  },
+  {
+   "id": "V74",
+   "round": "R84 v10 model-pin amend + F80 verification",
+   "commit": "38ed0b312",
+   "gate": "NOT_MET (score 5); v10 pin amended, one-shot pending builder",
+   "capability_change": "F80 on-row physics closed (36/36, 0 sign contradictions); v10 pin -> cohere/command-a",
+   "closed_findings": [
+    "F80"
+   ],
+   "evidence_sha": "eval/r84_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4114,7 +4147,7 @@
    "design": "chemistry monoculture-break + direction traps HO10-06/08/12/13 + pricing pos HO10-02/10 neg HO10-05/15 + 15 input traps"
   }
  },
- "progress_note": "SCORE 5/10 (external estimate reconciled — matches). v9 ran 3.000 UNRESOLVED; P1 108/108; router widened; all four v9 defect binds landed. F80 OPEN: generated answers' own numbers not computed on-row (schema lacks magnitude fields; physics on reference scenarios). v10 sealed (102a33bb). Path to 6: fire-now probe (c-0098) -> register -> v10 one-shot (all binds) -> mean>=3.25 CI>3.0; plus F80 on-row computation. Goal 9/10.",
+ "progress_note": "SCORE 5/10. F80 CLOSED (on-row physics: answer's own numbers computed, 36/36, 0 sign contradictions, frozen-safe, CI-gated). v10 model pin AMENDED to cohere/command-a (R81 fire-now frontier flagship). Path to 6 unblocked: builder flips route_adapter to xkiro/cohere/command-a + claims v10 before read + sealed one-shot (all four binds + on-row leg) -> auditor scores mean>=3.25 CI>3.0 -> score 6 -> BURN. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
