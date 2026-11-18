@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "9b0c9820a",
+  "queue/dev12_r7": "114e77c57",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1510,25 +1510,43 @@
    "id": "F74",
    "severity": "MEDIUM",
    "title": "HF token lacks repo.write scope: the owner-delivered HuggingFace fineGrained token (prateekm1) has discussion/post.write only, user entity permissions None. The HF vault setup (Art. 17 v3.3.0) cannot proceed until the token is granted repo.write OR a private dataset repo is pre-created with write access. The coder correctly identified this and reminded the owner. The session vault + committed digests serve as interim custody.",
-   "status": "OPEN-OWNER",
+   "status": "CLOSED",
    "opened": "2026-11-18",
    "last_checked": "61d94b2a9",
    "rounds_open": 1,
    "articles": [
     17
-   ]
+   ],
+   "closed_at": "2026-11-18",
+   "resolution": "Private vault repo prateekm1007/model-vault-container exists (auditor-verified via API); owner granted repo.write per builder's two independent verifications; Art.17 custody operational (local .env.keys working copy + private vault master + digests-only in tracked repo)."
   },
   {
    "id": "F75",
    "severity": "MEDIUM",
    "title": "agnes-3.0-flash deliverable-quality class: (a) HO9-14 refusal-shaped non-answer ('I cannot fulfill this request... I am Agnes-3.0-flash') scored critic=CLEAN — the deterministic critic type-gate false-passes refusals that contain mitigation verbs; (b) identity-leak preamble ('I am Agnes-3.0-flash, developed by Sapiens AI') in HO9-13/14; (c) reasoning thrash ('No—Correction... Wait') leaking into physics checks (HO9-01/02/25). BIND: critic must refuse refusal-shaped answers + identity preambles; generation directive must forbid identity disclosure and internal-deliberation leakage.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-18",
    "last_checked": "9b0c9820a",
    "rounds_open": 1,
    "articles": [
     3,
     19
+   ],
+   "closed_at": "2026-11-18",
+   "resolution": "R70 (80629f9f7->114e77c57) + auditor R71 independent recompute: r70_deliverable_class_scan.py (REFUSAL_SHAPED_ANSWER/IDENTITY_LEAK_PREAMBLE/REASONING_THRASH_LEAK) + r70_stated_formula_scan.py wired into r40 both branches + effective_critic_verdict refuses CLEAN on F75 keys; DELIVERABLE-CLASS BIND clause M in both contracts. Recompute on committed v9 rows: HO9-14->REFUSAL+IDENTITY, HO9-13->IDENTITY, HO9-30->STATED_FORMULA_DIRECTION_CONTRADICTION, HO9-02/25->THRASH; clean controls HO9-04/22 silent. test_r70_f75_binds 17/17, CI green."
+  },
+  {
+   "id": "F76",
+   "severity": "LOW",
+   "title": "v9 dual-lane attestation provenance (adjudicated): lane A (builder-r64s4 keyed execution) slice=186 lines/178 calls; lane B (builder-r60s1 completion, canonical window declared f05606de9) reassembled full-window slice=138 lines/133 calls covering all 30 rows. Committed attestation is lane B (self-consistent, 0 served-model mismatches, auditor-verified). The 'HO9-01..06 outside slice' refers to lane A's original window, superseded by the canonical lane-B declaration + r67s2 disclosure. No impact on the v9 UNRESOLVED outcome. Lane-A window quarantined (digests match).",
+   "status": "CLOSED",
+   "opened": "2026-11-18",
+   "closed_at": "2026-11-18",
+   "last_checked": "114e77c57",
+   "resolution": "Adjudicated: canonical window = lane B; lane-B attestation covers 30/30 with 0 mismatches; dual-lane counts disclosed (r67s2_verifier_disclosure.json); no scoring impact.",
+   "articles": [
+    1,
+    22
    ]
   }
  ],
@@ -2591,6 +2609,19 @@
     "F75 opened: refusal/identity-leak/reasoning-thrash class on agnes-3.0-flash; critic type-gate false-pass on HO9-14.",
     "Capability trajectory: v6 2.583 (wrapper) -> v7 2.917 (wrapper) -> v9 3.000 (engine route, agnes-3.0-flash). +0.417 over v6; the engine route + physics layer lifted the mean to the bar but not beyond it. Frontier-tier model (xkiro maintenance exits 2026-11-19T16:25Z) + F75 binds + monoculture-break chemistry elicitation are the levers to push mean >=3.25 for RESOLVED."
    ]
+  },
+  {
+   "id": "AM64",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R71 auditor audit of R70 (AM63 directions 1+2+4): F75 bind + chemistry elicitation + formula-direction scan",
+   "changes": [
+    "R70 VERIFIED from pushed bytes (114e77c57, CI green): F75 bind (3 deliverable-class detectors + formula-direction scan wired into r40 both branches + effective_critic_verdict + clause M in both contracts); chemistry elicitation (population_search.chemistry_admitted + chemistry_elicited, winner-rule bytes unchanged); frontier runbook time-gated to 2026-11-19T16:25Z. Auditor independent recompute on committed v9 rows confirms all labelled detections + clean-control silence. F75 CLOSED.",
+    "Chemistry elicitation: 8/8 admitting problems elicit+elect chemistry (100% vs 0/8), 0/22 non-admitting changed (CI-verified recompute). Formula-direction: HO9-30 contradiction KILLs, sign-consistent controls silent.",
+    "F74 CLOSED (private vault repo model-vault-container exists, owner granted repo.write). F76 adjudicated+closed (v9 dual-lane attestation provenance; canonical lane-B covers 30/30, no scoring impact).",
+    "Process: Art.29 validator caught out-of-enum kind + unregistered session + missing claimed_at pre-push; fix-forward 80629f9f7->114e77c57 disclosed. builder-r70s1 lane's 4 local commits (INFRA_CREDENTIAL_LOST) superseded by builder-r64s4 pusher-wins (Art.29(e)); c-0090 DONE.",
+    "Score stays 5. Frontier: v10 fresh sealed one-shot after the maintenance window with the F75/chemistry/formula binds active; target mean>=3.25 (CI>3.0) for score 6."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3604,6 +3635,19 @@
     "CORR-5"
    ],
    "evidence_sha": "eval/holdout_v9_auditor_score.json"
+  },
+  {
+   "id": "V64",
+   "round": "R71 audit of R70 binds",
+   "commit": "114e77c57",
+   "gate": "NOT_MET (acceptance UNRESOLVED; score 5)",
+   "capability_change": "F75/chemistry/formula binds landed + verified; refusal false-pass structurally impossible; chemistry elicitation 8/8",
+   "closed_findings": [
+    "F75",
+    "F74",
+    "F76"
+   ],
+   "evidence_sha": "eval/r71_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3822,7 +3866,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10 (CORR-5: P1 gate=5, acceptance=6). v9 scored on engine route (agnes-3.0-flash): mean 3.000, CI [2.751,3.249], 0/0/0 hard clauses, VALID — acceptance UNRESOLVED (Art.14). v9 BURNED. Trajectory v6 2.583 -> v7 2.917 -> v9 3.000. Levers to 6: frontier model post-maintenance (2026-11-19T16:25Z), F75 refusal/identity/thrash binds, monoculture-break chemistry elicitation; need mean >=3.25 at n=30/SD0.7. F74 HF token repo.write owner-side. Goal 9/10.",
+ "progress_note": "SCORE 5/10. R70 binds VERIFIED (F75 refusal/identity/thrash + formula-direction + chemistry elicitation 8/8); refusal type-gate false-pass structurally impossible; F74/F76 closed. v9 mean 3.000 UNRESOLVED (CI includes 3.0). Frontier: v10 fresh sealed one-shot after xkiro maintenance exits 2026-11-19T16:25Z, with binds active + frontier model; target mean>=3.25 (CI>3.0) -> score 6. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
