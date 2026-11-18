@@ -1,0 +1,38 @@
+{
+ "record": "R75_FREEZE_GUARD_CI_STATUS/1.0.0",
+ "session": "builder-r75s1",
+ "claim": "c-0093",
+ "work_id": "r75-freeze-guard-ci",
+ "base_sha": "f8b2e0bc41fd2be4d598726fe798f3398698f8c5",
+ "finding_fixed": "F78",
+ "f78_class": "exists-but-does-not-gate (F32 recurring): test_r64_v9_preflight existed since c-0087 but was invoked in NO workflow \u2014 frozen-file drift pushed green (F77 happened exactly this way)",
+ "changes": {
+  "workflow": ".github/workflows/r11_queue_surface.yml \u2014 tests/test_r64_v9_preflight.py joins the v3.1.0 enforcement block (after test_article22_measured_path.py); step name cites the F78 freeze guard; the pytest invocation is inside the set -e block so a guard failure reds the push",
+  "map": "eval/enforcement_flags.json article_map['22'] (PARTIAL) \u2014 mechanism now cites tests/test_r64_v9_preflight.py; the map-completeness test enforces that every cited WIRED/PARTIAL test is invoked in this workflow, so map and CI cannot drift"
+ },
+ "acceptance_evidence": {
+  "red_on_deliberate_drift": {
+   "method": "appended one comment byte to frozen file scripts/r22_a1w_v5_repair.py, ran the guard exactly as CI will",
+   "pytest_exit": 1,
+   "failed_tests": [
+    "test_recorded_record_matches_pinned_run",
+    "test_frozen_loop_bytes_hold"
+   ],
+   "diff_shown": "scripts/r22_a1w_v5_repair.py drifted 669dd66c621d616b != recorded 97fe7740563c6d82",
+   "reverted": "byte-exact restore, git diff empty, green re-run exit 0"
+  },
+  "green_at_tip": "7/7 PASS (pytest exit 0) with no frozen-file drift",
+  "ci_reachability": "guard imports only scripts/r64_v9_preflight.py (subprocess git show, zero network modules); pinned audit sha a293b63e3b4b lives on origin/audit/r11-auditor-verdict-20261114 \u2014 actions/checkout fetch-depth:0 fetches all branch heads incl. the audit branch, so git show resolves in a fresh CI checkout"
+ },
+ "frontier_window": {
+  "gate": "2026-11-19T16:25Z (xkiro maintenance exit)",
+  "now_utc": "2026-11-18T14:45Z",
+  "state": "CLOSED (~25.7h remain) \u2014 Art. 3 typed refusal stands; the runbook pre-gate fires typed with zero probes until the window opens; no probes consumed this round"
+ },
+ "custody": {
+  "hf_token_digest": "33bc7af22c62",
+  "gh_pat_digest": "f1ebca5f9b62",
+  "match": "both digest-match the committed custody records (eval/r59_credential_custody_r59s1.json + the Art. 17 v3.3.0 typed state); whoami-v2 login prateekm1 role fineGrained, scoped repo.write granted, vault prateekm1/operator-keys-vault tree read HTTP 200 \u2014 F74-closed state re-verified; .env.keys restored gitignored 0o600"
+ },
+ "score_note": "score stays 5; acceptance (score 6) = v10 fresh sealed one-shot with binds active, mean >=3.25, CI >3.0 (Art. 14) \u2014 capability, not governance"
+}
