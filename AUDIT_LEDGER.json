@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "e0341e5b5",
+  "queue/dev12_r7": "ea6e62ef3",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1567,14 +1567,16 @@
    "id": "F78",
    "severity": "MEDIUM",
    "title": "Freeze-baseline guard is LOCAL-ONLY (exists-but-does-not-gate, F32 class recurring): test_r64_v9_preflight is NOT in the CI workflow test list, so frozen-file drift pushes green (F77 happened exactly this way). FIX: wire test_r64_v9_preflight into the queue CI surface so any frozen-file edit without a re-freeze reds the push. Also triage the 4 legacy local-only residuals (secret-scan self-fixture false positive needs a test-file allowlist; r531 memoization pin + 2x r544 golden-era pins are superseded-era) into a follow-up lane WITHOUT weakening the verifier.",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-18",
    "last_checked": "f587246f6",
    "rounds_open": 1,
    "articles": [
     27,
     29
-   ]
+   ],
+   "closed_at": "2026-11-18",
+   "resolution": "R75 (959a21662, c-0093): test_r64_v9_preflight.py wired into the queue-push CI enforcement block (set -e chain) + Art.22 map citation in enforcement_flags.json. Auditor independent verification: 15/15 frozen-file sha16 baselines match tip bytes; one-byte drift on scripts/r60_v9_one_shot.py changes sha16 a3a50dc09fd6fe90->30435a709108714f (guard fails closed). Builder demonstrated RED_EXIT=1 on drift / GREEN_EXIT=0 on revert. CI green at 959a21662/39d12577e/ea6e62ef3. c-0093+c-0094 DONE."
   },
   {
    "id": "F79",
@@ -2689,6 +2691,17 @@
     "Chemistry-elicitation null-domain side-effect typed (8/12 HO7 predictor rows change plan order; gate PASS 0/0/0; benign for the gate but watch on v10; consider tightening CHEMISTRY_ADMITS_RX/domain clamp for predictor rows).",
     "Score stays 5. Frontier unchanged: v10 after 2026-11-19T16:25Z window with binds + frontier model; mean>=3.25 CI>3.0 for score 6."
    ]
+  },
+  {
+   "id": "AM67",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R76 auditor audit of R75 (F78 freeze-guard CI wiring)",
+   "changes": [
+    "F78 CLOSED + independently verified: freeze-baseline guard (test_r64_v9_preflight) now in the queue-push CI enforcement block + Art.22 map citation. Auditor recompute: 15/15 frozen sha16 baselines match tip bytes; one-byte drift flips the hash (fail-closed proven). Governance chain now gated end-to-end every push: verdict grep + byte-identity + freeze guard.",
+    "c-0093 (builder-r75s1) + c-0094 (builder-r75s2 verification) DONE; CI green at ea6e62ef3. Custody re-verified (GH_PAT f1ebca5f9b62, HF 33bc7af22c62 repo.write, vault operator-keys-vault 200). Frontier runbook pre-gate fires typed (window 2026-11-19T16:25Z, zero probes).",
+    "Score stays 5. All governance gates wired; the sole remaining lever to 6 is capability: frontier model + fresh sealed v10 with binds active, mean>=3.25 CI>3.0 (Art.14). No further governance work needed — focus capability."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3743,6 +3756,17 @@
     "F78"
    ],
    "evidence_sha": "eval/r74_auditor_verification.json"
+  },
+  {
+   "id": "V68",
+   "round": "R76 audit of R75 freeze-guard wiring",
+   "commit": "ea6e62ef3",
+   "gate": "NOT_MET (acceptance UNRESOLVED; score 5)",
+   "capability_change": "freeze guard CI-gated (F78 closed); governance chain complete end-to-end",
+   "closed_findings": [
+    "F78"
+   ],
+   "evidence_sha": "eval/r76_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3961,7 +3985,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10. R72 both lanes verified (c-0091 re-freeze baselines 15/15; c-0092 P1.4 evidence byte-identity CI leg restored, F79 closed). F78 OPEN: freeze-baseline guard still local-only (F32 class) — wire into CI. Chemistry elicitation null-domain side-effect typed (8/12 HO7 rows, gate holds). v9 mean 3.000 UNRESOLVED. Frontier: v10 after 2026-11-19T16:25Z with binds + frontier model; mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
+ "progress_note": "SCORE 5/10. F78 CLOSED (freeze guard CI-gated, independently verified 15/15 baselines + fail-closed drift demo). Governance chain complete end-to-end every push (verdict grep + byte-identity + freeze guard). F74/F75/F77/F79 closed. v9 mean 3.000 UNRESOLVED. Sole lever to 6: frontier model + fresh sealed v10 (binds active) after 2026-11-19T16:25Z window; mean>=3.25 CI>3.0. Goal 9/10; capability now, governance done.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
