@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "5d55de556",
+  "queue/dev12_r7": "b8117977d",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1453,6 +1453,19 @@
    "articles": [
     27
    ]
+  },
+  {
+   "id": "F70",
+   "severity": "LOW",
+   "title": "R62 registry expansion verification: 7 new pint-typed relations + 19 router classes + P1 108/108 = 1.0 on full 36-row corpus. All 7 relations in REFERENCE_SCENARIOS (7/7), all have refusal logic (out_of_domain/ValueError). DEGENERATE_KWARGS coverage verified (battery 61/61 locally). CI green at b8117977d. Engine share 39.2% (capability round). P1 gate RE-CLOSED on full corpus (was 0.4167 on 45/108; now 1.0 on 108/108). Definition verbatim r54, never tuned.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "b8117977d",
+   "rounds_open": 1,
+   "articles": [
+    3,
+    27
+   ]
   }
  ],
  "amendments": [
@@ -2424,6 +2437,19 @@
     "F68 OPENED (MEDIUM): queue tip RED — r60_status.json violates engine-share gate (0% no typed exception) + D2 remote_ci.pushed_sha malformed. The v3.2.0 gates are working. F69 OPENED (LOW): stale 1.1.0 pin in test_r58_route_adapter.py:166 + file outside workflow surface.",
     "z-ai grant 429 outage (Art.15 typed infra failure, ~2h15m sustained) gates challenger resume -> criteria -> c-0082 -> v9 one-shot; lease live to 2026-11-19; resume point committed. Score stays 5; P2 (->6) gated on the 429 window + F68 record fix."
    ]
+  },
+  {
+   "id": "AM57",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R63 auditor audit of R62 registry expansion (b8117977d): P1 gate re-closed on full corpus",
+   "changes": [
+    "R62 VERIFIED from pushed bytes: 7 new pint-typed relations (archard_wear, impact_erosion_rate, contact_erosion_per_operation, biogenic_acid_thinning, microbial_growth_rate, dust_layer_ignition_margin, humidity_permeability_ratio) + 19 router classes. All 7 in REFERENCE_SCENARIOS (7/7), all have refusal logic. DEGENERATE_KWARGS coverage verified (61/61 battery locally). CI green at b8117977d (surface success). Engine share 39.2% (capability round, no exception).",
+    "P1 GATE RE-CLOSED on full 36-row DEV corpus: r61_p1_baseline_rows.json at b8117977d shows verdict=P1_BASELINE_ROWS_PASS, fraction=1.0, numeric_claims_total=108, carrying=108. This closes the gap identified in R61 (was 45/108=0.4167). Definition verbatim r54, never tuned. The expansion added real physics coverage (router + relations), not tuning.",
+    "SCORE UPDATE: 5->6. The P1 gate (>=80% numeric-claims-unit-checked) now holds on the full corpus (1.0 >= 0.80). All three P1 legs verified: (1) 0 allowed-measures/0 false input-flags/0 inverted (R53, CI-gated); (2) >=80% unit-checked = 1.0 (R62, verified from pushed bytes); (3) engine deterministic + typed refusals (R53/R56/R62).",
+    "Frontier shifts to P2 (->6): v9 confidential sealed acceptance. Gated on: (a) 429 window clears (z-ai grant outage, Art. 15); (b) c-0079 challenger resume + adoption verdict; (c) c-0082 claim + v9 one-shot; (d) auditor scoring vs private-repo rubric (mean>=3.0, 0/0/0, CI excludes 3.0). Lease live to 2026-11-19T00:00:00Z.",
+    "F68 (queue tip RED) CLOSED by R61 fix-forward; F69 (stale pin) CLOSED; F70 LOW opened (verification record). Goal 9/10."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3355,6 +3381,21 @@
     "F69"
    ],
    "evidence_sha": "eval/r61_auditor_verification.json"
+  },
+  {
+   "id": "V56",
+   "round": "R63 audit of R62 registry expansion",
+   "commit": "b8117977d",
+   "gate": "P1 PASSED (score 6); acceptance NOT_MET (v9 one-shot pending)",
+   "capability_change": "P1 gate re-closed on full corpus (108/108=1.0); 7 new relations + 19 router classes; CI green",
+   "new_findings": [
+    "F70"
+   ],
+   "closed_findings": [
+    "F68",
+    "F69"
+   ],
+   "evidence_sha": "eval/r63_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3570,7 +3611,7 @@
    "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
   }
  },
- "progress_note": "SCORE 5/10. R60 verified: v9 freeze rubric-isolation STRUCTURAL (builder-never-reads provable; no rubric read/HTTP, require_registered_model gate, MEASURED_PATH through engine, c-0082 pre-staked); shape hardening green (R59 obs fixed); baseline 36/36 + challenger 4/36, criteria honest UNCOMPUTED/UNMEASURABLE. QUEUE TIP RED (F68): r60_status.json engine-share 0% no typed exception + remote_ci.pushed_sha malformed — v3.2.0 gates working, executor must fix forward. F69 stale pin + coverage gap. z-ai 429 outage gates the v9 one-shot (lease 2026-11-19). P2 (->6) next point = v9 sealed acceptance once 429 clears + F68 fixed. Goal 9/10.",
+ "progress_note": "SCORE 6/10 (P1 gate passed on full corpus). R62 registry expansion VERIFIED: 7 new pint-typed relations + 19 router classes; P1 108/108=1.0 (was 0.4167); CI green; engine share 39.2%. All three P1 legs verified: 0/0/0 CI-gated (R53), >=80% unit-checked=1.0 (R62), engine deterministic+typed refusals (R53/R56/R62). Frontier: P2 v9 sealed acceptance (->6 on acceptance, not P1). Gated on 429 window + c-0079 lease + adoption verdict + c-0082 claim + auditor scoring. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
