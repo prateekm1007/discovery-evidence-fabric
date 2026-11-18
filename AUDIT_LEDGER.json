@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "b8117977d",
+  "queue/dev12_r7": "dade20f9c",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1466,6 +1466,19 @@
     3,
     27
    ]
+  },
+  {
+   "id": "F71",
+   "severity": "LOW",
+   "title": "R63 v10 repair-loop prototype VERIFIED from pushed bytes. Evidence base confirmed: V8.1 pre-run census shows 9/9 rows burned full repair budget (repairs=3) and 6/9 still ended critic=FLAG (auditor Finding 1). Mechanism: (1) BYTE-KEEP constraint + targeted directives (remediation map, not megastack); (2) convergence guard (EARLY_STOP:STUCK_AXIS after 2 identical finding signatures); (3) value ledger (EARLY_STOP:NO_MARGINAL_VALUE after 2 consecutive value-zero repairs); (4) budget stays 3 (imported from r40_machine_v77, identity-tested). Byte-reuse verified: proto.scan_input_availability is r40_machine_v77.scan_input_availability (test_6). 9/9 offline tests present (test_1 through test_9). CI green at dade20f9c (surface success). Plan-layer work (zero engine lines, zero z-ai probes, zero changes to sealed v9 instrument). Score stays 6; v10 lane ready for LLM-connected validation when 429 window clears.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "dade20f9c",
+   "rounds_open": 1,
+   "articles": [
+    3,
+    27
+   ]
   }
  ],
  "amendments": [
@@ -2450,6 +2463,18 @@
     "Frontier shifts to P2 (->6): v9 confidential sealed acceptance. Gated on: (a) 429 window clears (z-ai grant outage, Art. 15); (b) c-0079 challenger resume + adoption verdict; (c) c-0082 claim + v9 one-shot; (d) auditor scoring vs private-repo rubric (mean>=3.0, 0/0/0, CI excludes 3.0). Lease live to 2026-11-19T00:00:00Z.",
     "F68 (queue tip RED) CLOSED by R61 fix-forward; F69 (stale pin) CLOSED; F70 LOW opened (verification record). Goal 9/10."
    ]
+  },
+  {
+   "id": "AM58",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R64 auditor audit of R63 v10 repair-loop prototype (dade20f9c): plan-layer work for Finding 1",
+   "changes": [
+    "R63 VERIFIED from pushed bytes: v10 repair-loop prototype (317 lines) + design doc (66 lines) + 9 offline tests landed green (CI success at dade20f9c). Evidence base confirmed: V8.1 pre-run census at b8117977d shows 9/9 rows burned full repair budget (repairs=3) and 6/9 still ended critic=FLAG — matches auditor Finding 1 exactly. Mechanism verified: (1) BYTE-KEEP constraint + targeted directives (remediation map); (2) convergence guard (EARLY_STOP:STUCK_AXIS after 2 identical finding signatures); (3) value ledger (EARLY_STOP:NO_MARGINAL_VALUE after 2 consecutive value-zero repairs); (4) budget stays 3 (imported from r40_machine_v77, identity-tested). Byte-reuse verified: proto.scan_input_availability is r40_machine_v77.scan_input_availability (test_6, identity check). 9/9 offline tests present (test_1 through test_9). Plan-layer work: zero engine lines, zero z-ai probes held (429 window stayed dark all round), zero changes to sealed v9 instrument.",
+    "SCORE STAYS 6: v10 is plan-layer work (the repair mechanism is ready to converge when the 429 window opens), not a gate. The P1 gate passed at R63 (108/108=1.0 on full corpus); the frontier is P2 v9 sealed acceptance (gated on 429 window + c-0079 lease + adoption verdict + c-0082 claim + auditor scoring).",
+    "c-0079 challenger lease (~19.5h left at R63 open) stays with lease-holder (Art. 29(d): takeover lawful only after expiry + dead lease). Finding 1's live half (LLM-connected validation) deferred to new claim behind adoption verdict (per Finding 2 sequencing). Value metric offline is violation-load, not rubric-based; rubric question re-opens on real run evidence.",
+    "Untouched lanes: c-0079 lease-holder's, adoption verdict → c-0082 → frozen v9 one-shot → auditor scoring. Goal 9/10; capability, not governance."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3396,6 +3421,17 @@
     "F69"
    ],
    "evidence_sha": "eval/r63_auditor_verification.json"
+  },
+  {
+   "id": "V57",
+   "round": "R64 audit of R63 v10 repair-loop",
+   "commit": "dade20f9c",
+   "gate": "P1 PASSED (score 6); acceptance NOT_MET (v9 one-shot pending)",
+   "capability_change": "v10 repair-loop prototype landed (plan layer); mechanism ready for LLM-connected validation",
+   "new_findings": [
+    "F71"
+   ],
+   "evidence_sha": "eval/r64_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3611,7 +3647,7 @@
    "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
   }
  },
- "progress_note": "SCORE 6/10 (P1 gate passed on full corpus). R62 registry expansion VERIFIED: 7 new pint-typed relations + 19 router classes; P1 108/108=1.0 (was 0.4167); CI green; engine share 39.2%. All three P1 legs verified: 0/0/0 CI-gated (R53), >=80% unit-checked=1.0 (R62), engine deterministic+typed refusals (R53/R56/R62). Frontier: P2 v9 sealed acceptance (->6 on acceptance, not P1). Gated on 429 window + c-0079 lease + adoption verdict + c-0082 claim + auditor scoring. Goal 9/10.",
+ "progress_note": "SCORE 6/10 (P1 gate passed on full corpus at R63). R63 v10 repair-loop prototype VERIFIED: evidence base confirmed (V8.1 census 9/9 repairs=3, 6/9 FLAG), mechanism verified (4 controls: BYTE-KEEP, STUCK_AXIS, NO_MARGINAL_VALUE, budget=3), byte-reuse verified (identity check), 9/9 tests present, CI green. Plan-layer work (zero engine lines, zero z-ai probes). Score stays 6; v10 lane ready for LLM-connected validation when 429 window clears. Frontier: P2 v9 sealed acceptance (429 window + c-0079 lease + adoption verdict + c-0082 claim + auditor scoring). Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
