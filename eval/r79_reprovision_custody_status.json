@@ -1,0 +1,74 @@
+{
+ "record": "R79_REPROVISION_CUSTODY_STATUS/1.0.0",
+ "session": "builder-r79s1",
+ "claim": "c-0097",
+ "work_id": "r79-reprovision4-custody-precheck",
+ "round_class": "pre-window custody/infrastructure round (typed Art. 27 disclosure; zero engine lines)",
+ "state_fetch": {
+  "checked_at": "2026-11-18T15:46:10Z (sandbox clock)",
+  "queue_tip_at_open": "03d8e66c7 (R77 round close; the conservation lane 985c06243 + 03d8e66c7 is pending next-round audit — not this lane's bytes)",
+  "audit_tip": "763ef3210 (auditor R78, AM68/V69 — matches the round-open directive exactly)",
+  "constitutions_read": {
+   "epistemic": "v3.3.0 FULL-read from the queue tip (29 articles + amendment records v3.0.0-v3.3.0)",
+   "auditor": "v1.3.0 FULL-read @ 763ef3210 (14 articles + amendments v1.1.0/v1.2.0/v1.3.0)"
+  },
+  "audit_artifacts_read": [
+   "eval/r78_auditor_verification.json",
+   "AUDIT_LEDGER.json @ 763ef3210: AM68 read; findings 76, open 0 (F74-F79 all closed)"
+  ]
+ },
+ "reprovision": {
+  "event": "sandbox reprovision #4 detected at round open: /home/z/fabric-r53 absent — the worktree of every prior session died with its sandbox (the exact Art. 18 failure class the R77 tool closed)",
+  "recovery": "fresh anonymous clone (repo is public-readable), checkout queue/dev12_r7 at 03d8e66c7, git config core.hooksPath .githooks (the F53/guard-activation setup step)",
+  "custody_bootstrap": {
+   "bootstrap_digests_verified": {
+    "HF_TOKEN": "33bc7af22c62",
+    "GH_PAT": "f1ebca5f9b62"
+   },
+   "bootstrap_digests_match_committed_records": true,
+   "restore_tool": "scripts/r77_vault_restore.py (the COMMITTED Art. 18 tool — no hand-rolled recovery; R78 verdict direction 4)",
+   "tool_exit_code": 0,
+   "vault_keys_restored": 6,
+   "per_key_digests": {
+    "AGNES_API_KEY": "d0c666a3842f [COMMITTED_RECORD_MATCH]",
+    "AGNES_API_KEY_2": "5c4dffd28fe4 [NEW_IN_RECORDS — typed, same pair as the R77 drill]",
+    "AGNES_BASE_URL": "e592ff32df1f [NEW_IN_RECORDS — typed, same pair as the R77 drill]",
+    "GH_PAT": "f1ebca5f9b62 [COMMITTED_RECORD_MATCH]",
+    "GITHUB_TOKEN": "f1ebca5f9b62 [COMMITTED_RECORD_MATCH]",
+    "XKIRO_API_KEY": "f6c09bee9bde [COMMITTED_RECORD_MATCH]"
+   },
+   "env_keys": "session-local .env.keys, 0o600, gitignored (.gitignore line 2); digests only in this record — values never committed"
+  }
+ },
+ "frontier_window": {
+  "gate": "2026-11-19T16:25Z",
+  "checked_at": "2026-11-18T15:46:10Z",
+  "state": "CLOSED (opens in ~24h39m)",
+  "art3_typed_refusal": "the frontier re-probe is time-gated and was NOT fired this round: ZERO probes, ZERO quota consumption. The probe round is cron 537019's at 2026-11-19T16:40Z (R78 verdict direction 1); the runbook's own pre-gate remains the authoritative enforcement"
+ },
+ "window_round_readiness": {
+  "cron_537019": {
+   "kind": "one_time",
+   "fires": "2026-11-19T16:40:00Z",
+   "tz": "UTC",
+   "run_count_at_check": 0,
+   "status": "armed (sandbox-scheduler state — unverifiable from remote bytes; the runbook gate is authoritative, per AM68)"
+  },
+  "custody_for_probe": "XKIRO_API_KEY f6c09bee9bde restored and digest-verified; HF master 33bc7af22c62 present (inference.serverless.write verified in prior rounds); GH_PAT f1ebca5f9b62 push-capable",
+  "runbook": "scripts/r70_frontier_reprobe_runbook.py (the pre-gate typed-refusal path was exercised in R75; zero probes pre-window)"
+ },
+ "art27_capability_budget": {
+  "engine_lines": 0,
+  "test_lines": 0,
+  "engine_line_share_measured": 0,
+  "engine_diff": "zero engine lines this round — typed CUSTODY + PROBE-WINDOW pre-check round (reprovision #4 restore via the committed tool; Art. 3 typed refusal on the closed frontier window)",
+  "share_exception_reason": "custody/probe/infrastructure round: the R78 verdict direction 5 defers the capability budget to the window round — the score-6 lever is the frontier re-probe + sealed v10 (both window-gated); no governance work done this round (direction 5; the chain is complete end-to-end, 0 open findings)",
+  "primary_metric_delta": "none claimed — no score number claimed; the measured delta arrives with the v10 sealed one-shot (the R77 conservation bind joins that measurement)"
+ },
+ "disclosures": {
+  "detect_secrets": "pre-commit detect-secrets module unavailable in this fresh sandbox — typed degradation (Art. 5), compensated by manual staged-diff token-pattern grep on every push this round: 0 hits (ghp_/github_pat_/hf_.../x-access-token patterns)",
+  "json_guard": "the c-0054 pre-commit JSON guard ran on every committed byte (all staged JSON parses); core.hooksPath .githooks activated in the fresh clone first",
+  "registry_insertion_incident": "self-caught (Art. 5), pre-commit, zero refused bytes reached git or the remote: the first surgical attempt produced a keyless session object (invalid JSON — caught by json.loads validation); the second appended the claim entry to the corrections[] array tail instead of claims[] (valid JSON, caught by a semantic diff-count check: claims still 93); an earlier semantically-correct but noisy +209/-185 full re-serialization commit (badfeba50) was replaced pre-push by the surgical +24-line form per the 7d96964cf diff-minimal convention. The committed bytes are the fourth, verified attempt: surgical +24 lines, prior claims/sessions/corrections byte-identical"
+ },
+ "next": "window round fires via cron 537019 at 2026-11-19T16:40Z: custody bootstrap via the committed r77_vault_restore.py -> claim-before-work -> runbook probe (full 19K-char contract, max_tokens 8192, admission scan; command-a-plus excluded) -> register the strongest SERVING frontier id -> push + remote CI -> typed handoff to the auditor (prereg amend + v10 author + re-freeze authorization are the auditor's alone, per directions 2-3; the builder never re-freezes unilaterally)"
+}
