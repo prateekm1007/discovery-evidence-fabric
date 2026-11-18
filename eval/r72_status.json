@@ -1,0 +1,50 @@
+{
+ "record": "R72_ROUND_STATUS/1.0.0",
+ "session": "builder-r64s4",
+ "round": 72,
+ "work_ids": [
+  "r72-verification-prep (c-0091)"
+ ],
+ "base_sha": "114e77c57a1963a22867629e478130324d95f7e6",
+ "remote_state": {
+  "queue/dev12_r7": "114e77c57 (fetched, clean FF from bfaab8511, 12 commits pulled)",
+  "audit/r11-auditor-verdict-20261114": "30d578d35 (fetched; AM63/AM64/V64 read from AUDIT_LEDGER.json @ this SHA)"
+ },
+ "round_open_note": "the previous turn's sandbox start FAILED (Art. 15-class local interruption: zero reads, zero claims, nothing done); this session re-opened R72 from the fetched tips and honored the read-before-act order in full before any action",
+ "constitution_reads": {
+  "epistemic_v3.3.0": "FULL read @ 114e77c57 (preamble + Arts. 1-29 + disposition ledger + amendment records v3.0.0/v3.1.0/v3.2.0/v3.3.0); md5 bd5ff20961772840a3522dca5ab60edc; first FULL read of the v3.3.0 custody amendment (Art. 17 += HF private vault, owner intent enacted; its typed 06:30Z 'grant pending' state is superseded by the F74 closure in eval/r67_f74_hf_vault_setup.json — repo.write grant landed)",
+  "auditor_v1.3.0": "FULL read @ 30d578d35 (Arts. 1-14 + amendments v1.1.0/v1.2.0/v1.3.0); md5 d40a92a14854accfd558c7df4f29b9b0 — byte-identical to the standing read recorded in r64_status.json (no auditor-constitution commits since)",
+  "amendments": "AM63 + AM64 read in full from AUDIT_LEDGER.json @ 30d578d35; verdict V64 read; eval/r71_auditor_verification.json read in full (NOTE: the record lives on the audit branch — the auditor never pushes to the queue branch; the R71 message's path is resolvable only on the audit tip)"
+ },
+ "verification_recompute": {
+  "method": "builder-side independent recompute from committed tip bytes only (no LLM, no network); scripts/r71_bind_recompute.py",
+  "f75_detectors": "7/7 MATCH the R71 auditor table: HO9-14 [REFUSAL_SHAPED_ANSWER, IDENTITY_LEAK_PREAMBLE]; HO9-13 [IDENTITY_LEAK_PREAMBLE]; HO9-02/25 [REASONING_THRASH_LEAK]; HO9-30 [STATED_FORMULA_DIRECTION_CONTRADICTION]; clean controls HO9-04/22 silent",
+  "tests": "test_r70_f75_binds 17/17; full local battery: completed; exactly 6 failures itemized: 2x test_r64_v9_preflight freeze-baseline drift (R70 edited 2 frozen files without re-recording the baselines — FIXED FORWARD in this commit, re-freeze act completed, 7/7 green) + 4 legacy local-only residuals typed-disclosed (test_secret_scanning self-fixture false positive on tests/test_all_refs_secret_scan.py's deliberately-fake keys; test_r531_memoization C8-hook-era pin; 2x test_r544 one-conversation golden-era pins — all outside the CI test list; R11 P1-8 typed-skip precedent, follow-up lane)",
+  "chemistry": "winner-rule byte-identity covered by the binds suite (elicited-when-admitted, silent-when-not, clamp-still-wins, chemistry-first — 4/4 green)",
+  "score_bytes": "recomputed from the audit-branch committed score record: n=30, mean 3.0000, SD 0.695, CI95 [2.751, 3.249] == the reported values exactly; score 5, acceptance NOT_GRANTED/UNRESOLVED (Art. 14: CI includes 3.0)"
+ },
+ "frontier_prep": {
+  "runbook": "scripts/r70_frontier_reprobe_runbook.py executed NOW (pre-window): typed Art. 3 refusal, EXIT=3, ZERO probes fired, countdown verified (window opens 2026-11-19T16:25Z)",
+  "key_custody_start_blocker": "RETIRED: session vault .env.keys present + gitignored; 3 keys by name (XKIRO_API_KEY, AGNES_API_KEY, GH_PAT); 8/8 value digests sha256[:12]-verified against the committed eval/r59_credential_custody_r59s1.json record; F74 HF vault repo usable per eval/r67_f74_hf_vault_setup.json",
+  "post_window_chain": "probe (full 19K-char expansion contract + max_tokens 8192 + r70 admission scan as kill criterion; command-a-plus excluded) -> eval/r70_frontier_reprobe_candidates.json -> register strongest SERVING id -> auditor prereg amend (AM62 template) -> conscious re-freeze -> v10 fresh sealed one-shot (auditor-authored, binds active)"
+ },
+ "disclosures": [
+  "builder-r70s1 lane: ABSENT from this sandbox — zero local refs, zero stash, zero reflog traces, no matching commits anywhere in git log --all; per AM64 its 4 credential-lost local commits are superseded by builder-r64s4's landed work (pusher-wins, Art. 29(e)); nothing disjoint exists to recover",
+  "superseded lane-A v9 scratch: the untracked eval/holdout_v9_generation/ left by the interrupted local lane blocked the fast-forward; all 38 local files diffed against the remote tip (35 differ, 3 smoke-only — the canonical lane-B bytes live on the remote per the F76 adjudication, 'no scoring impact'); quarantined BYTE-PRESERVING to a scratch dir outside the repo tree, zero deletions",
+  "detect-secrets missing in the recycled sandbox: the c-0091 claim commit's pre-commit scan was SKIPPED (typed degradation); detect-secrets installed and the commit diff re-scanned clean (zero findings) BEFORE push — Art. 17 gate satisfied at push time",
+  "pint missing in the recycled sandbox (the R64-flagged known gap): installed locally so the full battery runs; CI unaffected (workflow installs it separately)"
+ ],
+ "art27_capability_budget": {
+  "round_kind": "precision",
+  "engine_diff": "NONE — zero engine-module lines: the deliverables are the freeze-baseline fix-forward (eval/r64_v9_preflight.json, the R70 missed re-record act, 2 sha entries + typed note), the round record, the verification-recompute tool (scripts/r71_bind_recompute.py, reads committed bytes only), and the claim registry update. The frozen engine files themselves are untouched (their baselines are re-RECORDED, not the files edited).",
+  "engine_line_share_measured": 0.0,
+  "share_exception_reason": "PRECISION/verification round (typed, F63 disclosure class): post-R71 fetch-state round — the read-before-act order (both constitutions FULL + AM63/AM64/V64 + the R71 verification record), the builder-side bind recompute, the frontier-runbook pre-window gate proof, the vault digest restore, and the freeze-baseline fix-forward; the engine is not the diff target",
+  "primary_metric_delta": {
+   "metric": "holdout_v9_mean",
+   "before": 3.0,
+   "after": 3.0,
+   "note": "no new measurement this round; v9 stays UNRESOLVED (CI [2.751,3.249]); score 5"
+  },
+  "deletions": "NONE (no retirement; Art. 16 ledger untouched)"
+ }
+}
