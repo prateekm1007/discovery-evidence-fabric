@@ -1,0 +1,51 @@
+{
+ "record": "R72_CLAIM_COLLISION/1.0.0 (Art. 29(e) adjudication + Art. 5 disclosure)",
+ "session": "builder-r72s1",
+ "date": "2026-11-18",
+ "instance": "claim-id race PLUS a materialized artifact-path overlap: two sessions independently took c-0091 from the same base during a credential-lost window, and both rounds' records targeted eval/r72_status.json (the constitution's RACE ledger numbers per-work races; highest prior instance #11 - the auditor's ledger owns the numbering, so this record uses the descriptive id)",
+ "parties": {
+  "first_pusher": {
+   "session": "builder-r64s4",
+   "claim_id": "c-0091",
+   "work_id": "r72-verification-prep",
+   "chain": "8f883d994 -> a3e5005eb -> d9c813a72 -> f587246f6",
+   "role_after": "EXECUTOR (unchanged - the push mutex is theirs; round closed green at f587246f6)",
+   "record_path": "eval/r72_status.json (landed, canonical, UNTOUCHED by this adjudication)"
+  },
+  "this_session": {
+   "session": "builder-r72s1",
+   "claim_id_staked": "c-0091",
+   "claim_id_final": "c-0092",
+   "work_id": "r72-evidence-integrity-fix",
+   "pre_collision_chain": "114e77c57 + 4 commits, tip 57b120ceb",
+   "push_incident": "typed INFRA_CREDENTIAL_LOST (exit 128) during the round; credential restored by the owner (~2026-11-18T13:52Z, the Art. 17 one-master-reminder response)",
+   "record_path": "eval/r72_evidence_integrity_status.json (re-pathed - see artifact_overlap)"
+  }
+ },
+ "timeline": [
+  "2026-11-18T13:19Z: builder-r72s1 stakes c-0091 at base 114e77c57 (1cb1be32e; diff-against-remote clean: origin tip == base)",
+  "credential-lost window: the chain builds locally (4 commits), push fails exit 128",
+  "2026-11-18T13:20:54Z (sandbox clock): builder-r64s4 registers c-0091 (r72-verification-prep) and pushes 8f883d994 - inside this chain's credential-lost window, invisible to the claim-time check",
+  "2026-11-18T13:52Z: the owner delivers the GH_PAT",
+  "2026-11-18T13:57Z: the push attempt fetches the remote tip and finds the first collision; the Art. 29(e) adjudication starts (rebase onto 8f883d994)",
+  "2026-11-18T14:2xZ: the archive-ref push succeeded; the canonical push pre-check found the remote ADVANCED AGAIN to f587246f6 (the first-pusher's round work + close, linear on 8f883d994) - the rebase base moves, and the shared-path hazard is now MATERIALIZED: their round record landed at eval/r72_status.json",
+  "2026-11-18T14:35Z: the rebase v2 lands on f587246f6 with the record re-pathed (second-lander yields)"
+ ],
+ "adjudication": {
+  "rule": "Art. 29(e): same-work_id non-fast-forward => stand down (never rebase a duplicate); rebase only disjoint work; write only claimed paths; one canonical artifact per work_id",
+  "finding": "the work_ids are DISJOINT (r72-evidence-integrity-fix vs r72-verification-prep): no shared engine lines, no shared scripts, no shared test bytes",
+  "action": "re-key the claim c-0091 -> c-0092 (the minimum edit restoring registry uniqueness - the Art. 29 suite asserts no duplicate claim_id); rebase the chain onto the final remote tip f587246f6; RE-PATH this session's round record to eval/r72_evidence_integrity_status.json (the first-pusher's eval/r72_status.json bytes stay byte-untouched); first-pusher mutex honored; NO takeover; NO force-push",
+  "not_this_class": "this is NOT the F25/RACE#8 duplicate class - no duplicate work is re-run and no verifier stand-down is needed; the two work items are different lanes of R72"
+ },
+ "artifact_overlap": {
+  "fact": "eval/r72_status.json was targeted by BOTH rounds' records; the first-pusher's record LANDED there (a3e5005eb, amended d9c813a72) while this chain was credential-blocked",
+  "rule": "Art. 29(e) one-canonical-artifact is per work_id - two work_ids, two records; the PATH was the collision",
+  "disposition": "the second lander re-paths: this session's round record = eval/r72_evidence_integrity_status.json (with the canonical_path_pointer inside); the first-pusher's record stays at eval/r72_status.json byte-untouched; the registry artifact_paths reflect the re-path; disclosed here per Art. 5 rather than silently absorbed"
+ },
+ "preservation": {
+  "archive_ref": "queue/r72s1-unpushed-archive",
+  "tip": "57b120ceb",
+  "contents": "the verbatim pre-collision chain (114e77c57 + 4 trailer-bound commits with the original c-0091 claim bytes), pushed BEFORE the rebase per the Art. 4 evidence-preservation rule"
+ },
+ "secret_scan": "manual token-pattern grep over the rebased diffs: 0 hits (detect-secrets hook degraded in this sandbox - the typed compensating control)"
+}

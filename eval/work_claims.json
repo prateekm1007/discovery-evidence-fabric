@@ -2114,7 +2114,7 @@
    "claimed_at": "2026-11-18 (sandbox clock)",
    "work_id": "r72-evidence-integrity-fix",
    "title": "F77 fix-forward: restore the P1.4 CI byte-identity leg (dropped in the R60 workflow restructure) + regenerate the stale labelled-regression record (last regenerated at R53, engine behavior changed at R70 by the chemistry elicitation on null-domain labelled rows) + typed finding record; direction-4 lane adjudication (r70s1: no disjoint work)",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-18 (sandbox clock)",
    "session_id": "builder-r72s1",
    "role": "EXECUTOR",
@@ -2125,11 +2125,14 @@
    "artifact_paths": [
     ".github/workflows/r11_queue_surface.yml",
     "eval/r52_labelled_regression.json",
-    "eval/r72_f77_finding.json"
+    "eval/r72_f77_finding.json",
+    "eval/r72_evidence_integrity_status.json",
+    "eval/r72_claim_collision.json"
    ],
    "no_probes_note": "zero LLM probes; zero quota consumption; deterministic zero-LLM tooling only (the driver + git + the byte-gate)",
    "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == 114e77c57 == local HEAD; no competing OPEN claim for work_id r72-evidence-integrity-fix",
-   "collision_rekey_note": "typed re-key at the credential-restored push (Art. 5/29(e)): this claim was staked as c-0091 at base 114e77c57; the concurrent builder-r64s4 session registered c-0091 (work_id r72-verification-prep) as 8f883d994 during this chain's credential-lost window, so the id is re-keyed c-0092 - the minimum edit restoring registry uniqueness (the Art. 29 suite asserts no duplicate claim_id). The remote tip advanced a SECOND time while this chain was being rebased (8f883d994 -> f587246f6: the first-pusher's round work + close, linear on 8f883d994); this entry's base_sha tracks the final rebase base. Authority: Art. 29(e) rebase-only-disjoint-work - the work_ids are disjoint (r72-evidence-integrity-fix vs r72-verification-prep), NOT the forbidden duplicate class; first-pusher mutex honored (builder-r64s4 stays EXECUTOR of r72-verification-prep, its lease was live at adjudication time - no takeover). The collision_check field above records the claim-time state, which was true then; the verbatim pre-collision chain (114e77c57 + 4 commits, tip 57b120ceb) is preserved at queue/r72s1-unpushed-archive; full record: eval/r72_claim_collision.json."
+   "collision_rekey_note": "typed re-key at the credential-restored push (Art. 5/29(e)): this claim was staked as c-0091 at base 114e77c57; the concurrent builder-r64s4 session registered c-0091 (work_id r72-verification-prep) as 8f883d994 during this chain's credential-lost window, so the id is re-keyed c-0092 - the minimum edit restoring registry uniqueness (the Art. 29 suite asserts no duplicate claim_id). The remote tip advanced a SECOND time while this chain was being rebased (8f883d994 -> f587246f6: the first-pusher's round work + close, linear on 8f883d994); this entry's base_sha tracks the final rebase base. Authority: Art. 29(e) rebase-only-disjoint-work - the work_ids are disjoint (r72-evidence-integrity-fix vs r72-verification-prep), NOT the forbidden duplicate class; first-pusher mutex honored (builder-r64s4 stays EXECUTOR of r72-verification-prep, its lease was live at adjudication time - no takeover). The collision_check field above records the claim-time state, which was true then; the verbatim pre-collision chain (114e77c57 + 4 commits, tip 57b120ceb) is preserved at queue/r72s1-unpushed-archive; full record: eval/r72_claim_collision.json.",
+   "completion_note": "typed completion (push-ready): the pre-collision chain (114e77c57 + 4 trailer-bound commits, tip 57b120ceb, preserved verbatim at queue/r72s1-unpushed-archive) was adjudicated per Art. 29(e) at the credential-restored push - claim re-keyed c-0091 -> c-0092 (builder-r64s4's concurrent c-0091 for r72-verification-prep; full record in eval/r72_claim_collision.json) and the chain rebased TWICE as the remote advanced linearly (8f883d994 -> f587246f6 during the rebase; the second advance landed the first-pusher's round record at eval/r72_status.json, so THIS session's round record re-paths to eval/r72_evidence_integrity_status.json - the second-lander-yields resolution); the final chain: claim 1030f938f, F77 fix-forward 063125ab9, round status 56e1b0526, this completion commit; the push (fast-forward on f587246f6, diff-against-remote re-checked at push time) executes immediately after this commit"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
