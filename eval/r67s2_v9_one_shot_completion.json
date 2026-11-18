@@ -1,0 +1,52 @@
+{
+ "record": "R67S2_V9_ONE_SHOT_COMPLETION/1.0.0",
+ "session": "builder-r60s1 (completing executor; channel zai-web, session web-4ba18cb7-7a0a-4f07-9eab-bf6b23029a14)",
+ "date": "2026-11-18T09:17Z",
+ "claim": "c-0082 holdout-v9-generation (sealed one-shot executor lock; claim registered 5b47d4cb0, lease 2026-11-20T00:00:00Z)",
+ "result": "30/30 ROWS COMMITTED; rows_30_30_attestation=TRUE (recomputed from committed bytes by the driver's attest command)",
+ "attestation_verbatim": {
+  "executor_id": "builder-r60s1@holdout-v9-generation",
+  "registered_model": "agnes-3.0-flash",
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "rows_committed": 30,
+  "gateway_completed_calls": 133,
+  "gateway_error_lines": 0,
+  "all_calls_requested_registered": true,
+  "all_calls_served_registered": true,
+  "served_model_matches_registered": true,
+  "rows_30_30_attestation": true,
+  "window_ended_at": "2026-11-18T09:16:43.602744Z"
+ },
+ "true_window": {
+  "started_at": "2026-11-18T08:15:32.731545Z",
+  "ended_at": "2026-11-18T09:15:33Z (last gateway log entry)",
+  "provenance": "the TRUE window start is preserved in the committed events.json @ f82dea546 (the first chunk's ledger); each later chunk's ledger rewrite carries ITS OWN run_start in the window_started_at field (a single-invocation field meeting the multi-chunk reality) — the full-window start is this committed byte plus the slice reassembly below"
+ },
+ "execution_lineage": {
+  "first_executor": "builder-r64s4 (reached rows_done=23 on the agnes-3.0-flash registration before the sandbox cut; those rows were NEVER pushed/attested/scored and died in the reprovision — zero bytes entered the evidence base; RUN_LOST typed 715e887e3)",
+  "completing_executor": "builder-r60s1 (the lock-holder's keyed sandbox; fresh 30/30 from the sealed packet per the 715e887e3 completion path)",
+  "seal": "verified fail-closed at EVERY chunk load (6/6 invocations: seal 502e93d84b19dcda..., 30 problems 15+15)"
+ },
+ "chunk_timeline": [
+  {"chunk": 1, "rows": "1-12", "executor_context": "prior turn; PRE-rotation gateway (log entries carry no key_id)", "outcome": "stalled at 12/30 on the free-user 429 @ 08:24:01.180Z"},
+  {"chunk": 2, "rows": "13-17", "note": "post-patch; row 17 carries the run's only FLAG"},
+  {"chunk": 3, "rows": "18-21", "note": "cut by the sandbox command timeout mid-row-22; rows are per-file durable so the cut lost nothing committed"},
+  {"chunk": 4, "rows": "22-25"},
+  {"chunk": 5, "rows": "26-28"},
+  {"chunk": 6, "rows": "29-30"}
+ ],
+ "final_critic_verdicts": {"CLEAN": 29, "FLAG": 1},
+ "gateway_slice_assembly": {
+  "method": "the driver writes a CHUNK-LOCAL slice (offset->EOF per invocation); per the disclosed completion path (715e887e3), the committed gateway_slice.txt is the FULL-WINDOW reassembly: a byte-identical suffix copy of the append-only ENGINE_RUNS/zai_gateway_calls.jsonl starting at the first entry at/after the true window start (log line 80; 66,654 bytes; 138 lines; window 08:15:44.872Z -> 09:15:33.249Z). Every byte genuine; assembly disclosed here; the attest command recomputed the attestation from these committed bytes (recompute, never re-run, Art. 29(c))",
+  "full_window_calls": {
+   "total_OK": 133,
+   "by_key_id": {"(pre-patch, first chunk)": 54, "d0c666a3842f": 78, "5c4dffd28fe4": 1},
+   "key_rotations": 1,
+   "rotation_event": "2026-11-18T08:51:00.942Z: key d0c666a3842f hit the free-user 429 mid-repair; the R67s2 gateway rotated to 5c4dffd28fe4 with no sleep and the call completed — the owner's second-key delivery doing exactly its measured job",
+   "served_equals_registered_violations": 0
+  }
+ },
+ "transport_change_context": "the R67s2 stage (f82dea546): owner second-key delivery -> probe-before-admit -> gateway per-key rotation (INFRA, not frozen; registered route and every engine gate unchanged) -> this completion. The frozen machine (r40_machine_v77.py V7.7 loop) was byte-untouched; V77_REQUEST_MODEL=agnes-3.0-flash throughout.",
+ "standing_gates_downstream": "auditor scoring (n=30, mean >= 3.0, 0/0/0, CI excludes 3.0) and the AM62-class ratification on the registration chain + the lost-run completion remain the auditor's calls; this record closes the generation side only.",
+ "zero_zai_probes": "the z-ai grant transport was never probed this stage (the registered route is the agnes upstream; quota conservation honored)"
+}

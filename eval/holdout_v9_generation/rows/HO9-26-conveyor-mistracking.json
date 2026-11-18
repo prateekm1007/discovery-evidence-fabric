@@ -1,0 +1,93 @@
+{
+ "problem_id": "HO9-26-conveyor-mistracking",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:2312e36bff14": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:0585155a89f5": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:efae92e1d2f4": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T09:10:06.551414Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice delivers a MONITORING/INDICATION scheme using edge-position sensors or laser tracking; my mechanism is a same-class inference that uses the **drive-motor current signature** to detect the non-linear rise in rolling friction caused by belt-to-trough friction, which precedes visible edge damage. The genuine departure is using the existing electrical telemetry (current) as a proxy for the mechanical friction state, rather than deploying physical edge sensors, by exploiting the distinct current spike associated with the friction transition.\n\nPHYSICS CHECK\nGoverning relation: $I_{motor} = I_{load} + I_{friction}$. The friction component $I_{friction}$ rises sharply when the belt edge contacts the trough cheek (misalignment).\nMagnitude verification: A 1200mm belt with a load scale signal exists. Typical belt drive motors operate at ~50-70% load factor. Mistracking friction adds approximately 5-10% to total rolling resistance. Therefore, a 5% increase in total current ($I_{total}$) is detectable against the 1-minute resolution baseline.\nDIRECTION-OF-EFFECT: driving variable = lateral displacement of belt centerline; the mechanism monitors the *consequence* (current rise) to infer the driving variable; it does not actively move the variable up, it infers the drift to trigger a correction alert. The predictor warns the operator to adjust the tracking system, thereby moving the lateral displacement DOWN (centered).\nSIGNED STATEMENT: The failure driver is lateral offset $x$. The friction force $F_f$ is proportional to $x$ once the edge contacts the cheek. The current $I$ is proportional to $F_f$. As $x$ increases (driving failure), $I$ increases. The mechanism detects the positive slope of $I$ to predict $x$ exceeding critical limit. This correctly identifies the direction of the failure trend.\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS:** Electrical-Telemetry Friction Inference\n\n1.  **Data Source (a):** Existing Drive Motor Current Signal.\n    *   *Tag:* ALREADY-RECORDED. The problem states \"use only the existing drive-motor current\". This is a standard 4-20mA or 0-10V signal from the VFD/motor controller, already logged at 1-minute resolution.\n    *   *Procurement:* None. Uses existing control system historian/SCADA tags.\n2.  **Data Source (b):** Existing Belt-Scale Load Signal.\n    *   *Tag:* ALREADY-RECORDED. The problem states \"use... belt-scale load\". This is required to normalize the current signal for load variations (i.e., a high-current spike on an empty belt is mistracking; on a full belt, it is load-dependent).\n    *   *Procurement:* None. Uses existing weighbridge/scale transmitter signals.\n3.  **Computation Unit (c):** Edge-Gate Logic Module.\n    *   *Tag:* NEW catalog part. A standard industrial programmable logic controller (PLC) logic routine or a dedicated edge-computing gateway (e.g., Siemens S7-1200, Allen-Bradley CompactLogix, or equivalent) capable of running at 1-minute scan intervals.\n    *   *Function:* Compares the *normalized* current ($I_{norm} = I_{motor} / Load$) against a derived threshold.\n    *   *Installation:* As-sold hardware added to the existing control cabinet. No modification to motor, belt, or trough.\n4.  **Alert Interface (d):** Operator HMI/DMS.\n    *   *Tag:* NEW catalog part. Configuration of the existing HMI to display a \"Mistracking Probability\" alarm 7 days before predicted edge damage.\n    *   *Procedure:* Sends hard alarm to maintenance system when the predicted time-to-failure < 7 days.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** SAME class. Requires no mechanical penetration of the belt or trough. Only electrical taps to existing VFD/scale signals (which are already accessible).\n*   **Operability:** SAME class. The operator receives a standard alarm. No new physical interaction with the belt.\n*   **Maintenance:** LOWER burden. No edge sensors to clean or replace. No calibration of laser/UV sensors.\n*   **Rough Cost Class:** LOWER. Utilizes existing hardware; adds only a low-cost edge gateway/PLC license and configuration time.\n*   **Operational Loss:** ZERO. No throughput reduction. The system is purely diagnostic.\n*   **False Alarm Constraint:** The problem requires <= 1 FA/year. The threshold must be tuned to minimize noise. Since we use 1-minute resolution and a 7-day lead time, we are looking for a *persistent* drift in the normalized current, not a transient spike. This statistical filtering (e.g., moving average over 24 hours) ensures that transient load variations do not trigger the alarm, satisfying the FA constraint.\n\nEXECUTABLE TEST\n*   **Protocol:**\n    1.  **Baseline Derivation:** Calculate the historical baseline of $I_{norm}$ (Current/Load) for a \"healthy\" period where tracking is known to be centered (derived from existing maintenance logs or periods with zero edge-damage reports). This defines $I_{healthy}$.\n    2.  **Threshold Calculation:** $I_{crit} = I_{healthy} \\times (1 + \\delta)$, where $\\delta$ is the friction coefficient increase associated with edge contact. Based on typical ST2500 belt friction physics, a 5% rise in rolling resistance occurs upon edge contact. Set threshold at 1.05x baseline.\n    3.  **Prediction Logic:** Implement a linear regression on the last 3 days of $I_{norm}$ data. Calculate the time to reach $I_{crit}$.\n    4.  **Pass/Fail:** If Time-to-Threshold < 7 days, trigger \"WARN\" state. If < 24 hours, trigger \"ALARM\" state (immediate tracking correction).\n    5.  **Falsification:** During a planned maintenance window, intentionally mistrack the belt (within safe limits) until edge contact occurs. Verify that the $I_{norm}$ signal rises >5% before visible edge wear is detected by standard visual inspection. The system must have issued the \"WARN\" 7 days prior if the drift rate was constant, or immediately upon contact if drift was sudden.\n\nCONSTRAINT BIND\n*   **Primary Indicator:** The problem states \"warn >=7 days before edge damage\". The primary indicator of impending edge damage is the **mechanical friction rise**.\n*   **Proxy Selection:** The problem prohibits \"new sensors\" and specifically \"NO belt-edge sensor\". It permits \"drive-motor current\". Therefore, **Drive-Motor Current** is the PRIMARY stated indicator available for use.\n*   **Secondary Indicator:** **Belt-Scale Load** is used ONLY to normalize the primary indicator (removing load-dependent torque variation). It does not replace the current signal; it conditions it.\n*   **Why This Works:** The current signal contains the friction signature. Without normalization, load fluctuations would mask the slow rise in friction caused by mistracking. The combination allows the prediction of the *state* (mistracking) that leads to the *failure* (edge damage).\n\nRESOLUTION OF TYPED FINDINGS\n*   **BILL_UNTAGGED:** All bill rows now carry procurement tags: (a) Existing Data, (b) Existing Data, (c) New Catalog PLC/Gateway, (d) New Catalog HMI Config.\n*   **DEPLOYED-PART CLAUSE:** The mechanism uses NO physical modification to the belt, trough, or idlers. It only adds an electronic computation layer on top of existing signals.\n*   **PERMITTED-SET CLAUSE:** The constraint permits \"drive-motor current\" and \"belt-scale load\". The bill uses ONLY these two data streams. No physical hardware (sensors) is added to the belt path.\n*   **DIRECTION-OF-EFFECT:** Driving variable is lateral offset. Mechanism monitors Current (friction). Friction rises as offset rises. Monitoring the rise predicts the offset exceeding critical limit. Direction is correct (predicting the upward trend of the failure driver).\n*   **EXEMPLAR-REALITY:** The \"Edge-Gate Logic Module\" is a standard industrial PLC/Edge Gateway (e.g., Siemens, Rockwell, Schneider classes). These are stocked SKUs. The claim is based on standard industrial control capabilities.\n*   **PREMISE-VALIDITY:** The problem states \"existing drive-motor current\" and \"belt-scale load\" exist. The topology is valid.\n*   **CERTIFIED-SYSTEM-AS-SOLD:** No new hardware in the belt path. Only control system additions.\n*   **DIRECTION-CORRECTNESS:** Signed statement included in Physics Check.\n*   **INPUT-AVAILABILITY:** Inputs are Current and Load, both explicitly permitted.\n*   **COST-PRICING:** No setpoint modulation of the drive speed is required; the system is diagnostic. Operational cost is zero throughput loss.\n*   **MECHANISM-DIVERSITY:** \"MECHANISM CLASS: Electrical-Telemetry Friction Inference\" stated at top of bill.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   *Tag:* ALREADY-RECORDED. The problem states \"use only the existing drive-motor current",
+    "*   *Procurement:* None. Uses existing control system historian/SCADA tags.",
+    "*   *Tag:* ALREADY-RECORDED. The problem states \"use... belt-scale load\". This is required",
+    "*   *Procurement:* None. Uses existing weighbridge/scale transmitter signals.",
+    "*   *Tag:* NEW catalog part. A standard industrial programmable logic controller (PLC) log",
+    "*   *Function:* Compares the *normalized* current ($I_{norm} = I_{motor} / Load$) against ",
+    "*   *Installation:* As-sold hardware added to the existing control cabinet. No modificatio",
+    "4.  **Alert Interface (d):** Operator HMI/DMS.",
+    "*   *Tag:* NEW catalog part. Configuration of the existing HMI to display a \"Mistracking P",
+    "*   *Procedure:* Sends hard alarm to maintenance system when the predicted time-to-failure",
+    "*   **Installability:** SAME class. Requires no mechanical penetration of the belt or trou",
+    "*   **Operability:** SAME class. The operator receives a standard alarm. No new physical i",
+    "*   **Maintenance:** LOWER burden. No edge sensors to clean or replace. No calibration of ",
+    "*   **Rough Cost Class:** LOWER. Utilizes existing hardware; adds only a low-cost edge gat",
+    "*   **Operational Loss:** ZERO. No throughput reduction. The system is purely diagnostic.",
+    "*   **False Alarm Constraint:** The problem requires <= 1 FA/year. The threshold must be t"
+   ]
+  }
+ },
+ "declared_template_prose": "** electrical-telemetry friction inference",
+ "allowed_row_outside": 0,
+ "sha256_16": "cdd8ae3623b9bb93",
+ "smoke": false
+}

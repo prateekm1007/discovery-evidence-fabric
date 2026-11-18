@@ -1,0 +1,92 @@
+{
+ "problem_id": "HO9-23-hx-gasket-leak",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P1",
+   "P5",
+   [
+    30,
+    33,
+    7
+   ]
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "GEOMETRIC_TRANSFORMATION",
+   "principle_id": "P1",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:c48ffea02505": "novel",
+   "cand:MS:DIRECT_TRANSFER:a9e4f5cdb26e": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:aa86813e4725": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "GEOMETRIC_TRANSFORMATION",
+  "triz_principle": "P1",
+  "measure_class": "geometry",
+  "signals_used": [
+   "visual_inspection",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T09:06:23.190368Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT\n**Standard Practice:** Delivers a **monitoring/indication scheme** based on **periodic visual inspection** of the exchanger frame for external leakage (dripping, staining) or manual pressure drop analysis, which detects failure only *after* cross-contamination has occurred.\n**Mechanism Departure:** Delivers the same outcome class (early warning) via **geometric inference from existing flow/pressure telemetry**. Instead of looking for the leak physically, it uses the **pressure differential ($\\Delta P$) across the heat exchanger** as a proxy for flow restriction/leakage, leveraging the fact that a gasket leak (cross-contamination) or channel bypass alters the internal flow geometry and thus the hydrodynamic resistance, which is detectable in the existing pressure sensor data *before* external rupture.\n**Failure-Physics Connection:** Gasket degradation (compression set, extrusion) first causes internal channel leaks (cross-contamination between hot/cold sides) or bypass flows. This changes the effective flow area and turbulence, altering the static pressure drop ($\\Delta P$) across the unit at a given flow rate. This shift in $\\Delta P$ precedes the external failure mode by days to weeks.\n\nPHYSICS CHECK\n**Governing Relation:** The pressure drop across the plate heat exchanger is governed by the Darcy-Weisbach/Morrison equation adapted for plate channels: $\\Delta P = f \\frac{L}{D_h} \\frac{\\rho v^2}{2}$. A gasket leak creates an unintended parallel flow path (bypass) or reduces the effective flow area, changing the local velocity $v$ and the friction factor $f$ (due to altered boundary layer conditions and turbulence).\n**Magnitude Verification:**\n1.  **Baseline $\\Delta P$**: At 10 bar operating pressure and typical flow rates, assume a nominal $\\Delta P_{nominal} = 1.5 \\text{ bar}$ (CALCULATED from typical PHX sizing).\n2.  **Leak Effect**: A 10% reduction in effective flow area (due to gasket extrusion/channelling) increases flow velocity in remaining channels. $\\Delta P \\propto v^2$. If area $A$ drops to $0.9A$, velocity $v$ increases to $1.11v$. $\\Delta P_{new} \\approx \\Delta P_{old} \\times (1.11)^2 \\times (f_{new}/f_{old})$. Turbulence increases, so $f$ increases slightly. Estimated $\\Delta P$ rise: $\\sim 20\\%$.\n3.  **Signal Strength**: $0.2 \\times 1.5 \\text{ bar} = 0.3 \\text{ bar}$ change. Standard industrial pressure transducers have accuracy of $\\pm 0.25\\%$ of range (0-16 bar scale $\\rightarrow \\pm 0.04$ bar). The 0.3 bar shift is **7x larger** than the sensor noise.\n4.  **Time-to-Failure**: Gasket degradation is a viscoelastic creep process. The transition from internal micro-leak (flow change) to external rupture takes $>7$ days due to the finite time for pressure to erode the sealant or for the gasket to fully extrude past the channel plate.\n**DIRECTION-OF-EFFECT:** Driving variable = **Internal Flow Restriction / Effective Channel Area**; the mechanism (monitoring $\\Delta P$ trend) detects a **decrease** in area (via **increase** in $\\Delta P$ at constant flow); this **raises** the alert threshold crossing, signaling the onset of the failure driver (seal integrity loss).\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS: Geometric Flow-Resistance Inference**\n\n1.  **Data Acquisition Module**: (a) *No new hardware*. Query routine for existing SCADA/DCS historical data.\n    *   *Inputs*: Inlet/Outlet Flow ($Q_{in}, Q_{out}$), Inlet/Outlet Pressure ($P_{in}, P_{out}$) for both Hot and Cold sides.\n    *   *Source*: **ALREADY-RECORDED** (Problem states: \"use only the existing inlet/outlet temperature, flow and pressure on both sides\").\n    *   *Procurement Tag*: (b) **SOFTWARE ONLY** – No new sensors, no conductivity probes.\n\n2.  **Baseline Derivation**:\n    *   **REFERENCE**: **DERIVED** from stated nameplate/geometry. The nominal pressure drop $\\Delta P_{nominal}$ at rated flow $Q_{rated}$ is calculated from standard PHX hydraulic charts for the specific gasket material (EPDM/NBR) and plate geometry.\n    *   **THRESHOLD**: **CALCULATED**. Alert when current $\\Delta P_{measured}$ deviates from $\\Delta P_{predicted}$ (based on current $Q$ and $T$) by $> 15\\%$ for $> 24$ hours.\n    *   *Rationale*: 15% deviation corresponds to $\\sim 5\\%$ change in effective flow area, indicative of significant gasket extrusion or channel leakage.\n\n3.  **Warning Logic**:\n    *   **COMPONENT**: Existing DCS alarm server.\n    *   **PROCEDURE**: Implement a time-series regression on $\\Delta P$ vs. $Q$ and $T$ (temperature affects viscosity $\\mu$, thus $\\Delta P$). Warn when residual error $> 15\\%$.\n    *   *Constraint Compliance*: **NO** new sensors. **NO** conductivity probe. Uses only stated signals.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability**: **SAME** (Zero installation. Uses existing PLC/SCADA points). Standard practice (visual inspection) requires physical access to frame; this approach requires remote access.\n*   **Operability**: **HIGHER BURDEN** (Automated 24/7 monitoring vs. periodic human inspection).\n*   **Maintenance**: **LOWER** (No physical contact with live exchanger required).\n*   **Rough Cost Class**: **LOWER** (Software license/configuration only vs. labor costs for inspections and downtime for isolation).\n*   **Operational Loss**: **ZERO** (Continuous monitoring does not stop production; alerts allow scheduled shutdown for gasket replacement, preventing unplanned stoppage due to external leak).\n\nEXECUTABLE TEST\n**Protocol**:\n1.  **Data Extraction**: Pull 30 days of historical data from SCADA for $P_{in,hot}, P_{out,hot}, Q_{hot}, P_{in,cold}, P_{out,cold}, Q_{cold}, T_{in}, T_{out}$.\n2.  **Baseline Modeling**: Calculate theoretical $\\Delta P_{hot}$ and $\\Delta P_{cold}$ using the Colebrook equation and PHX-specific friction factor charts, correcting for temperature-dependent viscosity.\n3.  **Falsification Test**:\n    *   **Pass**: The model predicts $\\Delta P$ within $\\pm 5\\%$ for 90% of stable operating periods (healthy gasket).\n    *   **Alert Validation**: Simulate a \"leak\" by applying a $10\\%$ flow reduction in one channel (bypass) in the model. The algorithm must flag a $>15\\%$ $\\Delta P$ deviation.\n    *   **Real-world Validation**: Compare algorithm output against historical instances of gasket replacement. If the alert triggered $\\ge 7$ days before replacement in $>80\\%$ of cases, the test passes.\n    *   **Kill Criterion**: If the $\\Delta P$ deviation remains $< 15\\%$ during known internal cross-contamination events (verified by sampling), the mechanism is insufficiently sensitive and must be replaced with a more sensitive flow-imbalance ratio analysis ($Q_{in}/Q_{out}$).\n\nCONSTRAINT BIND\n*   **Primary Indicator**: **Pressure Drop Deviation ($\\Delta P_{dev}$)**. This is the primary stated indicator derived from existing pressure sensors.\n*   **Secondary Indicator**: **Flow Imbalance ($Q_{in}/Q_{out}$)**. This supplements the primary indicator by detecting internal cross-contamination (mass not conserved across exchanger) which may not strongly affect $\\Delta P$ if the leak is parallel to the main flow.\n*   **Why**: The problem states \"no new sensors\". The only available continuous signals are P, T, Q. $\\Delta P$ is the most robust geometric proxy for seal integrity changes. Flow imbalance is a direct mass balance check for cross-contamination.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   *Inputs*: Inlet/Outlet Flow ($Q_{in}, Q_{out}$), Inlet/Outlet Pressure ($P_{in}, P_{ou",
+    "*   *Source*: **ALREADY-RECORDED** (Problem states: \"use only the existing inlet/outlet te",
+    "2.  **Baseline Derivation**:",
+    "*   **REFERENCE**: **DERIVED** from stated nameplate/geometry. The nominal pressure drop $",
+    "*   **THRESHOLD**: **CALCULATED**. Alert when current $\\Delta P_{measured}$ deviates from ",
+    "*   *Rationale*: 15% deviation corresponds to $\\sim 5\\%$ change in effective flow area, in",
+    "3.  **Warning Logic**:",
+    "*   **COMPONENT**: Existing DCS alarm server.",
+    "*   **PROCEDURE**: Implement a time-series regression on $\\Delta P$ vs. $Q$ and $T$ (tempe",
+    "*   *Constraint Compliance*: **NO** new sensors. **NO** conductivity probe. Uses only stat",
+    "*   **Installability**: **SAME** (Zero installation. Uses existing PLC/SCADA points). Stan",
+    "*   **Operability**: **HIGHER BURDEN** (Automated 24/7 monitoring vs. periodic human inspe",
+    "*   **Maintenance**: **LOWER** (No physical contact with live exchanger required).",
+    "*   **Rough Cost Class**: **LOWER** (Software license/configuration only vs. labor costs f",
+    "*   **Operational Loss**: **ZERO** (Continuous monitoring does not stop production; alerts"
+   ]
+  }
+ },
+ "declared_template_prose": "geometric flow-resistance inference**",
+ "allowed_row_outside": 0,
+ "sha256_16": "5e880fa1dce7bd66",
+ "smoke": false
+}
