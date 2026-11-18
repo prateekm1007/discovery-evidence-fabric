@@ -1863,13 +1863,14 @@
    ],
    "secrets_note": "no credential work in this lane; vault untouched",
    "collision_note": "the touched record/tests are the c-0079 lane's artifacts but the fixes are AUDITOR-DIRECTED (R61 verdict direction 1: turn the queue green first; direction 2's test: 'If the freeze must change, re-freeze before claiming'); the c-0079 lane is quota-gated (z-ai 429) and its lease-holder typed no competing CI-restore item; fix-forward, no history rewrite",
-   "done_note": "queue restored green: F68 (both gate contracts verified locally then remotely SUCCESS @b40bfd6cd) + F69 (pin shape-agnostic + workflow coverage) + direction 5 (conditional reads live) + direction 4 (P1 baseline 108/45/0.4167 BELOW BAR typed honestly, definition verbatim r54)"
+   "done_note": "queue restored green: F68 (both gate contracts verified locally then remotely SUCCESS @b40bfd6cd) + F69 (pin shape-agnostic + workflow coverage) + direction 5 (conditional reads live) + direction 4 (P1 baseline 108/45/0.4167 BELOW BAR typed honestly, definition verbatim r54)",
+   "verifier_record": "eval/r61_verifier_c0083.json (builder-r60s1, 2026-11-18): C0083_VERIFIED — F68 gate fields + both gate tests green, F69 pin+wiring verified, P1 recompute byte-identical, r41 conditional reader verified from code, tip CI green through the verifier claim commit; the verifier never re-ran quota work"
   },
   {
    "claim_id": "c-0084",
    "work_id": "r61-ci-restore-verifier-infra",
    "title": "VERIFIER record for c-0083 (executor builder-r61s1): recompute from committed bytes at e9022acd7 — F68 (r60_status.json gate-read fields: the Art. 27 typed share_exception_reason words + the remote_ci D2 schema {pushed_sha, conclusion, check_runs}), F69 (test_r58_route_adapter.py shape-agnostic pin + the workflow-surface wiring), direction 5 (r41 If-None-Match conditional reader; ETag cache sandbox-local OUTSIDE the repo), direction 4 (P1 zero-LLM recompute: 108 numeric claims / 45 carrying / fraction 0.4167), the queue-surface battery reproduction at the tip, and the tip remote-CI green read (check-run API)",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-18T02:16:00Z (sandbox clock)",
    "session_id": "builder-r60s1",
    "role": "VERIFIER",
@@ -1882,7 +1883,9 @@
     "eval/r61_verifier_c0083.json",
     "eval/work_claims.json"
    ],
-   "notes": "Art. 29(c): the VERIFIER never re-runs quota work; it recomputes from committed bytes. Zero LLM calls; the only network is the GitHub check-run API read of the tip (conditional where cached, direction 5). This session is the c-0079 lease-holder (EXECUTOR of the ablation machine leg); the VERIFIER role on this DIFFERENT work item is the Art. 29(b) design. The challenger-arm resume continues in parallel under the paced recovery monitor (2-consecutive-probe guard, grant-safe per direction 6) — separate lane, zero overlap with this verification."
+   "notes": "Art. 29(c): the VERIFIER never re-runs quota work; it recomputes from committed bytes. Zero LLM calls; the only network is the GitHub check-run API read of the tip (conditional where cached, direction 5). This session is the c-0079 lease-holder (EXECUTOR of the ablation machine leg); the VERIFIER role on this DIFFERENT work item is the Art. 29(b) design. The challenger-arm resume continues in parallel under the paced recovery monitor (2-consecutive-probe guard, grant-safe per direction 6) — separate lane, zero overlap with this verification.",
+   "done_at": "2026-11-18T02:19:00Z (sandbox clock)",
+   "done_note": "verifier record eval/r61_verifier_c0083.json: C0083_VERIFIED — all recomputations green (both F68 gates, the full surface battery, the P1 recompute 108/45/0.4167 byte-identical, the conditional-reader code, the tip CI reads at e9022acd7 AND 392d29d0d both success)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
