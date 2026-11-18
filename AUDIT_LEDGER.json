@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "61d94b2a9",
+  "queue/dev12_r7": "9b0c9820a",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1517,6 +1517,19 @@
    "articles": [
     17
    ]
+  },
+  {
+   "id": "F75",
+   "severity": "MEDIUM",
+   "title": "agnes-3.0-flash deliverable-quality class: (a) HO9-14 refusal-shaped non-answer ('I cannot fulfill this request... I am Agnes-3.0-flash') scored critic=CLEAN — the deterministic critic type-gate false-passes refusals that contain mitigation verbs; (b) identity-leak preamble ('I am Agnes-3.0-flash, developed by Sapiens AI') in HO9-13/14; (c) reasoning thrash ('No—Correction... Wait') leaking into physics checks (HO9-01/02/25). BIND: critic must refuse refusal-shaped answers + identity preambles; generation directive must forbid identity disclosure and internal-deliberation leakage.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "9b0c9820a",
+   "rounds_open": 1,
+   "articles": [
+    3,
+    19
+   ]
   }
  ],
  "amendments": [
@@ -2565,6 +2578,19 @@
     "SCORING AUTHORIZED: the auditor scores the 30/30 rows against the private-repo rubric (prateekm1007/def-rubric-custody). Bar: mean>=3.0, 0 allowed-measures violations, 0 inverted-direction, 0 unavailable-input rows, run_verdict=VALID, CI excludes 3.0 (n=30, SD~0.7 -> mean >=3.25 for RESOLVED).",
     "SCORE: 6 -> 7 on acceptance if the bar is met."
    ]
+  },
+  {
+   "id": "AM63",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R69 — FIRST v9 ACCEPTANCE SCORE on the engine route (agnes-3.0-flash), full 30-row read vs PRIVATE rubric",
+   "changes": [
+    "v9 run VALID (attestation 30/30 served==registered agnes-3.0-flash; auditor slice recompute 0 mismatches; prereg amended AM62; claim-before-read; CI green). SCORED: mean 3.0000/4 (intervention 2.8, predictor 3.2), SD 0.695, CI95 [2.751,3.249]. Hard clauses: 0 allowed-measures violations, 0 inverted-direction mechanisms, 0 unavailable-input rows. ACCEPTANCE NOT GRANTED — UNRESOLVED per Art.14 (CI includes 3.0; point estimate exactly at bar).",
+    "CORR-5: score mapping corrected — P1 gate pass = score 5 (not 6); 6 requires sealed acceptance with CI excluding 3.0. SCORE = 5.",
+    "v9 BURNED after scoring (one-shot consumed; rows preserved read-only at 9b0c9820a). v10 must be fresh, domain-disjoint, confidential custody.",
+    "F75 opened: refusal/identity-leak/reasoning-thrash class on agnes-3.0-flash; critic type-gate false-pass on HO9-14.",
+    "Capability trajectory: v6 2.583 (wrapper) -> v7 2.917 (wrapper) -> v9 3.000 (engine route, agnes-3.0-flash). +0.417 over v6; the engine route + physics layer lifted the mean to the bar but not beyond it. Frontier-tier model (xkiro maintenance exits 2026-11-19T16:25Z) + F75 binds + monoculture-break chemistry elicitation are the levers to push mean >=3.25 for RESOLVED."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3557,6 +3583,27 @@
    "gate": "P1 PASSED (score 6); acceptance PENDING (scoring in progress)",
    "capability_change": "v9 one-shot COMPLETE 30/30 on agnes-3.0-flash; prereg amended (AM62); run VALID",
    "evidence_sha": "eval/r68_auditor_verification.json"
+  },
+  {
+   "id": "V62",
+   "round": "R69 first v9 acceptance score",
+   "commit": "9b0c9820a",
+   "gate": "NOT_MET (acceptance UNRESOLVED)",
+   "run_verdict": "VALID",
+   "v9_mean": 3.0,
+   "v9_ci": [
+    2.751,
+    3.249
+   ],
+   "acceptance": "NOT_GRANTED",
+   "score": 5,
+   "new_findings": [
+    "F75"
+   ],
+   "corrections": [
+    "CORR-5"
+   ],
+   "evidence_sha": "eval/holdout_v9_auditor_score.json"
   }
  ],
  "gold_set": {
@@ -3760,7 +3807,7 @@
    ]
   },
   "holdout_v9": {
-   "status": "SEALED_REGISTERED",
+   "status": "BURNED",
    "selection_sha256": "502e93d84b19dcda5b0a7d656a3195e509ddec8247aad2e6bddec082e10f34ce",
    "n": 30,
    "intervention": 15,
@@ -3769,10 +3816,13 @@
    "custody": "rubric ACCESS-CONTROLLED private repo prateekm1007/def-rubric-custody (unauth 404, F60 solved; secret gist deleted CORR-3); problems audit/holdout_v9/",
    "power_basis": "n=30, SD 0.7, power ~0.85, Art.14 CI lower bound > 3.0",
    "bar": "mean>=3.0 AND 0 allowed-measures AND 0 inverted AND 0 unavailable-input AND VALID; Art.14 CI>3.0",
-   "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
+   "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps",
+   "burned_at": "2026-11-18",
+   "score_mean": 3.0,
+   "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 6/10 pending acceptance. R68: v9 one-shot COMPLETE 30/30 on agnes-3.0-flash (contract-fit winner). Prereg amended (AM62) to pin agnes-3.0-flash. Run VERIFIED VALID (attestation: 30/30 rows, all_calls_served_registered=true). Scoring in progress against private-repo rubric. Next: acceptance decision (mean>=3.0, 0/0/0, CI>3.0) -> score 6->7. Goal 9/10.",
+ "progress_note": "SCORE 5/10 (CORR-5: P1 gate=5, acceptance=6). v9 scored on engine route (agnes-3.0-flash): mean 3.000, CI [2.751,3.249], 0/0/0 hard clauses, VALID — acceptance UNRESOLVED (Art.14). v9 BURNED. Trajectory v6 2.583 -> v7 2.917 -> v9 3.000. Levers to 6: frontier model post-maintenance (2026-11-19T16:25Z), F75 refusal/identity/thrash binds, monoculture-break chemistry elicitation; need mean >=3.25 at n=30/SD0.7. F74 HF token repo.write owner-side. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -3869,6 +3919,13 @@
    "withdrawn": "AM54 claim that the v9 secret gist was confidential (unauth 404)",
    "corrected": "GitHub SECRET gists are UNLISTED, not access-controlled — unauth read returned 200. The v9 rubric is moved to an ACCESS-CONTROLLED PRIVATE REPO prateekm1007/def-rubric-custody (unauth read 404 verified) and the secret gist bd537259 DELETED (204). F60 genuinely solved for v9 via private-repo custody.",
    "reason": "auditor self-check (Art.1 bytes-over-claims + Art.9 duty-to-correct): the gist public=False flag did NOT prevent unauth reads; the private repo does."
+  },
+  {
+   "id": "CORR-5",
+   "date": "2026-11-18",
+   "withdrawn": "R63 (AM57) score mapping 5->6 on P1 gate pass",
+   "corrected": "Owner roadmap defines 6 = a sealed set ACCEPTED (mean>=3.0, 0 violations, CI excludes 3.0). P1 (physics claims computed) is score 5. v9 scored mean 3.000 but CI [2.751,3.249] includes 3.0 -> UNRESOLVED, acceptance NOT GRANTED. SCORE = 5, not 6.",
+   "reason": "Art.9 duty-to-correct: the R63 mapping conflated the P1 gate with the acceptance gate."
   }
  ],
  "rulings": [
