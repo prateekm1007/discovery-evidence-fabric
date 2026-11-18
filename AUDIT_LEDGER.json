@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "f587246f6",
+  "queue/dev12_r7": "e0341e5b5",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1575,6 +1575,21 @@
     27,
     29
    ]
+  },
+  {
+   "id": "F79",
+   "severity": "HIGH",
+   "title": "P1.4 evidence staleness + CI byte-identity leg lost (builder-r72s1 artifact mislabeled F77 — ID collision with the ledger's F77 re-freeze finding; adjudicated to F79): eval/r52_labelled_regression.json last regenerated R53 (597cbf30e) but population_search changed R70 (80629f9f7); chemistry elicitation moves plan order on 8/12 HO7 null-domain labelled-negative rows (gearbox-oil-varnish via lubric/oxid, lead-acid pitch via acids, digester-foaming via ph). Gate verdict PASS 0/0/0 on BOTH byte sets; candidate IDs content-stable; pre-chemistry head 9b0c9820a reproduces committed bytes EXACTLY (isolation). The R60 workflow restructure silently dropped the git diff --exit-code byte-identity leg. FIXED (063125ab9): both legs restored — verdict grep AND git diff --exit-code gate every push; evidence regenerated.",
+   "status": "CLOSED",
+   "opened": "2026-11-18",
+   "closed_at": "2026-11-18",
+   "last_checked": "e0341e5b5",
+   "resolution": "063125ab9 restored both CI legs (verdict + byte-identity); eval/r52_labelled_regression.json regenerated; CI green e0341e5b5. ID collision noted: builder artifact F77 != ledger F77 (re-freeze); this finding adjudicated F79.",
+   "articles": [
+    1,
+    2,
+    27
+   ]
   }
  ],
  "amendments": [
@@ -2661,6 +2676,19 @@
     "builder-r70s1 lane absent/superseded (pusher-wins, no disjoint work); lane-A v9 scratch quarantined byte-preserving outside repo. Infra: pytest tmp factory ~7GB aggregate ENOSPC contamination typed; detect-secrets+pint reinstalled.",
     "Score stays 5. Frontier unchanged: v10 fresh sealed one-shot after xkiro maintenance exits 2026-11-19T16:25Z with binds active + frontier model; target mean>=3.25 (CI>3.0) for score 6."
    ]
+  },
+  {
+   "id": "AM66",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R74 auditor audit of R72 c-0092 lane (builder-r72s1): F77/F79 evidence-chain fix + workflow byte-identity leg restored",
+   "changes": [
+    "Current tip e0341e5b5 CI SUCCESS. c-0091 (builder-r64s4) + c-0092 (builder-r72s1) both DONE. Parallel auditor R73 (AM65/V66) verified the c-0091 re-freeze (baselines 15/15, F77 closed) and opened F78 (preflight guard local-only).",
+    "F79 CLOSED (builder artifact mislabeled F77; ID collision adjudicated): P1.4 evidence staleness + lost CI byte-identity leg. 063125ab9 restored BOTH legs (verdict grep + git diff --exit-code) so evidence freshness gates every push; regression record regenerated; gate PASS 0/0/0 on current bytes; isolation proves R70 chemistry elicitation caused the plan-order divergence on 8/12 null-domain HO7 rows (gate holds, candidate IDs stable).",
+    "F78 STILL OPEN: test_r64_v9_preflight (freeze-baseline guard) is NOT in the CI workflow — frozen-file drift still pushes green (F32 class recurring). The c-0092 workflow edit added the labelled-regression byte-identity leg but NOT the preflight guard. Direct: wire the freeze guard into CI.",
+    "Chemistry-elicitation null-domain side-effect typed (8/12 HO7 predictor rows change plan order; gate PASS 0/0/0; benign for the gate but watch on v10; consider tightening CHEMISTRY_ADMITS_RX/domain clamp for predictor rows).",
+    "Score stays 5. Frontier unchanged: v10 after 2026-11-19T16:25Z window with binds + frontier model; mean>=3.25 CI>3.0 for score 6."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3701,6 +3729,20 @@
     "F78"
    ],
    "evidence_sha": "eval/r73_auditor_verification.json"
+  },
+  {
+   "id": "V67",
+   "round": "R74 audit of R72 c-0092 evidence-chain fix",
+   "commit": "e0341e5b5",
+   "gate": "NOT_MET (acceptance UNRESOLVED; score 5)",
+   "capability_change": "P1.4 evidence byte-identity CI leg restored (F79 closed); freeze guard still local-only (F78 open)",
+   "closed_findings": [
+    "F79"
+   ],
+   "open_findings": [
+    "F78"
+   ],
+   "evidence_sha": "eval/r74_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3919,7 +3961,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10. R72 verified: re-freeze baselines 15/15 match current bytes (F77 closed), D2 self-catch fixed, F75 recompute committed, score bytes exact, runbook gated, vault digests match. F78 opened: freeze-baseline guard local-only (wire into CI). v9 mean 3.000 UNRESOLVED. Frontier: v10 after 2026-11-19T16:25Z with binds + frontier model; mean>=3.25 (CI>3.0) -> score 6. Goal 9/10.",
+ "progress_note": "SCORE 5/10. R72 both lanes verified (c-0091 re-freeze baselines 15/15; c-0092 P1.4 evidence byte-identity CI leg restored, F79 closed). F78 OPEN: freeze-baseline guard still local-only (F32 class) — wire into CI. Chemistry elicitation null-domain side-effect typed (8/12 HO7 rows, gate holds). v9 mean 3.000 UNRESOLVED. Frontier: v10 after 2026-11-19T16:25Z with binds + frontier model; mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
