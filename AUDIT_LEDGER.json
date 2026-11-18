@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "03d8e66c7",
+  "queue/dev12_r7": "48bf88362",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2726,6 +2726,19 @@
     "Race handled by precedent: parallel instance staked same c-0095 for disjoint vault-restore work; re-keyed c-0096, rebased, first-lander bytes untouched. c-0054 JSON guard refused a malformed record (repaired, never reached git). c-0095+c-0096 DONE.",
     "ALL FOUR auditor-cited v9 key-defect classes now bound: refusal/identity/thrash (F75), formula-direction (HO9-30), chemistry-conservation (HO9-05), monoculture-break (chemistry elicitation). The v10 one-shot measures the combined lift. Score stays 5; frontier window 2026-11-19T16:25Z, cron 537019 fires 16:40Z."
    ]
+  },
+  {
+   "id": "AM70",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "OWNER DIRECTIVE: fire the frontier re-probe NOW, do not wait for 2026-11-19T16:25Z",
+   "changes": [
+    "OWNER OVERRIDE of the maintenance-window wait: the runbook's WINDOW_OPENS=2026-11-19T16:25Z timestamp pre-gate is WAIVED by owner authority. The builder fires the frontier re-probe IMMEDIATELY against whatever is serving now.",
+    "Implementation: add a typed owner-override to scripts/r70_frontier_reprobe_runbook.py (e.g. env OWNER_FIRE_NOW=1 or an explicit --owner-override flag) that bypasses ONLY the timestamp check, disclosed in the round record. The servability gates REMAIN MANDATORY: full 19K-char contract-fit probe + max_tokens 8192 + the deliverable-class admission scan (refusal/identity/thrash/formula/conservation). Register the strongest id that actually SERVES and completes under the contract (R36 lesson: never register an unservable id). command-a-plus stays excluded (contract-fit falsified).",
+    "If the frontier flagships are still 503/403, register the strongest serving id (agnes-3.0-flash or better if anything stronger serves) and proceed — the four binds (F75/chemistry/formula/conservation) are the mean-lift lever, not the model alone. The owner's principle stands: the provider must not block us.",
+    "Sequence: override gate -> fire probe -> register strongest serving id -> push+CI -> typed handoff. Auditor amends the prereg model pin + authors v10 (fresh, domain-disjoint, n>=30, confidential custody) -> re-freeze (CI-gated) -> sealed v10 one-shot with all four binds -> mean>=3.25 CI>3.0 -> score 6.",
+    "c-0097 (reprovision4 custody-precheck) is a pre-window round; the fire-now directive supersedes the wait. The cron 537019 (16:40Z) becomes a backstop, not the primary trigger."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3807,6 +3820,14 @@
    "gate": "NOT_MET (acceptance UNRESOLVED; score 5)",
    "capability_change": "element-conservation bind landed (last un-bound v9 defect class); 73% engine lines; frozen-safe; ablation-verified",
    "evidence_sha": "eval/r79_auditor_verification.json"
+  },
+  {
+   "id": "V71",
+   "round": "R80 owner fire-now directive",
+   "commit": "48bf88362",
+   "gate": "NOT_MET (score 5); fire-now authorized",
+   "capability_change": "owner override of window wait; probe fires now; v10 next",
+   "evidence_sha": "eval/r80_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4025,7 +4046,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10. R77 conservation bind VERIFIED (HO9-05 carbon-phantom fires, controls silent, regression byte-identical, 15/15 frozen baselines, 73% engine, CI-gated). ALL FOUR v9 key-defect classes now bound (refusal/identity/thrash, formula-direction, chemistry-conservation, monoculture-break). v9 mean 3.000 UNRESOLVED. Frontier: window 2026-11-19T16:25Z -> cron 537019 16:40Z -> probe -> register -> auditor prereg amend + v10 -> re-freeze -> sealed v10 (all binds) -> mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
+ "progress_note": "SCORE 5/10. OWNER DIRECTIVE (AM70/R-FIRE-NOW): fire the frontier re-probe NOW, waive the 2026-11-19T16:25Z wait. Builder adds typed owner-override to the runbook timestamp gate (servability gates remain), fires probe, registers strongest SERVING id, hands off. Auditor amends prereg + authors v10; re-freeze; sealed v10 one-shot with all four binds -> mean>=3.25 CI>3.0 -> score 6. All four v9 defect classes bound. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -4136,6 +4157,12 @@
    "id": "R-REQID-v2",
    "date": "2026-11-18",
    "ruling": "SERVED-MODEL IDENTITY GOVERNS (v2, supersedes R36). The frozen contract's glm-4-plus is RETIRED. The new registered id is cohere/command-a-plus on xkiro (probed, reachable, 0.7s latency). The v9 one-shot MUST serve cohere/command-a-plus on every call (30/30 attestation). Any deviation = run_verdict INVALID. The prereg is amended to pin this id.",
+   "status": "ACTIVE"
+  },
+  {
+   "id": "R-FIRE-NOW",
+   "date": "2026-11-18",
+   "ruling": "Owner authority waives the frontier maintenance-window wait (2026-11-19T16:25Z). The re-probe fires immediately; the runbook timestamp pre-gate is overridden by a typed owner-override flag. Servability gates (contract-fit + admission scan) remain mandatory. Register the strongest SERVING id; proceed to v10 with all four binds. The provider must not block progress.",
    "status": "ACTIVE"
   }
  ]
