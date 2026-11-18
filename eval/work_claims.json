@@ -195,6 +195,11 @@
    "registered_at": "2026-11-18 (sandbox clock)",
    "role": "builder",
    "note": "R64 session 2 (OWNER-DIRECTIVE lane): claim c-0088 r64-provider-failover-census \u2014 the alternate-provider roster census (xkiro/agnes, GET /models, vaulted keys, zero z-ai probes) as the evidence base for the re-registration proposal that answers the owner's directive (failover on z-ai failure; retire glm-4-plus as too low level). REGISTRATION FIX: the claim commit 80b7f0faf referenced this session without registering it (the c-0087 script's session block was dropped when the c-0088 script was written) \u2014 this block completes the Art. 29(a) identity-on-first-push requirement; the omission was caught by test_article29 (the guard did its job) after the claim commit had been pushed; disclosed in the round report."
+  },
+  "builder-r64s3": {
+   "registered_at": "2026-11-18 (sandbox clock)",
+   "role": "builder",
+   "note": "R64 session 3 (round message directive-intake lane): the round message ordered an immediate route switch (retire glm-4-plus, elevate agnes/xkiro to registered on 'qwen 3.8'), claim c-0082, and the v9 one-shot run \u2014 citing dade20f9c as its audit basis. This session VERIFIED the directive against the loop's own records and live reachability before any action: (1) the audit branch has ZERO commits beyond a293b63e3 \u2014 no AM superseding R36, no prereg amendment, no Finding-2 re-ordering; (2) the constitutions are byte-identical to the standing FULL reads; (3) 'qwen 3.8' exists on ZERO reachable paths (0/79 live roster ids carry any qwen family \u2014 verified live, R36 lesson); (4) the packet is burn_after_use and the prereg pins '30/30 served_model==registered glm-4-plus' as MANDATORY_RUN_ARTIFACTS[1] \u2014 running before the prereg amendment burns the one-shot on an unscoreable run. Claim c-0089 records the intake verdict: the lawful subset executed, the irreversible step gated, the exact unblock path written. Session identity registered with the claim in ONE commit."
   }
  },
  "claims": [
@@ -2003,6 +2008,26 @@
    "no_probes_note": "zero Z-AI probes; the census makes GET /models calls to the two vaulted alternate providers (R58 custody-probe precedent) and nothing else",
    "done_at": "2026-11-18 (sandbox clock)",
    "done_note": "landed @ f8d5321bb (+ session fix 9cf18731f): census record (BOTH alternates live: xkiro 69 models/18 flagship hints, agnes 10; no glm family anywhere) + re-registration proposal (5-step gated chain, freeze manifest, prereg-amendment requirement); CI surface SUCCESS; zero z-ai probes; no constant flipped, no freeze touched"
+  },
+  {
+   "claim_id": "c-0089",
+   "work_id": "r64s3-directive-intake",
+   "title": "R64s3: round-message directive intake \u2014 verification-first execution of the route-switch/run directive. Verified: audit branch static (no AM superseding R36, no prereg amendment), constitutions byte-identical (9a5ae1cd/d40a92a1), the named candidate 'qwen 3.8' unservable on zero reachable paths (live roster probe, both alternates LIVE: xkiro 69 ids, agnes 10), prereg pins the glm-4-plus attestation (MANDATORY_RUN_ARTIFACTS[1]), burn_after_use. Executed the lawful subset: the intake record with the verification table, the capability-based route evidence, and the exact gated chain. NOT executed: no registry flip, no constant flip, no freeze touch, NO c-0082 claim (Finding 2: adoption verdict first; the c-0079 lease is still live ~18h), NO one-shot run (burn_after_use + prereg-as-written = unscoreable)",
+   "status": "OPEN",
+   "registered_at": "2026-11-18 (sandbox clock)",
+   "session_id": "builder-r64s3",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "a968c445d",
+   "claimed_at": "2026-11-18 (sandbox clock)",
+   "lease_expiry": "2026-11-19T12:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r64s3_directive_intake.json"
+   ],
+   "secrets_note": "no credential work; the live roster probes used vault keys resolved by name, values never printed or persisted",
+   "collision_note": "read-only verification + one record file; zero engine lines; the c-0079 lease stays with the lease-holder (live to 2026-11-19T00:00:00Z); no competing intake claim exists (checked at a968c445d)",
+   "no_probes_note": "zero Z-AI probes; two GET /models custody probes on the vaulted alternates (R58 precedent)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
