@@ -1,0 +1,2725 @@
+{
+ "record": "HOLDOUT_V9_GENERATION_EVENTS/1.0.0",
+ "run": "holdout-v9-generation",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "registered_model": "agnes-3.0-flash",
+ "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+ "window_started_at": "2026-11-18T08:15:32.731545Z",
+ "events": [
+  {
+   "problem_id": "HO9-01-chloralkali-brine-hardness",
+   "generated_at": "2026-11-18T08:06:09.802338Z",
+   "histogram_before": {},
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4727,
+     "latency_s": 17.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Burden:** Continuous chemical dosing (chelant/resin) requires proc",
+       "*   **My Bill Burden:** Hardware cost = $0$ (uses existing pump). Control cost = $0$ (PLC ",
+       "*   **Parity Conclusion:** Lower burden class. The mechanism replaces a continuous chemica",
+       "1.  **Setup:** Operate a representative test cell at 4 kA/m². Baseline: Standard continuou",
+       "2.  **Intervention:** Replace continuous chelant dosing with the **High-Shear Scouring Mod",
+       "3.  **Protocol:** Run for 72 hours. Log ΔP and cell voltage at 15-minute intervals.",
+       "4.  **Pass/Fail Thresholds:**",
+       "*   **Pass:** ΔP remains within 10% of baseline steady-state ΔP. Voltage drift < 5 mV over",
+       "*   **Fail (Kill Criterion):** ΔP increases > 20% OR voltage drift > 10 mV, indicating fou",
+       "5.  **Validation:** If passed, confirm via post-test rinse (acid wash) that the bulk of Ca",
+       "*   **Allowed Measures:** \"brine flow/pH procedure only\". This intervention uses **brine f",
+       "*   **Exclusions:** \"No cell or membrane redesign.\" Compliant. \"Retrospect only\" (implied ",
+       "*   **Topology:** Dead-end membrane. No reverse flow. Uses forward-only pulsing. Compliant",
+       "*   **Catalog/Standard Bill:** No custom parts. No new materials. Uses existing pump. Comp"
+      ],
+      "CONVERSION": [
+       "PREMISE_TOPOLOGY_INVALID: flow-reversal claim on a no-second-path topology: s; this is distinct because it does not reverse flow direction (which is forbidden by the topology constraint of"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Hydraulic shear and pressure fluctuations promote the deposition, compaction, and bridging of colloidal Ca/Mg hardness salts onto the membrane surface. "
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Hydraulic shear and pressure fluctuations promote the deposition, compaction, and bridging of colloidal Ca/Mg hardness salts onto the membrane surface. | ingredient: The proposed high-velocity pulse increases transient wall shear stress and pressure gradients, which enhances mass transfer to the membrane surface and mechanical compaction of the fouling layer, thereby accelerating the very fouling mechanism it aims to stop. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Hydraulic shear and pressure fluctuations promote the deposition, compaction, and bridging of colloidal Ca/Mg hardness salts onto the membrane surface.",
+      "ingredient_action": "The proposed high-velocity pulse increases transient wall shear stress and pressure gradients, which enhances mass transfer to the membrane surface and mechanical compaction of the fouling layer, thereby accelerating the very fouling mechanism it aims to stop.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "01d5577d9c08cbb0"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8225,
+     "latency_s": 15.7,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Row 1: Brine Temperature Setpoint Retuning**",
+       "*   **Action:** Adjust the temperature controller setpoint from the current operating valu",
+       "*   **Hardware:** None. Existing temperature control loop.",
+       "*   **Standard:** Manufacturer's recommended operating window.",
+       "*   **Row 2: Brine Feed Pump Duty Cycle Modulation**",
+       "*   **Action:** Program the VFD/Controller to apply a \"Pressure Pulse\" profile: Ramp press",
+       "*   **Hardware:** Existing VFD/PLC. No new valves, no new pumps.",
+       "*   **Standard:** Using the existing pump's dynamic range within its rated HP limit.",
+       "*   **Row 3: Verification Protocol (No New Hardware)**",
+       "*   **Action:** Operator reviews existing HMI trends for the new pressure pulse signature ",
+       "*   **Hardware:** Existing HMI/SCADA system.",
+       "*   **Installation:** **Zero.** No new parts installed. Only parameter changes to existing",
+       "*   **Commissioning:** **Lower.** Standard practice requires chemical dosing system calibr",
+       "*   **Operation:** **Zero Operational Loss.** The temperature reduction may slightly reduc",
+       "*   **Maintenance:** **Lower.** Eliminates the risk of chelant dosing failures or resin ex",
+       "*   **Conclusion:** Burden is **same-or-lower** (specifically lower) than standard chemica"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Supersaturation of hardness ions (Ca/Mg) in the brine feed exceeding the ion-exchange membrane's capacity, leading to precipitation and scale formation that blocks ion transport. | ingredient: Lowers brine temperature to reduce solubility product and saturation index (keeping ions sub-saturated) and applies high-shear pressure pulses to mechanically remove nascent scale nuclei, thereby reducing net scale accumulation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Supersaturation of hardness ions (Ca/Mg) in the brine feed exceeding the ion-exchange membrane's capacity, leading to precipitation and scale formation that blocks ion transport.",
+      "ingredient_action": "Lowers brine temperature to reduce solubility product and saturation index (keeping ions sub-saturated) and applies high-shear pressure pulses to mechanically remove nascent scale nuclei, thereby reducing net scale accumulation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "558b0722a5882e3b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Row 1: Brine Temperature Setpoint Retuning**; *   **Action:** Adjust the temperature controller setpoint"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7231,
+     "latency_s": 8.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Operating-Point & Procedure Reconfiguration",
+       "*   **Row 1: Brine Temperature Setpoint Retuning**",
+       "*   **Action:** Adjust the existing brine cooler/heater temperature controller setpoint fr",
+       "*   **Rationale:** Maximizes thermal solubility margin and mass transfer rates.",
+       "*   **Row 2: Chelant/Resin Polish Dosing Procedure**",
+       "*   **Action:** Reconfigure the existing dosing pump (already present for hardness removal",
+       "*   **Row 3: pH Verification Procedure**",
+       "*   **Action:** Verify that the existing brine pH control loop maintains pH at the upper l",
+       "*   **Hardware:** The intervention adds **zero** new hardware. It uses the existing temper",
+       "*   **Consumables:** Chelant usage may decrease or remain stable. The \"continuous low-rate",
+       "*   **Operational Loss Pricing:**",
+       "*   **Energy Cost:** Raising brine temperature from 45°C to 62°C increases heating duty. H",
+       "*   **Throughput Impact:** Zero. The duty cycle is unchanged.",
+       "*   **Parity Conclusion:** The burden is **lower** than standard practice because it reduc",
+       "*   **Protocol:**",
+       "1.  Baseline: Run cell at 45°C with standard reactive dosing for 2 weeks. Measure membrane",
+       "2.  Intervention: Switch to 62°C setpoint and continuous low-rate chelant dosing for 2 wee",
+       "3.  Monitoring: Track $\\Delta V$ daily. A fouling membrane exhibits a monotonic increase i",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Pass:** The slope of $\\Delta V$ vs. time during the intervention period is **less th",
+       "*   **Fail:** $\\Delta V$ slope is equal to or greater than baseline, or precipitate is det",
+       "*   **Kill Criterion:** If membrane voltage exceeds 95% of the maximum allowable limit, st",
+       "*   **Constraint Fit:** The allowed measures are \"brine temperature setpoint retuning\" and",
+       "*   **Premise Validity:** The problem states the device is a chlor-alkali membrane cell. T",
+       "*   **Direction Correctness:** The mechanism moves the driving variable (supersaturation) ",
+       "*   **Input Availability:** The remedy requires temperature, pH, and chelant dosing signal"
+      ],
+      "APPARATUS_ROW": [
+       "3.  Monitoring: Track $\\Delta V$ daily. A fouling membrane exhibits a monotonic increase in $\\Delta V$ at cons"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Hardness fouling is driven by the precipitation of sparingly soluble salts (e.g., CaCO3, Mg(OH)2) when local supersaturation at the membrane interface e"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Hardness fouling is driven by the precipitation of sparingly soluble salts (e.g., CaCO3, Mg(OH)2) when local supersaturation at the membrane interface exceeds the solubility limit, a process thermodynamically favored at lower temperatures and high ion concentrations. | ingredient: Raising the brine temperature to the maximum allowable limit decreases the solubility of calcium carbonate (inverse solubility characteristic for this scale in high-ionic-strength brine), thereby increasing the supersaturation index and driving force for precipitation. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Hardness fouling is driven by the precipitation of sparingly soluble salts (e.g., CaCO3, Mg(OH)2) when local supersaturation at the membrane interface exceeds the solubility limit, a process thermodynamically favored at lower temperatures and high ion concentrations.",
+      "ingredient_action": "Raising the brine temperature to the maximum allowable limit decreases the solubility of calcium carbonate (inverse solubility characteristic for this scale in high-ionic-strength brine), thereby increasing the supersaturation index and driving force for precipitation.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "0988f1fc4480c19b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Operating-Point & Procedure Reconfiguration; *   **Row 1: Brine Temperature Setpoint ",
+      "APPARATUS_ROW: 3.  Monitoring: Track $\\Delta V$ daily. A fouling membrane exhibits a monotonic increase in $\\Delta V$ at cons",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "PHYSICS_DIRECTION_INVERTED: the sign/integral check reads the mechanism INVERTED: driver: Hardness fouling is driven by the precipitation "
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 9004,
+     "latency_s": 15.4,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Where it attaches:* Existing brine temperature control loop (heating/cooling coils or",
+       "*   *Parameter:* $T_{brine} = 30^\\circ C$.",
+       "*   *Where it attaches:* Existing brine feed pumps (VFDs or valves).",
+       "*   *Parameter:* $Q_{brine} = 1.2 \\times Q_{base}$.",
+       "*   *Where it attaches:* Existing PLC/DCS scheduling function.",
+       "*   *Parameter:* Cycle period = 4.5 hours.",
+       "*   **Installation:** Zero new hardware. Uses existing pumps, heaters/coolers, and PLC. **",
+       "*   **Commissioning:** Configuration change in existing HMI/PLC. **Burden: Same/Lower.**",
+       "*   **Operation:**",
+       "*   *Pump Energy:* A 20% increase in flow rate increases pump power by $\\approx (1.2)^3 \\a",
+       "*   *Thermal Energy:* Cooling from 35°C to 30°C requires heat rejection.",
+       "*   *Operational Loss Pricing:* During the 30-min high-flow window, cell voltage may rise ",
+       "*   *Availability:* Zero loss. The process continues running.",
+       "*   **Maintenance:** No new consumables. No new calibration. **Burden: Lower.**",
+       "*   **Conclusion:** Same-or-lower burden class.",
+       "1.  **Protocol:** Run the cell stack in parallel with a control stack using standard stati",
+       "2.  **Instruments:** Existing cell voltage transducers, brine flow meters, and conductivit",
+       "3.  **Duration:** 4 weeks.",
+       "4.  **Pass/Fail Thresholds:**",
+       "*   Measure the rate of increase in cell voltage ($\\Delta V / \\text{week}$) attributable t",
+       "*   Measure the frequency of \"pressure drop anomalies\" in the brine header (indicator of f",
+       "*   **Pass Condition:** The test stack shows a $\\geq 50\\%$ reduction in the rate of voltag",
+       "5.  **Kill Criterion:** If the test stack exhibits *faster* voltage rise or *higher* brine",
+       "*   **Constraint Check:** The problem states \"allowed measures: ... brine flow/pH procedur",
+       "*   **Procurement Rule:** No new items. Only existing equipment re-parameterized.",
+       "*   **Deployed-Part Clause:** No modification to the membrane cell. Only external process ",
+       "*   **Direction-Of-Effect:** Confirmed. Increasing flow (downstream mixing) and lowering t",
+       "*   **Required Signals:** Brine flow rate, Brine temperature, Cell Voltage.",
+       "*   **Permitted Sources:** All are standard plant instrumentation. Flow is measured by exi",
+       "*   **Modulation:** Flow +20% for 30 min every 4.5 hours. Temp -5°C for 30 min.",
+       "*   **Cost:** Pump energy increase $\\approx 0.1$ kWh/cell-day (estimate). Cooling duty $\\a",
+       "*   **Trade-off:** Negligible energy cost vs. $50k+ membrane replacement cost. Trade nets "
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Fouling is caused by the local supersaturation of calcium carbonate (SI > 1) driven by concentration polarization and thermal effects during continuous operation. | ingredient: The dynamic modulation of increased flow and lowered temperature reduces the local supersaturation index and mass transfer resistance, thereby decreasing the net accumulation of scale over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Fouling is caused by the local supersaturation of calcium carbonate (SI > 1) driven by concentration polarization and thermal effects during continuous operation.",
+      "ingredient_action": "The dynamic modulation of increased flow and lowered temperature reduces the local supersaturation index and mass transfer resistance, thereby decreasing the net accumulation of scale over the duty cycle.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "cea50682a7ccf3fd",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   *Where it attaches:* Existing brine temperature control loop (heating/cooling coils or; *   *Parameter:* $",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "cea50682a7ccf3fd",
+   "final_chars": 9004
+  },
+  {
+   "problem_id": "HO9-02-bayer-digestion-scale",
+   "generated_at": "2026-11-18T08:07:15.273357Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7186,
+     "latency_s": 14.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation**: Standard practice installs dosing pumps and pumps. Intervention adds",
+       "*   **Commissioning**: Requires tuning of the pressure threshold $K$ and pulse duration $t",
+       "*   **Operation**: The system runs in \"pulse\" mode instead of constant flow. The energy pe",
+       "*   **Maintenance**: Dosing pump maintenance is unchanged. Pump maintenance is unchanged. ",
+       "*   **Conclusion**: The intervention is delivered entirely through configuration and chemi"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Installation**: Standard practice installs dosing pumps and pumps. Intervention adds zero hardware. The "
+      ],
+      "NAMED_VARIANT": [
+       "variant-marker: specialty organic | 1.  **Antiscalant Chemistry Selection**: Standard practice bills include a conti"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Scale formation is driven by supersaturation and low boundary-layer shear, which allows aluminosilicate crystals to nucleate and adhere to the tube wall. | ingredient: The high-velocity flow pulses increase wall shear stress, which mechanically detaches crystals and opposes the adhesive forces driving accumulation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Scale formation is driven by supersaturation and low boundary-layer shear, which allows aluminosilicate crystals to nucleate and adhere to the tube wall.",
+      "ingredient_action": "The high-velocity flow pulses increase wall shear stress, which mechanically detaches crystals and opposes the adhesive forces driving accumulation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "d48dc30a3ed141ec"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5910,
+     "latency_s": 8.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation**:",
+       "*   **Commissioning**:",
+       "*   **Hardware**: Zero new hardware. Standard practice bills for dosing pumps and control ",
+       "*   **Operational Loss Pricing**:",
+       "*   **Throughput Loss**: Zero. Higher flow velocity may reduce residence time in the diges",
+       "*   **Energy Cost**: Heating 10°C less reduces steam consumption by ~2-3% in the digester.",
+       "*   **Quality**: Reduced temperature may slightly extend digestion time, but the 25% veloc",
+       "*   **Conclusion**: Same-or-lower burden class. No new procurement. Operational costs are "
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Thermodynamic supersaturation of soluble silica species at high temperatures drives the crystallization and adhesion of sodalite/cancrinite scale on heat transfer surfaces. | ingredient: Reducing the digestion temperature lowers the thermodynamic driving force (supersaturation index) for scale formation, thereby opposing the established driver. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Thermodynamic supersaturation of soluble silica species at high temperatures drives the crystallization and adhesion of sodalite/cancrinite scale on heat transfer surfaces.",
+      "ingredient_action": "Reducing the digestion temperature lowers the thermodynamic driving force (supersaturation index) for scale formation, thereby opposing the established driver.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "789b71403450708a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Installation**:; *   **Commissioning**:; *   **Hardware**: Zero new hardware. Standard practice bills fo"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7818,
+     "latency_s": 97.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill:**",
+       "*   Hardware: Fixed 250 °C setpoint, base flow rate, periodic acid wash (high-cost, downti",
+       "*   Burden: Downtime for cleaning every 6–12 months, acid inventory, environmental disposa",
+       "*   **Your Bill:**",
+       "*   Hardware: Existing dosing pump (no new capex), existing VFDs (no new capex).",
+       "*   Consumables: Sodium hexametaphosphate (cost class: standard antiscalant, <$1/kg).",
+       "*   Operational Loss: **Zero throughput loss.** The temperature reduction (250 °C → 245 °C",
+       "*   **Conclusion:** Same-or-lower burden class. The intervention adds a cheap consumable a",
+       "*   **Protocol:**",
+       "1.  **Baseline:** Run digester at 250 °C, base flow, no antiscalant for 1 month. Record he",
+       "2.  **Intervention:** Switch to 245 °C, 50 ppm SHMP dosing, +15% flow. Run for 3 months.",
+       "3.  **Verification:** Monitor the **fouling resistance** ($R_f$) calculated from the tempe",
+       "*   **Instruments:** Existing DCS trend logs for Temperature, Flow, Pressure Drop.",
+       "*   **Pass/Fail Threshold:**",
+       "*   **Pass:** Fouling resistance ($R_f$) remains <0.01 K·m²/W after 3 months (stable).",
+       "*   **Fail:** $R_f$ increases >50% from baseline or cancrinite crystals are observed upon ",
+       "*   **Kill Criterion:** If alumina recovery drops >2% at 245 °C, the temperature is too lo"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Supersaturation of zeolitic minerals (sodalite/cancrinite) in the hot caustic liquor induces crystallization and scale formation. | ingredient: The polyphosphate antiscalant chelates ions to reduce supersaturation, and the temperature reduction lowers the crystallization kinetic rate, both acting to prevent scale. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Supersaturation of zeolitic minerals (sodalite/cancrinite) in the hot caustic liquor induces crystallization and scale formation.",
+      "ingredient_action": "The polyphosphate antiscalant chelates ions to reduce supersaturation, and the temperature reduction lowers the crystallization kinetic rate, both acting to prevent scale.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "9ff96501596d4fb8",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Standard Practice Bill:**; *   Hardware: Fixed 250 °C setpoint, base flow rate, periodic acid wash (high"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 10770,
+     "latency_s": 22.4,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill (Reference):**",
+       "*   Hardware: Fixed temperature setpoint (250°C), Fixed dosing rate, Fixed flow rate.",
+       "*   Procedure: Daily monitoring, periodic acid wash.",
+       "*   **Intervention Bill (Itemized):**",
+       "*   **Row 1 (Temp Setpoint):** No hardware. Zero cost. Operational loss: 0.5% reduction in",
+       "*   **Row 2 (Dosing Protocol):** No new hardware (uses existing pumps). Cost: +5% chemical",
+       "*   **Row 3 (Flow Procedure):** No new hardware. Zero operational loss if integrated into ",
+       "*   **UNPRICED OPERATIONAL LOSS CHECK:**",
+       "*   Temperature drop (5°C): Energy cost increase $\\approx 2\\%$ (heating 245 vs 250 require",
+       "*   Dosing increase: Chemical cost +5%.",
+       "*   Flow procedure: Availability risk 0% if followed.",
+       "*   **Conclusion:** Net burden is **LOWER** than standard practice which suffers from peri"
+      ],
+      "APPARATUS_ROW": [
+       "*   Procedure: Daily monitoring, periodic acid wash."
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The established physical driver for heater tube scale in this context is the precipitation of aluminosilicates (such as sodalite/cancrinite) due to local supersaturation (Ion Activity Product exceeding Solubility Product) at the high-temperature wall surface. | ingredient: The active ingredient (dynamic antiscalant dosing and temperature retuning) imposes a chemical and thermal environment that reduces the local supersaturation index below the critical threshold, thereby adding a negative sign to the net scale deposition rate integral over the duty | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The established physical driver for heater tube scale in this context is the precipitation of aluminosilicates (such as sodalite/cancrinite) due to local supersaturation (Ion Activity Product exceeding Solubility Product) at the high-temperature wall surface.",
+      "ingredient_action": "The active ingredient (dynamic antiscalant dosing and temperature retuning) imposes a chemical and thermal environment that reduces the local supersaturation index below the critical threshold, thereby adding a negative sign to the net scale deposition rate integral over the duty",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "a1cc601f65bdf057",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Standard Practice Bill (Reference):**; *   Hardware: Fixed temperature setpoint (250°C), Fixed dosing ra",
+      "APPARATUS_ROW: *   Procedure: Daily monitoring, periodic acid wash."
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "a1cc601f65bdf057",
+   "final_chars": 10770
+  },
+  {
+   "problem_id": "HO9-03-pulp-kappa-uniformity",
+   "generated_at": "2026-11-18T08:09:41.635522Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 12715,
+     "latency_s": 22.3,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Existing VFD Control Logic Modification:** *(Class c)*",
+       "*   *Item:* The existing Variable Frequency Drive (VFD) controlling the recirculation pump",
+       "*   *Action:* Program the VFD to accept a user-setpoint oscillation. Instead of a constant",
+       "*   *Parameter:* Oscillation amplitude $A = 15-20\\%$ of mean flow rate. Frequency $\\omega ",
+       "*   *Rationale:* No new hardware. The VFD is already present and capable of modulating fre",
+       "2.  **Pump Operating Duty Change:** *(Class c)*",
+       "*   *Item:* The existing recirculation pump.",
+       "*   *Action:* Operate at the new modulated flow rate profile.",
+       "*   *Parameter:* Mean flow rate $Q_{mean}$ unchanged. Peak-to-peak flow variation $\\Delta ",
+       "*   *Rationale:* Ensures the hydraulic force is sufficient to shift channel locations.",
+       "3.  **Chip Feed Rate Synchronization (Optional but Recommended):** *(Class c)*",
+       "*   *Item:* Existing chip feed system.",
+       "*   *Action:* Maintain constant feed rate to ensure consistent $T_{transit}$.",
+       "*   *Parameter:* No change to feed rate magnitude, only verify stability.",
+       "*   **Standard Practice Bill:**",
+       "*   VFD set to constant Hz (Constant Flow).",
+       "*   Operator monitors alarms.",
+       "*   No operational loss (steady state).",
+       "*   **Intervention Bill:**",
+       "*   VFD set to Oscillating Hz (Pulsed Flow).",
+       "*   Operator monitors same alarms.",
+       "*   **Operational Loss:** **Zero.** The mean flow rate is unchanged. The energy consumptio",
+       "*   **Conclusion:** The burden class"
+      ],
+      "APPARATUS_ROW": [
+       "*   Operator monitors alarms.",
+       "*   Operator monitors same alarms."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Non-uniform delignification is caused by short-circuiting and channeling of liquor flow, which creates local high-velocity jets that bypass large sections of the chip bed, leading to local under-cooking and kappa number variation. | ingredient: Pulsed recirculation modulation disrupts stable flow channeling and short-circuiting by breaking up established high-velocity jets, thereby reducing local flow maldistribution and promoting a more uniform H-factor across the digester cross-section. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Non-uniform delignification is caused by short-circuiting and channeling of liquor flow, which creates local high-velocity jets that bypass large sections of the chip bed, leading to local under-cooking and kappa number variation.",
+      "ingredient_action": "Pulsed recirculation modulation disrupts stable flow channeling and short-circuiting by breaking up established high-velocity jets, thereby reducing local flow maldistribution and promoting a more uniform H-factor across the digester cross-section.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "a720203accb0a57a"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 10024,
+     "latency_s": 17.8,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Alkali Charge Modulation Algorithm:**",
+       "*   **Description:** Modify the existing DCS/PLC control logic for the white-liquor dosing",
+       "*   **Source:** This uses the existing white-liquor metering system. The calculation is a ",
+       "*   **Basis:** The plant already has the alkali charge control loop. This is a retuning of",
+       "2.  **H-Factor Setpoint Retuning:**",
+       "*   **Description:** Adjust the global H-factor setpoint to a value that accounts for the ",
+       "*   **Source:** Existing temperature sensors in the digester profile. The setpoint change ",
+       "3.  **Procedure Change: Blow Line Sampling Protocol:**",
+       "*   **Description:** Instead of taking a single composite sample from the blow line, the o",
+       "*   **Source:** Standard lab analysis capability. No new equipment.",
+       "*   **Removed:** \"Operator monitors alarms.\" This is a standard operational task, not a ne",
+       "*   **Removed:** \"VFD Control Logic Modification\" as a separate hardware row. It is subsum",
+       "*   **Installation:** Zero installation. No physical changes.",
+       "*   **Commissioning:** Minimal. Requires one calibration cycle to determine $K_{comp}$ (ap",
+       "*   **Operation:** The DCS logic change is trivially small. The operator procedure for sam",
+       "*   **Operational Loss Pricing:**",
+       "*   **Throughput/Energy:** Zero loss. The modulation is within the normal operating envelo",
+       "*   **Quality Risk:** During the initial tuning period, there is a risk of temporary kappa",
+       "*   **Net Trade:** The cost is a slight potential increase in chemical usage (alkali) in c"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Thermal maldistribution creates local variance in reaction rates, leading to spatial variation in delignification extent and kappa number. | ingredient: Modulates alkali concentration inversely to local temperature to compensate for kinetic rate fluctuations and equalize reaction extent. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Thermal maldistribution creates local variance in reaction rates, leading to spatial variation in delignification extent and kappa number.",
+      "ingredient_action": "Modulates alkali concentration inversely to local temperature to compensate for kinetic rate fluctuations and equalize reaction extent.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "89889bd835b2b693",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Alkali Charge Modulation Algorithm:**; *   **Description:** Modify the existing DCS/PLC control logic fo"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7061,
+     "latency_s": 15.6,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Parameter/Procedure Change (Chemistry Retuning)",
+       "*   **Installation:** Zero. No new hardware, piping, or sensors.",
+       "*   **Commissioning:** Low. Requires software logic update and PLC parameter tuning (stand",
+       "*   **Operation:** No operational loss. The total chemical dose is unchanged; the duty cyc",
+       "*   **Cost Class:** Same as standard practice. The only cost is the engineering time to re",
+       "*   **Conclusion:** Same-or-lower burden class.",
+       "*   **Protocol:** Run two batches of identical wood chips in the digester.",
+       "*   *Batch A (Standard):* Constant white-liquor ratio throughout the cook cycle.",
+       "*   *Batch B (Intervention):* Two-stage alkali charge profile (low alkali during high-T pl",
+       "*   **Instruments:** Existing kappa number analyzer (standard lab equipment), digester tem",
+       "*   **Pass/Fail Thresholds:**",
+       "*   Kappa Number Mean: Within ±2% of standard practice.",
+       "*   Kappa Number Standard Deviation (Uniformity): Batch B SD must be <0.5, while Batch A S",
+       "*   **Duration:** 2 weeks of alternating runs or 4 consecutive runs (2 standard, 2 interve",
+       "*   **Kill Criterion:** If Batch B shows a kappa SD increase or if the mean kappa number d",
+       "*   **Allowed Measures:** \"white-liquor alkali charge chemistry retuning, H-factor tempera",
+       "*   **Compliance:** The proposed intervention is a **white-liquor alkali charge chemistry ",
+       "*   **Exclusions:** No digester redesign, no new hardware.",
+       "*   **Performance Bounds:** Maintains total EAD, ensuring no loss in delignification quali",
+       "*   **DEPLOYED-PART CLAUSE:** No modification to the digester vessel, liners, or blow line",
+       "*   **PERMITTED-SET CLAUSE:** The measure is drawn from \"white-liquor alkali charge chemis",
+       "*   **DIRECTION-OF-EFFECT CLAUSE:** Explicitly stated in Physics Check.",
+       "*   **EXEMPLAR-REALITY CLAUSE:** No commercial exemplars named; only standard process para",
+       "*   **PREMISE-VALIDITY CLAUSE:** Uses existing temperature sensors and dosing pumps stated",
+       "*   **CERTIFIED-SYSTEM-AS-SOLD:** No new hardware.",
+       "*   **DIRECTION-CORRECTNESS:** Driving variable (local alkali dose variance) is reduced.",
+       "*   **INPUT-AVAILABILITY:** Requires temperature profile (stated/standard) and dosing cont",
+       "*   **COST-PRICING:** No operational loss; zero energy/throughput impact.",
+       "*   **MECHANISM-DIVERSITY:** Mechanism Class is \"Parameter/Procedure Change.\""
+      ],
+      "APPARATUS_ROW": [
+       "*   **Installation:** Zero. No new hardware, piping, or sensors."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Kappa number variation is industrially driven by spatial heterogeneity in chip density and liquor distribution, which causes local variance in the effective alkali dose and reaction kinetics within the digester. | ingredient: The proposed intervention artificially introduces a large temporal gradient in alkali concentration by lowering it during the high-temperature plateau, which increases the sensitivity of the local reaction rate to minor density fluctuations and likely amplifies the spatial varian | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Kappa number variation is industrially driven by spatial heterogeneity in chip density and liquor distribution, which causes local variance in the effective alkali dose and reaction kinetics within the digester.",
+      "ingredient_action": "The proposed intervention artificially introduces a large temporal gradient in alkali concentration by lowering it during the high-temperature plateau, which increases the sensitivity of the local reaction rate to minor density fluctuations and likely amplifies the spatial varian",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "dd9a83b028854fb7",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Parameter/Procedure Change (Chemistry Retuning); *   **Installation:** Zero. No new h",
+      "APPARATUS_ROW: *   **Installation:** Zero. No new hardware, piping, or sensors.",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7464,
+     "latency_s": 10.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Configuration/Procedure Change (Cyclic Duty Cycle on Existing Pum",
+       "*   **Standard Practice Bill:** Operator maintains steady-state flow $Q_{std}$ continuousl",
+       "*   **Intervention Bill:** Operator adjusts flow to $Q_{high}$ for 15 min and $Q_{low}$ fo",
+       "*   **Comparison:**",
+       "*   *Hardware:* Zero added. (Standard: 0, Intervention: 0).",
+       "*   *Commissioning:* Zero added. The pumps/valves are already rated for the range; the cyc",
+       "*   *Operation:* The intervention adds a 15/45 min toggle. The operational loss is **zero*",
+       "*   *Conclusion:* The burden class is **lower** than standard practice in terms of cogniti",
+       "1.  **Protocol:** Run the kraft pulp continuous digester at 165°C for 3 batches (24 hours ",
+       "2.  **Instruments:** Standard blow-line kappa number analyzer (e.g., M88) at the end of th",
+       "3.  **Pass/Fail Thresholds:** Calculate the standard deviation ($\\sigma$) of the Kappa num",
+       "4.  **Duration:** 72 hours total.",
+       "5.  **Kill Criterion:** If $\\sigma_{cyclic} > \\sigma_{steady}$, or if the mean Kappa numbe",
+       "*   **Allowed Measures:** The problem allows \"chip-feed/liquor-circulation procedure only.",
+       "*   **No Digester Redesign:** No hardware changes.",
+       "*   **Deployed-Part Clause:** No modification to digester parts. Pumps and valves are exte",
+       "*   **Permitted-Set Clause:** The measure is a \"procedure\" (cyclic duty cycle), which is e",
+       "*   **Direction-of-Effect:** Moving concentration variance *down* reduces Kappa non-unifor",
+       "*   **Input-Availability:** The procedure requires only time (clock) and flow rate (pump s",
+       "*   **Cost-Pricing:** Energy penalty <2% of thermal input. Negligible.",
+       "*   **Exemplar-Reality:** No commercial exemplar needed; this is a procedure.",
+       "*   **Premise-Validity:** The system has a circulation loop and pumps (stated in \"liquor-c",
+       "*   **Certified-System:** Not a medical/food system, so no certified hardware constraint a"
+      ],
+      "APPARATUS_ROW": [
+       "2.  **Instruments:** Standard blow-line kappa number analyzer (e.g., M88) at the end of the digester/blow line"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Local spatial variance in alkali concentration and shear within the digester volume causes non-uniform delignification, resulting in kappa-number variance across the blow line. | ingredient: Modulating the circulation flow creates transient turbulence and convective mixing that actively homogenizes the liquor and reduces local concentration variance. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Local spatial variance in alkali concentration and shear within the digester volume causes non-uniform delignification, resulting in kappa-number variance across the blow line.",
+      "ingredient_action": "Modulating the circulation flow creates transient turbulence and convective mixing that actively homogenizes the liquor and reduces local concentration variance.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "7e72374e86ac7d21",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Configuration/Procedure Change (Cyclic Duty Cycle on Existing Pum; *   **Standard Pra",
+      "APPARATUS_ROW: 2.  **Instruments:** Standard blow-line kappa number analyzer (e.g., M88) at the end of the digester/blow line"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "7e72374e86ac7d21",
+   "final_chars": 7464
+  },
+  {
+   "problem_id": "HO9-04-sugar-massecuite-crystallization",
+   "generated_at": "2026-11-18T08:10:52.065222Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7522,
+     "latency_s": 11.0,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill:** Operates at fixed $P_{setpoint}$ (high vacuum), fixed feed",
+       "*   **Proposed Bill:**",
+       "*   **Row 1 (Pressure Setpoint):** Parameter change to existing controller. No hardware. B",
+       "*   **Row 2 (Feed Rate):** Parameter change to existing pump. No hardware. Burden: Zero in",
+       "*   **Row 3 (Circulation):** Parameter change to existing VFD. No hardware. Burden: Zero i",
+       "*   **Operational Loss Pricing:** Lowering the boiling temperature reduces the crystalliza",
+       "*   **Conclusion:** The burden is **LOWER** than standard practice for any mitigation requ",
+       "*   **Protocol:** Run two parallel vacuum pans (or sequential batches) under identical fee",
+       "*   **Control Batch:** Standard pressure setpoint, standard feed rate.",
+       "*   **Test Batch:** Reduced pressure setpoint (+20 mbar), reduced feed rate (-10%), increa",
+       "*   **Instruments:** Existing laboratory sieve shaker, optical particle counter (or standa",
+       "*   **Pass/Fail Thresholds:**",
+       "*   Measure Crystal Size Distribution (CSD) at 4, 6, and 8 hours of boiling.",
+       "*   Calculate the Coefficient of Variation (CV = Std Dev / Mean) of the crystal size distr",
+       "*   **PASS:** The Test Batch CV must be at least 15% lower than the Control Batch CV at th",
+       "*   **FAIL:** If the Test Batch CV is equal to or higher than Control, or if crystal growt",
+       "*   **Duration:** Two 10-hour batches (approx. 48 hours including prep and analysis).",
+       "*   **Kill Criterion:** If the Test Batch produces a \"sludge\" (excessive fines < 20 µm com"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: The CSD spread is driven by secondary nucleation events that are exponentially sensitive to supersaturation, generating a population of fines that widen"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: The CSD spread is driven by secondary nucleation events that are exponentially sensitive to supersaturation, generating a population of fines that widen the distribution. | ingredient: The proposed operating condition maintains or increases supersaturation (targeting σ = 1.05–1.10 vs. standard 0.95–1.05), which is the direct driver of secondary nucleation, thereby continuing the physical process that causes the failure. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "The CSD spread is driven by secondary nucleation events that are exponentially sensitive to supersaturation, generating a population of fines that widen the distribution.",
+      "ingredient_action": "The proposed operating condition maintains or increases supersaturation (targeting σ = 1.05–1.10 vs. standard 0.95–1.05), which is the direct driver of secondary nucleation, thereby continuing the physical process that causes the failure.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "4c199f873e4ed360"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 10382,
+     "latency_s": 19.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Row 1: Vacuum Pan Controller Setpoint Modification**",
+       "*   **Description:** Adjust the pan's existing vacuum/temperature controller setpoints to ",
+       "*   **Standard Practice Comparison:** Standard practice uses a fixed high-vacuum setpoint;",
+       "*   **Procurement:** No new hardware. Uses existing controllers.",
+       "*   **Row 2: Seeding/Dosing Protocol (Procedural Change)**",
+       "*   **Description:** Establish a fixed schedule for adding a known mass of standard commer",
+       "*   **Standard Practice Comparison:** Standard practice often seeds only at the start or a",
+       "*   **Procurement:** Uses \"commercial sugar crystals\" (grains) as a bulk material, which i",
+       "*   **Row 3: Verification of Supersaturation Level**",
+       "*   **Description:** The plant's existing temperature and pressure instruments (thermocoup",
+       "*   **Standard Practice Comparison:** Standard practice also uses T and P instruments; thi",
+       "*   **Commissioning Burden:** Same as standard. The plant must run a batch to tune the new",
+       "*   **Operational Loss Pricing:**",
+       "*   **Energy/Throughput:** By lowering the supersaturation setpoint, the boiling rate may ",
+       "*   **Magnitude:** Order of magnitude estimate: If batch time increases by 10-20% to achie",
+       "*   **Trade-off Netting Positive:** The operational loss in throughput is offset by the re",
+       "*   **Burden Class Conclusion:** The burden class is **SAME-OR-LOWER** for hardware/instal"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Burden Class Conclusion:** The burden class is **SAME-OR-LOWER** for hardware/installation. The operatio"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The spread in crystal size distribution is physically caused by secondary nucleation events that are driven by high supersaturation and shear, creating a late-born population of small crystals. | ingredient: The active intervention (lowering supersaturation below the critical threshold and seeding) imposes a physical state that eliminates secondary nucleation and restricts crystal population growth, thereby subtracting from the source of CSD spread over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The spread in crystal size distribution is physically caused by secondary nucleation events that are driven by high supersaturation and shear, creating a late-born population of small crystals.",
+      "ingredient_action": "The active intervention (lowering supersaturation below the critical threshold and seeding) imposes a physical state that eliminates secondary nucleation and restricts crystal population growth, thereby subtracting from the source of CSD spread over the duty cycle.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "eb2433e7e1886de3",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Row 1: Vacuum Pan Controller Setpoint Modification**; *   **Description:** Adjust the pan's existing vac",
+      "APPARATUS_ROW: *   **Burden Class Conclusion:** The burden class is **SAME-OR-LOWER** for hardware/installation. The operatio"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 8074,
+     "latency_s": 11.2,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Row 1: Seeding Material Preparation Protocol**",
+       "*   **Description:** Use existing granulated sugar (seed) from standard stock inventory. D",
+       "*   **Attachment:** Operator procedure card attached to the existing weighing station (alr",
+       "*   **Parameters:** Mass ratio $M_{seed}/M_{massecuite} = 0.015$.",
+       "*   **Row 2: First Seeding Event & Setpoint Step**",
+       "*   **Description:** At time $t_1$ (start of main crystallization), introduce Seed Batch A",
+       "*   **Attachment:** Existing Pan Controller HMI.",
+       "*   **Parameters:** $\\Delta T = -2.0^\\circ\\text{C}$; $S_{target} = 1.15$.",
+       "*   **Row 3: Second Seeding Event & Setpoint Step**",
+       "*   **Description:** At time $t_2$ (defined as $t_1 + 30$ min, or when crystal weight frac",
+       "*   **Attachment:** Existing Pan Controller HMI.",
+       "*   **Parameters:** $t_{interval} = 30$ min; $\\Delta T_2 = -1.0^\\circ\\text{C}$; $S_{target",
+       "*   **Row 4: Circulation Duty Modification**",
+       "*   **Description:** Modify the existing circulation pump duty cycle. Instead of continuou",
+       "*   **Attachment:** Existing pump VFD/Timer module.",
+       "*   **Parameters:** Duty Cycle = 80%; Period = 100 sec.",
+       "*   **Standard Practice Bill:** Continuous circulation (100% duty), single setpoint target",
+       "*   **Intervention Bill:**",
+       "*   Hardware: **None added.** All changes are to existing controllers, pumps, and standard",
+       "*   Installation: **Zero.** No physical installation required.",
+       "*   Operation: Added 2 manual/automated seeding steps (procedure cost ~5 min labor).",
+       "*   Setpoint Changes: Two discrete steps.",
+       "*   Duty Cycle: Pump timer adjustment.",
+       "*   **Operational Loss Pricing:**",
+       "*   Throughput Loss: The 2.0°C and 1.0°C temperature steps slightly reduce boiling efficie",
+       "*   Time Loss: The 30-min interval is within the standard crystallization time window. No ",
+       "*   Net Trade: 1.5% energy increase vs. significant reduction in CSD spread (quality yield",
+       "*   **Burden Class Conclusion:** **SAME-OR-LOWER.** The intervention adds no hardware, no "
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Random, spontaneous secondary nucleation triggered by local peaks in supersaturation creates a wide crystal size distribution. | ingredient: The seeding and reduced supersaturation setpoints provide a dominant crystal population to consume solute and cap supersaturation below the threshold for spontaneous nucleation, thereby eliminating the source of the small crystals that widen the distribution. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Random, spontaneous secondary nucleation triggered by local peaks in supersaturation creates a wide crystal size distribution.",
+      "ingredient_action": "The seeding and reduced supersaturation setpoints provide a dominant crystal population to consume solute and cap supersaturation below the threshold for spontaneous nucleation, thereby eliminating the source of the small crystals that widen the distribution.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "6182fa0e035fb729",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Row 1: Seeding Material Preparation Protocol**; *   **Description:** Use existing granulated sugar (seed"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7245,
+     "latency_s": 46.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Description:** Define a standardized graining charge of pre-calcined seed crystals (",
+       "*   **Basis:** Uses existing seed crystal material and standard weighing/dosing equipment ",
+       "*   **Description:** Modify the vacuum controller setpoints to implement a cyclic profile:",
+       "*   **Basis:** Uses the existing vacuum pump control system and pressure transducers (Clas",
+       "*   **Description:** Adjust the feed-rate of raw sugar solution to match the evaporation r",
+       "*   **Basis:** Uses the existing feed pump speed control and flow meters (Class C procedur",
+       "*   **Hardware:** Zero new hardware. All changes are procedural (seeding timing) and param",
+       "*   **Installation/Commissioning:** Zero. The vacuum controllers and feed pumps are alread",
+       "*   **Operational Loss:** The cyclic vacuum control slightly reduces the average evaporati",
+       "*   **Protocol:** Run two parallel batches (or sequential runs) in the same vacuum pan: Ba",
+       "*   **Instruments:** Existing Brix meter, temperature probe, pressure transducer. For CSD ",
+       "*   **Pass/Fail Thresholds:**",
+       "1.  **CSD Spread:** The Span ($S = (D_{90} - D_{10}) / D_{40}$) of Batch B must be at leas",
+       "2.  **Supersaturation Control:** The pressure log for Batch B must show the cyclic pattern",
+       "*   **Duration:** Two full boiling cycles (approx. 6–8 hours total).",
+       "*   **Kill Criterion:** If the cyclic vacuum control causes the massecuite viscosity to in"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: High supersaturation levels exceeding the secondary nucleation threshold trigger uncontrolled crystal birth, which broadens the crystal size distribution. | ingredient: Cyclic modulation and throttling of the supersaturation index maintain the operating point below the secondary nucleation threshold, thereby suppressing the rate of new crystal formation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "High supersaturation levels exceeding the secondary nucleation threshold trigger uncontrolled crystal birth, which broadens the crystal size distribution.",
+      "ingredient_action": "Cyclic modulation and throttling of the supersaturation index maintain the operating point below the secondary nucleation threshold, thereby suppressing the rate of new crystal formation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "4fc38a64e310babf",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Description:** Define a standardized graining charge of pre-calcined seed crystals (; *   **Basis:** Use"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "4fc38a64e310babf",
+   "final_chars": 7245
+  },
+  {
+   "problem_id": "HO9-05-ammonia-catalyst-poisoning",
+   "generated_at": "2026-11-18T08:12:24.070791Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 11559,
+     "latency_s": 14.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  Existing Makeup Gas Valves (Control Valves).",
+       "2.  Existing DCS/PLC Control Logic (Pressure-based makeup gas control).",
+       "3.  Existing Purification Train (Methanator/Dryer).",
+       "4.  Existing Flow Transmitters (FT) and Pressure Transmitters (PT).",
+       "*   **Row 1: Control Logic Modification.**",
+       "*   *Standard:* P-Controller.",
+       "*   *Intervention:* P-Controller + Ramp Limiter.",
+       "*   *Burden:* Same class (software parameter change). No new hardware. **Parity: Same/Lowe",
+       "*   **Row 2: Instrumentation.**",
+       "*   *Standard:* Existing PT/FT.",
+       "*   *Intervention:* Existing PT/FT.",
+       "*   *Burden:* No new instruments. **Parity: Lower (0 new items).**",
+       "*   **Row 3: Hardware.**",
+       "*   *Standard:* Existing Valves.",
+       "*   *Intervention:* Existing Valves.",
+       "*   *Burden:* No new valves. **Parity: Lower (0 new items).**",
+       "*   **Operational Loss:**",
+       "*   The ramp limiter may delay the makeup gas response during transients, causing a slight",
+       "*   *Loss:* Minimal. The pressure dip is momentary (seconds to minutes) and well within th",
+       "*   *Conclusion:* Same-or-lower burden class. The intervention is a \"free\" procedural impr",
+       "1.  Baseline: Run the system with standard P-control. Induce a transient demand spike (e.g",
+       "2.  Intervention: Enable the Ramp-Limiter in the DCS. Set the max flow rate to $Q_{max\\_pu",
+       "3.  Repeat the transient demand spike.",
+       "4.  Compare the makeup gas flow profiles and the oxygen breakthrough indicators.",
+       "*   **Pass:** With the Ramp-Limiter active, the makeup gas flow rate never exceeds $Q_{max",
+       "*   **Fail:** The flow rate still exceeds the limit, or the oxygen breakthrough spikes abo",
+       "*   **Allowed Measures:** \"load-ramp/purge procedure\". The intervention is a load-ramp pro",
+       "*   **Procurement:** No new items.",
+       "*   **Novelty:** Lives in the *configuration/parameterization* of the existing control loo",
+       "*   **Physics:** Attacks the driving mechanism (oxygen breakthrough due to high flow/low r"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: FT-200 | 4.  **(a) Existing Instrumentation:** Use the existing Loop Pressure Transmitter"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Transient oxygen poisoning is driven by the presence of active oxygen species in the catalyst bed, which oxidize the iron active phase and reduce conver"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Transient oxygen poisoning is driven by the presence of active oxygen species in the catalyst bed, which oxidize the iron active phase and reduce conversion efficiency. | ingredient: The proposed flow-rate-actuated bypass diverts makeup gas around the purification train, ensuring that oxygen-rich, unpurified gas is delivered to the catalyst bed during transients. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Transient oxygen poisoning is driven by the presence of active oxygen species in the catalyst bed, which oxidize the iron active phase and reduce conversion efficiency.",
+      "ingredient_action": "The proposed flow-rate-actuated bypass diverts makeup gas around the purification train, ensuring that oxygen-rich, unpurified gas is delivered to the catalyst bed during transients.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "dbd57dfcdf3a32a1"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8239,
+     "latency_s": 12.6,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Procedural Parameterization (Pressure/Temp Setpoint & Ramp Profil",
+       "*   **Standard Practice Bill:** Continuous operation at nominal setpoints; manual or autom",
+       "*   **This Bill:**",
+       "*   Installation Burden: **Zero.** No physical installation.",
+       "*   Commissioning Burden: **Low.** Configuration of DCS/PLC setpoints and HMI alarm thresh",
+       "*   Operational Loss: **Zero.** The 300-second purge/cool-down occurs during pressure tran",
+       "*   **Conclusion:** Same-or-lower burden class. The implementation is purely software/conf",
+       "*   **Protocol:** Introduce a known transient oxygen spike (simulated by opening a small b",
+       "1.  **Baseline Run:** Perform the test with standard constant setpoints. Measure the resul",
+       "2.  **Mitigated Run:** Perform the identical test with the new DCS procedure active (20% f",
+       "*   **Instruments:** Existing Pressure Transmitter (PT-100), Existing Temperature Controll",
+       "*   **Pass/Fail Thresholds:** The poisoned integral (estimated by the subsequent 24h activ",
+       "*   **Duration:** 48 hours total (24h baseline + 24h mitigated).",
+       "*   **Kill Criterion:** If the activity loss in the Mitigated Run is not significantly low",
+       "*   **Required Signals:** Pressure trend ($dP/dt$ or deviation), Temperature setpoint, Flo",
+       "*   **Sources:** All derived from **existing** PT-100, TIC-101, and FIC-100 (Flow Controll",
+       "*   **Operational Cost:** The procedure triggers only during pressure transients. The 50K "
+      ],
+      "APPARATUS_ROW": [
+       "1.  **Baseline Run:** Perform the test with standard constant setpoints. Measure the resulting oxygen concentr"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: TIC-101 | *   **(b) Existing Inlet Temperature Control Loop (TIC-101):** Modify the setpoi",
+       "model/brand-marker: TIC-101 | *   **Instruments:** Existing Pressure Transmitter (PT-100), Existing Temperatur",
+       "model/brand-marker: TIC-101 | *   **Sources:** All derived from **existing** PT-100, TIC-101, and FIC-100 (Flo"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Transient oxygen ingress into the high-pressure synthesis loop causes catalyst deactivation by increasing the residual oxygen partial pressure (P_O2), which drives the poisoning integral upward. | ingredient: The proposed mitigation reduces the residual oxygen partial pressure through increased sweep dilution and temperature adjustment, thereby decreasing the magnitude of the poisoning integral. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Transient oxygen ingress into the high-pressure synthesis loop causes catalyst deactivation by increasing the residual oxygen partial pressure (P_O2), which drives the poisoning integral upward.",
+      "ingredient_action": "The proposed mitigation reduces the residual oxygen partial pressure through increased sweep dilution and temperature adjustment, thereby decreasing the magnitude of the poisoning integral.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "d852d9906831a4ef",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Procedural Parameterization (Pressure/Temp Setpoint & Ramp Profil; *   **Standard Pra",
+      "APPARATUS_ROW: 1.  **Baseline Run:** Perform the test with standard constant setpoints. Measure the resulting oxygen concentr",
+      "NAMED_VARIANT: model/brand-marker: TIC-101 | *   **(b) Existing Inlet Temperature Control Loop (TIC-101):** Modify the setpoi"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 8115,
+     "latency_s": 21.1,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Stage A (Normal):** 450°C.",
+       "*   **Stage B (Transient):** 500°C.",
+       "*   *Source:* Existing DCS/HMI configuration.",
+       "*   **Trigger:** If Total Mass Flow deviates by >5% from baseline for >60 seconds.",
+       "*   **Duration:** Stage B active for 15 minutes post-stabilization, then return to Stage A",
+       "*   *Source:* Existing standard PID/On-Off logic blocks in the PLC/DCS.",
+       "*   **Action:** Prior to heating the bed to 450°C, maintain flow of oxygen-free nitrogen/m",
+       "*   *Source:* Standard operating procedure (SOP) modification; uses existing valves and co",
+       "1.  Run baseline for 72 hours at constant 480°C.",
+       "2.  Switch to proposed protocol (450°C baseline, 500°C pulses on flow deviation) for 72 ho",
+       "3.  Introduce controlled \"transient\" events: Simulate flow deviations by opening a bypass ",
+       "4.  Measure catalyst performance (conversion efficiency) and analyze off-gas for oxygen sp",
+       "*   **Failure:** If oxygen spikes at the catalyst inlet exceed 10 ppm during transients AN",
+       "*   **Pass:** If oxygen spikes are reduced by >50% compared to baseline (due to the purge/",
+       "*   **Kill Criterion:** If the 450°C baseline causes persistent loss of activity that cann",
+       "*   **No Converter Redesign:** Complied.",
+       "*   **Allowed Measures:** Used **Inlet Temperature Setpoint Retuning** (450/500°C split) a",
+       "*   **No New Hardware:** All signals are derived from existing flow meters and temperature",
+       "*   **Premise Validity:** Uses stated flow and pressure instruments; does not assume new s"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: TIC-101 | 1.  **(c) Parameter Change:** Modify the Inlet Temperature Control Loop (TIC-101"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Trans ingress of oxygen into the synthesis loop reacts with the iron catalyst to form irreversible oxide species, governed by the Arrhenius-dependent oxidation kinetics where higher temperature and partial pressure increase the damage rate. | ingredient: The intervention reduces the baseline temperature to lower the reaction rate constant and employs high-flow nitrogen purging to dilute oxygen partial pressure, thereby decreasing the cumulative integral of poisoning over time. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Trans ingress of oxygen into the synthesis loop reacts with the iron catalyst to form irreversible oxide species, governed by the Arrhenius-dependent oxidation kinetics where higher temperature and partial pressure increase the damage rate.",
+      "ingredient_action": "The intervention reduces the baseline temperature to lower the reaction rate constant and employs high-flow nitrogen purging to dilute oxygen partial pressure, thereby decreasing the cumulative integral of poisoning over time.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "a6ce623563952287",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Stage A (Normal):** 450°C.; *   **Stage B (Transient):** 500°C.; *   *Source:* Existing DCS/HMI configur",
+      "NAMED_VARIANT: model/brand-marker: TIC-101 | 1.  **(c) Parameter Change:** Modify the Inlet Temperature Control Loop (TIC-101",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 8365,
+     "latency_s": 15.4,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow meters ar",
+       "*   *Operating Parameter:* Setpoint logic: If ($\\Delta P > \\Delta P_{baseline} + 10\\%$) OR",
+       "*   *Action:* Upon State B trigger, the system automatically ramps the Inlet Temperature S",
+       "*   *Duration:* State B holds until $\\Delta P$ returns to baseline $\\pm 5\\%$ for 30 minute",
+       "*   *Operating Parameter:* Normal State A: 450°C. Transient State B: 500°C.",
+       "*   *Constraint:* 500°C is within the manufacturer's rated continuous operating limit for ",
+       "1.  Simulate an oxygen transient by introducing a measured 500 ppm $O_2$ spike into the sy",
+       "2.  Reset catalyst activity (regenerate or use a fresh section if available for testing). ",
+       "3.  Measure $\\Delta P$ during the transient and the post-transient ammonia conversion effi",
+       "*   **Failure of Proposed Mitigation:** If, during State B, the post-transient ammonia con",
+       "*   **Success:** If, during State B, the post-transient ammonia conversion efficiency retu"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: TIC-101 | *   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Transient ingress of oxygen into the synthesis loop adsorbs onto the iron catalyst surface, increasing surface oxygen coverage ($\\theta_O$) and forming non-reactive oxides that permanently poison the active sites. | ingredient: The temperature-hold-and-purge protocol increases the inlet temperature, which thermally promotes the desorption and reaction (e.g., methanation or reduction) of absorbed oxygen species, thereby decreasing surface oxygen coverage. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Transient ingress of oxygen into the synthesis loop adsorbs onto the iron catalyst surface, increasing surface oxygen coverage ($\\theta_O$) and forming non-reactive oxides that permanently poison the active sites.",
+      "ingredient_action": "The temperature-hold-and-purge protocol increases the inlet temperature, which thermally promotes the desorption and reaction (e.g., methanation or reduction) of absorbed oxygen species, thereby decreasing surface oxygen coverage.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "6579bc58b29e1a30",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow meters ar; *   *Operating Par",
+      "NAMED_VARIANT: model/brand-marker: TIC-101 | *   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "6579bc58b29e1a30",
+   "final_chars": 8365
+  },
+  {
+   "problem_id": "HO9-06-ethylene-cracker-coke",
+   "generated_at": "2026-11-18T08:15:32.752615Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 8666,
+     "latency_s": 12.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation:** Zero cost. DCS logic change takes <1 hour by control engineer. Stand",
+       "*   **Commissioning:** Operator training on the new 60-second event. Standard practice req",
+       "*   **Operation:** No change in average energy consumption. The pulse is short (60s) relat",
+       "*   **Maintenance:** No additional wear on valves compared to normal modulation. The rapid",
+       "*   **Operational Loss:** The feed ramp to 100% for 60s increases production slightly (neg",
+       "*   **Conclusion:** The burden is **Same-or-Lower**. The mechanism relies entirely on rear",
+       "*   **Protocol:** Run the ethylene cracker for one full \"run\" (2–3 weeks) under standard s",
+       "*   **Instruments:** Use existing Furnace Outlet Temperature (TIT-105), Coil Outlet Temper",
+       "*   **Pass/Fail Thresholds:**",
+       "1.  **Coke Growth Rate:** Measure the increase in Coil Outlet Temperature (COT) per unit o",
+       "2.  **Run Length:** The pulsed run must extend the \"time-to-next-decoking\" by **>20%** com",
+       "3.  **Safety:** No tube metal temperature (TMT) excursions above 850°C + 5°C during the pu",
+       "*   **Duration:** Two consecutive runs (4–6 weeks total).",
+       "*   **Kill Criterion:** If the COT rise rate does not improve, or if TMT spikes above 855°",
+       "*   **Allowed Measures:** \"decoking-cycle/feed-ramp procedure only\". My proposal is a *fee",
+       "*   **Exclusions:** \"No coil or furnace redesign\". My proposal adds no hardware.",
+       "*   **Performance Bounds:** Maintains 850°C operation. The pulse does not alter the mean t",
+       "*   **Forbidden Classes:** No custom machining, no new coating, no custom calibration, no ",
+       "*   **Premise Validity:** The flow is unidirectional. The \"pressure differential\" is creat"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Commissioning:** Operator training on the new 60-second event. Standard practice requires steady-state m"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: FIC-101 | *Standard Practice Bill for Comparison:* Steady-state controller loops for Dilut",
+       "model/brand-marker: FIC-101 | | **2. Steam Modulation** | During the 60s pulse: Ramp FIC-101 (Steam) from 100%",
+       "model/brand-marker: FIC-100 | | **3. Feed Ramp** | Simultaneously with Steam drop: Ramp FIC-100 (Feed) from 90",
+       "model/brand-marker: TIT-105 | *   **Instruments:** Use existing Furnace Outlet Temperature (TIT-105), Coil Out"
+      ],
+      "CONVERSION": [
+       "PREMISE_TOPOLOGY_INVALID: flow-reversal claim on a no-second-path topology: mentum change of the gas itself, not by reversing the flow through a different path. The steam surge propagates down t"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The deposition of coking precursors onto the hot tube wall is driven by the residence time and local concentration of hydrocarbons in the laminar sublayer, which promotes heterogeneous pyrolysis and polymerization reactions. | ingredient: The transient steam surge increases the local shear stress at the wall, which mechanically detaches the nascent coke layer, thereby reducing the accumulation of the deposit (the damage term) over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The deposition of coking precursors onto the hot tube wall is driven by the residence time and local concentration of hydrocarbons in the laminar sublayer, which promotes heterogeneous pyrolysis and polymerization reactions.",
+      "ingredient_action": "The transient steam surge increases the local shear stress at the wall, which mechanically detaches the nascent coke layer, thereby reducing the accumulation of the deposit (the damage term) over the duty cycle.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "3939f22e97172166"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 6606,
+     "latency_s": 9.1,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill for Comparison:** Steady-state controller loops for Dilution ",
+       "*   **Your Bill Rows:**",
+       "*   **Hardware:** 0 new components. Same valves, sensors, and DCS nodes as standard practi",
+       "*   **Installation:** Same or lower. Logic change is trivial compared to installing a new ",
+       "*   **Operation:** Slight increase in operator vigilance during decoking.",
+       "*   **Operational Loss Pricing:** The +15% steam increase for 60 seconds consumes addition",
+       "*   **Conclusion:** Same-or-lower burden class. No new hardware, no new maintenance tasks."
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: FIC-101 | 1.  **DCS Logic Modification for Dilution-steam Ratio Setpoint:** Change the set"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: High local hydrocarbon partial pressure and low steam concentration at the tube wall drive the net formation rate of coke precursors. | ingredient: The transient increase in dilution steam mole fraction reduces the local hydrocarbon partial pressure, thereby inhibiting the net rate of coke precursor formation and deposition. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "High local hydrocarbon partial pressure and low steam concentration at the tube wall drive the net formation rate of coke precursors.",
+      "ingredient_action": "The transient increase in dilution steam mole fraction reduces the local hydrocarbon partial pressure, thereby inhibiting the net rate of coke precursor formation and deposition.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "eac8e6a0a48742c6",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Standard Practice Bill for Comparison:** Steady-state controller loops for Dilution ; *   **Your Bill Ro",
+      "NAMED_VARIANT: model/brand-marker: FIC-101 | 1.  **DCS Logic Modification for Dilution-steam Ratio Setpoint:** Change the set"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6013,
+     "latency_s": 8.3,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill for Comparison:** Steady-state DCS setpoints for Dilution Ste",
+       "*   **Your Bill Rows:**",
+       "*   **Hardware:** Zero. The mechanism uses existing DCS loops and valves.",
+       "*   **Installation:** Zero. No physical installation required; only software logic update ",
+       "*   **Operational Loss:** The cycle involves a 10% feed reduction for 30 minutes every 24 ",
+       "*   **Conclusion:** Same-or-lower burden class. The operational loss is negligible and exp",
+       "*   **Protocol:** Run the unit in steady state for 72 hours. Record Coil Outlet Temperatur",
+       "*   **Instruments:** Existing DCS historical data logger for COT and Dilution Ratio ($R$).",
+       "*   **Pass/Fail Threshold:** Pass if the COT drift rate decreases by >20% compared to the ",
+       "*   **Duration:** 72 hours per phase.",
+       "*   **Kill Criterion:** If COT drift accelerates (positive feedback not broken) or if pres",
+       "*   **Permitted Set:** The intervention is a \"decoking-cycle/feed-ramp procedure,\" which i",
+       "*   **Direction of Effect:** Moves coking integral down. Correct.",
+       "*   **Input Availability:** Uses existing $F_{feed}$, $F_{steam}$, and $T_{out}$ signals. ",
+       "*   **Cost Pricing:** Operational loss <0.01% throughput, explicitly stated.",
+       "*   **Deployed Part Clause:** No modification to coil tubes. Only DCS logic and valve setp",
+       "*   **NAMED VARIANT:** No brands or model numbers used. Only generic DCS logic and standar"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The dominant industrial driver of radiant-coil coke deposition and subsequent metal temperature rise is the net chemical coking rate ($k_c$), which increases exponentially with wall temperature and decreases with higher steam-to-carbon ratios ($R_{SC}$). | ingredient: The proposed feed-ramp procedure transiently increases the steam-to-feed ratio ($R$) and induces high-velocity steam scouring, which physically removes coke and chemically suppresses further formation, thereby reducing the net accumulation of the thermal resistive coke layer. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The dominant industrial driver of radiant-coil coke deposition and subsequent metal temperature rise is the net chemical coking rate ($k_c$), which increases exponentially with wall temperature and decreases with higher steam-to-carbon ratios ($R_{SC}$).",
+      "ingredient_action": "The proposed feed-ramp procedure transiently increases the steam-to-feed ratio ($R$) and induces high-velocity steam scouring, which physically removes coke and chemically suppresses further formation, thereby reducing the net accumulation of the thermal resistive coke layer.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "50a165c94eb0f748",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Standard Practice Bill for Comparison:** Steady-state DCS setpoints for Dilution Ste; *   **Your Bill Ro"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6932,
+     "latency_s": 9.6,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Coke deposition in ethylene crackers is driven by high wall temperatures and hydrocarbon partial pressures, which increase the rate of secondary polymerization reactions according to the Arrhenius law. | ingredient: The proposed mitigation lowers the hydrocarbon partial pressure (via DSR increase) and wall temperature (via COT decrease) during the scour window, thereby reducing the coke formation rate integral over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Coke deposition in ethylene crackers is driven by high wall temperatures and hydrocarbon partial pressures, which increase the rate of secondary polymerization reactions according to the Arrhenius law.",
+      "ingredient_action": "The proposed mitigation lowers the hydrocarbon partial pressure (via DSR increase) and wall temperature (via COT decrease) during the scour window, thereby reducing the coke formation rate integral over the duty cycle.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "ba0099ea80b2e6f1",
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "ba0099ea80b2e6f1",
+   "final_chars": 6932
+  },
+  {
+   "problem_id": "HO9-07-hydrotreater-sulfiding",
+   "generated_at": "2026-11-18T08:16:23.796308Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7030,
+     "latency_s": 8.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom material"
+      ],
+      "BILL_UNTAGGED": [
+       "*   **Installation:** Zero hardware installation. The change is purely a software setpoint",
+       "*   **Commissioning:** Standard commissioning for a setpoint change. No new validation tes",
+       "*   **Operation:** The total sulfiding time increases by ~6 hours (4h hold + 2h hold vs. l",
+       "*   **Maintenance:** No new maintenance.",
+       "*   **Conclusion:** Same-or-lower burden class. The intervention uses only existing infras",
+       "*   **Protocol:** Run a sulfiding cycle on the reactor using the modified profile (150°C h",
+       "*   **Instruments:** Existing DMDS analyzer (spectroscopy or titration) in the effluent st",
+       "*   **Pass/Fail Thresholds:**",
+       "1.  **Effluent H₂S Peak:** The H₂S peak in the effluent during the 150°C hold should be br",
+       "2.  **Final Sulfur Content:** Post-sulfiding catalyst core sampling (if taken) or initial ",
+       "3.  **Time-to-Full-Activity:** The time to reach 99% of maximum HDS activity must be < 1 h",
+       "*   **Duration:** 24 hours (including the 6-hour hold extension).",
+       "*   **Kill Criterion:** If the initial HDS activity is <80% of theoretical maximum, or if ",
+       "*   **Constraint Fit:** The intervention uses \"sulfiding temperature ramp setpoint retunin",
+       "*   **Catalog-Composition:** No new hardware. No custom materials. No bespoke calibration.",
+       "*   **Premise Validity:** The system is a fixed-bed reactor (unidirectional flow). The int",
+       "*   **Operational Loss Pricing:** The sulfiding phase is non-producing. Extending the non-"
+      ],
+      "NAMED_VARIANT": [
+       "variant-marker: bespoke | *   **Catalog-Composition:** No new hardware. No custom materials. No bespoke ca"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "DIRECTION_UNPROVEN": [
+       "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+      ]
+     },
+     "direction_check": {
+      "direction": "UNCLEAR",
+      "reason": "driver: Incomplete catalyst sulfiding is driven by insufficient chemical potential of sulfur and hydrogen to kinetically convert the oxidized CoMo precursor into the active MoS2 and Co-Mo-S phases before the operating temperature is reached. | ingredient: The modified temperature ramp holds the reactor at a lower temperature (150°C) for an extended period, which reduces the reaction kinetics for sulfur incorporation (lowering R_sulf) without altering the sulfur chemical potential. | ingredient sign vs driver: UNSTATED -> UNCLEAR",
+      "established_driver": "Incomplete catalyst sulfiding is driven by insufficient chemical potential of sulfur and hydrogen to kinetically convert the oxidized CoMo precursor into the active MoS2 and Co-Mo-S phases before the operating temperature is reached.",
+      "ingredient_action": "The modified temperature ramp holds the reactor at a lower temperature (150°C) for an extended period, which reduces the reaction kinetics for sulfur incorporation (lowering R_sulf) without altering the sulfur chemical potential.",
+      "sign_of_ingredient_vs_driver": "UNSTATED",
+      "divergence": "the model labeled INVERTED but the sign comparison derives UNCLEAR — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "7f77f865bfd43423"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8318,
+     "latency_s": 41.3,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Adjust Sulfiding Temperature Ramp Setpoints:**",
+       "*   **Action:** Modify the DCS profile for the sulfiding phase. Increase the temperature r",
+       "*   **Specification:** Standard DCS setpoint modification; no hardware change.",
+       "2.  **Increase DMDS Dosing Rate:**",
+       "*   **Action:** Adjust the flow setpoint of the existing DMDS dosing pump to 150% of the s",
+       "*   **Specification:** Verify pump capacity allows 150% flow; if at limit, extend dosing t",
+       "3.  **Verify H2/Oil Ratio Procedure:**",
+       "*   **Action:** Maintain the existing H2/oil ratio procedure as per constraint. Ensure H2 ",
+       "*   **Specification:** No change to H2 supply; standard operation.",
+       "4.  **Commissioning/Validation Protocol:**",
+       "*   **Action:** Before full hydrocarbon introduction, verify bed temperature uniformity us",
+       "*   **Specification:** No new instrumentation.",
+       "*   **Hardware:** Zero new hardware. All changes are software setpoints and procedure para",
+       "*   **Installation:** Zero hardware installation. The change is purely a software setpoint",
+       "*   **Commissioning:** Standard DCS point-to-point checks (already performed during routin",
+       "*   **Operational Loss:** The intervention is applied during the *sulfiding* phase, which ",
+       "*   **Parity Conclusion:** Same-or-lower burden. The \"cost\" is a slight increase in DMDS c"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The established physical driver of incomplete catalyst sulfiding is insufficient thermal energy and sulfur species availability to overcome the activation energy barrier for the exothermic conversion of metal oxides to metal sulfides. | ingredient: The remedy imposes increased thermal driving force and chemical sulfur activity, which accelerates the sulfiding reaction rate, thereby reducing the time-integrated deficit of sulfide formation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The established physical driver of incomplete catalyst sulfiding is insufficient thermal energy and sulfur species availability to overcome the activation energy barrier for the exothermic conversion of metal oxides to metal sulfides.",
+      "ingredient_action": "The remedy imposes increased thermal driving force and chemical sulfur activity, which accelerates the sulfiding reaction rate, thereby reducing the time-integrated deficit of sulfide formation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "391c0c0bbcf008f2",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Adjust Sulfiding Temperature Ramp Setpoints:**; *   **Action:** Modify the DCS profile for the sulfiding"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 8670,
+     "latency_s": 12.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom material"
+      ],
+      "BILL_UNTAGGED": [
+       "*   **Row 1:** Modify DCS Temperature Ramp Setpoints: Change the single linear ramp to a 4",
+       "*   **Row 2:** Modify DCS H2/Oil Ratio Setpoints: Synchronize the H2/oil ratio controller ",
+       "*   **Row 3:** Verify DMDS Injection Timing: Ensure DMDS injection begins *before* the fir",
+       "*   **Standard Practice Bill:** Requires DCS configuration for temperature ramp, H2/oil ra",
+       "*   **My Bill:**",
+       "*   **Installation:** 0 hours. No physical work.",
+       "*   **Commissioning:** ~8-12 hours of DCS configuration to program the step logic and inte",
+       "*   **Operation:** No operational loss. The process runs at the same total throughput. The",
+       "*   **Cost Class:** Same. No new hardware.",
+       "*   **Operational Loss Pricing:** The sulfiding cycle is typically a startup activity. The"
+      ],
+      "DIRECTION_CHECK_UNAVAILABLE": [
+       "typed fail-open: JSONDecodeError: Invalid \\escape: line 1 column 525 (char 524) (the authoritative read stays the auditor's)"
+      ]
+     },
+     "direction_check": {
+      "direction": "DIRECTION_CHECK_UNAVAILABLE",
+      "reason": "JSONDecodeError: Invalid \\escape: line 1 column 525 (char 524)"
+     },
+     "sha256_16": "ac34443f1c9b1082",
+     "findings_disclosed": [
+      "DEV_NEED: custom material",
+      "BILL_UNTAGGED: *   **Row 1:** Modify DCS Temperature Ramp Setpoints: Change the single linear ramp to a 4; *   **Row 2:** Mod",
+      "DIRECTION_CHECK_UNAVAILABLE: typed fail-open: JSONDecodeError: Invalid \\escape: line 1 column 525 (char 524) (the authoritative read stays "
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6610,
+     "latency_s": 8.9,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation:** 0. No hardware installation.",
+       "*   **Commissioning:** 0. Uses existing DCS recipes and control loops.",
+       "*   **Operation:** **Zero operational loss.** The \"Hold\" steps add time to the startup seq",
+       "*   **Maintenance:** 0. No new parts.",
+       "*   **Conclusion:** Same-or-lower burden class. The burden is purely temporal (startup dur"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The failure is driven by a deficit in the sulfur chemical potential (insufficient H2S partial pressure) at the metal sites, which prevents the sulfiding reaction from completing within the thermal window. | ingredient: The active ingredient (holding temperature and stabilizing H2S partial pressure) increases the local chemical potential of sulfur and extends the time integral of the driving force, thereby adding positive drive to the sulfiding process and removing the deficit. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The failure is driven by a deficit in the sulfur chemical potential (insufficient H2S partial pressure) at the metal sites, which prevents the sulfiding reaction from completing within the thermal window.",
+      "ingredient_action": "The active ingredient (holding temperature and stabilizing H2S partial pressure) increases the local chemical potential of sulfur and extends the time integral of the driving force, thereby adding positive drive to the sulfiding process and removing the deficit.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "17d74cdcc42b1c84",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Installation:** 0. No hardware installation.; *   **Commissioning:** 0. Uses existing DCS recipes and co",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "17d74cdcc42b1c84",
+   "final_chars": 6610
+  },
+  {
+   "problem_id": "HO9-08-flotation-bubble-coalescence",
+   "generated_at": "2026-11-18T08:17:40.766498Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 8031,
+     "latency_s": 16.5,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Parameter 1 (Pulse Ratio):** Set a duty cycle where $Q_{air} = 2.0 \\times Q_{std}$ f",
+       "*   **Final Parameter:** **Pulse Pattern:** Square wave modulation of air flow between $1.",
+       "*   **Hardware Cost:** **Zero.** No new valves, sensors, or instruments are procured. Only",
+       "*   **Installation:** **Zero.** No physical installation required. Commissioning involves ",
+       "*   **Maintenance:** **Same or Lower.** Pulsing air valves may increase actuator wear slig",
+       "*   **Operational Loss:** **Zero.** The mean air flow rate is maintained at the standard $",
+       "*   **Constraint Compliance:**",
+       "*   *No column/sparger redesign:* Met.",
+       "*   *Allowed measures:* \"Air-rate procedure only\" is explicitly allowed. This is a procedu",
+       "1.  **Baseline:** Run the column at standard steady-state air flow $Q_{std}$ and record ba",
+       "2.  **Intervention:** Switch the PLC to the PAFR mode: $Q_{air}(t)$ oscillates between $1.",
+       "3.  **Measurement:** Monitor froth depth fluctuation ($\\sigma_{froth}$) and Cu recovery (%",
+       "4.  **Duration:** 24 hours.",
+       "5.  **Pass/Fail Thresholds:**",
+       "*   **Froth Stability:** $\\sigma_{froth}$ must decrease by $\\geq 20\\%$ compared to baselin",
+       "*   **Recovery:** Cu Recovery must maintain or increase baseline by $\\geq 2\\%$.",
+       "*   **Bubble Size:** (Optional offline check) Laser Diffraction at the outlet must show a ",
+       "6.  **Kill Criterion:** If froth depth becomes unstable (large oscillations >50cm) or air ",
+       "*   **Constraint 0 (Allowed Measures):** The problem allows \"air-rate procedure only.\" Thi",
+       "*   **Constraint 2 (Exclusions):** No column/sparger redesign. Met.",
+       "*   **Weight Rule:** The burden is minimal (software update). It rides on existing infrast",
+       "*   **Novelty:** The mechanism (pulsed shear to inhibit coalescence) is a departure from s"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Bubble coalescence is driven by the accumulation of gas volume at the interface, where gas holdup and interfacial stagnation allow the film between adjacent bubbles to drain, leading to merger. | ingredient: The active ingredient (high-velocity air pulse) imposes a high shear rate and pressure fluctuation that fragments large bubbles into smaller ones, counteracting the growth of coalescence and reducing the driving gas holdup for coalescence. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Bubble coalescence is driven by the accumulation of gas volume at the interface, where gas holdup and interfacial stagnation allow the film between adjacent bubbles to drain, leading to merger.",
+      "ingredient_action": "The active ingredient (high-velocity air pulse) imposes a high shear rate and pressure fluctuation that fragments large bubbles into smaller ones, counteracting the growth of coalescence and reducing the driving gas holdup for coalescence.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "6ea5670580c65f1a"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 6492,
+     "latency_s": 10.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation:** 0 hours. No hardware installation required.",
+       "*   **Commissioning:** 2 hours (DCS reconfiguration). Standard practice also requires 2 ho",
+       "*   **Operation:**",
+       "*   *Standard Practice:* Continuous air energy cost = $E_{air} \\times Q_{std}$.",
+       "*   *Intervention:* Mean air volume is reduced to $0.8 Q_{std}$. However, the compressor d",
+       "*   *Operational Loss Pricing:* **Zero net loss.** The intervention explicitly reduces the",
+       "*   **Maintenance:** No change. Valve cycles 5 Hz; standard pneumatic valves handle 100 Hz",
+       "*   **Conclusion:** Same-or-lower burden class. No new procurement.",
+       "1.  Run column at steady state with standard frother/collector dosing and constant air flo",
+       "2.  Switch to pulsed mode: 2 s on / 8 s off, 80% of $Q_{std}$ mean flow. Run for 24 hours.",
+       "3.  Measure: Froth stability (CV% of level), Recovery (from assay data), and Selectivity.",
+       "*   Existing column level sensor (for stability).",
+       "*   Standard lab assays (for recovery/selectivity).",
+       "*   Existing flow meter (for verification of mean air rate).",
+       "*   **Stability:** CV% of froth height must decrease by >20% compared to steady-state.",
+       "*   **Recovery:** Must maintain within 95% of baseline recovery.",
+       "*   **Selectivity:** Must increase or remain constant.",
+       "*   If froth slumping occurs (level drops >50% during off-phase) or recovery drops >5% des",
+       "*   **Permitted Set:** The constraint allows \"air-rate procedure only.\"",
+       "*   **Compliance:** The intervention is a change in the air-rate *profile* (pulse vs. cons",
+       "*   **Deployed Part Clause:** No modification to the column, sparger, or frother injection",
+       "*   **Direction-of-Effect:** Correct. We reduce the driving variable (froth volume/coalesc"
+      ],
+      "DIRECTION_UNPROVEN": [
+       "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+      ]
+     },
+     "direction_check": {
+      "direction": "UNCLEAR",
+      "reason": "driver: High bubble concentration and residence time in the froth zone, caused by continuous high air flow, lead to film overlap and coalescence. | ingredient: Pulsed air dosing reduces the time-averaged air flow rate and allows froth drainage, which decreases bubble concentration and film overlap. | ingredient sign vs driver: UNSTATED -> UNCLEAR",
+      "established_driver": "High bubble concentration and residence time in the froth zone, caused by continuous high air flow, lead to film overlap and coalescence.",
+      "ingredient_action": "Pulsed air dosing reduces the time-averaged air flow rate and allows froth drainage, which decreases bubble concentration and film overlap.",
+      "sign_of_ingredient_vs_driver": "UNSTATED"
+     },
+     "sha256_16": "260be65bfe9fe01c",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Installation:** 0 hours. No hardware installation required.; *   **Commissioning:** 2 hours (DCS reconfi",
+      "DIRECTION_UNPROVEN: the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign t"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 5201,
+     "latency_s": 40.5,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Hardware:** 0 new items. (Standard practice uses steady dosing; this uses pulsed dos",
+       "*   **Commissioning:** 2 hours for DCS logic configuration and tuning of pulse widths. (Lo",
+       "*   **Operational Loss:** **Zero.** The total volumetric flow of air and chemicals over th",
+       "*   **Conclusion:** Same-or-lower burden. The mechanism requires only control logic change",
+       "*   **Protocol:**",
+       "1.  Record baseline froth stability (froth density, half-life) under steady-state dosing/a",
+       "2.  Implement synchronized pulsed dosing and air (e.g., 30s/60s) via DCS.",
+       "3.  Run for 24 hours. Monitor froth stability metrics and copper recovery grade.",
+       "*   **Instruments:** Existing froth stability sensor (if present) or visual observation/ph",
+       "*   **Pass/Fail:**",
+       "*   **Pass:** Froth half-life increases by >20% AND copper recovery grade improves or main",
+       "*   **Kill Criterion:** If froth becomes overly dense (dead froth) or slippage increases b",
+       "*   **Falsification:** If froth instability metrics do not improve (coalescence rate remai"
+      ],
+      "APPARATUS_ROW": [
+       "3.  Run for 24 hours. Monitor froth stability metrics and copper recovery grade."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Bubble coalescence in flotation columns is driven by the depletion of surfactant (frother) at the interface, which lowers interfacial elasticity and disjoining pressure, allowing bubble film drainage and rupture. | ingredient: The synchronized pulsed dosing transiently increases the local surfactant concentration ($C_s$) above the critical threshold at the moment of bubble generation, thereby increasing interfacial rigidity and opposing the coalescence process. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Bubble coalescence in flotation columns is driven by the depletion of surfactant (frother) at the interface, which lowers interfacial elasticity and disjoining pressure, allowing bubble film drainage and rupture.",
+      "ingredient_action": "The synchronized pulsed dosing transiently increases the local surfactant concentration ($C_s$) above the critical threshold at the moment of bubble generation, thereby increasing interfacial rigidity and opposing the coalescence process.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "7530219936e84be9",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Hardware:** 0 new items. (Standard practice uses steady dosing; this uses pulsed dos; *   **Commissionin",
+      "APPARATUS_ROW: 3.  Run for 24 hours. Monitor froth stability metrics and copper recovery grade.",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6685,
+     "latency_s": 13.7,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom formulation"
+      ],
+      "BILL_UNTAGGED": [
+       "*   **Hardware:** 0 new items. Standard practice uses the valve; we use the same valve.",
+       "*   **Commissioning:** 0 new instruments. Standard practice commissions the loop; we modif",
+       "*   **Operational Loss:** **Zero.** The time-averaged air rate is identical to the standar",
+       "*   **Conclusion:** Same burden class as standard practice. We are not adding hardware, no"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: The established physical driver of bubble-coalescence froth instability is a net coalescence rate where the rate of bubble collision and adhesion exceed"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: The established physical driver of bubble-coalescence froth instability is a net coalescence rate where the rate of bubble collision and adhesion exceeds the rate of breakup, typically induced by excessive gas kinetic energy and interfacial shear stress exceeding the critical she | ingredient: The ingredient's active process of modulating the air-rate valve to impose transient, high-frequency aerodynamic shear directly adds positive interfacial stress to the damage integral, which promotes bubble deformation and coalescence at the same sign as the failure driver. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "The established physical driver of bubble-coalescence froth instability is a net coalescence rate where the rate of bubble collision and adhesion exceeds the rate of breakup, typically induced by excessive gas kinetic energy and interfacial shear stress exceeding the critical she",
+      "ingredient_action": "The ingredient's active process of modulating the air-rate valve to impose transient, high-frequency aerodynamic shear directly adds positive interfacial stress to the damage integral, which promotes bubble deformation and coalescence at the same sign as the failure driver.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "5d1dd30107182c66",
+     "findings_disclosed": [
+      "DEV_NEED: custom formulation",
+      "BILL_UNTAGGED: *   **Hardware:** 0 new items. Standard practice uses the valve; we use the same valve.; *   **Commissioning:*",
+      "PHYSICS_DIRECTION_INVERTED: the sign/integral check reads the mechanism INVERTED: driver: The established physical driver of bubble-coales"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "5d1dd30107182c66",
+   "final_chars": 6685
+  },
+  {
+   "problem_id": "HO9-09-thickener-bed-compaction",
+   "generated_at": "2026-11-18T08:19:09.770662Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 10313,
+     "latency_s": 17.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation:** Standard practice uses the existing PLC/DCS. My intervention uses th",
+       "*   **Commissioning:** Requires re-programming the interlock logic. This is a standard con",
+       "*   **Operation:** No new physical actuation required. The pump and rake are existing. The",
+       "*   *Refined Mechanism:* The \"Duty Cycle\" must apply to the **Recirculation** (which is al",
+       "*   *Wait, User Variables:* \"allowed measures: ... bed-level/underflow setpoint retuning, ",
+       "*   *Interpretation:* I can change the underflow setpoint (level) and the rake procedure.",
+       "*   *Revised Bill Row 1:* Change the underflow level setpoint to a *higher* level (lower b",
+       "*   *Revised Mechanism:* The novelty must be the **sequence**.",
+       "*   *Correction on Pump Flow:* Most thickener underflow systems use a control valve on a *",
+       "*   *Operational Loss Pricing:* If I cycle the valve, the *average* level will be higher t",
+       "*   *Actually, the simplest valid arrangement:* Use the **Recirculation** measure.",
+       "*   *Let's stick to the \"Sequenced Interconnection\" but ensure no flow loss.*",
+       "*   *Revised Bill:* The pump is constant speed. The valve is modulating.",
+       "*   *Standard Practice:* Valve opens 50% continuously. Average flow = 50%.",
+       "*   *My Practice:* Valve opens 100% for 50% of the time (Pump-Drain Phase), and 0% for 50%",
+       "*   *Burden:* **Same or Lower.** No new hardware. Only programming change.",
+       "*   **Maintenance:** No new moving parts added. The valve cycles more frequently (1 cycle/",
+       "*   **Conclusion:** Same-or-lower burden class.",
+       "*   **Protocol:**",
+       "1.  Baseline: Run standard continuous modulation (valve at 50% open) for 24 hours. Record ",
+       "2.  Intervention: Switch to \"Dense Bed Locking\" mode:",
+       "*   30 Min Phase A: Rake at max speed, Underflow Valve 0% (Closed).",
+       "*   30 Min Phase B: Rake Stopped, Underflow Valve 100% (Open).",
+       "*   Repeat cycle.",
+       "3.  Measure underflow SG at the pipe outlet every 15 minutes for 72 hours.",
+       "*   **Instruments:** Existing underflow density meter (or portable nuclear/sonar gauge).",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Pass:** Time-averaged underflow SG increases by > 0.05 (e.g., from 1.15 to 1.20) whi",
+       "*   **Fail:** Bed level fluctuates by > 1.0 meter (operational instability) OR underflow S",
+       "*   **Duration:** 72 hours.",
+       "*   **Kill Criterion:** If the underflow stream shows > 10% increase in fines content (mea"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Sustained high underflow draw-off velocity (hydraulic suction) creates a downward fluid flow that exceeds the settling velocity of fines, entraining and compacting them into the thick bed. | ingredient: The sequenced operation isolates the draw-off phase to periods of zero mechanical shear and allows a consolidation phase with zero underflow velocity, fundamentally reducing the time-averaged hydraulic entrapment stress acting on the settling zone. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Sustained high underflow draw-off velocity (hydraulic suction) creates a downward fluid flow that exceeds the settling velocity of fines, entraining and compacting them into the thick bed.",
+      "ingredient_action": "The sequenced operation isolates the draw-off phase to periods of zero mechanical shear and allows a consolidation phase with zero underflow velocity, fundamentally reducing the time-averaged hydraulic entrapment stress acting on the settling zone.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "fb882cb7dd53dd46"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 7548,
+     "latency_s": 10.0,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Configuration/Duty Cycle Change.",
+       "*   **Hardware:** **Zero (0)** new hardware. All components (PLC, VFD, Gate, Sensor) are a",
+       "*   **Installation:** **Zero (0)** physical installation. The work is purely software/conf",
+       "*   **Commissioning:** Minimal. Requires tuning the $t_{scour}$ duration and $\\omega_{high",
+       "*   **Operational Loss Pricing:**",
+       "*   **Throughput:** During the 10-min scouring phase, underflow gate is at 50%. Production",
+       "*   **Energy:** Rake energy increases slightly (speed $\\uparrow$), but this is negligible ",
+       "*   **Net Benefit:** The 8.3% throughput reduction is traded for a significant increase in"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Sustained compressive stress from overlying slurry causes particle network consolidation, expelling water and increasing bed density. | ingredient: Pulsed high-shear rake action mechanically disrupts the solid network, reducing effective compressive stress and re-entraining particles. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Sustained compressive stress from overlying slurry causes particle network consolidation, expelling water and increasing bed density.",
+      "ingredient_action": "Pulsed high-shear rake action mechanically disrupts the solid network, reducing effective compressive stress and re-entraining particles.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "140b5d8637e99425",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Configuration/Duty Cycle Change.; *   **Hardware:** **Zero (0)** new hardware. All co",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 10303,
+     "latency_s": 13.6,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Flocculant dosing system (existing)",
+       "2. Bed level control loop (existing, setpoint fixed)",
+       "3. Rake drive (existing, constant speed)",
+       "4. Underflow discharge valve (existing)",
+       "- **Hardware Burden:** 0 new hardware. All controls are reprogramming of existing PLC/DCS ",
+       "- **Procedural Burden:** Operator must accept a new 2-hour cycle. No new maintenance inter",
+       "- **Operational Loss:** The system spends 10% of the time at a lower bed level (Setpoint B"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Bed compaction underflow density limitations are industrially caused by an insufficient steady-state underflow discharge rate that leads to the excessive accumulation of solids mass, creating the static pressure and depth necessary for the bed to compact. | ingredient: The intervention imposes a temporary reduction in the system's solids inventory and underflow discharge velocity by lowering the bed height setpoint during the flush cycle, which reduces the local solid concentration and pressure driving the compaction mechanism. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Bed compaction underflow density limitations are industrially caused by an insufficient steady-state underflow discharge rate that leads to the excessive accumulation of solids mass, creating the static pressure and depth necessary for the bed to compact.",
+      "ingredient_action": "The intervention imposes a temporary reduction in the system's solids inventory and underflow discharge velocity by lowering the bed height setpoint during the flush cycle, which reduces the local solid concentration and pressure driving the compaction mechanism.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "6e4e85f12e7d5db2",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. Flocculant dosing system (existing); 2. Bed level control loop (existing, setpoint fixed); 3. Rake drive (e"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 9067,
+     "latency_s": 14.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Flocculant Selection & Dosing Adjustment:** Select a high-molecular-weight anionic p",
+       "2.  **Bed Level Setpoint Retuning:** Lower the automated bed-level control setpoint from t",
+       "3.  **Rake Speed Duty Cycle Change:** Implement a procedure to reduce the rake speed from ",
+       "4.  **Underflow Discharge Verification:** Maintain existing underflow density monitoring. ",
+       "*   **Hardware:** **Zero** new hardware. All components (dosing pumps, controls, drives) a",
+       "*   **Procurement:** One new chemical item (flocculant). Standard practice *already* procu",
+       "*   **Installation/Commissioning:** **Zero** installation. Changes are software setpoints ",
+       "*   **Operational Loss:** As calculated above, the loss of buffer volume is an acceptable ",
+       "*   **Conclusion:** Same-or-lower burden. This intervention removes the need for future ca"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: The failure is caused by excessive compressive stress at the underflow discharge point (high bed weight), which drives the sludge into a state of over-c"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: The failure is caused by excessive compressive stress at the underflow discharge point (high bed weight), which drives the sludge into a state of over-compaction, hindering dewatering and limiting achievable density. | ingredient: The proposed remedy lowers the bed level and increases rake torque/holding time to deliberately increase the compressive load and consolidation stress on the sludge bed. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "The failure is caused by excessive compressive stress at the underflow discharge point (high bed weight), which drives the sludge into a state of over-compaction, hindering dewatering and limiting achievable density.",
+      "ingredient_action": "The proposed remedy lowers the bed level and increases rake torque/holding time to deliberately increase the compressive load and consolidation stress on the sludge bed.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "97bf895c536d232b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Flocculant Selection & Dosing Adjustment:** Select a high-molecular-weight anionic p; 2.  **Bed Level Se",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration",
+      "PHYSICS_DIRECTION_INVERTED: the sign/integral check reads the mechanism INVERTED: driver: The failure is caused by excessive compressive s"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "97bf895c536d232b",
+   "final_chars": 9067
+  },
+  {
+   "problem_id": "HO9-10-rotary-dryer-flight-lifting",
+   "generated_at": "2026-11-18T08:20:09.824344Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1,
+    "** operating-point retuning (parameter change)": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 10372,
+     "latency_s": 45.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Generic Class:* Existing plant control system (PLC/DCC).",
+       "*   *Location:* Existing feed line control loop.",
+       "*   *Parameter:* $F_{feed\\_base} = 0.9 \\times F_{feed\\_standard}$.",
+       "*   *Generic Class:* Existing control setpoints ($T_{inlet}$, $N_{drum}$, $F_{feed}$).",
+       "*   *Location:* Control HMI/PLC parameter table.",
+       "*   *Parameter:* Mapping table $\\{T_{inlet} \\rightarrow F_{feed}\\}$ with negative slope.",
+       "*   **Standard Practice Bill:** Operator sets $F_{feed}$ to a fixed constant (e.g., 100%).",
+       "*   **My Bill:**",
+       "*   *Row 3 (No New Hardware):* No procurement.",
+       "*   **Conclusion:** The burden is **lower** than standard practice's *failure response* bu",
+       "*   **Protocol:** Run the dryer at the current standard speed $N_{drum}$. Set $T_{inlet}$ ",
+       "1.  Set $F_{feed}$ to the new base (90% of old standard).",
+       "2.  Observe outlet temperature $T_{outlet}$ and residence time (inferred from inventory).",
+       "3.  Measure moisture content of discharge product (standard lab test).",
+       "4.  Compare the *uniformity* of moisture (standard deviation of moisture across multiple s",
+       "*   **Instruments:** Existing moisture analyzer (portable), existing temperature sensors, ",
+       "*   **Pass/Fail Threshold:** The standard deviation of discharge moisture content must dro",
+       "*   **Duration:** 2 hours per setpoint level, 3 repetitions.",
+       "*   **Kill Criterion:** If $T_{outlet}$ drops below the minimum required temperature for t",
+       "1.  **Allowed Measures:** The intervention uses **feed-rate procedure** (change in $F_{fee",
+       "2.  **Catalog Composition:** No new hardware. The \"arrangement\" is the negative correlatio",
+       "3.  **Premise Validity:** The system is a single-input, single-output (mostly) process. Th",
+       "*   **Operational Loss:** Lower feed rate means lower throughput. The ledger must price th",
+       "*   *Loss:* Throughput reduced by ~10-15% relative to maximum capacity.",
+       "*   *Pricing:* If the dryer was operating at 100% capacity, the new procedure operates at ",
+       "*   *Revised Ledger Entry:* \"Operational Loss: 10% throughput reduction. This is a known t"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Conclusion:** The burden is **lower** than standard practice's *failure response* burden (which involves",
+       "4.  **Standard-Bill Bind:** No custom machining. No new sensors. No surface treatments. The \"new\" thing is the"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Excessive material bed thickness relative to drum rotation causes the material to slide rather than be thrown, reducing heat transfer surface area and causing uneven drying. | ingredient: The intervention reduces the feed rate to lower the steady-state inventory, thereby decreasing bed thickness and keeping it below the critical height for effective flight lifting. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Excessive material bed thickness relative to drum rotation causes the material to slide rather than be thrown, reducing heat transfer surface area and causing uneven drying.",
+      "ingredient_action": "The intervention reduces the feed rate to lower the steady-state inventory, thereby decreasing bed thickness and keeping it below the critical height for effective flight lifting.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "fc50b94d5005ecdd"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8586,
+     "latency_s": 47.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Hardware:** Zero change. Standard practice for troubleshooting often involves adding",
+       "*   **Software/Procedure:** Standard practice involves ad-hoc adjustments; this interventi",
+       "*   **Operational Loss Pricing:** The reduction in feed-rate setpoint implies a reduction ",
+       "*   **Conclusion:** Same-or-lower burden class. The intervention is purely parametric.",
+       "*   **Protocol:**",
+       "1.  Establish baseline: Record standard feed rate $F_{std}$, inlet temp $T_{std}$, and out",
+       "2.  Intervention: Reduce feed-rate setpoint to $0.75 F_{std}$. Simultaneously adjust inlet",
+       "3.  Run at new settings for 4 hours to reach steady state.",
+       "4.  Sample outlet material at 3 distinct points (center, near wall, near flight tip) for m",
+       "*   **Instruments:** Existing thermocouples, flow meters, and portable moisture meter (sta",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Pass:** Standard deviation of moisture content across the three sampling points is $",
+       "*   **Fail:** Standard deviation remains $> 1.0\\%$ OR throughput loss exceeds 30% (indicat",
+       "*   **Duration:** 1 day (2h baseline + 4h run + 2h sampling/analysis).",
+       "*   **Kill Criterion:** If outlet temperature does not stabilize at the predicted setpoint",
+       "*   **Allowed Measures:** The problem explicitly allows \"feed-moisture setpoint retuning, ",
+       "*   **Deployed-Part Clause:** No part of the rotary dryer (drum, flights, shell) is modifi",
+       "*   **Input-Availability:** The mechanism requires $Flow_{rate}$ and $Inlet_{Temp}$. The p",
+       "*   **Direction-Correctness:** Reducing feed rate reduces bed depth, which *reduces* the s",
+       "*   **Exemplar-Reality:** No new commercial exemplars are introduced. The \"moisture meter\"",
+       "*   **Premise-Validity:** The mechanism relies on the physical reality that flight lifting",
+       "*   **Certified-System:** Not a regulated medical/food system in a way that restricts setp",
+       "*   **Cost-Pricing:** The cost is the throughput reduction. This is priced in the Burden L",
+       "*   **Mechanism-Diversity:** Mechanism Class: Operating-Point Decoupling."
+      ],
+      "APPARATUS_ROW": [
+       "*   **Hardware:** Zero change. Standard practice for troubleshooting often involves adding sensors or modifyin"
+      ],
+      "DRIVER_CLASS_AS_REMEDY": [
+       "the mechanism's action ingredient 'drying' and the stated failure driver 'drying' are the same action class (wet-dry-cycling) — a remedy may not be its own driver"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Excessive solids inventory (feed rate) increases bed depth, causing the material to submerge the flights and preventing the centrifugal acceleration from lifting the bed, which leads to avalanching and poor drying uniformity. | ingredient: The intervention reduces the feed-rate setpoint, thereby lowering the steady-state solids bed depth below the critical submersion limit, which allows the flights to effectively lift the material and restores the tumbling trajectory. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Excessive solids inventory (feed rate) increases bed depth, causing the material to submerge the flights and preventing the centrifugal acceleration from lifting the bed, which leads to avalanching and poor drying uniformity.",
+      "ingredient_action": "The intervention reduces the feed-rate setpoint, thereby lowering the steady-state solids bed depth below the critical submersion limit, which allows the flights to effectively lift the material and restores the tumbling trajectory.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "5cd1187725b2e8a6",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Hardware:** Zero change. Standard practice for troubleshooting often involves adding; *   **Software/Pro",
+      "APPARATUS_ROW: *   **Hardware:** Zero change. Standard practice for troubleshooting often involves adding sensors or modifyin",
+      "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'drying' and the stated failure driver 'drying' are the same action class (w"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 8191,
+     "latency_s": 9.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Row 1:** Update the **Drum Speed Setpoint** in the existing PLC/VFD controller to a ",
+       "*   **Justification:** Ensures $v > v_{crit}$ for flighting. No hardware change.",
+       "*   **Row 2:** Retune the **Inlet Temperature Cascade Controller** setpoint.",
+       "*   **Justification:** The operator calculates the required $T_{in}$ to achieve target dis",
+       "*   **Row 3:** Implement a **Feed-Rate Procedure** check: Reduce feed rate by 10% initiall",
+       "*   **Justification:** The constraint allows \"feed-rate procedure.\" Reducing feed rate com",
+       "*   **Hardware:** Zero. Standard practice uses the same PLC, VFD, and thermocouples. This ",
+       "*   **Installation:** Zero. No physical installation.",
+       "*   **Commissioning:** Low. Requires 1-2 days of operational data logging to map the new $",
+       "*   **Operational Loss (AM37 D3):**",
+       "*   **Energy Cost:** Increasing inlet temperature by ~15-20°C (to compensate for shorter r",
+       "*   **Throughput Cost:** The initial 10% feed rate reduction reduces daily output by 10% f",
+       "*   **Net Trade:** The operational loss is **bounded** and **temporary**. The permanent st",
+       "*   **Parity Conclusion:** Same-or-lower burden class. The intervention replaces \"troubles"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Commissioning:** Low. Requires 1-2 days of operational data logging to map the new $T_{in}$ vs. $Rpm$ re"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: AM37 | *   **Operational Loss (AM37 D3):**"
+      ],
+      "DRIVER_CLASS_AS_REMEDY": [
+       "the mechanism's action ingredient 'drying' and the stated failure driver 'drying' are the same action class (wet-dry-cycling) — a remedy may not be its own driver"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Insufficient rotational speed causes material slumping (loss of centrifugal effect), which reduces the solid-gas contact area and degrades the drying uniformity rate. | ingredient: The intervention enforces a minimum drum speed floor that is kinematically above the critical velocity for flighting, thereby restoring the centrifugal retention of material against the flights and increasing the contact area. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Insufficient rotational speed causes material slumping (loss of centrifugal effect), which reduces the solid-gas contact area and degrades the drying uniformity rate.",
+      "ingredient_action": "The intervention enforces a minimum drum speed floor that is kinematically above the critical velocity for flighting, thereby restoring the centrifugal retention of material against the flights and increasing the contact area.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "65432a27ca1f4689",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Row 1:** Update the **Drum Speed Setpoint** in the existing PLC/VFD controller to a ; *   **Justificatio",
+      "APPARATUS_ROW: *   **Commissioning:** Low. Requires 1-2 days of operational data logging to map the new $T_{in}$ vs. $Rpm$ re",
+      "NAMED_VARIANT: model/brand-marker: AM37 | *   **Operational Loss (AM37 D3):**",
+      "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'drying' and the stated failure driver 'drying' are the same action class (w"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7416,
+     "latency_s": 10.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Operating-Point Retuning (Parameter Change)",
+       "*   *Action:* Change process control setpoints or manual sampling/blending ratios.",
+       "*   *Action:* Edit PLC/HMI recipe or VFD reference speed.",
+       "*   *Action:* Adjust feeder speed control or gate opening fraction.",
+       "*   **Hardware:** 0 new parts. All actions use existing PLCs, VFDs, and upstream dewaterin",
+       "*   **Installation:** 0 labor hours for installation. Time is spent on tuning (hours of en",
+       "*   **Commissioning:** 0 new instrumentation. Relies on existing moisture sensors (if pres",
+       "*   **Operational Loss:**",
+       "*   *Throughput:* Reduced by ~10-15% due to lower feed rate/setpoint.",
+       "*   *Energy:* Increased by ~20-30% due to higher drum speed (VFD power $\\propto \\omega^3$)",
+       "*   *Net Benefit:* The cost of increased electricity and reduced throughput is significant",
+       "*   **Parity Conclusion:** Same-or-lower burden class. Standard practice for \"poor lifting",
+       "1.  **Baseline:** Run at current settings. Measure outlet moisture uniformity (standard de",
+       "2.  **Intervention:**",
+       "*   Reduce feed moisture setpoint by 10% (via upstream control).",
+       "*   Increase drum speed by 10%.",
+       "*   Reduce feed rate by 10%.",
+       "3.  **Observation Period:** Run for 2 hours at steady state.",
+       "4.  **Measurement:** Collect 5 samples across the discharge. Calculate new $\\sigma_{new}$.",
+       "5.  **Pass/Fail Criterion:** Pass if $\\sigma_{new} < 0.5 \\sigma_{base}$ (significant impro",
+       "6.  **Kill Criterion:** If $\\sigma_{new} > \\sigma_{base}$ or if the drum overloads (curren",
+       "1.  **Permitted Set:** The constraint allows \"feed-moisture setpoint retuning, drum-speed/",
+       "*   Row 1 (Feed Moisture): Permitted.",
+       "*   Row 2 (Drum Speed): Permitted.",
+       "*   Row 3 (Feed Rate): Permitted.",
+       "*   No new hardware added. No physical measures outside this set.",
+       "2.  **Direction of Effect:**",
+       "*   Failure Driver: Adhesion/Clumping due to high moisture.",
+       "*   Mechanism Action: Lower Moisture (Down), Increase Speed (Up).",
+       "*   Result: Lower Adhesion, Higher Inertial Lift. This moves the system **away** from the ",
+       "3.  **Input Availability:**",
+       "*   Signals required: Feed Moisture (manual or existing sensor), Drum Speed (VFD feedback)",
+       "*   All are standard, existing process variables. No new sensors required.",
+       "4.  **Cost Pricing:**",
+       "*   Operational cost: +20% Energy, -10% Throughput.",
+       "*   Benefit: +50%+ Product Quality (reduced rework/rejection).",
+       "*   Net Positive.",
+       "*   **APPARATUS_ROW:** No new apparatus.",
+       "*   **NAMED_VARIANT:** No brands. Generic \"VFD\", \"PLC\", \"Dewatering equipment\".",
+       "*   **DRIVER_CLASS_AS_REMEDY:** The failure driver is \"poor flight lifting\". The remedy is",
+       "*   **DEPLOYED-PART CLAUSE:** No modification to drum or flights. Only surrounding system ",
+       "*   **EXEMPLAR-REALITY:** No exemplars needed as no new parts are procured.",
+       "*   **PREMISE-VALIDITY:** Relies on stated infrastructure (feed system, dryer drive)."
+      ],
+      "DRIVER_CLASS_AS_REMEDY": [
+       "the mechanism's action ingredient 'drying' and the stated failure driver 'drying' are the same action class (wet-dry-cycling) — a remedy may not be its own driver"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Moisture-induced adhesive cohesion (capillary bridges) exceeds inertial lift forces, causing material to stick to flights or the shell rather than cascading. | ingredient: The remedy reduces the adhesion driver by lowering feed moisture and increases the lift force driver by increasing drum speed (centrifugal inertia), thereby shifting the operating point from sticking to cascading. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Moisture-induced adhesive cohesion (capillary bridges) exceeds inertial lift forces, causing material to stick to flights or the shell rather than cascading.",
+      "ingredient_action": "The remedy reduces the adhesion driver by lowering feed moisture and increases the lift force driver by increasing drum speed (centrifugal inertia), thereby shifting the operating point from sticking to cascading.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e6fc59f27908a64a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Operating-Point Retuning (Parameter Change); *   *Action:* Change process control set",
+      "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'drying' and the stated failure driver 'drying' are the same action class (w"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "e6fc59f27908a64a",
+   "final_chars": 7416
+  },
+  {
+   "problem_id": "HO9-11-ball-mill-liner-wear",
+   "generated_at": "2026-11-18T08:22:10.287609Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1,
+    "** operating-point retuning (parameter change)": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1,
+    "** operating-point retuning (parameter change)": 1,
+    "ball-charge gradation adjustment": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6450,
+     "latency_s": 10.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill:**",
+       "*   (d) Feed rate at design load (fixed).",
+       "*   **My Intervention Bill:**",
+       "*   **Protocol:**",
+       "1.  Establish baseline liner wear rate (mm/month) using current mixed charge and 20 rpm.",
+       "2.  Purge the mill of all cast/rough media over a 4-week period, replacing with 100% smoot",
+       "3.  Simultaneously, retune mill speed to 18.5 rpm.",
+       "4.  Maintain feed rate such that motor load remains within 85-95% of rated load (using the",
+       "5.  Measure liner thickness at the wave profile crests using ultrasound or laser scan at w",
+       "*   **Instruments:** Existing motor load meter, VFD speed display, portable ultrasound thi",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Pass:** The rate of thickness loss at the wave crests in the 18.5 rpm / Smooth Chrom",
+       "*   **Kill Criterion:** If the specific grinding efficiency (kWh/ton) drops by more than 1",
+       "*   **Duration:** 6 months (180 days) to capture statistically significant wear data."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The established physical driver of accelerated liner wave-profile wear in this context is the impact of the cascading charge against the liner, which adds a positive damage term to the cumulative wear integral. | ingredient: The remedy imposes a reduction in the kinetic energy and impact frequency of the balls relative to the liner by lowering the mill speed and stabilizing the charge, thereby subtracting from the damage integral. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The established physical driver of accelerated liner wave-profile wear in this context is the impact of the cascading charge against the liner, which adds a positive damage term to the cumulative wear integral.",
+      "ingredient_action": "The remedy imposes a reduction in the kinetic energy and impact frequency of the balls relative to the liner by lowering the mill speed and stabilizing the charge, thereby subtracting from the damage integral.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "c6de726fc5719553"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 9085,
+     "latency_s": 11.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Where it attaches:* Existing mill feed control loop (already stated in infrastructure",
+       "*   *Operating Parameters:* Cycle period $T$ = 10–30 minutes (tunable), $F_{high}$ = 110% ",
+       "*   *Where it attaches:* Existing speed controller.",
+       "*   *Operating Parameters:* Constant 20 rpm.",
+       "*   *Note:* If PLC reconfiguration is not feasible, a **standard 4-20mA square wave genera",
+       "*   **Standard Practice Bill:**",
+       "*   **My Intervention Bill:**",
+       "*   **Operational Loss Pricing:**",
+       "*   **Throughput Impact:** The average feed rate is maintained at 100% design load by bala",
+       "*   **Energy Impact:** Negligible. The VFD handles the power; modulation does not signific"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: In ball mill liner wear, the failure is driven by the impact energy of the charge toe (free fall) hitting the liner, which is determined by the mill speed and charge filling level; higher local charge mass and steeper toe angles increase impact velocity and thus wear. | ingredient: The proposed feed-rate modulation reduces the effective charge accumulation and impact velocity at the liner surface, thereby lowering the local impact energy density that drives the wear integral. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "In ball mill liner wear, the failure is driven by the impact energy of the charge toe (free fall) hitting the liner, which is determined by the mill speed and charge filling level; higher local charge mass and steeper toe angles increase impact velocity and thus wear.",
+      "ingredient_action": "The proposed feed-rate modulation reduces the effective charge accumulation and impact velocity at the liner surface, thereby lowering the local impact energy density that drives the wear integral.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "66815b20913e483d",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   *Where it attaches:* Existing mill feed control loop (already stated in infrastructure; *   *Operating Par"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 5370,
+     "latency_s": 38.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Wave-profile liner wear in a ball mill is driven by high-frequency cyclic plasticity and abrasive impacts at the wave crest, where the kinetic energy and impact rate of the ball charge are maximized relative to the liner's fatigue endurance limit. | ingredient: Coarsening the ball charge and reducing mill speed decreases the total impact frequency and peak impact velocity on the liner surface, thereby reducing the accumulated damage integral over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Wave-profile liner wear in a ball mill is driven by high-frequency cyclic plasticity and abrasive impacts at the wave crest, where the kinetic energy and impact rate of the ball charge are maximized relative to the liner's fatigue endurance limit.",
+      "ingredient_action": "Coarsening the ball charge and reducing mill speed decreases the total impact frequency and peak impact velocity on the liner surface, thereby reducing the accumulated damage integral over the duty cycle.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "85df3fc16f93777a",
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "85df3fc16f93777a",
+   "final_chars": 5370
+  },
+  {
+   "problem_id": "HO9-12-cyclone-overflow-roping",
+   "generated_at": "2026-11-18T08:23:18.873504Z",
+   "histogram_before": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1,
+    "** operating-point retuning (parameter change)": 1,
+    "ball-charge gradation adjustment": 1
+   },
+   "histogram_after": {
+    "** operating-point & procedure reconfiguration (cyclic).": 1,
+    "** operating-point modulation & chemical dosing optimization": 1,
+    "** configuration/procedure change (cyclic duty cycle on existing pump).": 1,
+    "** dynamic supersaturation modulation via existing vacuum control.": 1,
+    "** temperature-dependent surface desorption via load-ramp setpoint modulation": 1,
+    "scheduled setpoint inversion (procedural/control configuration)**": 1,
+    "** configuration (parameter/duty retuning)": 1,
+    "** aerodynamic scouring via transient shear (air-valve pulsing)": 1,
+    "** operating-point retuning (parameter change)": 1,
+    "ball-charge gradation adjustment": 1,
+    "** configuration/operating-point parameter retuning": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6317,
+     "latency_s": 8.2,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation:** Standard practice installs a spigot valve. My intervention uses the ",
+       "*   **Commissioning:** Standard practice tests the spigot open/close. My intervention requ",
+       "*   **Operation:** Standard practice operates continuously or on long cycles. My intervent",
+       "*   **Maintenance:** Standard practice requires occasional clearing of the spigot. My inte",
+       "*   **Cost:** No new hardware. Burden: **Zero**.",
+       "1.  Baseline: Run cyclone at standard continuous discharge. Measure underflow density (spe",
+       "2.  Intervention: Switch the spigot valve to the 5s ON / 25s OFF cycle. Allow 2 hours to s",
+       "3.  Measurement: Record $R_{test}$ and $D_{test}$.",
+       "*   **Pass:** Roping events $R_{test} < 0.5 \\times R_{base}$ AND Underflow density $D_{tes",
+       "*   **Kill Criterion:** If underflow density drops below $D_{base}$, the pulse is too aggr"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Roping is caused by the accumulation of solid particles at the apex due to insufficient underflow discharge velocity, which allows the vortex core to st"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Roping is caused by the accumulation of solid particles at the apex due to insufficient underflow discharge velocity, which allows the vortex core to stabilize and ingest air, breaking the air-core seal. | ingredient: Closing the spigot for 25 seconds significantly reduces the underflow mass flow rate and discharge velocity, which decreases the centrifugal/impulsive forces required to clear the apex, thereby increasing the probability of particle accumulation and air ingestion (the root cause  | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Roping is caused by the accumulation of solid particles at the apex due to insufficient underflow discharge velocity, which allows the vortex core to stabilize and ingest air, breaking the air-core seal.",
+      "ingredient_action": "Closing the spigot for 25 seconds significantly reduces the underflow mass flow rate and discharge velocity, which decreases the centrifugal/impulsive forces required to clear the apex, thereby increasing the probability of particle accumulation and air ingestion (the root cause ",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "5481ab4c4988625e"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 6438,
+     "latency_s": 7.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Reconfigure Control Logic (Procedure Change):** Modify the existing PLC/control loop",
+       "*   *State A (Processing):* $\\rho_{set} = \\rho_{standard}$, $P_{set} = P_{standard}$. Dura",
+       "*   *State B (Scouring):* $\\rho_{set} = \\rho_{standard} - \\Delta\\rho$ (reduced density), $",
+       "2.  **Spigot Verification Protocol (Procedure Change):** During the scheduled maintenance ",
+       "3.  **Setpoint Limits Configuration:** Program the high/low limits in the DCS to allow $\\r",
+       "*   **Hardware:** Zero new hardware. The standard practice uses the existing DCS and spigo",
+       "*   **Commissioning:** The standard practice commissions static setpoints. My intervention",
+       "*   **Operational Loss Pricing:** The modulation causes a brief drop in throughput during ",
+       "*   **Conclusion:** Same-or-lower burden class. The intervention is purely procedural/para",
+       "1.  Run the cyclone cluster at the standard static setpoints for 4 hours (Baseline). Measu",
+       "2.  Enable the square-wave modulation: $t_{proc}=30$s, $t_{scour}=5$s, $\\Delta\\rho = -5\\%$",
+       "3.  **Instruments:** Existing DCS historical data for $P_{inlet}$ and $\\rho_{feed}$, and t",
+       "4.  **Pass/Fail Thresholds:**",
+       "*   Pass: No visual observation of roping at the apex spigot during the 4-hour test period",
+       "*   Fail: Roping observed, OR underflow flow rate drops to zero.",
+       "5.  **Kill Criterion:** If the increased pressure $\\Delta P$ causes vibration in the 250mm",
+       "*   **Permitted Set:** Uses only \"feed-density setpoint retuning\" and \"inlet-pressure setp",
+       "*   **Deployed-Part Clause:** No modification to the cyclone body, spigot, or apex geometr",
+       "*   **Input Availability:** Uses existing $\\rho_{feed}$ and $P_{inlet}$ signals. No new se",
+       "*   **Direction of Effect:** Correctly identified that increasing pressure and decreasing "
+      ],
+      "DIRECTION_UNPROVEN": [
+       "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+      ]
+     },
+     "direction_check": {
+      "direction": "UNCLEAR",
+      "reason": "driver: Underflow roping in dense-phase desliming cyclones is physically driven by insufficient particle-fluid coupling and lack of inter-particle impact, which requires increasing solid concentration and reducing gas velocity at the spigot to maintain a continuous, high-velocity dense s | ingredient: The mechanism lowers feed density and increases inlet pressure to reduce solid concentration and disrupt the dense phase flow, which adds to the instability that causes roping rather than compensating for it. | ingredient sign vs driver: UNSTATED -> UNCLEAR",
+      "established_driver": "Underflow roping in dense-phase desliming cyclones is physically driven by insufficient particle-fluid coupling and lack of inter-particle impact, which requires increasing solid concentration and reducing gas velocity at the spigot to maintain a continuous, high-velocity dense s",
+      "ingredient_action": "The mechanism lowers feed density and increases inlet pressure to reduce solid concentration and disrupt the dense phase flow, which adds to the instability that causes roping rather than compensating for it.",
+      "sign_of_ingredient_vs_driver": "UNSTATED",
+      "divergence": "the model labeled INVERTED but the sign comparison derives UNCLEAR — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "aeb1369369d1aeb3",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Reconfigure Control Logic (Procedure Change):** Modify the existing PLC/control loop; *   *State A (Proc",
+      "DIRECTION_UNPROVEN: the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign t"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7698,
+     "latency_s": 9.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Operating-Point Parameter Retuning",
+       "1.  **Retune Feed-Density Setpoint:** Lower the density control setpoint on the existing f",
+       "*   **Location:** Existing DCS/PLC density loop.",
+       "2.  **Verify Inlet Pressure Setpoint:** Hold the inlet pressure setpoint constant at 150 k",
+       "3.  **Spigot/Apex Clearance Check (Procedure):** Perform a standard manual clearance check",
+       "*   **Standard Practice Bill:**",
+       "*   Maintain feed density at nominal (750 kg/m³).",
+       "*   Maintain inlet pressure at nominal (150 kPa).",
+       "*   Periodic spigot inspection.",
+       "*   **Intervention Bill Comparison:**",
+       "*   **Hardware:** No new hardware. (0 cost delta).",
+       "*   **Procedural:** No new procedures beyond standard control tuning and routine spigot ch",
+       "*   **Operational Loss:**",
+       "*   **Throughput:** Lowering feed density from 750 to 680 kg/m³ at constant volumetric flo",
+       "*   **Cost Impact:** Minor increase in water usage or slight decrease in total mass proces",
+       "*   **Net Benefit:** The 9% mass loss is offset by the restoration of classification effic",
+       "*   **Conclusion:** Burden is **lower** than standard practice because it eliminates a fai",
+       "*   **Protocol:**",
+       "1.  Stabilize the cyclone at current density (750 kg/m³) and pressure (150 kPa). Record un",
+       "2.  Step the feed density setpoint down to 680 kg/m³. Hold inlet pressure at 150 kPa.",
+       "3.  Run for 2 hours. Record underflow flow rate and monitor for roping events.",
+       "*   **Instruments:** Existing density transmitter, pressure transmitter, flow meter, and v",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Pass:** Roping frequency drops to zero (continuous, non-roping flow) AND underflow s",
+       "*   **Fail:** Roping persists OR underflow flow rate drops by >20% (indicating pump cavita",
+       "*   **Duration:** 3 hours total (1 hour baseline, 2 hours test).",
+       "*   **Kill Criterion:** If the density controller cannot hold the new setpoint due to pump",
+       "*   **Permitted Set Clause:** The intervention uses **feed-density setpoint retuning**, wh",
+       "*   **Deployed Part Clause:** No cyclone or apex redesign. No machining. The intervention ",
+       "*   **Direction-of-Effect Clause:** As shown in Physics Check, the mechanism moves the dri",
+       "*   **Input Availability Clause:** The required signals (density, pressure) are standard p",
+       "*   **Cost Pricing Clause:** The operational loss (9% throughput reduction) is priced in t",
+       "*   **Mechanism Diversity:** This is a **Parameter Retuning** mechanism. It does not rely "
+      ],
+      "APPARATUS_ROW": [
+       "3.  Run for 2 hours. Record underflow flow rate and monitor for roping events."
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Underflow roping in desliming cyclones is caused by excessive solids concentration in the feed stream, which increases the local Reynolds number and disrupts the laminar core necessary for stable separation. | ingredient: The proposed mitigation lowers the feed density setpoint, thereby reducing the volumetric solids loading and the magnitude of the hydrodynamic instability driving the roping phenomenon. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Underflow roping in desliming cyclones is caused by excessive solids concentration in the feed stream, which increases the local Reynolds number and disrupts the laminar core necessary for stable separation.",
+      "ingredient_action": "The proposed mitigation lowers the feed density setpoint, thereby reducing the volumetric solids loading and the magnitude of the hydrodynamic instability driving the roping phenomenon.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "07b3f07d114b5556",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Operating-Point Parameter Retuning; 1.  **Retune Feed-Density Setpoint:** Lower the d",
+      "APPARATUS_ROW: 3.  Run for 2 hours. Record underflow flow rate and monitor for roping events."
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6752,
+     "latency_s": 8.7,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Configuration/Operating-Point Parameter Retuning",
+       "*   **Comparison:** Standard practice uses fixed setpoints. This intervention adds a minor",
+       "*   **Hardware Cost:** $0 (no new parts).",
+       "*   **Installation Burden:** $0 (software/logic change only).",
+       "*   **Operational Loss Pricing:**",
+       "*   **Throughput:** Zero loss. The cyclone capacity is maintained by adjusting pressure an",
+       "*   **Quality:** The underflow density is slightly lower, which may increase the tailings ",
+       "*   **Net Trade:** Positive. The cost of slightly higher dilution water (energy for pumpin",
+       "*   **Conclusion:** Same-or-lower burden class. The mechanism is \"light\" (software/paramet"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Roping is caused by the underflow solids concentration exceeding the critical jamming concentration, leading to solid-bridge formation in the spigot. | ingredient: The remedy lowers the steady-state feed density by increasing dilution water, thereby reducing the underflow concentration and the associated jamming probability. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Roping is caused by the underflow solids concentration exceeding the critical jamming concentration, leading to solid-bridge formation in the spigot.",
+      "ingredient_action": "The remedy lowers the steady-state feed density by increasing dilution water, thereby reducing the underflow concentration and the associated jamming probability.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "cd129e854812a34a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Configuration/Operating-Point Parameter Retuning; *   **Comparison:** Standard practi",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "final_sha256_16": "cd129e854812a34a",
+   "final_chars": 6752
+  }
+ ]
+}

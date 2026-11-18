@@ -51,6 +51,21 @@
  *    (the caller gets a reset and its own retry owns a fresh connection),
  *    so no caller can hang forever on a silent connection.
  *
+ * R67s2 MULTI-KEY CUSTODY (owner delivery 2026-11-18, in-channel, mid
+ * run): the owner delivered a second Agnes key alongside the original
+ * (both live-probed 200 / served==requested / agnes-3.0-flash before
+ * admission — R36 discipline; digests d0c666a3842f + 5c4dffd28fe4,
+ * CORR-3 class, vault-only). The measured free-user 429 quota is PER
+ * KEY (the 12/30 window exhausted key 1 at 08:24:01Z), so the agnes
+ * branch now carries an ordered key list and altComplete rotates on
+ * 429 with NO sleep (a fresh bucket), sleeping 30 s only when every
+ * key is exhausted. Each alt call's log entry carries the serving
+ * key's sha256[:12] digest (never raw bytes, Art. 17) — the per-key
+ * served-call distribution is auditor-verifiable against the custody
+ * records. Pure transport plumbing: zero epistemic authority granted,
+ * the registered route (agnes-3.0-flash) and all engine gates are
+ * unchanged.
+ *
  * Usage:
  *   ZAI_GATEWAY_KEY=<secret> node scripts/zai_gateway.mjs [port]
  *   (default port 8787; binds 127.0.0.1 only)
@@ -95,7 +110,7 @@ const ALT_UPSTREAMS = {
     base: (process.env.XKIRO_BASE_URL ||
            "https://api.xkiro.com/v1").replace(/\/+$/, ""),
     model: process.env.XKIRO_MODEL_ID || "cohere/command-a-plus",
-    keyEnv: "XKIRO_API_KEY",
+    keyEnvs: ["XKIRO_API_KEY"],
     // Cloudflare 1010 bans tool UAs — browser UA REQUIRED (R58).
     ua: "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) "
         + "Gecko/20100101 Firefox/132.0",
@@ -105,7 +120,17 @@ const ALT_UPSTREAMS = {
     base: (process.env.AGNES_BASE_URL ||
            "https://apihub.agnes-ai.com/v1").replace(/\/+$/, ""),
     model: process.env.AGNES_MODEL_ID || "agnes-3.0-flash",
-    keyEnv: "AGNES_API_KEY",
+    // R67s2 multi-key custody (owner delivery 2026-11-18, in-channel,
+    // both keys live-probed 200 / served==requested / agnes-3.0-flash
+    // before admission, R36 discipline): the free-user 429 quota is
+    // PER KEY (measured mid-run: the 12/30 window exhausted key
+    // d0c666a3842f at 08:24:01Z), so the agnes branch carries an
+    // ORDERED key list; altComplete rotates to the next key on 429
+    // (separate quota bucket — immediate, no sleep) and sleeps only
+    // when every key is exhausted. Every alt call log entry carries
+    // the serving key's digest sha256[:12] (the CORR-3 custody class
+    // — zero key bytes in any log or commit, Art. 17).
+    keyEnvs: ["AGNES_API_KEY", "AGNES_API_KEY_2"],
     ua: "agnes-route-adapter/1.0",
     headroom: AGNES_HEADROOM,
   },
@@ -142,17 +167,29 @@ function logCall(entry) {
 
 /** One completion through an alternate HTTP upstream (R64s4). Same
  *  resolve shape as zaiComplete: {content, model, finish_reason,
- *  usage, latency_ms}. Serves cfg.model regardless of the requested
- *  id (R458-C1 precedent); one bounded 30 s retry on 429/5xx before
- *  surfacing a typed error to the caller's own retry ladder. */
+ *  usage, latency_ms, key_id}. Serves cfg.model regardless of the
+ *  requested id (R458-C1 precedent). R67s2 retry ladder: a 429 is
+ *  PER-KEY quota, so it rotates through cfg.keyEnvs IMMEDIATELY (no
+ *  sleep — a different quota bucket); when every key is exhausted
+ *  (or on a 5xx), one bounded 30 s retry restarting from key 0, then
+ *  a typed error to the caller's own retry ladder. key_id = the
+ *  serving key's sha256[:12] digest (custody class; never raw). */
 function altComplete(cfg, messages, requestedModel, callerMaxTokens,
                      timeoutMs) {
   return new Promise((resolve, reject) => {
-    const key = process.env[cfg.keyEnv] || "";
-    if (!key) {
+    const keys = cfg.keyEnvs
+      .map((e) => ({ env: e, value: process.env[e] || "" }))
+      .filter((k) => k.value)
+      .map((k) => ({
+        env: k.env, value: k.value,
+        id: crypto.createHash("sha256").update(k.value, "utf8")
+          .digest("hex").slice(0, 12),
+      }));
+    if (!keys.length) {
       return reject(new Error(
-        "[no-upstream-key] " + cfg.keyEnv + " unset (vault custody "
-        + "— start_gateway must pass the vault env through)"));
+        "[no-upstream-key] none of " + cfg.keyEnvs.join("/")
+        + " set (vault custody — start_gateway must pass the vault "
+        + "env through)"));
     }
     const mt = (Number(callerMaxTokens) > 0
                 ? Number(callerMaxTokens) : 512) + cfg.headroom;
@@ -162,14 +199,15 @@ function altComplete(cfg, messages, requestedModel, callerMaxTokens,
       max_tokens: mt,
       temperature: 0.0,
     });
-    const attempt = (triesLeft) => {
+    const attempt = (keyIdx, triesLeft) => {
+      const k = keys[keyIdx];
       const t0 = Date.now();
       const u = new URL(cfg.base + "/chat/completions");
       const req = https.request({
         hostname: u.hostname, port: 443, path: u.pathname,
         method: "POST",
         headers: {
-          "Authorization": "Bearer " + key,
+          "Authorization": "Bearer " + k.value,
           "Content-Type": "application/json",
           "User-Agent": cfg.ua,
           "Content-Length": Buffer.byteLength(payload),
@@ -180,19 +218,27 @@ function altComplete(cfg, messages, requestedModel, callerMaxTokens,
         res.on("end", () => {
           const latencyMs = Date.now() - t0;
           if (res.statusCode >= 400) {
-            const retryable = res.statusCode === 429 ||
-                              res.statusCode >= 500;
+            const is429 = res.statusCode === 429;
+            const retryable = is429 || res.statusCode >= 500;
+            const rotate = is429 && keyIdx + 1 < keys.length;
             logCall({
               ts: new Date().toISOString(),
-              status: retryable && triesLeft > 0
+              status: retryable && (rotate || triesLeft > 0)
                 ? "RATE_LIMITED_RETRY" : "UPSTREAM_ERROR",
               upstream: UPSTREAM, http_status: res.statusCode,
               requested_model: requestedModel,
               model: cfg.model,
+              key_id: k.id,
+              rotated_to_key_id: rotate
+                ? keys[keyIdx + 1].id : undefined,
               body_head: data.slice(0, 200),
             });
+            if (rotate) {
+              // per-key quota: the next bucket is fresh — no sleep
+              return attempt(keyIdx + 1, triesLeft);
+            }
             if (retryable && triesLeft > 0) {
-              return setTimeout(() => attempt(triesLeft - 1),
+              return setTimeout(() => attempt(0, triesLeft - 1),
                                 30_000);
             }
             return reject(new Error(
@@ -220,6 +266,7 @@ function altComplete(cfg, messages, requestedModel, callerMaxTokens,
             finish_reason: ch.finish_reason || "stop",
             usage: parsed.usage || null,
             latency_ms: latencyMs,
+            key_id: k.id,
           });
         });
       });
@@ -231,7 +278,7 @@ function altComplete(cfg, messages, requestedModel, callerMaxTokens,
       req.write(payload);
       req.end();
     };
-    attempt(1);
+    attempt(0, 1);
   });
 }
 
@@ -436,6 +483,8 @@ const server = http.createServer(async (req, res) => {
         content_sha256: sha(out.content),
         latency_ms: out.latency_ms,
         usage: out.usage,
+        key_id: out.key_id,  // alt upstreams: custody digest of the
+        // serving key (R67s2); undefined (dropped) on the zai-cli path
         status: "OK",
       };
       logCall(entry);

@@ -1,0 +1,74 @@
+{
+ "problem_id": "HO9-11-ball-mill-liner-wear",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    40,
+    4,
+    16
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:0fd8d7317192": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:08aab152dd7e": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:22:10.287609Z",
+ "attempts_n": 3,
+ "a1_answer": "MECHANISM CLASS: Ball-charge gradation adjustment\n\nNOVELTY STATEMENT (INTERVENTION)\nThe intervention is to replace the current ball-charge makeup with a coarser, narrower-size-grade ball charge (e.g., increasing the median ball diameter by 10–20% within the mill's standard charging range) while simultaneously retuning the mill speed setpoint to a lower RPM (e.g., 18–19 rpm instead of 20 rpm). Standard practice for liner wear mitigation in ball mills is typically to increase ball charge weight to maintain grinding efficiency or to simply replace worn liners with new material; this does not address the dynamic impact pattern that causes wave-profile wear. My mitigation departs by altering the kinetic energy distribution of the balls (larger balls, lower speed) to shift the impact zone and reduce the high-frequency micro-impacts at the wave profile crest, thereby reducing the fatigue and abrasion mechanism specific to wave-profile wear. Adjacent-technique clearance: The closest existing practice in mining is \"liner life extension via hardfacing\" (adding material) or \"ball charge optimization for grinding\" (usually focusing on P80 reduction). This intervention is different because it specifically targets the *liner wear mode* (wave-profile fatigue/abrasion) by modifying the impact frequency and energy per ball, rather than just adding mass or changing the liner material.\n\nPHYSICS CHECK\nGoverning relation: Liner wear rate \\( W \\) is proportional to the frequency of ball impacts \\( f \\) and the square of the impact velocity \\( v^2 \\) (Hertzian contact stress accumulation). Wave-profile wear is driven by the periodic lifting and dropping of balls that matches the liner's wave frequency.\n\\( W \\propto N_{balls} \\cdot v^2 \\).\nMagnitude verification: By increasing ball diameter \\( D \\) by 20% (from ~40mm to 48mm), the number of balls \\( N \\) for the same charge mass decreases by approximately \\( (1/1.2)^3 \\approx 0.58 \\). By reducing mill speed from 20 rpm to 18 rpm, the tangential velocity decreases by 10%, and impact velocity \\( v \\) decreases significantly due to lower centrifugal lift. The combined effect reduces the impact frequency and stress amplitude.\nDIRECTION-OF-EFFECT: driving variable = *Impact Energy Flux on Liner*; the mechanism moves it *down* by *reducing impact frequency (fewer, larger balls) and impact velocity (lower mill speed)*; this *reduces* the *fatigue-abrasion damage integral*.\nINPUT-AVAILABILITY CLAUSE: Required signals: Mill speed (existing VFD/drive control signal), Ball charge level (existing weight or volumetric feed control). No new instrumentation required.\n\nIMPLEMENTATION BILL\nStandard Practice Bill: 1. Order new liners. 2. Grind out old liners. 3. Install new liners. 4. Restore standard ball charge (mix of sizes). 5. Restore standard mill speed (20 rpm).\n\nMy Bill Rows:\n1. (c) Retune mill speed setpoint from 20 rpm to 18 rpm via the existing Variable Frequency Drive (VFD) or electronic governor.\n   *Where it attaches:* Existing mill drive control loop.\n   *Operating Parameter:* 18 rpm.\n2. (b) Procure and add coarse ball charge (e.g., 50mm balls) to replace the existing fines fraction during the next scheduled makeup cycle. Use standard procurement for 50mm cast iron or chrome steel balls.\n   *Where it attaches:* Ball-charge makeup system (pneumatic or bucket feed).\n   *Operating Parameter:* Target median ball size shifted up by 10-20%.\n3. (c) Adjust feed-rate/load procedure to maintain constant work index; reduce feed rate by 10% to compensate for lower ball charge kinetic energy if necessary, using existing feed conveyor or pneumatic feed controls.\n   *Where it attaches:* Existing feed system.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallation: Same. No new hardware installed.\nCommissioning: Same. Retuning VFD and adjusting ball makeup are standard operator tasks.\nOperation: Operational loss = 0 throughput if feed rate is adjusted to match capacity. Energy cost is marginally lower at 18 rpm vs 20 rpm (cubing law, ~30% reduction in motor load, offset by longer liner life).\nCost Class: Same or lower (liner replacement cost deferred, ball cost similar).\nCONCLUSION: Same-or-lower burden class.\n\nEXECUTABLE TEST\nProtocol: Run the mill at 18 rpm with the coarser ball charge for 500 operating hours. Compare liner wear thickness at the wave profile crest using standard ultrasonic thickness gauges (already part of maintenance kit) against a baseline period of 500 hours at 20 rpm with old ball charge.\nInstruments: Existing UTT gauge, existing mill speed display.\nPass/Fail: Pass if the reduction in wear thickness at the wave crest is >15% compared to the baseline trend.\nDuration: 500 hours (approx. 21 days continuous).\nKill Criterion: If throughput drops >5% and cannot be corrected by feed adjustment, or if liner wear rate does not decrease, revert to standard settings.\n\nCONSTRAINT COMPLIANCE CHECK:\n- \"no mill or liner redesign\": Complied. No changes to liner geometry or mill structure.\n- \"allowed measures: ball-charge makeup chemistry/size selection, mill-speed setpoint retuning, or feed-rate/load procedure only\": Complied. Ball size selection (measure 2), speed retuning (measure 1), feed rate adjustment (measure 3).\n- \"DEPLOYED-PART CLAUSE\": No machining or modification of the mill or liner. Only operational parameters and consumable ball size changed.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {}
+ },
+ "declared_template_prose": "ball-charge gradation adjustment",
+ "allowed_row_outside": 0,
+ "sha256_16": "85df3fc16f93777a",
+ "smoke": false
+}

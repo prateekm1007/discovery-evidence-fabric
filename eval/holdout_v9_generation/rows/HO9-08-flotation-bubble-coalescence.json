@@ -1,0 +1,87 @@
+{
+ "problem_id": "HO9-08-flotation-bubble-coalescence",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:41bbbea3b77f": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:f5353ccef64d": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:17:40.766498Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\n**Question-answered sentence:** We will mitigate bubble coalescence and froth instability by implementing a **high-frequency, low-amplitude pulsing of the existing air-rate valve** (mechanism: **Aerodynamic Scouring via Transient Shear**), rather than the standard practice of steady-state air dosing.\n\n**Standard Practice vs. Mitigation:** Standard practice treats air rate as a steady DC input to optimize gas throughput and recovery, accepting the resulting hydrodynamic stability. This mitigation treats the air rate as a modulated AC signal on top of the mean, exploiting the physics that transient velocity gradients in the froth phase break up coalesced bubbles faster than they form, while the *time-averaged* gas volume remains identical to the steady state.\n\n**Adjacent-Technique Clearance:** The closest existing practice is \"air pulsing for foam control in distillation columns\" (e.g., modulating steam rates to collapse foams). This is different because distillation foams are viscous, gas-liquid interactions in a bulk phase, whereas flotation froths are stable, air-continuous, two-phase media at the surface; the mechanism here relies on **interfacial shear in the froth zone** to rupture large bubbles, not bulk column convection, and operates at high frequency (Hz) rather than slow on/off cycles.\n\n**Mechanism:** The intervention attacks the driving physics of coalescence (collision frequency proportional to bubble size and gas concentration) by introducing a transient shear stress $\\tau(t)$ that exceeds the interfacial strength of the coalesced cluster, breaking it into smaller, stable bubbles that are more easily transported. The departure is the **operating point and duty cycle**: specifically, the *frequency* and *modulation depth* of the air valve, not a new valve type.\n\nPHYSICS CHECK\n**Governing Relation:**\nThe probability of bubble coalescence $P_c$ is governed by the residence time of bubbles in the froth and their collision frequency. The critical condition for breakup is when the instantaneous shear rate $\\dot{\\gamma}(t)$ exceeds the critical shear rate $\\dot{\\gamma}_{crit}$ for bubble deformation and breakup.\n$$ \\dot{\\gamma}(t) \\approx \\frac{\\Delta v_{air}(t)}{L_{bubble}} $$\nWhere $\\Delta v_{air}(t)$ is the fluctuation in air-induced liquid velocity.\n\n**Magnitude Verification:**\nStandard steady state: $\\dot{\\gamma}_{steady} \\approx 0$ (no time-derivative). Coalescence proceeds unchecked.\nPulsed state: By modulating air rate $\\pm 20\\%$ around the mean at $1-2$ Hz, we generate transient pressure waves that induce liquid velocity fluctuations. For a 15m column, the acoustic time constant is short; the local froth shear responds nearly instantly to the gas velocity change. If $\\dot{\\gamma}_{transient} > \\dot{\\gamma}_{crit}$ (typically $10^2$ to $10^3$ s$^{-1}$ for froth bubbles), the coalescence rate drops.\n**DIRECTION-OF-EFFECT:** driving variable = **Net Coalescence Rate ($R_{c}$)**; the mechanism moves it **DOWN** by **increasing the transient shear rate $\\dot{\\gamma}(t)$ above the critical breakup threshold** via high-frequency air modulation; this **reduces the Mean Bubble Diameter ($d_{32}$)** and **raises Froth Stability** (by preventing the growth of large, unstable bubbles that cause entrainment). The sign is correct: we are moving the variable *away* from the failure state (large, coalesced bubbles) toward the desired state (small, dispersed bubbles).\n\n**INPUT-AVAILABILITY:** The mechanism requires only the **Air Rate** (flow signal) and **Valve Position** (feedback/control signal). Both are standard process variables in a flotation plant. No new instrumentation is needed; the PLC/modulator uses existing loop signals.\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS:** Aerodynamic Scouring via Transient Shear (Air-Valve Pulsing)\n\n| Item | Description | Tag | Note |\n| :--- | :--- | :--- | :--- |\n| 1 | Existing Air Rate Control Valve | (a) | Already present in stated infrastructure. No hardware change. |\n| 2 | Existing PLC/DCS Loop | (a) | Uses standard logic to implement the pulse. |\n| 3 | Dosing Procedure Change | (c) | Change setpoint from \"Constant Flow\" to \"Pulsed Flow\" (Square wave or Sine wave modulation $\\pm 20\\%$ at 1 Hz). |\n| 4 | Air Rate Operating Point | (c) | **Operational Cost Line:** Mean air rate remains at current optimal for recovery. **Loss:** Zero throughput loss. **Energy:** Negligible increase in valve actuation energy ($<1\\%$ of total column energy). **Quality:** Potential minor grade variation if pulse frequency couples with column dynamics; monitored via existing grade sensors (no new hardware). |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Hardware:** 0 new items. Standard practice uses the valve; we use the same valve.\n*   **Commissioning:** 0 new instruments. Standard practice commissions the loop; we modify the logic only.\n*   **Operational Loss:** **Zero.** The time-averaged air rate is identical to the standard setpoint. The \"cost\" is the implementation of a control strategy change, which is a software/procedure parameter, not an operational curtailment. The potential risk is instability if the frequency hits a structural resonance, which is mitigated by starting at low amplitude and tuning (standard control practice).\n*   **Conclusion:** Same burden class as standard practice. We are not adding hardware, not stopping the plant, not reducing throughput. We are changing the *duty cycle* of an existing component.\n\nEXECUTABLE TEST\n**Protocol:**\n1.  Baseline: Run column at steady air rate $Q_0$ for 8 hours. Record froth height, grade, and recovery.\n2.  Intervention: Switch to pulsed air rate: $Q(t) = Q_0 \\pm 0.2 Q_0 \\sin(2\\pi t)$ at 1 Hz.\n3.  Duration: Run for 24 hours.\n4.  Pass/Fail Thresholds:\n    *   **Froth Height:** Must remain stable within $\\pm 5\\%$ of baseline.\n    *   **Recovery:** Must not drop by more than $2\\%$ absolute.\n    *   **Grade:** Entrainment of gangue must not increase; grade stability (std dev) must improve or remain same.\n5.  Kill Criterion: If froth height oscillates with a period matching the pulse period (indicating resonance) or recovery drops >2%, stop the test and return to steady state.\n\n**DEPLOYED-PART CLAUSE COMPLIANCE:** The column, sparger, and valve bodies are not modified. The mechanism is purely a change in the *driving signal* to the existing valve.\n**PERMITTED-SET CLAUSE COMPLIANCE:** The constraint allows \"air-rate procedure only.\" This intervention is exactly that: a procedure change to the air rate. No new chemistry, no new hardware.\n**STANDARD-BILL BIND COMPLIANCE:** All rows are (a) or (c). No custom machining, no new sensors, no custom formulations.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "DEV_NEED": [
+    "custom formulation"
+   ],
+   "BILL_UNTAGGED": [
+    "*   **Hardware:** 0 new items. Standard practice uses the valve; we use the same valve.",
+    "*   **Commissioning:** 0 new instruments. Standard practice commissions the loop; we modif",
+    "*   **Operational Loss:** **Zero.** The time-averaged air rate is identical to the standar",
+    "*   **Conclusion:** Same burden class as standard practice. We are not adding hardware, no"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: The established physical driver of bubble-coalescence froth instability is a net coalescence rate where the rate of bubble collision and adhesion exceed"
+   ]
+  }
+ },
+ "declared_template_prose": "** aerodynamic scouring via transient shear (air-valve pulsing)",
+ "allowed_row_outside": 0,
+ "sha256_16": "5d1dd30107182c66",
+ "smoke": false
+}

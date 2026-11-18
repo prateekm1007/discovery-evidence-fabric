@@ -1,0 +1,97 @@
+{
+ "problem_id": "HO9-05-ammonia-catalyst-poisoning",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    11,
+    10,
+    15
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:90f1fcc1f760": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:1cd30acbf534": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:12:24.070791Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**\n**Question Answered:** The proposed intervention is a **load-ramp/purge procedure** that implements a **temperature-hold-and-purge protocol** during oxygen transient events, using the existing inlet temperature setpoint retuning capability to maintain the catalyst bed at a specific elevated temperature *only* when flow rate indicates a drop in conversion efficiency (oxygen ingress), thereby utilizing the exothermic heat of the main reaction to thermally oxidize the absorbed oxygen species into volatile $\\text{CO}_2$ before it permanently poisons the iron sites.\n\n**Standard Practice vs. Mitigation:** Standard practice typically relies on upstream **methanation/drying** (chemical removal) or simply waiting for the transient to pass, which allows oxygen to adsorb onto the Fe catalyst and form non-reactive iron oxides that require high-temperature regeneration or reduce activity permanently. My mitigation departs by coupling the **inlet temperature setpoint** to the **flow rate/pressure differential** signals (available in the DCS) to trigger a controlled temperature hold and increased purge gas flow (via load-ramp procedure) specifically during the transient, rather than just changing the chemical makeup gas composition. The departure is the *arrangement*: using the existing control logic to shift the operating point from \"steady-state synthesis\" to \"high-temperature purge/methanation buffer\" automatically when the failure driver (O2 ingress) is detected via the process variables, without installing new hardware.\n\n**Adjacent-Technique Clearance:** The closest existing practice is **catalyst regeneration cycles**, which are scheduled, long-duration thermal treatments to burn off coke or oxides. My mitigation is different because it is an **online, transient-response load-ramp procedure** that uses short-duration temperature modulation (15–30 minutes) within the normal operating envelope to *prevent* oxide accumulation, rather than a scheduled *remediation* cycle that halts production. It exploits the *in-situ* thermal lability of surface oxygen species at the specific retention temperature, rather than requiring full bed regeneration.\n\n**MECHANISM CLASS:** Temperature-Dependent Surface Desorption via Load-Ramp Setpoint Modulation\n\n---\n\n**PHYSICS CHECK**\n**Governing Relation:** The driving variable is the **surface coverage of oxygen species ($\\theta_O$)** on the Fe catalyst, which increases when $O_2$ ingress exceeds the rate of its thermal desorption/reaction. The rate of oxygen removal $r_{rem}$ is governed by Arrhenius kinetics: $r_{rem} = A \\exp(-E_a/RT) C_{O}$. The failure integral is the time-averaged $\\theta_O$; if $\\int \\theta_O dt$ exceeds a threshold, permanent poisoning occurs.\n\n**Direction-of-Effect:**\n**Driving variable:** Surface oxygen coverage ($\\theta_O$).\n**Mechanism:** Moves $\\theta_O$ **down** by **increasing** the inlet temperature ($T_{in}$) by 50–100 K during transient events.\n**Result:** This **reduces** the failure driver ($\\theta_O$) because the thermal energy overcomes the adsorption binding energy of oxygen on Fe sites, promoting desorption and reaction with feed H2/N2 to form volatile species ($H_2O, N_2, NH_3$) that are swept away by the purge flow. The sign is correct: higher $T$ increases the desorption rate constant, directly counteracting the adsorption flux of incoming $O_2$.\n\n**Magnitude Verification:** At 450°C (723 K), the desorption energy barrier for oxygen on Fe is partially overcome but slow. At 500°C (773 K), the rate constant increases by a factor of $\\approx 10^{1.5}$ (assuming $E_a \\approx 100$ kJ/mol). This factor is sufficient to clear the transient oxygen pulse within the residence time of the purge gas, preventing the accumulation that leads to permanent oxide formation.\n\n---\n\n**IMPLEMENTATION BILL**\n*Note: All items are drawn from the permitted set: load-ramp/purge procedure, inlet temperature setpoint retuning. No new hardware is installed.*\n\n1.  **(c) Parameter Change:** Configure the existing DCS/HMI to implement a **Logic Gate** that monitors the **Pressure Differential** ($\\Delta P$) across the catalyst bed and the **Flow Rate** of the synthesis gas.\n    *   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow meters are stated in the problem infrastructure).\n    *   *Operating Parameter:* Setpoint logic: If ($\\Delta P > \\Delta P_{baseline} + 10\\%$) OR (Flow Rate < 90% of setpoint for > 5 min), trigger State B.\n2.  **(c) Procedure Change:** Define the **Load-Ramp/Purge Protocol** in the operator manual.\n    *   *Action:* Upon State B trigger, the system automatically ramps the Inlet Temperature Setpoint from 450°C to 500°C over 15 minutes. Simultaneously, the recycle gas compressor load is adjusted to maintain a high gas velocity (purge) through the bed, increasing residence time for desorption.\n    *   *Duration:* State B holds until $\\Delta P$ returns to baseline $\\pm 5\\%$ for 30 minutes, then ramps back to 450°C over 15 minutes.\n3.  **(c) Parameter Change:** Set the **Inlet Temperature Setpoint Retuning** ranges in the DCS.\n    *   *Operating Parameter:* Normal State A: 450°C. Transient State B: 500°C.\n    *   *Constraint:* 500°C is within the manufacturer's rated continuous operating limit for the Fe catalyst (typically 450–500°C or higher for regeneration, but transient operation at 500°C is standard for this class).\n\n---\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*Comparison against Standard Practice (Upstream Methanation/Drying + Normal Operation):*\n\n| Bill Row | Class | Standard Practice Bill Item | Comparison | Operational Loss |\n| :--- | :--- | :--- | :--- | :--- |\n| DCS Logic Config | (c) | DCS exists; logic programming is a standard commissioning task. | **Same.** No new hardware. Programming effort is minimal (hours). | **Zero.** Logic is passive during normal ops. |\n| Load-Ramp Procedure | (c) | Standard operating procedures exist. This adds one conditional branch. | **Lower Burden.** No new physical components. | **Zero.** During normal ops. During transients, see below. |\n| T-Setpoint 500°C | (c) | Catalyst is rated for 500°C transient. No new hardware. | **Same.** Uses existing control loops. | **Negligible.** 50°C increase for ~1 hr reduces NH3 conversion efficiency by ~2% (exothermic equilibrium shift), but the transient event already disrupts production. Net loss vs. doing nothing (permanent poisoning) is **negative cost** (i.e., benefit). |\n\n**Conclusion:** Same-or-lower burden class. The mechanism adds no hardware, no new materials, and no new process steps beyond existing DCS parameters and operator procedures. The operational loss during the transient (1 hour at 500°C) is an acceptable trade-off to prevent the high-cost event of catalyst regeneration or replacement.\n\n---\n\n**EXECUTABLE TEST**\n**Protocol:**\n1.  Simulate an oxygen transient by introducing a measured 500 ppm $O_2$ spike into the synthesis gas feed for 2 hours while the system is in **State A** (450°C, no purge ramp). Measure $\\Delta P$ increase and subsequent activity loss (ammonia yield drop).\n2.  Reset catalyst activity (regenerate or use a fresh section if available for testing). Repeat the 500 ppm $O_2$ spike, but activate the **Proposed Load-Ramp Procedure** (State B: 500°C + High Flow Purge).\n3.  Measure $\\Delta P$ during the transient and the post-transient ammonia conversion efficiency.\n\n**Instruments:** Existing DCS pressure transmitters, flow meters, and gas analyzers (if available for O2 verification).\n\n**Pass/Fail Thresholds:**\n*   **Failure of Proposed Mitigation:** If, during State B, the post-transient ammonia conversion efficiency drops by more than 5% relative to baseline, or if $\\Delta P$ remains >20% above baseline after 24 hours.\n*   **Success:** If, during State B, the post-transient ammonia conversion efficiency returns to >95% of baseline within 24 hours, AND $\\Delta P$ returns to baseline within 24 hours, whereas State A shows permanent >10% activity loss.\n\n**Duration:** 48 hours for both test cases to allow for equilibrium recovery.\n\n**Kill Criterion:** If the 500°C excursion causes thermal sintering of the catalyst (indicated by a permanent increase in $\\Delta P$ or a sudden drop in activity that does not recover with H2/N2 cycling), the mechanism is invalid and must be abandoned.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow meters ar",
+    "*   *Operating Parameter:* Setpoint logic: If ($\\Delta P > \\Delta P_{baseline} + 10\\%$) OR",
+    "*   *Action:* Upon State B trigger, the system automatically ramps the Inlet Temperature S",
+    "*   *Duration:* State B holds until $\\Delta P$ returns to baseline $\\pm 5\\%$ for 30 minute",
+    "*   *Operating Parameter:* Normal State A: 450°C. Transient State B: 500°C.",
+    "*   *Constraint:* 500°C is within the manufacturer's rated continuous operating limit for ",
+    "1.  Simulate an oxygen transient by introducing a measured 500 ppm $O_2$ spike into the sy",
+    "2.  Reset catalyst activity (regenerate or use a fresh section if available for testing). ",
+    "3.  Measure $\\Delta P$ during the transient and the post-transient ammonia conversion effi",
+    "*   **Failure of Proposed Mitigation:** If, during State B, the post-transient ammonia con",
+    "*   **Success:** If, during State B, the post-transient ammonia conversion efficiency retu"
+   ],
+   "NAMED_VARIANT": [
+    "model/brand-marker: TIC-101 | *   *Where it attaches:* Existing DCS configuration block (TIC-101 loop and flow"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ },
+ "declared_template_prose": "** temperature-dependent surface desorption via load-ramp setpoint modulation",
+ "allowed_row_outside": 0,
+ "sha256_16": "6579bc58b29e1a30",
+ "smoke": false
+}

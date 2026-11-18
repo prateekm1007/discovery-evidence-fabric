@@ -1,0 +1,103 @@
+{
+ "problem_id": "HO9-03-pulp-kappa-uniformity",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:93ce752d4139": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:26d2abc4ca6e": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:09:41.635522Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**\nThe proposed intervention is a **chip-feed/liquor-circulation procedure change**: implementing a \"high-low\" cyclic agitation protocol via the existing chip feed pump and liquor circulation loop, specifically by decoupling the circulation flow from the digestion cycle to create a dynamic turbulence envelope that homogenizes the white liquor before it fully reacts with the wood fibers.\nStandard practice operates the digestion cycle in a closed-loop, steady-state mode where liquor circulation is constant and chip feed is continuous, leading to local alkali depletion and excessive delignification (high kappa) in stagnant zones and under-delignification (low kappa) in high-shear zones. My mitigation is a genuine departure because it introduces a *procedural duty-cycle split* (alternating high-flow/high-shear for 15 min followed by low-flow/low-shear for 45 min) rather than a continuous constant flow.\nAdjacent-technique clearance: The closest existing practice in other industries (e.g., pharmaceutical batch reactors) uses periodic dumping of the batch to ensure mixing. My mechanism is different because it does *not* dump the batch or stop production; it modulates the *flow rate* of the existing circulation loop within the standard operating envelope to create transient mixing events while maintaining material containment.\nThe mechanism attacks the driving physics (local concentration gradients of NaOH/Na2S) by increasing the frequency of convective mixing events, thereby reducing the local variance in effective H-factor experienced by individual chips, which directly reduces the variance in the resulting Kappa number.\n\n**PHYSICS CHECK**\nThe governing physical relation for Kappa number variation is the spatial integral of the local delignification rate over the residence time. Delignification rate $r$ is proportional to the local effective alkali concentration $C_{eff}$ raised to a power $n$ ($r \\propto C_{eff}^n$). In steady state, $C_{eff}$ has a spatial variance $\\sigma^2_{steady}$. The intervention moves the system from a steady state to a cyclic state. By increasing flow rate (high shear/mixing) during the \"high\" phase, the Péclet number $Pe = \\frac{uD}{D_m}$ increases, reducing the local concentration variance $\\sigma^2_{cyc} < \\sigma^2_{steady}$. Consequently, the variance in local H-factors decreases, and since Kappa is a function of H-factor, the standard deviation of Kappa numbers across the blow line drops.\nDIRECTION-OF-EFFECT: driving variable = *local alkali concentration variance ($\\sigma^2_{C}$)*; the mechanism moves it *down* by *increasing the Péclet number via flow modulation to enhance convective mixing* (magnitude: 20-30% reduction in variance via cycle averaging); this *reduces* *the failure driver (Kappa number non-uniformity)*.\n\n**IMPLEMENTATION BILL**\n*   **MECHANISM CLASS:** Configuration/Procedure Change (Cyclic Duty Cycle on Existing Pump).\n*   **Row 1 (a):** Use the **existing chip feed pump** to adjust flow rate from the standard steady-state $Q_{std}$ to a high $Q_{high}$ (approx 1.5x $Q_{std}$) for 15 minutes, then to a low $Q_{low}$ (approx 0.5x $Q_{std}$) for 45 minutes. This is a **parameter change** on existing equipment. No new hardware.\n*   **Row 2 (a):** Use the **existing liquor circulation loop** valves (bypass or main line) to modulate the turbulence. This is a **procedural change** to the valve positions setpoints. No new hardware.\n*   **Row 3 (a):** Update the **existing DCS/PLC logic** or operator procedure log to execute the 15/45 minute cycle. This is a **procedure change**. No new instrumentation.\n\n*(Note: All rows are tagged (a) as they utilize the problem's stated infrastructure: chip-feed/liquor-circulation procedure. No new catalog items are introduced. The \"high-low\" modulation is a configuration of existing pumps/valves.)*\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice Bill:** Operator maintains steady-state flow $Q_{std}$ continuously.\n*   **Intervention Bill:** Operator adjusts flow to $Q_{high}$ for 15 min and $Q_{low}$ for 45 min on a repeating cycle.\n*   **Comparison:**\n    *   *Hardware:* Zero added. (Standard: 0, Intervention: 0).\n    *   *Commissioning:* Zero added. The pumps/valves are already rated for the range; the cycle is a parameter change. (Standard: 0, Intervention: 0).\n    *   *Operation:* The intervention adds a 15/45 min toggle. The operational loss is **zero** because the material remains in the digester; no throughput is lost, only the flow rate fluctuates within the design envelope. The \"high\" phase increases energy consumption of the pump by approx 30% for 25% of the cycle, and the \"low\" phase decreases it by 25% for 75% of the cycle. The net energy penalty is negligible (<2% of total digester thermal energy).\n    *   *Conclusion:* The burden class is **lower** than standard practice in terms of cognitive load if automated, or **same** if manual. It is strictly same-or-lower hardware burden. No operational loss is priced as negative because the cycle is within normal pump curves.\n\n**EXECUTABLE TEST**\n1.  **Protocol:** Run the kraft pulp continuous digester at 165°C for 3 batches (24 hours each). Batch 1: Standard steady-state flow $Q_{std}$. Batch 2: Standard steady-state flow $Q_{std}$ (Control). Batch 3: The proposed 15 min $Q_{high}$ / 45 min $Q_{low}$ cyclic procedure.\n2.  **Instruments:** Standard blow-line kappa number analyzer (e.g., M88) at the end of the digester/blow line. Collect 5 samples per batch at 4-hour intervals from the blow line exit.\n3.  **Pass/Fail Thresholds:** Calculate the standard deviation ($\\sigma$) of the Kappa numbers for each batch. The intervention (Batch 3) passes if $\\sigma_{cyclic} < 0.8 \\times \\sigma_{steady}$. A 20% reduction in Kappa standard deviation is the target.\n4.  **Duration:** 72 hours total.\n5.  **Kill Criterion:** If $\\sigma_{cyclic} > \\sigma_{steady}$, or if the mean Kappa number shifts by more than 0.5 units (indicating excessive or insufficient total delignification), the mechanism is failed. Additionally, if pump vibration or pressure fluctuation exceeds 10% of design limits during the high-flow phase, the procedure is unsafe and the test is aborted.\n\n**CONSTRAINT BIND & CLAUSE RESOLUTION**\n*   **Allowed Measures:** The problem allows \"chip-feed/liquor-circulation procedure only.\" My mechanism is exactly this: a procedure change on the chip-feed/liquor-circulation system.\n*   **No Digester Redesign:** No hardware changes.\n*   **Deployed-Part Clause:** No modification to digester parts. Pumps and valves are external circulation equipment, not the digester shell/internal structure.\n*   **Permitted-Set Clause:** The measure is a \"procedure\" (cyclic duty cycle), which is explicitly in the permitted set.\n*   **Direction-of-Effect:** Moving concentration variance *down* reduces Kappa non-uniformity. This is the correct direction.\n*   **Input-Availability:** The procedure requires only time (clock) and flow rate (pump speed/valve position), both of which are available on the existing system. No new sensors.\n*   **Cost-Pricing:** Energy penalty <2% of thermal input. Negligible.\n*   **Exemplar-Reality:** No commercial exemplar needed; this is a procedure.\n*   **Premise-Validity:** The system has a circulation loop and pumps (stated in \"liquor-circulation\").\n*   **Certified-System:** Not a medical/food system, so no certified hardware constraint applies.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** Configuration/Procedure Change (Cyclic Duty Cycle on Existing Pum",
+    "*   **Standard Practice Bill:** Operator maintains steady-state flow $Q_{std}$ continuousl",
+    "*   **Intervention Bill:** Operator adjusts flow to $Q_{high}$ for 15 min and $Q_{low}$ fo",
+    "*   **Comparison:**",
+    "*   *Hardware:* Zero added. (Standard: 0, Intervention: 0).",
+    "*   *Commissioning:* Zero added. The pumps/valves are already rated for the range; the cyc",
+    "*   *Operation:* The intervention adds a 15/45 min toggle. The operational loss is **zero*",
+    "*   *Conclusion:* The burden class is **lower** than standard practice in terms of cogniti",
+    "1.  **Protocol:** Run the kraft pulp continuous digester at 165°C for 3 batches (24 hours ",
+    "2.  **Instruments:** Standard blow-line kappa number analyzer (e.g., M88) at the end of th",
+    "3.  **Pass/Fail Thresholds:** Calculate the standard deviation ($\\sigma$) of the Kappa num",
+    "4.  **Duration:** 72 hours total.",
+    "5.  **Kill Criterion:** If $\\sigma_{cyclic} > \\sigma_{steady}$, or if the mean Kappa numbe",
+    "*   **Allowed Measures:** The problem allows \"chip-feed/liquor-circulation procedure only.",
+    "*   **No Digester Redesign:** No hardware changes.",
+    "*   **Deployed-Part Clause:** No modification to digester parts. Pumps and valves are exte",
+    "*   **Permitted-Set Clause:** The measure is a \"procedure\" (cyclic duty cycle), which is e",
+    "*   **Direction-of-Effect:** Moving concentration variance *down* reduces Kappa non-unifor",
+    "*   **Input-Availability:** The procedure requires only time (clock) and flow rate (pump s",
+    "*   **Cost-Pricing:** Energy penalty <2% of thermal input. Negligible.",
+    "*   **Exemplar-Reality:** No commercial exemplar needed; this is a procedure.",
+    "*   **Premise-Validity:** The system has a circulation loop and pumps (stated in \"liquor-c",
+    "*   **Certified-System:** Not a medical/food system, so no certified hardware constraint a"
+   ],
+   "APPARATUS_ROW": [
+    "2.  **Instruments:** Standard blow-line kappa number analyzer (e.g., M88) at the end of the digester/blow line"
+   ]
+  }
+ },
+ "declared_template_prose": "** configuration/procedure change (cyclic duty cycle on existing pump).",
+ "allowed_row_outside": 0,
+ "sha256_16": "7e72374e86ac7d21",
+ "smoke": false
+}

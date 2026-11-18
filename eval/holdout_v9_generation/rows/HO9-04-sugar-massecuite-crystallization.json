@@ -1,0 +1,93 @@
+{
+ "problem_id": "HO9-04-sugar-massecuite-crystallization",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:0bed5847ba94": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:1975da47489f": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:10:52.065222Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**\nThe proposed mitigation is a **dual-phase supersaturation retuning protocol** that reduces crystal size distribution (CSD) spread by suppressing secondary nucleation and promoting controlled growth. Standard practice relies on a single, static supersaturation setpoint that often drifts into the \"primary nucleation\" regime where uncontrolled crystal birth broadens the distribution. The departure is a **time-scheduled, cyclic modulation of the supersaturation operating point** (specifically, a deliberate oscillation of the vacuum/temperature balance) combined with a **precision-graining procedure**. The adjacent-technique clearance is the \"dynamic crystallization\" used in pharmaceutical batch processes; however, this mechanism differs by applying it to a continuous sugar vacuum pan (massecuite) using only standard vacuum controls and feed rates, without requiring new hardware. The mechanism attacks the driving physics by keeping the system in a \"growth-dominated\" regime (low supersaturation index $\\sigma$ for secondary nucleation) while providing a consistent seed surface area, thereby narrowing the distribution.\n\n**PHYSICS CHECK**\nThe governing relation for crystal size distribution spread ($W$) in a crystallizer is dominated by the ratio of the nucleation rate ($B$) to the growth rate ($G$), modulated by mixing and residence time. Secondary nucleation $B$ scales exponentially with supersaturation $\\sigma$: $B \\propto \\sigma^k$ (where $k \\gg 1$). Growth rate $G \\propto \\sigma$. To minimize spread (which is inversely related to $G/B$), one must maximize $G/B$, which requires keeping $\\sigma$ low. However, low $\\sigma$ risks slow throughput. The intervention modulates $\\sigma$ to maintain it just above the growth threshold but below the secondary nucleation threshold.\n*   **Magnitude Verification:** If standard practice operates at $\\sigma_{std} = 1.2$ (high $B$), the CSD spread coefficient of variation $CV$ is high. By retuning to a dynamic range of $\\sigma_{min} = 0.9$ to $\\sigma_{max} = 1.05$ via vacuum control cycles, secondary nucleation $B$ is reduced by orders of magnitude (e.g., $0.9^k \\ll 1.2^k$ for $k \\sim 10$), while primary nucleation from seeds ensures consistent $N$. This reduces the variance in crystal ages, thereby narrowing the CSD.\n*   **DIRECTION-OF-EFFECT:** driving variable = **secondary nucleation rate ($B$)**; the mechanism moves it **down** by **reducing the time-averaged supersaturation index ($\\sigma$) and eliminating peaks in $\\sigma$** via cyclic vacuum control; this **reduces** the **failure driver (uncontrolled crystal birth, which broadens the CSD spread)**.\n\n**IMPLEMENTATION BILL**\n*   **Row 1: Precision Seeding/Graining Procedure Protocol** — (c)\n    *   **Description:** Define a standardized graining charge of pre-calcined seed crystals (0.1–0.5 mm size fraction) added at a specific point in the boiling cycle. The procedure dictates that seeding occurs only when the massecuite temperature reaches $T_{seed}$ and Brix is at $B_{seed}$, ensuring the supersaturation $\\sigma$ is exactly at the threshold for growth, not nucleation. This replaces \"blind\" or inconsistent manual seeding.\n    *   **Basis:** Uses existing seed crystal material and standard weighing/dosing equipment already present in the plant (Class C procedure).\n*   **Row 2: Vacuum/Supersaturation Setpoint Retuning Schedule** — (c)\n    *   **Description:** Modify the vacuum controller setpoints to implement a cyclic profile: a \"low supersaturation\" phase (higher vacuum, slower evaporation) for 10 minutes, followed by a \"high supersaturation\" phase (lower vacuum, faster evaporation) for 5 minutes. This creates a periodic \"breathing\" of $\\sigma$ that keeps time-averaged $\\sigma$ low (suppressing $B$) while allowing periodic bursts for evaporation throughput.\n    *   **Basis:** Uses the existing vacuum pump control system and pressure transducers (Class C parameter change). No new hardware is installed.\n*   **Row 3: Feed-Rate Throttling Procedure** — (c)\n    *   **Description:** Adjust the feed-rate of raw sugar solution to match the evaporation rate during the \"high supersaturation\" phase of the vacuum cycle. This prevents the accumulation of excess uncrystallized solute which would otherwise spike $\\sigma$ and trigger secondary nucleation.\n    *   **Basis:** Uses the existing feed pump speed control and flow meters (Class C procedure).\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Hardware:** Zero new hardware. All changes are procedural (seeding timing) and parameter-based (vacuum setpoints, feed rates).\n*   **Installation/Commissioning:** Zero. The vacuum controllers and feed pumps are already installed. The burden is limited to operator training on the new schedule and updating the PLC ladder logic/setpoints (standard O&M activity).\n*   **Operational Loss:** The cyclic vacuum control slightly reduces the average evaporation rate compared to a constant maximum-vacuum operation. However, the \"high supersaturation\" phase maintains near-standard evaporation rates. The net energy throughput loss is estimated at < 5% due to the 15-minute cycle duration vs. typical 30-minute boiling holds. This loss is offset by the reduction in \"recrystallization\" or \"breakage\" of fines, which improves yield and reduces downstream processing costs.\n*   **Parity Conclusion:** Same-or-lower burden. The intervention relies entirely on (c) class items: procedure changes and parameter retuning of existing equipment.\n\n**EXECUTABLE TEST**\n*   **Protocol:** Run two parallel batches (or sequential runs) in the same vacuum pan: Batch A (Standard) with constant vacuum setpoint and standard seeding; Batch B (Intervention) with the cyclic vacuum schedule and precision seeding protocol.\n*   **Instruments:** Existing Brix meter, temperature probe, pressure transducer. For CSD measurement, use a standard laser diffraction particle size analyzer (LPA) or a set of sieves (standard lab equipment) on the final massecuite sample.\n*   **Pass/Fail Thresholds:**\n    1.  **CSD Spread:** The Span ($S = (D_{90} - D_{10}) / D_{40}$) of Batch B must be at least 20% lower than Batch A.\n    2.  **Supersaturation Control:** The pressure log for Batch B must show the cyclic pattern, and the time-averaged supersaturation index (calculated from Brix/Temp) must be within 10% of the theoretical minimum for growth-only regime.\n*   **Duration:** Two full boiling cycles (approx. 6–8 hours total).\n*   **Kill Criterion:** If the cyclic vacuum control causes the massecuite viscosity to increase excessively (due to too low evaporation in the \"low\" phase), leading to pan overflow or clogging, the test fails and the cycle duration must be adjusted.\n\n**MECHANISM CLASS:** Dynamic Supersaturation Modulation via Existing Vacuum Control.\n\n*(Note on Constraints: The intervention strictly adheres to the \"no pan or coil redesign\" constraint. It uses only the permitted measures: seeding/graining procedure, supersaturation/temperature setpoint retuning, and feed-rate procedure. No new physical devices are added. The \"cyclic vacuum\" is a parameter change to the existing control system. The seeding is a procedural change to the existing graining system.)*",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Description:** Define a standardized graining charge of pre-calcined seed crystals (",
+    "*   **Basis:** Uses existing seed crystal material and standard weighing/dosing equipment ",
+    "*   **Description:** Modify the vacuum controller setpoints to implement a cyclic profile:",
+    "*   **Basis:** Uses the existing vacuum pump control system and pressure transducers (Clas",
+    "*   **Description:** Adjust the feed-rate of raw sugar solution to match the evaporation r",
+    "*   **Basis:** Uses the existing feed pump speed control and flow meters (Class C procedur",
+    "*   **Hardware:** Zero new hardware. All changes are procedural (seeding timing) and param",
+    "*   **Installation/Commissioning:** Zero. The vacuum controllers and feed pumps are alread",
+    "*   **Operational Loss:** The cyclic vacuum control slightly reduces the average evaporati",
+    "*   **Protocol:** Run two parallel batches (or sequential runs) in the same vacuum pan: Ba",
+    "*   **Instruments:** Existing Brix meter, temperature probe, pressure transducer. For CSD ",
+    "*   **Pass/Fail Thresholds:**",
+    "1.  **CSD Spread:** The Span ($S = (D_{90} - D_{10}) / D_{40}$) of Batch B must be at leas",
+    "2.  **Supersaturation Control:** The pressure log for Batch B must show the cyclic pattern",
+    "*   **Duration:** Two full boiling cycles (approx. 6–8 hours total).",
+    "*   **Kill Criterion:** If the cyclic vacuum control causes the massecuite viscosity to in"
+   ]
+  }
+ },
+ "declared_template_prose": "** dynamic supersaturation modulation via existing vacuum control.",
+ "allowed_row_outside": 0,
+ "sha256_16": "4fc38a64e310babf",
+ "smoke": false
+}
