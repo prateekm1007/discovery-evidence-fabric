@@ -215,6 +215,11 @@
    "registered_at": "2026-11-18T14:41:00Z (sandbox clock)",
    "role": "builder",
    "note": "R75 session: fresh-sandbox lineage (credential restore FIRST per Art. 17 v3.3.0: HF 33bc7af22c62 + GH_PAT f1ebca5f9b62 both digest-match the committed custody records; whoami-v2 login prateekm1, repo.write scoped, vault operator-keys-vault read 200 \u2014 F74-closed state re-verified). Lane: F78 freeze-guard CI wiring (the round-open direction 1)."
+  },
+  "builder-r75s2": {
+   "registered_at": "2026-11-18T14:58:52Z (sandbox clock)",
+   "role": "builder",
+   "note": "R75 second session (continuation lineage of builder-r75s1's sandbox; custody restored per Art. 17 v3.3.0 BEFORE any work: HF 33bc7af22c62 digest-verified from the owner-delivered master token (absent from this session's working copy, restored) + GH_PAT f1ebca5f9b62 digest-match; keyfile mode tightened 755->600; gitignored throughout)."
   }
  },
  "claims": [
@@ -2160,6 +2165,27 @@
    "no_probes_note": "zero LLM probes; zero quota consumption; deterministic zero-LLM tooling only (pytest + git + the workflow edit)",
    "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == f8b2e0bc4 == local HEAD (fast-forward base); no competing OPEN claim for work_id r75-freeze-guard-ci; prior work_id unused (grep over claims[])",
    "completion_note": "typed completion (pushed): F78 fix landed as 959a21662 on f8b2e0bc4+claim 33f9b7857, fast-forward push 33f9b7857..959a21662; remote surface CI completed success on 959a21662 (authenticated check-runs read, D2 convention) \u2014 the passing workflow includes tests/test_r64_v9_preflight.py in its pytest chain, so the freeze guard is verified gating from the remote's own execution. Acceptance demonstrated fail-closed pre-push: deliberate one-byte drift on frozen scripts/r22_a1w_v5_repair.py reds the guard (exit 1, two tests FAIL with the exact sha16 diff), byte-exact revert restores 7/7 green. Art. 22 map entry cites the guard; map-completeness + Art.29 + guard suites green locally (20/20). Frontier window CLOSED at round time (gate 2026-11-19T16:25Z) \u2014 runbook pre-gate re-verified firing typed with zero probes; the re-probe + v10 sealed one-shot remain the next-round path (score 6 = mean>=3.25, CI>3.0, Art. 14)."
+  },
+  {
+   "claim_id": "c-0094",
+   "claimed_at": "2026-11-18T14:58:52Z (sandbox clock)",
+   "registered_at": "2026-11-18T14:58:52Z (sandbox clock)",
+   "work_id": "r75-c0093-verify-close",
+   "title": "R75 verification + round-close lane: builder-r75s2 fetched mid-flight and found c-0093 (r75-freeze-guard-ci, F78 fix) ALREADY LANDED at the new origin tip 959a21662 \u2014 Art. 29(e): stand down to VERIFIER for the landed work (bytes byte-untouched, no duplicate lane), verify it from committed bytes (Art. 29(c) + auditor Art. 1), run the fail-closed acceptance drill, apply the D2 remote_ci read (r41_remote_ci_read.py) to the round record, and complete the c-0093 lifecycle (DONE + completion_note) \u2014 the closures the landed tip still carries OPEN.",
+   "status": "OPEN",
+   "session_id": "builder-r75s2",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "959a2166223f9dd2e3aa8dc1a5f47e8e3b99b274",
+   "lease_expiry": "2026-11-19T15:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r75_freeze_guard_ci_status.json",
+    "eval/r75_c0093_verification.json",
+    "eval/work_claims.json"
+   ],
+   "no_probes_note": "zero LLM probes; zero quota consumption; the frontier re-probe window is CLOSED until 2026-11-19T16:25Z (Art. 3 typed refusal stands; the HF master token delivered this round is used ONLY for the custody restore digest-check, never for probes)",
+   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 tip 959a21662 == local HEAD (fast-forward); the round's DIRECTION (F78) was found already claimed AND landed by builder-r75s1 (c-0093, base f8b2e0bc4) between the owner's instruction and this fetch \u2014 so this claim is for the DISJOINT verification/closure lane (work_id r75-c0093-verify-close unused in claims[]; grep clean), never a duplicate of r75-freeze-guard-ci"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
