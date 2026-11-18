@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "114e77c57",
+  "queue/dev12_r7": "f587246f6",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1548,6 +1548,33 @@
     1,
     22
    ]
+  },
+  {
+   "id": "F77",
+   "severity": "MEDIUM",
+   "title": "R70 missed the conscious re-freeze act: the binds commit (80629f9f7->114e77c57) edited frozen files r40_machine_v77.py (effective_critic_verdict F75 bind) + r29_a1w_v72_contract.py (clause M) WITHOUT re-recording eval/r64_v9_preflight.json freeze baselines. Caught by the local full battery (test_r64_v9_preflight red); pushed CI stayed green because the guard is outside the CI test list. FIXED FORWARD R72 (a3e5005eb): baselines re-recorded, auditor verified 15/15 freeze_baselines_sha16 match current bytes (r40 ff43c6056d7e4163, r29 90b231184b885a1c), refreeze_note_r72 honest, preflight PASS.",
+   "status": "CLOSED",
+   "opened": "2026-11-18",
+   "closed_at": "2026-11-18",
+   "last_checked": "f587246f6",
+   "resolution": "R72 fix-forward; auditor byte-verified 15/15 baselines match.",
+   "articles": [
+    22,
+    27
+   ]
+  },
+  {
+   "id": "F78",
+   "severity": "MEDIUM",
+   "title": "Freeze-baseline guard is LOCAL-ONLY (exists-but-does-not-gate, F32 class recurring): test_r64_v9_preflight is NOT in the CI workflow test list, so frozen-file drift pushes green (F77 happened exactly this way). FIX: wire test_r64_v9_preflight into the queue CI surface so any frozen-file edit without a re-freeze reds the push. Also triage the 4 legacy local-only residuals (secret-scan self-fixture false positive needs a test-file allowlist; r531 memoization pin + 2x r544 golden-era pins are superseded-era) into a follow-up lane WITHOUT weakening the verifier.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "f587246f6",
+   "rounds_open": 1,
+   "articles": [
+    27,
+    29
+   ]
   }
  ],
  "amendments": [
@@ -2622,6 +2649,18 @@
     "Process: Art.29 validator caught out-of-enum kind + unregistered session + missing claimed_at pre-push; fix-forward 80629f9f7->114e77c57 disclosed. builder-r70s1 lane's 4 local commits (INFRA_CREDENTIAL_LOST) superseded by builder-r64s4 pusher-wins (Art.29(e)); c-0090 DONE.",
     "Score stays 5. Frontier: v10 fresh sealed one-shot after the maintenance window with the F75/chemistry/formula binds active; target mean>=3.25 (CI>3.0) for score 6."
    ]
+  },
+  {
+   "id": "AM65",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R73 auditor audit of R72 (verification-prep + re-freeze fix-forward + D2 self-catch)",
+   "changes": [
+    "R72 VERIFIED from pushed bytes (f587246f6, CI green): re-freeze fix-forward audited 15/15 freeze_baselines_sha16 match current frozen-file bytes (F77 CLOSED); D2 self-catch fixed (remote_ci block API-quoted, surface success); F75 recompute artifact committed (r71_bind_recompute.py); score bytes recompute exact (n=30 mean 3.000 CI [2.751,3.249]); runbook pre-gate refusal EXIT=3 zero probes; vault 8/8 digests match.",
+    "F78 OPENED: freeze-baseline guard local-only (test_r64_v9_preflight not in CI) — frozen-file drift pushes green; wire it into CI. 4 legacy residuals disclosed (secret-scan self-fixture, r531/r544 pins) — triage follow-up, verifier not weakened.",
+    "builder-r70s1 lane absent/superseded (pusher-wins, no disjoint work); lane-A v9 scratch quarantined byte-preserving outside repo. Infra: pytest tmp factory ~7GB aggregate ENOSPC contamination typed; detect-secrets+pint reinstalled.",
+    "Score stays 5. Frontier unchanged: v10 fresh sealed one-shot after xkiro maintenance exits 2026-11-19T16:25Z with binds active + frontier model; target mean>=3.25 (CI>3.0) for score 6."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3648,6 +3687,20 @@
     "F76"
    ],
    "evidence_sha": "eval/r71_auditor_verification.json"
+  },
+  {
+   "id": "V66",
+   "round": "R73 audit of R72 verification-prep",
+   "commit": "f587246f6",
+   "gate": "NOT_MET (acceptance UNRESOLVED; score 5)",
+   "capability_change": "re-freeze baselines restored (15/15 verified); D2 self-catch fixed; F78 local-only guard gap opened",
+   "closed_findings": [
+    "F77"
+   ],
+   "new_findings": [
+    "F78"
+   ],
+   "evidence_sha": "eval/r73_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3866,7 +3919,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10. R70 binds VERIFIED (F75 refusal/identity/thrash + formula-direction + chemistry elicitation 8/8); refusal type-gate false-pass structurally impossible; F74/F76 closed. v9 mean 3.000 UNRESOLVED (CI includes 3.0). Frontier: v10 fresh sealed one-shot after xkiro maintenance exits 2026-11-19T16:25Z, with binds active + frontier model; target mean>=3.25 (CI>3.0) -> score 6. Goal 9/10.",
+ "progress_note": "SCORE 5/10. R72 verified: re-freeze baselines 15/15 match current bytes (F77 closed), D2 self-catch fixed, F75 recompute committed, score bytes exact, runbook gated, vault digests match. F78 opened: freeze-baseline guard local-only (wire into CI). v9 mean 3.000 UNRESOLVED. Frontier: v10 after 2026-11-19T16:25Z with binds + frontier model; mean>=3.25 (CI>3.0) -> score 6. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
