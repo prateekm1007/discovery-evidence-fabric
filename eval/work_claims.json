@@ -1954,6 +1954,17 @@
    "finding": "commit lacks Session:/Work-Id: trailers (Art. 29(a)) \u2014 caught by tests/test_article29_parallel_coordination.py during the R50 local CI repro (the red CI at a57972828)",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "pushed history cannot be rewritten (never rebase pushed commits); remediation is forward \u2014 every builder commit from r50s1 onward carries both trailers (see r50s1+ commits)"
+  },
+  {
+   "sha": "abbbc8d08",
+   "session": "builder-r62s1",
+   "work_id": "r62-physics-registry-expansion",
+   "claim": "c-0085",
+   "detected_by": "builder-r62s1",
+   "detected_at": "2026-11-18T04:05:00Z (local CI repro of the red surface step at f76a7316d)",
+   "finding": "commit lacks Session:/Work-Id: trailers (Art. 29(a)) \u2014 the lines were glued to the final body paragraph instead of passed via --trailer, so git's trailer parser reads none; caught by test_article29_parallel_coordination.py::test_post_adoption_commits_carry_session_and_work_id_trailers (CI red f76a7316d, step: Constitution v3.1.0 enforcement)",
+   "status": "DISCLOSED_PENDING_REMEDIATION",
+   "remediation": "fix-forward: this registration commit + the round-record commit carry proper --trailer flags; abbbc8d08's content is unchanged (no history rewrite on a pushed queue branch); subsequent commits verified trailer-parseable before push"
   }
  ],
  "canonical_claim_violations": [
