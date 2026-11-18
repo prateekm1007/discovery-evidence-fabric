@@ -163,7 +163,10 @@ def test_evaluator_deferred_verdict_on_unmeasurable():
               {"p1": {"mean_score": None,
                       "measure_classes": ["x"],
                       "allowed_row_outside": 0}})
-    assert out["record"] == "R53_P2_ABLATION_CRITERIA/1.1.0"
+    # F69 fix-forward: the pin tracks the evaluator's record VERSION
+    # SHAPE, not one literal (the 4db375c3a hardening bumped the
+    # evaluator v1.1.0 -> v1.2.0; a stale literal reds deterministically)
+    assert out["record"].startswith("R53_P2_ABLATION_CRITERIA/"), out["record"]
     assert out["criteria"][0]["met"] and out["criteria"][1]["met"]
     assert out["criteria"][2]["value"] == "UNMEASURABLE"
     # the R58 amendment: NEVER a DELETE on no measurement
