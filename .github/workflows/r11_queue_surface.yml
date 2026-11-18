@@ -123,12 +123,19 @@ jobs:
       # or the push reds. The driver is zero-LLM (deterministic,
       # content-only candidate hashes after the derived_at/hash-seed
       # fixes), so CI is the reproducibility proof.
-      - name: P1.4 labelled regression through the integrated engine route (F64)
+      # F77 fix-forward (R72, c-0091): the byte-identity leg of this step
+      # (git diff --exit-code, the R53 contract) was silently lost in the
+      # R60 workflow restructure and the committed record went stale at
+      # R70 (the chemistry elicitation moved plan order on null-domain
+      # labelled rows). BOTH legs are restored: the verdict AND the
+      # byte-identity gate every push, as the R53 remedy committed.
+      - name: P1.4 labelled regression through the integrated engine route (F64/F77)
         run: |
           set -e
           python3 scripts/r52_labelled_regression.py | tee /tmp/r53_regression.log
           grep -q '"verdict":"PASS 0/0/0"' /tmp/r53_regression.log \
             || grep -q '"verdict": "PASS 0/0/0"' /tmp/r53_regression.log
+          git diff --exit-code -- eval/r52_labelled_regression.json
       # The P1 >=80% numeric-claims-unit-checked leg (R54, c-0072):
       # every numeric-direction claim on the labelled DEV rows must
       # carry an applicable registry relation that RUNS with a pint
