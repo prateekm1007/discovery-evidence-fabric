@@ -1,0 +1,28 @@
+{
+ "record": "R60_VERIFIER_STATE/1.0.0",
+ "verifier_session": "builder-r60s2",
+ "audited_tip": "dc9a6d5d5",
+ "mandated_reads": {
+  "epistemic_v3.2.0": "byte-identity VERIFIED (md5 9a5ae1cdcaaf4abae12701525f39bc48 identical at 81e9b0f13 / 590fac029 / dc9a6d5d5 — the earlier mismatch in this round's first probe was the stale pre-ratification local tree at 149cbab63, not a queue change; zero commits touch the file since the ratification)",
+  "auditor_v1.3.0_at_04b5e0983": "FULL-read (105 lines, 14 articles + 3 amendment records; AM54/AM55/CORR-3 live in AUDIT_LEDGER.json, v1.3.0 remains the constitution head)",
+  "v9_preregistration": "FULL-read: seal 502e93d8..., n=30 power pre-registered (CI lower bound >3.0 for RESOLVED), custody = access-controlled private repo (unauth 404, CORR-3), one-shot protocol step 2 designates the PEER session as verifier"
+ },
+ "verified_from_committed_bytes": {
+  "shape_hardening_4db375c3a": "the R59 verifier observation was reproduced live and FIXED TYPED (row-shape validation before computation; missing fields refused never defaulted; raw run-record markers named in the refusal); regression-pinned in tests/test_r53_criteria_typed_refusal.py — 8 tests GREEN on committed bytes",
+  "v9_freeze_6f1a87913": "rubric isolation is STRUCTURAL: grep of scripts/r60_v9_one_shot.py shows no rubric path/list/read code (only docstring custody notes); transport gated by route_adapter.require_registered_model BEFORE gateway start; seal recipe fail-closed; MEASURED_PATH through engine_route.run_row -> mechanism_space; V7.7 loop imported BYTE-UNCHANGED; zero-LLM dry-run PASS recorded",
+  "c0082_staking": "the freeze commit pre-stakes claim c-0082 (holdout-v9-generation) to land AFTER c-0079 completes — this lane did NOT claim v9-generation (collision avoided per Art. 29(e); builder-r60s2 = the prereg's peer verifier for protocol step 2)",
+  "rows_on_disk": "baseline 36/36 committed (critic_verdict: 30 CLEAN / 1 KILL / 5 FLAG; allowed_row_outside sum 7 = baseline-arm input context, NOT a gate value), challenger 4/36; every row carries sha256_16 (byte-pinned resume)",
+  "infra_state": "z-ai grant 429 window typed by the executor (Art. 15, Art. 15's never-switch-families honored); resume point 4 committed challenger rows; lease 2026-11-19T00:00:00Z live"
+ },
+ "findings": [
+  {
+   "id": "R60-F1 (stale version-pin)",
+   "severity": "LOW",
+   "evidence": "tests/test_r58_route_adapter.py:166 asserts record == 'R53_P2_ABLATION_CRITERIA/1.1.0' while 4db375c3a bumped the evaluator to 1.2.0 — deterministic local red (verifier run EXIT=1); the file is OUTSIDE the workflow test surface (only test_r53_criteria_typed_refusal.py was added at .github/workflows/r11_queue_surface.yml:108), so remote CI stayed green",
+   "fix": "one-line pin update to 1.2.0 (or a version-agnostic regex pin) rides the executor's challenger-resume commit; NOT fixed by this lane — the file is the c-0079 claim's artifact and the lane is ACTIVE",
+   "also": "test_r58_route_adapter.py is absent from the workflow test list — a coverage gap worth closing in the same fix"
+  }
+ ],
+ "criteria_state": "1+2 UNCOMPUTED (normalizer runs at ablation completion; never projected); 3 UNMEASURABLE (private-repo rubric scores post-v9 only)",
+ "verdict": "R60 peer lane VERIFIED sound; one LOW typed finding filed for the executor; the frontier remains: 429 window clears -> challenger 5..36 -> criteria 1+2 -> c-0082 claim -> frozen v9 one-shot -> auditor scoring"
+}
