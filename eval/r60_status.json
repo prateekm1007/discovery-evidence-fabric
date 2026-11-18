@@ -62,8 +62,11 @@
   "claim_state": "NOT YET CLAIMED — the claim (c-0082) lands after the c-0079 ablation completes (the owner's directed order), BEFORE any v9 problem read"
  },
  "transport_state": {
-  "upstream": "the sandbox z-ai CLI upstream: R58's 500-outage (~19:45Z) transitioned to 429-at-every-call (typed by direct CLI probes 21:53Z-22:22Z; a paced recovery monitor runs, probe every 180s)",
-  "discipline": "Art. 15 (infra failure is never scientific rejection) + the matched-model-identity constraint (the lane waits on the transport, it never switches families)"
+  "upstream": "the sandbox z-ai grant is in a SUSTAINED ALL-ENDPOINT THROTTLE: chat AND image-search AND the default-model probe all return 429 'Too many requests' (typed: grant-level, not model-level; probes 2026-11-17 21:53Z through 2026-11-18 00:04Z, ~2h15m continuous)",
+  "history": "R58's 500-outage (~19:45Z) transitioned to 429-at-every-call by 21:53Z; the 00:00Z UTC boundary did NOT reset it (not a daily-reset pattern); the provider appears to hold the grant in a protective cooldown after the outage",
+  "probing": "paced recovery probing (~1 probe/100-180s, 2-token requests); on recovery the c-0079 challenger resume execs immediately (the committed resume point: python3 scripts/r58_p2_ablation_driver.py challenger, resume-safe from the 4 committed rows)",
+  "lease_margin": "c-0079 lease 2026-11-19T00:00:00Z — ~24h of margin at typing time",
+  "discipline": "Art. 15 (infra failure is never scientific rejection; the resume-safe driver continues from committed bytes) + the matched-model-identity constraint (the lane waits on the registered route, it never switches families)"
  },
  "remote_ci": {
   "pushed_shas": {
