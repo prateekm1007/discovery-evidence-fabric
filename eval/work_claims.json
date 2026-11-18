@@ -2546,6 +2546,28 @@
    "role_on_record": "EXECUTOR (c-0082 covers the canonical paths substantively; the commit itself carried no trailers so the trailer->claim match could not bind)",
    "status": "disclosed_pending_remediation",
    "note": "registered by builder-r64s4 cross-session; remediation = the completion commit carries Session/Work-Id trailers matching c-0082"
+  },
+  {
+   "sha": "09972e513",
+   "session": "builder-r87s1",
+   "correct_work_id": "holdout-v10-generation",
+   "correct_claim_id": "c-0100",
+   "detected_by": "builder-r87s1 (self-caught by tests/test_article29_parallel_coordination.py pre-push)",
+   "detected_at": "2026-11-18T19:40:00Z (sandbox clock)",
+   "finding": "the AM75 re-freeze+flip+re-smoke commit touches canonical bytes under eval/holdout_v10_generation/ (the regenerated agnes smoke artifacts) with Session: builder-r87s1 while the covering EXECUTOR claim c-0100 was staked by builder-r85s1; the canonical bytes ARE covered by the c-0100 artifact_paths (rows_smoke/, events_smoke.json, gateway_slice_smoke.txt, attestation_smoke.json all listed) and the Work-Id trailer is correct - the ONLY mismatch is the acting session being the blood-line continuation, not the staking session",
+   "status": "DISCLOSED_RESOLVED",
+   "note": "F36-pattern typed allowance, fail-closed the other way: the sandbox reprovision (#4) wiped the r85s1 worktree; builder-r87s1 is the SAME conversation blood-line (registered in sessions{} with the lineage note) executing the auditor-directed AM75 continuation under the LIVE claim (lease 2026-11-20T00:00Z - not expired, so no Art. 29(d) takeover applies; the claim record stands untouched per Art. 4); pushed history is never rewritten"
+  },
+  {
+   "sha": "511d94470",
+   "session": "builder-r87s1",
+   "correct_work_id": "holdout-v10-generation",
+   "correct_claim_id": "c-0100",
+   "detected_by": "builder-r87s1 (self-caught by the same test, pre-push)",
+   "detected_at": "2026-11-18T19:40:00Z (sandbox clock)",
+   "finding": "the sealed v10 one-shot run commit (30 rows + events ledger + gateway slice + attestation + the typed run record) carries Session: builder-r87s1 vs the c-0100 staking session builder-r85s1; every canonical path is inside the c-0100 artifact_paths and the Work-Id trailer is correct; the one-shot rows record the claim named executor builder-r85s1@holdout-v10-generation (ONE named executor id per the prereg)",
+   "status": "DISCLOSED_RESOLVED",
+   "note": "same continuation disclosure as 09972e513 - the acting session is the r85s1 blood-line continuation under the live lease; the auditor R86 direction ordered the run under the existing claim c-0100"
   }
  ],
  "findings": [
