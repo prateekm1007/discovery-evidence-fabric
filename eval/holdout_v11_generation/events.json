@@ -1,0 +1,901 @@
+{
+ "record": "HOLDOUT_V11_GENERATION_EVENTS/1.0.0",
+ "run": "holdout-v11-generation",
+ "executor_id": "builder-r91s1@holdout-v11-generation",
+ "registered_model": "agnes-3.0-flash",
+ "registered_upstream": "agnes",
+ "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+ "binds": [
+  "F75_deliverable_class",
+  "chemistry_elicitation",
+  "formula_direction",
+  "element_conservation",
+  "equilibrium_direction"
+ ],
+ "repair_loop_convergence_note": "per-row repairs + residual keys + repair_budget_burned_full recorded for the convergence measurement (R89 d5; recomputable from committed bytes, never scored by this instrument)",
+ "window_started_at": "2026-11-18T22:11:05.955613Z",
+ "events": [
+  {
+   "problem_id": "HO11-01-al-smelter-anode-effect",
+   "generated_at": "2026-11-18T22:11:05.975490Z",
+   "histogram_before": {},
+   "histogram_after": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7050,
+     "latency_s": 8.7,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- *Logic*: Dosing trigger is NOT time-based. Dosing is triggered when:",
+       "1. Hopper pressure differential ($\\Delta P$) indicates a charge is ready (carrier air flow",
+       "2. Flow meter confirms active alumina delivery.",
+       "3. Dosing duration is fixed at a short interval (e.g., 10-15 seconds) to deliver a specifi",
+       "- *Frequency*: The system is allowed to dose up to every 15-20 seconds, provided the flow/",
+       "1. **Hardware**: No new sensors required if existing flow/pressure meters are used. If a f",
+       "2. **Software**: PLC program change. Existing PLC has sufficient I/O. No new hardware clas",
+       "3. **Operation**: No change to bath temperature setpoint (constraint respected). No change",
+       "4. **Maintenance**: Slightly higher duty cycle for the pneumatic system (more cycles). How",
+       "5. **Burden Conclusion**: Same-or-lower burden class. The intervention uses existing infra"
+      ],
+      "STATED_REACTION_ELEMENT_PHANTOM": [
+       "formation product 'NO' uses element(s) N with no source species anywhere in the answer: ...dure\" -> **YES** (Flow-Gated Dosing Procedure).\n- Allowed measures: \"bath temperature setpoint retuning\" -> **NO** (Not used).\n- Allowed measures: \"an",
+       "formation product 'NO' uses element(s) N with no source species anywhere in the answer: ...temperature setpoint retuning\" -> **NO** (Not used).\n- Allowed measures: \"anode-effect quench procedure\" -> **NO** (Not used).\n- Exclusions: \"no cell "
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Local depletion of alumina concentration at the anode surface (Cs -> 0) initiates the anode effect. | ingredient: High-frequency dosing increases the alumina concentration (Cs) at the anode surface, opposing the depletion that triggers the failure. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Local depletion of alumina concentration at the anode surface (Cs -> 0) initiates the anode effect.",
+      "ingredient_action": "High-frequency dosing increases the alumina concentration (Cs) at the anode surface, opposing the depletion that triggers the failure.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "617f77ae376084f8"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5396,
+     "latency_s": 10.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installation Burden**: 0. No new hardware, sensors, or structural modifications. The",
+       "*   **Operational Loss**: The bath temperature oscillation (945°C to 965°C) introduces a m",
+       "*   **Maintenance Burden**: 0. No new parts to fail. The dosing system and temperature con"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Installation Burden**: 0. No new hardware, sensors, or structural modifications. The intervention is pur"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Local depletion of alumina concentration at the anode surface below a critical threshold, which increases the frequency of anode effects and subsequent perfluorocarbon generation. | ingredient: The procedure increases and stabilizes the local alumina partial pressure at the anode surface via pulse dosing and temperature gating, thereby opposing the depletion mechanism that causes the failure. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Local depletion of alumina concentration at the anode surface below a critical threshold, which increases the frequency of anode effects and subsequent perfluorocarbon generation.",
+      "ingredient_action": "The procedure increases and stabilizes the local alumina partial pressure at the anode surface via pulse dosing and temperature gating, thereby opposing the depletion mechanism that causes the failure.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e2e7bcb07596ddce",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Installation Burden**: 0. No new hardware, sensors, or structural modifications. The; *   **Operational ",
+      "APPARATUS_ROW: *   **Installation Burden**: 0. No new hardware, sensors, or structural modifications. The intervention is pur"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 8945,
+     "latency_s": 10.0,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Energy Loss:** Raising bath temperature by 20°C for ~1.5 minutes during an anode effec",
+       "1. **Baseline:** Record PFC emissions (via existing flue gas monitoring) and anode effect ",
+       "2. **Intervention:** For the next 10 events, retune bath temperature to 980°C and extend q",
+       "3. **Measurement:** Use **existing** flue gas PFC analyzers (e.g., GC-MS or FTIR) to measu",
+       "4. **Pass/Fail:** **Pass** if average PFC concentration per event decreases by ≥20% relati",
+       "- **APPARATUS_ROW:** Resolved. No new hardware. Only DCS parameter and procedure changes.",
+       "- **DEPLOYED-PART CLAUSE:** Resolved. No modification to anode, bath, or cell structure. O",
+       "- **PERMITTED-SET CLAUSE:** Resolved. Uses only \"bath temperature setpoint retuning\" and \"",
+       "- **DIRECTION-OF-EFFECT:** Resolved. Drives \\( T_{anode} \\) down, reducing PFC.",
+       "- **PREMISE-VALIDITY:** Resolved. Uses existing DCS, bath, and quench systems.",
+       "- **CERTIFIED-SYSTEM-AS-SOLD:** N/A (smelter, not medical).",
+       "- **INPUT-AVAILABILITY:** Resolved. Uses existing temperature and PFC signals.",
+       "- **COST-PRICING:** Resolved. Energy cost is negligible; PFC benefit is high."
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The established physical driver of PFC generation in anode effects is the formation of a plasma jet at the anode/cathode interface with local temperatures exceeding 4000 K, which provides sufficient energy to break C-O bonds in alumina and initiate the fluorination reaction of ca | ingredient: The proposed ingredient action lowers the local anode temperature and reduces power density during the effect, which thermodynamically suppresses the forward rate of fluorination and favors the reverse reduction of PFCs, thereby subtracting from the damage integral over the duty  | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The established physical driver of PFC generation in anode effects is the formation of a plasma jet at the anode/cathode interface with local temperatures exceeding 4000 K, which provides sufficient energy to break C-O bonds in alumina and initiate the fluorination reaction of ca",
+      "ingredient_action": "The proposed ingredient action lowers the local anode temperature and reduces power density during the effect, which thermodynamically suppresses the forward rate of fluorination and favors the reverse reduction of PFCs, thereby subtracting from the damage integral over the duty ",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "cb0184892c766af2",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Energy Loss:** Raising bath temperature by 20°C for ~1.5 minutes during an anode effec; 1. **Baseline:** R"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 5573,
+     "latency_s": 6.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Hardware Cost:** Zero. All controls (PLC, setpoints, current breakers) are existing ",
+       "*   **Installation Burden:** Zero. No physical modifications, coatings, or new sensors.",
+       "*   **Operational Loss Pricing:**",
+       "*   **Throughput:** The 15-minute temperature dip per dosing event (approx. every 20-30 mi",
+       "*   **Energy Cost:** The re-heat of the bath after the dip costs ~$2-5 per cell per event.",
+       "*   **PFC Cost Avoided:** A single anode effect generates ~1-2 kg of $CF_4$ (equivalent to",
+       "*   **Net Trade:** The operational loss (~$10-20/cell/day in energy) is significantly lowe",
+       "*   **Protocol:** Operate the cell at the standard $950^{\\circ}C$ setpoint for 7 days (Bas",
+       "*   **Instruments:** Existing cell voltage/current transducers, bath thermocouples (standa",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Fail:** If PFC proxy ($V_{AE} \\cdot t$) does not decrease by $>10\\%$ compared to bas",
+       "*   **Pass:** If PFC proxy decreases by $\\geq 10\\%$ and bath temperature oscillation remai",
+       "*   **Duration:** 14 days total.",
+       "*   **Kill Criterion:** If the temperature dip causes \"frozen\" alumina in the bath (observ"
+      ],
+      "APPARATUS_ROW": [
+       "*   **Installation Burden:** Zero. No physical modifications, coatings, or new sensors.",
+       "*   **Protocol:** Operate the cell at the standard $950^{\\circ}C$ setpoint for 7 days (Baseline). Then, implem"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: PFC formation is driven by the high local temperature and voltage stress during the anode effect, which promotes the decomposition of the fluoride melt and subsequent reaction of carbon anodes to form fluorinated carbon species. | ingredient: The remedy imposes a thermal excursion that lowers the bath temperature, thereby reducing the reaction kinetics for PFC formation and the magnitude/duration of the anode effect voltage spike. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "PFC formation is driven by the high local temperature and voltage stress during the anode effect, which promotes the decomposition of the fluoride melt and subsequent reaction of carbon anodes to form fluorinated carbon species.",
+      "ingredient_action": "The remedy imposes a thermal excursion that lowers the bath temperature, thereby reducing the reaction kinetics for PFC formation and the magnitude/duration of the anode effect voltage spike.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e78a80aebd22a559",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Hardware Cost:** Zero. All controls (PLC, setpoints, current breakers) are existing ; *   **Installation",
+      "APPARATUS_ROW: *   **Installation Burden:** Zero. No physical modifications, coatings, or new sensors.; *   **Protocol:** Ope"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "APPARATUS_ROW",
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 8,
+   "final_sha256_16": "e78a80aebd22a559",
+   "final_chars": 5573
+  },
+  {
+   "problem_id": "HO11-02-zinc-roaster-agglomeration",
+   "generated_at": "2026-11-18T22:11:44.967230Z",
+   "histogram_before": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1
+   },
+   "histogram_after": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7673,
+     "latency_s": 8.7,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom material"
+      ],
+      "BILL_UNTAGGED": [
+       "- Installation: Zero. No hardware changes, no new sensors, no tooling. All changes are set",
+       "- Commissioning: Minimal. Standard procedure involves retuning the control loops to new se",
+       "- Operation: Continuous. The new duty cycle is steady-state, requiring no shifts in operat",
+       "- Maintenance: Unchanged. The increased gas flow does not accelerate wear beyond design li",
+       "- Cost Class: Same as standard practice. No capital expenditure, no new procurement.",
+       "- Operational Loss: Zero. The reaction completeness is maintained within acceptable limits"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: High-temperature sintering driven by Arrhenius kinetics that causes particle bonding and agglomeration. | ingredient: Lowers the bed temperature to 910°C, which significantly reduces the sintering rate constant and therefore reduces the formation of new agglomerates over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "High-temperature sintering driven by Arrhenius kinetics that causes particle bonding and agglomeration.",
+      "ingredient_action": "Lowers the bed temperature to 910°C, which significantly reduces the sintering rate constant and therefore reduces the formation of new agglomerates over the duty cycle.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "322d0244ef557a49"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 6671,
+     "latency_s": 12.0,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Hardware**: 0 new items. (Standard practice also has 0 new items for steady-state op",
+       "*   **Installation**: Zero. No physical installation required.",
+       "*   **Commissioning**: Low (programming existing PLC/DCS). Same class as standard setpoint",
+       "*   **Operational Loss**:",
+       "*   *Energy*: The 850°C dip reduces fuel/air heating requirements slightly, but the freque",
+       "*   *Throughput*: Zero loss. The roaster operates continuously; no downtime.",
+       "*   *Product Quality*: Zinc sulfate conversion efficiency may drop marginally during the 5",
+       "*   *Conclusion*: Same-or-lower burden class. The operational cost is a minor energy/quali",
+       "*   **Protocol**:",
+       "1.  Baseline: Operate roaster at steady-state 950°C for 2 weeks. Record bed stability, pre",
+       "2.  Intervention: Switch to the 950°C/850°C oscillating schedule (35 min hot, 5 min cold) ",
+       "3.  Measure: Compare the \"Time to Agglomeration Event\" (defined as a 20% rise in bed press",
+       "*   **Instruments**: Existing DCS pressure and temperature transducers. No new sensors.",
+       "*   **Pass/Fail Threshold**: The median time-to-agglomeration in the intervention phase mu",
+       "*   **Duration**: 6 weeks total (2 weeks baseline + 4 weeks intervention).",
+       "*   **Kill Criterion**: If bed pressure drop rises >10% within the first week of intervent",
+       "*   **Constraint Adherence**: The intervention uses **only** the permitted measures: \"bed ",
+       "*   **Premise Validity**: The mechanism relies on the thermal inertia of the fluid bed (st",
+       "*   **Direction Correctness**: Moving temperature down (850°C) moves the sintering rate do",
+       "*   **Input Availability**: All signals (T_bed, Air Flow, Feed Rate) are already available",
+       "*   **Certified System**: No new hardware or consumables are introduced into the process s"
+      ],
+      "CONVERSION": [
+       "ADDED_PROCESS_STEP: Sintering on a row that does not ride existing/unchanged infrastructure: *MECHANISM CLASS: Thermal-Oscillatory Sintering Suppression*"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Sustained high operating temperature (approx. 950°C) drives solid-state diffusion and inter-particle neck growth (sintering), causing the bed to agglomerate. | ingredient: Periodic thermal oscillations that lower the bed temperature below the sintering threshold, thereby reducing the effective thermal exposure time required for diffusion-driven damage accumulation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Sustained high operating temperature (approx. 950°C) drives solid-state diffusion and inter-particle neck growth (sintering), causing the bed to agglomerate.",
+      "ingredient_action": "Periodic thermal oscillations that lower the bed temperature below the sintering threshold, thereby reducing the effective thermal exposure time required for diffusion-driven damage accumulation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "21becc965d147510",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Hardware**: 0 new items. (Standard practice also has 0 new items for steady-state op; *   **Installation",
+      "CONVERSION: ADDED_PROCESS_STEP: Sintering on a row that does not ride existing/unchanged infrastructure: *MECHANISM CLASS:",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6323,
+     "latency_s": 7.3,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  Temperature Adjustment: Standard practice uses existing PID controllers; this adds no ",
+       "2.  Airflow Reduction: Standard practice uses existing dampers/VFDs. No hardware. Cost: Ze",
+       "3.  Scheduling: Standard practice uses existing DCS timers. No hardware. Cost: Zero."
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: High-temperature particle contact and coalescence during continuous operation | ingredient: Lowering temperature and reducing turbulence to suppress sintering rate and limit contact time | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "High-temperature particle contact and coalescence during continuous operation",
+      "ingredient_action": "Lowering temperature and reducing turbulence to suppress sintering rate and limit contact time",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e5cddc1975fcef0e",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  Temperature Adjustment: Standard practice uses existing PID controllers; this adds no ; 2.  Airflow Reduct"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7121,
+     "latency_s": 12.3,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom compound"
+      ],
+      "BILL_UNTAGGED": [
+       "- **Standard Practice Bill**: Includes roaster hardware, feed conveyor, air blower, temper",
+       "- **Intervention Bill Comparison**:",
+       "- **Hardware**: The intervention adds **zero** new hardware classes. The fumed silica is a",
+       "- **Operation**: The temperature setpoint change is a zero-cost software/parameter update.",
+       "- **Operational Loss Pricing**: Reducing temperature by 50°C may slightly reduce reaction ",
+       "- **Conclusion**: Burden is **lower** than standard mechanical bed-breaking interventions "
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The failure is driven by high-temperature sintering where inter-particle cohesive forces exceed fluidizing forces due to rapid diffusion and surface energy acting at the roasting temperature. | ingredient: The intervention lowers the bed temperature to suppress the Arrhenius-dependent diffusion coefficient and adds fumed silica to reduce effective surface energy, thereby decreasing the rate of sintering neck growth and cohesive force accumulation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The failure is driven by high-temperature sintering where inter-particle cohesive forces exceed fluidizing forces due to rapid diffusion and surface energy acting at the roasting temperature.",
+      "ingredient_action": "The intervention lowers the bed temperature to suppress the Arrhenius-dependent diffusion coefficient and adds fumed silica to reduce effective surface energy, thereby decreasing the rate of sintering neck growth and cohesive force accumulation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "eaca91014e02d246",
+     "findings_disclosed": [
+      "DEV_NEED: custom compound",
+      "BILL_UNTAGGED: - **Standard Practice Bill**: Includes roaster hardware, feed conveyor, air blower, temper; - **Intervention B"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED",
+    "DEV_NEED"
+   ],
+   "repair_budget_burned_full": true,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 20,
+   "final_sha256_16": "eaca91014e02d246",
+   "final_chars": 7121
+  },
+  {
+   "problem_id": "HO11-03-lead-smelter-slag-viscosity",
+   "generated_at": "2026-11-18T22:12:28.426227Z",
+   "histogram_before": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1
+   },
+   "histogram_after": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1,
+    "parameter/procedure retuning on flux and temperature controls": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6591,
+     "latency_s": 11.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  Pre-tap: Hold furnace pressure at $P_{max}$ (upper limit of standard operating band, e",
+       "2.  Initiation: Open tap hole. Simultaneously, set pressure control to $P_{min}$ (lower li",
+       "3.  Steady State: Return pressure control to standard setpoint ($P_{std}$) for the remaind",
+       "4.  Post-tap: Close tap hole. Return pressure to $P_{std}$.",
+       "-  Hardware: Tap hole, pressure dampers, control valves (Existing).",
+       "-  Procedure: Static pressure setpoint, open tap, gravity flow, close tap.",
+       "-  Burden Class: Low (routine operation).",
+       "-  Operational Loss: None. The pressure excursions are within the furnace's designed press",
+       "-  Comparison: The intervention adds zero hardware cost and zero new maintenance burden. I"
+      ],
+      "APPARATUS_ROW": [
+       "No new instruments, sensors, or hardware are added. [Class (c)]"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The primary physical driver of tapping failure in this mode is the high yield stress and viscosity of the slag resisting gravity-driven flow at the tap hole. | ingredient: The active pressure modulation imposes a transient positive pressure differential (suction on the exit side) that adds a positive driving head to the Bingham plastic flow equation, counteracting the viscous resistance. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The primary physical driver of tapping failure in this mode is the high yield stress and viscosity of the slag resisting gravity-driven flow at the tap hole.",
+      "ingredient_action": "The active pressure modulation imposes a transient positive pressure differential (suction on the exit side) that adds a positive driving head to the Bingham plastic flow equation, counteracting the viscous resistance.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "a0f4bb7528ca62ab"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8550,
+     "latency_s": 10.0,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Note:* Standard catalog item. Used as a discrete charge, not mixed with the main flux",
+       "*   *Parameter:* This is a parameter change to the existing charging procedure (a \"procedu",
+       "*   *Note:* No new hardware. No new sensors. The effect is derived purely from the chemica",
+       "*   **Installation:** Zero. No new hardware installed. The charging system is standard inf",
+       "*   **Commissioning:** Zero. No new controls.",
+       "*   **Operation:** The operator adds one extra charge button press or a scheduled batch ad",
+       "*   **Cost Class:** The cost is the marginal cost of 200 kg of limestone/dolomite. This is",
+       "*   **Operational Loss:** Zero throughput loss. The charge is added to the existing burden",
+       "*   **Conclusion:** Same-or-lower burden class. The \"cost\" is a trivial amount of material"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Excess silicate polymerization (high SiO2 network connectivity) at the operating temperature results in high viscosity that impedes flow. | ingredient: Injection of high-basicity flux (CaO) breaks silicate polymer chains into monomers, thereby reducing viscosity. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Excess silicate polymerization (high SiO2 network connectivity) at the operating temperature results in high viscosity that impedes flow.",
+      "ingredient_action": "Injection of high-basicity flux (CaO) breaks silicate polymer chains into monomers, thereby reducing viscosity.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "59dafca2a8548da8",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   *Note:* Standard catalog item. Used as a discrete charge, not mixed with the main flux; *   *Parameter:* T"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7078,
+     "latency_s": 8.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom material"
+      ],
+      "BILL_UNTAGGED": [
+       "*   *Item:* Existing furnace temperature control setpoint register.",
+       "*   *Where/How:* Modify the PLC program to step the target temperature from $1200^\\circ\\te",
+       "*   *Operating Parameter:* $\\Delta T = +50^\\circ\\text{C}$ for $t_{pre-tap}$.",
+       "*   *Item:* Existing flux charging system (conveyor/bucket).",
+       "*   *Where/How:* Schedule an additional discrete charge of CaO-rich flux (standard calcine",
+       "*   *Operating Parameter:* Mass $m_{pulse}$ calculated to shift local basicity by +0.2 uni",
+       "*   *Item:* Existing tap hole opening/closing mechanism.",
+       "*   *Where/How:* Execute the tap hole piercing at the peak of the viscosity reduction wind",
+       "*   **Row 1 (Temp Modulation):** Standard practice already modulates temperature for quali",
+       "*   **Row 2 (Flux Pulse):** Standard practice procures CaO. This uses existing stock. Burd",
+       "*   **Row 3 (Procedure):** Standard practice performs tapping. This optimizes timing. Burd",
+       "*   **Operational Loss Pricing:** Energy lost during the 30-min higher temp setpoint is of"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: High slag viscosity is driven by thermal cooling and high silica content causing silicate polymerization and increased resistance to flow. | ingredient: The remedy imposes a transient thermal and compositional pulse that raises temperature and basicity, thereby reducing silicate polymerization and decreasing the dynamic viscosity. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "High slag viscosity is driven by thermal cooling and high silica content causing silicate polymerization and increased resistance to flow.",
+      "ingredient_action": "The remedy imposes a transient thermal and compositional pulse that raises temperature and basicity, thereby reducing silicate polymerization and decreasing the dynamic viscosity.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "f0fa1ba89c3c5bb6",
+     "findings_disclosed": [
+      "DEV_NEED: custom material",
+      "BILL_UNTAGGED: *   *Item:* Existing furnace temperature control setpoint register.; *   *Where/How:* Modify the PLC program t"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6111,
+     "latency_s": 7.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom material"
+      ],
+      "BILL_UNTAGGED": [
+       "*   *Item:* Existing flux dosing system (CaO, SiO2, FeO sources).",
+       "*   *Where/How:* Modify the dosing schedule to inject a \"viscosity-reducing flux pulse\" 30",
+       "*   *Parameter:* Increase CaO:SiO2 ratio by 5-10 units in the pre-tap pulse to break up si",
+       "*   *Item:* Existing furnace temperature control setpoint register (PLC/HMI).",
+       "*   *Where/How:* Modify the PLC program to raise the setpoint by +20°C to +30°C during the",
+       "*   *Parameter:* $\\Delta T = +25 \\pm 5$ °C.",
+       "*   *Item:* Tapping gate operation procedure.",
+       "*   *Where/How:* Instruct operators to open the tap gate slowly (10% aperture) for 5 minut",
+       "*   *Parameter:* Initial flow check duration = 5 min.",
+       "*   *Standard Practice Bill:* Flux dosing at fixed intervals; temperature setpoint constan",
+       "*   *Intervention Bill:* Flux dosing at variable intervals (pulse); temperature setpoint m",
+       "*   *Comparison:*",
+       "1.  *Flux:* No new hardware. Slight increase in flux consumption (estimated 5-10% more CaO",
+       "2.  *Temperature:* No new hardware. Energy cost increase for +25°C for 1 hour. Estimate: 0",
+       "3.  *Procedure:* No new hardware. 5-minute delay in full gate opening. Operational loss: N",
+       "*   *Conclusion:* Same-or-lower burden class. The intervention uses only parameter changes"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: High slag viscosity impedes tapping flow because a high temperature or inappropriate chemical composition increases the activation energy for viscous flow and thus the effective viscosity. | ingredient: The intervention injects viscosity-lowering flux (increasing CaO to disrupt silicate networks) and raises the temperature setpoint, which physically reduces the activation energy and increases thermal energy to lower viscosity. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "High slag viscosity impedes tapping flow because a high temperature or inappropriate chemical composition increases the activation energy for viscous flow and thus the effective viscosity.",
+      "ingredient_action": "The intervention injects viscosity-lowering flux (increasing CaO to disrupt silicate networks) and raises the temperature setpoint, which physically reduces the activation energy and increases thermal energy to lower viscosity.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "41297ec3d07d23c0",
+     "findings_disclosed": [
+      "DEV_NEED: custom material",
+      "BILL_UNTAGGED: *   *Item:* Existing flux dosing system (CaO, SiO2, FeO sources).; *   *Where/How:* Modify the dosing schedule"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED",
+    "DEV_NEED"
+   ],
+   "repair_budget_burned_full": true,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 19,
+   "final_sha256_16": "41297ec3d07d23c0",
+   "final_chars": 6111
+  },
+  {
+   "problem_id": "HO11-04-ni-laterite-autoclave-scaling",
+   "generated_at": "2026-11-18T22:13:09.934319Z",
+   "histogram_before": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1,
+    "parameter/procedure retuning on flux and temperature controls": 1
+   },
+   "histogram_after": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1,
+    "parameter/procedure retuning on flux and temperature controls": 1,
+    "antiscalant dosing with temperature setpoint retuning": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6160,
+     "latency_s": 8.2,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Hardware**: Standard practice uses periodic acid cleaning (manual/valve operation) and",
+       "- **Operation**: Standard practice is reactive (clean when fouled). This intervention is c",
+       "- **Maintenance**: Replacing diaphragms on metering pumps is a standard operation equivale",
+       "- **Conclusion**: The burden is strictly lower because it replaces a high-energy, high-lab"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: The established physical driver for HPAL autoclave heater scaling is the supersaturation of calcium and magnesium salts (calcite and gypsum) at the heat"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: The established physical driver for HPAL autoclave heater scaling is the supersaturation of calcium and magnesium salts (calcite and gypsum) at the heated surface, where high temperatures reduce solubility and promote heterogeneous nucleation. | ingredient: The active ingredient, calcium sulphate, is a direct precursor to the scale phase and adds positive driving force (increases supersaturation) to the damage integral. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "The established physical driver for HPAL autoclave heater scaling is the supersaturation of calcium and magnesium salts (calcite and gypsum) at the heated surface, where high temperatures reduce solubility and promote heterogeneous nucleation.",
+      "ingredient_action": "The active ingredient, calcium sulphate, is a direct precursor to the scale phase and adds positive driving force (increases supersaturation) to the damage integral.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "c142b605f154aba1"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3889,
+     "latency_s": 4.8,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The failure is driven by the thermodynamic and kinetic supersaturation (SSI) of scale-forming species exceeding the critical deposition threshold at the heater surface, creating a positive driving force for solid accumulation. | ingredient: Antiscalant dosing and temperature retuning impose a chemical and thermal inhibition that reduces the SSI below the critical threshold, exerting a negative driving force that opposes net deposition and promotes solid suspension. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The failure is driven by the thermodynamic and kinetic supersaturation (SSI) of scale-forming species exceeding the critical deposition threshold at the heater surface, creating a positive driving force for solid accumulation.",
+      "ingredient_action": "Antiscalant dosing and temperature retuning impose a chemical and thermal inhibition that reduces the SSI below the critical threshold, exerting a negative driving force that opposes net deposition and promotes solid suspension.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "6af9f1d50de88517",
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 1,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [],
+   "repair_budget_burned_full": false,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 17,
+   "final_sha256_16": "6af9f1d50de88517",
+   "final_chars": 3889
+  },
+  {
+   "problem_id": "HO11-05-co-sx-crud",
+   "generated_at": "2026-11-18T22:13:24.727834Z",
+   "histogram_before": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1,
+    "parameter/procedure retuning on flux and temperature controls": 1,
+    "antiscalant dosing with temperature setpoint retuning": 1
+   },
+   "histogram_after": {
+    "thermal setpoint modulation & dosing schedule synchronization*": 1,
+    "feed chemistry additive dosing + temperature setpoint reduction": 1,
+    "parameter/procedure retuning on flux and temperature controls": 1,
+    "antiscalant dosing with temperature setpoint retuning": 1,
+    "kinematic-thermal pulsed recirculation": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 8040,
+     "latency_s": 9.7,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Reconfiguration of PLC program (Labor: <1 hour engineering time; Class: Parameter Change",
+       "- Timer module setup (Labor: <30 min; Class: Standard Operation).",
+       "- Motor driver swap (Hardware: 1 standard catalog item; Class: Same frame size as existing",
+       "- Check valve verification/swap (Hardware: 1-2 standard catalog items; Class: Standard)."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Continuous interfacial mixing (high interfacial area and shear) entrains and stabilizes impurities into a viscous third phase (crud). | ingredient: The "
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Continuous interfacial mixing (high interfacial area and shear) entrains and stabilizes impurities into a viscous third phase (crud). | ingredient: The 'high-intensity flush' pulse actively increases interfacial area and shear, imposing the very conditions that drive crud formation and organic phase loss. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Continuous interfacial mixing (high interfacial area and shear) entrains and stabilizes impurities into a viscous third phase (crud).",
+      "ingredient_action": "The 'high-intensity flush' pulse actively increases interfacial area and shear, imposing the very conditions that drive crud formation and organic phase loss.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "a9e3bdcb03242b88"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5894,
+     "latency_s": 7.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Pulsed Low-Shear Mixing & Thermal Setpoint Shift",
+       "*   **Standard Practice Bill:** Continuous high-shear mixing + manual periodic cleaning. H",
+       "*   **Intervention Bill:**",
+       "*   **Operational Loss Pricing:**",
+       "*   **Throughput Loss:** Zero. The duty cycle averages to the same volumetric throughput (",
+       "*   **Energy Cost:** Reduced by ~30% (due to time-averaged power reduction, as P $\\propto ",
+       "*   **Quality Risk:** Theoretically none, as the pulse ensures bulk mixing, and the temper",
+       "*   **Conclusion:** The intervention carries **lower** burden than standard practice (ener",
+       "*   **Protocol:** Operate the mixer-settler for 4 weeks under standard conditions (Baselin",
+       "*   **Instruments:** Existing flow meters, temperature controllers, standard lab scales fo",
+       "*   **Pass/Fail Threshold:** Organic loss rate in Test phase must be **>40% lower** than B",
+       "*   **Duration:** 8 weeks total.",
+       "*   **Kill Criterion:** If organic loss increases or phase separation time extends by >20%",
+       "*   **Allowed Measures:** The intervention uses *mixing/flow procedure* (pulsed duty cycle",
+       "*   **No Settler Redesign:** The interface is purely control-logic and setpoint. No physic",
+       "*   **Risk:** If the crud formation is driven by *chemical* impurities rather than interfa"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Crud formation in solvent extraction is driven by interfacial stress and mechanical agitation that create stable emulsions and solid-liquid-liquid inter"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Crud formation in solvent extraction is driven by interfacial stress and mechanical agitation that create stable emulsions and solid-liquid-liquid interfacial stability, which trap organic phase and cause loss. | ingredient: The proposed pulsed mixing regime imposes interfacial shear stress, including high-shear pulses, which adds to the time-integrated mechanical damage integral, thereby increasing the driving force for emulsification and crud formation. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Crud formation in solvent extraction is driven by interfacial stress and mechanical agitation that create stable emulsions and solid-liquid-liquid interfacial stability, which trap organic phase and cause loss.",
+      "ingredient_action": "The proposed pulsed mixing regime imposes interfacial shear stress, including high-shear pulses, which adds to the time-integrated mechanical damage integral, thereby increasing the driving force for emulsification and crud formation.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "31eef0b5acd20c8d",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Pulsed Low-Shear Mixing & Thermal Setpoint Shift; *   **Standard Practice Bill:** Con",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "PHYSICS_DIRECTION_INVERTED: the sign/integral check reads the mechanism INVERTED: driver: Crud formation in solvent extraction is driven b"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7465,
+     "latency_s": 8.5,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Cyclic Thermal/Setpoint Modulation & Agitation Duty Cycle.",
+       "*   **Standard Practice Bill:** Continuous constant temperature setpoint ($T_{const}$) and",
+       "*   **Your Bill:**",
+       "*   **Installation:** Zero new hardware. No procurement, installation, or commissioning of",
+       "*   **Commissioning:** Requires programming of two new schedule patterns in the existing D",
+       "*   **Operation:** The system operates continuously. There is **zero operational loss** in",
+       "*   **Maintenance:** The mechanism *reduces* the burden of periodic crud cleaning/flushing",
+       "*   **Conclusion:** Same-or-lower burden class. The novelty is delivered entirely through "
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Inorganic crud formation is driven by the accumulation of unsolvated inorganic solids and colloids that exceed the saturation limit or aggregation threshold, leading to phase entrainment and loss. | ingredient: The thermal cycling increases the solubility limit during the high-temperature phase, actively dissolving accumulated solids, while the synchronized high-shear agitation disrupts floc aggregation kinetics to prevent stable particle growth. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Inorganic crud formation is driven by the accumulation of unsolvated inorganic solids and colloids that exceed the saturation limit or aggregation threshold, leading to phase entrainment and loss.",
+      "ingredient_action": "The thermal cycling increases the solubility limit during the high-temperature phase, actively dissolving accumulated solids, while the synchronized high-shear agitation disrupts floc aggregation kinetics to prevent stable particle growth.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "7e1d48af9e69d131",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Cyclic Thermal/Setpoint Modulation & Agitation Duty Cycle.; *   **Standard Practice B"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 5161,
+     "latency_s": 6.6,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Hardware:** Standard practice uses the pump and heating system continuously. This in",
+       "*   **Installation:** No installation. Only DCS recipe update and valve setpoint adjustmen",
+       "*   **Operation:** Adds a 5-minute high-power state every 4 hours. Energy delta is minimal",
+       "*   **Parity Conclusion:** Burden is strictly lower than standard practice (which often re"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The established physical driver for crud formation in solvent extraction is the precipitation and agglomeration of solids caused by increased supersaturation at lower temperatures and stagnant boundary layers, where the precipitation rate is favored by low shear and high viscosit | ingredient: The remedy imposes a high-shear event and a temperature step-up, which increase the local shear stress ($\tau_{local}$) and decrease viscosity, thereby opposing the solid precipitation and agglomeration rates that drive the failure. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The established physical driver for crud formation in solvent extraction is the precipitation and agglomeration of solids caused by increased supersaturation at lower temperatures and stagnant boundary layers, where the precipitation rate is favored by low shear and high viscosit",
+      "ingredient_action": "The remedy imposes a high-shear event and a temperature step-up, which increase the local shear stress ($\tau_{local}$) and decrease viscosity, thereby opposing the solid precipitation and agglomeration rates that drive the failure.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "6fa08303b6ff513f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Hardware:** Standard practice uses the pump and heating system continuously. This in; *   **Installation"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 7,
+   "final_sha256_16": "6fa08303b6ff513f",
+   "final_chars": 5161
+  }
+ ]
+}
