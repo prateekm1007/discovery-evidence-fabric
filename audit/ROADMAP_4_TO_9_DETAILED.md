@@ -22,3 +22,38 @@ GATE: >=50% viable+non-obvious; >=0.2 separation; 0 canary completions; speed bu
 GATE: >=40% mechanisms recovered; >=1 agent-validated; unattended pass. LABEL: physical efficacy unclaimed unless T3.
 ## RISKS
 P0 slip blocks all acceptance (escalate). Engine integration crux: negative-case tests before ablation. Judge-queue 429/503: backoff + R-JUDGE (no silent rung substitution). Rediscovery cutoff: canary-probe every item. ~17-27 rounds total; delete failed ablations.
+
+
+## COPYABLE WORLDWIDE TECHNIQUES (license-verified R92, 2026-11-18) — mapped to phases
+Deep research of GitHub/global sources; licenses read via GitHub API. Copy only permissive (MIT/Apache/BSD) with attribution+NOTICE. Each item targets a measured gap. EXCLUSIONS: Moirai (CC BY-NC 4.0, non-commercial), AI-Scientist-v2 (restrictive custom), new-api (AGPL), EnvCommons/PaperBench (no license — use openai/preparedness MIT), AutoTRIZ casebase (no license — encode TRIZ ourselves), jataware open-coscientist (Commons Clause).
+
+### Generation quality + repair convergence (P1/P2 — the current frontier, mean stuck ~3.1, 27/30 burn full repair budget)
+- Reflexion (noahshinn/reflexion, MIT): verbal self-reflection MEMORY carrying error patterns across repair attempts. Copy the reflection-memory pattern into the repair loop so each attempt learns from the prior failure signature. Acceptance: >=50% of rows reach zero findings within budget on v11 (convergence gate).
+- Self-Refine (madaan/self-refine, Apache-2.0): feedback->refine->stop loop structure. Copy the structured stop criterion (not fixed budget burn). Acceptance: same convergence gate.
+- CRITIC (microsoft, tool-interactive critiquing, paper pattern): self-correct by CALLING external tools to verify+amend, not just flag. Wire the critic to call the physics/equilibrium tools to correct first-pass defects. Acceptance: first-pass defect incidence drops vs v10.
+- AIDE (WecoAI/aideml, MIT): solution-space TREE SEARCH (best-first over diverse candidates, metric-pruned). Replace single-chain repair with population tree search scored by the binds. Acceptance: >=3 distinct candidates/intervention, best-first selection, schedule-family <=17%.
+- DSPy + GEPA (stanfordnlp/dspy MIT, gepa-ai/gepa MIT): compile the generation directive OFFLINE against the labelled bind corpus (reflective prompt evolution, ~35x fewer rollouts than RL). Acceptance: >=10-point bind-pass gain on a held-out labelled slice; zero LLM in CI.
+- TextGrad (zou-group/textgrad, MIT): text-as-gradient directive optimization (alternative/complement to GEPA).
+
+### Physics/chemistry correctness (the HO10-03 inverted-equilibrium class)
+- Cantera (Cantera/cantera, BSD-3-Clause; GitHub NOASSERTION — verify license text): equilibrate() COMPUTES chemical equilibrium composition. STRONGEST fix for the equilibrium-direction class: compute the equilibrium and check the claimed T/P/concentration direction against the computed result, instead of the LLM guessing. Acceptance: HO10-03-class claims verified against computed equilibrium; 0 inverted on computed rows.
+- ChemCrow (ur-whitelab/chemcrow-public, MIT): LLM + 18 chemistry tools (RDKit/reaction/property). Copy the tool-integration pattern for chemistry reasoning. Acceptance: chemistry claims tool-verified.
+- CoolProp (MIT) / thermo (CalebBell/thermo, MIT): extend the existing physics layer to equilibrium/phase checks.
+- PySR (astroautomata/PySR, Apache-2.0): symbolic regression to DISCOVER governing relations from data (predictor feature laws). Acceptance: predictors carry discovered symbolic laws with units.
+
+### Diversity (monoculture)
+- pyribs (icaros-usc/pyribs, MIT): MAP-Elites/CMA-ME quality diversity — fill a grid of mechanism niches with the best candidate per cell (structural diversity vs our cap). Acceptance: mechanism-class grid coverage; schedule-family <=17%.
+
+### P3 predictors + speed/efficiency
+- TimesFM (google-research/timesfm, Apache-2.0 code+weights<=2.5) / Chronos (amazon-science/chronos-forecasting, Apache-2.0): time-series FOUNDATION models, zero-shot forecast/anomaly -> predictor lead-time + FA quality. Acceptance: validated on C-MAPSS/XJTU-SY/CWRU with conformal FA control. (Moirai EXCLUDED: CC BY-NC.)
+- MAPIE (scikit-learn-contrib/MAPIE, BSD-3): conformal prediction intervals -> computed FA-rate control (<=1 FA/year). Acceptance: coverage >=1-alpha.
+- vLLM (vllm-project/vllm, Apache-2.0) / SGLang (sgl-project/sglang, Apache-2.0): high-throughput serving if self-hosting a frontier model. Acceptance: speed median <=2min/worst <=5min.
+- RouteLLM (lm-sys/RouteLLM, Apache-2.0): cost-aware strong/weak routing -> efficiency. Acceptance: cheap model for easy rows, frontier for hard; cost/row drops.
+- LiteLLM (BerriAI/litellm, MIT core; GitHub NOASSERTION dual-license — verify): gateway requested-vs-served logging (R-REQID attestation). Beware the response-model alias-overwrite pitfall.
+
+### P4 novelty/viability + P5 external proof
+- SPECTER2 (allenai/SPECTER2, Apache-2.0): scientific document embeddings -> prior-art distance (novelty). Acceptance: separates known-novel/known-obvious >=0.2 cosine. PaECTER (patent embeddings, CC-BY per paper — verify) for patents.
+- Inspect (UKGovernmentBEIS/inspect_ai, MIT): eval transcript + blind cross-family panel scoring + unattended batch harness (P5). Acceptance: panel agreement >=0.7; unattended 30-batch 0 interventions.
+
+### Integration discipline
+Every copied technique: (1) attribution+NOTICE; (2) a deterministic acceptance test wired into CI (exists-but-does-not-gate is a defect); (3) ablated at matched budget on DEV before adoption, deleted if it doesn't earn its place; (4) no frozen-file edits without a conscious CI-gated re-freeze; (5) generation-side improvement, not just another detection bind (AM78 P3).
