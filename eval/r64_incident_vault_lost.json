@@ -1,0 +1,29 @@
+{
+ "record": "R64_INCIDENT_VAULT_LOST/1.0.0",
+ "session": "builder-r60s1",
+ "date": "2026-11-18T05:28Z (approx, sandbox reprovision boundary)",
+ "incident": "VAULT_LOST_SANDBOX_REPROVISION",
+ "facts": {
+  "destroyed": [
+   "/home/z/fabric-r53 worktree (re-established same round from /home/z/my-project/discovery-evidence-fabric, synced to dade20f9c)",
+   "/home/z/r60_session tooling v1 (rebuilt as v2 with the vault gate + reprovision recovery)",
+   "/home/z/my-project/scripts/.ci_etag_cache.json (the r41 conditional-read cache — an optimization, never evidence; the next read of any SHA is unconditional and re-stores the ETag)",
+   "/home/z/fabric-r53/.env.keys THE VAULT (3 keys: XKIRO / AGNES / GH_PAT class; no credential material survives anywhere in the sandbox — env has only DATABASE_URL, no ~/.git-credentials, no git credential helper configured)"
+  ],
+  "safe": [
+   "ALL committed evidence (every push through 4b813d540 and the R62/R63 lanes through dade20f9c) is on the remote",
+   "the cron scheduler is gateway-side (job survived the reprovision)",
+   "the z-ai CLI (node_modules) and the Python runtime survived; pint/pytest re-installed"
+  ]
+ },
+ "consequences": [
+  "PUSHES BLOCKED until owner key re-delivery (CORR-3 convention; digests verifiable against the R59/R60 committed custody records: XKIRO f6c09bee9bde / AGNES d0c666a3842f / GH_PAT f1ebca5f9b62)",
+  "the c-0079 challenger resume is DOUBLY gated: the z-ai 429 window (still down at 05:36:28Z, continuous since 2026-11-17T21:53Z) AND the vault (chunks without push capability are FORBIDDEN: unpushed rows dying with a reprovision would force row regeneration = a one-shot violation, Art. 18/29(c))"
+ ],
+ "escalation": "Art. 28 (owner-dependency, escalate never idle): the TOP blocking owner action is key re-delivery. Offline work done meanwhile: constitutions FULL-read at the R64 SHAs (byte-identity verified), the R64 auditor verification + AM58 read, the lane repaired, the watch re-armed (step script v2 + runbook v2 + cron job 536147, 8h interval), this incident record prepared for the first post-restoration push.",
+ "art15_typing": "the reprovision itself is an infra event, not a scientific result; no measurement was in flight (the lane was probe-waiting); zero rows lost; the resume point (4/36 committed) is unchanged",
+ "constitution_reads": {
+  "epistemic_v3.2.0": "md5 9a5ae1cd byte-identity verified @ dade20f9c (the in-session FULL read stands; zero commits touch the file)",
+  "auditor_v1.3.0": "md5 d40a92a1 byte-identity verified @ 152c16896 (the in-session FULL read stands; zero diff vs 04b5e0983)"
+ }
+}
