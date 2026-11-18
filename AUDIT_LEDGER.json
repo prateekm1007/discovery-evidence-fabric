@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "ee9e080cb",
+  "queue/dev12_r7": "d4e524141",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2808,6 +2808,19 @@
     "Builder next: (1) re-freeze the v10 instrument scripts/r85_v10_one_shot.py with V10_REQUEST_MODEL=agnes-3.0-flash (the frozen r40 file constant is already agnes-3.0-flash, so the binding becomes identity) — conscious re-freeze, CI-gated by the freeze guard; (2) flip route_adapter registered block to agnes/agnes-3.0-flash + ZAI_GATEWAY_UPSTREAM=agnes (route_adapter NOT frozen); (3) update test_r58 pins riding the flip; (4) re-smoke on BURNED v7 (agnes); (5) run the sealed v10 one-shot (all four binds + on-row physics leg), 30/30 served==requested==registered agnes-3.0-flash; (6) push+CI+handoff; auditor scores mean>=3.25 CI>3.0 -> score 6 -> BURN.",
     "R85 verified: AM73 flip + v10 machine freeze (beb3e29c0) + claim c-0100 before read + smoke 12/12 cohere/command-a on burned v7 + typed xkiro quota block (ee9e080cb CI green). The one-shot integrity intact; zero v10 rows generated under the blocked route. The agnes switch resolves the quota block without owner spend."
    ]
+  },
+  {
+   "id": "AM76",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R88 — v10 ACCEPTANCE SCORE (agnes-3.0-flash default, all four binds + on-row physics)",
+   "changes": [
+    "v10 run VALID (seal 102a33bb recomputed exact; attestation 30/30 served==requested==registered agnes-3.0-flash, auditor slice recompute 0 mismatches, both keys rotated; claim-before-read; rubric isolated). SCORED full 30-row read vs PRIVATE rubric: mean 3.1 (interv 2.933, pred 3.2), SD 0.548, CI95 [2.904,3.296].",
+    "ACCEPTANCE NOT GRANTED on two grounds: (1) 1 inverted-direction mechanism HO10-03 (raises T + excess O2 claiming TiO2 removal; physics inverted — oxidation accelerates deposition, excess O2 drives toward solid TiO2 not volatile TiCl4; on-row sign check flagged); (2) Art.14 UNRESOLVED — mean CI includes 3.0.",
+    "Improvements vs v9 (3.000->3.1): chemistry elicitation worked (non_schedule_first 30/30; monoculture breaks HO10-01/04/09); direction traps HO10-06/08/12/13 passed; 0 allowed-measures violations; 0 unavailable-input rows; on-row physics 434 own numbers/6 bindings/36 assumptions.",
+    "Key remaining defect: reaction-equilibrium direction inversion (HO10-03) — element-conservation bind catches phantom elements but not equilibrium-direction error. Next capability lever: thermodynamic/equilibrium-direction bind (Le Chatelier / oxidation-state direction check).",
+    "v10 BURNED after scoring. Score stays 5. v11 fresh sealed set + the equilibrium-direction bind are the path to 6."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3935,6 +3948,22 @@
    "gate": "NOT_MET (score 5); v10 pin -> agnes-3.0-flash, one-shot pending re-freeze",
    "capability_change": "owner default agnes-3.0-flash; v10 pin amended; xkiro quota block resolved by route switch",
    "evidence_sha": "eval/r86_auditor_verification.json"
+  },
+  {
+   "id": "V76",
+   "round": "R88 v10 acceptance score",
+   "commit": "d4e524141",
+   "gate": "NOT_MET (acceptance NOT_GRANTED)",
+   "run_verdict": "VALID",
+   "v10_mean": 3.1,
+   "v10_ci": [
+    2.904,
+    3.296
+   ],
+   "inverted_direction": 1,
+   "acceptance": "NOT_GRANTED",
+   "score": 5,
+   "evidence_sha": "eval/holdout_v10_auditor_score.json"
   }
  ],
  "gold_set": {
@@ -4153,7 +4182,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   },
   "holdout_v10": {
-   "status": "SEALED_REGISTERED",
+   "status": "BURNED",
    "selection_sha256": "102a33bb7dc563a3c2929050875800226d0094d2e0b015bad253c55e3ee17561",
    "n": 30,
    "intervention": 15,
@@ -4163,10 +4192,13 @@
    "power_basis": "n=30, SD 0.7, power ~0.85, Art.14 CI lower bound > 3.0",
    "model_pin": "agnes-3.0-flash (amended after fire-now probe registration)",
    "bar": "mean>=3.0 AND 0 allowed-measures AND 0 inverted AND 0 unavailable-input AND VALID; Art.14 CI>3.0",
-   "design": "chemistry monoculture-break + direction traps HO10-06/08/12/13 + pricing pos HO10-02/10 neg HO10-05/15 + 15 input traps"
+   "design": "chemistry monoculture-break + direction traps HO10-06/08/12/13 + pricing pos HO10-02/10 neg HO10-05/15 + 15 input traps",
+   "burned_at": "2026-11-18",
+   "score_mean": 3.1,
+   "acceptance": "NOT_GRANTED (1 inverted HO10-03; CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10. OWNER DIRECTIVE (AM75): agnes-3.0-flash default generator; v10 pin amended back from cohere/command-a (xkiro quota-blocked ~150K/day vs ~870K needed). R85 verified (AM73 flip + v10 freeze + claim c-0100 + smoke 12/12 + typed quota block). Builder: re-freeze v10 instrument to agnes-3.0-flash + flip route_adapter to agnes (2-key rotation) + re-smoke + sealed v10 one-shot (all binds + on-row) -> mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
+ "progress_note": "SCORE 5/10. v10 scored: mean 3.1 (v9 3.0), CI [2.904,3.296], 0 allowed-measures/0 unavailable-input, BUT 1 inverted-direction (HO10-03 reaction-equilibrium inversion) + CI includes 3.0 -> ACCEPTANCE NOT_GRANTED. Chemistry elicitation + direction traps worked; on-row physics live. v10 BURNED. Next lever: thermodynamic/equilibrium-direction bind (catch HO10-03-class inverted chemistry) + v11 fresh sealed set -> mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
