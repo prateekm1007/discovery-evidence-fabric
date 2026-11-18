@@ -33,6 +33,17 @@ Enum fields and their vocabularies:
                      rule the prose scanner enforces, now checkable
                      without regexing prose.
 
+  numeric_claims   — (F80, R83 c-0099) the answer's OWN stated numbers
+                     as typed records {value, unit, unit_raw, quantity,
+                     dimension, source_field, source_span, assumption}
+                     extracted by engine.numeric_claims. OPTIONAL and
+                     ADDITIVE: absent means the wrap stays byte-identical
+                     to the pre-F80 1.1.0 form (the frozen machine path
+                     never reads it); present-but-malformed fires
+                     NUMERIC_CLAIM_MALFORMED (value not numeric / unit
+                     not a non-empty string). Deep pint verification
+                     lives in numeric_claims / onrow_physics.
+
 Zero LLM, zero network. The module NEVER parses candidate prose —
 every value it reads or validates is a typed schema field.
 """
@@ -75,6 +86,7 @@ def extend_to_1_1(cand: Dict[str, Any],
                   principle_id: str = UNASSIGNED,
                   mechanism_class: str = UNDECLARED,
                   allowed_measures: Optional[List[str]] = None,
+                  numeric_claims: Optional[List[Dict[str, Any]]] = None,
                   ) -> Dict[str, Any]:
     """Wrap a 1.0.0 candidate into 1.1.0. The input dict is copied, the
     four enum fields are added, candidate_hash/candidate_id are NOT
@@ -99,6 +111,10 @@ def extend_to_1_1(cand: Dict[str, Any],
     out["signals_used"] = [str(s) for s in (signals_used or [])]
     out["principle_id"] = str(principle_id or UNASSIGNED)
     out["mechanism_class"] = str(mechanism_class or UNDECLARED)
+    # F80: OPTIONAL — None leaves the key ABSENT (the pre-F80
+    # byte-stable wrap; the frozen machine path never attaches it)
+    if numeric_claims is not None:
+        out["numeric_claims"] = [dict(nc) for nc in numeric_claims]
     return out
 
 
@@ -144,4 +160,26 @@ def validate_candidate_schema(cand: Dict[str, Any],
             "principle_id is UNASSIGNED — acceptable until the TRIZ "
             "JSON lands (P2); the P2 gate requires a typed principle "
             "on every candidate"]
+    # F80 (R83 c-0099): numeric_claims is OPTIONAL — absent means no
+    # finding (the pre-F80 byte-stable path); present means
+    # shape-checked (value numeric + unit a non-empty string).
+    if "numeric_claims" in cand:
+        bad = []
+        for i, nc in enumerate(cand.get("numeric_claims") or []):
+            if not isinstance(nc, dict):
+                bad.append(f"entry {i} is not an object")
+                continue
+            v = nc.get("value")
+            u = nc.get("unit")
+            if not isinstance(v, (int, float)) or isinstance(v, bool):
+                bad.append(f"entry {i} value {v!r} is not numeric")
+            elif not isinstance(u, str) or not u.strip():
+                bad.append(f"entry {i} unit {u!r} is not a non-empty "
+                           "string")
+        if bad:
+            findings["NUMERIC_CLAIM_MALFORMED"] = [
+                "numeric_claims malformed: " + "; ".join(bad)
+                + " — the typed F80 fields are value (number) + unit "
+                "(non-empty string); deep pint verification is the "
+                "extractor's job"]
     return findings

@@ -1,0 +1,59 @@
+{
+ "record": "R83_F80_ONROW_STATUS/1.0.0",
+ "session": "builder-r83s1",
+ "claim": "c-0099",
+ "work_id": "r83-f80-onrow-physics",
+ "round_class": "F80 capability round (engine work; AM72/V73 direction 3)",
+ "f80_fix": {
+  "finding": "F80 (audit 740814634): the schema had measure/signal/principle/class enums but NO stated-magnitude/assumption/numeric_claim fields; physics_checks ran on REFERENCE_SCENARIOS, not the answer's own numbers; on_row_physics_runs was 0/36 on the labelled set — the P1 gate measured registry coverage, not the output's own physics",
+  "landed": {
+   "discovery_fabric/engine/numeric_claims.py": "NEW (178 lines): deterministic extraction of the answer's OWN numbers (intervention/expected_effect/testable_prediction/mechanism/falsification_test fields) to typed {value, unit, unit_raw, quantity, dimension, source_field, source_span} records; closed unit vocabulary with alias normalization (kA/m2, degC/C, %, bar, h); pint-level typed refusal for unparseable units; identifiers (TRIZ P31, R40) never match",
+   "discovery_fabric/engine/onrow_physics.py": "NEW (307 lines): INPUT_UNITS — the committed per-kwarg unit table for all 20 registry checks (extracted verbatim from the _q() coercions); dimension-only binding (a claim binds a kwarg iff its pint quantity converts to the kwarg's declared unit — kA/m2 cannot bind an A input, typed unbindable); ROW CLAIMS WIN over reference values; gaps fill from committed reference values as TYPED ASSUMPTIONS with per-input provenance + the Art. 9 labelled-assumption note; default kwargs ride the function default (FUNCTION_DEFAULT provenance, never fabricated); computation ONLY through the frozen run_check registry; sign-check (AGREES/SIGN_CONTRADICTION/DEFERRED/NEUTRAL_COMPUTED)",
+   "discovery_fabric/engine/candidate_schema.py": "ADDITIVE (+38): optional numeric_claims param on extend_to_1_1 (None = key ABSENT = the pre-F80 byte-stable wrap the frozen machine runs) + the NUMERIC_CLAIM_MALFORMED validator leg (fires only when the field is present and malformed)",
+   "scripts/r54_p1_unit_checked_measurement.py": "definition v2.0.0: carrying = the applicable relation RUNS ON THE ROW (row-claims-first, typed assumptions with provenance, sign-check) — the v1 reference-scenario leg is superseded (git history preserves it); verdict now requires fraction >= 0.80 AND zero sign contradictions; the artifact carries per-run input provenance + the own-numbers inventory",
+   "tests/test_f80_onrow_physics.py": "NEW (327 lines, 20 tests): extraction/aliases/unparseable, dimensional binding (incl. the same-dimension determinism + the kA/m2-vs-A refusal), row-claims-first (the row's own 105 C CHANGES the arrhenius computation vs the reference-only run), provenance (ROW_CLAIM/ASSUMPTION/FUNCTION_DEFAULT), sign-check matrix + frame-dependent verbs defer, typed refusals (UNKNOWN_CHECK/ONROW_UNITS_UNMAPPED/PENDING_INPUTS), schema additivity + frozen-path byte-stability, and the labelled-set acceptance from a FRESH measurement run",
+   ".github/workflows/r11_queue_surface.yml": "the F80 suite joins the enforcement block (gates every push)"
+  }
+ },
+ "acceptance": {
+  "auditor_bar": ">=80% of the answer's own numeric claims computed on-row with units; 0 sign contradictions on the labelled set",
+  "measured": {
+   "numeric_direction_claims": 36,
+   "on_row_carrying": 36,
+   "fraction": 1.0,
+   "sign_contradictions": 0,
+   "on_row_runs": 36,
+   "own_numbers_extracted": 30,
+   "own_numbers_unparseable": 0,
+   "row_claim_inputs_consumed": 6,
+   "assumption_inputs_typed": 114
+  },
+  "f80_delta": "v1 (pre-fix): on_row_physics_runs 0/36 — the row's own numbers never entered a computation. v2: 36/36 claims carry an on-row run; 6 row-claim inputs consumed the answer's OWN numbers (HO7-02's 105 C and HO7-07's 78 C bind arrhenius t1 and CHANGE the computed value vs the reference-only run); 114 inputs are typed ASSUMPTIONS with per-input provenance (visible, sourced, Art. 9 — never silent defaults); 0 sign contradictions",
+  "honest_limits": [
+   "the labelled DEV rows state few own numbers (30 extracted across 12 rows — mostly echoed device parameters); the on-row mechanics will consume far more on v10's full-contract answers",
+   "BINDING_IS_DIMENSIONAL_ONLY: a dimension-compatible claim binds the first matching kwarg in signature order — binding cannot semantically disambiguate same-dimension inputs (pinned by test)",
+   "DIRECTION_WORDS_ARE_UNAMBIGUOUS_ONLY: frame-dependent verbs (reduces/increases/accelerates) defer, never guess (reduces the RATE is improves, reduces the MARGIN is worsens)",
+   "the extractor recognizes a closed unit vocabulary; unrecognized units are not number+unit pairs (prose), and pint-level failures are typed refusals"
+  ]
+ },
+ "frozen_path_safety": {
+  "freeze_baselines": "15/15 hold (test_r64_v9_preflight 7/7) — zero frozen files moved (candidate_schema/physics_checks/engine_route are NOT in the 15-file manifest, verified before the edit)",
+  "r52_byte_identity": "PASS 0/0/0, eval/r52_labelled_regression.json byte-identical after the change (the projection is a closed key set; the additive design leaves the route path untouched)",
+  "frozen_machine": "r60_v9_one_shot reaches these modules only via engine_route (unchanged); numeric_claims is absent from every labelled candidate (pinned by test) — the pre-F80 wrap stays byte-stable",
+  "v10_note": "the sealed v10 one-shot still WAITS on the auditor's model-pin amend (prereg pins agnes-3.0-flash at audit tip 740814634; the R81 handoff registered cohere/command-a); this lane deliberately does NOT touch the measured engine_route path so the sealed machine is unchanged for the one-shot"
+ },
+ "art27_capability_budget": {
+  "engine_lines": 523,
+  "test_lines": 327,
+  "measurement_script_lines": 98,
+  "workflow_lines": 1,
+  "engine_line_share_measured": 55,
+  "engine_diff": "523 new/added engine lines (numeric_claims.py 178 + onrow_physics.py 307 + candidate_schema.py 38) — the F80 on-row computation lane",
+  "share_exception_reason": "capability round: the >=30% engine-line rule is MET (55%); no score number claimed — the measured delta arrives with the sealed v10 one-shot (the auditor's bar), not from a DEV-set lane",
+  "primary_metric_delta": "P1 on-row gate: v1 0/36 on-row -> v2 36/36 on-row (fraction 1.0, 0 sign contradictions) — the P1 gate now measures the output's actual physics"
+ },
+ "disclosures": {
+  "detect_secrets": "pre-commit detect-secrets unavailable in this sandbox (typed degradation, Art. 5) — manual staged-diff token-pattern grep 0 hits; all six changed files CLEAN under the committed r45 scanner",
+  "v10_wait": "the one-shot is NOT fired this round: the auditor's prereg model-pin amend has not landed (checked at round time; audit tip 740814634) — the builder never runs the sealed one-shot against an unamended pin"
+ }
+}
