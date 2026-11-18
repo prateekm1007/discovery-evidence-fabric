@@ -167,12 +167,13 @@ BAD_INPUTS = {
 }
 
 
-def test_registry_has_twelve_relations():
-    # R54 (claim c-0072): the registry expanded 6 -> 12 relations /
-    # 12 failure classes to close the P1 unit-checked coverage on the
-    # labelled DEV rows; the completeness pin moves with it.
-    assert len(pc.CHECKS) == 12, sorted(pc.CHECKS)
-    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 12
+def test_registry_has_nineteen_relations():
+    # R54 (c-0072): 6 -> 12. R62 (claim c-0085): 12 -> 19 relations /
+    # 31 failure classes to close the P1 coverage gap on the FULL DEV
+    # corpus (21 previously-unrouted rows); the pin moves with the
+    # registry (a stale literal reds — the R60-F1 lesson applied).
+    assert len(pc.CHECKS) == 19, sorted(pc.CHECKS)
+    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 31
 
 
 def test_every_check_refuses_garbage_rather_than_fabricating():
@@ -248,3 +249,87 @@ def test_npsh_zero_rho_typed_refusal_not_raise():
                      friction_loss_m=0.3, npshr_m=0.5)
     assert r["verdict"] == "REFUSED"
     assert "out_of_domain" in r["detail"]["error"]
+
+
+# ------------------------------------------------ R62 registry expansion
+# (claim c-0085): the 7 new relations RUN on their reference scenarios,
+# typed-REFUSE on their true degenerate axes, and the collision-sensitive
+# router classes pin to the physically-right instrument.
+def test_r62_expansion_reference_scenarios_all_run():
+    for cid in ("archard_wear", "impact_erosion_rate",
+                "contact_erosion_per_operation", "biogenic_acid_thinning",
+                "microbial_growth_rate", "dust_layer_ignition_margin",
+                "humidity_permeability_ratio"):
+        r = pc.run_check(cid, **pc.REFERENCE_SCENARIOS[cid])
+        assert r["verdict"] == "RUN", (cid, r)
+        assert r["direction_of_effect"] == "worsens", (cid, r)
+
+
+def test_r62_archard_wear_value_and_refusal():
+    r = pc.run_check("archard_wear", load_n=500.0,
+                     sliding_distance_m=50000.0, hardness_pa=1.0e8,
+                     wear_coeff=2.0e-3)
+    assert r["verdict"] == "RUN" and abs(r["value"] - 5e-4) < 1e-8
+    bad = pc.run_check("archard_wear", load_n=500.0,
+                       sliding_distance_m=50000.0, hardness_pa=0.0,
+                       wear_coeff=2.0e-3)
+    assert bad["verdict"] == "REFUSED" and "hardness" in (
+        bad["detail"]["error"])
+
+
+def test_r62_biogenic_acid_thinning_units():
+    # 1.0 g H2S/m2/day * 0.85 * (98.08/34.08) = 7.104 g H2SO4/m2/day;
+    # capacity 75 kg/m3 -> 7.104 g / 75000 g/m3 = 9.472e-5 m/day
+    # = 0.03262 mm/day (the pint g/kg cancellation carries the units)
+    r = pc.run_check("biogenic_acid_thinning", h2s_flux_g_m2_day=1.0,
+                     acid_yield_fraction=0.85,
+                     neutralization_capacity_kg_m3=75.0)
+    assert r["verdict"] == "RUN"
+    assert abs(r["value"] - 0.03262) < 5e-4
+    assert r["unit"] == "mm/day"
+
+
+def test_r62_microbial_q10_domain_refusal():
+    bad = pc.run_check("microbial_growth_rate", mu_ref_per_day=0.25,
+                       q10=0.0, t_degC=32.0, t_ref_degC=20.0, days=30.0)
+    assert bad["verdict"] == "REFUSED"
+    assert "Q10" in bad["detail"]["error"]
+
+
+def test_r62_humidity_rh_domain_refusal():
+    bad = pc.run_check("humidity_permeability_ratio",
+                       alpha_per_rh_percent=0.09, rh_percent=150.0,
+                       rh_ref_percent=0.0)
+    assert bad["verdict"] == "REFUSED"
+    assert "[0, 100]" in bad["detail"]["error"]
+
+
+def test_r62_router_collision_pins():
+    # the collision-sensitive texts route to the RIGHT instrument
+    cls = pc.classify_failure
+    assert cls("screed plate bottoms wear thin at the leading edge") \
+        == "mechanical_wear"          # bare "leading edge" != rain erosion
+    assert cls("rain and particle impact erode the leading-edge "
+               "coating") == "leading_edge_erosion"
+    assert cls("brush and slip-ring contact wear progresses to arcing") \
+        == "electrical_contact_erosion"
+    assert cls("opportunity charging drives electrolyte loss") \
+        == "lead_acid_watering"
+    assert cls("Electrolyte dry-out: sustained operation at high "
+               "temperature drives solvent evaporation") \
+        == "electrolyte_dryout"       # "dry-out" != desiccant context
+
+
+def test_r62_router_covers_all_dev_rows():
+    # the F64-deterministic recompute: every corpus row now routes to a
+    # class whose checks RUN (the P1 coverage gap's root cause, closed)
+    # this test pins the ROUTER (every corpus failure text resolves to
+    # a class whose checks are mapped); the P1 recomputation itself is
+    # the driver re-run committed beside the expansion
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from r58_p2_ablation_driver import load_dev_problems
+    for p in load_dev_problems():
+        c = pc.classify_failure(str(p.get("failure", "")))
+        assert c is not None, f"{p['problem_id']}: still unrouted"
+        assert pc.check_for_failure_class(c), (
+            f"{p['problem_id']}: class {c} maps to no check")

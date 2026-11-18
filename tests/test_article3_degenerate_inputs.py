@@ -62,6 +62,33 @@ DEGENERATE_KWARGS: dict[str, dict] = {
                           polarization_slope_v_m2_a=1e-8,
                           characteristic_length_m=0.0),
     "foam_index": dict(sigma_ref_mn_m=0.0, sigma_sludge_mn_m=30.0),
+    # R62 (c-0085) expansion: the true degenerate axis per new relation
+    # (archard/impact/biogenic divide by hardness/removal-energy/
+    # capacity; contact refuses a zero coefficient; microbial refuses
+    # Q10 outside (0,5]; dust refuses negative thickness; humidity
+    # refuses RH outside [0,100])
+    "archard_wear": dict(load_n=500.0, sliding_distance_m=50000.0,
+                         hardness_pa=0.0, wear_coeff=2.0e-3),
+    "impact_erosion_rate": dict(impact_flux_w_m2=5.0,
+                                specific_removal_energy_j_m3=0.0,
+                                exposure_s=3.15e7,
+                                erosion_efficiency=5.0e-5),
+    "contact_erosion_per_operation": dict(arc_charge_c=30.0,
+                                          erosion_coeff_ug_per_c=0.0,
+                                          operations_per_year=6000.0),
+    "biogenic_acid_thinning": dict(h2s_flux_g_m2_day=1.0,
+                                   acid_yield_fraction=0.85,
+                                   neutralization_capacity_kg_m3=0.0),
+    "microbial_growth_rate": dict(mu_ref_per_day=0.25, q10=0.0,
+                                  t_degC=32.0, t_ref_degC=20.0,
+                                  days=30.0),
+    "dust_layer_ignition_margin": dict(t_hot_surface_degC=220.0,
+                                       layer_ignition_degC=350.0,
+                                       layer_thickness_mm=-1.0,
+                                       thickness_derate_degC_per_mm=15.0),
+    "humidity_permeability_ratio": dict(alpha_per_rh_percent=0.09,
+                                        rh_percent=150.0,
+                                        rh_ref_percent=0.0),
 }
 
 EXPECTED_REGISTRY = {
@@ -69,6 +96,10 @@ EXPECTED_REGISTRY = {
     "npsh_margin", "dewpoint_frost_margin", "larson_miller_lmp",
     "surge_margin", "fatigue_miner", "breakthrough_capacity",
     "faraday_gas_rate", "wagner_number", "foam_index",
+    "archard_wear", "impact_erosion_rate",
+    "contact_erosion_per_operation", "biogenic_acid_thinning",
+    "microbial_growth_rate", "dust_layer_ignition_margin",
+    "humidity_permeability_ratio",
 }
 
 TYPED_VERDICTS = {"REFUSED", "FAIL", "PASS", "RUN", "NOT_COMPUTABLE"}
@@ -145,6 +176,30 @@ HEALTHY_KWARGS: dict[str, dict] = {
                           polarization_slope_v_m2_a=1e-8,
                           characteristic_length_m=0.01),
     "foam_index": dict(sigma_ref_mn_m=72.0, sigma_sludge_mn_m=30.0),
+    # R62 (c-0085) expansion healthy companions (== the reference
+    # scenarios; the relations must still compute, never over-refuse)
+    "archard_wear": dict(load_n=500.0, sliding_distance_m=50000.0,
+                         hardness_pa=1.0e8, wear_coeff=2.0e-3),
+    "impact_erosion_rate": dict(impact_flux_w_m2=5.0,
+                                specific_removal_energy_j_m3=5.0e6,
+                                exposure_s=3.15e7,
+                                erosion_efficiency=5.0e-5),
+    "contact_erosion_per_operation": dict(arc_charge_c=30.0,
+                                          erosion_coeff_ug_per_c=15.0,
+                                          operations_per_year=6000.0),
+    "biogenic_acid_thinning": dict(h2s_flux_g_m2_day=1.0,
+                                   acid_yield_fraction=0.85,
+                                   neutralization_capacity_kg_m3=75.0),
+    "microbial_growth_rate": dict(mu_ref_per_day=0.25, q10=2.2,
+                                  t_degC=32.0, t_ref_degC=20.0,
+                                  days=30.0),
+    "dust_layer_ignition_margin": dict(t_hot_surface_degC=220.0,
+                                       layer_ignition_degC=350.0,
+                                       layer_thickness_mm=10.0,
+                                       thickness_derate_degC_per_mm=15.0),
+    "humidity_permeability_ratio": dict(alpha_per_rh_percent=0.09,
+                                        rh_percent=85.0,
+                                        rh_ref_percent=0.0),
 }
 
 

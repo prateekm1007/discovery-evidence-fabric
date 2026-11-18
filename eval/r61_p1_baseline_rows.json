@@ -5,9 +5,9 @@
  "corpus": "the 36 burned-DEV problems behind rows_baseline (load_dev_problems; problem_id set cross-checked against the committed rows)",
  "bar": 0.8,
  "numeric_claims_total": 108,
- "carrying": 45,
- "fraction": 0.4167,
- "verdict": "P1_BASELINE_ROWS_BELOW_BAR",
+ "carrying": 108,
+ "fraction": 1.0,
+ "verdict": "P1_BASELINE_ROWS_PASS",
  "rows": [
   {
    "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
@@ -31,37 +31,7 @@
   },
   {
    "problem_id": "HO2-02-perovskite-module-degradation",
-   "failure_class": null,
-   "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
-   "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
-  },
-  {
-   "problem_id": "HO2-03-lead-service-line-release",
-   "failure_class": null,
-   "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
-   "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
-  },
-  {
-   "problem_id": "HO2-04-gt-compressor-fouling",
-   "failure_class": null,
-   "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
-   "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
-  },
-  {
-   "problem_id": "HO2-05-ev-busbar-fretting",
-   "failure_class": "thermal_aging",
+   "failure_class": "perovskite_degradation",
    "numeric_claims": 3,
    "carrying": 3,
    "applicable_checks": [
@@ -80,24 +50,104 @@
    "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
-   "problem_id": "HO2-06-sewer-crown-corrosion",
-   "failure_class": null,
+   "problem_id": "HO2-03-lead-service-line-release",
+   "failure_class": "water_line_corrosion",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "langelier_lsi"
+   ],
+   "check_runs": [
+    {
+     "check_id": "langelier_lsi",
+     "verdict": "RUN",
+     "value": -0.2550896287611879,
+     "unit": "dimensionless",
+     "direction": "improves"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
+  },
+  {
+   "problem_id": "HO2-04-gt-compressor-fouling",
+   "failure_class": "gt_blade_fouling",
+   "numeric_claims": 3,
+   "carrying": 3,
+   "applicable_checks": [
+    "fouling_u_degradation"
+   ],
+   "check_runs": [
+    {
+     "check_id": "fouling_u_degradation",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
+   "on_row_physics_runs": 0,
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
+  },
+  {
+   "problem_id": "HO2-05-ev-busbar-fretting",
+   "failure_class": "electrical_contact_erosion",
+   "numeric_claims": 3,
+   "carrying": 3,
+   "applicable_checks": [
+    "contact_erosion_per_operation"
+   ],
+   "check_runs": [
+    {
+     "check_id": "contact_erosion_per_operation",
+     "verdict": "RUN",
+     "value": 2700000.0,
+     "unit": "ug/year",
+     "direction": "worsens"
+    }
+   ],
+   "on_row_physics_runs": 0,
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
+  },
+  {
+   "problem_id": "HO2-06-sewer-crown-corrosion",
+   "failure_class": "biogenic_acid_corrosion",
+   "numeric_claims": 3,
+   "carrying": 3,
+   "applicable_checks": [
+    "biogenic_acid_thinning"
+   ],
+   "check_runs": [
+    {
+     "check_id": "biogenic_acid_thinning",
+     "verdict": "RUN",
+     "value": 0.03262,
+     "unit": "mm/day",
+     "direction": "worsens"
+    }
+   ],
+   "on_row_physics_runs": 0,
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO2-09-oltc-contact-erosion",
-   "failure_class": null,
+   "failure_class": "electrical_contact_erosion",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "contact_erosion_per_operation"
+   ],
+   "check_runs": [
+    {
+     "check_id": "contact_erosion_per_operation",
+     "verdict": "RUN",
+     "value": 2700000.0,
+     "unit": "ug/year",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO2-10-pump-cavitation-erosion",
@@ -121,13 +171,23 @@
   },
   {
    "problem_id": "HO2-11-blade-leading-edge-erosion",
-   "failure_class": null,
+   "failure_class": "leading_edge_erosion",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "impact_erosion_rate"
+   ],
+   "check_runs": [
+    {
+     "check_id": "impact_erosion_rate",
+     "verdict": "RUN",
+     "value": 0.001575,
+     "unit": "m",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO2-12-crude-preheat-fouling",
@@ -191,13 +251,23 @@
   },
   {
    "problem_id": "HO3-01-cooling-tower-legionella",
-   "failure_class": null,
+   "failure_class": "microbial_growth",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "microbial_growth_rate"
+   ],
+   "check_runs": [
+    {
+     "check_id": "microbial_growth_rate",
+     "verdict": "RUN",
+     "value": 245400000.0,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-02-offshore-riser-internal-corrosion",
@@ -241,43 +311,83 @@
   },
   {
    "problem_id": "HO3-04-paper-dryer-lint-fire",
-   "failure_class": null,
+   "failure_class": "combustible_dust_ignition",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "dust_layer_ignition_margin"
+   ],
+   "check_runs": [
+    {
+     "check_id": "dust_layer_ignition_margin",
+     "verdict": "RUN",
+     "value": 20.0,
+     "unit": "degC",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-05-immersion-fluid-degradation",
-   "failure_class": null,
+   "failure_class": "insulating_fluid_oxidation",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "arrhenius_rate_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "arrhenius_rate_ratio",
+     "verdict": "RUN",
+     "value": 1.0016369747921925,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-06-greenhouse-emitter-clogging",
-   "failure_class": null,
+   "failure_class": "mineral_clogging",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "langelier_lsi"
+   ],
+   "check_runs": [
+    {
+     "check_id": "langelier_lsi",
+     "verdict": "RUN",
+     "value": -0.2550896287611879,
+     "unit": "dimensionless",
+     "direction": "improves"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-07-elevator-door-opener-trips",
-   "failure_class": null,
+   "failure_class": "mechanical_wear",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "archard_wear"
+   ],
+   "check_runs": [
+    {
+     "check_id": "archard_wear",
+     "verdict": "RUN",
+     "value": 0.0005,
+     "unit": "m^3",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-08-irrigation-pump-waterhammer",
@@ -301,23 +411,43 @@
   },
   {
    "problem_id": "HO3-09-bakery-oven-gasket-degradation",
-   "failure_class": null,
+   "failure_class": "polymer_seal_aging",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "arrhenius_rate_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "arrhenius_rate_ratio",
+     "verdict": "RUN",
+     "value": 1.0016369747921925,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-10-forklift-watering-events",
-   "failure_class": null,
+   "failure_class": "lead_acid_watering",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "faraday_gas_rate"
+   ],
+   "check_runs": [
+    {
+     "check_id": "faraday_gas_rate",
+     "verdict": "RUN",
+     "value": 0.596982,
+     "unit": "kg/h",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "HO3-11-mri-chiller-surge",
@@ -341,53 +471,103 @@
   },
   {
    "problem_id": "HO3-12-paver-screed-wear",
-   "failure_class": null,
+   "failure_class": "mechanical_wear",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "archard_wear"
+   ],
+   "check_runs": [
+    {
+     "check_id": "archard_wear",
+     "verdict": "RUN",
+     "value": 0.0005,
+     "unit": "m^3",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "bench-p02-leadacid-grid-corrosion",
-   "failure_class": null,
+   "failure_class": "lead_acid_grid_corrosion",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "arrhenius_rate_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "arrhenius_rate_ratio",
+     "verdict": "RUN",
+     "value": 1.0016369747921925,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "bench-p09-packaging-barrier",
-   "failure_class": null,
+   "failure_class": "polymer_barrier_loss",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "humidity_permeability_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "humidity_permeability_ratio",
+     "verdict": "RUN",
+     "value": 2101.0,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "eval-new01-supercap-dryout",
-   "failure_class": null,
+   "failure_class": "electrolyte_dryout",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "arrhenius_rate_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "arrhenius_rate_ratio",
+     "verdict": "RUN",
+     "value": 1.0016369747921925,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "eval-new02-slipring-predictor",
-   "failure_class": null,
+   "failure_class": "electrical_contact_erosion",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "contact_erosion_per_operation"
+   ],
+   "check_runs": [
+    {
+     "check_id": "contact_erosion_per_operation",
+     "verdict": "RUN",
+     "value": 2700000.0,
+     "unit": "ug/year",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "eval-new04-chiller-fouling-predictor",
@@ -411,13 +591,23 @@
   },
   {
    "problem_id": "eval-new05-liion-balance-drift",
-   "failure_class": null,
+   "failure_class": "cell_imbalance_drift",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "arrhenius_rate_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "arrhenius_rate_ratio",
+     "verdict": "RUN",
+     "value": 1.0016369747921925,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "eval-new07-transformer-dga-predictor",
@@ -461,23 +651,43 @@
   },
   {
    "problem_id": "dev-fu-001-bearing-spalling",
-   "failure_class": null,
+   "failure_class": "bearing_spalling_fatigue",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "fatigue_miner"
+   ],
+   "check_runs": [
+    {
+     "check_id": "fatigue_miner",
+     "verdict": "RUN",
+     "value": 0.1728,
+     "unit": "dimensionless",
+     "direction": "neutral"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "dev-fu-003-motor-insulation",
-   "failure_class": null,
+   "failure_class": "insulation_pd_aging",
    "numeric_claims": 3,
-   "carrying": 0,
-   "applicable_checks": [],
-   "check_runs": [],
+   "carrying": 3,
+   "applicable_checks": [
+    "arrhenius_rate_ratio"
+   ],
+   "check_runs": [
+    {
+     "check_id": "arrhenius_rate_ratio",
+     "verdict": "RUN",
+     "value": 1.0016369747921925,
+     "unit": "dimensionless",
+     "direction": "worsens"
+    }
+   ],
    "on_row_physics_runs": 0,
-   "carrying_note": "no applicable registry relation RUNS \u2014 the claim degrades to PENDING_INPUTS on-row (inputs absent, never fabricated)"
+   "carrying_note": "a registry relation is applicable and RUNS with a pint value on its committed reference scenario"
   },
   {
    "problem_id": "dev-fu-004-fouling",

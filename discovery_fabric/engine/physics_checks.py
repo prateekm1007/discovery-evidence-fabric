@@ -534,6 +534,291 @@ def foam_index(sigma_ref_mn_m: float, sigma_sludge_mn_m: float
                        {"error": f"{type(e).__name__}: {e}"})
 
 
+# ---------------------------------------------------------------------------
+# R62 (claim c-0085): registry expansion closing the P1 coverage gap on
+# the full DEV corpus (direction 1). The 21 unrouted rows' failure
+# texts mapped to 19 deterministic classes; 7 new pint-typed relations
+# below (each domain-guarded -> typed REFUSED, never a raise), 12 rows
+# reuse an existing relation that is the physically-right instrument
+# (LSI for water-line corrosivity and emitter precipitate potential,
+# fouling U for GT blade deposits, Miner fatigue for bearing spalling,
+# Faraday gassing for opportunity-charge electrolyte loss, Arrhenius
+# for the thermal-acceleration leg of hydrolysis/oxidation/aging
+# families — the non-thermal legs stay PENDING_INPUTS on-row, never
+# fabricated).
+# ---------------------------------------------------------------------------
+def archard_wear(load_n: float, sliding_distance_m: float,
+                 hardness_pa: float,
+                 wear_coeff: float) -> Dict[str, Any]:
+    try:
+        k = _q(wear_coeff, "dimensionless")
+        f = _q(load_n, "N")
+        s = _q(sliding_distance_m, "m")
+        h = _q(hardness_pa, "Pa")
+        if float(f.magnitude) <= 0:
+            raise ValueError("load must be > 0")
+        if float(s.magnitude) < 0:
+            raise ValueError("sliding distance must be >= 0")
+        if float(h.magnitude) <= 0:
+            raise ValueError("hardness must be > 0 (the wear volume "
+                             "divides by it)")
+        if not 0.0 < float(k.magnitude) <= 1.0:
+            raise ValueError("wear coefficient must be in (0, 1]")
+        volume = (k * f * s / h).to("m^3")
+        direction = ("worsens" if float(volume.magnitude) > 1e-15
+                     else "neutral")
+        return _result(
+            "archard_wear", "mechanical_wear", "RUN",
+            float(f"{volume.magnitude:.4g}"), "m^3", direction,
+            {"load_N": float(f.magnitude),
+             "sliding_distance_m": float(s.magnitude),
+             "hardness_Pa": float(h.magnitude),
+             "wear_coeff": float(k.magnitude),
+             "basis": "Archard: V = K*F*s/H — wear volume grows with "
+                      "load and sliding distance and shrinks with "
+                      "hardness (rollers, screeds, brush/slip-ring "
+                      "contact wear)"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("archard_wear", "mechanical_wear", "REFUSED",
+                       None, "m^3", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def impact_erosion_rate(impact_flux_w_m2: float,
+                        specific_removal_energy_j_m3: float,
+                        exposure_s: float,
+                        erosion_efficiency: float) -> Dict[str, Any]:
+    try:
+        flux = _q(impact_flux_w_m2, "W/m^2")
+        e_rm = _q(specific_removal_energy_j_m3, "J/m^3")
+        t = _q(exposure_s, "s")
+        eff = _q(erosion_efficiency, "dimensionless")
+        if float(flux.magnitude) <= 0:
+            raise ValueError("impact flux must be > 0")
+        if float(e_rm.magnitude) <= 0:
+            raise ValueError("specific removal energy must be > 0 "
+                             "(the depth divides by it)")
+        if float(t.magnitude) < 0:
+            raise ValueError("exposure time must be >= 0")
+        if not 0.0 < float(eff.magnitude) <= 1.0:
+            raise ValueError("erosion efficiency must be in (0, 1]")
+        depth = (flux * eff * t / e_rm).to("m")
+        direction = ("worsens" if float(depth.magnitude) > 1e-15
+                     else "neutral")
+        return _result(
+            "impact_erosion_rate", "leading_edge_erosion", "RUN",
+            float(f"{depth.magnitude:.4g}"), "m", direction,
+            {"impact_flux_W_m2": float(flux.magnitude),
+             "removal_energy_J_m3": float(e_rm.magnitude),
+             "exposure_s": float(t.magnitude),
+             "erosion_efficiency": float(eff.magnitude),
+             "basis": "depth = (KE flux * efficiency * exposure) / "
+                      "specific removal energy — rain/particle impact "
+                      "material loss per unit area (leading-edge "
+                      "coatings)"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("impact_erosion_rate", "leading_edge_erosion",
+                       "REFUSED", None, "m", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def contact_erosion_per_operation(arc_charge_c: float,
+                                  erosion_coeff_ug_per_c: float,
+                                  operations_per_year: float
+                                  ) -> Dict[str, Any]:
+    try:
+        m_op = (_q(arc_charge_c, "C")
+                * _q(erosion_coeff_ug_per_c, "ug/C")).to("ug")
+        ops = _q(operations_per_year, "dimensionless")
+        if float(_q(arc_charge_c, "C").magnitude) <= 0:
+            raise ValueError("arc charge per operation must be > 0")
+        if float(_q(erosion_coeff_ug_per_c, "ug/C").magnitude) <= 0:
+            raise ValueError("erosion coefficient must be > 0")
+        if float(ops.magnitude) < 0:
+            raise ValueError("operations per year must be >= 0")
+        total_ug = float(m_op.magnitude) * float(ops.magnitude)
+        direction = ("worsens" if total_ug > 1e-9 else "neutral")
+        return _result(
+            "contact_erosion_per_operation", "electrical_contact_erosion",
+            "RUN", float(f"{total_ug:.4g}"), "ug/year", direction,
+            {"arc_charge_C": float(arc_charge_c),
+             "erosion_coeff_ug_per_C": float(erosion_coeff_ug_per_c),
+             "operations_per_year": float(operations_per_year),
+             "basis": "mass loss = arc charge * erosion coefficient "
+                      "* operations (charge-transfer erosion of arcing "
+                      "contacts — OLTC diverters, slip-ring/brush "
+                      "pairs); resistance rise follows the mass loss"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("contact_erosion_per_operation",
+                       "electrical_contact_erosion", "REFUSED", None,
+                       "ug/year", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def biogenic_acid_thinning(h2s_flux_g_m2_day: float,
+                           acid_yield_fraction: float,
+                           neutralization_capacity_kg_m3: float
+                           ) -> Dict[str, Any]:
+    try:
+        flux = _q(h2s_flux_g_m2_day, "g/(m^2*day)")
+        if float(flux.magnitude) <= 0:
+            raise ValueError("H2S flux must be > 0")
+        if not 0.0 < float(acid_yield_fraction) <= 1.0:
+            raise ValueError("acid yield fraction must be in (0, 1]")
+        cap = _q(neutralization_capacity_kg_m3, "kg/m^3")
+        if float(cap.magnitude) <= 0:
+            raise ValueError("neutralization capacity must be > 0 "
+                             "(the thinning rate divides by it)")
+        # H2S -> H2SO4 molar conversion (2 H2S + 2 O2 -> H2SO4, i.e.
+        # 98.08 g H2SO4 per 34.08 g H2S consumed at full oxidation)
+        acid = (flux * float(acid_yield_fraction)
+                * (98.08 / 34.08))          # Quantity g H2SO4/(m^2 day)
+        thinning = (acid / cap).to("mm/day")
+        direction = ("worsens" if float(thinning.magnitude) > 1e-9
+                     else "neutral")
+        return _result(
+            "biogenic_acid_thinning", "biogenic_acid_corrosion", "RUN",
+            float(f"{thinning.magnitude:.4g}"), "mm/day", direction,
+            {"h2s_flux_g_m2_day": float(flux.magnitude),
+             "acid_yield_fraction": float(acid_yield_fraction),
+             "neutralization_capacity_kg_H2SO4_m3": float(cap.magnitude),
+             "basis": "crown thinning = (H2S flux * yield * 98.08/34.08 "
+                      "acid mass) / acid-neutralization capacity of the "
+                      "cement matrix (Pomeroy-style biogenic sulfuric-"
+                      "acid corrosion of concrete)"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("biogenic_acid_thinning", "biogenic_acid_corrosion",
+                       "REFUSED", None, "mm/day", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def microbial_growth_rate(mu_ref_per_day: float, q10: float,
+                          t_degC: float, t_ref_degC: float,
+                          days: float) -> Dict[str, Any]:
+    try:
+        mu_ref = _q(mu_ref_per_day, "1/day")
+        if float(mu_ref.magnitude) <= 0:
+            raise ValueError("reference growth rate must be > 0")
+        if not 0.0 < float(q10) <= 5.0:
+            raise ValueError("Q10 must be in (0, 5]")
+        if float(days) < 0:
+            raise ValueError("exposure days must be >= 0")
+        mu = float(mu_ref.magnitude) * float(q10) ** (
+            (float(t_degC) - float(t_ref_degC)) / 10.0)
+        exponent = mu * float(days)
+        saturated = None
+        if exponent > 709.78:
+            exponent, saturated = 709.78, "upper"
+        multiplier = math.exp(exponent)
+        if saturated == "upper":
+            multiplier = 1e308
+        direction = ("worsens" if multiplier > 1.0 + 1e-12
+                     else "neutral")
+        detail = {
+            "mu_ref_per_day": float(mu_ref.magnitude),
+            "q10": float(q10), "t_degC": float(t_degC),
+            "t_ref_degC": float(t_ref_degC), "days": float(days),
+            "basis": "growth multiplier = exp(mu * days) with "
+                     "mu = mu_ref * Q10^((T-Tref)/10) — the "
+                     "temperature-accelerated exponential bloom "
+                     "(Legionella-type colonization of warm basins)"}
+        if saturated:
+            detail["saturated"] = ("exponent clamped at the upper "
+                                   "double-precision bound — the "
+                                   "reported multiplier is the clamped "
+                                   "value, disclosed in-band (F-V5 "
+                                   "pattern)")
+        return _result("microbial_growth_rate", "microbial_growth",
+                       "RUN", float(f"{multiplier:.4g}"),
+                       "dimensionless", direction, detail)
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("microbial_growth_rate", "microbial_growth",
+                       "REFUSED", None, "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def dust_layer_ignition_margin(t_hot_surface_degC: float,
+                               layer_ignition_degC: float,
+                               layer_thickness_mm: float,
+                               thickness_derate_degC_per_mm: float
+                               ) -> Dict[str, Any]:
+    try:
+        t_surf = _q(t_hot_surface_degC, "degC")
+        t_li = _q(layer_ignition_degC, "degC")
+        thick = _q(layer_thickness_mm, "mm")
+        derate = float(thickness_derate_degC_per_mm)
+        if float(thick.magnitude) < 0:
+            raise ValueError("layer thickness must be >= 0")
+        if float(derate) < 0:
+            raise ValueError("thickness derate must be >= 0")
+        eff_li = float(t_li.magnitude) - float(derate) * float(
+            thick.magnitude)
+        margin = float(t_surf.magnitude) - eff_li
+        direction = ("worsens" if margin >= 0 else "improves")
+        return _result(
+            "dust_layer_ignition_margin", "combustible_dust_ignition",
+            "RUN", round(margin, 1), "degC", direction,
+            {"t_hot_surface_degC": float(t_surf.magnitude),
+             "layer_ignition_degC": float(t_li.magnitude),
+             "layer_thickness_mm": float(thick.magnitude),
+             "thickness_derate_degC_per_mm": float(derate),
+             "effective_layer_ignition_degC": round(eff_li, 1),
+             "basis": "margin = hot-surface temperature minus the "
+                      "thickness-derated layer ignition temperature "
+                      "(a thicker insulating dust layer lowers the "
+                      "effective MIT); margin >= 0 is the ignition-"
+                      "reachable regime (NFPA-654-style layer control)"})
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("dust_layer_ignition_margin",
+                       "combustible_dust_ignition", "REFUSED", None,
+                       "degC", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def humidity_permeability_ratio(alpha_per_rh_percent: float,
+                                rh_percent: float,
+                                rh_ref_percent: float
+                                ) -> Dict[str, Any]:
+    try:
+        alpha = float(alpha_per_rh_percent)
+        rh = float(rh_percent)
+        rh_ref = float(rh_ref_percent)
+        if alpha <= 0:
+            raise ValueError("humidity sensitivity alpha must be > 0")
+        if not 0.0 <= rh <= 100.0 or not 0.0 <= rh_ref <= 100.0:
+            raise ValueError("relative humidity values must be in "
+                             "[0, 100] %RH")
+        exponent = alpha * (rh - rh_ref)
+        saturated = None
+        if exponent > 709.78:
+            exponent, saturated = 709.78, "upper"
+        ratio = math.exp(exponent)
+        if saturated == "upper":
+            ratio = 1e308
+        direction = ("worsens" if ratio > 1.1 else
+                     ("improves" if ratio < 0.9 else "neutral"))
+        detail = {
+            "alpha_per_rh_percent": alpha, "rh_percent": rh,
+            "rh_ref_percent": rh_ref,
+            "basis": "permeability ratio = exp(alpha * (RH - RHref)) — "
+                     "the humidity-activated barrier loss of moisture-"
+                     "sensitive polymer films (EVOH-class oxygen/"
+                     "moisture barriers)"}
+        if saturated:
+            detail["saturated"] = ("exponent clamped at the upper "
+                                   "double-precision bound (F-V5 "
+                                   "pattern)")
+        return _result("humidity_permeability_ratio",
+                       "polymer_barrier_loss", "RUN",
+                       float(f"{ratio:.4g}"), "dimensionless",
+                       direction, detail)
+    except (TypeError, ValueError, pint.DimensionalityError) as e:
+        return _result("humidity_permeability_ratio",
+                       "polymer_barrier_loss", "REFUSED", None,
+                       "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
 CHECKS = {
     "arrhenius_rate_ratio": arrhenius_rate_ratio,
     "fouling_u_degradation": fouling_u_degradation,
@@ -547,6 +832,13 @@ CHECKS = {
     "faraday_gas_rate": faraday_gas_rate,
     "wagner_number": wagner_number,
     "foam_index": foam_index,
+    "archard_wear": archard_wear,
+    "impact_erosion_rate": impact_erosion_rate,
+    "contact_erosion_per_operation": contact_erosion_per_operation,
+    "biogenic_acid_thinning": biogenic_acid_thinning,
+    "microbial_growth_rate": microbial_growth_rate,
+    "dust_layer_ignition_margin": dust_layer_ignition_margin,
+    "humidity_permeability_ratio": humidity_permeability_ratio,
 }
 
 CHECKS_BY_FAILURE_CLASS = {
@@ -562,6 +854,29 @@ CHECKS_BY_FAILURE_CLASS = {
     "electrolytic_mist": ["faraday_gas_rate"],
     "electrodeposition": ["wagner_number"],
     "foaming": ["foam_index"],
+    # R62 (c-0085) expansion classes: 19 deterministic classes covering
+    # the 21 previously-unrouted DEV rows (failure_class=None ->
+    # NO_APPLICABLE). Where an existing relation is the physically-
+    # right instrument it is reused; 7 new relations carry the rest.
+    "water_line_corrosion": ["langelier_lsi"],
+    "gt_blade_fouling": ["fouling_u_degradation"],
+    "biogenic_acid_corrosion": ["biogenic_acid_thinning"],
+    "electrical_contact_erosion": ["contact_erosion_per_operation"],
+    "leading_edge_erosion": ["impact_erosion_rate"],
+    "microbial_growth": ["microbial_growth_rate"],
+    "combustible_dust_ignition": ["dust_layer_ignition_margin"],
+    "mineral_clogging": ["langelier_lsi"],
+    "mechanical_wear": ["archard_wear"],
+    "polymer_seal_aging": ["arrhenius_rate_ratio"],
+    "lead_acid_watering": ["faraday_gas_rate"],
+    "lead_acid_grid_corrosion": ["arrhenius_rate_ratio"],
+    "polymer_barrier_loss": ["humidity_permeability_ratio"],
+    "electrolyte_dryout": ["arrhenius_rate_ratio"],
+    "cell_imbalance_drift": ["arrhenius_rate_ratio"],
+    "bearing_spalling_fatigue": ["fatigue_miner"],
+    "insulation_pd_aging": ["arrhenius_rate_ratio"],
+    "perovskite_degradation": ["arrhenius_rate_ratio"],
+    "insulating_fluid_oxidation": ["arrhenius_rate_ratio"],
 }
 
 
@@ -577,6 +892,51 @@ CHECKS_BY_FAILURE_CLASS = {
 # stay PENDING_INPUTS; the scenarios are wiring proofs, not data).
 # ---------------------------------------------------------------------------
 _CLASS_RULES = (
+    # R62 (c-0085) expansion: specific classes FIRST (first match
+    # wins). Keywords are collision-checked against every existing
+    # rule — e.g. "leading-edge coating" (rain erosion) never fires on
+    # a paver's bare "leading edge", and "electrolyte loss" (watering)
+    # never fires on "Electrolyte dry-out".
+    ("water_line_corrosion",
+     ("lead line", "dissolved lead", "action level")),
+    ("gt_blade_fouling",
+     ("deposit on blades", "heat rate")),
+    ("biogenic_acid_corrosion",
+     ("sulfuric acid", "cement matrix", "h2s", "crown")),
+    ("electrical_contact_erosion",
+     ("arcing erodes", "diverter", "contact resistance", "slip-ring",
+      "brush and slip")),
+    ("leading_edge_erosion",
+     ("leading-edge coating", "rain and particle", "rain erosion")),
+    ("microbial_growth",
+     ("legionella", "cfu", "colonize")),
+    ("combustible_dust_ignition",
+     ("lint", "ignited", "hot-bearing spark")),
+    ("mineral_clogging",
+     ("emitters", "calcium-phosphate", "precipitate")),
+    ("mechanical_wear",
+     ("roller", "belt slip", "door stall", "screed plate", "wear thin",
+      "wear progresses")),
+    ("polymer_seal_aging",
+     ("gasket", "hardens and shrinks", "steam leak")),
+    ("lead_acid_watering",
+     ("opportunity charging", "electrolyte loss", "sulfate on plate")),
+    ("lead_acid_grid_corrosion",
+     ("grid corrosion", "grid cross-section", "float charge")),
+    ("polymer_barrier_loss",
+     ("ethylene-vinyl alcohol", "barrier properties", "evoh")),
+    ("electrolyte_dryout",
+     ("dry-out", "solvent evaporation", "seal permeation")),
+    ("cell_imbalance_drift",
+     ("self-discharge", "cell-to-cell", "imbalance")),
+    ("bearing_spalling_fatigue",
+     ("spalling", "inner-race", "race spall")),
+    ("insulation_pd_aging",
+     ("partial discharge", "stator winding", "ground fault")),
+    ("perovskite_degradation",
+     ("perovskite", "encapsulant", "moisture ingress")),
+    ("insulating_fluid_oxidation",
+     ("acid number", "mgkoh", "dissolved copper")),
     ("electrolytic_mist",
      ("acid aerosol", "oxygen evolution", "bubble", "tankhouse air",
       "electrowinning mist")),
@@ -663,6 +1023,32 @@ REFERENCE_SCENARIOS = {
                       "polarization_slope_v_m2_a": 0.02,
                       "characteristic_length_m": 0.3},
     "foam_index": {"sigma_ref_mn_m": 72.0, "sigma_sludge_mn_m": 45.0},
+    # R62 (c-0085) expansion scenarios — real magnitudes from the
+    # relation domains (elevator/PA roller, rain-eroded coating, OLTC
+    # diverter, sewer crown, Legionella basin, dryer-duct lint, EVOH
+    # distribution humidity)
+    "archard_wear": {"load_n": 500.0, "sliding_distance_m": 50000.0,
+                     "hardness_pa": 1.0e8, "wear_coeff": 2.0e-3},
+    "impact_erosion_rate": {"impact_flux_w_m2": 5.0,
+                            "specific_removal_energy_j_m3": 5.0e6,
+                            "exposure_s": 3.15e7,
+                            "erosion_efficiency": 5.0e-5},
+    "contact_erosion_per_operation": {"arc_charge_c": 30.0,
+                                      "erosion_coeff_ug_per_c": 15.0,
+                                      "operations_per_year": 6000.0},
+    "biogenic_acid_thinning": {"h2s_flux_g_m2_day": 1.0,
+                               "acid_yield_fraction": 0.85,
+                               "neutralization_capacity_kg_m3": 75.0},
+    "microbial_growth_rate": {"mu_ref_per_day": 0.25, "q10": 2.2,
+                              "t_degC": 32.0, "t_ref_degC": 20.0,
+                              "days": 30.0},
+    "dust_layer_ignition_margin": {"t_hot_surface_degC": 220.0,
+                                   "layer_ignition_degC": 350.0,
+                                   "layer_thickness_mm": 10.0,
+                                   "thickness_derate_degC_per_mm": 15.0},
+    "humidity_permeability_ratio": {"alpha_per_rh_percent": 0.09,
+                                    "rh_percent": 85.0,
+                                    "rh_ref_percent": 0.0},
 }
 
 

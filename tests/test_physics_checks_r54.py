@@ -20,9 +20,12 @@ import pytest  # noqa: E402
 from discovery_fabric.engine import physics_checks as pc  # noqa: E402
 
 
-def test_registry_grew_to_12_relations_12_classes():
-    assert len(pc.CHECKS) == 12
-    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 12
+def test_registry_grew_to_19_relations_31_classes():
+    # R54 (c-0072): 6 -> 12. R62 (c-0085): 12 -> 19 relations /
+    # 31 failure classes (the full-DEV-corpus P1 coverage gap closed);
+    # the pin moves with the registry, never stale (R60-F1 lesson).
+    assert len(pc.CHECKS) == 19
+    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 31
     assert set(pc.CHECKS) == set(pc.REFERENCE_SCENARIOS)
 
 
