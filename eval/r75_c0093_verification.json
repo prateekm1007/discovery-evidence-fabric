@@ -1,0 +1,117 @@
+{
+ "record": "R75_C0093_VERIFICATION/1.0.0",
+ "session": "builder-r75s2",
+ "claim": "c-0094",
+ "work_id": "r75-c0093-verify-close",
+ "verified_work": {
+  "claim": "c-0093",
+  "work_id": "r75-freeze-guard-ci",
+  "session": "builder-r75s1",
+  "landed_sha": "959a2166223f9dd2e3aa8dc1a5f47e8e3b99b274",
+  "round_close": "39d12577e452746337c5f00d25a680fb4c764e24",
+  "finding": "F78"
+ },
+ "typed_relation": "VERIFIER (Art. 29(c): never re-runs the landed work's commits; recomputes from committed bytes) \u2014 the executor lane was found done at fetch; stand-down typed per Art. 29(e), second-lander yields. Second collision on the round-close: this chain's first work commit carried the same D2 apply + c-0093 flip the executor's 39d12577e had already landed \u2014 per Art. 29(e) the DUPLICATE parts were dropped in the rebase (never rebase a duplicate; rebase only disjoint work) and this record is the disjoint remainder.",
+ "read_receipts": {
+  "EPISTEMIC_CONSTITUTION.md": {
+   "sha": "959a2166223f9dd2e3aa8dc1a5f47e8e3b99b274",
+   "version": "v3.3.0",
+   "lines": 221,
+   "depth": "FULL (all 29 articles + the v3.0.0/v3.1.0/v3.2.0/v3.3.0 amendment records + the disposition ledger + the Art. 28 addendum)"
+  },
+  "AUDITOR_CONSTITUTION.md": {
+   "sha": "85c6e6ea4 (origin/audit/r11-auditor-verdict-20261114, exact-head verified by git fetch)",
+   "version": "v1.3.0",
+   "lines": 105,
+   "md5": "d40a92a14854accfd558c7df4f29b9b0",
+   "md5_note": "byte-identical to the standing read recorded in 8f883d994",
+   "depth": "FULL (14 articles + the v1.1.0/v1.2.0/v1.3.0 amendment records)"
+  },
+  "eval/r74_auditor_verification.json": {
+   "sha": "85c6e6ea4",
+   "depth": "FULL"
+  },
+  "AUDIT_LEDGER.json": {
+   "sha": "85c6e6ea4",
+   "entries_read": "AM66 + V67 + F77/F78/F79 states (findings 76, verdicts 59, amendments 67)"
+  }
+ },
+ "verification_results": {
+  "fetch_state": {
+   "audit_branch": "85c6e6ea4 (matches the owner-typed audit head exactly)",
+   "queue_tip": "origin/queue/dev12_r7 = 959a21662 \u2014 ADVANCED past the owner-typed builder tip f8b2e0bc4 (f8b2e0bc4 is an ancestor; verified with merge-base --is-ancestor)"
+  },
+  "c0093_diff_scope": {
+   "files": [
+    ".github/workflows/r11_queue_surface.yml",
+    "eval/enforcement_flags.json",
+    "eval/r75_freeze_guard_ci_status.json",
+    "eval/work_claims.json"
+   ],
+   "engine_lines": 0,
+   "art27_note": "typed ENFORCEMENT round \u2014 no capability claim",
+   "trailers": "Session: builder-r75s1 / Work-Id: r75-freeze-guard-ci present on both commits"
+  },
+  "workflow_invocation": {
+   "line": "tests/test_r64_v9_preflight.py joins the v3.1.0 enforcement block after tests/test_article22_measured_path.py",
+   "gating": "inside the set -e chain \u2014 a guard failure reds the push",
+   "step_name": "cites the F78 freeze guard",
+   "checkout": "actions/checkout@v4 fetch-depth: 0 (workflow line 25) \u2014 the pinned audit sha a293b63e3b4b resolves in a fresh CI checkout"
+  },
+  "map_citation": {
+   "article": "22",
+   "mechanism_tail": "cites tests/test_r64_v9_preflight.py \u2014 frozen-file byte-baselines CHECKED, never regenerated, on every push",
+   "map_completeness_test": "green (tests/test_article_process_wiring.py)"
+  },
+  "freeze_baselines": {
+   "record": "eval/r64_v9_preflight.json",
+   "path": "checks/freeze_baselines_sha16",
+   "entries": 15,
+   "mismatches": 0,
+   "note": "all 15 frozen files match the tip bytes \u2014 the re-freeze state is intact on the landed tip"
+  },
+  "local_battery": {
+   "set": "test_r64_v9_preflight.py + test_article_process_wiring.py + test_article29_parallel_coordination.py + test_remote_ci_rule.py",
+   "result": "31 passed, exit 0 (re-asserted green on the rebased state before push)"
+  },
+  "fail_closed_drill": {
+   "method": "one comment byte appended to frozen scripts/r22_a1w_v5_repair.py, guard run exactly as CI will (verifier re-execution of the acceptance evidence \u2014 zero-LLM, zero-quota)",
+   "sha16_before": "97fe7740563c6d82",
+   "sha16_after": "e1dcc71055ddd676",
+   "failed_tests": [
+    "test_recorded_record_matches_pinned_run",
+    "test_frozen_loop_bytes_hold"
+   ],
+   "restore": "git checkout -- <file>; sha16 back to 97fe7740563c6d82; git status clean for the file",
+   "green_rerun": "7/7 pass, exit 0",
+   "exit_code_note": "exit codes asserted DIRECTLY (pytest exit captured without a pipeline tail) \u2014 the 114e77c57 lesson; the red itself is proven by the two FAILED test lines"
+  },
+  "remote_ci_of_landed_tip": {
+   "sha": "959a2166223f9dd2e3aa8dc1a5f47e8e3b99b274",
+   "conclusion": "success",
+   "check_runs": [
+    {
+     "name": "surface",
+     "conclusion": "success"
+    }
+   ],
+   "read_at": "2026-11-18T14:54:39Z",
+   "tool": "scripts/r41_remote_ci_read.py (the green is the remote's, not a local pytest run)",
+   "note": "an INDEPENDENT read that also confirms the executor's own remote_ci block in eval/r75_freeze_guard_ci_status.json"
+  }
+ },
+ "disclosures": [
+  "custody: the session-local .env.keys had NO HF_TOKEN entry and carried mode 0755 when this session started (the landed record's custody block described the executor's session-local state); the owner-delivered master token was digest-verified (33bc7af22c62 \u2014 exact match to the committed custody records) and restored into the gitignored keyfile; mode tightened to 0600. Values never printed, logged, or committed (Art. 17).",
+  "the drift drill's first exit-code read went through a pipeline tail (GUARD-EXIT=0 artifact from tail's exit status \u2014 the exact 114e77c57 pitfall); re-asserted directly; the RED verdict itself was never in doubt (both pinned tests FAILED on the drifted bytes).",
+  "the R64s4 run-state residue (38 untracked files under eval/holdout_v9_generation/) collided with the fast-forward; quarantined BYTE-PRESERVING to /home/z/my-project/v9_holdout_quarantine_r75/ (outside the repo) before checkout \u2014 the canonical tracked bytes at the tip were never touched (the R72 lane-A quarantine precedent).",
+  "second collision (round-close): the push of this chain was rejected because the executor's own round-close 39d12577e had landed the D2 remote_ci apply + the c-0093 DONE flip in parallel; the duplicate parts of my work commit were dropped in the rebase (their bytes byte-untouched; my claim c-0094 is disjoint and kept), typed here and in the commit message.",
+  "frontier re-probe: window CLOSED until 2026-11-19T16:25Z (~25.5h at read time) \u2014 Art. 3 typed refusal, zero probes, zero quota consumed; the HF master token delivered this round was used ONLY for the custody digest-check."
+ ],
+ "f_state_note": {
+  "F78": "CLOSED by the landed work (c-0093) \u2014 verified here independently; formal closure is the auditor's (AM-record), as with F79.",
+  "F79": "stays CLOSED (per AM66).",
+  "F77": "stays CLOSED (re-freeze; baselines 15/15 re-verified on the tip).",
+  "stable_ids": "no ID reuse (Art. 8 / AM66): evidence-staleness = F79; re-freeze = F77; guard = F78."
+ },
+ "score_note": "score stays 5 (the auditor's call, not the builder's); the governance chain is now gated end-to-end (verdict + byte-identity + freeze-baseline guard, every push). The next capability point is the frontier re-probe (window opens 2026-11-19T16:25Z) -> register -> prereg amend -> re-freeze (now CI-gated by the F78 guard), then the fresh sealed v10 one-shot with binds active: mean >=3.25, CI >3.0 (Art. 14) -> score 6."
+}

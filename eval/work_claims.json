@@ -2172,7 +2172,7 @@
    "registered_at": "2026-11-18T14:58:52Z (sandbox clock)",
    "work_id": "r75-c0093-verify-close",
    "title": "R75 verification + round-close lane: builder-r75s2 fetched mid-flight and found c-0093 (r75-freeze-guard-ci, F78 fix) ALREADY LANDED at the new origin tip 959a21662 \u2014 Art. 29(e): stand down to VERIFIER for the landed work (bytes byte-untouched, no duplicate lane), verify it from committed bytes (Art. 29(c) + auditor Art. 1), run the fail-closed acceptance drill, apply the D2 remote_ci read (r41_remote_ci_read.py) to the round record, and complete the c-0093 lifecycle (DONE + completion_note) \u2014 the closures the landed tip still carries OPEN.",
-   "status": "OPEN",
+   "status": "DONE",
    "session_id": "builder-r75s2",
    "role": "EXECUTOR",
    "kind": "task",
@@ -2185,7 +2185,9 @@
     "eval/work_claims.json"
    ],
    "no_probes_note": "zero LLM probes; zero quota consumption; the frontier re-probe window is CLOSED until 2026-11-19T16:25Z (Art. 3 typed refusal stands; the HF master token delivered this round is used ONLY for the custody restore digest-check, never for probes)",
-   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 tip 959a21662 == local HEAD (fast-forward); the round's DIRECTION (F78) was found already claimed AND landed by builder-r75s1 (c-0093, base f8b2e0bc4) between the owner's instruction and this fetch \u2014 so this claim is for the DISJOINT verification/closure lane (work_id r75-c0093-verify-close unused in claims[]; grep clean), never a duplicate of r75-freeze-guard-ci"
+   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 tip 959a21662 == local HEAD (fast-forward); the round's DIRECTION (F78) was found already claimed AND landed by builder-r75s1 (c-0093, base f8b2e0bc4) between the owner's instruction and this fetch \u2014 so this claim is for the DISJOINT verification/closure lane (work_id r75-c0093-verify-close unused in claims[]; grep clean), never a duplicate of r75-freeze-guard-ci",
+   "completed_at": "2026-11-18T15:00:26Z (sandbox clock)",
+   "completion_note": "DONE: verification complete \u2014 read receipts + byte checks + live fail-closed drill + independent remote_ci read (success, 14:54:39Z); the c-0093 lifecycle completion and the D2 apply landed via the EXECUTOR\u2019s own round-close 39d12577e (their bytes verbatim, kept in the rebase; this chain\u2019s duplicate closure parts dropped per Art. 29(e)), so the rebased work commit carries only the additive verification bytes (verifier_addendum + eval/r75_c0093_verification.json); the final apply commit quoting THIS chain\u2019s own push CI follows per the D2 round-closing procedure."
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
