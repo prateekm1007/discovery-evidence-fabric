@@ -2739,6 +2739,17 @@
     "Sequence: override gate -> fire probe -> register strongest serving id -> push+CI -> typed handoff. Auditor amends the prereg model pin + authors v10 (fresh, domain-disjoint, n>=30, confidential custody) -> re-freeze (CI-gated) -> sealed v10 one-shot with all four binds -> mean>=3.25 CI>3.0 -> score 6.",
     "c-0097 (reprovision4 custody-precheck) is a pre-window round; the fire-now directive supersedes the wait. The cron 537019 (16:40Z) becomes a backstop, not the primary trigger."
    ]
+  },
+  {
+   "id": "AM71",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R80 auditor: holdout v10 authored + sealed (confidential custody) under AM70 fire-now",
+   "changes": [
+    "HOLDOUT v10 AUTHORED + SEALED: 30 fresh domain-disjoint problems (15 intervention + 15 predictor), seal 102a33bb7dc563a3, power pre-registered n=30. Problems public on audit branch; rubric in PRIVATE repo def-rubric-custody (unauth 404). Model pin agnes-3.0-flash (current registered), amended by auditor after the fire-now probe registration.",
+    "v10 tests the engine route with ALL FOUR binds active (F75 + chemistry elicitation + formula-direction + element-conservation). Design targets the v9 defect classes: chemistry monoculture-break (HO10-01/04/09/11), direction traps (HO10-06/08/12/13), pricing pos/neg controls, 15 input traps.",
+    "Builder: fire the probe NOW (AM70/R-FIRE-NOW override), register strongest serving id, hand off; auditor amends model pin; run sealed v10 one-shot; auditor scores (mean>=3.25 CI>3.0 -> score 6)."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3828,6 +3839,14 @@
    "gate": "NOT_MET (score 5); fire-now authorized",
    "capability_change": "owner override of window wait; probe fires now; v10 next",
    "evidence_sha": "eval/r80_auditor_verification.json"
+  },
+  {
+   "id": "V72",
+   "round": "R80 v10 authoring + fire-now",
+   "commit": "48bf88362",
+   "gate": "NOT_MET (score 5); v10 sealed, one-shot pending fire-now probe",
+   "capability_change": "v10 authored + sealed (confidential); fire-now authorized; all four binds ready",
+   "evidence_sha": "audit/holdout_v10/PREREGISTRATION.json"
   }
  ],
  "gold_set": {
@@ -4044,6 +4063,19 @@
    "burned_at": "2026-11-18",
    "score_mean": 3.0,
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
+  },
+  "holdout_v10": {
+   "status": "SEALED_REGISTERED",
+   "selection_sha256": "102a33bb7dc563a3c2929050875800226d0094d2e0b015bad253c55e3ee17561",
+   "n": 30,
+   "intervention": 15,
+   "predictor": 15,
+   "author": "auditor (problems public + rubric PRIVATE repo)",
+   "custody": "rubric private repo def-rubric-custody/holdout_v10_rubric_PRIVATE.json (unauth 404); problems audit/holdout_v10/",
+   "power_basis": "n=30, SD 0.7, power ~0.85, Art.14 CI lower bound > 3.0",
+   "model_pin": "agnes-3.0-flash (amended after fire-now probe registration)",
+   "bar": "mean>=3.0 AND 0 allowed-measures AND 0 inverted AND 0 unavailable-input AND VALID; Art.14 CI>3.0",
+   "design": "chemistry monoculture-break + direction traps HO10-06/08/12/13 + pricing pos HO10-02/10 neg HO10-05/15 + 15 input traps"
   }
  },
  "progress_note": "SCORE 5/10. OWNER DIRECTIVE (AM70/R-FIRE-NOW): fire the frontier re-probe NOW, waive the 2026-11-19T16:25Z wait. Builder adds typed owner-override to the runbook timestamp gate (servability gates remain), fires probe, registers strongest SERVING id, hands off. Auditor amends prereg + authors v10; re-freeze; sealed v10 one-shot with all four binds -> mean>=3.25 CI>3.0 -> score 6. All four v9 defect classes bound. Goal 9/10.",
