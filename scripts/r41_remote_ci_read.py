@@ -51,21 +51,64 @@ def _token() -> str:
                        "be read, so no green may be claimed")
 
 
+_ETAG_CACHE = Path("/home/z/my-project/scripts/.ci_etag_cache.json")
+
+
+def _etag_load() -> dict:
+    try:
+        return json.loads(_ETAG_CACHE.read_text())
+    except Exception:
+        return {}
+
+
+def _etag_save(url: str, etag: str, block: dict) -> None:
+    try:
+        c = _etag_load()
+        c[url] = {"etag": etag, "block": block, "saved_at": _now()}
+        _ETAG_CACHE.write_text(json.dumps(c, indent=1))
+    except Exception:
+        pass  # the cache is an optimization, never evidence
+
+
 def read_check_runs(sha: str) -> dict:
-    """Read the check-runs for a pushed SHA. Returns the block; never
-    prints the token."""
+    """Read the check-runs for a pushed SHA. Conditional requests
+    (If-None-Match, auditor R61 direction 5): a 304 costs NO quota —
+    the cached block is returned typed as not_modified. The FIRST read
+    of a SHA is unconditional (no ETag yet) and stores the ETag. The
+    token is never printed."""
     tok = _token()
-    out = subprocess.run(
-        ["curl", "-s", "--max-time", "30",
-         f"https://api.github.com/repos/{OWNER_REPO}/commits/{sha}/"
-         f"check-runs",
-         "-H", f"Authorization: Bearer {tok}",
-         "-H", "Accept: application/vnd.github+json"],
-        capture_output=True, text=True, timeout=40)
+    url = (f"https://api.github.com/repos/{OWNER_REPO}/commits/{sha}/"
+           f"check-runs")
+    hdrfile = Path("/tmp") / f"ci_hdr_{sha}.txt"
+    cmd = ["curl", "-s", "--max-time", "30", "-w", "\n%{http_code}",
+           "-D", str(hdrfile), url,
+           "-H", f"Authorization: Bearer {tok}",
+           "-H", "Accept: application/vnd.github+json"]
+    cached = _etag_load().get(url)
+    if cached and cached.get("etag"):
+        cmd += ["-H", f"If-None-Match: {cached['etag']}"]
+    out = subprocess.run(cmd, capture_output=True, text=True, timeout=40)
     if out.returncode != 0:
         return {"read_error": f"curl exit {out.returncode}"}
+    body, _, code = out.stdout.rpartition("\n")
+    etag = ""
     try:
-        d = json.loads(out.stdout)
+        for h in hdrfile.read_text().splitlines():
+            if h.lower().startswith("etag:"):
+                etag = h.split(":", 1)[1].strip()
+                break
+    except Exception:
+        pass
+    if code.strip() == "304":
+        blk = dict(cached.get("block") or {})
+        if blk:
+            blk["not_modified"] = True
+            blk["read_at"] = _now()
+            return blk
+        return {"read_error": "304 without a cached block (cache "
+                              "cleared mid-poll; re-read unconditionally)"}
+    try:
+        d = json.loads(body)
     except json.JSONDecodeError:
         return {"read_error": "non-JSON response (rate limit or auth)"}
     if d.get("message") and "check_runs" not in d:
@@ -78,7 +121,10 @@ def read_check_runs(sha: str) -> dict:
         return {"read_error": "no check-runs recorded for the SHA "
                               "(CI may not have triggered — a push "
                               "without a check-run is NOT green)"}
-    return {"pushed_sha": sha, "check_runs": runs, "read_at": _now()}
+    block = {"pushed_sha": sha, "check_runs": runs, "read_at": _now()}
+    if etag:
+        _etag_save(url, etag, block)
+    return block
 
 
 def conclude(block: dict) -> int:
@@ -119,9 +165,21 @@ def main() -> int:
     ap.add_argument("--sha", required=True)
     ap.add_argument("--apply", help="round-record JSON path; the "
                     "remote_ci block is written into it")
+    ap.add_argument("--wait", type=int, default=0,
+                    help="poll ONCE per push until terminal (auditor "
+                    "R61 direction 5): re-polls use If-None-Match so "
+                    "a 304 costs no quota; exit 0 green, 1 red, 2 "
+                    "unreadable, 3 still pending at the wait budget")
     a = ap.parse_args()
-    block = read_check_runs(a.sha)
-    rc = conclude(block)
+    import time
+    deadline = time.time() + max(0, a.wait)
+    while True:
+        block = read_check_runs(a.sha)
+        rc = conclude(block)
+        terminal = rc in (0, 1, 2)
+        if terminal or time.time() >= deadline:
+            break
+        time.sleep(45)
     if a.apply and "read_error" not in block:
         rec = json.loads(Path(a.apply).read_text(encoding="utf-8"))
         rec["remote_ci"] = block
