@@ -1,0 +1,109 @@
+{
+ "record": "R64S4_KEY_ROTATION_CUSTODY/1.0.0",
+ "session": "builder-r64s4 (continuation)",
+ "date": "2026-11-18",
+ "values": false,
+ "steps": {
+  "digests": {
+   "candidate_a_digest12": "d0c666a3842f",
+   "candidate_b_digest12": "5c4dffd28fe4",
+   "current_stored_digest12": "d0c666a3842f",
+   "r59_original_digest12": "d0c666a3842f"
+  },
+  "identification": {
+   "original": "A",
+   "original_digest12": "d0c666a3842f",
+   "new": "B",
+   "new_digest12": "5c4dffd28fe4",
+   "matches_r59_original_record": true
+  },
+  "agnes_probes": {
+   "candidate_a": {
+    "http": 200,
+    "models": 10,
+    "digest12": "d0c666a3842f"
+   },
+   "candidate_b": {
+    "http": 200,
+    "models": 10,
+    "digest12": "5c4dffd28fe4"
+   }
+  },
+  "envkeys_update": {
+   "added": "AGNES_API_KEY_2",
+   "new_digest12": "5c4dffd28fe4",
+   "perms": "600",
+   "original_line_untouched": true
+  },
+  "hf_token": {
+   "digest12": "33bc7af22c62",
+   "matches_recorded_master_digest_33bc7af22c62": true,
+   "login": "prateekm1",
+   "token_role": "fineGrained"
+  },
+  "vault_repo": {
+   "private": true,
+   "sha12": "23220f76c172"
+  },
+  "vault_restore_verification": {
+   "AGNES_API_KEY": {
+    "digest12": "d0c666a3842f",
+    "stored_digest_field_matches": true,
+    "matches_local_envkeys_value": true
+   },
+   "AGNES_BASE_URL": {
+    "digest12": "e592ff32df1f",
+    "stored_digest_field_matches": true,
+    "matches_local_envkeys_value": false
+   },
+   "GH_PAT": {
+    "digest12": "f1ebca5f9b62",
+    "stored_digest_field_matches": true,
+    "matches_local_envkeys_value": true
+   },
+   "GITHUB_TOKEN": {
+    "digest12": "f1ebca5f9b62",
+    "stored_digest_field_matches": true,
+    "matches_local_envkeys_value": false
+   },
+   "XKIRO_API_KEY": {
+    "digest12": "f6c09bee9bde",
+    "stored_digest_field_matches": true,
+    "matches_local_envkeys_value": true
+   },
+   "AGNES_API_KEY_2": {
+    "digest12": "df7e70e50215",
+    "stored_digest_field_matches": false,
+    "matches_local_envkeys_value": false
+   }
+  },
+  "remediation_disclosure": {
+   "typed": "PRE_EXISTING_ENTRY_MISMATCH_OWNED_KEY",
+   "note": "a prior invocation of THIS script (variable-shadowing bug: the candidate label 'B' was used instead of the key bytes) wrote b64('B') under AGNES_API_KEY_2 with the real key's digest in the digest field; that entry is script-OWNED and is rewritten and digest-verified in the extension step below (Art. 5 disclosure; the buggy commit remains in the vault history)",
+   "observed_pre_state": {
+    "digest12": "df7e70e50215",
+    "stored_digest_field_matches": false,
+    "matches_local_envkeys_value": false
+   }
+  },
+  "vault_extension": {
+   "added": "AGNES_API_KEY_2",
+   "new_digest12": "5c4dffd28fe4",
+   "digest_field": "sha256_12",
+   "uploaded_this_run": true,
+   "post_upload_digest_ok": true,
+   "stored_digest_field_matches": true,
+   "matches_local_envkeys_value": true,
+   "pre_existing_entries_byte_unchanged": true,
+   "vault_keys": [
+    "AGNES_API_KEY",
+    "AGNES_API_KEY_2",
+    "AGNES_BASE_URL",
+    "GH_PAT",
+    "GITHUB_TOKEN",
+    "XKIRO_API_KEY"
+   ]
+  }
+ },
+ "verdict": "CUSTODY_EXTENDED"
+}
