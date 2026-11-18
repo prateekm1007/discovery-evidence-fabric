@@ -1,0 +1,46 @@
+{
+ "record": "R77_CHEMISTRY_CONSERVATION_STATUS/1.0.0",
+ "session": "builder-r77s1",
+ "claim": "c-0096",
+ "work_id": "r77-chemistry-conservation-bind",
+ "base_sha": "d05904dbf546",
+ "rebase_note": "CLAIM-ID COLLISION (R72 precedent): a parallel instance of this lineage staked c-0095 for the DISJOINT work_id r77-vault-restore-custody from the same base d05904dbf and landed first (pusher-wins, 27fd50949..f91cc55c8); this lane re-keyed to c-0096 and rebased \u2014 their bytes byte-untouched; both new bind-test suites now share the enforcement block.",
+ "round_type": "CAPABILITY (engine)",
+ "finding_target": "the HO9-05 key-defect class from the v9 auditor score (eval/holdout_v9_auditor_score.json key_defects: 'thermally oxidize the absorbed oxygen species into volatile CO2' in an ammonia-synthesis answer whose system contains NO carbon) \u2014 the one un-bound defect class left after the F75/chemistry/formula binds (refusal-shape, identity-leak, thrash, formula direction are already bound and the HO9-14 type-gate false-pass is closed by effective_critic_verdict).",
+ "changes": {
+  "engine": "scripts/r70_stated_formula_scan.py (+233 lines): the STATED_REACTION_ELEMENT_PHANTOM leg \u2014 answer-wide element provenance: an element inside a stated formation product (strict formula token after an arrow, a chemistry-verb+into/to anchor, or a formation verb) is a PHANTOM iff it never appears in any source context (any other strict formula token or element word) in the whole answer. Zero-LLM, deterministic; merged into scan_stated_formula_direction so the FROZEN machine call site (r40_machine_v77.py:490, both question types in the vio path) gains the leg UNTOUCHED \u2014 zero frozen files moved (15/15 freeze baselines still match).",
+  "conservatism": "typed skips, never false kills: word-form products escape (typed limitation); ion notation (Ca2+/Na+/OH-) skipped; process nouns (formation/generation/production/creation) are not relations; formulations are not relations; temperatures masked (450\u00b0C is never carbon); stoichiometric coefficients split (2O2 tokenizes as O2); letter-subscript LaTeX variables masked (C_{O} coverage is not carbon); NOx/SOx/VOC-class abbreviations stoplisted; unparseable products stay silent. Every rule earned by a real false-positive/negative caught in the ablation loop and pinned as a control.",
+  "wiring": ".github/workflows/r11_queue_surface.yml: tests/test_r70_f75_binds.py joins the v3.1.0 enforcement block alongside the first-lander's tests/test_r77_vault_restore.py \u2014 the bind suite (and the new conservation tests) gate every queue push (the F78 pattern; the bind file was test-only before, another latent exists-but-does-not-gate instance closed while wiring the new leg).",
+  "tests": "tests/test_r70_f75_binds.py (+84): fixture fire (HO9-05 exactly once, element C), the 30-row sweep (exactly one fire), 9 silent controls (balanced reactions, sourced variants, word-form products, ion lists, letter-subscript variables, formulations), 2 fire controls (carbon-free CO2 claim, unsourced SO2), and the merged-call-site assertion."
+ },
+ "acceptance_evidence": {
+  "fixture": "HO9-05 fires exactly once: STATED_REACTION_ELEMENT_PHANTOM 'formation product CO2 uses element(s) C with no source species anywhere in the answer' \u2014 the auditor's own cited bytes (the R40 fire-test discipline: fix against the auditor's fixtures, no v10 data exists to overfit)",
+  "sweep": "30 committed v9 rows: exactly ONE fire (HO9-05), 29 silent \u2014 zero noise added to the scored corpus",
+  "controls": "11 silent + 2 fire synthetic controls green",
+  "r71_recompute": "scripts/r71_bind_recompute.py 7/7 MATCH \u2014 the R71 auditor verification table is intact (HO9-14/13/02/25/30/04/22 key sets unchanged)",
+  "regression_byte_identity": "eval/r52_labelled_regression.json sha256[:16] 81597158d1ac0093 BEFORE == AFTER the engine change (r52_labelled_regression.py rerun exit 0; git status clean) \u2014 the CI byte-identity leg holds without a re-land",
+  "rendered_block": "the enforcement pytest chain extracted from the committed YAML and executed locally as bash (the R42 rendered procedure): exit 0, 1 skip \u2014 re-run green with BOTH new test files in the chain after the rebase",
+  "freeze_baselines": "15/15 sha16 match the tip bytes \u2014 zero frozen files touched, no re-freeze act needed"
+ },
+ "art27_capability_budget": {
+  "engine_lines": 233,
+  "test_lines": 84,
+  "workflow_lines": 1,
+  "engine_share": "73% (>=30% rule: CAPABILITY round)",
+  "capability_claim": "NO score number claimed \u2014 the measured delta arrives with the v10 sealed one-shot; this round binds a defect class the auditor cited, with the labelled regression (PASS 0/0/0 bytes unchanged) proving zero false-kill on the labelled corpus"
+ },
+ "frontier_window": {
+  "gate": "2026-11-19T16:25Z (xkiro maintenance exit)",
+  "now_utc": "2026-11-18T15:55Z (sandbox clock)",
+  "state": "CLOSED (~24.5h remain) \u2014 Art. 3 typed refusal stands: ZERO probes, zero quota consumed this round; the runbook pre-gate (scripts/r70_frontier_reprobe_runbook.py) fires typed until the window opens; the delivered HF master token was used ONLY for the custody digest-check (33bc7af22c62 match, keyfile 0600 gitignored)"
+ },
+ "custody": {
+  "hf_token_digest": "33bc7af22c62",
+  "gh_pat_digest": "f1ebca5f9b62",
+  "match": "both digest-match the committed custody records (carried over the R75 restore; keyfile 0600 gitignored; values never printed or committed)"
+ },
+ "disclosures": [
+  "the c-0054 pre-commit JSON guard REFUSED the first commit attempt of this record (a python-style parenthesized string broke the JSON during a text edit); repaired via a json-aware regeneration \u2014 the refused bytes never reached git (the guard's live refusal path, working as designed)."
+ ],
+ "score_note": "score stays 5 (the auditor's call); the sole lever to 6 remains the frontier model + the fresh sealed v10 with binds active (mean >=3.25, CI >3.0, Art. 14) after the window opens 2026-11-19T16:25Z \u2014 this round adds the conservation bind to that surface at zero governance cost"
+}

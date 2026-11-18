@@ -168,3 +168,87 @@ def test_winner_rule_still_picks_chemistry_first_when_admitted():
     first_non_sched = next(p for p in plans
                            if p["measure_class"] != "duty_cycle")
     assert first_non_sched["measure_class"] == "chemistry"
+
+
+# ---- 5. stated-reaction element conservation (R77, the HO9-05 class) ----
+from r70_stated_formula_scan import (  # noqa: E402
+    CONSERV_KEY, scan_reaction_conservation)
+
+
+def test_ho9_05_phantom_carbon_fires():
+    """The auditor-cited v9 defect: CO2 formed from a carbon-free
+    H/N/O/Fe ammonia-synthesis system. The committed row must fire
+    exactly once, naming C."""
+    rows = list((REPO / "eval/holdout_v9_generation/rows")
+                .glob("HO9-05-*.json"))
+    if not rows:
+        pytest.skip("v9 rows not in this tree")
+    ans = json.loads(rows[0].read_text(encoding="utf-8"))["a1_answer"]
+    f = scan_reaction_conservation(ans)
+    assert len(f.get(CONSERV_KEY, [])) == 1
+    msg = f[CONSERV_KEY][0]
+    assert "element(s) C" in msg and "CO2" in msg
+
+
+def test_v9_rows_exactly_one_conservation_fire():
+    """The sweep: HO9-05 fires, the other 29 committed rows stay
+    silent — the leg adds no noise to the scored corpus."""
+    rows = sorted((REPO / "eval/holdout_v9_generation/rows")
+                  .glob("HO9-*.json"))
+    if not rows:
+        pytest.skip("v9 rows not in this tree")
+    fired = []
+    for p in rows:
+        ans = json.loads(p.read_text(encoding="utf-8"))["a1_answer"]
+        if scan_reaction_conservation(ans).get(CONSERV_KEY):
+            fired.append(p.name.split("-")[0] + "-" + p.name.split("-")[1])
+    assert fired == ["HO9-05"], fired
+
+
+def test_balanced_and_sourced_reactions_stay_silent():
+    silent = [
+        # reactants name every product element
+        "The loop runs N2 + 3H2 -> 2NH3 over the promoted Fe catalyst.",
+        "Calcination drives CaCO3 -> CaO + CO2 in the preheater vessel.",
+        "Complete combustion: CH4 + 2O2 -> CO2 + 2H2O, flue to stack.",
+        "Steam reforming CH4 + H2O -> CO + 3H2 runs at 850 C over Ni.",
+        # the removed species is the process's own (sourced) species
+        "The amine absorbs CO2 from the flue slipstream; regeneration "
+        "releases the CO2 for compression.",
+        # word-form / unparseable products (typed limitation)
+        "The oxygen species are thermally reduced, forming water on "
+        "the catalyst sites.",
+        # ion lists after a process noun are not products
+        "Scale formation is slowed by lowering the ionic activity "
+        "product of the cations (Na+, Ca2+) at the wall.",
+        # letter-subscripted variables are not species
+        "Removal follows $r_{rem} = A \\exp(-Ea/RT) C_{O}$ kinetics.",
+        # a named carbon source rescues the claim
+        "Burning the carbon deposits, the oxygen species are oxidized "
+        "into CO2 that leaves with the purge.",
+    ]
+    for s in silent:
+        assert not scan_reaction_conservation(s), s[:60]
+
+
+def test_unsourced_formation_fires():
+    fire = ("This utilizes the exothermic heat to thermally oxidize "
+            "the absorbed oxygen species into volatile "
+            "$\\text{CO}_2$ before it poisons the iron sites.")
+    f = scan_reaction_conservation(fire)
+    assert CONSERV_KEY in f and "element(s) C" in f[CONSERV_KEY][0]
+    fire_s = ("A side reaction forms SO2 in the absorber off-gas, "
+              "raising the stack opacity index.")
+    f2 = scan_reaction_conservation(fire_s)
+    assert CONSERV_KEY in f2 and "element(s) O,S" in f2[CONSERV_KEY][0]
+
+
+def test_conservation_joins_the_merged_formula_scan():
+    """The machine's frozen call site imports only
+    scan_stated_formula_direction — the conservation leg must ride
+    inside its output (both question types share that call)."""
+    ans = ("The exothermic heat thermally oxidizes the absorbed "
+           "oxygen species into volatile $\\text{CO}_2$ on the iron "
+           "sites before poisoning.")
+    f = scan_stated_formula_direction(ans)
+    assert CONSERV_KEY in f
