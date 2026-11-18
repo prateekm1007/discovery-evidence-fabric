@@ -18,9 +18,18 @@ The xkiro flagship namespace exits upstream 503 maintenance at
 cohere/command-a-plus is EXCLUDED outright (falsified c8cc5deb2).
 Registration, the auditor's prereg amendment and the re-freeze remain
 the gated chain AFTER the probe evidence lands (AM62 is the template).
+
+AM70 / R-FIRE-NOW (owner directive 2026-11-18, audit 2a6d748f6): the
+WINDOW_OPENS timestamp pre-gate is WAIVED by owner authority when env
+OWNER_FIRE_NOW=1 is set. The override bypasses ONLY the timestamp
+check; the servability gates (full 19K-char contract-fit probe,
+max_tokens 8192, the deliverable-class admission scan) remain
+MANDATORY, and the exclusion list is untouched. The override state is
+typed to stdout and recorded in the candidates record.
 """
 import datetime
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -87,7 +96,16 @@ def _raw(key, model):
 
 def main() -> int:
     now = datetime.datetime.now(datetime.UTC)
-    if now < WINDOW_OPENS:
+    owner_override = os.environ.get("OWNER_FIRE_NOW", "") == "1"
+    window_state = ("OVERRIDDEN_BY_OWNER (AM70/R-FIRE-NOW, fired "
+                    f"{now.strftime('%Y-%m-%dT%H:%M:%SZ')} pre-window; "
+                    "the timestamp gate alone is waived \u2014 the "
+                    "servability gates held mandatory)"
+                    if (owner_override and now < WINDOW_OPENS) else
+                    "OPEN (post-window 2026-11-19T16:25Z)" if
+                    now >= WINDOW_OPENS else
+                    "CLOSED (refused, zero probes)")
+    if now < WINDOW_OPENS and not owner_override:
         wait = WINDOW_OPENS - now
         print(f"WINDOW REFUSED (typed, Art. 3): the xkiro flagship "
               f"namespace is still in upstream 503 maintenance; the "
@@ -95,6 +113,15 @@ def main() -> int:
               f"({wait.days}d {wait.seconds//3600}h "
               f"{(wait.seconds//60)%60}m from now). Zero probes fired.")
         return 3
+    if owner_override and now < WINDOW_OPENS:
+        print("OWNER OVERRIDE ACTIVE (typed, AM70/R-FIRE-NOW, owner "
+              "directive 2026-11-18 @ audit 2a6d748f6): the "
+              "WINDOW_OPENS=2026-11-19T16:25Z timestamp pre-gate is "
+              "WAIVED by owner authority. ONLY the timestamp check is "
+              "bypassed; the servability gates (full 19K-char "
+              "contract-fit probe, max_tokens 8192, deliverable-class "
+              "admission scan) remain MANDATORY; command-a-plus stays "
+              "excluded.", flush=True)
     key = resolve_vault_key("XKIRO_API_KEY")
     req = urllib.request.Request(
         BASE.rstrip("/") + "/models",
@@ -127,8 +154,9 @@ def main() -> int:
             print(f"    -> {type(e).__name__}", flush=True)
     record = {
         "record": "R70_FRONTIER_REPROBE_CANDIDATES/1.0.0",
-        "session": "builder-r64s4 (continuation)",
+        "session": "builder-r81s1 (AM70 owner fire-now round)",
         "window": "2026-11-19T16:25Z (maintenance exit)",
+        "window_state": window_state,
         "excluded": sorted(EXCLUDED),
         "full_contract": "contract_for_v72('intervention-proposal') + "
                          f"max_tokens={PROBE_MT} (the 19K-char class)",
