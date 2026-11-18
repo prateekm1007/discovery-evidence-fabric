@@ -2144,7 +2144,7 @@
    "claimed_at": "2026-11-18T14:41:00Z (sandbox clock)",
    "work_id": "r75-freeze-guard-ci",
    "title": "F78 fix: wire the freeze-baseline guard (tests/test_r64_v9_preflight.py) into the queue-push CI surface (.github/workflows/r11_queue_surface.yml) so frozen-file drift reds the push (F32 class recurring: exists-but-does-not-gate) + map-completeness citation (Art. 22 entry cites the guard) + red-on-deliberate-drift demonstration + the round record",
-   "status": "OPEN",
+   "status": "DONE",
    "registered_at": "2026-11-18T14:41:00Z (sandbox clock)",
    "session_id": "builder-r75s1",
    "role": "EXECUTOR",
@@ -2158,7 +2158,8 @@
     "eval/r75_freeze_guard_ci_status.json"
    ],
    "no_probes_note": "zero LLM probes; zero quota consumption; deterministic zero-LLM tooling only (pytest + git + the workflow edit)",
-   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == f8b2e0bc4 == local HEAD (fast-forward base); no competing OPEN claim for work_id r75-freeze-guard-ci; prior work_id unused (grep over claims[])"
+   "collision_check": "diff-against-remote at claim time: origin/queue/dev12_r7 == f8b2e0bc4 == local HEAD (fast-forward base); no competing OPEN claim for work_id r75-freeze-guard-ci; prior work_id unused (grep over claims[])",
+   "completion_note": "typed completion (pushed): F78 fix landed as 959a21662 on f8b2e0bc4+claim 33f9b7857, fast-forward push 33f9b7857..959a21662; remote surface CI completed success on 959a21662 (authenticated check-runs read, D2 convention) \u2014 the passing workflow includes tests/test_r64_v9_preflight.py in its pytest chain, so the freeze guard is verified gating from the remote's own execution. Acceptance demonstrated fail-closed pre-push: deliberate one-byte drift on frozen scripts/r22_a1w_v5_repair.py reds the guard (exit 1, two tests FAIL with the exact sha16 diff), byte-exact revert restores 7/7 green. Art. 22 map entry cites the guard; map-completeness + Art.29 + guard suites green locally (20/20). Frontier window CLOSED at round time (gate 2026-11-19T16:25Z) \u2014 runbook pre-gate re-verified firing typed with zero probes; the re-probe + v10 sealed one-shot remain the next-round path (score 6 = mean>=3.25, CI>3.0, Art. 14)."
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
