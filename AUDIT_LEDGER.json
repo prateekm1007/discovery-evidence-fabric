@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "48bf88362",
+  "queue/dev12_r7": "17eef70bb",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1592,6 +1592,19 @@
     2,
     27
    ]
+  },
+  {
+   "id": "F80",
+   "severity": "MEDIUM",
+   "title": "On-row physics computation gap (external-assessor core valid point, auditor-confirmed): candidate_schema.py captures measure_class/signals_used/principle_id/mechanism_class enums but NO stated-magnitude/assumption/numeric_claim fields. physics_checks runs on REFERENCE_SCENARIOS, not the generated answer's own numbers; engine_route does not extract on-row magnitudes. So the P1 gate (108/108) measures registry coverage + reference-scenario runs, NOT the answer's own computed physics. The generated answers' own assumptions/magnitudes remain unchecked. FIX: extend the schema with typed numeric_claim fields (value+units+assumption), feed them to physics_checks for on-row computation + sign-check; P1 then measures actual output physics.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "17eef70bb",
+   "rounds_open": 1,
+   "articles": [
+    19,
+    27
+   ]
   }
  ],
  "amendments": [
@@ -2750,6 +2763,18 @@
     "v10 tests the engine route with ALL FOUR binds active (F75 + chemistry elicitation + formula-direction + element-conservation). Design targets the v9 defect classes: chemistry monoculture-break (HO10-01/04/09/11), direction traps (HO10-06/08/12/13), pricing pos/neg controls, 15 input traps.",
     "Builder: fire the probe NOW (AM70/R-FIRE-NOW override), register strongest serving id, hand off; auditor amends model pin; run sealed v10 one-shot; auditor scores (mean>=3.25 CI>3.0 -> score 6)."
    ]
+  },
+  {
+   "id": "AM72",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R82 auditor reconciliation of external progress estimate (~5/10) against verified bytes",
+   "changes": [
+    "External estimate score 5 MATCHES verified score 5. STALE reasons corrected from bytes: (a) v9 HAS run — 30/30 VALID, mean 3.000, CI [2.751,3.249], UNRESOLVED (not 'hasn't run'); (b) P1 is 108/108=1.0 (R62 registry expansion to 12 relations + 19 router classes fixed the 0.4167/21-unrouted gap); (c) cited CI commits b40bfd6cd/1c9037d29/e9022acd7 are R61-era — current tip 17eef70bb; (d) recent engine-line share 73% (R77), not 33%; (e) repair-loop '0 of 36 zero findings' is the v8.1 census — v9 committed lane-B was 29 CLEAN/1 FLAG.",
+    "VALID remaining points: no sealed holdout ACCEPTED (v9 UNRESOLVED, v10 sealed pending fire-now probe); outputs not yet novel/viable real-world (P4/P5); AND F80 — the generated answers' own numbers are not computed on-row (schema lacks magnitude fields; physics runs on reference scenarios). F80 OPENED.",
+    "Fastest path to 6 (reconciled): (1) fire-now probe (c-0098 staked) -> register strongest serving id -> auditor amends v10 model pin -> sealed v10 one-shot (all four binds) -> mean>=3.25 CI>3.0 -> score 6; (2) F80 on-row computation (schema numeric_claim fields -> physics_checks) makes the physics gate measure actual outputs, strengthening 5->6 and beyond.",
+    "v10 already authored+sealed (AM71, seal 102a33bb, rubric private custody). Builder c-0098 (fire-now reprobe) staked at 17eef70bb."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3847,6 +3872,17 @@
    "gate": "NOT_MET (score 5); v10 sealed, one-shot pending fire-now probe",
    "capability_change": "v10 authored + sealed (confidential); fire-now authorized; all four binds ready",
    "evidence_sha": "audit/holdout_v10/PREREGISTRATION.json"
+  },
+  {
+   "id": "V73",
+   "round": "R82 external-estimate reconciliation",
+   "commit": "17eef70bb",
+   "gate": "NOT_MET (score 5; v10 pending fire-now probe)",
+   "capability_change": "reconciliation; F80 on-row computation gap opened",
+   "new_findings": [
+    "F80"
+   ],
+   "evidence_sha": "eval/r82_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4078,7 +4114,7 @@
    "design": "chemistry monoculture-break + direction traps HO10-06/08/12/13 + pricing pos HO10-02/10 neg HO10-05/15 + 15 input traps"
   }
  },
- "progress_note": "SCORE 5/10. OWNER DIRECTIVE (AM70/R-FIRE-NOW): fire the frontier re-probe NOW, waive the 2026-11-19T16:25Z wait. Builder adds typed owner-override to the runbook timestamp gate (servability gates remain), fires probe, registers strongest SERVING id, hands off. Auditor amends prereg + authors v10; re-freeze; sealed v10 one-shot with all four binds -> mean>=3.25 CI>3.0 -> score 6. All four v9 defect classes bound. Goal 9/10.",
+ "progress_note": "SCORE 5/10 (external estimate reconciled — matches). v9 ran 3.000 UNRESOLVED; P1 108/108; router widened; all four v9 defect binds landed. F80 OPEN: generated answers' own numbers not computed on-row (schema lacks magnitude fields; physics on reference scenarios). v10 sealed (102a33bb). Path to 6: fire-now probe (c-0098) -> register -> v10 one-shot (all binds) -> mean>=3.25 CI>3.0; plus F80 on-row computation. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
