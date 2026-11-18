@@ -1479,6 +1479,19 @@
     3,
     27
    ]
+  },
+  {
+   "id": "F72",
+   "severity": "INFO",
+   "title": "R65 session-log re-delivery: coder message describes previous session work (c-0084 verifier, recovery monitor, cron jobs, 429 probing). VERIFIED: c-0084 DONE at 4b813d540 (verifier record eval/r61_verifier_c0083.json present, 24 lines, verdict=C0083_VERIFIED). Recovery monitor/cron jobs are session-local infrastructure (not in repo, not required — the 429 outage is environmental, Art. 15 typed infra failure; the lease discipline is correct). Current state: queue tip dade20f9c (R63 complete), audit tip 152c16896 (R64 complete). Frontier: P2 v9 sealed acceptance. Only open claim: c-0079 (challenger ablation, lease 2026-11-19T00:00:00Z). Next: wait for 429 window OR lease expiry, then resume/challenge c-0079, adoption verdict, claim c-0082, run v9 one-shot, auditor scoring.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "dade20f9c",
+   "rounds_open": 1,
+   "articles": [
+    15,
+    29
+   ]
   }
  ],
  "amendments": [
@@ -2475,6 +2488,18 @@
     "c-0079 challenger lease (~19.5h left at R63 open) stays with lease-holder (Art. 29(d): takeover lawful only after expiry + dead lease). Finding 1's live half (LLM-connected validation) deferred to new claim behind adoption verdict (per Finding 2 sequencing). Value metric offline is violation-load, not rubric-based; rubric question re-opens on real run evidence.",
     "Untouched lanes: c-0079 lease-holder's, adoption verdict → c-0082 → frozen v9 one-shot → auditor scoring. Goal 9/10; capability, not governance."
    ]
+  },
+  {
+   "id": "AM59",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R65 session-log re-delivery audit: coder message describes previous session (c-0084 verifier, recovery monitor, cron, 429 probing)",
+   "changes": [
+    "SESSION-LOG VERIFIED: coder message is a re-delivery of previous session work. c-0084 verifier record VERIFIED at 4b813d540 (eval/r61_verifier_c0083.json, verdict=C0083_VERIFIED, F68/F69 gates reproduced, P1 recompute 108/45/0.4167 byte-identical, tip CI green). Recovery monitor/cron jobs are session-local infrastructure (not in repo, not required for capability — Art. 15 typed infra failure for 429 outage; lease discipline correct).",
+    "CURRENT STATE: queue tip dade20f9c (R63 complete, v10 prototype landed green), audit tip 152c16896 (R64 AM58 complete, v10 verified). Only open claim: c-0079 (challenger ablation, lease 2026-11-19T00:00:00Z). V9 one-shot script exists (scripts/r60_v9_one_shot.py). Rubric in private repo (CORR-3 custody solved).",
+    "FRONTIER UNCHANGED: P2 v9 sealed acceptance. Blockers: (a) 429 transport outage (environmental, Art. 15); (b) c-0079 lease (expires 2026-11-19T00:00:00Z, Art. 29(d) takeover lawful only after expiry+dead lease); (c) adoption verdict sequencing (Finding 2: ADOPT/DELETE on plan layer precedes c-0082 claim).",
+    "SCORE STAYS 6: P1 gate passed (108/108=1.0 on full corpus). Next point: sealed acceptance at mean>=3.0, 0/0/0, CI>3.0 (Art. 14 power-pre-registered n=30). Goal 9/10; capability, not governance."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3432,6 +3457,17 @@
     "F71"
    ],
    "evidence_sha": "eval/r64_auditor_verification.json"
+  },
+  {
+   "id": "V58",
+   "round": "R65 session-log re-delivery",
+   "commit": "dade20f9c",
+   "gate": "P1 PASSED (score 6); acceptance NOT_MET (v9 one-shot pending)",
+   "capability_change": "session-log verified; frontier unchanged",
+   "new_findings": [
+    "F72"
+   ],
+   "evidence_sha": "eval/r65_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3647,7 +3683,7 @@
    "design": "chemistry/barrier monoculture-break + direction traps HO9-04/06 + pricing pos HO9-02/09 neg HO9-12/13 + 15 input traps"
   }
  },
- "progress_note": "SCORE 6/10 (P1 gate passed on full corpus at R63). R63 v10 repair-loop prototype VERIFIED: evidence base confirmed (V8.1 census 9/9 repairs=3, 6/9 FLAG), mechanism verified (4 controls: BYTE-KEEP, STUCK_AXIS, NO_MARGINAL_VALUE, budget=3), byte-reuse verified (identity check), 9/9 tests present, CI green. Plan-layer work (zero engine lines, zero z-ai probes). Score stays 6; v10 lane ready for LLM-connected validation when 429 window clears. Frontier: P2 v9 sealed acceptance (429 window + c-0079 lease + adoption verdict + c-0082 claim + auditor scoring). Goal 9/10.",
+ "progress_note": "SCORE 6/10 (P1 gate passed on full corpus at R63). R65 session-log re-delivery VERIFIED: c-0084 verifier record present (C0083_VERIFIED); recovery monitor/cron are session-local (not in repo, not required). Current state: R63/R64 complete. Frontier: P2 v9 sealed acceptance. Blockers: 429 outage (Art. 15) + c-0079 lease (2026-11-19T00:00:00Z) + adoption verdict sequencing. Next: wait for 429 window OR lease expiry, then resume/challenge c-0079, adoption verdict, claim c-0082, run v9 one-shot, auditor scoring (mean>=3.0, 0/0/0, CI>3.0). Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
