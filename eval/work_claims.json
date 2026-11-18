@@ -225,6 +225,11 @@
    "registered_at": "2026-11-18T15:20:00Z (sandbox clock)",
    "role": "builder",
    "note": "R77 session (fresh-sandbox reprovision #3): custody bootstrap FIRST per Art. 17 v3.3.0 \u2014 owner-delivered HF token digest 33bc7af22c62 (login prateekm1, repo.write, inference.serverless.write) + GH_PAT f1ebca5f9b62; both digest-match the committed custody records; vault operator-keys-vault fetched read-only, 6/6 key digests self-consistent (XKIRO f6c09bee9bde present). Lane: durable-execution staging for the window-gated frontier round \u2014 commit the general vault-restore tool (the reprovision-recovery path died with prior sandboxes; Art. 18), live-drill it, schedule the one-shot cron that fires the frontier re-probe round at window open 2026-11-19T16:25Z."
+  },
+  "builder-r79s1": {
+   "registered_at": "2026-11-18T15:53:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R79 session (fresh-sandbox reprovision #4): custody bootstrap FIRST via the COMMITTED scripts/r77_vault_restore.py (the Art. 18 / R78-verdict direction-4 path \u2014 no hand-rolled recovery): owner-delivered HF master (sha256_12 33bc7af22c62) + GH_PAT (f1ebca5f9b62) both digest-match the committed custody records; vault restore exit 0, 6/6 keys decoded (4 COMMITTED_RECORD_MATCH + AGNES_API_KEY_2 5c4dffd28fe4 / AGNES_BASE_URL e592ff32df1f typed NEW_IN_RECORDS, same pair as the R77 drill), XKIRO_API_KEY f6c09bee9bde present. Lane: the PRE-WINDOW round \u2014 Art. 3 typed refusal (frontier window CLOSED until 2026-11-19T16:25Z; zero probes, zero quota), the reprovision-#4 custody record, window-round readiness (cron 537019 one-shot 2026-11-19T16:40Z verified armed, run_count 0)."
   }
  },
  "claims": [
@@ -2241,6 +2246,25 @@
    "collision_check": "CLAIM-ID COLLISION TYPED (the R72 precedent): this session and a parallel instance of the same lineage both staked c-0095 from the same base d05904dbf \u2014 theirs (work_id r77-vault-restore-custody, chain 27fd50949..f91cc55c8) landed FIRST (pusher-wins), so this second-lander RE-KEYS to c-0096 and rebases; the work itself is DISJOINT (conservation bind vs vault-restore tool; artifact_paths disjoint except the shared registry + workflow wiring) \u2014 their bytes stay byte-untouched; work_id r77-chemistry-conservation-bind unused in claims[] (grep clean); no competing OPEN claim for THIS lane",
    "completed_at": "2026-11-18T15:36:03Z (sandbox clock)",
    "completion_note": "DONE (rebased, re-keyed from the c-0095 claim-id collision): the conservation leg landed (scripts/r70_stated_formula_scan.py +233 engine lines; tests/test_r70_f75_binds.py +84; the bind suite wired into the queue CI enforcement block alongside the first-lander's test_r77_vault_restore.py). Ablation evidence complete: HO9-05 fires exactly once (element C, the auditor-cited bytes), 30-row sweep 1 fire / 29 silent, 11 silent + 2 fire controls, r71_bind_recompute 7/7 MATCH, eval/r52_labelled_regression.json byte-identical (81597158d1ac0093 before == after), rendered enforcement block green exit 0, freeze baselines 15/15 (zero frozen files). The final apply commit quoting THIS chain's own push CI follows per the D2 round-closing procedure."
+  },
+  {
+   "claim_id": "c-0097",
+   "claimed_at": "2026-11-18T15:53:00Z (sandbox clock)",
+   "registered_at": "2026-11-18T15:53:00Z (sandbox clock)",
+   "work_id": "r79-reprovision4-custody-precheck",
+   "title": "R79 pre-window round: reprovision #4 custody restored via the committed r77_vault_restore.py (the first real reprovision use of the Art. 18 class closure \u2014 no hand-rolled recovery), bootstrap digests verified (HF 33bc7af22c62 / GH f1ebca5f9b62), 6/6 vault keys decoded; frontier window CLOSED (gate 2026-11-19T16:25Z) \u2014 Art. 3 typed refusal, zero probes; window-round cron 537019 verified armed; round record with the typed Art. 27 custody/probe disclosure",
+   "status": "OPEN",
+   "session_id": "builder-r79s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "03d8e66c714f7",
+   "lease_expiry": "2026-11-19T16:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r79_reprovision_custody_status.json"
+   ],
+   "no_probes_note": "zero LLM probes; zero quota consumption; frontier window CLOSED until 2026-11-19T16:25Z (Art. 3 typed refusal; the re-probe fires via cron 537019 at 2026-11-19T16:40Z per the R78 verdict direction 1)",
+   "collision_check": "work_id r79-reprovision4-custody-precheck unused in claims[] (grep clean); c-0097 free (last claim c-0096); no competing OPEN claim at base 03d8e66c7 (tip is the R77 round close; the conservation lane 985c06243/03d8e66c7 is pending next-round audit \u2014 not this lane's bytes)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work \u2014 the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
