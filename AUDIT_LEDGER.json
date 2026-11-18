@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "ea6e62ef3",
+  "queue/dev12_r7": "f91cc55c8",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2702,6 +2702,18 @@
     "c-0093 (builder-r75s1) + c-0094 (builder-r75s2 verification) DONE; CI green at ea6e62ef3. Custody re-verified (GH_PAT f1ebca5f9b62, HF 33bc7af22c62 repo.write, vault operator-keys-vault 200). Frontier runbook pre-gate fires typed (window 2026-11-19T16:25Z, zero probes).",
     "Score stays 5. All governance gates wired; the sole remaining lever to 6 is capability: frontier model + fresh sealed v10 with binds active, mean>=3.25 CI>3.0 (Art.14). No further governance work needed — focus capability."
    ]
+  },
+  {
+   "id": "AM68",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R78 auditor audit of R77 (durable-execution staging: committed vault-restore tool + window-round cron)",
+   "changes": [
+    "R77 VERIFIED from pushed bytes (f91cc55c8, CI green on 27fd50949/28fd0b9d9/f91cc55c8): scripts/r77_vault_restore.py (198 lines) — one read-only vault GET, per-key sha256 digest cross-check vs the vault's own digest field (fail-closed: tampered vault never reaches .env.keys), digests-only output (key names + sha256_12, never values), typed exits. 7 zero-network tests wired into CI (incl. fail_closed_on_self_mismatch + gitignore_covers_env_keys). c-0095 DONE. R77 diff secret-grep: 0 (PAT/ghp_/hf_ absent).",
+    "Art.18 class closed: general committed vault-restore tool replaces hand-rolled session-local recovery that died with each sandbox reprovision. Live drill 6/6 digests verified (XKIRO available; AGNES_API_KEY_2/AGNES_BASE_URL typed NEW_IN_RECORDS).",
+    "Window round armed: one-shot cron 537019 @ 2026-11-19T16:40Z (15min post-gate) fires custody bootstrap -> claim-before-work -> runbook probe -> register strongest-serving id -> push+CI -> typed handoff (auditor amends prereg + authors v10; builder never re-freezes unilaterally — CI freeze guard reds unaccompanied drift). Cron is sandbox-scheduler state (unverifiable from remote bytes; the runbook gate is the authoritative enforcement). Bootstrap credentials transient/digest-verified/never-committed (secret-grep confirms).",
+    "Score stays 5 (0 engine lines, custody/infra class, Art.27 typed). Capability budget deferred to the window round. Frontier: probe -> register -> auditor prereg amend + v10 author -> re-freeze -> sealed v10 -> mean>=3.25 CI>3.0 shot at 6."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3767,6 +3779,14 @@
     "F78"
    ],
    "evidence_sha": "eval/r76_auditor_verification.json"
+  },
+  {
+   "id": "V69",
+   "round": "R78 audit of R77 durable-execution staging",
+   "commit": "f91cc55c8",
+   "gate": "NOT_MET (acceptance UNRESOLVED; score 5)",
+   "capability_change": "committed vault-restore tool (Art.18 class closed); window round armed; 0 engine lines (custody/infra)",
+   "evidence_sha": "eval/r78_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -3985,7 +4005,7 @@
    "acceptance": "NOT_GRANTED (UNRESOLVED, CI includes 3.0)"
   }
  },
- "progress_note": "SCORE 5/10. F78 CLOSED (freeze guard CI-gated, independently verified 15/15 baselines + fail-closed drift demo). Governance chain complete end-to-end every push (verdict grep + byte-identity + freeze guard). F74/F75/F77/F79 closed. v9 mean 3.000 UNRESOLVED. Sole lever to 6: frontier model + fresh sealed v10 (binds active) after 2026-11-19T16:25Z window; mean>=3.25 CI>3.0. Goal 9/10; capability now, governance done.",
+ "progress_note": "SCORE 5/10. R77 verified: committed vault-restore tool (fail-closed digest cross-check, digests-only, 7 CI tests) closes the Art.18 hand-rolled-recovery class; window round cron armed (2026-11-19T16:40Z). Governance complete (F74-F79 closed). v9 mean 3.000 UNRESOLVED. Frontier: window fires -> probe -> register -> auditor prereg amend + v10 -> re-freeze -> sealed v10 (binds active) -> mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
