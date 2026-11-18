@@ -1,0 +1,78 @@
+{
+ "record": "R85_V10_QUOTA_BLOCK/1.0.0",
+ "session": "builder-r85s1",
+ "claim": "c-0100",
+ "work_id": "holdout-v10-generation",
+ "typed_state": "INFRA_BLOCKED_XKIRO_FREE_QUOTA_DAY_WINDOW (Art. 15 typed infra skip \u2014 infrastructure failure is never scientific rejection; the one-shot integrity is intact: ZERO v10 rows generated, zero problem content consumed in any generation, the claim c-0100 stands OPEN with the frozen machine beb3e29c0)",
+ "failure": {
+  "class": "xkiro free-model token quota, day window, exhausted",
+  "evidence_headers": {
+   "probed_at": "2026-11-18T18:23:12Z",
+   "http": 429,
+   "retry_after_s": 20208,
+   "x_ratelimit_scope": "free",
+   "x_ratelimit_window": "day",
+   "reset_at_utc": "2026-11-19T00:00:00Z (retry-after 20208s from 18:23:12Z)",
+   "body": "You've reached today's free-model token quota. Your plan's paid allowance is separate \u2014 switch to a paid model to keep going, or wait for the daily reset.",
+   "probe_cost": "one 1-token probe (rejected 429 \u2014 zero quota consumed)"
+  },
+  "first_quota_429_in_run_window": "2026-11-18T18:05:23Z",
+  "gateway_telemetry_excerpt": [
+   {
+    "ts": "2026-11-18T18:14:03.545Z",
+    "status": "RATE_LIMITED_RETRY",
+    "http_status": 429,
+    "body_head": "{\"error\":{\"message\":\"You've reached today's free-model token quota. Your plan's paid allowance is separa"
+   },
+   {
+    "ts": "2026-11-18T18:14:33.623Z",
+    "status": "UPSTREAM_ERROR",
+    "http_status": 429
+   },
+   {
+    "ts": "2026-11-18T18:20:14.336Z",
+    "status": "UPSTREAM_ERROR",
+    "http_status": 429
+   }
+  ],
+  "machine_behavior": "the frozen machine's own retry discipline fired end-to-end (gateway: one bounded 30s retry per call; machine: _retry_call 5 tries with 10/30/60/120s backoff; gen_with_fallback walked the dead NVIDIA chain after 2 consecutive 500-class primary failures and raised the typed RuntimeError) \u2014 no silent fallback, no fabricated row (Art. 3)"
+ },
+ "consumption_accounting_today_2026_11_18": {
+  "this_clone_21_ok_calls": {
+   "prompt_tokens": 76403,
+   "completion_tokens": 11020,
+   "cached_tokens": 15344,
+   "total": 87423
+  },
+  "breakdown": {
+   "smoke_12_calls_2_burned_HO7_rows": "the mandatory mechanics verification under the claim (repairs=3 exercised the full machine; attestation_smoke 12/12 served==requested==registered cohere/command-a)",
+   "killed_attempt_1_2_calls": "the sandbox reaper killed the first backgrounded run ~30s after the launching tool call returned (process-tree reaper; setsid did not survive either) \u2014 row never written, content unrecorded, disclosed orphans",
+   "killed_attempt_2_3_calls": "same reaper class; row never written"
+  },
+  "same_day_usage_outside_this_clone": "R81 fire-now probe (6 full-contract calls @ max_tokens 8192, AM70 owner authority) + r64s4-era xkiro contract probes \u2014 same key, same daily window (their tokens are outside this clone's gateway log; the R81 record is eval/r81_frontier_reprobe_registration.json)",
+  "empirical_daily_ceiling": "~150K tokens/day (the quota broke after this clone's 87,423 + the R81/r64s4 same-day usage)"
+ },
+ "run_projection": {
+  "measured_per_row_cost": "~29K tokens/row (the smoke's 2 rows: 12 calls, ~57K total \u2014 full repair budget exercised)",
+  "full_run_need": "~870K tokens (30 rows x ~29K)",
+  "free_tier_viability": "NOT VIABLE in one window: ~5 rows/night at the empirical ceiling -> ~6 nights for 30 rows"
+ },
+ "process_notes": {
+  "background_execution_finding": "the sandbox reaps process trees spawned by a tool call ~10-30s after the call returns (nohup AND setsid both reaped; the Next.js dev server survives because the session manager parents it) \u2014 the v9 --max-rows heartbeat pattern (in-call chunks, resume-safe) is the working execution discipline here; chunk 1 fired 18:14Z and hit the quota wall immediately (zero rows)",
+  "orphan_calls_disclosure": "5 orphan calls (2+3) from the two reaped attempts at 17:58:33/17:58:36 + 18:05:08/18:05:10/18:05:22 \u2014 content never landed in any row (rows dir empty), the affected row regenerated at next attempt per the Art. 29(d) partial-row resume discipline; the orphans are visible in the session-local gateway log but excluded from the committed run slice by design (the slice covers committed-row windows only)"
+ },
+ "options": {
+  "owner_actions": [
+   "PAID ALLOWANCE: the error says the plan's paid allowance is separate \u2014 if cohere/command-a is billable under the paid allowance on this key, the owner enabling/spending it unblocks the run in one window (the owner's xkiro account action; NOT the builder's to spend)",
+   "SECOND XKIRO KEY: a per-key quota bucket (the R67s2 agnes multi-key pattern; the gateway already implements ordered key rotation for agnes \u2014 extending keyEnvs to xkiro is a small typed transport change, zai_gateway.mjs is NOT among the 15 frozen files); ~6 key-days would carry the full run in one window"
+  ],
+  "default_no_owner_action": "nightly trickle on each daily reset (~5 rows/night, ~6 nights; Art. 29(d) lease-takeover mechanics after 2026-11-20T00:00:00Z as needed; the auditor scoring waits for the 30/30 attestation)"
+ },
+ "lease": {
+  "claim": "c-0100",
+  "lease_expiry": "2026-11-20T00:00:00Z",
+  "state": "OPEN, work in progress, typed infra block disclosed; heartbeat = this record's push"
+ },
+ "next_scheduled_action": "post-reset empirical measurement: the first heartbeat chunk (3 rows) at 2026-11-19T00:05Z measures the fresh window (if 3 rows complete clean, continue chunking until the quota breaks \u2014 the exact nightly capacity gets typed into the record; if the chunk 429s immediately, the ceiling is below 3 rows/night and the owner escalation is the only path)",
+ "recorded_at": "2026-11-18T18:25:23.521189Z"
+}
