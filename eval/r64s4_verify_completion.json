@@ -1,0 +1,220 @@
+{
+ "record": "R64S4_VERIFY_COMPLETION/1.0.0",
+ "session": "builder-r64s4 (continuation session; VERIFIER recompute per epistemic Art. 29(c) \u2014 recomputed, never re-run)",
+ "date": "2026-11-18",
+ "subject": "eval/holdout_v9_generation/ (this tree's window)",
+ "registered_model": "agnes-3.0-flash",
+ "audit_ref": "origin/audit/r11-auditor-verdict-20261114",
+ "method": "independent recompute from raw artifact bytes + audit-branch sealed packet via git show; no instrument module imported",
+ "checks": [
+  {
+   "check": "rows.count==30",
+   "verdict": "PASS",
+   "got": 30,
+   "want": 30
+  },
+  {
+   "check": "rows.filename==problem_id",
+   "verdict": "PASS",
+   "got": null,
+   "want": null
+  },
+  {
+   "check": "rows.verdicts_typed_and_total_30",
+   "verdict": "PASS",
+   "got": {
+    "CLEAN": 29,
+    "FLAG": 1
+   },
+   "want": "all in {CLEAN,FLAG}, n=30",
+   "note": "tally RECOMPUTED and disclosed, never asserted from a prior record (the 23-row partial state quoted 21 CLEAN / 2 FLAG)"
+  },
+  {
+   "check": "rows.FLAG_findings_typed",
+   "verdict": "PASS",
+   "got": {
+    "flag_rows": [
+     "HO9-17-generator-stator-vibration"
+    ],
+    "finding_classes": [
+     "BILL_UNTAGGED",
+     "NYQUIST_UNSAMPLED"
+    ]
+   },
+   "want": "every FLAG row carries typed findings_disclosed"
+  },
+  {
+   "check": "rows.executor_id==instrument_constant",
+   "verdict": "PASS",
+   "got": [
+    "builder-r60s1@holdout-v9-generation"
+   ],
+   "want": [
+    "builder-r60s1@holdout-v9-generation"
+   ],
+   "note": "EXECUTOR_ID is a hard-coded lock-holder constant (scripts/r60_v9_one_shot.py:101); true executor chain lives in eval/r64s4_adoption_record.json"
+  },
+  {
+   "check": "events.count==30",
+   "verdict": "PASS",
+   "got": 30,
+   "want": 30
+  },
+  {
+   "check": "events.ids==rows.ids(order)",
+   "verdict": "PASS",
+   "got": null,
+   "want": null
+  },
+  {
+   "check": "events.timestamps.monotonic",
+   "verdict": "PASS",
+   "got": null,
+   "want": null
+  },
+  {
+   "check": "seal.selection_order==events.ids(order)",
+   "verdict": "PASS",
+   "got": {
+    "packet_first3": [
+     "HO9-01-chloralkali-brine-hardness",
+     "HO9-02-bayer-digestion-scale",
+     "HO9-03-pulp-kappa-uniformity"
+    ],
+    "packet_n": 30
+   },
+   "want": {
+    "events_first3": [
+     "HO9-01-chloralkali-brine-hardness",
+     "HO9-02-bayer-digestion-scale",
+     "HO9-03-pulp-kappa-uniformity"
+    ],
+    "events_n": 30
+   }
+  },
+  {
+   "check": "slice.lines==186",
+   "verdict": "FAIL",
+   "got": 138,
+   "want": 186
+  },
+  {
+   "check": "slice.completed_calls==178",
+   "verdict": "FAIL",
+   "got": 133,
+   "want": 178
+  },
+  {
+   "check": "slice.completed.served==requested==registered(agnes-3.0-flash)",
+   "verdict": "PASS",
+   "got": [],
+   "want": "none"
+  },
+  {
+   "check": "slice.lines_without_model_field==0",
+   "verdict": "PASS",
+   "got": 0,
+   "want": 0,
+   "note": "attestation error-line definition: lines carrying no model field"
+  },
+  {
+   "check": "slice.window within attestation window",
+   "verdict": "FAIL",
+   "got": [
+    "2026-11-18T08:15:44.872Z",
+    "2026-11-18T09:15:33.249Z"
+   ],
+   "want": null
+  },
+  {
+   "check": "slice.status_distribution",
+   "verdict": "PASS",
+   "got": {
+    "OK": 133,
+    "RATE_LIMITED_RETRY": 5
+   },
+   "want": null,
+   "note": "typed; non-OK statuses are telemetry, never scored"
+  },
+  {
+   "check": "attest.rows_committed==30",
+   "verdict": "PASS",
+   "got": 30,
+   "want": 30
+  },
+  {
+   "check": "attest.gateway_completed_calls==recomputed",
+   "verdict": "PASS",
+   "got": 133,
+   "want": 133
+  },
+  {
+   "check": "attest.all_calls_requested_registered==true",
+   "verdict": "PASS",
+   "got": true,
+   "want": true
+  },
+  {
+   "check": "attest.all_calls_served_registered==true",
+   "verdict": "PASS",
+   "got": true,
+   "want": true
+  },
+  {
+   "check": "attest.served_model_matches_registered==true",
+   "verdict": "PASS",
+   "got": true,
+   "want": true
+  },
+  {
+   "check": "attest.rows_30_30_attestation==true",
+   "verdict": "PASS",
+   "got": true,
+   "want": true
+  },
+  {
+   "check": "attest.registered_model==agnes-3.0-flash",
+   "verdict": "PASS",
+   "got": "agnes-3.0-flash",
+   "want": "agnes-3.0-flash"
+  },
+  {
+   "check": "attest.window_started<=first_event",
+   "verdict": "PASS",
+   "got": [
+    "(recomputed from bytes)",
+    "2026-11-18T08:06:09.802338Z"
+   ],
+   "want": null
+  },
+  {
+   "check": "attest.window_ended>=last_event",
+   "verdict": "PASS",
+   "got": [
+    "2026-11-18T09:16:43.602744Z",
+    "2026-11-18T09:14:16.734536Z"
+   ],
+   "want": null
+  },
+  {
+   "check": "attest.executor_id==instrument_constant",
+   "verdict": "PASS",
+   "got": "builder-r60s1@holdout-v9-generation",
+   "want": "builder-r60s1@holdout-v9-generation"
+  },
+  {
+   "check": "token_pattern_scan==0",
+   "verdict": "PASS",
+   "got": [],
+   "want": "none"
+  }
+ ],
+ "digests": {
+  "events.json_sha256_16": "aa887ccb1ab05bc1",
+  "gateway_slice.txt_sha256_16": "5f60a386bcb6cf7e",
+  "attestation.json_sha256_16": "1e27322c75743dca",
+  "rows_set_sha256_16": "4fd4ee90fdc22cf3",
+  "prereg_selection_sha256_at_ref": "502e93d84b19dcda5b0a7d656a3195e509ddec8247aad2e6bddec082e10f34ce"
+ },
+ "verdict": "FAILED"
+}
