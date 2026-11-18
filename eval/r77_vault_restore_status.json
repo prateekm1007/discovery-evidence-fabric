@@ -1,0 +1,37 @@
+{
+ "record": "R77_VAULT_RESTORE_STATUS/1.0.0",
+ "session": "builder-r77s1",
+ "claim": "c-0095",
+ "work_id": "r77-vault-restore-custody",
+ "base_sha": "d05904dbf54668bf3a091c5ea403e8ee4bcce2fa",
+ "deliverable": {
+  "script": "scripts/r77_vault_restore.py \u2014 the general, committed, digest-verifying, fail-closed HF-vault restore path (Art. 17 v3.3.0 'look it up there' made operational). Reprovision-recovery tooling was session-local in every prior loss (CORR-3, r64 incident) and died with its sandbox (Art. 18 class); this one is committed, CI-tested, and typed.",
+  "typed_exits": "0 OK / 2 fetch-parse-decode-digest failure (fail closed, .env.keys untouched) / 3 HF_TOKEN missing (INFRA_CREDENTIAL_MISSING, the ONE master reminder is the caller's job)",
+  "output_discipline": "digests only are ever printed; values never reach stdout, tracebacks, or records; vault self-digest cross-check fails closed on mismatch (a tampered vault never reaches .env.keys); merge semantics: vault wins on conflict, session-only keys kept and reported, never silently dropped",
+  "test": "tests/test_r77_vault_restore.py \u2014 7 zero-network tests, CI-wired into the queue-surface enforcement block (the exists-but-does-not-gate lesson closes wired): digest consistency, fail-closed self-mismatch, typed exit 3, full happy path on a TEMP .env.keys (the real session vault is never touched by tests), vault-wins-on-conflict, source custody hygiene (no argv token path), gitignore coverage"
+ },
+ "live_drill": {
+  "result": "RESTORED 6 vault-managed keys + 1 session-only kept, exit 0",
+  "digests": {
+   "AGNES_API_KEY": "d0c666a3842f [COMMITTED_RECORD_MATCH]",
+   "AGNES_API_KEY_2": "5c4dffd28fe4 [NEW_IN_RECORDS - the R64s4-era addition postdating the r59 record; disclosed, not silent]",
+   "AGNES_BASE_URL": "e592ff32df1f [NEW_IN_RECORDS - same R64s4-era class]",
+   "GH_PAT": "f1ebca5f9b62 [COMMITTED_RECORD_MATCH]",
+   "GITHUB_TOKEN": "f1ebca5f9b62 [COMMITTED_RECORD_MATCH]",
+   "XKIRO_API_KEY": "f6c09bee9bde [COMMITTED_RECORD_MATCH]"
+  },
+  "session_state": ".env.keys 0o600 gitignored, custody FULLY restored (XKIRO available to the runbook at window open)"
+ },
+ "durable_execution": {
+  "mechanism": "one-shot cron job scheduled 2026-11-19T16:40:00Z UTC (15 min after the 16:25Z maintenance-exit gate) firing the complete frontier re-probe round: custody bootstrap (the two owner-delivered credentials embedded as session-transient custody bootstrap, digest-verified on arrival, never committed, one-shot consumed) -> round protocol (fetch, FULL constitutional reads, claim-before-work FIRST) -> fire scripts/r70_frontier_reprobe_runbook.py (the runbook's own gate is authoritative; a pre-window refusal is obeyed typed) -> register the strongest serving id -> push + remote CI verify (D2) -> typed handoff to the auditor lane (prereg amend + v10 authoring are the auditor's; re-freeze only after the prereg amend lands, CI-gated)",
+  "authority": "Art. 28 addendum (delegated owner actions are LOOP-OWNED; the loop never idles waiting on a delegated action) + Art. 18 (durable execution; observer-independent). The alternative was a credential-less fired session and an idled window round.",
+  "custody_note": "credential values ride the owner-delivered channel (the same channel that delivered them) and the gitignored session vault; zero credential bytes enter the tracked repo \u2014 the commit carries digests only (Art. 17)"
+ },
+ "frontier_window": {
+  "gate": "2026-11-19T16:25Z",
+  "now_utc": "2026-11-18T15:2xZ",
+  "state": "CLOSED (~25h remain) \u2014 Art. 3 typed refusal; zero probes consumed this round; the runbook's own gate is the enforcement surface"
+ },
+ "engine_line_share": "0.0 \u2014 typed disclosure (Art. 27 custody/infra class): this round ships custody tooling + durable-execution staging, zero engine lines; the capability budget is spent AT the window round (the probe + v10 are the capability events)",
+ "score_note": "score stays 5; the path to 6 is unchanged: frontier model + binds on fresh sealed v10, mean>=3.25 CI>3.0 (Art. 14)"
+}
