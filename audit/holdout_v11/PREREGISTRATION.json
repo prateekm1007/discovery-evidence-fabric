@@ -1,0 +1,46 @@
+{
+ "record": "HOLDOUT_V11_PREREGISTRATION/1.0.0",
+ "registered_at": "2026-11-18",
+ "registered_by": "auditor (Claude), loop-owned Art.28",
+ "selection_sha256": "1493bb84cccf027fdad8e181b8a636f0edef084f2052acf90bb4429cc30a1516",
+ "n_problems": 30,
+ "intervention": 15,
+ "predictor": 15,
+ "power_basis": {
+  "pre_registered_n": 30,
+  "observed_per_row_sd": 0.55,
+  "sd_source": "v10 scored rows",
+  "test": "one-sample t vs 3.0, alpha 0.05",
+  "resolved_rule": "Art.14: resolved only when n met AND 95% CI lower bound > 3.0 (mean ≳ 3.2 at n=30, SD 0.55); else UNRESOLVED"
+ },
+ "model_pin": {
+  "registered_id": "agnes-3.0-flash",
+  "served_model": "agnes-3.0-flash",
+  "upstream": "agnes (apihub.agnes-ai.com), AGNES_API_KEY + AGNES_API_KEY_2 rotation",
+  "note": "owner default agnes-3.0-flash (AM75). Attestation 30/30 served==requested==registered agnes-3.0-flash."
+ },
+ "custody": {
+  "problems": "audit/holdout_v11/holdout_v11_problems.json (public)",
+  "rubric": "PRIVATE repo prateekm1007/def-rubric-custody/holdout_v11_rubric_PRIVATE.json (unauth 404)",
+  "rubric_access": "auditor+owner only; builder NEVER_READ pre-generation"
+ },
+ "purpose": "ACCEPTANCE test for engine route with ALL FIVE binds. v10 mean 3.1 NOT_GRANTED (HO10-03 inverted + CI includes 3.0); v11 measures five-bind lift on fresh confidential set.",
+ "MANDATORY_RUN_ARTIFACTS": [
+  "committed gateway-log slice",
+  "30/30 served_model==registered agnes-3.0-flash attestation PRE-SCORING",
+  "durable all-row events ledger",
+  "ONE named executor id, claim before any problem read",
+  "green pushed CI read from check-run API",
+  "MEASURED_PATH through engine_route -> mechanism_space"
+ ],
+ "one_shot_protocol": [
+  "1. claim holdout-v11-generation BEFORE any problem read",
+  "2. problems ONLY; rubric NEVER read pre-generation; one generation frozen engine-route machine; commit rows+slice+ledger; peer VERIFIER recomputes",
+  "3. attestation pre-scoring; VOID/UNPROVABLE never scored",
+  "4. auditor scores vs PRIVATE repo rubric",
+  "5. BURN; v12 next"
+ ],
+ "ACCEPTANCE_BAR": "mean>=3.0 AND 0 allowed-measures AND 0 inverted-direction AND 0 unavailable-input AND run_verdict==VALID; Art.14 CI lower bound > 3.0",
+ "burn_after_use": true,
+ "status": "SEALED_REGISTERED"
+}

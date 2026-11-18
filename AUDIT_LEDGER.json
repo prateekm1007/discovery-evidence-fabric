@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "d4e524141",
+  "queue/dev12_r7": "7c3cc329c",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2821,6 +2821,17 @@
     "Key remaining defect: reaction-equilibrium direction inversion (HO10-03) — element-conservation bind catches phantom elements but not equilibrium-direction error. Next capability lever: thermodynamic/equilibrium-direction bind (Le Chatelier / oxidation-state direction check).",
     "v10 BURNED after scoring. Score stays 5. v11 fresh sealed set + the equilibrium-direction bind are the path to 6."
    ]
+  },
+  {
+   "id": "AM77",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R90: equilibrium-direction bind VERIFIED + v11 authored/sealed",
+   "changes": [
+    "Equilibrium-direction bind (R89 c-0101) VERIFIED: HO10-03 fires INVERTED_EQUILIBRIUM (auditor independent recompute), siblings silent, frozen r40 sha ff43c6056d7e4163 untouched 15/15, CI green. R77 device-noun false-positive fixed+pinned. c-0101 DONE.",
+    "v11 AUTHORED+SEALED: 30 fresh domain-disjoint (seal 1493bb84cccf027f), rubric PRIVATE repo, agnes-3.0-flash default, n=30 power SD 0.55, ALL FIVE binds. EQUILIBRIUM_TRAP rows HO11-03/11 target the HO10-03 class.",
+    "Builder: claim v11 before read + sealed one-shot (five binds) -> auditor scores mean>=3.2 CI>3.0 + 0 inverted -> score 6 -> BURN."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -3964,6 +3975,14 @@
    "acceptance": "NOT_GRANTED",
    "score": 5,
    "evidence_sha": "eval/holdout_v10_auditor_score.json"
+  },
+  {
+   "id": "V77",
+   "round": "R90 equilibrium verify + v11 author",
+   "commit": "7c3cc329c",
+   "gate": "NOT_MET (score 5); v11 sealed pending one-shot",
+   "capability_change": "equilibrium bind verified; v11 authored/sealed",
+   "evidence_sha": "eval/r90_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4196,9 +4215,17 @@
    "burned_at": "2026-11-18",
    "score_mean": 3.1,
    "acceptance": "NOT_GRANTED (1 inverted HO10-03; CI includes 3.0)"
+  },
+  "holdout_v11": {
+   "status": "SEALED_REGISTERED",
+   "selection_sha256": "1493bb84cccf027fdad8e181b8a636f0edef084f2052acf90bb4429cc30a1516",
+   "n": 30,
+   "model_pin": "agnes-3.0-flash",
+   "custody": "rubric private repo (unauth 404); problems audit/holdout_v11/",
+   "bar": "mean>=3.0 AND 0/0/0 AND VALID; Art.14 CI>3.0"
   }
  },
- "progress_note": "SCORE 5/10. v10 scored: mean 3.1 (v9 3.0), CI [2.904,3.296], 0 allowed-measures/0 unavailable-input, BUT 1 inverted-direction (HO10-03 reaction-equilibrium inversion) + CI includes 3.0 -> ACCEPTANCE NOT_GRANTED. Chemistry elicitation + direction traps worked; on-row physics live. v10 BURNED. Next lever: thermodynamic/equilibrium-direction bind (catch HO10-03-class inverted chemistry) + v11 fresh sealed set -> mean>=3.25 CI>3.0 -> score 6. Goal 9/10.",
+ "progress_note": "SCORE 5/10. Equilibrium-direction bind VERIFIED (HO10-03 class caught, frozen-safe, CI green). All five binds ready. v11 AUTHORED+SEALED (seal 1493bb84cccf027f, rubric private, agnes-3.0-flash, n=30). Builder: claim v11 + one-shot (five binds) -> mean>=3.2 CI>3.0 + 0 inverted -> score 6 -> BURN. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
