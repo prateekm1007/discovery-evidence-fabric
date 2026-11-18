@@ -28,18 +28,21 @@ from r58_p2_ablation_driver import (  # noqa: E402
 # ---------------------------------------------------------------- registry
 def test_route_registry_typed_facts():
     reg = ra.ROUTE_REGISTRY
-    # AM73 (audit 227e9e97b): the v10 model pin — R81's fire-now
-    # registered id supersedes the agnes v9 pin (r64s4/AM60) and
-    # R36's glm-4-plus before it.
-    assert reg["registered"]["model"] == "cohere/command-a"
-    assert reg["registered"]["name"] == "xkiro"
-    assert reg["registered"]["vault_key_name"] == "XKIRO_API_KEY"
-    assert "AM73" in reg["registered"]["provenance"]  # supersession
+    # AM75 (audit aef833e5c): the owner-directed DEFAULT generator —
+    # agnes-3.0-flash supersedes AM73's quota-blocked cohere/
+    # command-a (the r64s4/AM60 agnes pin restored) and R36's
+    # glm-4-plus before it.
+    assert reg["registered"]["model"] == "agnes-3.0-flash"
+    assert reg["registered"]["name"] == "agnes"
+    assert reg["registered"]["vault_key_name"] == (
+        "AGNES_API_KEY (ordered: AGNES_API_KEY, AGNES_API_KEY_2)")
+    assert "AM75" in reg["registered"]["provenance"]  # supersession
+    assert reg["registered"]["transport_facts"], (
+        "the registered route carries its transport facts")
     names = {a["name"] for a in reg["alternates"]}
     assert names == {
-        "agnes",
-        "xkiro-transport-facts (the registered route's "
-        "ledger entry)",
+        "xkiro-transport-facts (the R58/R81/R85 transport "
+        "ledger)",
         "zai-gateway (retired upstream)"}
     for a in reg["alternates"]:
         assert a["vault_key_name"]
@@ -47,26 +50,29 @@ def test_route_registry_typed_facts():
     xk = [a for a in reg["alternates"]
           if a["name"].startswith("xkiro-transport-facts")][0]
     assert any("User-Agent" in f for f in xk["transport_facts"])
+    assert any("150K tokens/day" in f for f in xk["transport_facts"]), (
+        "the R85 quota fact rides the xkiro ledger")
     assert {r["name"] for r in reg["retired"]} == {
         "zai-gateway / glm-4-plus",
         "xkiro / cohere/command-a-plus (r64s4 first candidate)",
-        "agnes / agnes-3.0-flash (the v9 registered pin)"}
+        "xkiro / cohere/command-a (the AM73 v10 pin, "
+        "quota-blocked)"}
     dead = {d["name"] for d in reg["dead"]}
     assert dead == {"deepai", "nvidia"}
 
 
 def test_require_registered_model_guard():
-    ra.require_registered_model("cohere/command-a")  # the reg. id
+    ra.require_registered_model("agnes-3.0-flash")  # the reg. id
     try:
         ra.require_registered_model("mistralai/ministral-14b")
         raise AssertionError("silent model swap must be refused")
     except ra.RouteRefused as e:
         assert e.kind == "unregistered_route"
-    # the superseded v9 pin is now a typed unregistered_route (the
-    # AM73 forward-only convention — never a silent swap)
+    # the superseded AM73 pin is now a typed unregistered_route (the
+    # AM75 forward-only convention — never a silent swap)
     try:
-        ra.require_registered_model("agnes-3.0-flash")
-        raise AssertionError("the superseded v9 pin must be refused")
+        ra.require_registered_model("cohere/command-a")
+        raise AssertionError("the superseded AM73 pin must be refused")
     except ra.RouteRefused as e:
         assert e.kind == "unregistered_route"
 

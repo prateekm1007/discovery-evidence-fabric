@@ -10,71 +10,54 @@ module is ever wired as a judge (the r30_nvidia_route role
 discipline: generator-leg only).
 
 ROUTE REGISTRY (typed, provenance-tagged):
-  registered  xkiro    cohere/command-a  AM73 (audit 227e9e97b): the
-                                        v10 model pin amended to R81's
-                                        fire-now registered id — the
-                                        frontier flagship, probe-proven
-                                        servable at the exact v10
-                                        contract shape (R81 full-
-                                        contract probe: finish=stop,
-                                        chars=3791, completion_tokens
-                                        =978, latency 17.7s,
-                                        deliverable_class_findings=[],
-                                        served==requested). Transport:
-                                        the loop-local gateway
-                                        (scripts/zai_gateway.mjs) with
-                                        ZAI_GATEWAY_UPSTREAM=xkiro +
-                                        XKIRO_MODEL_ID=cohere/command-a,
-                                        vault key XKIRO_API_KEY; the
-                                        browser UA + 1024 headroom are
-                                        the gateway's xkiro transport
-                                        contract. The v10 one-shot
-                                        generates HERE. Supersedes the
-                                        agnes-3.0-flash v9 pin
-                                        (r64s4/AM60) and, before that,
-                                        R36's glm-4-plus.
-  alternate   agnes    10 models        OpenAI-compatible, base
-                                        https://apihub.agnes-ai.com/v1
-                                        (c-0078 verified end-to-end;
-                                        R58 custody probe: roster 10
-                                        matches, agnes-2.5-pro/flash
-                                        tiers). Served the v9 one-shot
-                                        (30/30 served==requested==
-                                        registered agnes-3.0-flash; v9
-                                        mean 3.000 UNRESOLVED).
-                                        BUDGET FACT (c-0078,
-                                        measured): the flash tier
-                                        spends the token budget on
-                                        reasoning FIRST — at
-                                        max_tokens=16 the entire budget
-                                        went to reasoning tokens
-                                        (empty visible text); visible
-                                        text appeared at max_tokens=64
-                                        (309 total tokens). Every
-                                        agnes call must size
-                                        max_tokens >= visible_target +
-                                        REASONING_HEADROOM. Multi-key
-                                        429 rotation (R67s2):
-                                        AGNES_API_KEY +
-                                        AGNES_API_KEY_2 are per-key
-                                        quota buckets.
-  alternate   xkiro-transport-facts     The registered route's
-                                        transport ledger (kept as an
-                                        entry for the R58/R81 facts):
-                                        base https://api.xkiro.com/v1,
-                                        roster 69; Cloudflare BANS the
-                                        python-urllib default
+  registered  agnes    agnes-3.0-flash  AM75 (audit aef833e5c, R86
+                                        verification): the OWNER
+                                        DIRECTIVE — agnes-3.0-flash
+                                        is the DEFAULT generator
+                                        (supersedes AM73's
+                                        cohere/command-a; the xkiro
+                                        free-model daily token
+                                        quota ~150K/day empirical
+                                        ceiling cannot carry the
+                                        ~870K v10 run — R85 typed
+                                        INFRA_BLOCKED, zero v10
+                                        rows generated). agnes
+                                        served the v9 one-shot
+                                        30/30 (mean 3.000
+                                        UNRESOLVED) with the 2-key
+                                        ordered rotation
+                                        (AGNES_API_KEY +
+                                        AGNES_API_KEY_2, R67s2
+                                        per-key quota buckets).
+                                        Transport: the loop-local
+                                        gateway (scripts/
+                                        zai_gateway.mjs) with
+                                        ZAI_GATEWAY_UPSTREAM=agnes
+                                        + AGNES_MODEL_ID=agnes-
+                                        3.0-flash; reasoning
+                                        headroom 512 (c-0078). The
+                                        v10 one-shot generates HERE.
+  alternate   xkiro-transport-facts  The xkiro transport ledger
+                                        (R58/R81/R85 facts): base
+                                        https://api.xkiro.com/v1,
+                                        roster 69; Cloudflare BANS
+                                        the python-urllib default
                                         User-Agent (HTTP 403 "error
-                                        code: 1010") — a browser-like
-                                        UA is REQUIRED; gateway
+                                        code: 1010") — a browser-
+                                        like UA is REQUIRED; gateway
                                         headroom 1024 (command-a-plus
                                         measured ~1000 invisible
                                         reasoning tokens; command-a
-                                        measured 978 completion tokens
-                                        with clean stop at the full
-                                        19K-char contract — the
-                                        headroom is insurance, sized
-                                        by the r64s4 probe).
+                                        measured 978 completion
+                                        tokens with clean stop at
+                                        the full 19K-char contract);
+                                        R85: free-model day-window
+                                        quota ~150K tokens/day per
+                                        key (HTTP 429, x-ratelimit-
+                                        scope: free, window: day,
+                                        reset 2026-11-19T00:00Z) —
+                                        not viable for one-window
+                                        sealed runs.
   dead        deepai   402              key authenticates; account not
                                         Pro in good standing (typed
                                         R56 c-0076, R57 c-0077, R58
@@ -118,31 +101,46 @@ REASONING_HEADROOM = 512
 
 ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
     "registered": {
-        "name": "xkiro",
-        "base_url": "https://api.xkiro.com/v1",
-        "model": "cohere/command-a",
-        "vault_key_name": "XKIRO_API_KEY",
-        "provenance": "AM73 (audit 227e9e97b, R84 verification): "
-                      "the v10 model pin amended to R81's fire-now "
-                      "registered id (cohere/command-a — the "
-                      "frontier flagship; probe-proven servable at "
-                      "the exact v10 contract shape: finish=stop, "
-                      "chars=3791, completion_tokens=978, latency "
-                      "17.7s, deliverable_class_findings=[], "
-                      "served==requested). Supersedes the v9 pin "
-                      "agnes-3.0-flash (r64s4/AM60) and R36's "
-                      "glm-4-plus. Transport: the loop-local gateway "
-                      "with ZAI_GATEWAY_UPSTREAM=xkiro + "
-                      "XKIRO_MODEL_ID=cohere/command-a (R458-C1 id "
-                      "semantics: the gateway serves the registered "
-                      "id; requested+served are both logged and the "
-                      "attestation requires served==requested=="
-                      "registered); vault key XKIRO_API_KEY; browser "
-                      "UA + 1024 headroom per the gateway's xkiro "
-                      "transport contract. The v10 one-shot "
-                      "generates HERE.",
+        "name": "agnes",
+        "base_url": "https://apihub.agnes-ai.com/v1",
+        "model": "agnes-3.0-flash",
+        "vault_key_name": "AGNES_API_KEY (ordered: AGNES_API_KEY, "
+                          "AGNES_API_KEY_2)",
+        "provenance": "AM75 (audit aef833e5c, R86 verification): "
+                      "the OWNER DIRECTIVE — agnes-3.0-flash is "
+                      "the DEFAULT generator (supersedes AM73's "
+                      "cohere/command-a @ 227e9e97b: the xkiro "
+                      "free-model daily token quota ~150K/day "
+                      "empirical ceiling cannot carry the ~870K "
+                      "v10 run — R85 typed INFRA_BLOCKED with zero "
+                      "v10 rows generated; command-a's R81 probe "
+                      "provenance stands, the id moves to the "
+                      "retired ledger). agnes-3.0-flash served the "
+                      "v9 one-shot 30/30 served==requested=="
+                      "registered (v9 mean 3.000 UNRESOLVED; the "
+                      "r64s4/AM60 registration, restored by AM75). "
+                      "Transport: the loop-local gateway with "
+                      "ZAI_GATEWAY_UPSTREAM=agnes + AGNES_MODEL_ID="
+                      "agnes-3.0-flash (R458-C1 id semantics: the "
+                      "gateway serves the registered id; requested+"
+                      "served are both logged and the attestation "
+                      "requires served==requested==registered); "
+                      "the 2-key ordered rotation AGNES_API_KEY -> "
+                      "AGNES_API_KEY_2 (R67s2 per-key quota buckets, "
+                      "the gateway's agnes keyEnvs); reasoning "
+                      "headroom 512 (c-0078: the flash tier budgets "
+                      "reasoning tokens FIRST — size max_tokens >= "
+                      "visible_target + REASONING_HEADROOM). The "
+                      "v10 one-shot generates HERE.",
         "role": "generator (the ONLY registered generator id; the "
                 "v10 one-shot route)",
+        "transport_facts": [
+            "reasoning budgets FIRST: size max_tokens >= "
+            "visible_target + REASONING_HEADROOM (c-0078 measured)",
+            "free-user 429 quota is PER KEY: AGNES_API_KEY + "
+            "AGNES_API_KEY_2 rotate with no sleep (R67s2 measured "
+            "mid-run)",
+        ],
     },
     "retired": [
         {
@@ -169,44 +167,30 @@ ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
                       "the runbook (c8cc5deb2)",
         },
         {
-            "name": "agnes / agnes-3.0-flash (the v9 registered pin)",
-            "reason": "AM73 (R84): superseded as the registered "
-                      "generator by cohere/command-a for v10 — the "
-                      "owner-directed frontier flag (R81 fire-now "
-                      "probe registered the stronger serving id; "
-                      "AM62/AM70 lineage). agnes-3.0-flash's v9 "
-                      "attestation stands (30/30 served==requested=="
-                      "registered; v9 mean 3.000 UNRESOLVED); the "
-                      "route moves to alternates (still qualified, "
-                      "still custody-backed — a provider-spread "
-                      "alternate, never the registered id)",
+            "name": "xkiro / cohere/command-a (the AM73 v10 pin, "
+                    "quota-blocked)",
+            "reason": "AM75 (R86 audit aef833e5c): superseded as "
+                      "the registered generator by the OWNER "
+                      "DIRECTIVE — agnes-3.0-flash is the DEFAULT "
+                      "generator. The xkiro free-model DAY-WINDOW "
+                      "token quota (~150K/day empirical ceiling per "
+                      "key, R85 typed evidence: HTTP 429, "
+                      "x-ratelimit-scope: free, window: day, reset "
+                      "2026-11-19T00:00Z) cannot carry the ~870K "
+                      "v10 run (~29K tokens/row x 30). command-a's "
+                      "R81 fire-now provenance stands (clean stop, "
+                      "978 tokens, 17.7s, zero admission findings, "
+                      "served==requested at the full 19K-char "
+                      "contract); the route moves to alternates "
+                      "(still qualified, still custody-backed — a "
+                      "provider-spread alternate, never the "
+                      "registered id until the owner buys quota)",
         },
     ],
     "alternates": [
         {
-            "name": "agnes",
-            "base_url": "https://apihub.agnes-ai.com/v1",
-            "n_models": 10,
-            "provenance": "c-0078 end-to-end qualification; R58 "
-                          "custody probe (roster match); R67s2 "
-                          "multi-key custody (owner delivery "
-                          "2026-11-18, both keys live-probed 200 / "
-                          "served==requested before admission); "
-                          "served the v9 one-shot 30/30",
-            "transport_facts": [
-                "reasoning budgets FIRST: size max_tokens >= "
-                "visible_target + REASONING_HEADROOM (c-0078 "
-                "measured)",
-                "free-user 429 quota is PER KEY: AGNES_API_KEY + "
-                "AGNES_API_KEY_2 rotate with no sleep (R67s2 "
-                "measured mid-run)",
-            ],
-            "vault_key_name": "AGNES_API_KEY (ordered: "
-                              "AGNES_API_KEY, AGNES_API_KEY_2)",
-        },
-        {
-            "name": "xkiro-transport-facts (the registered route's "
-                    "ledger entry)",
+            "name": "xkiro-transport-facts (the R58/R81/R85 "
+                    "transport ledger)",
             "base_url": "https://api.xkiro.com/v1",
             "n_models": 69,
             "provenance": "c-0078 end-to-end qualification; R58 "
@@ -214,17 +198,21 @@ ROUTE_REGISTRY: Dict[str, Dict[str, Any]] = {
                           "probes (frontier tier serving verified; "
                           "command-a-plus falsified under contract, "
                           "command-a clean at the full 19K-char "
-                          "contract)",
+                          "contract); R85 quota block (the free-"
+                          "model day window ~150K tokens/day per "
+                          "key — the AM75 supersession evidence)",
             "transport_facts": [
                 "browser User-Agent REQUIRED (urllib default UA "
                 "banned: Cloudflare 403 error 1010, R58 typed)",
                 "gateway xkiro headroom 1024 (command-a-plus "
                 "measured ~1000 invisible reasoning tokens; the "
-                "registered command-a measured 978 completion tokens "
+                "AM73-era command-a measured 978 completion tokens "
                 "with clean stop — headroom is insurance)",
-                "generation identity lives in the REGISTERED block "
-                "since AM73 — this entry is the transport-facts "
-                "ledger only",
+                "R85 free-model quota: DAY-WINDOW ~150K tokens/day "
+                "per key (HTTP 429, x-ratelimit-scope: free, "
+                "window: day) — a one-window ~870K sealed run is "
+                "NOT VIABLE on the free tier; the AM75 default "
+                "route is agnes",
             ],
             "vault_key_name": "XKIRO_API_KEY",
         },
@@ -361,7 +349,7 @@ def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
 
 
 def registered_route() -> Dict[str, Any]:
-    """The registered generator route (AM73): identity evidence for
+    """The registered generator route (AM75): identity evidence for
     every generation ledger that must name its route."""
     return dict(ROUTE_REGISTRY["registered"])
 
@@ -373,11 +361,13 @@ def require_registered_model(model: str) -> None:
     reg = ROUTE_REGISTRY["registered"]["model"]
     if model != reg:
         raise RouteRefused(
-            "unregistered_route", "xkiro",
+            "unregistered_route", "agnes",
             f"requested '{model}' but the registered generator id is "
-            f"'{reg}' (AM73: R81's fire-now registration supersedes "
-            f"the agnes v9 pin r64s4/AM60 and R36's glm-4-plus) — a "
-            f"silent model swap is forbidden")
+            f"'{reg}' (AM75: the owner-directed DEFAULT generator "
+            f"agnes-3.0-flash supersedes AM73's quota-blocked "
+            f"cohere/command-a, the r64s4/AM60 agnes pin before "
+            f"it, and R36's glm-4-plus) — a silent model swap is "
+            f"forbidden")
 
 
 __all__ = ["ROUTE_ADAPTER_VERSION", "ROUTE_REGISTRY", "RouteRefused",

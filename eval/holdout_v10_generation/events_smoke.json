@@ -2,23 +2,23 @@
  "record": "HOLDOUT_V10_GENERATION_EVENTS/1.0.0",
  "run": "holdout-v10-generation",
  "executor_id": "builder-r85s1@holdout-v10-generation",
- "registered_model": "cohere/command-a",
- "registered_upstream": "xkiro",
+ "registered_model": "agnes-3.0-flash",
+ "registered_upstream": "agnes",
  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
- "window_started_at": "2026-11-18T17:54:48.210682Z",
+ "window_started_at": "2026-11-18T19:10:27.915851Z",
  "events": [
   {
    "problem_id": "HO7-01-zinc-ew-acid-mist",
-   "generated_at": "2026-11-18T17:54:48.231685Z",
+   "generated_at": "2026-11-18T19:10:27.937135Z",
    "histogram_before": {},
    "histogram_after": {
-    "** thermal duty cycle modulation.": 1
+    "interfacial modification and thermal setpoint reduction": 1
    },
    "attempts": [
     {
      "stage": "draft",
-     "chars": 2983,
-     "latency_s": 13.0,
+     "chars": 5528,
+     "latency_s": 7.0,
      "transport_tries": 1,
      "route": "zai_gateway",
      "route_model": null,
@@ -30,18 +30,18 @@
      },
      "scan": {
       "BILL_UNTAGGED": [
-       "- Parameter: 0.5 ppm continuous dosing",
-       "- Parameter: Increase from 35°C to 40°C to enhance foam stability",
-       "- Parameter: Add 2 mm vent holes to allow foam escape without mist",
-       "- **Fit:** Uses allowed measures (electrolyte additive, temperature retuning, cell-cover p",
-       "- **Risk:** Foam stability at 40°C must be verified; supplier data confirms stability up t"
+       "- **Standard Practice Burden**: Batch dosing of Class 1 foams every 4 hours (labor intensi",
+       "- **Proposed Burden**:",
+       "- **Hardware**: No new hardware. Foam dosing uses existing pumps. Ventilation uses existin",
+       "- **Materials**: Procurement of Class 2 foam agent (standard catalog item, cost comparable",
+       "- **Operational Loss**: Reduction of temperature by 5°C may slightly reduce electrolyte co",
+       "- **Parity Conclusion**: Same-or-lower burden class. The elimination of batch dosing labor"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Procurement of standard catalog item.' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
       ],
       "PHYSICS_DIRECTION_UNSTATED": [
        "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
-      ],
-      "INPUT_UNAVAILABLE": [
-       "derived feature input 'a hydrophilic foam layer' is not derivable from the permitted signals",
-       "derived feature input 'foam suppression) cuts rise velocity by 60%, reducing mist c' is not derivable from the permitted signals"
       ],
       "MECHANISM_CLASS_UNSTATED": [
        "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
@@ -49,17 +49,17 @@
      },
      "direction_check": {
       "direction": "CORRECT",
-      "reason": "driver: Bubble coalescence and rapid rise velocity drive acid mist carryover by increasing bubble size and entrainment capacity. | ingredient: Hydrophilic silica foam reduces bubble diameter by suppressing coalescence, decreasing rise velocity and mist entrainment. | ingredient sign vs driver: OPPOSITE -> CORRECT",
-      "established_driver": "Bubble coalescence and rapid rise velocity drive acid mist carryover by increasing bubble size and entrainment capacity.",
-      "ingredient_action": "Hydrophilic silica foam reduces bubble diameter by suppressing coalescence, decreasing rise velocity and mist entrainment.",
+      "reason": "driver: Oxygen evolution at the anode generates bubbles that accelerate to the surface and rupture the liquid-gas interface, ejecting acid ligaments into the air as aerosols. | ingredient: The high-density polymeric foam blanket imposes a viscoelastic yield stress at the interface, mechanically resisting bubble penetration and rupture, thereby opposing the ejection mechanism that generates the acid mist. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Oxygen evolution at the anode generates bubbles that accelerate to the surface and rupture the liquid-gas interface, ejecting acid ligaments into the air as aerosols.",
+      "ingredient_action": "The high-density polymeric foam blanket imposes a viscoelastic yield stress at the interface, mechanically resisting bubble penetration and rupture, thereby opposing the ejection mechanism that generates the acid mist.",
       "sign_of_ingredient_vs_driver": "OPPOSITE"
      },
-     "sha256_16": "7b8b7f1c3d46bdab"
+     "sha256_16": "90801c48dc239273"
     },
     {
      "stage": "repair_1",
-     "chars": 3263,
-     "latency_s": 14.9,
+     "chars": 7896,
+     "latency_s": 9.4,
      "transport_tries": 2,
      "route": "zai_gateway",
      "route_model": null,
@@ -69,135 +69,38 @@
       "verdict": "MATCH",
       "reason": "proposes a mitigation (section=True, verbs=True)"
      },
-     "scan": {
-      "BILL_UNTAGGED": [
-       "- **Cost class:** Same as standard practice (additive dosing and temperature control alrea",
-       "- **Permitted measures:** Foam dosing and temperature retuning are within allowed measures",
-       "- **Deployed-part clause:** No modifications to anodes or cells; uses existing dosing and ",
-       "- **Exemplar-reality clause:** PVA foam is a stocked SKU in water treatment and mining, wi",
-       "- **Operational-loss pricing:** Temperature increase reduces energy efficiency by ~2%; sta"
-      ],
-      "INPUT_UNAVAILABLE": [
-       "derived feature input 'Marangoni effect)' is not derivable from the permitted signals"
-      ]
-     },
+     "scan": {},
      "direction_check": {
       "direction": "CORRECT",
-      "reason": "driver: Bubble burst frequency at the anode surface, driven by high surface tension and large bubble size, causes acid aerosol mist. | ingredient: The hydrophilic foam blanket reduces surface tension and the temperature increase reduces bubble size, both acting to decrease burst frequency and thus acid aerosol generation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
-      "established_driver": "Bubble burst frequency at the anode surface, driven by high surface tension and large bubble size, causes acid aerosol mist.",
-      "ingredient_action": "The hydrophilic foam blanket reduces surface tension and the temperature increase reduces bubble size, both acting to decrease burst frequency and thus acid aerosol generation.",
+      "reason": "driver: Turbulent interfacial shear and high-velocity gas evolution from the anode mechanically entrain liquid droplets to form an acid aerosol mist. | ingredient: The silicone antifoam lowers interfacial tension to suppress fine bubble formation and promote coalescence, while temperature reduction decreases thermal convection, both acting to decrease the interfacial shear and turbulent energy available for aerosol generation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Turbulent interfacial shear and high-velocity gas evolution from the anode mechanically entrain liquid droplets to form an acid aerosol mist.",
+      "ingredient_action": "The silicone antifoam lowers interfacial tension to suppress fine bubble formation and promote coalescence, while temperature reduction decreases thermal convection, both acting to decrease the interfacial shear and turbulent energy available for aerosol generation.",
       "sign_of_ingredient_vs_driver": "OPPOSITE"
      },
-     "sha256_16": "57f79e51b8a8f1bf",
-     "findings_disclosed": [
-      "BILL_UNTAGGED: - **Cost class:** Same as standard practice (additive dosing and temperature control alrea; - **Permitted meas",
-      "INPUT_UNAVAILABLE: derived feature input 'Marangoni effect)' is not derivable from the permitted signals"
-     ]
-    },
-    {
-     "stage": "repair_2",
-     "chars": 2878,
-     "latency_s": 11.8,
-     "transport_tries": 3,
-     "route": "zai_gateway",
-     "route_model": null,
-     "fallback_reason": null,
-     "critic_verdict": "CLEAN",
-     "type_gate": {
-      "verdict": "MATCH",
-      "reason": "proposes a mitigation (section=True, verbs=True)"
-     },
-     "scan": {
-      "BILL_UNTAGGED": [
-       "- **Installation:** Same class (parameter change on existing controller).",
-       "- **Commissioning:** Same class (setpoint adjustment).",
-       "- **Operation:** Same class (existing temperature control system).",
-       "- **Maintenance:** Same class (no new hardware).",
-       "- **Cost class:** Same as standard practice (temperature control already exists).",
-       "- **Operational loss:** Throughput reduction = 0 (schedule unchanged).",
-       "- **Permitted measures:** Temperature setpoint retuning is explicitly allowed.",
-       "- **Direction-of-effect:** Lowering temperature reduces oxygen evolution rate, aligning wi",
-       "- **Input availability:** Temperature signal is already permitted and monitored.",
-       "- **Cost pricing:** Operational loss = 0 (no schedule change).",
-       "- **Mechanism diversity:** Mechanism class = \"temperature-driven kinetics suppression\"."
-      ]
-     },
-     "direction_check": {
-      "direction": "CORRECT",
-      "reason": "driver: Oxygen evolution at the anode, driven by temperature-dependent kinetics, causes bubble formation and acid aerosol mist. | ingredient: Lowering the electrolyte temperature setpoint reduces the oxygen evolution rate, thereby decreasing bubble nucleation and acid mist formation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
-      "established_driver": "Oxygen evolution at the anode, driven by temperature-dependent kinetics, causes bubble formation and acid aerosol mist.",
-      "ingredient_action": "Lowering the electrolyte temperature setpoint reduces the oxygen evolution rate, thereby decreasing bubble nucleation and acid mist formation.",
-      "sign_of_ingredient_vs_driver": "OPPOSITE"
-     },
-     "sha256_16": "65997582bf61ec95",
-     "findings_disclosed": [
-      "BILL_UNTAGGED: - **Installation:** Same class (parameter change on existing controller).; - **Commissioning:** Same class (se"
-     ]
-    },
-    {
-     "stage": "repair_3",
-     "chars": 2757,
-     "latency_s": 13.0,
-     "transport_tries": 4,
-     "route": "zai_gateway",
-     "route_model": null,
-     "fallback_reason": null,
-     "critic_verdict": "CLEAN",
-     "type_gate": {
-      "verdict": "MATCH",
-      "reason": "proposes a mitigation (section=True, verbs=True)"
-     },
-     "scan": {
-      "BILL_UNTAGGED": [
-       "- **Permitted Measures:** Temperature retuning and procedural changes comply.",
-       "- **Direction-of-Effect:** Cyclic cooling reduces nucleation rate, aligning with constrain",
-       "- **Inputs:** Uses existing temperature sensor (stated in problem).",
-       "- **Operational Loss:** Priced at 0.1 kWh/cycle; <<1% of cell energy budget."
-      ],
-      "STATED_REACTION_ELEMENT_PHANTOM": [
-       "formation product 'ON' uses element(s) N with no source species anywhere in the answer: ...ion:  tempC  (15 min) →  tempC  (45 min) | (a) |  \n| Commercial PID timer relay (b) | Controller I/O | 15 min ON / 45 min OFF cycle | (b) |  \n\n**BURDE"
-      ],
-      "INPUT_UNAVAILABLE": [
-       "derived feature input '\\ ); this suppresses bubble coalescence and mist carr' is not derivable from the permitted signals",
-       "derived feature input 'existing HMI)' is not derivable from the permitted signals",
-       "derived feature input '70% mist reduction' is not derivable from the permitted signals"
-      ]
-     },
-     "direction_check": {
-      "direction": "CORRECT",
-      "reason": "driver: Bubble nucleation and coalescence during oxygen evolution at the anode, driven by high temperature and constant thermal conditions, increase acid aerosol mist generation. | ingredient: Cyclic temperature reduction during the duty cycle decreases bubble nucleation rate by lowering the temperature, thereby suppressing mist formation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
-      "established_driver": "Bubble nucleation and coalescence during oxygen evolution at the anode, driven by high temperature and constant thermal conditions, increase acid aerosol mist generation.",
-      "ingredient_action": "Cyclic temperature reduction during the duty cycle decreases bubble nucleation rate by lowering the temperature, thereby suppressing mist formation.",
-      "sign_of_ingredient_vs_driver": "OPPOSITE"
-     },
-     "sha256_16": "c44af239d17eb763",
-     "findings_disclosed": [
-      "BILL_UNTAGGED: - **Permitted Measures:** Temperature retuning and procedural changes comply.; - **Direction-of-Effect:** Cycl",
-      "STATED_REACTION_ELEMENT_PHANTOM: formation product 'ON' uses element(s) N with no source species anywhere in the answer: ...ion:  tempC  (15 mi",
-      "INPUT_UNAVAILABLE: derived feature input '\\ ); this suppresses bubble coalescence and mist carr' is not derivable from the permit"
-     ]
+     "sha256_16": "b4fd00d65c8334f2",
+     "findings_disclosed": []
     }
    ],
    "engine_plans_n": 3,
    "winner_rule": "smoke_synthetic",
    "onrow_sign_contradictions": 0,
-   "onrow_answer_claims": 16,
-   "final_sha256_16": "c44af239d17eb763",
-   "final_chars": 2757
+   "onrow_answer_claims": 22,
+   "final_sha256_16": "b4fd00d65c8334f2",
+   "final_chars": 7896
   },
   {
    "problem_id": "HO7-09-chiller-condenser-fouling",
-   "generated_at": "2026-11-18T17:55:48.675518Z",
+   "generated_at": "2026-11-18T19:10:45.976420Z",
    "histogram_before": {
-    "** thermal duty cycle modulation.": 1
+    "interfacial modification and thermal setpoint reduction": 1
    },
    "histogram_after": {
-    "** thermal duty cycle modulation.": 1
+    "interfacial modification and thermal setpoint reduction": 1
    },
    "attempts": [
     {
      "stage": "draft",
-     "chars": 3087,
+     "chars": 12223,
      "latency_s": 13.6,
      "transport_tries": 1,
      "route": "zai_gateway",
@@ -208,33 +111,56 @@
       "verdict": "MATCH",
       "reason": "observable/indicator design present"
      },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
      "scan": {
       "BILL_UNTAGGED": [
-       "- **Components**: Existing condenser water inlet/outlet temperature sensors, condenser wat",
-       "- **Procedure**: Calculate condenser approach temperature (outlet - inlet) and normalize b",
-       "- Condenser water inlet/outlet temperature: ALREADY-RECORDED (stated).",
-       "- Condenser water flow rate: ALREADY-RECORDED (stated).",
-       "- Compressor power: ALREADY-RECORDED (stated).",
-       "- **Installability**: SAME (uses existing sensors).",
-       "- **Operability**: SAME (no new data streams or procedures).",
-       "- **Maintenance**: SAME (no additional hardware).",
-       "- **Cost class**: SAME (no new sensors or refrigerant-side taps).",
-       "- **Primary indicator**: Compressor power (stated as primary failure driver).",
-       "- **Supplementary indicator**: Condenser approach temperature normalized by flow (stated e",
-       "- **Risk**: False alarms may occur if power increases are due to non-fouling causes (e.g.,"
+       "*   **Input Streams:**",
+       "*   $T_{cw,in}$, $T_{cw,out}$: **ALREADY-RECORDED** (stated in constraint: \"existing conde",
+       "*   $\\dot{m}_{cw}$: **ALREADY-RECORDED** (stated in constraint: \"existing condenser-water ",
+       "*   $P_{comp}$: **ALREADY-RECORDED** (stated in constraint: \"compressor input power\").",
+       "*   **Reference/Threshold:**",
+       "*   **Design Minimum Approach ($A_{design}$):** **DERIVED** from **stated specs/nameplate*",
+       "*   **COP_Limit($T_{cw,in}$):** **DERIVED** from stated physics (Ideal/Carnot or Manufactu",
+       "*   **Trip Head ($P_{cond, trip}$):** **DERIVED** from stated manufacturer limits (High He",
+       "*   **Procedure:**",
+       "1.  Calculate $Q_{cond} = \\dot{m}_{cw} \\cdot c_p \\cdot (T_{cw,out} - T_{cw,in})$.",
+       "2.  Calculate $P_{cool} = Q_{cond} - P_{comp}$.",
+       "3.  Calculate $COP_{actual} = P_{cool} / P_{comp}$.",
+       "4.  Lookup/Calculate $COP_{limit}$ using $T_{cw,in}$ and the Design Performance Curve (whi",
+       "5.  Calculate $Fouling\\_Defect = COP_{limit} - COP_{actual}$.",
+       "6.  Calculate $Rate = \\frac{d(Fouling\\_Defect)}{dt}$ over the last 7-10 days.",
+       "7.  Calculate $Time\\_To\\_Trip = \\frac{(Defect\\_at\\_Trip - Current\\_Defect)}{Rate}$.",
+       "8.  Alarm if $Time\\_To\\_Trip < 14$ days.",
+       "*   **Standard Practice:** Monitor COP against a rolling 3-year average baseline. Requires",
+       "*   **Proposed Mechanism:** Monitor COP against a static Physics/Specs limit. Requires no ",
+       "*   **Installability:** Same. Uses existing sensors.",
+       "*   **Operability:** Easier. No need to \"train\" the baseline or adjust for changing operat",
+       "*   **Maintenance:** Lower. No data logger cleaning.",
+       "*   **Cost:** Same sensor class. Lower software complexity (no regression against history,",
+       "*   **Feasibility:** The key feasibility challenge is ensuring $COP_{limit}$ is accurate. "
+      ],
+      "REASONING_THRASH_LEAK": [
+       "Wait, $Q_{cond} \\approx P_{cool} + P_{comp}$. By energy balance, $\\dot{m}_{cw} c_p \\Delta T_{cw} = Q_{cond}$."
+      ],
+      "PREDICTOR_VIOLATION": [
+       "BASELINE_PROGRAM"
       ],
       "INPUT_UNAVAILABLE": [
-       "required online signal 'pressure' is not among the permitted measures/signals",
-       "derived feature input 'refrigerant-side pressure sensors to detect head increases' is not derivable from the permitted signals"
+       "required online signal 'fouling' is not among the permitted measures/signals"
       ]
      },
      "direction_check": null,
-     "sha256_16": "f3715a186bf1693b"
+     "sha256_16": "527b7be46925eb4a"
     },
     {
      "stage": "repair_1",
-     "chars": 3345,
-     "latency_s": 13.3,
+     "chars": 6667,
+     "latency_s": 8.9,
      "transport_tries": 2,
      "route": "zai_gateway",
      "route_model": null,
@@ -246,26 +172,27 @@
      },
      "scan": {
       "BILL_UNTAGGED": [
-       "- **Installability**: Same as standard practice (uses existing sensors).",
-       "- **Operability**: Same as standard practice (no new instrumentation).",
-       "- **Maintenance**: Same as standard practice (no additional maintenance).",
-       "- **Cost Class**: Same as standard practice (no new hardware)."
-      ],
-      "INPUT_UNAVAILABLE": [
-       "derived feature input 'heat transfer degradation' is not derivable from the permitted signals"
+       "*   *Derivation:* Both are ALREADY-RECORDED per constraint (\"existing ... compressor input",
+       "*   *Action:* Compute the ratio $EER_{cond} = \\frac{\\dot{m}_{cw} c_p \\Delta T_{cw}}{P_{com",
+       "*   *Threshold:* If $EER_{cond}$ drops below a calculated baseline by more than X%, trigge",
+       "*   Installability: ZERO (uses existing sensors: $T_{in}$, $T_{out}$, Flow Meter, Power Me",
+       "*   Operability: Low (requires BMS/SCADA logic update).",
+       "*   Maintenance: ZERO.",
+       "*   Cost: Software license/programming hours only.",
+       "*   Operational Loss: **ZERO** (monitoring only; does not change setpoints or reduce cooli",
+       "*   Parity: Same burden class as standard \"Approach Temperature Alarm,\" but with higher le"
       ]
      },
      "direction_check": null,
-     "sha256_16": "765ea64c23b3a2a0",
+     "sha256_16": "6f5e5f1ceb45ead0",
      "findings_disclosed": [
-      "BILL_UNTAGGED: - **Installability**: Same as standard practice (uses existing sensors).; - **Operability**: Same as standard ",
-      "INPUT_UNAVAILABLE: derived feature input 'heat transfer degradation' is not derivable from the permitted signals"
+      "BILL_UNTAGGED: *   *Derivation:* Both are ALREADY-RECORDED per constraint (\"existing ... compressor input; *   *Action:* Comp"
      ]
     },
     {
      "stage": "repair_2",
-     "chars": 2717,
-     "latency_s": 13.9,
+     "chars": 11270,
+     "latency_s": 14.7,
      "transport_tries": 3,
      "route": "zai_gateway",
      "route_model": null,
@@ -277,22 +204,46 @@
      },
      "scan": {
       "BILL_UNTAGGED": [
-       "- **Installability**: Same as standard practice (uses existing sensors).",
-       "- **Operability**: Same as standard practice (no new procedures).",
-       "- **Maintenance**: Same as standard practice (no new components).",
-       "- **Cost Class**: Same as standard practice (no new hardware or sensors)."
+       "*   $T_{in}$: Stated \"existing condenser-water inlet... temperature\". PERMITTED.",
+       "*   $T_{out}$: Stated \"existing... outlet... temperature\". PERMITTED.",
+       "*   $Flow$: Stated \"condenser-water flow meter\". PERMITTED.",
+       "*   $P_{in}$: Stated \"compressor input power\". PERMITTED.",
+       "*   $k$: Derived from nameplate. PERMITTED.",
+       "*   No new sensors required. No refrigerant taps required.",
+       "*   **Standard Practice Burden:** Requires weather station data (wet bulb) or a complex st",
+       "*   **My Burden:**",
+       "*   **Installability:** Zero. Uses existing DCS tags.",
+       "*   **Operability:** Zero. The chiller runs normally.",
+       "*   **Maintenance:** Zero. The calculation is static.",
+       "*   **Rough Cost Class:** $0 incremental hardware cost. Minor engineering time for one-tim",
+       "*   **Parity:** My burden is *LOWER* than standard practice because I eliminate the depend",
+       "*   **Operational Loss:** **Zero.** The predictor does not modulate setpoints. It only ala",
+       "1.  **Historical Back-Test (Validation):**",
+       "*   Retrieve 1 year of historical DCS data for the 900 kW chiller ($T_{in}, T_{out}, Flow,",
+       "*   Identify periods known to be \"Clean\" (post-cleaning) and \"Fouled\" (pre-cleaning, appro",
+       "*   Calculate $k$ using the \"Clean\" period data (average of $E$ should be near 0).",
+       "*   Apply the calculated $k$ to the entire dataset.",
+       "*   **Pass Criterion:** The calculated deviation $E$ remains within $\\pm 0.5\\text{K}$ for ",
+       "*   **Fouling Detection:** The \"Fouled\" period data should show a monotonic increase in $E",
+       "*   **14-Day Lead:** Identify the point in the \"Fouled\" data where $E$ crossed the $0.5\\te",
+       "2.  **Kill Criterion:**",
+       "*   If the historical data shows that the \"Clean\" variability (noise) in $E$ is consistent",
+       "*   If the lead time cannot be extended to 14 days without the false alarm rate exceeding ",
+       "*   **Primary Stated Indicator:** The problem states the failure is \"high-head trip\". The ",
+       "*   **My Indicator:** I am monitoring **Thermal Deviation ($E$)**, which is a *secondary* ",
+       "*   **Compliance Check:** The constraint says \"use only... temperature, flow, power\". It d"
       ]
      },
      "direction_check": null,
-     "sha256_16": "a8060488f48f7efa",
+     "sha256_16": "749bd63f73edeefa",
      "findings_disclosed": [
-      "BILL_UNTAGGED: - **Installability**: Same as standard practice (uses existing sensors).; - **Operability**: Same as standard "
+      "BILL_UNTAGGED: *   $T_{in}$: Stated \"existing condenser-water inlet... temperature\". PERMITTED.; *   $T_{out}$: Stated \"exist"
      ]
     },
     {
      "stage": "repair_3",
-     "chars": 2966,
-     "latency_s": 11.4,
+     "chars": 8176,
+     "latency_s": 10.0,
      "transport_tries": 4,
      "route": "zai_gateway",
      "route_model": null,
@@ -304,38 +255,69 @@
      },
      "scan": {
       "BILL_UNTAGGED": [
-       "- **Installability**: Same as standard practice (uses existing sensors).",
-       "- **Operability**: Same as standard practice (no new hardware).",
-       "- **Maintenance**: Same as standard practice (no additional maintenance).",
-       "- **Cost Class**: Same as standard practice (software-only modification).",
-       "1. Collect 14 days of condenser water inlet/outlet temperatures and flow rate data (ALREAD",
-       "2. Calculate ε daily and compare to baseline.",
-       "3. Trigger alarm if ε drops below threshold for 3 consecutive days.",
-       "- False alarm rate ≤ 1 per year (USER CONSTRAINT).",
-       "- Detection lead time ≥ 14 days (USER CONSTRAINT).",
-       "- Test validated against historical fouling events (ALREADY-RECORDED data).",
-       "- Kill criterion: Failure to detect fouling within 14 days of a known event.",
-       "- **Risk**: Cooling tower water temperature variability may affect ε calculation.",
-       "- **Mitigation**: Use seasonal baseline adjustments (DERIVED from historical data)."
+       "1. **Data Logger/SCADA Point Mapping**:",
+       "- **Component**: Existing BMS/PLC historian database.",
+       "- **Material/State**: As-installed.",
+       "- **Input Signals**:",
+       "- Condenser Water Inlet Temp ($T_{in}$): **ALREADY-RECORDED**.",
+       "- Condenser Water Outlet Temp ($T_{out}$): **ALREADY-RECORDED**.",
+       "- Condenser Water Flow ($\\dot{m}$): **ALREADY-RECORDED**.",
+       "- Compressor Input Power ($P_{in}$): **ALREADY-RECORDED**.",
+       "- Chiller Load (kW): **ALREADY-RECORDED** (derived from refrigerant side sensors, standard",
+       "2. **Baseline Algorithm (Firmware Update)**:",
+       "- **Component**: SCADA Control Logic / Python Dashboard.",
+       "- **Material**: Software code.",
+       "- **Procedure**:",
+       "- Calculate $T_{ref}$ (Expected Outlet): Using $P_{in}$, $T_{in}$, and $\\dot{m}$, the algo",
+       "- Calculate Deviation $\\Delta D = T_{out, measured} - T_{ref}$.",
+       "- Threshold Setting: Set $\\Delta D_{threshold}$ based on the fouling rate required to trig",
+       "- **Installability**: Zero new hardware. Standard practice (DPT) requires 2 new transducer",
+       "- **Operability**: Algorithm runs on existing SCADA. No operator intervention required bey",
+       "- **Maintenance**: None. No new sensors to calibrate.",
+       "- **Rough Cost Class**: Software configuration labor only (~$500–$1,000). Standard practic",
+       "- **Operational Loss**: **Zero**. The algorithm is passive. No setpoint changes or duty-cy",
+       "1. Retrieve 12 months of historical data from the BMS.",
+       "2. Identify a period of known low fouling (e.g., after a chemical treatment or at start of",
+       "3. Simulate the current data: Apply the algorithm to the most recent 30 days.",
+       "4. Calculate $\\Delta D$ daily.",
+       "5. **Pass/Fail**:",
+       "- **False Alarm Test**: Count alarms where $\\Delta D > Threshold$ that were *not* followed",
+       "- **Lead Time Test**: For the most recent actual fouling event (if one occurred), check if",
+       "- **Kill Criterion**: If the variance in $T_{out}$ due to control variability (load swings",
+       "- **Primary Stated Indicator**: **Condenser Approach Temperature** (implicit). The problem",
+       "- **Permitted Inputs**: $T_{in}$, $T_{out}$, $\\dot{m}$, $P_{in}$. All are existing BMS poi",
+       "- **Permitted Set Clause**: The constraint explicitly limits to \"existing... temperature..",
+       "- **Direction-of-Effect**: The predictor does *not* drive the failure; it *detects* the dr",
+       "- **Input-Availability**: All inputs are stated existing signals.",
+       "1. **BILL_UNTAGGED**: Resolved. Every input is tagged ALREADY-RECORDED with the problem's ",
+       "2. **Deployed-Part Clause**: Resolved. No modification of chiller or piping. Purely SCADA/",
+       "3. **Exemplar-Reality**: No commercial exemplars needed. Standard BMS functionality.",
+       "4. **Premise-Validity**: All signals ($T_{in}, T_{out}, \\dot{m}, P_{in}$) are standard chi",
+       "5. **Certified-System**: N/A (HVAC, not medical/food).",
+       "6. **Direction-Correctness**: The predictor tracks the *rise* in $T_{out}$ (relative to ex",
+       "7. **Input-Availability**: Verified against constraint.",
+       "8. **Cost-Pricing**: No operational cost (passive).",
+       "9. **Mechanism-Diversity**: MECHANISM CLASS: Computational Baseline Reconstruction. This i"
       ],
       "INPUT_UNAVAILABLE": [
-       "derived feature input 'a heat exchanger effectiveness model' is not derivable from the permitted signals"
+       "required online signal 'resistance' is not among the permitted measures/signals",
+       "derived feature input 'direct thermal resistance measurement   (requires differenti' is not derivable from the permitted signals"
       ]
      },
      "direction_check": null,
-     "sha256_16": "02f359f9e2878c32",
+     "sha256_16": "fd98d86830ed803a",
      "findings_disclosed": [
-      "BILL_UNTAGGED: - **Installability**: Same as standard practice (uses existing sensors).; - **Operability**: Same as standard ",
-      "INPUT_UNAVAILABLE: derived feature input 'a heat exchanger effectiveness model' is not derivable from the permitted signals"
+      "BILL_UNTAGGED: 1. **Data Logger/SCADA Point Mapping**:; - **Component**: Existing BMS/PLC historian database.; - **Material/S",
+      "INPUT_UNAVAILABLE: required online signal 'resistance' is not among the permitted measures/signals; derived feature input 'direct"
      ]
     }
    ],
    "engine_plans_n": 3,
    "winner_rule": "smoke_synthetic",
    "onrow_sign_contradictions": 0,
-   "onrow_answer_claims": 5,
-   "final_sha256_16": "02f359f9e2878c32",
-   "final_chars": 2966
+   "onrow_answer_claims": 15,
+   "final_sha256_16": "fd98d86830ed803a",
+   "final_chars": 8176
   }
  ]
 }

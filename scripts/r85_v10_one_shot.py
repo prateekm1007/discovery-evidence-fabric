@@ -1,9 +1,22 @@
 #!/usr/bin/env python3
 """scripts/r85_v10_one_shot.py — the FROZEN ENGINE-ROUTE MACHINE for
-the sealed holdout v10 one-shot generation (the AM73-unblocked one-shot;
+the sealed holdout v10 one-shot generation (the AM75-unblocked one-shot;
 preregistration audit/holdout_v10/PREREGISTRATION.json @ the audit
-branch 227e9e97b, seal 102a33bb..., n=30, power pre-registered,
-model_pin cohere/command-a).
+branch aef833e5c, seal 102a33bb..., n=30, power pre-registered,
+model_pin agnes-3.0-flash — the OWNER-DIRECTED default generator).
+
+AM75 RE-FREEZE (audit aef833e5c, R86 verification): the v10 model
+pin is amended BACK to agnes-3.0-flash (supersedes AM73's
+cohere/command-a — the xkiro free-model daily token quota
+~150K/day empirical ceiling cannot carry the ~870K run; agnes
+served v9 30/30 and carries the 2-key ordered rotation). This
+instrument was consciously re-frozen under the LIVE claim c-0100
+(lease 2026-11-20T00:00Z, zero v10 rows generated before this
+re-freeze — the R85 window was typed INFRA_BLOCKED, so the one-shot
+integrity is intact): V10_REQUEST_MODEL and GATEWAY_UPSTREAM are the
+only operational changes; the frozen V7.7 machine module bytes are
+untouched (the freeze guard stays green — its file constant was
+already agnes-3.0-flash).
 
 AUTHORED AND COMMITTED BEFORE the holdout-v10-generation claim and
 BEFORE ANY v10 problem read (claim-before-work, Art. 29(b); the F62
@@ -26,26 +39,26 @@ the LLM EXPANSION of the chosen winner plan reuses the FROZEN V7.7
 loop BYTE-UNCHANGED (machine_generate_v77 — the same expansion
 discipline the v9 one-shot measured; the frozen module's file bytes
 are pinned by the r64 preflight freeze guard and are NOT touched by
-this instrument). The transport is the AM73 REGISTERED route only
-(xkiro / cohere/command-a), gated by
+this instrument). The transport is the AM75 REGISTERED route only
+(agnes / agnes-3.0-flash), gated by
 route_adapter.require_registered_model BEFORE the gateway starts (a
 wrapper-only or swapped-route measurement is refused typed).
 
-THE AM73 MODEL-PIN BINDING (typed, disclosed — the one deliberate
-difference from the v9 instrument): the frozen machine module
-scripts/r40_machine_v77.py carries the v9-era request constant
+THE AM75 MODEL-PIN BINDING (typed, disclosed — an IDENTITY binding
+under this amendment): the frozen machine module
+scripts/r40_machine_v77.py carries the request constant
 V77_REQUEST_MODEL="agnes-3.0-flash" in its FROZEN BYTES (the freeze
-guard pins them; the auditor's direction authorized flipping
-route_adapter.py — NOT frozen — and left the frozen machine's bytes
-untouched). The v10 request id is therefore bound AT RUNTIME by this
-committed instrument: bind_v10_request_model() rebinds the module
-attribute to V10_REQUEST_MODEL="cohere/command-a" BEFORE any call,
-so every machine request (expansion, repairs, direction checks)
-carries the registered id and the attestation chain
-served==requested==registered holds per call. The binding is
-idempotent, logged in every row's machine record, and asserted by
-the dry-run; the frozen FILE keeps its v9 history bytes (the guard
-stays green; the v9 attestation's provenance is untouched).
+guard pins them), and AM75 pins v10 to that SAME id — so
+bind_v10_request_model() rebinds the module attribute to
+V10_REQUEST_MODEL="agnes-3.0-flash" (a no-op identity rebinding that
+is still ASSERTED, still logged in every row's machine record, and
+still exercised by the dry-run). Every machine request (expansion,
+repairs, direction checks) carries the registered id and the
+attestation chain served==requested==registered holds per call; the
+frozen FILE keeps its v9-history bytes (the guard stays green; the
+v9 attestation's provenance is untouched; the AM73-era runtime
+override is retired with this re-freeze — its window generated zero
+v10 rows).
 
 THE ON-ROW PHYSICS LEG (F80, AM72/AM74 — the auditor's "all four
 binds + the on-row physics leg" direction): per row, zero LLM, the
@@ -79,7 +92,7 @@ ONE-SHOT DISCIPLINE (the prereg's one_shot_protocol + Art. 29(c)):
     the PUBLISHED canonical-tuple recipe (eval/seal_anchor_
     verification_recipe.json @9ea2614a8; F50) — fail-closed typed;
   - the prereg's model_pin.registered_id must equal the instrument
-    id AND the route registry id (the AM73 gate — a drifted pin
+    id AND the route registry id (the AM75 gate — a drifted pin
     refuses typed before any problem byte is read);
   - the PRIVATE rubric is NEVER read, listed, or copied by this
     script (it does not exist on any builder-visible branch; custody
@@ -98,9 +111,11 @@ ONE-SHOT DISCIPLINE (the prereg's one_shot_protocol + Art. 29(c)):
 GATEWAY DISCIPLINE (the r58 lesson): a stale gateway already
 listening on 127.0.0.1:8787 REFUSES the run typed (an unknown
 upstream would poison the attestation); the vault must carry
-XKIRO_API_KEY (typed INFRA_CREDENTIAL_MISSING otherwise); the gateway
-starts with ZAI_GATEWAY_UPSTREAM=xkiro + XKIRO_MODEL_ID=cohere/
-command-a so the served id is the registered id (R458-C1 semantics:
+AGNES_API_KEY (typed INFRA_CREDENTIAL_MISSING otherwise; the ordered
+AGNES_API_KEY_2 rotation rides the gateway's agnes keyEnvs — R67s2
+per-key quota buckets); the gateway
+starts with ZAI_GATEWAY_UPSTREAM=agnes + AGNES_MODEL_ID=agnes-
+3.0-flash so the served id is the registered id (R458-C1 semantics:
 requested+served both logged; the attestation requires equality).
 
 RESUME SAFETY: eval/holdout_v10_generation/rows/ carries one file per
@@ -140,7 +155,7 @@ if ZAI_BIN.is_dir() and str(ZAI_BIN) not in sys.path:
 
 from r40_machine_v77 import (  # noqa: E401,E402
     machine_generate_v77, start_gateway, declared_template)
-import r40_machine_v77 as _m77  # noqa: E402  (the AM73 runtime binding)
+import r40_machine_v77 as _m77  # noqa: E402  (the AM75 identity binding)
 # Art. 22 v3.2.0 measured-path declaration (F61): the v10 measurement
 # runs THROUGH THE ENGINE — engine_route -> mechanism_space — and the
 # transport identity is gated by the engine's own route registry
@@ -162,12 +177,14 @@ V10_PROBLEMS_PATH = "audit/holdout_v10/holdout_v10_problems.json"
 EXPECTED_SEAL = ("102a33bb7dc563a3c2929050875800226d0094d2e0b015bad2"
                  "53c55e3ee17561")
 EXPECTED_N = 30
-# AM73 (audit 227e9e97b): the v10 registered generator id — R81's
-# fire-now probe-verified frontier flagship. The request id flows to
+# AM75 (audit aef833e5c, the owner default directive): the v10
+# registered generator id — agnes-3.0-flash, the id that served v9
+# 30/30 with the 2-key ordered rotation. The request id flows to
 # the gateway (which serves the registered id, R458-C1) so the
 # attestation chain served==requested==registered holds per call.
-V10_REQUEST_MODEL = "cohere/command-a"
-GATEWAY_UPSTREAM = "xkiro"
+# Supersedes AM73's cohere/command-a (xkiro free-quota blocked, R85).
+V10_REQUEST_MODEL = "agnes-3.0-flash"
+GATEWAY_UPSTREAM = "agnes"
 MEASURED_PATH = ("discovery_fabric.engine.engine_route -> "
                  "mechanism_space")
 # burned NON-v10 rows for the mechanics-only smoke (the v7 packet —
@@ -178,8 +195,12 @@ SMOKE_PACKET = "audit/holdout_v7/holdout_v7_problems.json"
 SMOKE_ROWS = ["HO7-01-zinc-ew-acid-mist",
               "HO7-09-chiller-condenser-fouling"]
 # the frozen v77 module's file constant (the v9-era pin the freeze
-# guard pins); the runtime binding overrides it for THIS process only
+# guard pins); under AM75 the v10 request id IS this constant — the
+# runtime binding is identity (asserted, never assumed)
 FROZEN_V77_FILE_CONSTANT = "agnes-3.0-flash"
+assert V10_REQUEST_MODEL == FROZEN_V77_FILE_CONSTANT, (
+    "AM75 identity drifted: the v10 pin and the frozen machine "
+    "constant must be the same id (typed abort at import)")
 
 
 def _now() -> str:
@@ -202,14 +223,17 @@ def _git_show(path: str) -> str:
 
 
 def bind_v10_request_model() -> str:
-    """The AM73 model-pin binding (typed, disclosed): rebind the
-    frozen machine module's request constant AT RUNTIME to the v10
-    registered id. The frozen FILE bytes are untouched (the r64
-    preflight freeze guard pins them; the v9 attestation's
-    provenance stands); every machine call in THIS process requests
-    cohere/command-a. Returns the frozen file constant for the
-    record (provenance: the binding is the committed instrument's
-    own line, never a silent swap)."""
+    """The AM75 model-pin binding (typed, disclosed — IDENTITY under
+    this amendment): rebind the frozen machine module's request
+    constant AT RUNTIME to the v10 registered id. Under AM75 the two
+    ids are the SAME string (agnes-3.0-flash — the frozen machine's
+    v9-era constant), so the rebinding is a no-op that is still
+    asserted and still logged (never an assumption). The frozen FILE
+    bytes are untouched (the r64 preflight freeze guard pins them;
+    the v9 attestation's provenance stands); every machine call in
+    THIS process requests the registered id. Returns the frozen file
+    constant for the record (provenance: the binding is the
+    committed instrument's own line, never a silent swap)."""
     frozen_const = _m77.V77_REQUEST_MODEL
     assert frozen_const == FROZEN_V77_FILE_CONSTANT, (
         f"the frozen machine module's constant drifted from the v9 "
@@ -252,26 +276,26 @@ def verify_seal(doc: dict, prereg_sel: str) -> dict:
 def load_v10_problems() -> tuple:
     """Problems ONLY, from the auditor's custody (fail-closed). The
     PRIVATE rubric is never touched by this script. The seal AND the
-    AM73 model pin are verified BEFORE any row runs."""
+    AM75 model pin are verified BEFORE any row runs."""
     prereg = json.loads(_git_show(V10_PREREG_PATH))
     sel = str(prereg.get("selection_sha256") or "")
     assert sel == EXPECTED_SEAL, (
         f"the prereg's selection_sha256 drifted from the pre-registered "
         f"v10 seal {EXPECTED_SEAL[:16]}... (typed abort)")
-    # the AM73 gate: the prereg's model pin, the instrument id and
+    # the AM75 gate: the prereg's model pin, the instrument id and
     # the route registry id must all name the SAME registered model
     pin = str((prereg.get("model_pin") or {})
               .get("registered_id") or "")
     assert pin == V10_REQUEST_MODEL, (
         f"the prereg's model_pin.registered_id is {pin!r} but the "
         f"instrument serves {V10_REQUEST_MODEL!r} (typed abort — the "
-        f"AM73 amendment and the instrument must agree before any "
+        f"AM75 amendment and the instrument must agree before any "
         f"problem byte is read)")
     reg_model = route_adapter.ROUTE_REGISTRY["registered"]["model"]
     assert reg_model == V10_REQUEST_MODEL, (
         f"the route registry's registered id is {reg_model!r} but "
         f"the instrument serves {V10_REQUEST_MODEL!r} (typed abort "
-        f"— flip route_adapter per AM73 before the one-shot)")
+        f"— flip route_adapter per AM75 before the one-shot)")
     doc = json.loads(_git_show(V10_PROBLEMS_PATH))
     seal = verify_seal(doc, sel)
     assert seal["verified"], (
@@ -493,16 +517,16 @@ def run_rows(probs: list, smoke: bool = False,
               "unknown upstream would poison the attestation (the "
               "r58 lesson). Kill it first, then re-run.", flush=True)
         return 3
-    if route_adapter.resolve_vault_key("XKIRO_API_KEY") is None:
+    if route_adapter.resolve_vault_key("AGNES_API_KEY") is None:
         print("REFUSED (typed INFRA_CREDENTIAL_MISSING, exit 3): "
-              "XKIRO_API_KEY absent from the vault (.env.keys) — "
+              "AGNES_API_KEY absent from the vault (.env.keys) — "
               "restore custody first (scripts/r77_vault_restore.py, "
               "Art. 17 v3.3.0). Zero gateway bytes read.", flush=True)
         return 3
-    # the AM73 runtime binding + the gateway's xkiro upstream config
+    # the AM75 identity binding + the gateway's agnes upstream config
     frozen_const = bind_v10_request_model()
     os.environ["ZAI_GATEWAY_UPSTREAM"] = GATEWAY_UPSTREAM
-    os.environ["XKIRO_MODEL_ID"] = V10_REQUEST_MODEL
+    os.environ["AGNES_MODEL_ID"] = V10_REQUEST_MODEL
 
     rows_dir = OUT / ("rows_smoke" if smoke else "rows")
     rows_dir.mkdir(parents=True, exist_ok=True)
@@ -570,7 +594,7 @@ def _run_body(probs: list, smoke: bool, synthetic_plan,
             machine_prob = challenger_prob(prob, winner, rule)
         trace = engine_trace(prob, row_out, winner, wresult, rule)
         # (3) the FROZEN V7.7 expansion loop (byte-unchanged, the
-        # request id runtime-bound per AM73) renders the engine's
+        # request id identity-bound per AM75) renders the engine's
         # chosen plan on the registered route
         hist = dict(used_templates)
         t_row = _now()
@@ -587,11 +611,12 @@ def _run_body(probs: list, smoke: bool, synthetic_plan,
             "problem_id": pid,
             "question_type": prob.get("question_type"),
             "executor_id": EXECUTOR_ID,
-            "machine": ("r85_v10_one_shot/1.0.0 — frozen engine-route "
+            "machine": ("r85_v10_one_shot/1.1.0 (AM75 re-freeze) — "
+                        "frozen engine-route "
                         "machine: engine_route.run_row -> "
                         "mechanism_space + the V7.7 expansion loop "
-                        "(byte-reused; the AM73 runtime binding "
-                        f"rebinds the request id to "
+                        "(byte-reused; the AM75 identity binding "
+                        f"asserts the request id "
                         f"{V10_REQUEST_MODEL!r}; the frozen module "
                         "file constant "
                         f"{FROZEN_V77_FILE_CONSTANT!r} is untouched — "
@@ -698,7 +723,7 @@ def _parse_slice(slice_path: Path) -> tuple:
 def _write_attestation(slice_path: Path, run_start: str,
                         smoke: bool, resumed: bool = False) -> dict:
     """The 30/30 served==requested==registered PRE-SCORING
-    attestation (the prereg's mandatory artifact; the AM73 chain).
+    attestation (the prereg's mandatory artifact; the AM75 chain).
     Recomputable from committed bytes by `attest` (the verifier lane,
     Art. 29(c) — recompute, never re-run)."""
     calls, errors = _parse_slice(slice_path)
@@ -727,7 +752,7 @@ def _write_attestation(slice_path: Path, run_start: str,
                                        if c.get("key_id")}),
         "resumed_slice_merge": resumed,
         "note": ("served==requested==registered per completed call "
-                 "from the gateway log slice (the AM73 chain: the "
+                 "from the gateway log slice (the AM75 chain: the "
                  "instrument requests the registered id, the gateway "
                  "serves it — R458-C1 semantics — and the route "
                  "registry pins it); error lines (429/5xx backoff "
@@ -779,21 +804,23 @@ def smoke() -> int:
 def dry_run() -> int:
     """Zero-LLM mechanics check (Art. 22: fixtures prove mechanics
     only): the audit-ref loader plumbing (seal recipe EXERCISED on a
-    burned packet, never on v10), the AM73 binding, the engine route,
-    the winner rule, the payload construction, the on-row leg wiring,
-    the attestation shape — on burned DEV problems."""
-    # (0) the AM73 gate shape: the registry refuses the v9 pin and
-    # admits the v10 pin (the flip is in place BEFORE the machine
-    # freezes)
+    burned packet, never on v10), the AM75 identity binding, the
+    engine route, the winner rule, the payload construction, the
+    on-row leg wiring, the attestation shape — on burned DEV
+    problems."""
+    # (0) the AM75 gate shape: the registry admits the v10 pin and
+    # refuses the superseded AM73 pin (the flip is in place BEFORE
+    # the machine re-freezes)
     route_adapter.require_registered_model(V10_REQUEST_MODEL)
     try:
-        route_adapter.require_registered_model("agnes-3.0-flash")
-        raise AssertionError("the superseded v9 pin must refuse")
+        route_adapter.require_registered_model("cohere/command-a")
+        raise AssertionError("the superseded AM73 pin must refuse")
     except route_adapter.RouteRefused:
         pass
-    # (1) the AM73 runtime binding: the frozen file constant is the
-    # v9 pin, the module attribute binds to the v10 id, and the
-    # frozen FILE keeps its v9-era bytes (the freeze-guard parity)
+    # (1) the AM75 identity binding: the frozen file constant IS the
+    # v10 registered id, the module attribute binds (identity) to
+    # the v10 id, and the frozen FILE keeps its v9-era bytes (the
+    # freeze-guard parity)
     frozen_const = bind_v10_request_model()
     assert frozen_const == FROZEN_V77_FILE_CONSTANT
     assert _m77.V77_REQUEST_MODEL == V10_REQUEST_MODEL
@@ -802,8 +829,8 @@ def dry_run() -> int:
     assert f'V77_REQUEST_MODEL = "{FROZEN_V77_FILE_CONSTANT}"' \
         in machine_src, ("the frozen machine file's v9 constant "
                          "drifted (the freeze guard owns that byte)")
-    print(f"[dry-run] AM73 binding OK: file constant "
-          f"{FROZEN_V77_FILE_CONSTANT!r} (frozen) -> runtime "
+    print(f"[dry-run] AM75 binding OK (identity): file constant "
+          f"{FROZEN_V77_FILE_CONSTANT!r} (frozen) == runtime "
           f"{_m77.V77_REQUEST_MODEL!r}")
     # (2) the seal recipe, exercised on the burned v7 packet (public;
     # the recipe recomputes its seal exactly)
