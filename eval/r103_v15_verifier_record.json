@@ -1,0 +1,60 @@
+{
+ "record": "R103_V15_VERIFIER_RECORD/1.0.0",
+ "role": "VERIFIER (Art. 29(c) — the recompute, never a re-run)",
+ "session": "builder-r103s1",
+ "work_id": "holdout-v15-generation",
+ "claim": "c-0122 (pushed 392356702; the auditor R104 assignment)",
+ "verified_commit": "539b88340 (the sealed v15 one-shot completion; lane chain f567e1f3d -> e52cf9aa6)",
+ "executor_claim": "c-0119 (builder-r105s1, EXECUTOR, kind one_shot, DONE)",
+ "executor_self_attest": "c-0121 (builder-r105s1's own attest-lane record) — treated as a CLAIMANT artifact throughout: verified, never trusted (Art. 2)",
+ "verified_at": "2026-11-19T19:05Z (sandbox clock, TRUE UTC)",
+ "recompute_results": {
+  "seal": {
+   "method": "the F50 canonical-tuple recipe (r38 canonical_tuple_hash: contamination-filtered [problem_id, device, failure, question, question_type, user_variables] tuples, sorted by problem_id, compact JSON, sha256) recomputed INDEPENDENTLY over the PINNED audit ref 46b826512 bytes",
+   "v14_control": "REPRODUCED FIRST (the recipe-lock pattern): recomputed 7707a0b4520c2a52 == registered 7707a0b4520c2a52 over audit ref 36f9559ef, n=30, file sha16 d412b32ea6e912d8",
+   "v15": "VERIFIED: recomputed b0e7011309fa37cb206f47fdfd6e12f64e7ae9a640d34a5b0de8a24a7f78846c == the registered selection_sha256 == the AM90 seal; n=30 problems, 0 contamination-tagged, file sha16 21eea5c73eb0505d",
+   "split": "15 intervention-proposal + 15 predictor-design (matches the AM90 authoring and the executor's claim)"
+  },
+  "attestation_independent_tally": {
+   "rule": "the auditor Art. 13 independent-tally rule: recomputed from the RAW gateway slice + row files by my own script — never the driver's summary, never the executor's attest record",
+   "rows": "30/30 non-smoke rows committed, all HO15-*, 30 unique problem_ids, one executor_id (builder-r105s1@holdout-v15-generation) across every row, registered_model agnes-3.0-flash on every row",
+   "gateway": "157 calls status OK / 0 errors parsed from the committed slice lines; requested_model==agnes-3.0-flash on ALL 157; served model==agnes-3.0-flash on ALL 157; upstream==agnes on ALL; serving-key digests {5c4dffd28fe4, d0c666a3842f} — the 2-key rotation ACTIVE (both vault-registered digests)",
+   "p3_speed": "RECOMPUTED from the committed row_wall_s bytes: median 37.5 s <= 120 PASS; worst 56.2 s (HO15-12-beamhouse-lime) <= 300 PASS; wall range 13.3-56.2 s; 30 rows measured",
+   "answers": "4482-10374 chars, all non-empty",
+   "critic": "28 CLEAN / 2 FLAG — the two FLAG rows carry their residual codes IN THE ROW BYTES: HO15-09-yarn-texture-crimp (BILL_SECTION_MISSING + REASONING_THRASH_LEAK, BUDGET_EXHAUSTED) and HO15-29-sammying-roll (BILL_UNTAGGED, BUDGET_EXHAUSTED) — matching the executor's tally exactly",
+   "stops": "13 CONVERGED_ZERO_FINDINGS / 17 BUDGET_EXHAUSTED",
+   "measured_path": "30/30 rows carry mechanism_space in the engine_trace; 30/30 carry measure classes (the plan_measure_classes surface); the events ledger (HOLDOUT_V15_GENERATION_EVENTS/1.0.0) declares measured_path engine_route -> mechanism_space + the tool_grounded_critic post-generation corrector + the aide_tree_search controller, the five binds (F75_deliverable_class, chemistry_elicitation, formula_direction, element_conservation, equilibrium_direction) and the four controllers (c-0109 v1.2 TOOLS FIRST, c-0110 TREE SECOND, c-0112 conformal, the SUPERSEDING permitted_measures + the ammonia direction bind) — 30 events",
+   "smoke_leakage": "ZERO: rows_smoke/ holds exactly the 2 BURNED HO7 packet rows (HO7-01, HO7-09), disjoint from the 30 v15 rows"
+  },
+  "guard_calibrations": {
+   "r99_disjointness": "RE-RUN read-only over the committed corpus: the v15 problems vs the FULL v1-v14 prior corpus (278,824 bytes assembled) -> 0 clashes; the NON-VACUITY self-clash proof -> 54 clashes when v15 is included in the corpus (every row self-clashes — the corpus genuinely covers v15; the r97 vacuity class checked)",
+   "permitted_measures": "RE-RUN read-only over all 30 v15 rows: 0 MEASURE_NOT_IN_PERMITTED_SET, 0 MEASURE_CLASS_UNRESOLVED — with ACTIVE COVERAGE verified (163 measure rows collected across the set; 4-5 per sampled row; the permitted sets parse non-empty on every sampled problem) — a TRUE NEGATIVE (the machine stayed inside every permitted set), NOT the 22/30 NOT_APPLICABLE coverage gap class (the superseded guard's defect, closed at dacffd034)",
+   "ammonia_bind": "RE-RUN read-only over all 30 rows: 0 fires — correct on the textile/leather domain (no ammonia-stripping row exists in v15; the v15 direction traps are domain-specific — the AM90 trap rows HO15-01/06/09/14 are direction/equilibrium TRAPS, and the machine's answers on them were scored CLEAN by the in-loop critic except the two disclosed FLAG rows above); the engine CHECKS registry carries ammonia_strip_direction live"
+  },
+  "registry_invariants": {
+   "one_executor": "exactly ONE EXECUTOR claim on holdout-v15-generation (c-0119, kind one_shot, DONE); the verifier claims: the executor's own c-0121 + this window's independent c-0122",
+   "claim_before_read": "c-0119 staked at f567e1f3d with no_problem_read_before_claim=True before any v15 problem byte"
+  },
+  "remote_ci": {
+   "completion_push": "539b88340 -> R11 Queue Surface Check SUCCESS (check-run 135801990800, read via the API by this verifier)",
+   "record_pushes": "2500d15f5 / 5440835bc / e52cf9aa6 / 392356702 all FAILED on the executor's r105s1_status.json schema defects (see the verifier_remediation_note in that record) — remediated in this same push; this push is the arbiter"
+  }
+ },
+ "defects_found_and_remediated": [
+  {
+   "defect": "the executor's round record eval/r105s1_status.json carried the three schema defects (missing art27_capability_budget, missing engine_line_share_measured, missing remote_ci) — redding every queue push after the completion, including this verifier's claim push",
+   "remediation": "the typed cross-lane remediation IN THE SAME PUSH as this record (the dacffd034 verifier-remediates precedent): the three blocks appended to the executor's record with the verifier_remediation_note disclosure; every appended fact recomputed from committed bytes (the per-commit numstat proving ZERO engine lines in the eleven R105 commits; the API check-run reads) — the art27 typing follows the r100s1 sealed-run precedent (custody + measurement round, engine share 0 with the disclosed exception)",
+   "disclosure": "the remediation is attributed in-record; the executor's lane content is otherwise VERIFIED — the defect was record-schema-only, zero run-artifact impact"
+  }
+ ],
+ "verdict": "THE SEALED V15 ONE-SHOT VERIFIED from committed bytes on every auditor-assigned axis: the seal (v14 control reproduced, v15 == b0e7011309fa37cb...), the attestation (independent tally: 30/30, 157/0, served==requested==registered==agnes-3.0-flash on every completed call, 2-key rotation, one executor, zero smoke leakage), the P3 gates (37.5/56.2 s both PASS), and the guard calibrations (0 disjointness clashes with non-vacuity proven; permitted-measures 0 kills with ACTIVE coverage — a true negative; the ammonia bind correctly silent on the textile domain). The run is VALID for the auditor's PRIVATE-rubric scoring. NO acceptance/score claim — the auditor scores v15 (mean >=3.5, CI lower >3.0, 0/0/0 -> re-earn score 7 -> BURN v15).",
+ "zero_generation": true,
+ "what_decides_the_consequence": "the auditor's v15 scoring vs the private rubric (AM90); this record is the verifier input, never the verdict",
+ "art27_capability_budget": {
+  "engine_diff": "NONE — the verifier duty moves zero engine lines by design (the recompute, never a re-run); this push's code artifacts are the verification record + the typed record-schema remediation",
+  "primary_metric_delta": "none claimed — the sealed v15 measurement is the auditor's to score",
+  "deletions": "none",
+  "engine_line_share_measured": 0,
+  "share_exception_reason": "DISCLOSED EXCEPTION (the F63 class): this is a custody + enforcement round (the verifier recompute + the cross-lane record remediation); the r100s1 sealed-round precedent"
+ }
+}
