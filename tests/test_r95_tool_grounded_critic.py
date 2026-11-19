@@ -90,7 +90,10 @@ def test_tagger_never_guesses_ambiguous_or_protocol_rows():
         "2.  **Additive**: Commercial-grade glue solution, stock 100 ppm.": "b",
         "3.  **Procedure**: Reconfigure the dosing controller to pulse mode.": "c",
         "*   **Pass:** If PFC proxy decreases by >= 10%.": None,  # protocol
-        "**Operational Loss Pricing:**": None,                    # bare header
+        # v1.2 (R103 c-0117, W1): the burden-labeled BARE header is a
+        # dispatchable annotation (the #1 burned-v14 residual class);
+        # labels in NO family keep the 1.0.0 bare-header None
+        "**Operational Loss Pricing:**": "a",
         "5.  **Mystery**: The catalyst exhibits both commercial-grade "
         "support and schedule flexibility.": None,                # ambiguous
         "6.  **Schedule**: The dosing runs on an existing continuous "
@@ -168,7 +171,7 @@ def test_grounded_critique_end_to_end_reduces_the_residual():
 
 def test_grounding_record_is_typed():
     _, rec = tgc.tag_bill("no bill here")
-    assert rec["record"] == "TOOL_GROUNDED_CRITIC/1.0.0"
+    assert rec["record"] == "TOOL_GROUNDED_CRITIC/1.2.0"
 
 
 # ------------------------------------------------------------ guards

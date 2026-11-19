@@ -170,10 +170,14 @@ BAD_INPUTS = {
 def test_registry_has_nineteen_relations():
     # R54 (c-0072): 6 -> 12. R62 (claim c-0085): 12 -> 19 relations /
     # 31 failure classes to close the P1 coverage gap on the FULL DEV
-    # corpus (21 previously-unrouted rows); the pin moves with the
-    # registry (a stale literal reds — the R60-F1 lesson applied).
-    assert len(pc.CHECKS) == 19, sorted(pc.CHECKS)
-    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 31
+    # corpus (21 previously-unrouted rows). R103 (claim c-0117): 19 ->
+    # 22 relations / 33 classes (the AM89 ride-along legs:
+    # ammonia_free_fraction, nh3_henry_ratio, naoh_solubility_guard +
+    # the ammonia_stripping/caustic_dosing failure classes); the pin
+    # moves with the registry (a stale literal reds — the R60-F1
+    # lesson applied).
+    assert len(pc.CHECKS) == 22, sorted(pc.CHECKS)
+    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 33
 
 
 def test_every_check_refuses_garbage_rather_than_fabricating():

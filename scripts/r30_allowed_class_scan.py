@@ -51,6 +51,22 @@ import re
 
 from r26_catalog_scan import _bill_rows
 
+# R103 (claim c-0117; AM89 directive 1): the per-problem permitted-set
+# enforcement is ENGINE logic (discovery_fabric/engine/
+# permitted_measures.py + the committed canonical taxonomy
+# data/measure_class_taxonomy.json; the F63 engine-line discipline) —
+# this frozen seam only WIRES it into the machine's violation surface.
+try:  # pragma: no cover - import guard for the scripts-dir test path
+    import sys as _sys
+    from pathlib import Path as _Path
+    _REPO = _Path(__file__).resolve().parents[1]
+    if str(_REPO) not in _sys.path:
+        _sys.path.insert(0, str(_REPO))
+    from discovery_fabric.engine.permitted_measures import (
+        enforce_answer as _enforce_permitted_set)
+except Exception:  # noqa: BLE001 — typed fail-closed below
+    _enforce_permitted_set = None
+
 ALLOWED_SPAN = re.compile(
     r"allowed measures?\s*[:\-]?\s*(.+?)(?:\.|;|$)", re.I)
 PERMITTED_SPAN = re.compile(
@@ -248,9 +264,24 @@ def _bill_rows_scoped(answer: str) -> list:
 
 
 def scan_allowed_measures_class(problem: dict, answer: str) -> dict:
-    """The CONSTRAINT-CLASS bind (precision-first)."""
-    perm = parse_permitted_set(problem.get("constraint") or "")
+    """The CONSTRAINT-CLASS bind (precision-first) + the R103 per-
+    problem permitted-measure-set enforcement (the engine bind)."""
     out: dict = {}
+    # [R103 c-0117] the AM89 directive-1 typed KILL: any measure
+    # outside the problem's exhaustive permitted set. Engine logic,
+    # wired here (the auditor-named seam); additive — the legs below
+    # are byte-identical. Fail-open TYPED on engine-surface
+    # unavailability (never a silent pass; the authoritative read
+    # stays the auditor's).
+    if _enforce_permitted_set is not None:
+        try:
+            out.update(_enforce_permitted_set(problem, answer))
+        except Exception as e:  # noqa: BLE001 — typed fail-open note
+            out["PERMITTED_SET_ENFORCER_UNAVAILABLE"] = [
+                f"typed fail-open: {type(e).__name__}: {str(e)[:100]} "
+                "(the authoritative constraint read stays the "
+                "auditor's)"]
+    perm = parse_permitted_set(problem.get("constraint") or "")
     # R35 D2 pin: actuation-device laundering. Runs whenever the
     # constraint states a BOUNDED permitted set ("only"), even when the
     # set is not param-exhaustive (the HO5-05 set carried "antifoam

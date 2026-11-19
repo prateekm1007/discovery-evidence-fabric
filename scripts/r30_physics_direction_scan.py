@@ -33,6 +33,20 @@ from __future__ import annotations
 
 import re
 
+# R103 (claim c-0117; AM89 directive 2): the ammonia-stripping
+# direction/premise bind is ENGINE logic
+# (discovery_fabric/engine/stripping_direction.py) — this frozen seam
+# only WIRES it into the machine's violation surface.
+try:  # pragma: no cover - import guard for the scripts-dir test path
+    import sys as _sys
+    from pathlib import Path as _Path
+    _REPO = _Path(__file__).resolve().parents[1]
+    if str(_REPO) not in _sys.path:
+        _sys.path.insert(0, str(_REPO))
+    from discovery_fabric.engine.stripping_direction import (
+        scan_stripping_direction as _scan_stripping)
+except Exception:  # noqa: BLE001 — typed fail-open below
+    _scan_stripping = None
 DIRECTION_VERBS = re.compile(
     r"\b(reduc\w*|lower\w*|decreas\w*|keep\w*\s+\w*\s+below|"
     r"suppress\w*|limit\w*|avoid\w*|prevent\w*|increas\w*|rais\w*|"
@@ -102,6 +116,18 @@ def scan_physics_direction(problem: dict, answer: str) -> dict:
     judges whether the stated direction is CORRECT)."""
     out: dict = {}
     a = str(answer or "")
+    # [R103 c-0117] the AM89 directive-2 bind: the ammonia-stripping
+    # A/W + high-pH premise inversion (the HO14-12 class). Engine
+    # logic, wired here; additive — the legs below are byte-identical.
+    # Fail-open TYPED on engine-surface unavailability (never a silent
+    # pass; the authoritative direction read stays the auditor's).
+    if _scan_stripping is not None:
+        try:
+            out.update(_scan_stripping(problem, a))
+        except Exception as e:  # noqa: BLE001 — typed fail-open note
+            out["STRIPPING_BIND_UNAVAILABLE"] = [
+                f"typed fail-open: {type(e).__name__}: {str(e)[:100]}"]
+    # else: silent (module absent = a tree defect the CI catches)
     st = DIRECTION_STATEMENT.search(a)
     if not st:
         out["PHYSICS_DIRECTION_UNSTATED"] = [

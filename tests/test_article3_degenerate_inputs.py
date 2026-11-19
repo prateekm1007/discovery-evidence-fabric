@@ -37,6 +37,11 @@ from discovery_fabric.engine import physics_checks as pc  # noqa: E402
 DEGENERATE_KWARGS: dict[str, dict] = {
     "arrhenius_rate_ratio": dict(ea_kj_mol=80.0, t1_degC=25.0,
                                  t2_degC=-273.15),          # T2 = 0 K
+    # R103 (c-0117) ride-along relations: the true degenerate axes
+    "ammonia_free_fraction": dict(ph=15.0),                # pH > 14
+    "nh3_henry_ratio": dict(t1_degC=25.0, t2_degC=-273.15),  # T2 = 0 K
+    "naoh_solubility_guard": dict(concentration_mol_l=0.0,
+                                  mass_fraction=None),  # c <= 0
     "fouling_u_degradation": dict(u_clean_w_m2k=0.0,
                                   rf_after_m2k_w=0.0004,
                                   rf_before_m2k_w=0.0002),
@@ -200,6 +205,12 @@ HEALTHY_KWARGS: dict[str, dict] = {
     "humidity_permeability_ratio": dict(alpha_per_rh_percent=0.09,
                                         rh_percent=85.0,
                                         rh_ref_percent=0.0),
+    # R103 (c-0117) ride-along healthy companions
+    "ammonia_free_fraction": dict(ph=11.0, temp_degC=25.0,
+                                  ph_ref=8.5),
+    "nh3_henry_ratio": dict(t1_degC=25.0, t2_degC=60.0),
+    "naoh_solubility_guard": dict(concentration_mol_l=19.0,
+                                  temp_degC=25.0),
 }
 
 

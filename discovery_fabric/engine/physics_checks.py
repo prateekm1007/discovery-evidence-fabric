@@ -819,6 +819,197 @@ def humidity_permeability_ratio(alpha_per_rh_percent: float,
                        {"error": f"{type(e).__name__}: {e}"})
 
 
+
+# ---------------------------------------------------------------------------
+# R103 (claim c-0117; AM89 directives 2+4, the ride-along computed legs
+# of the ammonia-stripping direction bind + the caustic magnitude guard)
+# ---------------------------------------------------------------------------
+
+# typed Art. 9 assumption: the NH4+ <=> NH3(aq) + H+ dissociation
+# enthalpy ~ +52.2 kJ/mol (the CRC basis) -> pKa(T) via van 't Hoff on
+# the equilibrium constant: pKa(T) = 9.25 - (dH/R) * ln(T/298.15) ...
+# the standard integrated form on 1/T: pKa(T2) = pKa(T1) +
+# dH/(2.303*R) * (1/T2 - 1/T1); at 25 C, pKa = 9.25 (the classical
+# ammonia-stripper design basis).
+NH4_PKA_25C = 9.25
+NH4_DH_DISS_KJ_MOL = 52.2
+# typed Art. 9 assumption: NH3(g) -> NH3(aq) enthalpy of solution
+# ~ -34.18 kJ/mol (exothermic; the NIST/CRC basis) -> Henry constant
+# kH(T2)/kH(T1) = exp(-dH_sol/R * (1/T2 - 1/T1)) (van 't Hoff);
+# solubility FALLS with T -> the stripping driving force rises.
+NH3_DH_SOL_KJ_MOL = -34.18
+# typed Art. 9 calibration: NaOH solubility anchors (CRC Handbook,
+# g NaOH / 100 g water -> mass fraction w = g/(100+g)): 0 C: 42
+# (w=0.2958), 20 C: 111 (w=0.5261), 100 C: 339 (w=0.7722);
+# piecewise-linear in T between anchors. Solution density anchors
+# (kg/L at 20-25 C, CRC): w=0: 1.000, 0.10: 1.109, 0.20: 1.219,
+# 0.30: 1.328, 0.40: 1.430, 0.50: 1.525, 0.60: 1.615 (linear interp).
+NAOH_SOL_ANCHORS = ((0.0, 0.2958), (20.0, 0.5261), (100.0, 0.7722))
+NAOH_RHO_ANCHORS = ((0.0, 1.000), (0.10, 1.109), (0.20, 1.219),
+                     (0.30, 1.328), (0.40, 1.430), (0.50, 1.525),
+                     (0.60, 1.615))
+NAOH_MOLAR_MASS_G_MOL = 39.997
+
+
+def _interp(x: float, anchors: tuple) -> float:
+    if x <= anchors[0][0]:
+        return anchors[0][1]
+    if x >= anchors[-1][0]:
+        return anchors[-1][1]
+    for (x0, y0), (x1, y1) in zip(anchors, anchors[1:]):
+        if x0 <= x <= x1:
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    return anchors[-1][1]
+
+
+def ammonia_free_fraction(ph: float,
+                          temp_degC: float = 25.0,
+                          ph_ref: Optional[float] = None
+                          ) -> Dict[str, Any]:
+    """The NH4+ <=> NH3 equilibrium partition — the free (strippable)
+    NH3 fraction 1/(1 + 10^(pKa - pH)), pKa 9.25 at 25 C with the
+    typed van-'t-Hoff temperature correction. Direction: with ph_ref,
+    RAISING pH toward/above the pKa is 'improves' (more free NH3, the
+    stripper design basis); without, a neutral state read."""
+    try:
+        ph_f = float(ph)
+        t_c = float(temp_degC)
+        if not 0.0 <= ph_f <= 14.0:
+            raise ValueError("pH must be in [0, 14]")
+        if not 0.0 <= t_c <= 100.0:
+            raise ValueError("temperature must be in [0, 100] degC")
+        t_k = t_c + 273.15
+        pka = NH4_PKA_25C + (NH4_DH_DISS_KJ_MOL * 1e3 /
+                             (2.302585 * 8.314462618)) *             (1.0 / t_k - 1.0 / 298.15)
+        frac = 1.0 / (1.0 + 10.0 ** (pka - ph_f))
+        direction = "neutral"
+        detail = {"ph": ph_f, "temp_degC": t_c, "pka_used": round(pka, 3),
+                  "basis": "free NH3 fraction = 1/(1+10^(pKa-pH)); "
+                           "pKa 9.25 @25C, dH_diss +52.2 kJ/mol "
+                           "(van 't Hoff corrected)"}
+        if ph_ref is not None:
+            phr = float(ph_ref)
+            if not 0.0 <= phr <= 14.0:
+                raise ValueError("ph_ref must be in [0, 14]")
+            frac_ref = 1.0 / (1.0 + 10.0 ** (pka - phr))
+            direction = ("improves" if frac > frac_ref * 1.05 else
+                         ("worsens" if frac < frac_ref * 0.95
+                          else "neutral"))
+            detail["ph_ref"] = phr
+            detail["fraction_at_ph_ref"] = round(frac_ref, 4)
+            detail["basis"] += "; direction vs the ph_ref partition"
+        return _result("ammonia_free_fraction", "ammonia_stripping",
+                       "RUN", float(f"{frac:.4g}"), "fraction",
+                       direction, detail)
+    except (TypeError, ValueError, OverflowError) as e:
+        return _result("ammonia_free_fraction", "ammonia_stripping",
+                       "REFUSED", None, "fraction", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def nh3_henry_ratio(t1_degC: float, t2_degC: float) -> Dict[str, Any]:
+    """The van 't Hoff temperature dependence of the NH3 Henry
+    constant: kH(T2)/kH(T1) = exp(-dH_sol/R * (1/T2 - 1/T1)), dH_sol
+    -34.18 kJ/mol (exothermic dissolution). Direction: raising T
+    LOWERS solubility (ratio < 0.9) -> 'improves' the stripping
+    driving force; cooling 'worsens' it."""
+    try:
+        t1 = float(t1_degC) + 273.15
+        t2 = float(t2_degC) + 273.15
+        if t1 <= 0.0 or t2 <= 0.0:
+            raise ValueError("temperatures must be above absolute zero")
+        if not 0.0 <= t1 - 273.15 <= 200.0 or \
+                not 0.0 <= t2 - 273.15 <= 200.0:
+            raise ValueError("temperatures must be in [0, 200] degC")
+        dh = NH3_DH_SOL_KJ_MOL * 1e3
+        ratio = math.exp(-dh / 8.314462618 * (1.0 / t2 - 1.0 / t1))
+        direction = ("improves" if ratio < 0.9 else
+                     ("worsens" if ratio > 1.1 else "neutral"))
+        return _result(
+            "nh3_henry_ratio", "ammonia_stripping", "RUN",
+            float(f"{ratio:.4g}"), "dimensionless", direction,
+            {"t1_degC": t1 - 273.15, "t2_degC": t2 - 273.15,
+             "dH_sol_kJ_mol": NH3_DH_SOL_KJ_MOL,
+             "basis": "kH(T2)/kH(T1) = exp(-dH_sol/R*(1/T2-1/T1)); "
+                      "exothermic dissolution -> solubility FALLS with "
+                      "T -> the gas-stripping driving force rises "
+                      "(van 't Hoff, the AM89 ride-along leg)"})
+    except (TypeError, ValueError, OverflowError) as e:
+        return _result("nh3_henry_ratio", "ammonia_stripping",
+                       "REFUSED", None, "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def naoh_solubility_guard(concentration_mol_l: Optional[float] = None,
+                          mass_fraction: Optional[float] = None,
+                          temp_degC: float = 25.0
+                          ) -> Dict[str, Any]:
+    """The caustic magnitude guard: a claimed aqueous NaOH
+    concentration vs the saturation curve. A claim above saturation
+    (margin > 1.0) is physically unrealizable — the HO14-04 committed
+    byte claims '50 M NaOH' (>2.4x the ~20.6 M saturation at 25 C;
+    the 50%-w/w/50-M confusion class). Direction: margin > 1.0
+    'worsens' (unrealizable as stated); <= 1.0 'neutral' (feasible)."""
+    try:
+        t_c = float(temp_degC)
+        if not 0.0 <= t_c <= 100.0:
+            raise ValueError("temperature must be in [0, 100] degC")
+        if (concentration_mol_l is None) == (mass_fraction is None):
+            raise ValueError("exactly one of concentration_mol_l / "
+                             "mass_fraction is required")
+        if mass_fraction is not None:
+            w = float(mass_fraction)
+            if not 0.0 < w <= 1.0:
+                raise ValueError("mass_fraction must be in (0, 1]")
+            c_mol_l = w * _interp(w, NAOH_RHO_ANCHORS) * 1000.0 / \
+                NAOH_MOLAR_MASS_G_MOL
+        else:
+            c_mol_l = float(concentration_mol_l)
+            if not 0.0 < c_mol_l <= 60.0:
+                raise ValueError("concentration_mol_L must be in "
+                                 "(0, 60] mol/L")
+            # invert c = w*rho(w)*1000/M for w (monotone in range)
+            lo, hi = 1e-6, 0.80
+            w = lo
+            for _ in range(60):
+                mid = 0.5 * (lo + hi)
+                c_mid = mid * _interp(mid, NAOH_RHO_ANCHORS) * \
+                    1000.0 / NAOH_MOLAR_MASS_G_MOL
+                if c_mid < c_mol_l:
+                    lo = mid
+                else:
+                    hi = mid
+            w = 0.5 * (lo + hi)
+        w_sat = _interp(t_c, NAOH_SOL_ANCHORS)
+        margin = w / w_sat
+        direction = "worsens" if margin > 1.0 else "neutral"
+        detail = {"claimed_mass_fraction": round(w, 4),
+                  "claimed_mol_l": round(c_mol_l, 3),
+                  "saturation_mass_fraction_at_T": round(w_sat, 4),
+                  "saturation_mol_l_approx": round(
+                      w_sat * _interp(w_sat, NAOH_RHO_ANCHORS) * 1000.0
+                      / NAOH_MOLAR_MASS_G_MOL, 2),
+                  "temp_degC": t_c,
+                  "basis": "NaOH solubility anchors (CRC): 42/111/339 "
+                           "g per 100 g water at 0/20/100 C, linear in "
+                           "T; density anchors linear in w; a claim "
+                           "above the curve cannot exist as a single "
+                           "aqueous phase at that T"}
+        if margin > 1.0:
+            detail["SATURATION_EXCEEDED"] = (
+                f"the claimed concentration exceeds the NaOH "
+                f"saturation at {t_c:g} C by {margin:.2f}x — "
+                "physically unrealizable as stated (the 50%-w/w vs "
+                "50-M confusion class)")
+        return _result("naoh_solubility_guard", "caustic_dosing",
+                       "RUN", float(f"{margin:.4g}"), "dimensionless",
+                       direction, detail)
+    except (TypeError, ValueError, OverflowError) as e:
+        return _result("naoh_solubility_guard", "caustic_dosing",
+                       "REFUSED", None, "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
 CHECKS = {
     "arrhenius_rate_ratio": arrhenius_rate_ratio,
     "fouling_u_degradation": fouling_u_degradation,
@@ -839,6 +1030,9 @@ CHECKS = {
     "microbial_growth_rate": microbial_growth_rate,
     "dust_layer_ignition_margin": dust_layer_ignition_margin,
     "humidity_permeability_ratio": humidity_permeability_ratio,
+    "ammonia_free_fraction": ammonia_free_fraction,
+    "nh3_henry_ratio": nh3_henry_ratio,
+    "naoh_solubility_guard": naoh_solubility_guard,
 }
 
 CHECKS_BY_FAILURE_CLASS = {
@@ -877,6 +1071,10 @@ CHECKS_BY_FAILURE_CLASS = {
     "insulation_pd_aging": ["arrhenius_rate_ratio"],
     "perovskite_degradation": ["arrhenius_rate_ratio"],
     "insulating_fluid_oxidation": ["arrhenius_rate_ratio"],
+    # R103 (c-0117): the AM89 ride-along legs
+    "ammonia_stripping": ["ammonia_free_fraction",
+                          "nh3_henry_ratio"],
+    "caustic_dosing": ["naoh_solubility_guard"],
 }
 
 
@@ -892,6 +1090,11 @@ CHECKS_BY_FAILURE_CLASS = {
 # stay PENDING_INPUTS; the scenarios are wiring proofs, not data).
 # ---------------------------------------------------------------------------
 _CLASS_RULES = (
+    # R103 (c-0117): specific water-chemistry classes first
+    ("ammonia_stripping",
+     ("ammonia strip", "ammonia removal", "nh3 removal",
+      "stripping efficiency", "air stripping")),
+    ("caustic_dosing", ("caustic", "naoh", "sodium hydroxide")),
     # R62 (c-0085) expansion: specific classes FIRST (first match
     # wins). Keywords are collision-checked against every existing
     # rule — e.g. "leading-edge coating" (rain erosion) never fires on
@@ -996,6 +1199,12 @@ def classify_failure(text: str):
 REFERENCE_SCENARIOS = {
     "arrhenius_rate_ratio": {"ea_kj_mol": 80.0, "t1_degC": 60.0,
                              "t2_degC": 80.0},
+    # R103 (c-0117) ride-along legs
+    "ammonia_free_fraction": {"ph": 11.0, "temp_degC": 25.0,
+                              "ph_ref": 8.5},
+    "nh3_henry_ratio": {"t1_degC": 25.0, "t2_degC": 60.0},
+    "naoh_solubility_guard": {"concentration_mol_l": 19.0,
+                              "temp_degC": 25.0},
     "fouling_u_degradation": {"u_clean_w_m2k": 2000.0,
                               "rf_after_m2k_w": 0.0004,
                               "rf_before_m2k_w": 0.0002},

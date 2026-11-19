@@ -70,11 +70,6 @@ B_CASES = [
 NARRATIVE_NONE = [
     "*   **Rationale:** Calculates the dominant natural frequency of "
     "the liner assembly from th",
-    "*   **DIRECTION-OF-EFFECT:** Correctly identifies the mechanism "
-    "as a *detector* of passive",
-    "*   **Deployed-Part Compliance:** No modification to the plunger "
-    "or seal.",
-    "6.  **Deployed-Part Clause**:",
     "*   *Physics*: In a tube-and-shell HX, $P_{shell}$ fluctuates",
     "*   *Is this better?* Yes. It uses *only* the stated signals",
     "*   -   **However**, \"Tube Wastage\" often correlates with "
@@ -82,37 +77,60 @@ NARRATIVE_NONE = [
     "*   -   **This is a trap**. If I can't get thickness, I can't "
     "predict leak *time* in days.",
     "*   *Problem*: I need a *disturbance* to measure the transient.",
-    "*   **PREMISE-VALIDITY:** References only stated signals",
+    # v1.2 (W2): the four compliance/echo rows moved to V12_TYPED — a
+    # compliance annotation is not reasoning leakage
 ]
 AMBIGUOUS_NONE = [
     # existing-infrastructure + configuration signals: true ambiguity
     ("*   *Operation:* Adjust the existing DCS/PLC setpoint. No new "
      "instrumentation."),
+]
+# R103 (c-0117, v1.2 W1/W3): the water-domain label families
+# deliberately RECLASSIFY four of these v1.1 ambiguity/None rows —
+# each reviewed against the procurement semantics (the v1.1 None was
+# the residual class that burned 21/30 burned-v14 water rows):
+#   burden-labeled zero-body annotations -> (a) (rides standard
+#   practice); the baseline-derivation configuration row -> (c).
+V12_TYPED = [
     ("- Commissioning: Zero. Setpoint change is a PLC/DCS parameter "
-     "edit. (Standard practice: Ze"),
-    # derived-from-existing-data: a+c ambiguity, never guessed
+     "edit. (Standard practice: Ze", "a"),
     ("*   **Baseline CRSD:** DERIVED from the first 30 days of "
-     "ALREADY-RECORDED data (Assumption"),
-    # zero-installation + procedure change in one row
+     "ALREADY-RECORDED data (Assumption", "c"),
     ("*   **Installation:** 0 hours. (Standard practice requires 0 "
-     "hours for recipe changes)."),
+     "hours for recipe changes).", "a"),
 ]
 HEADER_NONE = [
-    "*   **Operational Loss Pricing:**",
-    "*   **Pass/Fail Thresholds:**",
     "2.  **Injection Nozzle Retrofit:**",
     "1.  **Alkali Salt Additive Feed Tank:**",
+]
+# v1.2 (W1/W3): the burden-labeled and test-labeled BARE headers are
+# dispatchable annotations (the #1 burned-v14 residual class); labels
+# in NO family keep the 1.0.0 bare-header None.
+V12_TYPED += [
+    ("*   **Operational Loss Pricing:**", "a"),
+    ("*   **Pass/Fail Thresholds:**", "c"),
+    ("-   Cost: $0 (software). Operational Loss: 0.", "a"),
+    # v1.2 (W2): the compliance/echo reclassifications (the v1.1
+    # narrative-list Nones that were the burned-v14 residual class)
+    ("*   **DIRECTION-OF-EFFECT:** Correctly identifies the mechanism "
+     "as a *detector* of passive", "a"),
+    ("*   **Deployed-Part Compliance:** No modification to the plunger "
+     "or seal.", "a"),
+    ("6.  **Deployed-Part Clause**:", "a"),
+    ("*   **PREMISE-VALIDITY:** References only stated signals", "a"),
 ]
 NOMARKER_NONE = [
     "Compliant.",
     "*   **Kiln Geometry/Mass:** \"rotary kiln shell\" specifications "
     "(Stated in `device`).",
-    "-   Cost: $0 (software). Operational Loss: 0.",
+    # v1.2 (W1): the zero-cost annotation row -> (a); moved to
+    # V12_TYPED below
+    # "-   Cost: $0 (software). Operational Loss: 0.",
 ]
 
 
 def test_v13_class_table():
-    for row, want in C_CASES + A_CASES + B_CASES:
+    for row, want in C_CASES + A_CASES + B_CASES + V12_TYPED:
         assert tgc.classify_bill_row(row) == want, (want, row)
     for row in (NARRATIVE_NONE + AMBIGUOUS_NONE + HEADER_NONE
                 + NOMARKER_NONE):
@@ -143,7 +161,7 @@ def test_tag_bill_integration_v13():
         "- (Tag: c) placeholder\n"
     )
     corrected, rec = tgc.tag_bill(answer)
-    assert rec["record"] == "TOOL_GROUNDED_CRITIC/1.0.0"
+    assert rec["record"] == "TOOL_GROUNDED_CRITIC/1.2.0"
     assert rec["corrected"] == 2        # parameter + catalog rows
     assert rec["normalized"] == 1       # "(Tag: c)" -> "(c)"
     assert rec["left_flagged"] == 2     # both narrative rows stay
