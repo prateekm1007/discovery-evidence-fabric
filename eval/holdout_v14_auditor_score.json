@@ -1,0 +1,86 @@
+{
+ "record": "HOLDOUT_V14_AUDITOR_SCORE/1.0.0",
+ "session": "auditor-r102s1",
+ "sealed_sha": "d5561f87f",
+ "prereg_seal": "7707a0b4520c2a52",
+ "seal_recomputed_exact": true,
+ "per_row_scores": {
+  "HO14-01": 3,
+  "HO14-02": 3,
+  "HO14-03": 3,
+  "HO14-04": 4,
+  "HO14-05": 3,
+  "HO14-06": 3,
+  "HO14-07": 4,
+  "HO14-08": 3,
+  "HO14-09": 4,
+  "HO14-10": 4,
+  "HO14-11": 4,
+  "HO14-12": 0,
+  "HO14-13": 3,
+  "HO14-14": 3,
+  "HO14-15": 4,
+  "HO14-16": 4,
+  "HO14-17": 3,
+  "HO14-18": 3,
+  "HO14-19": 4,
+  "HO14-20": 3,
+  "HO14-21": 3,
+  "HO14-22": 4,
+  "HO14-23": 3,
+  "HO14-24": 4,
+  "HO14-25": 3,
+  "HO14-26": 4,
+  "HO14-27": 3,
+  "HO14-28": 3,
+  "HO14-29": 3,
+  "HO14-30": 3
+ },
+ "statistics": {
+  "n": 30,
+  "mean": 3.2667,
+  "sd": 0.7849,
+  "ci95": [
+   2.986,
+   3.548
+  ],
+  "converged_zero_findings": 9,
+  "convergence_share": 0.3
+ },
+ "gates": {
+  "P3_speed": {
+   "median_s": 50.2,
+   "worst_s": 199.0,
+   "pass": true
+  },
+  "attestation": {
+   "rows": 30,
+   "calls_ok": 161,
+   "errors": 0,
+   "served_registered": true
+  }
+ },
+ "hard_clauses": {
+  "inverted_direction_rows": [
+   "HO14-12-ammonia-strip (lowers air-to-water ratio via recirculation, WORSENING ammonia removal; correct direction is HIGHER A/W; also premise 'high pH inhibits stripping' is backwards)"
+  ],
+  "allowed_measures_violations": [
+   "HO14-12-ammonia-strip (recirculation-flow/VFD setpoint is OUTSIDE the permitted set {pH/caustic, air-to-water ratio, water-temperature} only)"
+  ],
+  "unavailable_input_rows": []
+ },
+ "acceptance": {
+  "mean_ge_3.5": false,
+  "ci95_lower_gt_3.0": false,
+  "inverted_count": 1,
+  "allowed_measures_count": 1,
+  "unavailable_count": 0,
+  "run_valid": true,
+  "GRANTED": false
+ },
+ "verdict": "ACCEPTANCE NOT GRANTED — HO14-12 inverted-direction + allowed-measures violation (recirculation outside permitted set; lowers A/W worsening removal); mean 3.267 < 3.5 bar; CI lower 2.986 < 3.0. 29/30 rows sound (predictors all permitted-signals). Score stays 6.",
+ "key_defect": "HO14-12 ammonia-stripping: generator used recirculation scour (unallowed) and LOWERED air-to-water ratio (inverted; correct is raise A/W / pH / temp). The deterministic allowed-measures scan missed it; auditor full-read caught it (Art.2).",
+ "capability_note": "water/wastewater domain converged only 9/30 (30%) vs v13 industrial 20/30 (67%) — convergence lever weaker on this domain; predictors all clean (0 unavailable-input).",
+ "score": 6,
+ "next": "v14 BURNED; fix ammonia-stripping direction + allowed-measures discipline + water-domain convergence; v15 fresh auditor-authored set"
+}
