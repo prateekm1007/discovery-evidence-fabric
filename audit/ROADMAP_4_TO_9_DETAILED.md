@@ -81,7 +81,7 @@ Continuing the worldwide search per owner directive. New license-verified copyab
 ### Frontier model class (AM78 P5 — acceptance runs need a serving frontier model)
 - Intern-S1-Pro (Shanghai AI Lab, open-sourced Feb 2026, trillion-param science multimodal): POTENTIAL frontier-class generator, but GitHub license NONE/unverified — DO NOT copy until license confirmed; track as a candidate serving model for acceptance runs (the owner-funded-allowance path remains primary).
 
-### Integration discipline (unchanged, AM79): attribution+NOTICE, CI-wired acceptance test, matched-budget DEV ablation before adoption, no frozen edits without CI-gated re-freeze, generation-side improvement not just detection binds. NOTE F81: the c-0105 convergence prototype's Reflexion/Self-Refine attribution is MISSING from NOTICE.md — fix before wiring into the frozen machine.
+### Integration discipline (unchanged, AM79): attribution+NOTICE, CI-wired acceptance test, matched-budget DEV ablation before adoption, no frozen edits without CI-gated re-freeze, generation-side improvement not just detection binds.
 
 
 ## COPYABLE TECHNIQUES — UPDATE 3 (R93, worldwide incl. China; license-verified)
