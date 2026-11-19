@@ -1,0 +1,54 @@
+{
+ "record": "R99S2_GUARD_VERIFIER_FINDINGS/1.0.0",
+ "filed_at": "2026-11-19T11:55:00Z (sandbox clock, TRUE UTC)",
+ "filed_by": "builder-r99s2 (VERIFIER role on work_id holdout-v14-generation; claim c-0115)",
+ "art29b_narrative": "this window independently executed the v14 pre-run disjointness gate (both constitutions FULL-read first; the v14 metadata-only read discipline held; the guard extended to the FULL v1-v13 corpus; the verdict reached was FAIL with HO14-08 as the sole true repeat) WHILE the parallel executor window (builder-r95s1) staked claim c-0114 @ 3e1391ae4 and landed its own execution of the same lane @ 0a15f59f1. Per Art. 29(e): same-work_id non-fast-forward => STAND DOWN to verifier, never rebase a duplicate. The executor's push is the lock; the executor's landed record (eval/r99_disjointness_v14_record.json) is the canonical verdict record; this window's duplicate implementation was DISCARDED (never landed, never pushed) and its unique evidence was folded into the verifier artifacts (this record + eval/r99s2_guard_verifier_recompute.json + tests/test_r99s2_guard_verifier.py).",
+ "verification_of_the_executor_verdict": {
+  "landed_record_claim": "1 BLOCKING CLASH: HO14-08-mbr-fouling <-> v8 HO8-08-membrane-fouling (device exact: municipal MBR + PVDF hollow-fibre; failure-family match: membrane fouling/TMP-rise vs irreversible-fouling; same question type) — FAIL-CLOSED STOP, zero generation calls, the disposition is the auditor's exclusive custody",
+  "verifier_confirmation": "CONFIRMED — the core verdict reproduces under (a) the landed instrument re-run from the landed bytes, (b) this window's independent word-stream matcher (hyphen-insensitive, stricter), and (c) this window's own independent execution (a fully separate derivation that reached the same sole true repeat before the stand-down). Two independent executions + one landed record agree: the v14 gate is RED, HO14-08 is the blocking repeat, and the run does NOT proceed. The executor's FAIL-CLOSED STOP decision is correct and stands.",
+  "recompute_record": "eval/r99s2_guard_verifier_recompute.json (committed beside this record; five recomputation legs a-e)"
+ },
+ "finding_F1_instrument_record_mismatch": {
+  "severity": "MEDIUM (instrument/record inconsistency; the gate verdict itself is UNCHANGED — red either way)",
+  "statement": "the LANDED V14_DOMAIN_HEAD map still carries the generic token 'packed tower' in HO14-12, although the executor's OWN landed commit message lists that exact refinement ('packed tower -> a sulfuric-acid drying tower') among the five typed refinements; the landed instrument therefore yields 2 violations (HO14-08 ~mbr + HO14-12 'packed tower' vs v13-15's 'sulfuric acid plant drying tower, 98.5% h2so4 circulation, 40 c acid, packed tower') where the landed record says 1",
+  "evidence": "recomputation legs (a) and (b) in eval/r99s2_guard_verifier_recompute.json: both engines yield [HO14-08, HO14-12] on the landed map; leg (c): the F1-corrected map (dropping exactly that one token) yields [HO14-08] on BOTH engines — the landed record's 1-clash verdict is the HONEST one and the extra hit is the adjudicated false friend (the H2SO4 drying tower's packing description is a generic equipment form, not the ammonia-stripping system)",
+  "class": "the landed map is not what the landed record describes — either the map was edited after the run or the typed refinement was never applied; the committed bytes are what count (Art. 1)",
+  "remediation_proposal": "a ONE-TOKEN executor edit to the landed guard (drop 'packed tower' from HO14-12) restores instrument/record agreement WITHOUT touching the verdict; the verifier does NOT make this edit (it is the executor's landed file; Art. 29(e))",
+  "executable_pin": "tests/test_r99s2_guard_verifier.py::test_f1_ho14_12_packed_tower_is_refined (xfail — flips to xpass when the one-token fix lands)"
+ },
+ "finding_F2_stale_v13_map_still_landed": {
+  "severity": "HIGH (a live vacuity on the landed instrument — the exact class the guard was built to kill)",
+  "statement": "the LANDED V13_DOMAIN_HEAD map does NOT describe the committed v13 bytes: it maps 13/30 rows to an unlanded water-treatment draft variant (HO13-01 -> coagulation/alum while the committed row is 'soda-lime glass melting tank, 1550 C, silica crown, endport-fired'; HO13-13 -> struvite/centrate while the committed row is Type III hard anodizing; HO13-30 -> traveling-bridge/sand-filter while the committed row is a PV-inverter DC-link; etc.)",
+  "evidence": "recomputation leg (d): the landed guard run in v13 mode ('audit/holdout_v13/holdout_v13_problems.json --map=v13', the landed regex engine, the v1-v12+dev12 corpus) returns '0 clashes across v1-v12 + dev12 (30 rows checked)' — the instrument CLEARS the known-defective committed v13 set, the set CORR-6 proved carries 13 prior-domain repeats; leg (e): the verifier's honest bytes-derived table (V13_AS_LANDED_HONEST, committed inside the recompute record) reproduces EXACTLY the 13-row CORR-6 record on the same corpus at the landed engine's semantics",
+  "why_the_v14_run_was_not_affected": "the executor's v14 run used --map=v14 (the honest derived map); the stale map only poisons any future v13 RE-CHECK (and any map-v13 default user)",
+  "class": "a test battery that carries its own verified table (the landed 5-test battery uses a test-local orig_heads table) can mask a stale table in the script — the script's CLI table and the battery's table never cross-validated",
+  "remediation_proposal": "replace V13_DOMAIN_HEAD with the bytes-derived V13_AS_LANDED_HONEST table (committed as evidence in the recompute record, validated exact-13; includes the '~steam trap' prefix form for HO13-27 — the plain space-phrase would miss the prior row's plural 'steam traps') and add a CLI v13 regression mode that exits 0 ONLY on the exact 13-row expected-defect record (a diff from 13 is a finding); the verifier does NOT make this edit (Art. 29(e))"
+ },
+ "verifier_side_adjudication_cross_check": {
+  "note": "this window's independent execution derived its own v14 head table and adjudicated five raw-token corpus hits before the stand-down; the cross-check against the executor's landed map agrees on every row that matters and adds two typed strictness observations",
+  "agreements": [
+   "HO14-08 is the sole TRUE repeat (both derivations kept the ~mbr/membrane-bioreactor system tokens — the executor's commit notes the ~mbr token was ADDED during refinement; this window's derivation never dropped it)",
+   "HO14-07 'disinfection byproduct' is a CONSTRAINT-side mention in the v2-03 lead-service-line row (both windows adjudicated the same false friend)",
+   "HO14-12 'packed tower' is the v13-15 drying-tower packing description (both windows adjudicated it; the executor's landed map failed to APPLY its own refinement — F1)",
+   "HO14-04 the ion-exchange technology word does not make the demineralizer a chloralkali repeat (both landed maps carry the demineralizer system words)"
+  ],
+  "strictness_notes": [
+   "the word-stream matcher is hyphen-insensitive (stricter than the landed regex): v1-04's 'cold-start' constraint text hits the space-phrase 'cold start' — the reason the honest v13 table omits that token (the genset row is identified by 'genset'/'diesel generator')",
+   "v7-01's hyphenated 'acid-mist' slug/device text hits the space-phrase 'acid mist' under the strict semantics — typed in the recompute record's strictness note for leg (e); the CORR-6 verified record does not count HO13-15 (different device and process) and the landed-semantics reproduction is exact-13"
+  ]
+ },
+ "what_this_window_does_NOT_do": [
+  "no edit to the executor's landed guard (scripts/r99_disjointness_guard.py) — the F1/F2 remediations are proposed, not applied (Art. 29(e): one canonical artifact per work_id; the verifier files records, never edits the executor's instrument)",
+  "no duplicate verdict record — the executor's eval/r99_disjointness_v14_record.json stands as canonical; this window's discarded duplicate is folded here as evidence",
+  "no claim on the generation lane — the v14 gate is RED (both windows agree); no problem statement bytes were read by EITHER window's instrument (metadata-only, per the preregistration's guard-before-run ordering)",
+  "no acceptance/score claim of any kind"
+ ],
+ "handoff_to_the_auditor": "the v14 gate verdict stands CONFIRMED (red gate; HO14-08 the sole true repeat). TWO typed instrument findings ride with it: F1 (one-token fix restores record/instrument agreement) and F2 (the stale v13 map must be replaced by the bytes-derived honest table — evidence committed). The executor's claimed-lane next step (the sealed one-shot) remains blocked until the auditor's custody decision on HO14-08 (replace + re-seal, or typed exception) AND the F1/F2 remediation lands. This window remains available as VERIFIER for the remediation recompute.",
+ "art27_capability_budget": {
+  "engine_diff": "NONE — verifier lane: scripts/r99s2_guard_verifier_recompute.py + tests/test_r99s2_guard_verifier.py + eval records; zero engine lines",
+  "engine_line_share_measured": 0,
+  "share_exception_reason": "ENFORCEMENT/verification round (the F63 disclosed class): the lane verifies the fail-closed ENFORCEMENT gate's landed verdict and files two instrument findings; the decision it gates is NAMED (the v14 run/no-run and the instrument remediation); the engine is untouched",
+  "primary_metric_delta": "the verifier's independent CONFIRMATION of the red-gate verdict (preventing a wasted one-shot on a set with a device-exact repeat) + two instrument findings (F1 record/instrument mismatch, F2 stale-map vacuity) — measured numbers: legs a-e in the recompute record; NO acceptance claim",
+  "deletions": "NONE (the window's own discarded duplicate guard implementation was never landed — nothing in the tree removed)"
+ }
+}
