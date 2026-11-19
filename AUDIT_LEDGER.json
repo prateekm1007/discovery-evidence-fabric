@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "d5561f87f",
+  "queue/dev12_r7": "cf95d1ab9",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -3042,6 +3042,18 @@
     "Water/wastewater convergence only 9/30 (30%) vs v13 industrial 20/30 (67%); predictors all clean. Next: domain-adaptive convergence + v15 fresh auditor-authored set.",
     "v14 BURNED. Score stays 6 (v12 stands)."
    ]
+  },
+  {
+   "id": "AM90",
+   "date": "2026-11-19",
+   "status": "ISSUED",
+   "reason": "R104 auditor: builder AM91 capability-fix lane VERIFIED; v15 authored+sealed (textile/leather blind acceptance)",
+   "changes": [
+    "Builder capability-fix lane VERIFIED from committed bytes (queue cf95d1ab9, CI green): (1) measure_guard.py + measure_taxonomy.json per-problem permitted-measure enforcement — auditor INDEPENDENT re-run on the 30 burned v14 rows: exactly HO14-12 KILL (MEASURE_NOT_IN_PERMITTED_SET, primary flow_recirculation_hardware), 0 false-kills on the other 29 (7 CLEAN + 22 NOT_APPLICABLE sensor-form/non-param-exhaustive). Sensitivity 1/1, false-kill 0/29 — matches auditor full-read baseline. NOTE: 22 rows return NOT_APPLICABLE (per-problem layer coverage limitation to widen). (2) ammonia_strip_direction computed relation (Emerson pKa) + r70 DIRECTION_INVERTED + PREMISE_FALSE legs. (3) van 't Hoff + NaOH-saturation guards. (4) water-domain convergence: 127->38 residuals (-70%), 14/21=66.7% proxy convergence >=50% gate MET (read-only over burned artifacts, zero LLM, honestly typed as proxy). Engine share 41.5%.",
+    "v15 AUTHORED+SEALED (blind acceptance): fresh TEXTILE/LEATHER cluster, 30 problems (15+15), seal b0e7011309fa37cb, rubric PRIVATE. Auditor verified domain-disjointness: replaced stenter (v6 HO6-05) + ring-spinning (v8 HO8-14) clashes with warp-sizing/fabric-shearing/tfo-twister/fabric-compactor (all fresh). Direction traps HO15-01/06/09/14 + equilibrium traps HO15-02/12/13 + monoculture breaks HO15-03/05/10/11 + 15 input traps.",
+    "Builder: run r99_disjointness_guard over FULL v1-v14 corpus (0 clashes), claim holdout-v15-generation before read, sealed one-shot on agnes-3.0-flash with all five binds + c-0109 v1.2 + c-0110 + c-0112 + measure_guard + ammonia bind. Auditor scores mean>=3.5 CI>3.0 0/0/0 -> score 7 -> BURN.",
+    "Score stays 6 until v15 acceptance. Parallel-session c-0116/c-0117 takeover collision typed+resolved (takes_over must point to dead lease)."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -4362,6 +4374,14 @@
    "acceptance": "NOT_GRANTED",
    "score": 6,
    "evidence_sha": "eval/holdout_v14_auditor_score.json"
+  },
+  {
+   "id": "V90",
+   "round": "R104 builder capability-fix verification + v15 author",
+   "commit": "cf95d1ab9",
+   "gate": "score 6; v15 sealed pending builder run",
+   "capability_change": "measure_guard + ammonia bind + water convergence verified; v15 authored/sealed",
+   "evidence_sha": "eval/r104_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4643,9 +4663,21 @@
    "revision": "R101 HO14-08 mbr->cwetland (v8-08 clash fixed)",
    "acceptance": "NOT_GRANTED (HO14-12 inverted A/W + recirculation outside allowed set; mean 3.267<3.5; CI lower 2.986<3.0)",
    "score_mean": 3.2667
+  },
+  "holdout_v15": {
+   "status": "SEALED_REGISTERED",
+   "selection_sha256": "b0e7011309fa37cb",
+   "n": 30,
+   "intervention": 15,
+   "predictor": 15,
+   "author": "auditor (blind acceptance, textile/leather cluster)",
+   "custody": "rubric private repo (unauth 404); problems audit/holdout_v15/",
+   "model_pin": "agnes-3.0-flash",
+   "bar": "mean>=3.5 AND 0/0/0 AND VALID; Art.14 CI>3.0",
+   "disjointness": "stenter/ring-spinning clashes replaced (warp-sizing/fabric-shearing/tfo-twister/fabric-compactor); r99 guard full v1-v14 required pre-run"
   }
  },
- "progress_note": "SCORE 6/10. v14 scored mean 3.267 CI[2.986,3.548]: NOT_GRANTED — HO14-12 ammonia-strip inverted (lowers A/W) + recirculation outside allowed measures; water-domain convergence only 30% (vs v13 67%). 29/30 sound, predictors 0 unavailable-input. v14 BURNED. Next: fix stripping direction + allowed-measures discipline + water-domain convergence; v15 fresh auditor set. Goal 9/10.",
+ "progress_note": "SCORE 6/10. Builder AM91 capability-fix lane VERIFIED (measure_guard HO14-12 KILL 0 false-kills; ammonia direction bind; water convergence 66.7%>=50%; engine 41.5%; CI green). v15 AUTHORED+SEALED (textile/leather blind acceptance, b0e7011309fa37cb, rubric PRIVATE). Builder: r99 guard full v1-v14 + claim + sealed one-shot -> auditor scores mean>=3.5 CI>3.0 0/0/0 -> score 7 -> BURN. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
