@@ -1,0 +1,217 @@
+{
+ "problem_id": "HO13-27-steam-trap-failure",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v13-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r98_v13_one_shot/1.0.0 — the sealed v13 one-shot: r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction with the v13 typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock added by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v13-lane (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    30,
+    33,
+    7
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b0cb128a1957": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:90ba0a1a9eaa": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:31cc43c68951": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 6,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 10.0,
+     "unit_raw": "bar",
+     "source_field": "a1_answer",
+     "source_span": [
+      1385,
+      1391
+     ],
+     "unit": "bar",
+     "quantity": "10.0 bar",
+     "dimension": "[mass] / [length] / [time] ** 2"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 1.5,
+     "unit_raw": "bar",
+     "source_field": "a1_answer",
+     "source_span": [
+      1496,
+      1503
+     ],
+     "unit": "bar",
+     "quantity": "1.5 bar",
+     "dimension": "[mass] / [length] / [time] ** 2"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 10.0,
+     "unit_raw": "bar",
+     "source_field": "a1_answer",
+     "source_span": [
+      1582,
+      1588
+     ],
+     "unit": "bar",
+     "quantity": "10.0 bar",
+     "dimension": "[mass] / [length] / [time] ** 2"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 70.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1897,
+      1901
+     ],
+     "unit": "degC",
+     "quantity": "70.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-5",
+     "value": 5.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      2592,
+      2595
+     ],
+     "unit": "degC",
+     "quantity": "5.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-6",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      4408,
+      4414
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T08:42:02Z",
+ "attempts_n": 1,
+ "row_wall_s": 6.5,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice delivers a DESIGN CHANGE or MONITORING/INDICATION scheme via periodic visual/ultrasonic surveys that detect leaks after they have occurred, relying on manual inspection of trap exhaust.\nThis mechanism departs by delivering a MONITORING/INDICATION scheme using a **thermodynamic inference filter** on existing aggregate flow data and static temperature sensors to identify individual traps in a failed-open state by detecting the violation of the condensation temperature gradient required for trap closure, without new instrumentation.\nThe failure-physics connection is that a thermodynamic/float trap must see its downstream side cool to the saturation temperature to close; if downstream temperature remains high while upstream pressure drops or flow stagnates, the trap is failed-open, which is detectable via the *absence* of expected thermal recovery in the existing temperature logs.\n\nPHYSICS CHECK\nGoverning relation: For a steam trap to cycle, the downstream pressure $P_d$ must drop, causing the steam to expand and cool to the saturation temperature $T_{sat}(P_d)$. If the trap is failed-open, the downstream side is effectively at boiler/line pressure or maintains a direct high-pressure/high-temperature path, preventing the temperature dip required for the float or piston to reset.\nMagnitude verification: Assume a process trap at 10 bar upstream ($T_{sat} \\approx 180^\\circ C$). A healthy trap downstream of the valve sees pressure drop to ~1.5 bar during closure ($T_{sat} \\approx 111^\\circ C$). A failed-open trap maintains >10 bar downstream ($T_{sat} > 180^\\circ C$). The differential $\\Delta T = T_{upstream} - T_{downstream}$ for a healthy trap will show periodic dips corresponding to $T_{sat}(P_{valve})$; a failed-open trap shows $\\Delta T \\approx 0$ or $\\Delta T < (T_{sat}(P_{up}) - T_{sat}(P_{down\\_nominal}))$ persistently. This 70°C difference is far above the noise floor of standard industrial RTDs/thermocouples.\n\nIMPLEMENTATION BILL\n(a) Software module: Python/C++ script ingesting SCADA/historian logs for \"steam-flow meter aggregates\" and \"downstream temperature sensors\" [ALREADY-RECORDED per user constraint: \"use only the existing downstream temperature sensors... steam-flow meter aggregates\"].\n(b) Reference Baseline: Calculated saturation temperature curve $T_{sat}(P)$ using standard steam tables [DERIVED from stated physics: Clausius-Clapeyron/steam tables].\n(c) Threshold Logic: Flag individual trap $i$ if $T_{down, i}(t) > T_{sat}(P_{line, i}(t)) - 5^\\circ C$ for duration $> 15$ minutes [CALCULATED: The 5°C buffer accounts for sensor accuracy and heat conduction through the trap body, ensuring only true failed-open states trigger].\n(d) Aggregation Filter: Cross-reference flags with \"handheld ultrasound survey history\" logs to suppress false positives where ultrasound previously confirmed closure [ALREADY-RECORDED per user constraint: \"handheld ultrasound survey history\"].\n(e) Output: CSV report listing trap ID, timestamp, and inferred state \"FAILED-OPEN\" vs. \"OK\".\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice burden: Requires physical deployment of technicians with ultrasound kits for periodic surveys; cost is labor-heavy and time-distributed; misses leaks between surveys.\nThis mechanism burden: Zero physical installation (uses existing SCADA); cost is purely software development and one-time historian configuration (procurement tag (a)-(c) above); operability is automatic real-time; maintenance is zero (no sensors to calibrate/replace).\nComparison: SAME burden class (low marginal cost, no new hardware), DIFFERENT mechanism (passive data inference vs. active manual inspection). The heavy burden of the standard practice (labor) is shifted to the light burden of software computation.\nEXECUTABLE TEST\nProtocol:\n1. Retrieve historical data for the 400 traps over a 30-day period from the SCADA historian.\n2. Identify 10 known \"bad\" traps from the \"handheld ultrasound survey history\" that were marked as failed-open during that period [ALREADY-RECORDED].\n3. Run the software module (a)-(e) on this dataset.\n4. Pass/Fail: The algorithm must flag all 10 known bad traps as \"FAILED-OPEN\" with a start time within $\\pm 2$ hours of the ultrasound confirmation timestamp.\n5. False Positive Rate: Count how many of the 390 healthy traps were flagged. Pass threshold: $< 5$ false positives per 30 days.\n6. Kill Criterion: If false positives $> 10$ or any of the 10 known bad traps are missed, the threshold in (c) must be recalibrated against the specific pressure-temperature relationship of that site, or the method is rejected due to insufficient signal-to-noise ratio in the existing sensors.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 0,
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "13059c32aaab7fb9",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 0,
+   "budget_respected": true,
+   "angles_used": [],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n0"
+   ],
+   "final_node_id": "n0",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 1,
+   "closed": true
+  },
+  "delivered_node_id": "n0",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "3b8b869dc13eee2b",
+ "smoke": false
+}

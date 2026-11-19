@@ -44,34 +44,57 @@ def search(query, num=5):
          json.dumps({"query": query, "num": num})],
         capture_output=True, text=True, timeout=120)
     out = r.stdout.strip()
-    # the CLI prints the JSON result (possibly among log lines) —
-    # take the last JSON-looking line/blocks
-    cand = []
-    for ln in out.splitlines():
-        ln = ln.strip()
-        if ln.startswith("{") or ln.startswith("["):
-            try:
-                cand.append(json.loads(ln))
-            except Exception:
-                pass
-    if not cand:
+    # the CLI prints SDK log lines ("🚀 ...") BEFORE the JSON array —
+    # parse from the first "[" or "{" to the end as ONE document
+    starts = [i for i in (out.find("["), out.find("{")) if i >= 0]
+    if not starts:
+        return [], f"no JSON in CLI output: {out[:200]}"
+    blob = out[min(starts):]
+    try:
+        doc = json.loads(blob)
+    except Exception as ex:  # noqa: BLE001 — trailing log noise
+        # try trimming from the END to the last } or ]
+        end = max(blob.rfind("]"), blob.rfind("}"))
         try:
-            j = json.loads(out)
-            cand.append(j)
+            doc = json.loads(blob[:end + 1])
         except Exception:
-            return [], f"unparseable CLI output: {out[:200]}"
+            return [], f"unparseable CLI output ({ex}): {blob[:200]}"
     hits = []
-    for c in cand:
-        if isinstance(c, dict):
-            for k in ("results", "data", "items", "hits"):
-                if isinstance(c.get(k), list):
-                    hits = c[k]
-                    break
-            if not hits and c.get("url"):
-                hits = [c]
-        elif isinstance(c, list):
-            hits = c
+    if isinstance(doc, dict):
+        for k in ("results", "data", "items", "hits"):
+            if isinstance(doc.get(k), list):
+                hits = doc[k]
+                break
+        if not hits and doc.get("url"):
+            hits = [doc]
+    elif isinstance(doc, list):
+        hits = doc
     return hits, None
+
+
+def _norm(t):
+    """Collapse simple plural forms so 'trap'/'traps' count as ONE
+    distinctive token (the >=2 rule means 2 SEMANTIC tokens)."""
+    return t[:-3] + "y" if t.endswith("ies") else (t[:-1] if t.endswith("s")
+                                                  and len(t) > 4 else t)
+
+
+def confirm_from_hits(row_toks, hits):
+    """The typed confirmation recompute — offline over stored hits
+    (no network): a hit confirms when >= 2 DISTINCT normalized row
+    tokens appear in its title+snippet."""
+    out = []
+    for h in hits[:5]:
+        title = str(h.get("title") or h.get("name") or "")[:200]
+        url = str(h.get("url") or h.get("link") or "")[:300]
+        snip = str(h.get("snippet") or h.get("content") or "")[:400]
+        text = (title + " " + snip).lower()
+        raw = {t for t in row_toks if re.search(r"\b" + re.escape(t), text)}
+        matched = sorted({_norm(t) for t in raw})
+        out.append({"title": title, "url": url, "snippet": snip,
+                    "matched_tokens": matched[:8],
+                    "distinct_n": len(matched)})
+    return out
 
 
 def main() -> int:
@@ -99,27 +122,17 @@ def main() -> int:
         hits, err = search(q)
         row_toks = set(tokens(prob["device"])) | set(
             tokens(prob["failure"]))
-        checked = []
-        confirmed = False
+        checked = confirm_from_hits(row_toks, hits or [])
+        confirmed = any(c["distinct_n"] >= 2 for c in checked)
         rationale = None
-        for h in (hits or [])[:5]:
-            title = str(h.get("title") or "")[:200]
-            url = str(h.get("url") or h.get("link") or "")[:300]
-            snip = str(h.get("snippet") or h.get("content") or "")[:400]
-            text = (title + " " + snip).lower()
-            matched = sorted({t for t in row_toks
-                              if re.search(r"\b" + re.escape(t), text)})
-            checked.append({"title": title, "url": url,
-                            "snippet": snip,
-                            "matched_tokens": matched[:8]})
-            if len(matched) >= 2 and not confirmed:
-                confirmed = True
-                rationale = (f"hit matches {len(matched)} distinctive "
-                             f"row tokens "
-                             f"({', '.join(matched[:6])}) — device "
-                             f"domain + mechanism class co-present; "
-                             f"URL kept for the auditor's independent "
-                             f"re-verification")
+        if confirmed:
+            best = max(checked, key=lambda c: c["distinct_n"])
+            rationale = (f"hit matches {best['distinct_n']} DISTINCT "
+                         f"normalized row tokens "
+                         f"({', '.join(best['matched_tokens'][:6])}) — "
+                         f"device domain + mechanism class co-present; "
+                         f"URL kept for the auditor's independent "
+                         f"re-verification")
         recs.append({
             "problem_id": pid,
             "query": q,
