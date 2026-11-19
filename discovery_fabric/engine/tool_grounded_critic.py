@@ -42,7 +42,8 @@ RECORD = "TOOL_GROUNDED_CRITIC/1.0.0"
 BILL_SECTION = re.compile(
     r"IMPLEMENTATION BILL(.*?)(?=\n[A-Z][A-Z ]{4,}\n|\Z)", re.S | re.I)
 ROW_START = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+", re.M)
-NONSCANNABLE_TAG = re.compile(r"\(Tag: ?([abc])\)", re.I)
+NONSCANNABLE_TAG = re.compile(
+    r"\(\s*(?:Tag: ?)?([abc])\s*(?:[-–—][^)\n]{0,40})?\)", re.I)
 HEADER_ROW = re.compile(r"\*{0,2}[^*\n]{1,60}:\s*\*{0,2}\s*$")
 
 # --- typed procurement-class markers (probe-verified, see module doc) ---
@@ -69,16 +70,82 @@ C_ACTION_RE = re.compile(
 C_NOUN_RE = re.compile(
     r"\b(pulse|dosing|per (event|cycle|batch)|downtime|dip)\b", re.I)
 
+# --- v13 convergence extension (c-0113; mined from the sealed v12
+# residual BILL_UNTAGGED population, scripts/r98_probe_residuals.py):
+# the 24 BUDGET_EXHAUSTED v12 rows died on annotation/predictor rows the
+# 1.0.0 vocabulary could not classify. Three typed additions, each a
+# procurement-semantics rule (never a guess), all zero-LLM:
+#   (1) A-CLASS: rides-on-existing-DATA markers ("ALREADY-RECORDED",
+#       "AS-IS device") and label-scoped bare "none" burden lines —
+#       existing infrastructure/data, no procurement.
+#   (2) C-CLASS: procedure/software verbs the corpus actually uses
+#       (change/modify/implement/limit/deploy/derive/calculate/...).
+#   (3) LABEL dispatch: burden-annotation and predictor-logic labels
+#       (Parameter/Action/Logic/Rule/Threshold/Protocol/...) carry the
+#       (c) configuration class UNLESS an explicit (a)/(b) marker also
+#       fires (then the 1.0.0 ambiguity rule holds). Hardware-noun
+#       "Component:" rows are only (c) with a control-noun gate.
+#   (4) NARRATIVE guard: first-person deliberation and reasoning-leakage
+#       labels (Why/Note/Physics/Re-reading/"I ...") are NOT procurement
+#       rows — tagging them would be invented semantics; they stay
+#       flagged as the typed residual (1.0.0 rule preserved, now typed).
+A_CLASS_V13 = re.compile(
+    r"\b(already[- ]recorded|as[- ]is device|no modification\b|"
+    r"(instruments?|hardware|installation|commissioning|maintenance)"
+    r"\s*:\s*(?:\*\*)?\s*(?:none|zero|0 hours)\b)", re.I)
+C_ACTION_V13 = re.compile(
+    r"\b(change[sd]?|modif(y|ies|ied)|implement(s|ed|ing)?|"
+    r"limit(s|ed|ing)?|capped?|deploy(s|ed)?|populate[sd]?|"
+    r"retriev(e|es|ed)|identif(y|ies|ied)|track(s|ed|ing)?|"
+    r"appl(y|ies|ied)|replay(s|ed)?|back[- ]test(s|ed)?|"
+    r"deriv(e|es|ed|ation)|calculat(e|es|ed|ion)|"
+    r"comput(e|es|ed|ation)|set such that|warn(s|ing)?|alarm|"
+    r"flag(s|ged)?)\b", re.I)
+LABEL_C_V13 = re.compile(
+    r"^\s*(?:[-*•]|\d+[.)])?\s*\**\s*("
+    r"logic|rule|warning(?: logic| threshold(?:s)?)?|threshold(?: logic)?|"
+    r"protocol|description|derivation|baseline derivation|algorithm|"
+    r"predictor|parameter(?: change)?|action|operation|duration|"
+    r"firmware|software module|data acquisition|"
+    r"steam duty cycle|duty cycle|setpoint|temperature setpoint"
+    r")\b[^:\n]{0,40}:\s*", re.I)
+_COMPONENT_CONTROL_NOUN = re.compile(
+    r"\b(setpoint|loop|ratio|rate|logic|ramp|recipe|threshold|schedule|"
+    r"interlock|mode|adjustment|restriction|hold|control)\b", re.I)
+COMPONENT_C_V13 = re.compile(
+    r"^\s*(?:[-*•]|\d+[.)])?\s*\**\s*component\b[^:\n]{0,40}:\s*", re.I)
+NARRATIVE_V13 = re.compile(
+    r"(^\s*(?:[-*•]|\d+[.)])?\s*\**\s*"
+    r"(why\b|note\b|problem\b|exception\b|hard stop\b|correction\b|"
+    r"re-?evaluat\w+|re-?read\w+|alternative\b|implication\b|"
+    r"rationale\b|direction-of-effect|premise-validity|"
+    r"deployed[- ]part|new mechanism\b|physics\b|transient\b|"
+    r"leak effect\b|is this better|actually\b)"
+    r"|\b(perhaps|maybe|what if|this is a trap|but the question|"
+    r"we don't know|\bI\b|my (?:primary|measure|indicator|proposal)))",
+    re.I)
+
 
 def classify_bill_row(row: str) -> str | None:
     """The typed procurement class of ONE bill row: 'a'|'b'|'c'|None.
-    None = ambiguous or no typed marker — never a guess; the caller
-    leaves those rows flagged."""
+    None = ambiguous, narrative, or no typed marker — never a guess; the
+    caller leaves those rows flagged."""
+    if NARRATIVE_V13.search(row):
+        return None  # reasoning leakage / first-person deliberation
     if HEADER_ROW.search(row):
         return None  # bare headers have no procurement class
-    a = bool(A_CLASS_RE.search(row))
+    a = bool(A_CLASS_RE.search(row) or A_CLASS_V13.search(row))
     b = bool(B_CLASS_RE.search(row))
-    c = bool(C_ACTION_RE.search(row))
+    c = bool(C_ACTION_RE.search(row) or C_ACTION_V13.search(row))
+    # LABEL dispatch: a typed c-label makes (c) explicit unless an
+    # explicit (a)/(b) marker also fired. "Component:" is c only with a
+    # control-noun gate (a bare hardware component is procurement (b)
+    # or ambiguous — never guessed).
+    if not a and not b:
+        if LABEL_C_V13.search(row):
+            c = True
+        elif COMPONENT_C_V13.search(row) and _COMPONENT_CONTROL_NOUN.search(row):
+            c = True
     classes = [x for x, hit in (("a", a), ("b", b), ("c", c)) if hit]
     if len(classes) == 1:
         return classes[0]

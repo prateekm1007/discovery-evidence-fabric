@@ -1,0 +1,40 @@
+{
+ "record": "HOLDOUT_V13_PREREGISTRATION/1.0.0",
+ "run": "holdout-v13-lane (sealed one-shot)",
+ "registered_at": "2026-11-19T08:20:00Z (sandbox clock, TRUE UTC)",
+ "registered_by": "builder-r95s1 (claim c-0113 @ 8d85d2ac0)",
+ "problems_path": "audit/holdout_v13/holdout_v13_problems.json",
+ "selection_sha256": "f6d8372de85c37f27ad12d8b5c93fc188c503bbfb6cf63d7920e32234240b1c2",
+ "n_problems": 30,
+ "power": {
+  "design": "one-sample t-test vs the 3.0 rubric floor, alpha 0.05, pre-registered n=30",
+  "sd_assumption": 0.75,
+  "basis": "v12 observed SD ~0.77 (mean 3.400, CI95 half-width 0.276, n=30); 0.75 assumed conservative",
+  "resolved_when": "Art. 14 resolves only when the CI95 LOWER bound exceeds 3.0"
+ },
+ "model_pin": {
+  "registered_id": "agnes-3.0-flash",
+  "upstream": "https://apihub.agnes-ai.com/v1",
+  "custody": "AGNES_API_KEY + AGNES_API_KEY_2 restored byte-identical (digests d0c666a3842f + 5c4dffd28fe4 match the sealed v12 attestation), gitignored vault 0600, values never printed or committed"
+ },
+ "binds": [
+  "F75_deliverable_class",
+  "chemistry_elicitation",
+  "formula_direction",
+  "element_conservation",
+  "equilibrium_direction"
+ ],
+ "controllers": [
+  "tool_grounded_critic (c-0109; TOOLS FIRST) + the v13 typed vocabulary extension (the convergence lever, CI-tested by tests/test_r97_tool_grounded_critic_v13.py)",
+  "aide_tree_search (c-0110; TREE SECOND)"
+ ],
+ "gates": {
+  "acceptance_score7": "mean >= 3.5, CI95 lower bound > 3.0, 0 inverted-direction rows, 0 unavailable-input rows, 0 allowed-measures violations (the auditor computes these over the PRIVATE rubric; builder never reads a rubric)",
+  "P3_speed": "median row wall-clock <= 120 s AND worst row <= 300 s, measured on the sealed v13 run; per-row wall_s in the events ledger and row files; gates recomputed from committed bytes by the driver's attest",
+  "P4_novelty": "cosine distance 1 - max_cosine from the committed prior-art corpus (the v9-v12 solution rows' a1_answer bytes) >= 0.2 for >= 5/30 rows; method: sklearn TfidfVectorizer char_wb ngram (3,5) + word (1,2) union, deterministic, zero network — the disclosed SPECTER2-or-equivalent (SPECTER2 weights are unreachable in this offline sandbox; the equivalence is method-typed here, the auditor judges it)",
+  "P5_viability": ">= 1/30 rows carry external confirmation (patent prior art, literature, or deployed systems) found by real web semantic search on the committed rows; typed record with query, hit title/URL/snippet and the match rationale per row; the auditor re-verifies any cited URL"
+ },
+ "efficiency_targets": "optional per AM84: >= 50% rows reach CONVERGED_ZERO_FINDINGS within budget (v12: 6/30); mean repair attempts per row <= 3.5 (v12: ~3.6 attempts/row from the committed ledger)",
+ "burn_after_use": true,
+ "builder_reads_rubric": false
+}
