@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "7c3cc329c",
+  "queue/dev12_r7": "0ddf582bb",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -1607,6 +1607,18 @@
    ],
    "closed_at": "2026-11-18",
    "resolution": "R83 (620fa6d35, c-0099): numeric_claims.py (178) + onrow_physics.py (307) + candidate_schema numeric_claims field (additive). P1 measurement r54_p1_unit_checked v2.0.0: carrying=RUNS ON THE ROW, fraction 1.0 (36/36), 0 sign contradictions, own_numbers_totals extracted=30/bound=6/assumptions=117. ROW_CLAIM wins over reference; dimension-only binding (kA/m2 cannot bind A); typed Art.9 assumptions; FUNCTION_DEFAULT never fabricated; unambiguous direction words only. Frozen-safe (15/15 baselines, r52 byte-identity). 20-test suite CI-gated. Auditor verified modules + committed v2.0.0 record + CI green (independent full recompute limited by sandbox pint absence; committed measurement + CI gate authoritative)."
+  },
+  {
+   "id": "F81",
+   "severity": "LOW",
+   "title": "Convergence-prototype attribution gap: NOTICE.md carries triz-engine (MIT) but NOT the Reflexion (MIT) / Self-Refine (Apache-2.0) pattern attribution the builder reported adding; scripts/r80_repair_convergence.py copies those patterns. MIT/Apache require attribution. FIX: add the attributions to NOTICE.md (or the script header) before the convergence layer is wired into the frozen machine.",
+   "status": "OPEN",
+   "opened": "2026-11-18",
+   "last_checked": "0ddf582bb",
+   "articles": [
+    27,
+    29
+   ]
   }
  ],
  "amendments": [
@@ -2875,6 +2887,18 @@
     "SCORE 5→6 (first sealed acceptance). v11 BURNED (one-shot consumed). Next: v12 sealed set (consecutive acceptance for score 7, mean ≥3.3) OR move to P3 (speed/novelty/viability, AM78 P6 progression forcing).",
     "Goal 9/10: capability, not governance."
    ]
+  },
+  {
+   "id": "AM80",
+   "date": "2026-11-18",
+   "status": "ISSUED",
+   "reason": "R93 — v11 ACCEPTANCE SCORE (agnes-3.0-flash, all five binds)",
+   "changes": [
+    "v11 run VALID (seal 1493bb84 recomputed EXACT by verifier c-0104; attestation 30/30 served==requested==registered agnes-3.0-flash, 167 calls, 0 errors). SCORED full 30-row read vs PRIVATE rubric: mean 3.133 (interv 3.333, pred 2.933), SD 0.629, CI95 [2.908,3.358].",
+    "ACCEPTANCE NOT_GRANTED on Art.14 alone (CI includes 3.0). HARD CLAUSES ALL PASS: 0 inverted-direction (the equilibrium bind WORKED — HO11-03/11 traps avoided, HO11-02/12/14 not inverted; v10 had 1 inverted HO10-03), 0 allowed-measures violations, 0 unavailable-input rows. This is real progress: the inverted-chemistry class is eliminated.",
+    "Remaining gap: mean 3.133 CI-includes 3.0 (need ~3.25+). Quality residuals: HO11-14 schedule fallback ignores driver (2), HO11-05 monoculture partial, predictors HO11-16/20/25 (PREDICTOR_VIOLATION + REASONING_THRASH_LEAK) -> 2s. Repair loop still 26/30 burn full budget (convergence prototype c-0105 DEV-stage, NOT wired).",
+    "v11 BURNED. F81 opened (Reflexion/Self-Refine attribution missing from NOTICE). Next lever: wire the convergence layer into the frozen machine (CI-gated re-freeze) to cut residuals + lift mean past 3.25; then v12. Score stays 5."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -4057,6 +4081,25 @@
    "acceptance": "GRANTED",
    "score": 6,
    "evidence_sha": "eval/holdout_v11_auditor_score.json"
+  },
+  {
+   "id": "V80",
+   "round": "R93 v11 acceptance score",
+   "commit": "0ddf582bb",
+   "gate": "NOT_MET (acceptance NOT_GRANTED, Art.14 CI includes 3.0; hard clauses 0/0/0 PASS)",
+   "run_verdict": "VALID",
+   "v11_mean": 3.1333,
+   "v11_ci": [
+    2.908,
+    3.358
+   ],
+   "inverted_direction": 0,
+   "acceptance": "NOT_GRANTED",
+   "score": 5,
+   "new_findings": [
+    "F81"
+   ],
+   "evidence_sha": "eval/holdout_v11_auditor_score.json"
   }
  ],
  "gold_set": {
@@ -4298,11 +4341,11 @@
    "custody": "rubric private repo (unauth 404); problems audit/holdout_v11/",
    "bar": "mean>=3.0 AND 0/0/0 AND VALID; Art.14 CI>3.0",
    "burned_at": "2026-11-18",
-   "score_mean": 3.6,
-   "acceptance": "GRANTED (mean 3.6, CI [3.309,3.891], 0/0/0, VALID)"
+   "score_mean": 3.1333,
+   "acceptance": "NOT_GRANTED (Art.14 CI includes 3.0; hard clauses PASS)"
   }
  },
- "progress_note": "SCORE 6/10. v11 ACCEPTED (mean 3.6, CI [3.309,3.891], 0/0/0, VALID, RESOLVED). First sealed acceptance. v9 mean 3.1 → v11 mean 3.6 (+0.5). All five binds active. On-row physics live. v11 BURNED. Next: v12 consecutive acceptance (score 7, mean ≥3.3) OR P3 speed/novelty/viability (AM78 P6). Goal 9/10.",
+ "progress_note": "SCORE 5/10. v11 scored: mean 3.133 (v10 3.1), CI [2.908,3.358], hard clauses 0/0/0 PASS (inverted-chemistry class ELIMINATED by the equilibrium bind), but Art.14 UNRESOLVED (CI includes 3.0) -> NOT_GRANTED. v11 BURNED. Remaining: lift mean past ~3.25 — wire the convergence layer (Reflexion/Self-Refine, c-0105 DEV) into the frozen machine to cut residuals (HO11-14 schedule fallback, predictor thrash/violations) + converge the repair loop (26/30 burn full budget). Then v12 -> score 6. F81 (attribution) open. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
