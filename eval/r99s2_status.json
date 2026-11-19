@@ -37,5 +37,12 @@
   "pushed_sha": "66c669577",
   "remote_ci_conclusion": "pending",
   "note": "finalized by the post-push read (r41_remote_ci_read.py --apply or the typed unauthenticated fallback): GH_PAT is ABSENT from this reprovisioned sandbox's custody (typed), so the read is either unauthenticated (public repo; the IP hit the 60/hr unauthenticated limit at ~11:00Z, reset ~12:00Z typed) or typed 'unreadable' with the API response quoted — an asserted green is forbidden (D2)"
+ },
+ "PUSH_BLOCKED_typed": {
+  "state": "the verifier lane is COMMITTED locally (8310273fc on builder-r99s1, a clean fast-forward on top of the remote tip 66c669577 — diff-against-remote verified) but the PUSH IS BLOCKED: the sandbox reprovision lost every credential (no .env.keys / .netrc / .git-credentials / gh CLI / env tokens anywhere in the home tree, all typed; the git credential helper /home/z/.git-vault-cred.sh is absent) and the ONLY owner-delivered credential this window is the HF token, which is HF-scoped and cannot push to GitHub",
+  "lawful_paths_checked": "git config credential.helper (points at the missing vault script), ~/.netrc, ~/.git-credentials, ~/.config/gh, environment tokens — all absent; anonymous HTTPS push is not a thing; no credential forgery (Art. 17)",
+  "art28_escalation": "OWNER ACTION REQUIRED (the counter starts at R99s2): re-deliver the GitHub credential (the GH_PAT, digest f1ebca5f9b62 per the r60s1 custody record) or re-provision the vault so the helper script can be rebuilt; one reminder per loss event per the v3.3.0 master-reminder rule",
+  "durable_state": "the work is durable in the sandbox (local commits 8310273fc on the fast-forward branch); per Art. 18/D2 it is NOT remote evidence until pushed — the CI read stays 'pending', no green is claimed, and the next window (or this one, post-re-delivery) pushes the two-commit chain and reads the check-runs",
+  "meanwhile_offline_lane": "the Art. 28 offline-work list: the SPECTER2 full-corpus recompute (the score-8 prerequisite; the r99s1 calibration's typed blind spot was the v9-v12-only corpus) runs THIS window on the FULL v1-v13 corpus via the restored vault token (digest-verified 33bc7af22c62) — zero generation, encoder-only, deterministic; results land as local commits and push with the chain"
  }
 }
