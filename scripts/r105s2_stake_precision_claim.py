@@ -85,7 +85,7 @@ claim = {
     "status": "OPEN",
     "session_id": "builder-r105s2",
     "role": "EXECUTOR",
-    "kind": "precision_fixes",
+    "kind": "task",
     "base_sha": base,
     "lease_expiry": "2026-11-22T23:59:00Z",
     "artifact_paths": [
