@@ -2943,6 +2943,28 @@
     "eval/r103_notice_scan_verification.json"
    ],
    "notes": "Art. 29(b): claimed before any instrument byte. Disjointness: zero overlap with the c-0119 artifact set (the v15 generation lane, audit/holdout_v15/*, scripts/r105_*, eval/holdout_v15_generation/* are R105's canonical paths — untouched); no v15 problem byte read (the holdout integrity holds); no rubric byte read. The r100 prereg (eval/r100_core_mechanism_prereg.json) is implemented BYTE-FAITHFULLY with its parameters as module defaults — the prereg text is immutable for v14; the module is the reusable instrument for the auditor's v16 authoring. Custody: vault restored round-open (r77 path, 6 keys, digests COMMITTED_RECORD_MATCH); zero values in any record. KIND CORRECTION (self-caught by the Art. 29 suite at push+20min, disclosed Art. 5): the claim was staked with kind='standard' — an out-of-enum value (the registry enum is measurement/one_shot/task); corrected to 'task' (a multi-artifact instrument build, not a one-shot generation, not a quota-consuming measurement). The correction is forward-only on this OPEN claim's live entry (the cf95d1ab9 own-claim correction precedent); no historical claim touched."
+  },
+  {
+   "claim_id": "c-0121",
+   "claimed_at": "2026-11-19T18:55:30Z (sandbox clock, TRUE UTC)",
+   "registered_at": "2026-11-19T18:55:30Z (sandbox clock, TRUE UTC)",
+   "work_id": "holdout-v15-generation",
+   "title": "VERIFIER record for c-0119 (Art. 29(c): the recompute, never a re-run): the sealed v15 one-shot attestation recomputed from COMMITTED BYTES via the driver's attest() verifier lane (scripts/r105_v15_one_shot.py attest — re-parses the committed gateway slice + row files; zero generation calls): rows 30/30, rows_30_30_attestation TRUE, 157/157 gateway calls OK / 0 errors, served==requested==registered==agnes-3.0-flash on every completed call, upstream==agnes, both serving-key digests present (2-key rotation), P3 gates PASS (median 37.5s / worst 56.2s), MEASURED_PATH on every row. HONESTY TYPING: same-session bytes-only recompute — a CROSS-SESSION verifier re-verification is invited and typed as the preferred completion (the r103s1 pattern).",
+   "status": "DONE",
+   "session_id": "builder-r105s1",
+   "role": "VERIFIER",
+   "kind": "task",
+   "base_sha": "539b88340",
+   "lease_expiry": "2026-11-22T23:59:00Z",
+   "artifact_paths": [
+    "eval/holdout_v15_generation/attestation.json",
+    "eval/holdout_v15_generation/gateway_slice.txt",
+    "eval/holdout_v15_generation/events.json",
+    "eval/holdout_v15_generation/rows/",
+    "eval/r105s1_status.json"
+   ],
+   "notes": "Art. 29(c): verification is a recompute from committed bytes, never a re-run. The attest() lane re-parses the committed slice bytes independently of the run-time state; no gateway was started for this record. Art. 13 independent-tally discipline: the cross-session re-verification remains welcome (typed invitation).",
+   "no_problem_read_before_claim": "n/a (verifier: reads committed run bytes only, post-run)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
