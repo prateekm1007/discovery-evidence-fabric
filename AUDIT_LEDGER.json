@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "39489a780",
+  "queue/dev12_r7": "66c669577",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -3019,6 +3019,17 @@
     "pyribs NOT-ADOPTED (zero imports) — remove unused attribution; NOTICE scan rows (Intern-S1 Apache-2.0, Time-MoE ICLR25, MOMENT MIT) verified.",
     "v14 ALREADY AUDITOR-AUTHORED + SEALED (audit branch ca9b2d52b, water/wastewater cluster, seal 73222ce2feb8ab32, rubric PRIVATE). Builder does NOT wait for authoring — run r99_disjointness_guard over full v1-v13 corpus, claim before read, sealed one-shot. Score-7 bar: mean>=3.5, CI lower>3.0, 0/0/0 (P4 novelty is a score-8 gate, not score-7)."
    ]
+  },
+  {
+   "id": "AM88",
+   "date": "2026-11-19",
+   "status": "ISSUED",
+   "reason": "R101 auditor: CORR-7 fix v14 HO14-08 clash (auditor authoring error caught by builder's fail-closed guard)",
+   "changes": [
+    "Builder's fail-closed disjointness guard VERIFIED exemplary: extended r99 to v14 (full v1-v13 corpus, audit-ref source so sealed content never lands on builder branch pre-claim), found+fixed the stale V13_DOMAIN_HEAD map (instrument defect), derived honest stem-level v14 head table, adjudicated false-friends (ion-exchange->chloralkali, acid-mist->zinc-EW, cold-start->seal, decant->decanter-centrifuge), independent verifier recompute CONFIRMED the clash, guard battery 10/10, rubric custody unauth-404 verified.",
+    "CORR-7: v14 HO14-08-mbr-fouling clashed v8-08 (municipal MBR) — AUDITOR authoring error. FIXED: replaced with HO14-08-cwetland-clog (constructed-wetland substrate clogging). New seal 7707a0b4520c2a52. Rubric updated (private). The guard caught the auditor's own error pre-run — the fail-closed discipline works.",
+    "v14 RE-SEALED (7707a0b4520c2a52). Builder: re-run r99 guard on the corrected v14 (must pass 0 clashes), claim before read, sealed one-shot. Score-7 bar unchanged: mean>=3.5, CI lower>3.0, 0/0/0."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -4311,6 +4322,17 @@
    "gate": "score-7 pending v14 run; score-8 novelty gate redefined",
    "capability_change": "SPECTER2 scale finding credited; score-8 novelty gate redefined (core-mechanism + anchor-relative); blind panel live; v14 ready",
    "evidence_sha": "eval/r100_auditor_verification.json"
+  },
+  {
+   "id": "V88",
+   "round": "R101 CORR-7 fix v14 clash",
+   "commit": "66c669577",
+   "gate": "v14 re-sealed, pending corrected run",
+   "capability_change": "v14 HO14-08 clash fixed (auditor error caught by builder guard); v14 re-sealed",
+   "corrections": [
+    "CORR-7"
+   ],
+   "evidence_sha": "eval/r101_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4582,13 +4604,14 @@
   },
   "holdout_v14": {
    "status": "SEALED_REGISTERED",
-   "selection_sha256": "73222ce2feb8ab32c2cec9c287bc1ef4baa64d05f9b2540bf7b9e4816e148bd2",
+   "selection_sha256": "7707a0b4520c2a52b92fa56841d46e2d3cea757b391a6d091b2ade18cd4bd6a7",
    "n": 30,
    "author": "auditor (blind acceptance)",
    "custody": "rubric private repo (unauth 404); problems audit/holdout_v14/",
    "model_pin": "agnes-3.0-flash",
    "bar": "mean>=3.5 AND 0/0/0 AND VALID; Art.14 CI>3.0",
-   "disjointness": "water/wastewater cluster, r99 guard required pre-run"
+   "disjointness": "water/wastewater cluster, r99 guard required pre-run",
+   "revision": "R101 HO14-08 mbr->cwetland (v8-08 clash fixed)"
   }
  },
  "progress_note": "SCORE 6/10. v14 auditor-authored fresh water/wastewater set READY (73222ce2feb8ab32). SPECTER2 scale-invalid finding credited; score-8 novelty gate redefined (core-mechanism encoding + anchor-relative, 0.2 absolute retired). Blind cross-family panel live (3 agents/2 families). pyribs not-adopted. Builder: run r99 disjointness guard + v14 one-shot -> re-earn score 7. Goal 9/10.",
@@ -4702,6 +4725,13 @@
    "withdrawn": "R98 (AM85) v13 ACCEPTANCE GRANTED score 7",
    "corrected": "v13 acceptance REVOKED. The builder's defect disclosure (eval/r97_v13_disjointness_verifier_findings.json) verified from committed bytes: 13/30 v13 rows repeat prior v1-v12 device+failure families/process domains (3 EXACT: HO13-13=v8-01 anodize-burning, HO13-27=v5-09 steam-trap, HO13-30=v1-18 DC-link caps; 1 public-bank contamination HO13-29=dev12 CNC). The authoring clash-check was VACUOUS (corpus never held v1-v11, mangled slice line, pid[:6] prefix bug). Art.13 fresh-problem generalization compromised. Auditor oversight: R98 granted score 7 without verifying domain-disjointness. Score returns to 6 (v12 stands). Machine capability credited (fresh-subset 17 rows mean 3.647, convergence 67%). v14 auditor-authored fresh set sealed to re-earn score 7.",
    "reason": "Art.9 duty-to-correct + Art.13 fresh-problem integrity + Art.14 (machine scores are inputs, freshness weighting is auditor custody)."
+  },
+  {
+   "id": "CORR-7",
+   "date": "2026-11-19",
+   "withdrawn": "v14 as authored R99 (seal 73222ce2feb8ab32) claimed domain-disjoint",
+   "corrected": "v14 HO14-08-mbr-fouling CLASHED v8-08 (municipal MBR wastewater, PVDF hollow-fibre, membrane-irreversible-fouling) — device-exact + failure-family repeat, the CORR-6 class. AUDITOR authoring error (I missed v8-08 when authoring v14). Builder's fail-closed r99 guard caught it PRE-RUN (no generation, no quota). FIXED: HO14-08 replaced with HO14-08-cwetland-clog (constructed-wetland substrate clogging, fresh). New seal 7707a0b4520c2a52. Rubric updated. Builder's guard extension (v1-v13 corpus, audit-ref source, honest stem-level head derivation, false-friend adjudication, independent verifier recompute) is exemplary fail-closed discipline.",
+   "reason": "Art.9 duty-to-correct + Art.13 fresh-problem integrity. The guard works — it caught the auditor's own error."
   }
  ],
  "rulings": [
