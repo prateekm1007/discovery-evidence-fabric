@@ -26,6 +26,15 @@ is public-domain factual knowledge and is encoded in our own files
 
 ## Planned copies (AM43 directions D2–D8; attribution in-band at adoption)
 
+- microsoft CRITIC / CriticEval (ICLR23 pattern; CriticEval MIT;
+  license-verified AM82 worldwide update 3) — the tool-grounding critic
+  pattern (the critic CALLS external tools to verify/correct claims
+  instead of iterating prompts) copied into
+  `discovery_fabric/engine/tool_grounded_critic.py` (claim c-0109): the
+  deterministic bill-tagger + computed-chemistry corrector surfaces, the
+  machine's own base_scan as the CI oracle, adoption-gated (no frozen
+  bytes; the machine-side wiring + live ablation are the typed next
+  steps). Our own code, no upstream bytes.
 - WecoAI/aideml (MIT) — `aide/agent.py`, `aide/journal.py`, `aide/interpreter.py`
   candidate-population tree search patterns (D2 direction; the current V8.1.1
   population search is our own implementation, informed by the AIDE architecture).
