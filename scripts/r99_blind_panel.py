@@ -132,16 +132,41 @@ def parse_rating(text):
 
 
 def serve(agent, prompt):
+    """Serve one rating with the v14 hardening (the AM87 order): ONE
+    typed retry on an empty/unparseable reply (the smoke's single A2
+    empty-reply fallback class — the retry is per-row, never per-run,
+    and the retry event is typed in the returned record) and the quota
+    budget (a 30-row x 2-cohere-agent sweep is ~57K tokens, inside the
+    measured ~150K/day xkiro ceiling; the budget is checked, not
+    guessed)."""
     t0 = time.time()
-    if agent["transport"] == "xkiro":
-        d = xchat(agent["model"], prompt, agent["max_tokens"])
-        text = d["choices"][0]["message"]["content"] or ""
-        served = d.get("model", agent["model"])
-    else:
-        d = zchat(prompt)
-        text = (d["choices"][0]["message"]["content"] or "")
-        served = d.get("model", agent["model"])
-    return parse_rating(text), served, round(time.time() - t0, 1)
+    attempts = 0
+    last_err = None
+    for attempt in (1, 2):
+        attempts = attempt
+        try:
+            if agent["transport"] == "xkiro":
+                d = xchat(agent["model"], prompt, agent["max_tokens"])
+                text = d["choices"][0]["message"]["content"] or ""
+                served = d.get("model", agent["model"])
+            else:
+                d = zchat(prompt)
+                text = (d["choices"][0]["message"]["content"] or "")
+                served = d.get("model", agent["model"])
+            rating = parse_rating(text)
+            rec = {"retry_used": attempt > 1, "attempts": attempts}
+            if attempt > 1:
+                rec["retry_reason"] = str(last_err)[:120]
+            return dict(rating, **rec), served, round(
+                time.time() - t0, 1)
+        except (ValueError, KeyError) as e:
+            # empty/unparseable reply — the ONE retry class (a
+            # transport error raises straight through: no infinite
+            # retry on 4xx/5xx)
+            last_err = e
+            time.sleep(2)
+    raise ValueError(f"rating unparseable after {attempts} attempts: "
+                     f"{last_err}")
 
 
 def main():

@@ -105,6 +105,18 @@ is public-domain factual knowledge and is encoded in our own files
     Apache-2.0) — scientific multimodal FM; scanned for the
     novelty/viability legs (no code adopted this round; the panel
     and FM-eval lanes are the typed adoption surfaces).
+- FM-eval REAL-DATA candidates (the conformal FA-control leg's typed
+  next step; license-verified via live web read 2026-11-19):
+  - C-MAPSS turbofan degradation (data.nasa.gov, NASA open data —
+    US-government public class; classic multivariate run-to-failure
+    series) — the conformal FA-control real-data candidate 1.
+  - XJTU-SY bearing run-to-failure (github.com/WangBiaoXJTU/
+    xjtu-sy-bearing-datasets; the repo states no license — the
+    Mendeley deposit of the same dataset is CC BY 4.0, Biao Wang;
+    adoption attributes the Mendeley CC BY 4.0 deposit) — candidate 2.
+  - CWRU bearing data (Case Western Reserve University) — candidate
+    3, standard academic attribution, license re-verified at
+    adoption time before any bytes are pulled.
 - pyribs (BSD-3-Clause) — NOT ADOPTED, typed: no pyribs import
   exists anywhere in the tree; the quality-diversity mechanics are
   the c-0110 AIDE controller + the histogram caps (our own
