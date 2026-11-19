@@ -44,15 +44,15 @@
   "engine_line_share_measured": 51.1
  },
  "remote_ci": {
-  "pushed_sha": "0b16d5144",
-  "remote_ci_conclusion": "failure",
+  "pushed_sha": "68f6017d7",
+  "remote_ci_conclusion": "success",
   "check_runs": [
    {
     "name": "surface",
-    "conclusion": "failure",
+    "conclusion": "success",
     "status": "completed"
    }
   ],
-  "note": "quoted from the API check-run read (run 44589888548 / check-run 135792718921) of the WORK push 0b16d5144 — the failure is THIS record's own three typed schema defects (the missing art27_capability_budget ledger block; the missing engine_line_share_measured field; the missing remote_ci block — the D2 circularity: the work push cannot quote a CI read that only exists after it lands, so the work push reds on the record and the record-fix push is the arbiter, the 50729ed54/cf95d1ab9 precedent). Every other step of the work push's run was green (the log shows the failure isolated to the two record-schema tests over r103s1_status.json). This record-fix push carries the corrected schema; its own CI read is the next D2 event."
+  "note": "the D2 chain closed: the work push 0b16d5144 read FAILURE on this record's three schema defects (quoted in the record-fix commit); the RECORD-FIX push 68f6017d7 — carrying the corrected schema — read SUCCESS (check-run 135796083650, run 44592214370-class read via the API, first-try on the fix). The lane's later pushes: the c-0122 verifier-claim push 392356702 read FAILURE on the EXECUTOR's r105s1_status.json defects (not this lane's — remediated by this session in b3e997481, which read SUCCESS, restoring the queue tip green)."
  }
 }
