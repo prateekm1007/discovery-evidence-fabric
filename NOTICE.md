@@ -276,3 +276,63 @@ descriptions in `discovery_fabric/engine/data/triz_classical_matrix.json`
 are derived from the [triz-engine](https://github.com/SharathSPhD/triz-engine)
 project and are included under the MIT License. The full license text is
 preserved verbatim in [NOTICE-triz-engine](NOTICE-triz-engine).
+
+## Score-9 payloads (claim c-0127, adopted 2026-11-19; license texts byte-verified per the c-0125 convention)
+
+- MOOSE-Chem2 (Zonglin Yang et al., NeurIPS 2025) — GitHub
+  `ZonglinY/MOOSE-Chem2` @ `5b289372fe7722df33bfc49c4c329671967f8822`;
+  MIT (LICENSE byte-read: "MIT License, Copyright (c) 2025 Zonglin
+  Yang"). The 2024 fine-grained chemistry corpus
+  (`Data/chem_research_2024_finegrained.xlsx`, 276,676 bytes) supplies
+  the post-cutoff rediscovery corpus (30 sampled items committed under
+  `eval/r106_score9_corpus/` with attribution; the sampled rows carry
+  their source commit). Our own protocol engine; upstream method code
+  NOT copied.
+- PatentChem (Kevin Greenman, learningmatter-mit; DOI
+  10.5281/zenodo.7992427) — GitHub `learningmatter-mit/PatentChem`;
+  MIT (LICENSE byte-read: "Copyright (c) 2022 Kevin Greenman"). The
+  claim-extraction APPROACH (USPTO claims sections -> numbered-claim
+  segmentation -> keyword query mining -> molecule SMILES mining) is
+  re-expressed as this repository's engine rules
+  (`discovery_fabric/engine/patent_claim_extract.py`); zero upstream
+  bytes copied (the upstream is a USPTO bulk-download pipeline, ours
+  is the rule set + real-bytes acceptance sample).
+- PaECTER (Max Planck Institute of Innovation and Competition et al.;
+  PLOS ONE 2025, doi 10.1371/journal.pone.0358188) — HF
+  `mpi-inno-comp/paecter` (base `anferico/bert-for-patents`,
+  1024-dim). USED FOR: the machine-score similarity input on the
+  rediscovery lane (labelled INPUT_NOT_VERDICT). TYPED LICENSE
+  DISCREPANCY: the R106 auditor verdict names PaECTER "CC-BY,
+  attribution-only" but the canonical repo bytes carry
+  "license: apache-2.0" (HF API tag + the model card "license:
+  apache-2.0" line, both byte-read 2026-11-19); the NOTICE row cites
+  the byte-verified repo license and the discrepancy rides the run
+  record for auditor re-adjudication. Weights cached locally, not
+  redistributed.
+- Inspect AI (UK AI Security Institute) — `inspect-ai` v0.3.291; MIT
+  (PyPI classifier byte-read). The unattended 30-batch harness driver
+  (the Task/solver/scorer + the eval log). Typed deviations: this
+  build's `@scorer` requires `metrics=` and `@solver` requires
+  `name=` (signature regressions vs the public docstrings — worked
+  around at call sites, the library is NOT patched).
+- baber/uspto_raw (HF mirror of the Google-Patents-form USPTO grant
+  dump) — the real-bytes claims sample (12 granted chemistry patents,
+  `eval/r106_score9_patentchem/real_claims_sample.jsonl`). TYPED: the
+  mirror carries no license tag; the underlying texts are USPTO grant
+  publications; the Google Patents Public Data form is attributed;
+  attribution-only usage (excerpts + derived rule outputs committed).
+- big_patent subset b (HF `NortheasternUniversity/big_patent`,
+  CC-BY-4.0 tag byte-read) — the FIRST real-corpus pick for the
+  claims leg; the HF parquet carries only description+abstract (NO
+  claims field) so it was NOT adopted for the leg (the typed
+  correction in the extraction record); listed here for the
+  attribution discipline (Art. 16 accounting: the miss is disclosed,
+  not silent).
+
+## Score-9 exclusions (typed)
+
+- USPTO bulk downloads (bulkdata.uspto.gov / data.uspto.gov bulk /
+  the PatentChem Zenodo 75GB mirror) — NOT fetched: sandbox-egress
+  probes all failed (typed infra state, Art. 15) and the full-year
+  bulk exceeds the rootfs; the claims leg accepted on the
+  bounded real sample instead (Art. 22).

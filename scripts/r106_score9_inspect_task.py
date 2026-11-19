@@ -33,7 +33,7 @@ sys.path.insert(0, str(REPO))
 from inspect_ai import Task, task                      # noqa: E402
 from inspect_ai.dataset import Sample                  # noqa: E402
 from inspect_ai.model import get_model, GenerateConfig  # noqa: E402
-from inspect_ai.solver import Generate, solver, task_state  # noqa: E402
+from inspect_ai.solver import Generate, solver             # noqa: E402
 from inspect_ai.scorer import Score, scorer, Target    # noqa: E402
 
 from discovery_fabric.engine import rediscovery_protocol as rp  # noqa
@@ -54,18 +54,47 @@ def load_items():
     return items
 
 
+import threading
+_CP_LOCK = threading.Lock()
+
+
 def ensure_checkpoint():
-    cp = rp.load_checkpoint(CHECKPOINT)
-    if cp is None:
-        cp = rp.new_checkpoint()
-        cp["run_id"] = "r106-score9-30batch"
-        cp["interventions"] = 0
-        CHECKPOINT.write_text(json.dumps(cp))
-    return cp
+    with _CP_LOCK:
+        cp = rp.load_checkpoint(CHECKPOINT)
+        if cp is None:
+            cp = rp.new_checkpoint()
+            cp["run_id"] = "r106-score9-30batch"
+            cp["interventions"] = 0
+            CHECKPOINT.write_text(json.dumps(cp))
+        return cp
 
 
 def save_checkpoint(cp):
-    CHECKPOINT.write_text(json.dumps(cp))
+    # reload-before-save under the lock: concurrent solves merge their
+    # own completed item into the FRESHEST on-disk state (a lost
+    # update across items would silently shrink the ONE run)
+    with _CP_LOCK:
+        fresh = rp.load_checkpoint(CHECKPOINT)
+        if fresh is not None:
+            for k in ("usage", "typed_failures"):
+                if k in cp:
+                    merged = fresh.setdefault(k, {} if k == "usage"
+                                              else [])
+                    mine = cp[k]
+                    if k == "usage":
+                        for kk, vv in mine.items():
+                            merged[kk] = max(int(merged.get(kk, 0)),
+                                             int(vv))
+                    else:
+                        have = {(x.get("item_id"), x.get("seat"),
+                                 x.get("state")) for x in merged}
+                        for x in mine:
+                            if (x.get("item_id"), x.get("seat"),
+                                    x.get("state")) not in have:
+                                merged.append(x)
+            fresh["completed_items"].update(cp["completed_items"])
+            cp = fresh
+        CHECKPOINT.write_text(json.dumps(cp))
 
 
 def vault_key(name):
@@ -76,7 +105,7 @@ def vault_key(name):
     return key
 
 
-@solver
+@solver(name="rediscovery_solver")
 def rediscovery_solver():
     """Per-item: generation (Inspect provider layer, the registered
     route) -> two judge ratings (engine transports) -> engine
@@ -198,7 +227,7 @@ def rediscovery_solver():
     return solve
 
 
-@scorer
+@scorer(metrics=[])
 def recovery_scorer():
     async def score(state, target: Target):
         done = state.store.get("result")
@@ -229,6 +258,6 @@ if __name__ == "__main__":
     os.environ.setdefault("INSPECT_LOG_DIR",
                           str(REPO / "eval/r106_score9_inspect_logs"))
     logs = inspect_eval(score9_rediscovery(),
-                        max_connections=4,
+                        max_connections=1,
                         display="none")
     print("EVAL_DONE", len(logs))
