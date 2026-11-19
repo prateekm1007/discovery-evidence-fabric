@@ -2808,6 +2808,15 @@
    "finding": "commit carries Session:/Work-Id: on ONE line (a formatting defect of the c-0107 commit command): git parses that as a single malformed Session trailer with the Work-Id inline in its value, so the Work-Id TRAILER is absent — caught by tests/test_article29_parallel_coordination.py on the push's own CI read (the same F36-class validator, second instance in this session: 63d6b3f5c lacked trailers outright, aababd100 carried them malformed)",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "F36 typed allowance pattern (the R47 precedent): pushed history is never rewritten (Art. 4); remediation is forward — the remediation commit registers THIS violation typed, itself carries Session: builder-r80s1 + Work-Id: chemistry-computed-equilibrium-dev as SEPARATE trailer lines, and every builder-r80s1 commit from here onward carries properly-formatted trailers (session self-check: git log -1 --format='%(trailers)' must show BOTH lines separately BEFORE pushing). Content unaffected: the c-0107 chemistry prototype (scripts/r80_chemistry_equilibrium.py + 12 CI-wired tests + workflow wiring + NOTICE attribution) is green and stands as landed."
+  },
+  {
+   "sha": "f870ac640",
+   "session": "builder-r95s1",
+   "detected_by": "builder-r95s1 (self-caught from the remote CI read of the sealed-completion push 23ab8ad36 — the validator reds, never silent)",
+   "detected_at": "2026-11-19T07:13:13Z",
+   "finding": "the FORWARD-ONLY MERGE commit (integrating the parallel builder-r96s1 lanes with the c-0111 sealed-run completion after the mid-run remote advance) was made with `git merge -m` and lacks the Session:/Work-Id: trailers — the merge carries ZERO new claim content (disjoint file sets; no measurement bytes; the sealed-run content lives in 5a00dec56 which carries full trailers), but the F36 discipline requires 100% trailer compliance post-adoption, so the violation is typed here",
+   "remediation": "typed registration (this record) + the discipline adopted forward: every future merge on this lane is made with `git merge --no-ff -m` FOLLOWED BY `git commit --amend` ONLY when unpushed, or created via a trailer-bearing message from the start (merges are commits — they carry the same trailers); the validator's red on 23ab8ad36 was the detection surface and the very next push carries this registration",
+   "work_id": "holdout-v12-generation"
   }
  ],
  "canonical_claim_violations": [
