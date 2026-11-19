@@ -1,0 +1,40 @@
+{
+ "record": "R99_DISJOINTNESS_V15/1.0.0",
+ "ran_at": "2026-11-19T17:52:00Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r105s1",
+ "claim": "c-0119 (holdout-v15-generation, role EXECUTOR, kind one_shot, base dacffd034; pushed as f567e1f3d — the Art. 29(b) lock)",
+ "target": "origin/audit/r11-auditor-verdict-20261114:audit/holdout_v15/holdout_v15_problems.json",
+ "audit_tip": "46b826512",
+ "seal_verify": {
+  "method": "F50 canonical-tuple recipe (r38 canonical_tuple_hash: contamination-filtered rows, [problem_id, device, failure, question, question_type, user_variables] tuples, sorted by problem_id, compact JSON, sha256)",
+  "registered_selection_sha256": "b0e7011309fa37cb206f47fdfd6e12f64e7ae9a640d34a5b0de8a24a7f78846c",
+  "recomputed": "b0e7011309fa37cb206f47fdfd6e12f64e7ae9a640d34a5b0de8a24a7f78846c",
+  "match": true,
+  "control": {
+   "note": "the recipe was locked by reproducing the v14 known-good seal BEFORE reading the v15 result (a recipe-fitted false match is prevented); the raw-file sha differs from the registered seal by design — the seal is over the canonical content form, not the committed file bytes",
+   "v14_registered": "7707a0b4520c2a52b92fa56841d46e2d3cea757b391a6d091b2ade18cd4bd6a7",
+   "v14_recomputed": "7707a0b4520c2a52b92fa56841d46e2d3cea757b391a6d091b2ade18cd4bd6a7",
+   "v14_match": true
+  },
+  "timing_disclosure": "the seal verify ran mechanically BEFORE the claim push (zero problem bytes surfaced into builder context; the field-tuple recipe hashes content without exposing it) — typed in the c-0119 claim notes under Art. 5"
+ },
+ "instrument_read": "the V15 domain-head map was derived from the committed problem device/failure fields ONLY (no question text read) AFTER the claim push, per the v14/AM88 precedent ('derived from the committed problem device/failure fields by the executor AFTER the claim push — the mandated pre-run instrument read')",
+ "run_1": {
+  "command": "r99_disjointness_guard.py <audit_ref>:audit/holdout_v15/holdout_v15_problems.json --map=v15 --versions=1-14",
+  "corpus": "v1-v14 audit-branch problem files + v13 (queue HEAD) + eval/problems_dev12.json",
+  "result": "1 VIOLATION",
+  "violation": {
+   "problem_id": "HO15-10-fabric-coat-adhesion",
+   "token": "~laminat",
+   "context": "prior-corpus row: 'propose a mitigation for tablet capping/lamination on ejection.'",
+   "typed_disposition": "WORD-SENSE FALSE CLASH, not a domain repeat: the prior row is a PHARMACEUTICAL tablet-press problem (lamination = tablet layers splitting on ejection); HO15-10 is a textile fabric coating/laminating line (adhesive lamination of fabric webs, adhesion-loss/delamination). Different industry, device, and failure mechanism. The over-broad token was refined (the v14 HO14-08 re-derivation class); the identifying SYSTEM token 'fabric coating' (the device field's own words) produced no hit and remains the row's honest identifier."
+  }
+ },
+ "run_2": {
+  "command": "identical, after the HO15-10 token refinement",
+  "result": "0 clashes across v1-v14 + dev12 (30 rows checked, word-boundary domain heads)",
+  "gate": "PASS — the AM90 required gate (0 clashes) is MET"
+ },
+ "map_provenance": "V15_DOMAIN_HEAD added to scripts/r99_disjointness_guard.py (committed in the same change as this record); family-adjacent rows keep honest family tokens (jet-dyeing HO15-01/16, air-jet-loom HO15-04/17, texturing HO15-09/23, compressive-shrink HO15-25/26, nonwovens HO15-06/15, leather HO15-12/13/28/29/30); generic engineering nouns excluded per the guard contract",
+ "forward_fix": "the v15 lane imports the guard (the F-lesson pattern: any future sealed-set authoring re-uses the committed map, never an ad-hoc check)"
+}

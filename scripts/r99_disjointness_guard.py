@@ -180,7 +180,52 @@ V14_DOMAIN_HEAD = {
     "HO14-30": ["lamella", "inclined plate"],
 }
 
-DOMAIN_HEAD_MAPS = {"v13": V13_DOMAIN_HEAD, "v14": V14_DOMAIN_HEAD}
+# The v15 set's domain heads (the AUDITOR-AUTHORED textile/leather
+# set, seal b0e7011309fa37cb @ audit branch 46b826512; derived from
+# the committed problem device/failure fields by the executor AFTER
+# the claim push c-0119 (f567e1f3d) — the mandated pre-run instrument
+# read, the v14/AM88 precedent). Identifying SYSTEM tokens
+# (industry/equipment/process); generic engineering nouns (pump,
+# bearing, roller, blade, wear, heat exchanger alone) excluded per
+# the guard's contract. Family-adjacent rows keep their honest
+# family tokens (jet-dyeing 01/16, air-jet-loom 04/17, texturing
+# 09/23, compressive-shrink 25/26, nonwovens 06/15, leather 12/13/
+# 28/29/30) — if they clash, the guard types it (fail-closed).
+V15_DOMAIN_HEAD = {
+    "HO15-01": ["jet dyeing", "disperse dye"],
+    "HO15-02": ["~merceriz"],
+    "HO15-03": ["rotary screen", "reactive dye"],
+    "HO15-04": ["air-jet loom", "weft"],
+    "HO15-05": ["warp sizing", "slasher"],
+    "HO15-06": ["spunbond", "nonwoven"],
+    "HO15-07": ["circular knitting", "barre"],
+    "HO15-08": ["tufting", "bcf"],
+    "HO15-09": ["false-twist", "~textur", "poy"],
+    "HO15-10": ["fabric coating"],
+    "HO15-11": ["wool scouring", "lanolin", "suint"],
+    "HO15-12": ["beamhouse", "~liming"],
+    "HO15-13": ["chrome tanning", "tanyard"],
+    "HO15-14": ["stonewash", "pumice"],
+    "HO15-15": ["needlepunch", "needle punching", "barbed needle"],
+    "HO15-16": ["jet dyeing"],
+    "HO15-17": ["air-jet loom", "reed"],
+    "HO15-18": ["shearing", "rotary cutter"],
+    "HO15-19": ["carding", "metallic wire"],
+    "HO15-20": ["drawframe", "draw frame", "roller lapping"],
+    "HO15-21": ["comber", "nipper", "noil"],
+    "HO15-22": ["two-for-one", "tfo"],
+    "HO15-23": ["contact heater", "~textur"],
+    "HO15-24": ["calender"],
+    "HO15-25": ["compactor", "compressive shrink"],
+    "HO15-26": ["~sanforiz", "compressive shrink"],
+    "HO15-27": ["dyeing heat exchanger", "~dyehouse", "dye house"],
+    "HO15-28": ["tannery"],
+    "HO15-29": ["sammying"],
+    "HO15-30": ["setting-out", "setting out"],
+}
+
+DOMAIN_HEAD_MAPS = {"v13": V13_DOMAIN_HEAD, "v14": V14_DOMAIN_HEAD,
+                    "v15": V15_DOMAIN_HEAD}
 
 
 def main() -> int:
@@ -201,7 +246,7 @@ def main() -> int:
     if len(args) != 1:
         print("usage: r99_disjointness_guard.py "
               "<[REF:]audit/holdout_vNN/..._problems.json> "
-              "[--map v13|v14] [--versions 1-13]")
+              "[--map v13|v14|v15] [--versions 1-13]")
         return 2
     spec, = args
     ref = "HEAD"
