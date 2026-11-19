@@ -82,3 +82,22 @@ Continuing the worldwide search per owner directive. New license-verified copyab
 - Intern-S1-Pro (Shanghai AI Lab, open-sourced Feb 2026, trillion-param science multimodal): POTENTIAL frontier-class generator, but GitHub license NONE/unverified — DO NOT copy until license confirmed; track as a candidate serving model for acceptance runs (the owner-funded-allowance path remains primary).
 
 ### Integration discipline (unchanged, AM79): attribution+NOTICE, CI-wired acceptance test, matched-budget DEV ablation before adoption, no frozen edits without CI-gated re-freeze, generation-side improvement not just detection binds. NOTE F81: the c-0105 convergence prototype's Reflexion/Self-Refine attribution is MISSING from NOTICE.md — fix before wiring into the frozen machine.
+
+
+## COPYABLE TECHNIQUES — UPDATE 3 (R93, worldwide incl. China; license-verified)
+Addressing the convergence ablation's NOT_ADOPTED outcome: the prompt-refractory BILL_UNTAGGED class (27/30 rows) cannot be fixed by reflection alone (c-0106 ablation). The next leverage is **CRITIC tool-grounding** (generation-time tool calls that correct, not just flag) and **AIDE tree search** (population search over diverse candidates, metric-pruned).
+
+### CRITIC tool-grounding (c-0107 Cantera + ChemMCP/CACTUS wired into the critic/generator)
+- CRITIC pattern (microsoft, ICLR 2023; open-compass/CriticEval MIT benchmark): LLMs self-correct by CALLING external tools to verify and amend outputs, not just self-critique. Wire Cantera `equilibrate()` and ChemMCP/CACTUS chemistry tools into the generator so chemistry claims are tool-verified at generation time (kills the inversion class at the source; c-0107 is the mechanics).
+- ChemAgent (paper, 137 chemical tools integrated): comprehensive tool pool for chemistry/materials — copy the tool-integration pattern.
+- MatClaw (autonomous code-first LLM agent for materials, 2026): writes and executes Python directly in a sandboxed environment — the code-first execution pattern for chemistry claims.
+
+### AIDE tree search (replace single-chain repair with population search)
+- AIDE (WecoAI/aideml, MIT): tree-search agent that autonomously drafts, debugs, and benchmarks code until a user-defined metric is maximized. Copy the best-first tree-search pattern (diverse candidates, metric-pruned, refinement over attempts) to replace the single-chain repair loop that burns budget without converging on the prompt-refractory class.
+
+### Scientific agent skills (P4/P5 novelty/viability)
+- K-Dense-AI/scientific-agent-skills: 177 ready-to-use validated skills for AI agents (biology, chemistry, physics, engineering) — copy skill patterns for real-world validation.
+- awesome-ai4s (HyperAI): 200+ AI4S papers/tools open source — survey for P4/P5.
+- synthesis-agent (hspark1212): LLM agent for materials synthesis using Materials Project — copy the similarity-search-on-recipes pattern.
+
+### Integration discipline (unchanged, AM79): attribution+NOTICE, CI-wired acceptance test, matched-budget DEV ablation before adoption, no frozen edits without CI-gated re-freeze, generation-side improvement not just detection binds.
