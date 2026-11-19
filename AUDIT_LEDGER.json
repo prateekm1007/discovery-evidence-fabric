@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "c068f388f",
+  "queue/dev12_r7": "700d38219",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2994,6 +2994,18 @@
     "v13 BURNED. CI tip c068f388f red on D2 remote_ci block (record-formatting, builder to fix forward-only); capability run valid.",
     "Convergence lever (c-0109 typed vocabulary extension) worked: mined 231 residual BILL_UNTAGGED texts from v12, extended classifier, 5 mis-tags self-caught->None. BILL_UNTAGGED residual down to 9 rows (v12 ablation: 27/30)."
    ]
+  },
+  {
+   "id": "AM86",
+   "date": "2026-11-19",
+   "status": "ISSUED",
+   "reason": "R99 auditor: CORR-6 revoke v13 acceptance (freshness defect); v14 auditor-authored fresh set sealed",
+   "changes": [
+    "CORR-6: v13 ACCEPTANCE REVOKED (score 7 -> 6). Builder's defect disclosure verified: 13/30 v13 rows repeat prior domains (3 exact + 1 public-bank contamination); authoring clash-check vacuous. Art.13 generalization compromised. Auditor oversight acknowledged (R98 granted without disjointness check). v12 acceptance (score 6) stands.",
+    "Machine capability CREDITED: convergence 67% (v12: 20%), 2.9 attempts/row, P3 speed pass, P5 viability 28/30, fresh-subset(17) mean 3.647. The c-0109 v1.1 vocabulary extension + the builder's honest defect-finding + fail-closed disjointness guard (r99) + P4 union-method recompute are real capability/integrity gains.",
+    "v14 AUDITOR-AUTHORED fresh WATER/WASTEWATER-TREATMENT set sealed (73222ce2feb8ab32, 30 problems, rubric PRIVATE). Domain-disjoint from v1-v13 (untouched cluster). Builder MUST run r99_disjointness_guard over full v1-v13 corpus before run. Re-earn score 7 blind: mean>=3.5, CI lower>3.0, 0/0/0.",
+    "P4 novelty gate BLIND SPOT fixed-forward: prior-art corpus was v9-v12 only (missed v1-v8 repeats). v14 requires the FULL-corpus disjointness guard + semantic-novelty (SPECTER2) upgrade for score 8."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -4267,6 +4279,17 @@
    "acceptance": "GRANTED",
    "score": 7,
    "evidence_sha": "eval/holdout_v13_auditor_score.json"
+  },
+  {
+   "id": "V86",
+   "round": "R99 CORR-6 revoke v13 + v14 author",
+   "commit": "700d38219",
+   "gate": "v13 REVOKED (freshness); v14 sealed pending",
+   "capability_change": "v13 acceptance revoked (freshness defect); machine capability credited; v14 fresh auditor set sealed",
+   "corrections": [
+    "CORR-6"
+   ],
+   "evidence_sha": "eval/r99_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4528,16 +4551,26 @@
    "burned_at": "2026-11-19"
   },
   "holdout_v13": {
-   "status": "BURNED",
+   "status": "BURNED_REVOKED",
    "selection_sha256": "f6d8372de85c37f2",
    "n": 30,
    "score": 7,
-   "acceptance": "GRANTED (mean 3.667, CI95 [3.495,3.838] excludes 3.0, 0/0/0, P3/P4/P5 PASS)",
+   "acceptance": "REVOKED (freshness defect: 13/30 prior-domain repeats, 3 exact + 1 public-bank contamination; Art.13 generalization compromised). Capability gains credited; fresh-subset(17) mean 3.647.",
    "burned_at": "2026-11-19",
    "provenance": "builder-authored problems (capability demo), auditor-blind rubric scoring"
+  },
+  "holdout_v14": {
+   "status": "SEALED_REGISTERED",
+   "selection_sha256": "73222ce2feb8ab32c2cec9c287bc1ef4baa64d05f9b2540bf7b9e4816e148bd2",
+   "n": 30,
+   "author": "auditor (blind acceptance)",
+   "custody": "rubric private repo (unauth 404); problems audit/holdout_v14/",
+   "model_pin": "agnes-3.0-flash",
+   "bar": "mean>=3.5 AND 0/0/0 AND VALID; Art.14 CI>3.0",
+   "disjointness": "water/wastewater cluster, r99 guard required pre-run"
   }
  },
- "progress_note": "SCORE 7/10. v13 ACCEPTANCE GRANTED: mean 3.667, CI95 [3.495,3.838] excludes 3.0, 0/0/0 hard clauses, P3 speed (38.6s/125.2s) + P4 novelty (30/30) + P5 viability (28/30) PASS, convergence 67%, 2.9 attempts/row. v13 BURNED. Next: score-8 (auditor-authored blind set + semantic novelty embeddings + external viability proof). Goal 9/10.",
+ "progress_note": "SCORE 6/10 (CORR-6: v13 acceptance REVOKED — freshness defect 13/30 prior-domain repeats verified from committed bytes; v12 acceptance stands). Machine capability real: convergence 67%, speed P3 pass, fresh-subset(17) mean 3.647. v14 AUDITOR-AUTHORED fresh water/wastewater set sealed (73222ce2feb8ab32) to re-earn score 7 blind. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -4641,6 +4674,13 @@
    "withdrawn": "R63 (AM57) score mapping 5->6 on P1 gate pass",
    "corrected": "Owner roadmap defines 6 = a sealed set ACCEPTED (mean>=3.0, 0 violations, CI excludes 3.0). P1 (physics claims computed) is score 5. v9 scored mean 3.000 but CI [2.751,3.249] includes 3.0 -> UNRESOLVED, acceptance NOT GRANTED. SCORE = 5, not 6.",
    "reason": "Art.9 duty-to-correct: the R63 mapping conflated the P1 gate with the acceptance gate."
+  },
+  {
+   "id": "CORR-6",
+   "date": "2026-11-19",
+   "withdrawn": "R98 (AM85) v13 ACCEPTANCE GRANTED score 7",
+   "corrected": "v13 acceptance REVOKED. The builder's defect disclosure (eval/r97_v13_disjointness_verifier_findings.json) verified from committed bytes: 13/30 v13 rows repeat prior v1-v12 device+failure families/process domains (3 EXACT: HO13-13=v8-01 anodize-burning, HO13-27=v5-09 steam-trap, HO13-30=v1-18 DC-link caps; 1 public-bank contamination HO13-29=dev12 CNC). The authoring clash-check was VACUOUS (corpus never held v1-v11, mangled slice line, pid[:6] prefix bug). Art.13 fresh-problem generalization compromised. Auditor oversight: R98 granted score 7 without verifying domain-disjointness. Score returns to 6 (v12 stands). Machine capability credited (fresh-subset 17 rows mean 3.647, convergence 67%). v14 auditor-authored fresh set sealed to re-earn score 7.",
+   "reason": "Art.9 duty-to-correct + Art.13 fresh-problem integrity + Art.14 (machine scores are inputs, freshness weighting is auditor custody)."
   }
  ],
  "rulings": [

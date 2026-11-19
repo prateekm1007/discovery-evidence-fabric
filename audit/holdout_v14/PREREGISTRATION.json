@@ -1,0 +1,38 @@
+{
+ "record": "HOLDOUT_V14_PREREGISTRATION/1.0.0",
+ "registered_at": "2026-11-19",
+ "registered_by": "auditor (Claude), loop-owned Art.28",
+ "selection_sha256": "73222ce2feb8ab32c2cec9c287bc1ef4baa64d05f9b2540bf7b9e4816e148bd2",
+ "n_problems": 30,
+ "intervention": 15,
+ "predictor": 15,
+ "power_basis": {
+  "pre_registered_n": 30,
+  "observed_per_row_sd": 0.55,
+  "test": "one-sample t vs 3.0, alpha 0.05",
+  "resolved_rule": "Art.14: resolved only when n met AND 95% CI lower bound > 3.0"
+ },
+ "model_pin": {
+  "registered_id": "agnes-3.0-flash",
+  "upstream": "agnes (apihub.agnes-ai.com), AGNES_API_KEY + AGNES_API_KEY_2 rotation",
+  "note": "owner default agnes-3.0-flash"
+ },
+ "custody": {
+  "problems": "audit/holdout_v14/holdout_v14_problems.json (public)",
+  "rubric": "PRIVATE repo prateekm1007/def-rubric-custody/holdout_v14_rubric_PRIVATE.json (unauth 404)",
+  "rubric_access": "auditor+owner only; builder NEVER_READ pre-generation"
+ },
+ "purpose": "BLIND ACCEPTANCE re-earn score 7 after v13 freshness defect (13/30 prior-domain repeats). Auditor-authored fresh water/wastewater set. All five binds + c-0109 corrector + c-0110 AIDE + c-0112 conformal active.",
+ "disjointness_requirement": "builder MUST run scripts/r99_disjointness_guard.py over the FULL v1-v13 corpus before the run; fail-closed on any domain-head clash",
+ "MANDATORY_RUN_ARTIFACTS": [
+  "committed gateway-log slice",
+  "30/30 served_model==registered agnes-3.0-flash attestation PRE-SCORING",
+  "durable all-row events ledger",
+  "ONE named executor id, claim before any problem read",
+  "green pushed CI read from check-run API",
+  "MEASURED_PATH through engine_route -> mechanism_space"
+ ],
+ "ACCEPTANCE_BAR": "mean>=3.5 AND 0 allowed-measures AND 0 inverted AND 0 unavailable-input AND run_verdict==VALID; Art.14 CI lower bound > 3.0",
+ "burn_after_use": true,
+ "status": "SEALED_REGISTERED"
+}
