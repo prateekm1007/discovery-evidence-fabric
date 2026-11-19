@@ -77,6 +77,17 @@ REDACTION_PATTERNS = (
 )
 REDACTION_TOKEN = "[redacted-id]"
 
+# The canary/provenance sweep (the P4 canary clause: 0 canary
+# completions, byte-checkable on the SERVED prompt and reply bytes):
+# the id pattern above + the run-provenance strings — a hit is a
+# typed finding, never silently dropped.
+CANARY_PATTERNS = (
+    re.compile(r"HO[0-9]+-[a-z0-9-]+", re.IGNORECASE),
+    re.compile(r"holdout", re.IGNORECASE),
+    re.compile(r"agnes", re.IGNORECASE),
+    re.compile(r"canary", re.IGNORECASE),
+)
+
 PROMPT_TMPL = """You are a blind industrial-engineering reviewer.
 
 PROBLEM:
@@ -130,6 +141,22 @@ def assert_blind_prompt(prompt: str) -> None:
                 "blindness contract violated: id pattern "
                 f"{pat.pattern!r} present in the prompt (typed "
                 "refusal — the row is never served un-redacted)")
+
+
+def scan_canary(text: str) -> list:
+    """The canary/provenance sweep over ONE byte string (a served
+    prompt or a reply): returns the TYPED findings list (which
+    pattern matched, plus a short context window) — EMPTY means
+    clean. The caller aggregates over every prompt and reply; the
+    acceptance counts the total (0 = clean)."""
+    findings = []
+    s = text or ""
+    for pat in CANARY_PATTERNS:
+        for m in pat.finditer(s):
+            ctx = s[max(0, m.start() - 30):m.end() + 30].strip()
+            findings.append({"pattern": pat.pattern,
+                             "context": ctx[:80]})
+    return findings
 
 
 def build_rating_prompt(problem: dict,
@@ -375,7 +402,9 @@ def run_panel(seats: Sequence[PanelSeat], rows: dict,
               problems: dict, serve_fn: Callable,
               budget: Optional[QuotaBudget] = None,
               per_row_token_estimate: int = 0,
-              seed: int = PANEL_SEED) -> dict:
+              seed: int = PANEL_SEED,
+              per_serve_estimate: Optional[Callable[[PanelSeat], int]] = None,
+              ) -> dict:
     """The composed blind sweep. rows: {row_id: solution_text};
     problems: {row_id: problem_fields}. For each shuffled row and
     each seat: quota-check, serve-with-retry, record. Returns the
@@ -387,6 +416,18 @@ def run_panel(seats: Sequence[PanelSeat], rows: dict,
     row entry with the typed error (the sweep continues on the other
     seats — one transport's outage must not kill the panel; the
     record discloses every error).
+
+    ADDITIVE (the r106 transport-honest quota accounting; default
+    preserves the committed scalar behavior byte-for-byte):
+    per_serve_estimate, when provided, supersedes the scalar for the
+    per-serve budget estimate on a PER-SEAT basis (seat -> int). The
+    r106 lane uses it to keep the z-ai CLI seat OUT of the xkiro
+    ceiling (estimate 0, typed in the record) while the xkiro seats
+    carry the pre-registered arithmetic. The estimate covers ONE
+    serve-with-retry cycle (the retry lives inside serve_with_retry);
+    the allowance headroom vs the measured reply class is the
+    conservatism for the retry class, and the harness discloses the
+    REAL per-call usage in the record.
     """
     for s in seats:
         register_seat(s)  # structural isolation, fail-closed
@@ -399,12 +440,15 @@ def run_panel(seats: Sequence[PanelSeat], rows: dict,
         entry = {"label": label, "ratings": {}}
         for seat in seats:
             try:
+                est = (per_serve_estimate(seat)
+                       if per_serve_estimate is not None
+                       else per_row_token_estimate)
                 if budget is not None:
-                    budget.check(per_row_token_estimate)
+                    budget.check(est)
                 sr = serve_with_retry(seat.as_dict(), prompt,
                                       serve_fn)
                 if budget is not None:
-                    budget.record(per_row_token_estimate)
+                    budget.record(est)
                 entry["ratings"][seat.agent_id] = sr.as_dict()
                 agents_served.add(seat.agent_id)
                 families_served.add(seat.family)
