@@ -1,0 +1,206 @@
+{
+ "record": "MEASURE_TAXONOMY/1.1.0",
+ "provenance": "AM91 capability-fix lane (claim c-0116, work physics-sign-guards-dev): the canonical measure-class taxonomy behind the per-problem permitted-measure enforcement (the HO14-12 auditor finding — recirculation/VFD scour proposed outside the permitted set; the deterministic scan missed it because the v14 permitted sets live in user_variables and the offender row was procedure-shaped). Set-membership is deterministic: every permitted item and every bill row canonicalizes to class ids via the rules below; the row's matched class SET must be a subset of the permitted class set (anti-laundering) or the row is a typed KILL; a row matching no rule is MEASURE_CLASS_UNRESOLVED (fail-closed, no pass-through). v1.1.0 calibration (the 30-row post-burn regression, auditor full-read as the labelled truth): hardware/control/sensor classes fire ONLY on PROVISION intent (install/add/new/procure/switch-to) — a setpoint/configuration UPDATE on EXISTING infrastructure is the parameter-retuning family (the auditor-read convention; the noun names WHICH existing actuator, not new hardware); answer-metadata rows (the machine's own bold-labelled sections) are typed SKIPs; the sensor-form constraint ('use only the existing ..., no new sensors') bounds the DATA INPUTS, so its enforcement scope is the sensor_addition class only.",
+ "trigger": {
+  "measure_set_form": "allowed measures?[: ]",
+  "sensor_form": "use only the existing",
+  "only_marker": "\\bonly\\b"
+ },
+ "classes": {
+  "ph_alkalinity": "pH or alkalinity adjustment as the manipulated variable",
+  "chemical_dosing": "chemical dose/chemistry manipulation (coagulant, chlorine, caustic/NaOH, antiscalant, PAC, polymer, ferrate, PAA, peroxide, VFA carbon source, Mg/P ratio, regenerant/brine chemistry)",
+  "air_to_water_ratio": "air-to-water ratio as the manipulated variable",
+  "temperature_parameter": "water/process/brine/feed temperature as the manipulated variable",
+  "pressure_or_power_parameter": "pressure, voltage, current, power, lamp-power, ozone-generator power setpoints",
+  "flow_or_loading_parameter": "flow, velocity, hydraulic/loading-rate, recycle-ratio, upflow-velocity, EBCT, F:M, SRT setpoints (PARAMETER retuning of rates/ratios)",
+  "do_or_aeration_parameter": "dissolved-oxygen / aeration setpoint retuning",
+  "concentration_parameter": "sludge/liquid concentration setpoints",
+  "backwash_procedure": "backwash / pulse / regeneration-sequence procedure",
+  "cleaning_procedure": "wipe / scour / clean / flush procedures",
+  "settle_decant_procedure": "settle / decant procedure retuning",
+  "pretreatment_procedure": "settling/screening pre-treatment procedure retuning",
+  "gas_flow_procedure": "gas-flow / diffuser procedure retuning",
+  "schedule_or_frequency": "schedules, intervals, frequencies, timing, duty",
+  "parameter_retuning_generic": "generic setpoint/retune/adjust fallback (no more-specific class matched)",
+  "use_existing_instrumentation": "use of the EXISTING sensors/instrumentation/no-new-hardware statements (the predictor-row sensor constraint)",
+  "vfd_speed_control": "VFD / variable-frequency-drive / inverter manipulation PROPOSED AS the measure (install/switch-to language, not a setpoint update on an existing drive)",
+  "flow_recirculation_hardware": "recirculation FLOW manipulation / scour / loop-routing as a proposed measure (the HO14-12 'switch to scouring' signature; distinct from a permitted recirculation-RATIO setpoint retune)",
+  "hardware_installation": "install / fit / mount / procure / replace / add device or equipment (PROVISION intent)",
+  "material_placement": "place / spread / compact / fill / pour / lay / backfill bulk material",
+  "sensor_addition": "adding a NEW sensor / probe / gauge / instrument / meter (the sensor-form violation class)",
+  "control_hardware": "PLC / controller / actuator / solenoid hardware PROPOSED (provision intent, not a firmware/tag update on the existing controller)"
+ },
+ "item_rules": [
+  [
+   "\\bpH\\b|\\balkalinit",
+   "ph_alkalinity"
+  ],
+  [
+   "caustic|alkali|\\bNaOH\\b|sodium hydroxide|\\blime\\b",
+   "chemical_dosing"
+  ],
+  [
+   "air.to.water ratio",
+   "air_to_water_ratio"
+  ],
+  [
+   "\\btemperature\\b",
+   "temperature_parameter"
+  ],
+  [
+   "steam.temperature|\\bpressure\\b|\\bpower\\b|voltage|\\bcurrent\\b|lamp-power",
+   "pressure_or_power_parameter"
+  ],
+  [
+   "dosing|dose|chemistry|regenerant|\\bbrine\\b|coagulant|chlorine|antiscalant|\\bPAC\\b|polymer|ferrate|\\bPAA\\b|peroxide|\\bVFA\\b|carbon.source|Mg/P",
+   "chemical_dosing"
+  ],
+  [
+   "recycle.ratio|recirculation.ratio|hydraulic.loading|upflow.velocity|EBCT|empty.bed|F:M|\\bSRT\\b|\\bflow\\b|velocity|loading",
+   "flow_or_loading_parameter"
+  ],
+  [
+   "dissolved.oxygen|aeration|\\bDO\\b",
+   "do_or_aeration_parameter"
+  ],
+  [
+   "sludge.concentration|concentration setpoint",
+   "concentration_parameter"
+  ],
+  [
+   "backwash",
+   "backwash_procedure"
+  ],
+  [
+   "sleeve.wipe|wipe|scour|clean|flush",
+   "cleaning_procedure"
+  ],
+  [
+   "settle|decant",
+   "settle_decant_procedure"
+  ],
+  [
+   "pre.treatment|settling/screening|screening",
+   "pretreatment_procedure"
+  ],
+  [
+   "gas.flow|diffuser",
+   "gas_flow_procedure"
+  ],
+  [
+   "interval|schedul|frequency|timing|duty|procedure",
+   "schedule_or_frequency"
+  ],
+  [
+   "setpoint|retun|adjust|select|selection",
+   "parameter_retuning_generic"
+  ],
+  [
+   "use only the existing",
+   "use_existing_instrumentation"
+  ]
+ ],
+ "row_rules": [
+  [
+   "\\b(install\\w*|fitting|mount\\w*|retrofit\\w*|provisions?\\b|procure\\w*|\\bnew\\b|\\badd\\w*|\\bsecond\\b|\\badditional\\b|switch\\s+to)\\b.{0,60}\\b(VFD|variable.frequency|inverter)\\b|\\b(VFD|variable.frequency|inverter)\\b.{0,60}\\b(install\\w*|provisions?\\b|procure\\w*|\\bnew\\b|\\badd\\w*|switch\\s+to)\\b",
+   "vfd_speed_control"
+  ],
+  [
+   "recirculat\\w* (?:flow|scour|loop|line|pump)|recirculation-flow|\\bscour\\b|switch\\s+to\\s+.{0,30}(recirculat|scour|loop)",
+   "flow_recirculation_hardware"
+  ],
+  [
+   "\\b(install\\w*|fit\\b|fitting|mount\\w*|retrofit\\w*|weld\\w*|bolt\\w*|fasten\\w*|provisions?\\b|procure\\w*|replac\\w*|\\bnew\\b|\\badd\\w*|\\bsecond\\b|\\badditional\\b)\\b.{0,60}\\b(shield|panel|skid|system|unit|device|component|cartridge|valve|pump|filter|membrane|liner|exchanger|cooler|heater|coating|film|washer|shim|bracket|support|mesh|screen|aggregate|gravel|sand|soil|bedding|ballast|grout|module|blower|fan|lamp|sleeve|tank|basin|pipe|piping|hose|well|line)\\b|\\b(shield|panel|skid|system|unit|device|component|cartridge|valve|pump|filter|membrane|liner|exchanger|cooler|heater|washer|shim|bracket|support|mesh|screen|grout|module|blower|fan|lamp|sleeve|tank|basin|pipe|piping|hose|well|line)\\b.{0,60}\\b(install\\w*|fit\\b|mount\\w*|retrofit\\w*|provisions?\\b|procure\\w*|replac\\w*|\\bnew\\b|\\badd\\w*|\\bsecond\\b|\\badditional\\b)\\b",
+   "hardware_installation"
+  ],
+  [
+   "\\b(plac\\w*|spread\\w*|compact\\w*|fill\\w*|pour\\w*|lay\\w*|backfill\\w*)\\b",
+   "material_placement"
+  ],
+  [
+   "\\b(install\\w*|provisions?\\b|\\badd\\w*|\\bnew\\b|\\badditional\\b|\\bsecond\\b)\\b.{0,60}\\b(sensor|probe|gauge|meter|instrument|transducer|analy[sz]er|conductivity probe)\\b|\\b(sensor|probe|gauge|meter|instrument|transducer|analy[sz]er|conductivity probe)\\b.{0,60}\\b(install\\w*|provisions?\\b|\\badd\\w*|\\bnew\\b|\\badditional\\b)\\b",
+   "sensor_addition"
+  ],
+  [
+   "\\b(install\\w*|provisions?\\b|procure\\w*|\\bnew\\b|\\badd\\w*|\\badditional\\b|\\bsecond\\b)\\b.{0,60}\\b(PLC|SCADA|controller|actuator|solenoid|timer.controlled|motori[sz]ed|edge compute)\\b|\\b(PLC|SCADA|controller|actuator|solenoid|edge compute)\\b.{0,60}\\b(install\\w*|provisions?\\b|procure\\w*|\\bnew\\b|\\badd\\w*|\\badditional\\b)\\b",
+   "control_hardware"
+  ],
+  [
+   "\\b(raise|lower|increas\\w*|decreas\\w*|reduc\\w*|cut|trim|adjust|retun\\w*|set)\\b.{0,50}\\bpH\\b|\\bpH\\b.{0,50}\\b(raise|lower|increas\\w*|decreas\\w*|reduc\\w*|trim|adjust|retun\\w*|set)\\b|alkalinit",
+   "ph_alkalinity"
+  ],
+  [
+   "\\b(raise|lower|increas\\w*|decreas\\w*|reduc\\w*|cut|trim|adjust|retun\\w*|set)\\b.{0,50}\\btemperature\\b|\\btemperature\\b.{0,50}\\b(raise|lower|increas\\w*|decreas\\w*|reduc\\w*|trim|adjust|retun\\w*|set)\\b",
+   "temperature_parameter"
+  ],
+  [
+   "air.to.water|\\bA/W\\b ratio",
+   "air_to_water_ratio"
+  ],
+  [
+   "\\buse\\b.{0,30}\\b(existing|installed)\\b.{0,40}\\b(sensor|probe|gauge|meter|instrument|signal|reading)\\b|existing instrumentation|existing sensors|\\bexisting\\b.{0,50}\\b(flow meter|thermocouple|RTD|telemetry|logs?|control system infrastructure|transducer)\\b|no new (hardware|sensors?|probe|equipment|physical)|ALREADY-RECORDED",
+   "use_existing_instrumentation"
+  ],
+  [
+   "\\b(existing)\\b.{0,60}\\b(firmware|PLC tag|control loop|control logic|control system|infrastructure|acid dosing system|dosing infrastructure|SBR controller|SCADA|drive|equipment)\\b|\\b(update|reconfigur\\w*|firmware|tag change|tag update|setpoint change|parameter update|parameter change|logic update|logic block)\\b.{0,60}\\b(existing)\\b|firmware update|\\btag\\b.{0,20}\\bchange|update\\b.{0,40}\\b(existing|logic|loop|firmware)|configuration change",
+   "parameter_retuning_generic",
+   true
+  ],
+  [
+   "\\b(dose|dosing|dosage|inject\\w*|add\\w*|feed)\\b.{0,60}\\b(coagulant|chlorine|caustic|NaOH|sodium hydroxide|antiscalant|PAC|polymer|ferrate|PAA|peroxide|H2O2|VFA|carbon source|lime|regenerant|brine|alkali|MgCl|\\bMg\\b|phosphoric|acid|inhibitor|biocide|scavenger|antifoam|flocculant|dispersant|oxidant)\\b|\\b(coagulant|chlorine|caustic|NaOH|sodium hydroxide|antiscalant|PAC|polymer|ferrate|PAA|peroxide|H2O2|VFA|lime|regenerant|brine|alkali|inhibitor|biocide|scavenger|antifoam|flocculant|dispersant|oxidant)\\b.{0,60}\\b(dose|dosing|dosage|inject\\w*|add\\w*|feed)\\b|chemistry dosing",
+   "chemical_dosing"
+  ],
+  [
+   "backwash|\\bpulse\\b|regeneration sequence",
+   "backwash_procedure"
+  ],
+  [
+   "\\b(wipe|scour|clean\\w*|flush\\w*)\\b",
+   "cleaning_procedure"
+  ],
+  [
+   "\\bsettle\\b|\\bdecant\\b",
+   "settle_decant_procedure"
+  ],
+  [
+   "\\b(settling|screening)\\b.{0,40}(procedure|retun|upstream)",
+   "pretreatment_procedure"
+  ],
+  [
+   "gas.flow|diffuser",
+   "gas_flow_procedure"
+  ],
+  [
+   "\\b(interval|schedul\\w*|frequenc\\w*|timing|duty)\\b",
+   "schedule_or_frequency"
+  ],
+  [
+   "recycle.ratio|recirculation.ratio|hydraulic.loading|upflow.velocity|EBCT|empty.bed|F:M|\\bSRT\\b",
+   "flow_or_loading_parameter"
+  ],
+  [
+   "\\b(dissolved oxygen|\\bDO\\b setpoint|aeration)\\b",
+   "do_or_aeration_parameter"
+  ],
+  [
+   "\\b(power|voltage|current|pressure|lamp.power|steam.temperature)\\b.{0,50}\\b(setpoint|retun\\w*|set|raise|lower|increas\\w*|decreas\\w*|reduc\\w*|trim|adjust)\\b|\\b(setpoint|retun\\w*|set|raise|lower|increas\\w*|decreas\\w*|reduc\\w*|trim|adjust)\\b.{0,50}\\b(power|voltage|current|pressure|steam.temperature)\\b",
+   "pressure_or_power_parameter"
+  ],
+  [
+   "sludge.concentration|concentration setpoint",
+   "concentration_parameter"
+  ],
+  [
+   "\\b(setpoint|retun\\w*|set|adjust|optimi[sz]\\w*|trim|modify|change|update)\\b",
+   "parameter_retuning_generic"
+  ]
+ ],
+ "unclassified_policy": "MEASURE_CLASS_UNRESOLVED_KILL",
+ "primary_class_policy": "first matching rule in row_rules order (specific before generic); ALL matched classes must be within the permitted set (anti-laundering subset test)",
+ "sensor_form_scope": "the sensor constraint ('use only the existing ..., no new sensors') bounds the DATA INPUTS: enforcement covers the sensor_addition class only; every other row is SKIP_SENSOR_FORM (typed, disclosed)",
+ "verdicts": {
+  "KILL": "at least one bill row outside the permitted class set or unresolvable",
+  "CLEAN": "bill rows present and every checked row within the permitted set",
+  "NOT_APPLICABLE": "no permitted-measure span / no bill rows (typed, fail-open, disclosed — the authoritative class read stays the auditor's)"
+ }
+}

@@ -130,6 +130,32 @@ is public-domain factual knowledge and is encoded in our own files
     FA-control leg's external-validity framing (the data-layer
     mismatch caveat is the honest external-viability note for any
     TSFM adoption); no code adopted.
+  - FISHER (`jianganbai/FISHER`, license verified 2026-11-19; the
+    auditor-confirmed row) — a foundation model for multi-modal
+    industrial signal compreHEnsive representation
+    (sound/vibration/voltage, arbitrary sampling rates via sub-band
+    concatenation); ships the RMIS benchmark (19 sub-datasets).
+    Code MIT (LICENSE verified); weights on HuggingFace + Tsinghua
+    Cloud + wisemodel (tiny/mini/small). Publication: IEEE Trans.
+    Industrial Informatics DOI 10.1109/TII.2026.3698554; arXiv
+    2507.16696. No NOTICE file in the repo. Scanned for the
+    industrial-signal leg (the v13 domain family); no code adopted.
+  - microsoft/Industrial-Foundation-Models (verified 2026-11-19) —
+    Generative Tabular Learning models (healthcare/energy-storage/
+    commerce/transportation/agriculture). Code repo MIT (LICENSE
+    verified); weights distributed as GTL DELTA checkpoints
+    (microsoft/LLaMA-2-13b-GTL-Delta on HuggingFace, model card
+    `license: mit`) — the composite artifact depends on the LLaMA-2
+    base weights under Meta's LLaMA-2 Community License, which
+    downstream use inherits. Repo archived by the owner 2026-09-15.
+    Reference-only row; no code adopted.
+  - UniFault (`emadeldeen24/UniFault`, verified 2026-11-19) — a
+    fault-diagnosis foundation model from bearing data (multivariate
+    inputs unified into standardized univariate sequences; arXiv
+    2504.01373, cited-by 24). Code MIT (LICENSE verified); a tiny
+    checkpoint download is published in the README. No NOTICE file.
+    Scanned for the industrial-signal leg alongside FISHER/RMIS; no
+    code adopted.
 - pyribs (BSD-3-Clause) — NOT ADOPTED, typed: no pyribs import
   exists anywhere in the tree; the quality-diversity mechanics are
   the c-0110 AIDE controller + the histogram caps (our own

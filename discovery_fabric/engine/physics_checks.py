@@ -819,6 +819,174 @@ def humidity_permeability_ratio(alpha_per_rh_percent: float,
                        {"error": f"{type(e).__name__}: {e}"})
 
 
+# ---------------------------------------------------------------------------
+# AM91 (claim c-0116) capability-fix relations — the auditor-scored
+# v14 defect classes, each now a computed direction-of-effect:
+#   - ammonia_strip_direction: the HO14-12 inverted-direction class
+#     (lowering the air-to-water ratio, or the false "high pH
+#     inhibits stripping" premise). The stripping removal potential
+#     is the free-ammonia fraction alpha(T, pH) (pKa(T) per Emerson
+#     1975: warmer water shifts NH4+ -> NH3) times the A/W monotone
+#     factor 1-exp(-A/W); the SIGN of the potential delta is the
+#     direction-of-effect — raising A/W, pH or temperature improves.
+#   - vant_hoff_adsorption_direction: the HO14-04 inverted-direction
+#     class (claiming cooling promotes desorption under an
+#     exothermic adsorption enthalpy). ln(K2/K1) = -dH/R (1/T2-1/T1);
+#     exothermic dH_ads < 0 means HEATING lowers K_ads and promotes
+#     desorption — warm caustic elution, never cold.
+#   - aqueous_molarity_saturation_bound: the HO14-04 "50 M NaOH"
+#     gross-magnitude class (aqueous saturation ~20 M at 25 C, ~26 M
+#     hot); out-of-registry solutes refuse fail-closed.
+# ---------------------------------------------------------------------------
+_AMMONIA_INTENT = None  # the relation is direction-explicit by signs
+
+
+def ammonia_strip_direction(ph_initial: float, ph_proposed: float,
+                            temp_initial_degC: float,
+                            temp_proposed_degC: float,
+                            aw_initial: float,
+                            aw_proposed: float) -> Dict[str, Any]:
+    try:
+        ph0, ph1 = float(ph_initial), float(ph_proposed)
+        t0, t1 = float(temp_initial_degC), float(temp_proposed_degC)
+        aw0, aw1 = float(aw_initial), float(aw_proposed)
+        if not 0.0 <= ph0 <= 14.0 or not 0.0 <= ph1 <= 14.0:
+            raise ValueError("pH values must be in [0, 14]")
+        if t0 <= -273.15 or t1 <= -273.15:
+            raise ValueError("temperatures must be above 0 K")
+        if aw0 <= 0.0 or aw1 <= 0.0:
+            raise ValueError("air-to-water ratios must be > 0")
+        if (ph0 == ph1 and t0 == t1 and aw0 == aw1):
+            raise ValueError("degenerate input: no parameter change "
+                             "proposed (no directional claim "
+                             "possible)")
+        def _potential(ph: float, t_degC: float, aw: float) -> float:
+            t_k = t_degC + 273.15
+            pka = 0.09018 + 2729.92 / t_k  # Emerson et al. 1975
+            alpha = 1.0 / (1.0 + 10.0 ** (pka - ph))
+            return alpha * (1.0 - math.exp(-aw))
+        pot0 = _potential(ph0, t0, aw0)
+        pot1 = _potential(ph1, t1, aw1)
+        delta = pot1 - pot0
+        direction = ("improves" if delta > 1e-9 else
+                     ("worsens" if delta < -1e-9 else "neutral"))
+        detail = {
+            "removal_potential_initial": float(f"{pot0:.4g}"),
+            "removal_potential_proposed": float(f"{pot1:.4g}"),
+            "delta": float(f"{delta:.4g}"),
+            "basis": "stripping removal potential = alpha_free(T, pH) "
+                     "x (1 - exp(-A/W)); pKa(T) = 0.09018 + 2729.92/T_K "
+                     "(Emerson 1975) — raising A/W, pH or temperature "
+                     "raises the potential; lowering A/W is INVERTED "
+                     "(the HO14-12 class) and 'high pH inhibits "
+                     "stripping' is a false premise"}
+        return _result("ammonia_strip_direction", "ammonia_stripping",
+                       "RUN", float(f"{delta:.4g}"), "dimensionless",
+                       direction, detail)
+    except (TypeError, ValueError, OverflowError) as e:
+        return _result("ammonia_strip_direction", "ammonia_stripping",
+                       "REFUSED", None, "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+def vant_hoff_adsorption_direction(delta_h_ads_kj_mol: float,
+                                   t_initial_degC: float,
+                                   t_proposed_degC: float,
+                                   intent: str) -> Dict[str, Any]:
+    try:
+        dh_j = float(delta_h_ads_kj_mol) * 1000.0
+        t0 = (float(t_initial_degC) + 273.15)
+        t1 = (float(t_proposed_degC) + 273.15)
+        if dh_j == 0.0:
+            raise ValueError("degenerate input: zero adsorption "
+                             "enthalpy (no temperature dependence)")
+        if t0 <= 0.0 or t1 <= 0.0:
+            raise ValueError("temperatures must be above 0 K")
+        if t0 == t1:
+            raise ValueError("degenerate input: no temperature "
+                             "change proposed (no directional claim "
+                             "possible)")
+        if intent not in ("PROMOTE_DESORPTION", "PROMOTE_ADSORPTION"):
+            raise ValueError(f"intent {intent!r} not typed — must be "
+                             "PROMOTE_DESORPTION or PROMOTE_ADSORPTION")
+        ln_ratio = (-dh_j / float(R_GAS.magnitude)) * (1.0 / t1 - 1.0 / t0)
+        if ln_ratio > 709.78:
+            ln_ratio = 709.78
+        ratio = math.exp(ln_ratio)
+        desorption_promoted = ratio < 1.0  # K_ads falls
+        direction = ("improves" if
+                     (desorption_promoted ==
+                      (intent == "PROMOTE_DESORPTION")) else "worsens")
+        detail = {
+            "k2_over_k1": float(f"{ratio:.4g}"),
+            "delta_h_ads_kj_mol": float(delta_h_ads_kj_mol),
+            "basis": "van 't Hoff ln(K2/K1) = -dH_ads/R x (1/T2 - "
+                     "1/T1); exothermic dH_ads < 0 means HEATING "
+                     "lowers K_ads and promotes desorption (warm "
+                     "caustic elution) and COOLING strengthens "
+                     "adsorption — the HO14-04 inverted-direction "
+                     "class claimed the opposite"}
+        return _result("vant_hoff_adsorption_direction",
+                       "adsorption_desorption", "RUN",
+                       float(f"{ratio:.4g}"), "dimensionless",
+                       direction, detail)
+    except (TypeError, ValueError, OverflowError) as e:
+        return _result("vant_hoff_adsorption_direction",
+                       "adsorption_desorption", "REFUSED", None,
+                       "dimensionless", "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
+# the committed saturation registry (fail-closed on unknown solutes;
+# extendable, typed)
+_AQUEOUS_SATURATION = {
+    "naoh": {"name": "sodium hydroxide", "max_mol_per_l": 26.0,
+             "ref_mol_per_l": 20.0,
+             "basis": "solubility ~111 g/100 g H2O at 25 C (~20 M); "
+                      "up to ~26 M hot"},
+}
+_AQUEOUS_SATURATION_ALIASES = {
+    "sodium hydroxide": "naoh", "caustic": "naoh", "caustic soda":
+    "naoh",
+}
+
+
+def aqueous_molarity_saturation_bound(solute: str,
+                                      molarity_mol_per_l: float
+                                      ) -> Dict[str, Any]:
+    try:
+        key = str(solute).strip().lower()
+        key = _AQUEOUS_SATURATION_ALIASES.get(key, key)
+        if key not in _AQUEOUS_SATURATION:
+            raise ValueError(f"solute {solute!r} not in the aqueous "
+                             "saturation registry (fail-closed, no "
+                             "pass-through)")
+        m = float(molarity_mol_per_l)
+        if m <= 0.0:
+            raise ValueError("molarity must be > 0")
+        reg = _AQUEOUS_SATURATION[key]
+        if m > reg["max_mol_per_l"]:
+            raise ValueError(
+                f"molarity {m:g} mol/L exceeds the aqueous saturation "
+                f"bound ({reg['max_mol_per_l']:g} mol/L for "
+                f"{reg['name']} — the '50 M NaOH' gross-magnitude "
+                "class)")
+        direction = "neutral"  # a bound check, not a direction claim
+        detail = {
+            "solute": reg["name"], "near_saturation":
+                m > reg["ref_mol_per_l"],
+            "max_mol_per_l": reg["max_mol_per_l"],
+            "basis": reg["basis"]}
+        return _result("aqueous_molarity_saturation_bound",
+                       "caustic_cleaning", "RUN", m, "mol/L",
+                       direction, detail)
+    except (TypeError, ValueError) as e:
+        return _result("aqueous_molarity_saturation_bound",
+                       "caustic_cleaning", "REFUSED", None, "mol/L",
+                       "unavailable",
+                       {"error": f"{type(e).__name__}: {e}"})
+
+
 CHECKS = {
     "arrhenius_rate_ratio": arrhenius_rate_ratio,
     "fouling_u_degradation": fouling_u_degradation,
@@ -839,6 +1007,10 @@ CHECKS = {
     "microbial_growth_rate": microbial_growth_rate,
     "dust_layer_ignition_margin": dust_layer_ignition_margin,
     "humidity_permeability_ratio": humidity_permeability_ratio,
+    "ammonia_strip_direction": ammonia_strip_direction,
+    "vant_hoff_adsorption_direction": vant_hoff_adsorption_direction,
+    "aqueous_molarity_saturation_bound":
+        aqueous_molarity_saturation_bound,
 }
 
 CHECKS_BY_FAILURE_CLASS = {
@@ -877,6 +1049,10 @@ CHECKS_BY_FAILURE_CLASS = {
     "insulation_pd_aging": ["arrhenius_rate_ratio"],
     "perovskite_degradation": ["arrhenius_rate_ratio"],
     "insulating_fluid_oxidation": ["arrhenius_rate_ratio"],
+    # AM91 (c-0116): the v14 defect-class relations
+    "ammonia_stripping": ["ammonia_strip_direction"],
+    "adsorption_desorption": ["vant_hoff_adsorption_direction"],
+    "caustic_cleaning": ["aqueous_molarity_saturation_bound"],
 }
 
 
@@ -958,6 +1134,18 @@ _CLASS_RULES = (
     ("thermal_aging",
      ("scorch", "crosslink", "oxidation", "varnish", "capacity fade",
       "degradation", "aging", "ageing", "thermal")),
+    # AM91 (c-0116): appended LAST = least specific (specific rules
+    # above match first); multi-word keywords collision-checked —
+    # "regenerant" is not a substring of "regeneration" (the
+    # desiccant rule above), and the caustic keywords are wash-shaped
+    # so an electrolytic-mist "NaOH mist" text never routes here.
+    ("ammonia_stripping",
+     ("ammonia stripping", "air stripping", "stripping tower",
+      "poor ammonia removal")),
+    ("adsorption_desorption",
+     ("regenerant", "desorption", "resin regeneration")),
+    ("caustic_cleaning",
+     ("caustic clean", "caustic soak", "naoh wash", "caustic wash")),
 )
 
 # F66 (R55): dew-point phrasing is ambiguous between frost_condensation
@@ -994,6 +1182,16 @@ def classify_failure(text: str):
 
 
 REFERENCE_SCENARIOS = {
+    # AM91 (c-0116): the v14 defect-class relations' wiring scenarios
+    "ammonia_strip_direction": {"ph_initial": 8.0, "ph_proposed": 10.8,
+                                "temp_initial_degC": 25.0,
+                                "temp_proposed_degC": 35.0,
+                                "aw_initial": 2.0, "aw_proposed": 3.5},
+    "vant_hoff_adsorption_direction": {
+        "delta_h_ads_kj_mol": -40.0, "t_initial_degC": 25.0,
+        "t_proposed_degC": 60.0, "intent": "PROMOTE_DESORPTION"},
+    "aqueous_molarity_saturation_bound": {"solute": "naoh",
+                                          "molarity_mol_per_l": 15.3},
     "arrhenius_rate_ratio": {"ea_kj_mol": 80.0, "t1_degC": 60.0,
                              "t2_degC": 80.0},
     "fouling_u_degradation": {"u_clean_w_m2k": 2000.0,

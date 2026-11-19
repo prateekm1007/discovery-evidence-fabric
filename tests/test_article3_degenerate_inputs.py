@@ -89,6 +89,21 @@ DEGENERATE_KWARGS: dict[str, dict] = {
     "humidity_permeability_ratio": dict(alpha_per_rh_percent=0.09,
                                         rh_percent=150.0,
                                         rh_ref_percent=0.0),
+    # AM91 (c-0116): the true degenerate axis per new relation —
+    # ammonia refuses an all-equal proposal (no directional claim);
+    # van 't Hoff refuses a zero adsorption enthalpy (no temperature
+    # dependence); the saturation bound refuses a non-positive
+    # molarity
+    "ammonia_strip_direction": dict(ph_initial=10.8, ph_proposed=10.8,
+                                    temp_initial_degC=30.0,
+                                    temp_proposed_degC=30.0,
+                                    aw_initial=3.0, aw_proposed=3.0),
+    "vant_hoff_adsorption_direction": dict(delta_h_ads_kj_mol=0.0,
+                                           t_initial_degC=25.0,
+                                           t_proposed_degC=65.0,
+                                           intent="PROMOTE_DESORPTION"),
+    "aqueous_molarity_saturation_bound": dict(solute="naoh",
+                                              molarity_mol_per_l=0.0),
 }
 
 EXPECTED_REGISTRY = {
@@ -200,6 +215,18 @@ HEALTHY_KWARGS: dict[str, dict] = {
     "humidity_permeability_ratio": dict(alpha_per_rh_percent=0.09,
                                         rh_percent=85.0,
                                         rh_ref_percent=0.0),
+    # AM91 (c-0116): healthy companions — raise-all ammonia (improves),
+    # exothermic heating for desorption (warm-caustic), practical NaOH
+    "ammonia_strip_direction": dict(ph_initial=8.0, ph_proposed=10.8,
+                                    temp_initial_degC=25.0,
+                                    temp_proposed_degC=35.0,
+                                    aw_initial=2.0, aw_proposed=3.5),
+    "vant_hoff_adsorption_direction": dict(delta_h_ads_kj_mol=-40.0,
+                                           t_initial_degC=25.0,
+                                           t_proposed_degC=60.0,
+                                           intent="PROMOTE_DESORPTION"),
+    "aqueous_molarity_saturation_bound": dict(solute="naoh",
+                                              molarity_mol_per_l=15.3),
 }
 
 

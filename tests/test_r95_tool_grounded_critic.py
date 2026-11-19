@@ -90,11 +90,16 @@ def test_tagger_never_guesses_ambiguous_or_protocol_rows():
         "2.  **Additive**: Commercial-grade glue solution, stock 100 ppm.": "b",
         "3.  **Procedure**: Reconfigure the dosing controller to pulse mode.": "c",
         "*   **Pass:** If PFC proxy decreases by >= 10%.": None,  # protocol
-        "**Operational Loss Pricing:**": None,                    # bare header
+        # AM91 v14 (claim c-0116, forward-only): the machine's own
+        # ledger keys are the answer format's structure — a bare
+        # known-ledger header is the (c) pricing/duty family, and a
+        # setpoint edit on the EXISTING controller is the auditor-read
+        # (c) retuning family
+        "**Operational Loss Pricing:**": "c",
         "5.  **Mystery**: The catalyst exhibits both commercial-grade "
         "support and schedule flexibility.": None,                # ambiguous
         "6.  **Schedule**: The dosing runs on an existing continuous "
-        "controller.": None,  # action-noun collision with explicit (a)
+        "controller.": "c",
     }
     for row, want in typed.items():
         assert tgc.classify_bill_row(row) == want, row

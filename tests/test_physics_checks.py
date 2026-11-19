@@ -169,11 +169,13 @@ BAD_INPUTS = {
 
 def test_registry_has_nineteen_relations():
     # R54 (c-0072): 6 -> 12. R62 (claim c-0085): 12 -> 19 relations /
-    # 31 failure classes to close the P1 coverage gap on the FULL DEV
-    # corpus (21 previously-unrouted rows); the pin moves with the
+    # 31 failure classes. AM91 (claim c-0116): 19 -> 22 relations /
+    # 34 failure classes (the v14 defect-class relations:
+    # ammonia_strip_direction, vant_hoff_adsorption_direction,
+    # aqueous_molarity_saturation_bound); the pin moves with the
     # registry (a stale literal reds — the R60-F1 lesson applied).
-    assert len(pc.CHECKS) == 19, sorted(pc.CHECKS)
-    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 31
+    assert len(pc.CHECKS) == 22, sorted(pc.CHECKS)
+    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 34
 
 
 def test_every_check_refuses_garbage_rather_than_fabricating():

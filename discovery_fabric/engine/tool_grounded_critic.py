@@ -64,7 +64,7 @@ B_CLASS_RE = re.compile(
     r"stock|standard (catalog|grade|part)|commodity|"
     r"procurable|supplier|purchased|procured)\b", re.I)
 C_ACTION_RE = re.compile(
-    r"\b(reconfigure|retune|reprogram|schedule|setpoint|set \w+ to|"
+    r"\b(reconfigure|retune|reprogram|schedul\w*|setpoint|set \w+ to|"
     r"switch(ing)?|threshold|interval|duty|procedure|mode|adjust|"
     r"retiming|intermittent|increase|decrease|reduce|raise|lower)\b", re.I)
 C_NOUN_RE = re.compile(
@@ -125,18 +125,154 @@ NARRATIVE_V13 = re.compile(
     r"we don't know|\bI\b|my (?:primary|measure|indicator|proposal)))",
     re.I)
 
+# --- v14 water/wastewater convergence extension (c-0116; mined from
+# the BURNED v14 residual BILL_UNTAGGED population — 127 flagged rows
+# across the 21 non-converged water rows, scripts/
+# r101_water_domain_mining.py; every rule is a procurement-semantics
+# rule verified on those bytes, never a guess, zero LLM). Clusters:
+#   (1) BURDEN-LEDGER LABELS: the answer format's own burden-ledger
+#       keys (Operational Loss (Pricing), Installation/Procurement/
+#       Hardware Burden, Commissioning, Cost Impact, Energy,
+#       Throughput, Mitigation, Conclusion, Basis, Standard Practice
+#       Comparison) — the row's class is its ASSERTION: a
+#       zero/no-new/no-added-burden assertion is (a); a priced
+#       time/energy/throughput consequence is (c); a positive
+#       purchase of parts is (b); anything else stays flagged. The
+#       v13 ambiguity killer ate these rows (a zero marker + an
+#       echoed purchase word = 2 classes); the label scopes the
+#       reading.
+#   (2) TEST/VERIFICATION LABELS: Pass/Fail, Kill Criterion,
+#       Falsification, Protocol, Duration, Baseline, Acceptance —
+#       verification bookkeeping the machine's own contract tags (c)
+#       (procedure/configuration class) unless an explicit (a)/(b)
+#       fires.
+#   (3) CONFIGURATION-ON-EXISTING: the water corpus's dominant
+#       measure shape is "setpoint/parameter change on the existing
+#       <equipment>" — an existing-equipment mention + a
+#       configuration verb is (c) (the a-marker describes the
+#       OBJECT's provenance, not a no-procurement assertion); the
+#       strict a+c ambiguity rule stays for no-procurement
+#       assertions (no new/zero/none).
+#   (4) "update|reconfigure" join the c-class configuration verbs.
+BURDEN_LEDGER_LABEL_V14 = re.compile(
+    r"^\s*(?:[-*•]|\d+[.)])?\s*\**\s*("
+    r"operational loss(?: pricing)?|installation[/ \-]burden|"
+    r"procurement(?: burden)?|hardware(?: burden)?|installation[/ \-]"
+    r"commissioning|commissioning|cost(?: impact)?|"
+    r"standard practice comparison|throughput|mitigation|"
+    r"conclusion|basis|energy|parity|operability|operational cost|"
+    r"installability|maintainability|maintenance|cost class|"
+    r"installation\b|procurement\b|hardware\b"
+    r")\b[^:\n]{0,40}:\s*", re.I)
+TEST_PROTOCOL_LABEL_V14 = re.compile(
+    r"^\s*(?:[-*•]|\d+[.)])?\s*\**\s*("
+    r"pass/fail|kill criterion|falsification(?: test| criterion)?|"
+    r"test protocol|protocol|duration|acceptance test|baseline\b"
+    r")\b[^:\n]{0,40}:\s*", re.I)
+INPUT_LABEL_V14 = re.compile(
+    r"^\s*(?:[-*•]|\d+[.)])?\s*\**\s*inputs?\b[^:\n]{0,40}:\s*",
+    re.I)
+A_ZERO_V14 = re.compile(
+    r"(\$0\b|\b(?:zero|none|no new|no hardware|no parts|"
+    r"no additional|negligible|already (in place|installed|existing)|"
+    r"remains? (the same|unchanged|within|constant)|same.or.lower|"
+    r"no added|within the existing|0 new|no modification|not modify|"
+    r"does not modify|does not change|no change|no loss|zero loss|"
+    r"same as standard|0 hours)\b)", re.I)
+C_CONSEQUENCE_V14 = re.compile(
+    r"\b(\d+(?:\s*[-\u2013\u2014]\s*\d+)?\s*"
+    r"(?:hours?|hr|minutes?|min|seconds?)\b|\d+\s*%(?!\w)|energy\b|"
+    r"pumping\b|throughput (?:loss|reduction|remains)\b|"
+    r"temporary\b|seasonal\b|downtime\b|engineering time\b|"
+    r"software\b|monitor\w*|operator\b)", re.I)
+B_PURCHASE_POSITIVE_V14 = re.compile(
+    r"\b(purchase[sd]?|procure[sd]?|order(ed)?)\b(?![^.]{0,30}\b"
+    r"(no|zero|none)\b)", re.I)
+EXISTING_EQUIPMENT_V14 = re.compile(
+    r"\bexisting\b.{0,90}\b(equipment|system|pump\w*|blower|PLC|setpoint|"
+    r"controller|loop|infrastructure|dosing|drive\w*|VFD|analyzer|ratio|"
+    r"signal|flow|valve|sensor|probe|meter|DCS|HMI|panel|alarm|"
+    r"membrane|vessel)\b", re.I)
+C_ACTION_V14 = re.compile(
+    r"\b(update[sd]?|reconfigur\w+|record\b|recording\b)\b", re.I)
+
+
+# the machine's own answer-format CLAUSE keys (v14): answer
+# bookkeeping, not reasoning leakage — they bypass the narrative
+# early-return and classify by their assertion (zero/no-modification
+# -> (a); anything else -> (c), never (b): bookkeeping proposes
+# nothing)
+CLAUSE_LABEL_V14 = re.compile(
+    r"^\s*(?:[-*•]|\d+[.)])?\s*\**\s*("
+    r"deployed.part clause|permitted.set clause|"
+    r"direction.of.effect|exemplar.reality|certified.system|"
+    r"input.availability|cost.pricing|mechanism class|"
+    r"unpriced.duty.cycle|mechanism.class.unstated"
+    r")\b[^:\n]{0,40}:\s*", re.I)
+
+
+def _classify_v14(row: str, a: bool, b: bool, c: bool, clause: bool = False) -> str | None:
+    """The v14 water-domain dispatch (typed, never a guess)."""
+    burden = bool(BURDEN_LEDGER_LABEL_V14.search(row))
+    test_lbl = bool(TEST_PROTOCOL_LABEL_V14.search(row))
+    if INPUT_LABEL_V14.search(row) and not b:
+        return "a"  # data-source semantics (the predictor's own (a))
+    # a bare known-ledger header (label + colon + no content) is the
+    # ledger's own structure — the pricing/duty family is (c)
+    if (burden or test_lbl) and not re.search(
+            r":\s*\**\s*\S", row):
+        return "c"
+    if burden or test_lbl:
+        if A_ZERO_V14.search(row):
+            return "a"
+        if test_lbl:
+            # verification bookkeeping: the (c) procedure class unless
+            # an explicit (a) no-procurement assertion or a real
+            # purchase fires
+            if B_PURCHASE_POSITIVE_V14.search(row):
+                return "b"
+            return "c"
+        if burden and C_CONSEQUENCE_V14.search(row):
+            return "c"
+        if B_PURCHASE_POSITIVE_V14.search(row):
+            return "b"
+        # fall through: a burden-labelled row may still be the
+        # configuration-on-existing shape ("Basis: Change ... on
+        # existing equipment")
+    # configuration-on-existing: existing-equipment mention + a
+    # configuration verb = the (c) parameter-change class (the
+    # auditor-read convention; the no-procurement assertions keep
+    # the strict 1.0.0/v13 ambiguity rule)
+    if a and c and EXISTING_EQUIPMENT_V14.search(row):
+        return "c"
+    if burden or test_lbl:
+        return None  # unresolvable burden wording stays flagged
+    # the 1.0.0 bare-noun convention (pulse/dosing/downtime/dip rows)
+    if not a and not b and not c:
+        return "c" if C_NOUN_RE.search(row) else None
+    return None  # 2+ explicit classes: true ambiguity, never a guess
+
 
 def classify_bill_row(row: str) -> str | None:
     """The typed procurement class of ONE bill row: 'a'|'b'|'c'|None.
     None = ambiguous, narrative, or no typed marker — never a guess; the
     caller leaves those rows flagged."""
-    if NARRATIVE_V13.search(row):
+    clause = bool(CLAUSE_LABEL_V14.search(row))
+    if NARRATIVE_V13.search(row) and not clause:
         return None  # reasoning leakage / first-person deliberation
     if HEADER_ROW.search(row):
+        # a bare header of a KNOWN burden-ledger / test-protocol key
+        # is the machine's own ledger structure (the content sits on
+        # the following lines) — the pricing/duty family is (c); any
+        # other bare header has no procurement class
+        if BURDEN_LEDGER_LABEL_V14.search(row) or \
+                TEST_PROTOCOL_LABEL_V14.search(row):
+            return "c"
         return None  # bare headers have no procurement class
     a = bool(A_CLASS_RE.search(row) or A_CLASS_V13.search(row))
     b = bool(B_CLASS_RE.search(row))
-    c = bool(C_ACTION_RE.search(row) or C_ACTION_V13.search(row))
+    c = bool(C_ACTION_RE.search(row) or C_ACTION_V13.search(row)
+             or C_ACTION_V14.search(row))
     # LABEL dispatch: a typed c-label makes (c) explicit unless an
     # explicit (a)/(b) marker also fired. "Component:" is c only with a
     # control-noun gate (a bare hardware component is procurement (b)
@@ -146,12 +282,22 @@ def classify_bill_row(row: str) -> str | None:
             c = True
         elif COMPONENT_C_V13.search(row) and _COMPONENT_CONTROL_NOUN.search(row):
             c = True
+    if clause:
+        # the machine's own answer-format clauses: a zero/no-change
+        # assertion is (a); other bookkeeping is (c); never (b)
+        return "a" if A_ZERO_V14.search(row) else "c"
+    declared = NONSCANNABLE_TAG.search(row)
+    if declared:
+        # a self-declared class in any format is authoritative — the
+        # v14 refinement never overrides an explicit tag
+        return declared.group(1).lower()
     classes = [x for x, hit in (("a", a), ("b", b), ("c", c)) if hit]
     if len(classes) == 1:
         return classes[0]
-    if not classes:
-        return "c" if C_NOUN_RE.search(row) else None
-    return None  # 2+ explicit classes: true ambiguity, never a guess
+    # the v14 water-domain dispatch (burden-ledger scoping + the
+    # configuration-on-existing refinement) runs on the ambiguous and
+    # empty populations the 1.0.0/v13 rules leave flagged
+    return _classify_v14(row, a, b, c, clause)
 
 
 def _untagged_rows(section: str) -> list[int]:

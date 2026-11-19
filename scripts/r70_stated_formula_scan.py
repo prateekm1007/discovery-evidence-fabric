@@ -184,6 +184,7 @@ def scan_stated_formula_direction(answer: str) -> dict:
             break
     out.update(scan_reaction_conservation(answer))
     out.update(scan_equilibrium_direction(answer))
+    out.update(scan_ammonia_strip_direction(answer))  # AM91 (c-0116)
     return out
 
 
@@ -681,4 +682,140 @@ def scan_equilibrium_direction(answer: str) -> dict:
             break
     except _EquilDone:
         pass
+    return out
+
+
+# ---------------------------------------------------------------------------
+# AM91 (claim c-0116): the ammonia-stripping direction bind (the
+# HO14-12 auditor finding: the generator LOWERED the air-to-water
+# ratio as its mitigation — inverted; stripping removal improves when
+# A/W, pH and temperature RISE — and carried the false premise "high
+# pH inhibits stripping"). Legs, precision-first (explicit trend AND
+# explicit target AND stripping context; negated/non-proposal
+# mentions stay silent; the authoritative direction read remains the
+# auditor's):
+#   A1 — a DOWN trend verb attached to the air-to-water ratio target
+#        inside stripping context (the inverted mitigation);
+#   A2 — the "high pH inhibits stripping" premise shape (a
+#        premise-level kill even when the action direction is right);
+#   A3 — a DOWN trend verb on pH or temperature stated as a
+#        stripping-REMOVAL improvement (tight purpose window).
+# The computed physics lives in the engine:
+# discovery_fabric/engine/physics_checks.py::ammonia_strip_direction
+# (the SIGN of the removal-potential delta is the direction; this
+# scan reads the CLAIM, the relation computes the TRUTH).
+# ---------------------------------------------------------------------------
+AMMONIA_KEY = "AMMONIA_STRIP_DIRECTION_INVERTED"
+AMMONIA_PREMISE_KEY = "AMMONIA_STRIP_PREMISE_FALSE"
+
+_AMMONIA_CTX = re.compile(
+    r"\bammonia\b|\bnh[_3a-z]*3\b|\bnh4\b|air.stripping|"
+    r"stripping tower|stripping column", re.I)
+_AW_TOKEN = re.compile(
+    r"air.to.water(?:\s+ratio)?|\bA/W\b(?:\s+ratio)?", re.I)
+_NEGATION = re.compile(
+    r"\b(not|no|without|never|instead of|rather than|avoid\w*)\b",
+    re.I)
+_PREMISE_FALSE = re.compile(
+    r"(?:high|elevated|rais\w*|increas\w*)\s+pH\b[^.;!?]{0,110}"
+    r"\b(inhibit\w*|suppress\w*|hinder\w*|impair\w*|work\s+against|"
+    r"work\s+in\s+reverse|counter)\b", re.I)
+_REMOVAL_PURPOSE = re.compile(
+    r"\b(remov\w*|stripp\w*|efficienc\w*|recover\w*|reduction|"
+    r"mitigat\w*|improv\w*|treatment)\b", re.I)
+
+
+def _in_ammonia_context(text: str, pos: int, window: int = 400) -> bool:
+    lo, hi = max(0, pos - window), min(len(text), pos + window)
+    return bool(_AMMONIA_CTX.search(text[lo:hi]))
+
+
+def scan_ammonia_strip_direction(answer: str) -> dict:
+    if not answer:
+        return {}
+    text = answer
+    out: dict = {}
+    if not _AMMONIA_CTX.search(text):
+        return out  # typed not-applicable outside stripping context
+
+    # ---- A2: the false premise (premise-level kill; both orders —
+    # "high pH inhibits stripping" AND "stripping inhibition at high
+    # pH" — plus the noun form "high-pH inhibition") ----
+    _PREMISE_FALSE_NOUN = re.compile(
+        r"high.pH\s*(?:inhibition|inhibit\w*|suppress\w*)|"
+        r"\b(inhibit\w*|suppress\w*|hinder\w*|impair\w*)\b"
+        r"[^.;!?]{0,110}\b(?:high|elevated)\s*.?\s*pH\b", re.I)
+    for pm in list(_PREMISE_FALSE.finditer(text)) + \
+            list(_PREMISE_FALSE_NOUN.finditer(text)):
+        if _in_ammonia_context(text, pm.start(), 500):
+            out.setdefault(AMMONIA_PREMISE_KEY, []).append(
+                "false premise: 'high/elevated pH inhibits stripping' "
+                "shape — high pH SHIFTS NH4+ -> NH3(aq) (pKa ~9.25) "
+                "and IMPROVES stripping: ..."
+                f"{text[max(0, pm.start() - 60):pm.end() + 80]}")
+            break
+
+    # ---- A1: the inverted A/W mitigation (attachment pattern: the
+    # DOWN verb must grammatically attach to the A/W target itself —
+    # "lowering the instantaneous A/W ratio", "the A/W ratio is
+    # reduced" — a nearby verb on a DIFFERENT variable ("the water
+    # flow increases") must not mask or fake the claim) ----
+    _AW_DOWN_BEFORE = re.compile(
+        r"\b(lower\w*|reduc\w*|decreas\w*|drop\w*|cut\w*)\b"
+        r"[^.;!?]{0,40}?(?:instantaneous\s+|effective\s+|instant\s+)?"
+        r"(?:air.to.water(?:\s+ratio)?|\bA/W\b(?:\s+ratio)?)", re.I)
+    _AW_DOWN_AFTER = re.compile(
+        r"(?:air.to.water(?:\s+ratio)?|\bA/W\b(?:\s+ratio)?)"
+        r"[^.;!?]{0,40}?\b(is|was|be|gets?)\s+"
+        r"(lower\w*|reduc\w*|decreas\w*|drop\w*)\b"
+        r"|\b(lower\w*|reduc\w*|decreas\w*|drop\w*)\b"
+        r"[^.;!?]{0,12}(?:of\s+)?(?:the\s+)?(?:instantaneous\s+)?"
+        r"(?:air.to.water(?:\s+ratio)?|\bA/W\b)", re.I)
+    for wm in _AW_TOKEN.finditer(text):
+        if not _in_ammonia_context(text, wm.start()):
+            continue
+        hit = None
+        for pat in (_AW_DOWN_BEFORE, _AW_DOWN_AFTER):
+            for dm in pat.finditer(text):
+                span_txt = text[max(0, dm.start() - 40):dm.end() + 40]
+                if _NEGATION.search(span_txt):
+                    continue
+                hit = dm
+                break
+            if hit:
+                break
+        if hit:
+            out.setdefault(AMMONIA_KEY, []).append(
+                "inverted direction: LOWERING the air-to-water ratio "
+                "claimed as a stripping mitigation — stripping "
+                "removal potential RISES with A/W (more interfacial "
+                "contact per unit water; Henry driving force): ..."
+                f"{text[max(0, hit.start() - 60):hit.end() + 80]}")
+            break
+
+    # ---- A3: DOWN on pH/temperature stated as a removal improvement
+    # (tight purpose window: the trend verb and a removal-purpose
+    # word must co-occur near the target) ----
+    for tgt in (r"\bpH\b", r"\btemperature\b"):
+        for tm in re.finditer(tgt, text, re.I):
+            claimed = _trend_near(text, tm.start())
+            if claimed != -1:
+                continue
+            gap = text[max(0, tm.start() - 90):tm.start()]
+            if _NEGATION.search(gap):
+                continue
+            w = text[max(0, tm.start() - 160):
+                     min(len(text), tm.end() + 160)]
+            if not (_in_ammonia_context(text, tm.start(), 200)
+                    and _REMOVAL_PURPOSE.search(w)):
+                continue
+            out.setdefault(AMMONIA_KEY, []).append(
+                f"inverted direction: LOWERING {tm.group(0)} claimed "
+                "as an ammonia-removal improvement — both RAISE the "
+                "free-ammonia fraction and the stripping potential: "
+                f"...{gap[-70:]}{tm.group(0)} "
+                f"{text[tm.end():tm.end() + 90]}")
+            break
+        if AMMONIA_KEY in out:
+            break
     return out

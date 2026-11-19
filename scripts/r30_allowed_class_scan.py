@@ -51,6 +51,15 @@ import re
 
 from r26_catalog_scan import _bill_rows
 
+from discovery_fabric.engine import measure_guard  # noqa: E402
+# AM91 (claim c-0116): the per-problem permitted-measure enforcement
+# lives in the ENGINE (measure_guard.py + the committed taxonomy) —
+# this harness only wires it. The guard reads the permitted span from
+# user_variables AND constraint (the v14 structural miss) and
+# enforces class-membership over EVERY bill row at EVERY nesting
+# depth; its KILLs ride the same findings convention as the rest of
+# the scan (a key present == a finding; silence == clean).
+
 ALLOWED_SPAN = re.compile(
     r"allowed measures?\s*[:\-]?\s*(.+?)(?:\.|;|$)", re.I)
 PERMITTED_SPAN = re.compile(
@@ -247,6 +256,25 @@ def _bill_rows_scoped(answer: str) -> list:
     return rows
 
 
+def _merge_guard(out: dict, problem: dict, answer: str) -> dict:
+    """AM91: the engine per-problem permitted-measure guard. KILLs
+    ride the findings convention; CLEAN/NOT_APPLICABLE contribute
+    nothing (silence == clean)."""
+    try:
+        g = measure_guard.permitted_measures_check(problem, answer)
+    except Exception as e:  # noqa: BLE001 — a guard crash must never
+        # degrade into silence (fail-closed typed state)
+        out["PERMITTED_MEASURE_GUARD_ERROR"] = [
+            f"{type(e).__name__}: {e}"]
+        return out
+    if g["verdict"] == "KILL":
+        out["PERMITTED_MEASURE_SET_VIOLATION"] = [
+            f"verdict={g['verdict']} form={g['form']} "
+            f"permitted_classes={g['permitted_classes']}"
+        ] + g["kill_reasons"][:4]
+    return out
+
+
 def scan_allowed_measures_class(problem: dict, answer: str) -> dict:
     """The CONSTRAINT-CLASS bind (precision-first)."""
     perm = parse_permitted_set(problem.get("constraint") or "")
@@ -282,7 +310,11 @@ def scan_allowed_measures_class(problem: dict, answer: str) -> dict:
         if dev_hits:
             out["ACTUATION_DEVICE_AS_MEASURE"] = dev_hits[:2]
     if not perm["param_exhaustive"]:
-        return out  # typed not-applicable; stem scan still runs
+        return _merge_guard(out, problem, answer)  # typed
+        # not-applicable; stem scan still runs — the AM91 guard rides
+        # BOTH return paths (the HO14-12 set was structurally silent
+        # here: the permitted items live in user_variables and the
+        # set was not param-exhaustive by the shape heuristic)
     perm_stems = _permitted_stems(perm["items"])
     hits = []
     for row in _bill_rows_scoped(answer):
@@ -325,4 +357,4 @@ def scan_allowed_measures_class(problem: dict, answer: str) -> dict:
             break
     if lim_hits:
         out["LIMIT_DIRECTION_VIOLATION"] = lim_hits
-    return out
+    return _merge_guard(out, problem, answer)

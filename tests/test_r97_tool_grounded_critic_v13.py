@@ -70,11 +70,8 @@ B_CASES = [
 NARRATIVE_NONE = [
     "*   **Rationale:** Calculates the dominant natural frequency of "
     "the liner assembly from th",
-    "*   **DIRECTION-OF-EFFECT:** Correctly identifies the mechanism "
-    "as a *detector* of passive",
     "*   **Deployed-Part Compliance:** No modification to the plunger "
     "or seal.",
-    "6.  **Deployed-Part Clause**:",
     "*   *Physics*: In a tube-and-shell HX, $P_{shell}$ fluctuates",
     "*   *Is this better?* Yes. It uses *only* the stated signals",
     "*   -   **However**, \"Tube Wastage\" often correlates with "
@@ -84,36 +81,85 @@ NARRATIVE_NONE = [
     "*   *Problem*: I need a *disturbance* to measure the transient.",
     "*   **PREMISE-VALIDITY:** References only stated signals",
 ]
-AMBIGUOUS_NONE = [
-    # existing-infrastructure + configuration signals: true ambiguity
+AMBIGUOUS_NONE = []
+# AM91 v14 (claim c-0116, forward-only typed update): the
+# configuration-on-existing rows move from the v13 true-ambiguity pin
+# to the auditor-read (c) retuning family — a setpoint/parameter edit
+# on the EXISTING infrastructure is the parameter-change class (the
+# auditor's own HO14-06 read); the zero-assertion commissioning rows
+# are (a). The DERIVED-from-recorded-data row is (c) by the v13
+# vocabulary's own verbs (deriv-/calculat- were the v13 c-class
+# additions; the a-marker describes the data provenance, not a
+# no-procurement assertion).
+V14_CONFIG_ON_EXISTING_C = [
     ("*   *Operation:* Adjust the existing DCS/PLC setpoint. No new "
      "instrumentation."),
-    ("- Commissioning: Zero. Setpoint change is a PLC/DCS parameter "
-     "edit. (Standard practice: Ze"),
-    # derived-from-existing-data: a+c ambiguity, never guessed
     ("*   **Baseline CRSD:** DERIVED from the first 30 days of "
      "ALREADY-RECORDED data (Assumption"),
-    # zero-installation + procedure change in one row
+]
+V14_COMMISSIONING_ZERO_A = [
+    ("- Commissioning: Zero. Setpoint change is a PLC/DCS parameter "
+     "edit. (Standard practice: Ze"),
     ("*   **Installation:** 0 hours. (Standard practice requires 0 "
      "hours for recipe changes)."),
 ]
-HEADER_NONE = [
+
+
+def test_v14_config_on_existing_semantics():
+    for row in V14_CONFIG_ON_EXISTING_C:
+        assert tgc.classify_bill_row(row) == "c", row
+    for row in V14_COMMISSIONING_ZERO_A:
+        assert tgc.classify_bill_row(row) == "a", row
+# AM91 v14 water-domain semantics (claim c-0116, forward-only typed
+# update): the machine's OWN burden-ledger / test-protocol keys are
+# the answer format's ledger structure — a bare key header is the
+# (c) pricing/duty family and a zero-assertion ledger row is (a).
+# The 1.0.0/v13 None-pins for those two shapes move to the v14 lists
+# below; GENUINELY unknown headers/rows stay None (never a guess).
+V14_LEDGER_C = [
     "*   **Operational Loss Pricing:**",
     "*   **Pass/Fail Thresholds:**",
+    # the machine's own self-check clause keys (the AM91 clause
+    # dispatch: bookkeeping -> (c), never (b))
+    "*   **DIRECTION-OF-EFFECT:** Correctly identifies the mechanism "
+    "as a *detector* of passive",
+    "6.  **Deployed-Part Clause**:",
+]
+V14_LEDGER_A_NOTE = ("the Deployed-Part Compliance row STAYS None "
+                     "(narrative guard first; the v14 clause "
+                     "dispatch never overrides it)")
+HEADER_NONE = [
     "2.  **Injection Nozzle Retrofit:**",
     "1.  **Alkali Salt Additive Feed Tank:**",
+]
+V14_LEDGER_A = [
+    "-   Cost: $0 (software). Operational Loss: 0.",
 ]
 NOMARKER_NONE = [
     "Compliant.",
     "*   **Kiln Geometry/Mass:** \"rotary kiln shell\" specifications "
     "(Stated in `device`).",
-    "-   Cost: $0 (software). Operational Loss: 0.",
 ]
+
+
+def test_v14_ledger_semantics():
+    for row in V14_LEDGER_C:
+        assert tgc.classify_bill_row(row) == "c", row
+    for row in V14_LEDGER_A:
+        assert tgc.classify_bill_row(row) == "a", row
 
 
 def test_v13_class_table():
     for row, want in C_CASES + A_CASES + B_CASES:
         assert tgc.classify_bill_row(row) == want, (want, row)
+    for row in (NARRATIVE_NONE + AMBIGUOUS_NONE + HEADER_NONE
+                + NOMARKER_NONE):
+        assert tgc.classify_bill_row(row) is None, row
+
+
+def test_v13_none_pins_survive_v14():
+    """The genuinely-unknown shapes keep their None pins under the
+    v14 vocabulary (the AM91 extension must not invent tags)."""
     for row in (NARRATIVE_NONE + AMBIGUOUS_NONE + HEADER_NONE
                 + NOMARKER_NONE):
         assert tgc.classify_bill_row(row) is None, row
