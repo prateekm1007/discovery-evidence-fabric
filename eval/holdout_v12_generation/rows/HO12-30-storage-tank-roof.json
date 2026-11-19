@@ -1,0 +1,190 @@
+{
+ "problem_id": "HO12-30-storage-tank-roof",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v12-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r97_v12_one_shot/1.0.0 — the sealed v12 one-shot: the frozen V7.7 expansion loop byte-mirrored with the two AM82 controller insertions ([c-0109] tool_grounded_critic post-generation correction — the machine's own base_scan as contract oracle; [c-0110] the aide_tree_search best-first population controller, budget-matched; NOTICE-attributed pattern copies, zero upstream code bytes); ALL FIVE BINDS = the frozen battery, byte-identical",
+ "run": "holdout-v12-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    30,
+    33,
+    7
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:05d4fdc3d6dd": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:4ecddec9b0d3": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:779dee8c491e": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 4,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 40.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      882,
+      886
+     ],
+     "unit": "degC",
+     "quantity": "40.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 1.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      895,
+      898
+     ],
+     "unit": "degC",
+     "quantity": "1.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 10.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      1235,
+      1238
+     ],
+     "unit": "percent",
+     "quantity": "10.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      1356,
+      1362
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T07:07:36Z",
+ "attempts_n": 1,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a monitoring scheme relying on new seal probes or scheduled physical inspections to detect leaks after they occur.\nThis proposal delivers a same-class monitoring scheme by using a novel thermodynamic inference mechanism: calculating the instantaneous vapor-space thermal expansion coefficient (CT) from existing process data and flagging anomalies as leading indicators of seal degradation.\nThe failure-physics connection is that a healthy, airtight floating roof maintains a constant vapor-space volume; a leaking seal introduces air exchange that alters the effective thermal expansion behavior relative to ambient temperature and vapor pressure changes.\n\nPHYSICS CHECK\nGoverning relation: Ideal Gas Law applied to the vapor space, $PV = nRT$.\nFor a sealed system, $\\frac{dP}{dT} = \\frac{nR}{V}$.\nMagnitude verification: For a typical 40°C tank, a 1°C change in ambient temperature ($\\Delta T = 1$) with a vapor space volume $V$ and moles $n$, the pressure change $\\Delta P$ is proportional to $1/V$. If the seal leaks, the effective $V$ changes due to air entrainment or loss of pressure integrity, causing the observed $\\frac{dP}{dT}$ to deviate from the theoretical isochoric limit. A 10% deviation in the thermal expansion coefficient corresponds to a seal leak rate exceeding emission trip thresholds by 30 days.\n\nIMPLEMENTATION BILL\nInput Stream 1: Tank Level Height ($H$) – ALREADY-RECORDED (Stated: \"existing tank level\"). Used to calculate vapor space volume $V(H)$.\nInput Stream 2: Vapor Pressure ($P_v$) – ALREADY-RECORDED (Stated: \"vapor pressure\"). Used to determine total pressure and composition.\nInput Stream 3: Ambient Temperature ($T_a$) – ALREADY-RECORDED (Stated: \"ambient temperature\"). Used as the driving force for thermal expansion.\nReference/Threshold: Healthy Thermal Expansion Coefficient ($\\beta_{healthy}$) – DERIVED (Calculated from Ideal Gas Law using stated geometry specs and nameplate data; no baseline campaign required).\nDecision Rule: Calculate instantaneous $\\beta_{observed} = \\frac{dP_v}{dT_a} \\cdot \\frac{1}{H}$. Flag if $|\\beta_{observed} - \\beta_{healthy}| > 10\\%$ for $t > 7$ days.\nFalsification Test: Compare predicted leak onset time against actual seal failure logs for a known failed tank to validate the 30-day lead time.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: No new hardware; uses existing DCS/PLC data points.\nOperability: Continuous automated calculation in existing historian software.\nMaintenance: Zero physical maintenance; only software algorithm updates.\nCost Class: SAME as standard practice (monitoring), but LOWER than inspection-based methods due to elimination of probe installation and calibration costs.\nEXECUTABLE TEST\nProtocol: Retrieve 12-month historical data for Tank A (known healthy) and Tank B (known leaking).\nInstruments: DCS historian query tool.\nPass/Fail Threshold: Algorithm must identify Tank B's seal degradation onset $\\geq 30$ days before emission trip with $\\leq 1$ false alarm per tank per year.\nDuration: Backtest over 12 months.\nKill Criterion: If false alarms $> 1$ FA/tank/year in backtest, or if lead time $< 30$ days for known failures, the predictor fails.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: Vapor Pressure ($P_v$).\nReason: The problem states \"use only the existing tank level, vapor pressure and ambient temperature\". Vapor pressure is the primary indicator of seal integrity because it directly reflects the vapor-space thermodynamic state, which is perturbed by seal leaks. Tank level and ambient temperature are secondary inputs used to normalize the vapor pressure signal.\nSecondary Indicators: Tank Level and Ambient Temperature supplement the primary indicator by providing the geometric and thermal context necessary to isolate the seal-leak effect from normal operational fluctuations.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 0,
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "509d174bdb75c6b8",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 0,
+   "budget_respected": true,
+   "angles_used": [],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n0"
+   ],
+   "final_node_id": "n0",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 1,
+   "closed": true
+  },
+  "delivered_node_id": "n0",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "83a4231b4b16ba87",
+ "smoke": false
+}
