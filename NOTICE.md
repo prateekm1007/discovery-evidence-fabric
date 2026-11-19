@@ -218,6 +218,39 @@ benchmark result; it is treated as motivation only, never as evidence.
   toolkit (retro/forward reaction prediction) pattern (planned P2
   generation-side complement, AM81).
 
+## External model releases scanned (license-verified 2026-11-20, R105 scan lane; no code adopted — attribution + ecosystem tracking only)
+
+- Hydrogen-1.0 (Deep Principle, Hangzhou; released 2026-11-02) — 753B
+  science model post-trained on GLM-5.3 (Z.AI base). Weights MIT
+  (`License: mit` tag, HF model card `deep-principle/Hydrogen-1.0`);
+  independently authored code/docs Apache-2.0; BF16 + NVFP4 (Blackwell)
+  + MXFP4 (Instinct MI350X) variants; distributed HF + ModelScope +
+  NeuroSpark API. Publisher-reported evals (unreplicated, typed as
+  such): FSR 38.3%, GPQA-Diamonds 93.0%. Module-attribution note: the
+  z-ai/GLM family is being selected as a science post-training base by
+  third parties — a data point for the score-8 family planning.
+- structRFM (USTC; Nature, 2026-11-05) — structure-guided RNA sequence
+  foundation model; MIT (GitHub `heqin-zhu/structRFM` LICENSE file).
+  Releases pre-trained model (768d/12L/12H) + 21M sequence-structure
+  pairs + fine-tuned checkpoints + full code. No code adopted.
+- NASA-IBM Lunar Foundation Model (NASA-IBM AI4Science; paper
+  2026-09-08, open release 2026-09-10) — ViT-B encoder-decoder trained
+  on SomBench (~2M co-registered lunar tile bundles, 11 modalities);
+  Apache-2.0 (`nasa-ibm-ai4science/NASA-IBM-Lunar-Foundation-Model`).
+  Card states non-operational-use limitations (typed as-is; no
+  field-of-use legal restriction under Apache-2.0). No code adopted.
+- OpenMDW-1.1 license taxonomy event (Linux Foundation + PyTorch
+  Foundation; v1.1 published 2026-05-28) — permissive model-first
+  license covering weights + data + docs + model outputs; MOF-aligned.
+  NVIDIA adopting across Cosmos / Isaac GR00T / Ising / Nemotron
+  (verified on `nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16`:
+  "Governing Download Terms: OpenMDW License Agreement, version 1.1").
+  Taxonomy action: `openmdw-1.1` is tracked as a first-class permissive
+  license class in the scan ledger. Sub-items scanned, license NOT yet
+  byte-verified (stay provisional): Nemotron for Science + LitmusBench
+  v0.2 (~50k chemistry RLVR questions, SC26 2026-11-16), Nemotron 3.5
+  Transcribe, Bolt E4B. No code adopted.
+
 ## Datasets (public; our own loaders, per AM43)
 
 CWRU Bearing Data, XJTU-SY, NASA C-MAPSS, PHM-Vibench (ModelScope),
