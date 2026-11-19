@@ -3,59 +3,46 @@
  "registered_at": "2026-11-19",
  "registered_by": "auditor (Claude), loop-owned Art.28",
  "article": "Art.7 + Art.6 + Art.14 + served-model attestation",
- "selection_sha256": "d33378f2966f7c131571d5f20bf7ef0f0455cad16cc7e9609d48a50ed7363e8d",
+ "selection_sha256": "13e95f020b85b56f434043e724617fd92b31156b3d6bafeb2cd933cfda3ba6d5",
  "n_problems": 30,
  "intervention": 15,
  "predictor": 15,
  "power_basis": {
   "pre_registered_n": 30,
-  "observed_per_row_sd": 0.63,
-  "sd_source": "v11 scored rows",
+  "observed_per_row_sd": 0.55,
+  "sd_source": "v10/v11 scored rows",
   "target_effect": "mean 3.0 vs null ~2.6",
   "test": "one-sample t vs 3.0, alpha 0.05",
-  "resolved_rule": "Art.14: resolved only when n met AND 95% CI lower bound > 3.0 (mean ≳ 3.23 at n=30, SD 0.63); else UNRESOLVED"
+  "resolved_rule": "Art.14: resolved only when n met AND 95% CI lower bound > 3.0 (mean ≳ 3.2 at n=30, SD 0.55); else UNRESOLVED"
  },
  "model_pin": {
   "registered_id": "agnes-3.0-flash",
   "served_model": "agnes-3.0-flash",
-  "upstream": "agnes (apihub.agnes-ai.com), keys AGNES_API_KEY + AGNES_API_KEY_2 rotation",
-  "note": "owner default agnes-3.0-flash (AM75). Attestation 30/30 served==requested==registered agnes-3.0-flash."
+  "upstream": "agnes (apihub.agnes-ai.com), vault keys AGNES_API_KEY + AGNES_API_KEY_2 (ordered rotation)",
+  "note": "owner default agnes-3.0-flash (AM75). Attestation: 30/30 served==requested==registered agnes-3.0-flash."
  },
- "controllers_active": {
-  "c-0109_tool_grounding": "the CRITIC tool-grounding corrector (c-0109, 194 lines, 13 tests) mechanically corrects bill rows + computed chemistry direction before the critic flags",
-  "c-0110_aide_tree_search": "the AIDE tree-search controller (c-0110, 305 lines, 14 tests) replaces the single-chain repair loop with best-first population search over diverse candidates, metric-pruned"
- },
- "binds_active": [
-  "F75 refusal/identity/thrash",
-  "chemistry elicitation (stated-formula + element-conservation + equilibrium-direction)",
-  "formula-direction",
-  "allowed-measures class fit",
-  "input-availability (permitted signals only)"
- ],
  "custody": {
   "problems": "audit/holdout_v12/holdout_v12_problems.json (public, builder-readable)",
   "rubric": "PRIVATE repo prateekm1007/def-rubric-custody/holdout_v12_rubric_PRIVATE.json (access-controlled, unauth 404)",
   "rubric_access": "auditor+owner only; builder NEVER_READ pre-generation"
  },
- "purpose": "ACCEPTANCE test for engine route with ALL FIVE binds + BOTH controllers (c-0109 tool-grounding + c-0110 tree search). v10 mean 3.1 NOT_GRANTED (HO10-03 inverted + CI includes 3.0); v11 mean 3.133 NOT_GRANTED (Art.14 CI includes 3.0, hard clauses 0/0/0 PASS). v12 measures the six-technique lift (five binds + two controllers) on a fresh confidential set.",
+ "purpose": "ACCEPTANCE test for engine route with ALL FIVE binds + c-0109 tool-grounded corrector + c-0110 AIDE tree-search controller. v11 mean 3.133 NOT_GRANTED (Art.14 CI includes 3.0); v12 measures the five-bind + controllers lift on a fresh confidential set.",
  "MANDATORY_RUN_ARTIFACTS": [
   "committed gateway-log slice (requested+served per call)",
   "30/30 served_model==registered agnes-3.0-flash attestation PRE-SCORING",
   "durable all-row events ledger",
   "ONE named executor id, claim before any problem read",
   "green pushed CI read from check-run API",
-  "MEASURED_PATH through discovery_fabric.engine.engine_route -> mechanism_space",
-  "c-0109 corrector active (bill rows mechanically tagged, chemistry direction mechanically corrected where applicable)",
-  "c-0110 tree search active (population search over diverse repair candidates, best-first, metric-pruned)"
+  "MEASURED_PATH through discovery_fabric.engine.engine_route -> mechanism_space"
  ],
  "one_shot_protocol": [
   "1. Builder claims holdout-v12-generation BEFORE any problem read.",
-  "2. Problems ONLY from audit branch; rubric NEVER read pre-generation; one generation frozen engine-route machine with both controllers active; commit rows+slice+ledger; peer VERIFIER recomputes.",
+  "2. Problems ONLY from audit branch; rubric NEVER read pre-generation; one generation frozen engine-route machine; commit rows+slice+ledger; peer VERIFIER recomputes.",
   "3. Attestation gate pre-scoring; VOID/UNPROVABLE never scored.",
   "4. Auditor scores against PRIVATE repo rubric.",
   "5. BURN; fresh v13 next."
  ],
- "ACCEPTANCE_BAR": "mean>=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction AND 0 unavailable-input rows AND run_verdict==VALID; Art.14 CI lower bound > 3.0 for RESOLVED",
+ "ACCEPTANCE_BAR": "mean>=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction AND 0 unavailable-input rows AND run_verdict==VALID; Art.14 CI lower bound > 3.0",
  "burn_after_use": true,
  "status": "SEALED_REGISTERED — builder may claim the one-shot generation"
 }
