@@ -20,6 +20,7 @@ is public-domain factual knowledge and is encoded in our own files
 | thermo | MIT | https://github.com/CalebBell/thermo | chemical thermodynamics |
 | chemicals | MIT | https://github.com/CalebBell/chemicals | chemical property data |
 | tespy | MIT | https://github.com/oemof/tespy | thermal engineering plant cycles |
+| Cantera | BSD-3-Clause | https://github.com/Cantera/cantera | computed chemical equilibrium (AM80 direction 3: `equilibrate()` verifies claimed chemistry directions at generation time — the computed complement to the registry equilibrium-direction scan; suite `tests/test_r80_chemistry_equilibrium.py`, c-0107) |
 | detect-secrets (Yelp) | Apache-2.0 | https://github.com/Yelp/detect-secrets | secret scanning (D8; gitleaks binary substitution noted in the run record) |
 | scikit-learn-contrib MAPIE | BSD-3-Clause | https://github.com/scikit-learn-contrib/MAPIE | conformal prediction intervals (D5, planned) |
 
@@ -97,6 +98,12 @@ benchmark result; it is treated as motivation only, never as evidence.
   AFTER a reflection-augmented repair), instead of burning the fixed
   repair budget on non-improving repairs. Same two implementations
   and same pattern-copy-only terms as above.
+- ChemMCP (Apache-2.0; license-verified AM81/R93) — chemistry-tool
+  integration pattern (LLM calls chemistry tools instead of guessing
+  chemistries; planned P2 generation-side complement, AM81).
+- CACTUS (BSD-2-Clause; license-verified AM81/R93) — chemistry
+  toolkit (retro/forward reaction prediction) pattern (planned P2
+  generation-side complement, AM81).
 
 ## Datasets (public; our own loaders, per AM43)
 

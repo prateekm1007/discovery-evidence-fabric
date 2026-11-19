@@ -40,7 +40,10 @@ jobs:
           # physics slice); without it the step-2 collection dies with
           # exit 2 BEFORE any test runs (the 6d6c4de70 remote failure,
           # diagnosed by the same symptom locally).
-          python3 -m pip install --quiet pytest py pygments pint
+          # R80 (c-0107 lineage): cantera joins — the computed-equilibrium
+          # suite (tests/test_r80_chemistry_equilibrium.py) imports cantera
+          # (BSD-3, NOTICE.md); without it that suite dies at collection.
+          python3 -m pip install --quiet pytest py pygments pint cantera
       - name: Deterministic regression surfaces (zero LLM)
         run: |
           set -e
@@ -116,6 +119,7 @@ jobs:
             tests/test_v8_generation_binds.py \
             tests/test_r80_repair_convergence.py \
             tests/test_r93_repair_convergence.py \
+            tests/test_r80_chemistry_equilibrium.py \
             tests/test_physics_checks.py \
             tests/test_candidate_schema.py \
             tests/test_engine_route.py \
