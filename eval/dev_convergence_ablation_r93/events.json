@@ -9,7 +9,7 @@
  "corpus": "holdout_v10 (BURNED per auditor R88; DEV material; seal re-verified at load)",
  "battery_delta_note": "typed caveat: the incumbent v10 rows ran the FOUR-bind frozen battery; the challenger runs the CURRENT frozen call site (FIVE binds — the R89 equilibrium-direction bind rides the merged formula scan inside scan_stated_formula_direction). The delta adds finding surface on chemistry-direction rows only; disclosed, never hidden (Art. 5).",
  "convergence_note": "per-attempt signatures + stop_reason + addendum flags recorded; recomputable from committed bytes (analyze/attest), never scored by this instrument",
- "window_started_at": "2026-11-19T04:13:50.241307Z",
+ "window_started_at": "2026-11-19T04:24:11.239467Z",
  "events": [
   {
    "problem_id": "HO10-01-cu-refinery-anode-passivation",
@@ -3688,6 +3688,1402 @@
    "onrow_answer_claims": 18,
    "final_sha256_16": "e3617e77a31737c6",
    "final_chars": 7230
+  },
+  {
+   "problem_id": "HO10-16-transformer-core-ground",
+   "generated_at": "2026-11-19T04:24:11.263983Z",
+   "histogram_before": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "histogram_after": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 10775,
+     "latency_s": 12.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Input Streams (ALREADY-RECORDED):**",
+       "*   Top-oil Temperature ($T_{oil}$): Existing RTD/thermistor telemetry.",
+       "*   Load Current ($I$): Existing CT metering at high-voltage side.",
+       "*   Ambient Temperature ($T_{amb}$): Existing weather station or site telemetry (if not av",
+       "2.  **Reference/Threshold (DERIVED):**",
+       "*   Baseline Thermal Coefficient ($\\beta$): Derived from the problem's stated \"healthy\" op",
+       "*   CGC Threshold Proxy: The \"warning\" threshold is set when the predicted core temperatur",
+       "3.  **Procedure:**",
+       "*   Calculate $T_{expected}(I) = T_{amb} + \\beta \\cdot I^2$ (or linear fit).",
+       "*   Compute Residual $R = T_{oil} - T_{expected}(I)$.",
+       "*   Apply exponential moving average (EMA) to $R$ with a time constant tuned to the 45-day",
+       "*   Trigger alarm if EMA($R$) > $R_{threshold}$ for 3 consecutive days (hysteresis to avoi",
+       "*   **Installability:** Zero. Uses existing RTD and CT channels. No hardware installation.",
+       "*   **Operability:** Low. Continuous monitoring via existing SCADA historian. No new softw",
+       "*   **Maintenance:** Zero. No physical sensors to maintain.",
+       "*   **Rough Cost Class:** Negligible (engineering time only). Standard practice: High (sen",
+       "*   **Parity Conclusion:** SAME burden class (low operational overhead), DIFFERENT mechani",
+       "*   **Protocol:** Back-test using the *existing* historical data logs of the transformer f",
+       "*   **Instruments:** Existing data historian (SQL/Python).",
+       "*   **Pass/Fail Thresholds:**",
+       "1.  Identify 3 known past events where CGC rose above the failure threshold (recorded in m",
+       "2.  Determine the exact date of CGC threshold crossing from maintenance records.",
+       "3.  Apply the predictor algorithm to the historical $T_{oil}$ and $I$ data leading up to t",
+       "4.  Pass Criterion: The algorithm must trigger a \"Warning\" flag at least 45 days before th",
+       "5.  False Alarm Rate (FA): Count the number of times the algorithm triggered a warning ove",
+       "*   **Duration:** 5 years of historical data.",
+       "*   **Kill Criterion:** If the back-test shows the thermal residual $R$ does not diverge f",
+       "*   **Primary Stated Indicator:** The problem asks to design a predictor for **core ground",
+       "*   **Re-evaluation of Constraint Bind:** If existing CGC data is available, the \"novelty\"",
+       "*   **Corrected Primary Indicator:** The primary stated indicator is **Core Ground Current",
+       "*   **Revised Mechanism Departure:** Standard practice triggers an immediate alarm when CG",
+       "*   **Why the previous thermal-only approach was risky:** If existing CGC data is availabl",
+       "*   **Final Mechanism:** A **Non-Linear Trend Extrapolation** of the existing CGC data, no",
+       "1.  **Input Streams (ALREADY-RECORDED):**",
+       "*   Core Ground Current ($I_{CGC}$): Existing CGC monitor/telemetry (stated in `user_varia",
+       "*   Load Current ($I_{load}$): Existing CT telemetry.",
+       "2.  **Reference/Threshold (DERIVED):**",
+       "*   Coupling Coefficient $K$: Derived from historical data where $I_{CGC}$ is known to be ",
+       "*   Degradation Rate Threshold $\\sigma_{crit}$: Derived from the 45-day requirement. If $B",
+       "3.  **Procedure:**",
+       "*   Hourly: Calculate $I_{norm} = I_{CGC} - K \\cdot I_{load}^2$.",
+       "*   Daily: Fit a linear regression to $\\ln(I_{norm})$ over the last 7 days to estimate ins",
+       "*   Warning Logic: If $\\hat{\\sigma} > \\sigma_{crit}$ for 3 consecutive days, predict time-",
+       "*   **Installability:** Zero. Uses existing SCADA points.",
+       "*   **Operability:** Low. Daily regression calculation is computationally trivial.",
+       "*   **Maintenance:** Zero.",
+       "*   **Rough Cost Class:** Engineering time only.",
+       "*   **Parity:** Same burden, different mechanism (predictive trend vs. reactive trip).",
+       "*   **Protocol:** Back-test on existing CGC and Load Current logs.",
+       "*   **Pass/Fail:**",
+       "*   Identify historical periods where CGC rose and tripped.",
+       "*   Apply the $I_{norm}$ and $\\hat{\\sigma}$ calculation.",
+       "*   Verify that $\\hat{\\sigma} > \\sigma_{crit}$ occurred at least 45 days before the trip.",
+       "*   Verify that during stable healthy periods, $\\hat{\\sigma}$ remains below $\\sigma_{crit}",
+       "*   FA Limit: <= 1 FA/transformer/year.",
+       "*   **Kill Criterion:** If the noise in $I_{norm}$ prevents reliable estimation of $\\sigma"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "d68eed5340d63bb8",
+     "signature": {
+      "digest": "ce6d245e47b46144",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5926,
+     "latency_s": 8.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **Data Acquisition Interface**",
+       "- **Description:** Access to existing SCADA/DMS points for Top-Oil Temperature ($T_{oil}$)",
+       "- **Source:** Stated in constraint: \"use only the existing core ground current, top-oil te",
+       "2. **Prediction Engine Firmware**",
+       "- **Description:** Update to the existing monitoring controller firmware (or edge gateway)",
+       "- **Source:** Standard practice already monitors these signals; this adds an inference lay",
+       "3. **Baseline Model Library**",
+       "- **Description:** Pre-calculated thermal response curves for \"Healthy Core\" state, derive",
+       "- **Derivation:** CALCULATED from stated physics: $\\tau_{healthy} = f(V_{rated}, K_{losses",
+       "- **Installability:** Zero physical changes. Uses existing ports and firmware. SAME burden",
+       "- **Operability:** Real-time processing on existing edge device. Negligible CPU overhead (",
+       "- **Maintenance:** No new sensors to fail. Firmware updates only. LOWER burden than standa",
+       "- **Cost:** Software license update or internal code deployment. Order of magnitude: $0-1k",
+       "- **Operational Loss:** Zero. No throughput or availability impact."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1f54bf3bf5f13bc2",
+     "signature": {
+      "digest": "8b9803185db50113",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **Data Acquisition Interface**; - **Description:** Access to existing SCADA/DMS points for Top-Oil Temperat"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6425,
+     "latency_s": 7.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Description:** Access to existing SCADA/DMS points for Top-Oil Temperature ($\\theta_{T",
+       "- **Source:** ALREADY-RECORDED: \"use only the existing core ground current, top-oil temper",
+       "- **Description:** Standard off-the-shelf programmable logic controller (PLC) or dedicated",
+       "- **Source:** NEW CATALOG PART (Control hardware).",
+       "- **Description:** SQL database or time-series database instance on the monitoring server.",
+       "- **Source:** NEW SOFTWARE COMPONENT.",
+       "- **Installability:** Standard practice (DGA + visual) requires portable sampling kits and",
+       "- **Operability:** Standard practice is periodic (monthly/quarterly DGA). This predictor i",
+       "- **Maintenance:** No consumables (no DGA vials, no filter elements). Burden is LOWER.",
+       "- **Operational Loss:** Zero. The predictor uses existing telemetry; no change in transfor",
+       "- **Cost Class:** Standard practice is Labor + Lab Cost. This predictor is Software Engine"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "f7760b6263d0d8bf",
+     "signature": {
+      "digest": "f612721655f49493",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Description:** Access to existing SCADA/DMS points for Top-Oil Temperature ($\\theta_{T; - **Source:** ALRE"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7762,
+     "latency_s": 70.1,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Data-Driven Thermal-Electrical Coefficient Regression",
+       "*   **(d) Computing Module:** Edge Gateway PLC or DMS function block. No new hardware. Use",
+       "*   **(e) Algorithm:** Online Least Squares Estimator (LSE) for coefficient $k$ in $T = \\a",
+       "*   **(f) Alert Logic:** If $z_k > 2.0$ (statistical shift in thermal coupling), raise \"Co",
+       "*   (d) EXISTING EQUIPMENT: No new hardware procurement.",
+       "*   (e) SOFTWARE LICENSE: If DMS license requires it, **ASSUMPTION** of existing license c",
+       "*   (f) CONFIGURATION: **DERIVED** from existing alarm settings.",
+       "*   **Installability:** Zero. No new wires, no new sensors. Uses existing SCADA tags.",
+       "*   **Operability:** Zero manual effort. Automated DMS function.",
+       "*   **Maintenance:** Zero. Software-based.",
+       "*   **Cost:** Negligible (developer hours for function block).",
+       "*   **Parity:** Standard practice (adding a new CT or DGA kit) is heavier. My solution is ",
+       "*   **Operational Loss:** **Zero**. No shutdowns, no derating required. The predictor runs",
+       "*   **Why worth it:** Provides 45-day lead time without hardware intervention, leveraging ",
+       "*   **Protocol:** Retrieve historical data for a transformer with a known core ground curr",
+       "*   **Instruments:** Python/R script running LSE on the 3 signals.",
+       "*   **Pass/Fail Threshold:** The thermal gain coefficient $k$ must show a statistically si",
+       "*   **Duration:** Back-test on 1-year history.",
+       "*   **Kill Criterion:** If the thermal signal noise floor ($\\pm 0.1^\\circ C$) masks the th",
+       "*   **Validation:** Compare predicted 45-day marker against actual $I_{core}$ failure time",
+       "*   **Primary Indicator:** `Core Ground Current` is the problem's primary stated indicator",
+       "*   **Predictor Indicator:** `Thermal-Electrical Coefficient` ($k$) is the *leading indica",
+       "*   **Constraint Adherence:**",
+       "*   \"Use only existing core ground current, top-oil temperature and load current\": **COMPL",
+       "*   \"No new sensors\": **COMPLIED**.",
+       "*   \"No offline DGA\": **COMPLIED** (DGA is not used; thermal data is used).",
+       "*   \"Warn >=45 days before failure\": **COMPLIED** via lead-time calculation in the test pr",
+       "*   \"<=1 FA/transformer/year\": **COMPLIED** by setting a conservative z-score threshold (e",
+       "1.  `Top-Oil Temperature`: Tag = **ALREADY-RECORDED** (Source: SCADA `T_TOP_OIL`)",
+       "2.  `Load Current`: Tag = **ALREADY-RECORDED** (Source: SCADA `I_LOAD`)",
+       "3.  `Core Ground Current`: Tag = **ALREADY-RECORDED** (Source: SCADA `I_CORE_GND`)",
+       "4.  `Edge Gateway`: Tag = **EXISTING** (Source: DMS Host)",
+       "5.  `LSE Algorithm`: Tag = **SOFTWARE** (Source: DMS Function Block)",
+       "6.  `Alert Threshold`: Tag = **CONFIGURATION** (Source: DMS HMI)"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "7778afe9f88d1a8d",
+     "signature": {
+      "digest": "0c10deb364adebea",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Data-Driven Thermal-Electrical Coefficient Regression; *   **(d) Computing Module:** "
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "stagnation_stop": false,
+   "repair_prompt_addendum_attempts": 2,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 10,
+   "final_sha256_16": "7778afe9f88d1a8d",
+   "final_chars": 7762
+  },
+  {
+   "problem_id": "HO10-17-generator-rotor-ground",
+   "generated_at": "2026-11-19T04:25:50.002455Z",
+   "histogram_before": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "histogram_after": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7989,
+     "latency_s": 10.5,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Field Current ($I_f$):** *ALREADY-RECORDED* via the existing excitation system power",
+       "2.  **Bearing Vibration:** *ALREADY-RECORDED* via the existing Proximity Probes or Acceler",
+       "3.  **Field Voltage ($V_f$):** *ALREADY-RECORDED* via the excitation transformer secondary",
+       "1.  **Harmonic Baseline:** *DERIVED* from the **Stated Spec** of the excitation system's t",
+       "2.  **Vibration Spectral Shift:** *DERIVED* from **Stated Geometry** (rotor radius $R$, ai",
+       "3.  **Trend Rate:** *DERIVED* from **Stated Physics** of thermal degradation kinetics (Arr",
+       "*   **Installability:** **LOWER BURDEN.** Standard practice requires installing a REFD (re",
+       "*   **Operability:** **SAME CLASS.** Both run continuously. The proposed algorithm is a li",
+       "*   **Maintenance:** **LOWER BURDEN.** No REFD resistor to maintain, no calibration of hig",
+       "*   **Rough Cost Class:** **LOWER.** Standard REFD cost: $5k-$15k hardware + $2k-$5k insta",
+       "*   **Feasibility Note:** The burden class is strictly lower or equal, but the mechanism i",
+       "1.  **Data Pull:** Retrieve 12 months of historical $I_f$ and $V_{bearing}$ data for the s",
+       "2.  **Event Identification:** Locate the 2-3 most recent \"suspected minor ground faults\" o",
+       "*   *Simulation:* Inject a 5% step change in the harmonic content of $I_f$ and a 3dB step ",
+       "3.  **Pass/Fail Threshold:**",
+       "*   The algorithm must flag the anomaly with a confidence interval > 95% within **24 hours",
+       "*   False Positive Rate: Must be **<= 1** false alarm per generator per year during health",
+       "4.  **Duration:** 1 year of historical data analysis (retroactive validation).",
+       "5.  **Kill Criterion:** If the harmonic content of $I_f$ shows no correlation with the ons",
+       "*   **Primary Stated Indicator:** **Field Current ($I_f$)** and **Bearing Vibration** are ",
+       "*   **No New Sensors:** Complied. All data is from existing IEC 61850/DCS points.",
+       "*   **No Rotor Flux Probe:** Complied. The inference is based on electrical side effects (",
+       "*   **30-Day Warning:** The predictor uses a **trend slope** detector. Since the physical ",
+       "*   **<= 1 FA/Generator/Year:** Achieved by setting the alert threshold at **3 Sigma** of "
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "735c9a1ed7b2ec9b",
+     "signature": {
+      "digest": "58c6709075fa01bc",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false
+    },
+    {
+     "stage": "repair_1",
+     "chars": 11777,
+     "latency_s": 14.9,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Source:* Stated existing Field Current, Field Voltage, and Bearing Vibration sensors.",
+       "*   *Action:* Configure the existing data historian to record 1-second averages of $I_f$, ",
+       "*   *Tag:* **ALREADY-RECORDED** (per problem constraint \"use only the existing field curre",
+       "*   *Procurement:* None (Software/Firmware).",
+       "2.  **Baseline Derivation (The \"Reference\"):**",
+       "*   *Source:* **DERIVED** from stated existing data.",
+       "*   *Action:* The problem states \"use only the existing...\". The \"healthy signature\" is *n",
+       "*   *Tag:* **DERIVED** from stated specs/nameplate.",
+       "3.  **Trend Analysis Algorithm:**",
+       "*   *Source:* Stated existing signals.",
+       "*   *Action:* Linear regression on the High-Frequency Energy $E_{hf}(I_f)$ and the Bearing",
+       "*   *Tag:* **ALREADY-RECORDED** (Computed from existing streams).",
+       "4.  **Alarm Logic:**",
+       "*   *Source:* Stated existing DCS.",
+       "*   *Action:* Trigger \"Pre-Fault Warning\" if the slope of $E_{hf}$ exceeds a threshold $\\a",
+       "*   **Standard Practice Burden:** Installation of a rotor flux probe (high-voltage sensor)",
+       "*   **My Mechanism Burden:**",
+       "*   *Installability:* Zero physical installation. Firmware configuration only.",
+       "*   *Operability:* Zero operator training required (automatic trend alerts).",
+       "*   *Maintenance:* Zero additional maintenance (uses existing sensors).",
+       "*   *Cost Class:* Negligible (software license/configuration time) vs. High (probe + engin",
+       "*   *Parity:* My burden is strictly lower.",
+       "*   *Unpriced Operational Loss:* **Zero**. The mechanism does not reduce throughput, energ",
+       "*   **Protocol:** Inject a simulated \"leakage\" by connecting a variable resistor (1 k$\\Ome",
+       "*   **Instruments:** None new. Use existing DCS trending tools.",
+       "*   **Pass/Fail Thresholds:**",
+       "*   *Fail (False Positive):* If the algorithm triggers >1 alarm per generator per year on ",
+       "*   *Pass (Detection):* If the algorithm detects a $R_g$ drop of 50% from the healthy valu",
+       "*   **Duration:** Validate against 1 year of existing historical data from the generator's",
+       "*   **Kill Criterion:** If the correlation between $E_{hf}$ and actual measured $R_g$ (fro",
+       "*   **Primary Stated Indicator:** **Field Current** (and Voltage). The problem states \"use",
+       "*   **Secondary Indicator:** **Bearing Vibration.** This supplements the primary by provid",
+       "*   **Feasibility Check:**",
+       "*   *No New Sensors:* Complied. Using existing DCS points.",
+       "*   *No Rotor Flux Probe:* Complied. Inference is based on $I_f/V_f$ and Vibration, not di",
+       "*   *<= 1 FA/year:* The algorithm is a *trend* detector, not an instantaneous trip. It war",
+       "1.  **NYQUIST_UNSAMPLED:** The problem does not state the sampling rate. *Assumption:* Exi",
+       "*   *Revised Physics:* The drop in $R_g$ causes a slight increase in $I_f$ (for constant $",
+       "3.  **DEPLOYED-PART CLAUSE:** No modification to the rotor, bearings, or stator. The mecha",
+       "4.  **PERMITTED-SET CLAUSE:** The constraint states \"use only the existing field current, ",
+       "5.  **DIRECTION-OF-EFFECT:** Corrected. The driving variable is $R_g$ (falling). The obser",
+       "6.  **PREMISE-VALIDITY:** The problem states \"existing field current, field voltage and be",
+       "7.  **CERTIFIED-SYSTEM-AS-SOLD:** N/A (Generator is not a medical/food-contact system).",
+       "8.  **MECHANISM-DIVERSITY:** \"MECHANISM CLASS: **Electro-Mechanical Drift Inference from E"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "*Correction:* I will refine the physics to use **Low-Frequency Drift** in $I_f/V_f$ ratio and **RMS Vibration** trends instead of hig"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "355af62e25691806",
+     "signature": {
+      "digest": "62339c5dc8330be8",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   *Source:* Stated existing Field Current, Field Voltage, and Bearing Vibration sensors.; *   *Action:* Conf",
+      "REASONING_THRASH_LEAK: *Correction:* I will refine the physics to use **Low-Frequency Drift** in $I_f/V_f$ ratio and **RMS Vibration*"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 7161,
+     "latency_s": 9.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Identical to standard practice (no new sensors, no new wiring; uses the ",
+       "- Operability: The DSP update is performed during the next scheduled relay maintenance win",
+       "- Maintenance: Zero additional maintenance; the DSP runs continuously with the relay.",
+       "- Cost class: The DSP hardware is already on the relay (standard practice includes it). Th",
+       "- Operational loss: None. The mechanism does not alter duty cycle, setpoints, or availabil",
+       "- REASONING_THRASH_LEAK (NEW): The draft no longer contains \"Correction:\" or any revision "
+      ],
+      "REASONING_THRASH_LEAK": [
+       "Correction:\" or any revision language. The final position is shipped directly."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "47ba055c3794a871",
+     "signature": {
+      "digest": "409381c0c21ab4b2",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Identical to standard practice (no new sensors, no new wiring; uses the ; - Operability: The",
+      "REASONING_THRASH_LEAK: Correction:\" or any revision language. The final position is shipped directly."
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 12656,
+     "latency_s": 31.3,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. $R_{nom}$: Derived from Nameplate/Manufacturer data sheet (Stated Spec).",
+       "2. Thermal coefficient $\\alpha$: Derived from copper constant (Stated Physics: $\\approx 0.",
+       "3. Warning Threshold: Derived from physics. Trip point is typically $R_g = 0$ (short) or s",
+       "4. 30-Day Lead Time: Derived from historical degradation rates of insulation systems (Stan"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "Wait, $R_{nom}=0.2 \\Omega$. 10% is 0.02 $\\Omega$. 1 C deg change is $0.0039 \\cdot 0.2 \\approx 0.0008 \\Omega$. So thermal nois"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "17a5caacefded8de",
+     "signature": {
+      "digest": "4bd226058fb4ee1d",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. $R_{nom}$: Derived from Nameplate/Manufacturer data sheet (Stated Spec).; 2. Thermal coefficient $\\alpha$: ",
+      "REASONING_THRASH_LEAK: Wait, $R_{nom}=0.2 \\Omega$. 10% is 0.02 $\\Omega$. 1 C deg change is $0.0039 \\cdot 0.2 \\approx 0.0008 \\Omega$. "
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "FLAG",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED",
+    "REASONING_THRASH_LEAK"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "stagnation_stop": false,
+   "repair_prompt_addendum_attempts": 2,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 13,
+   "final_sha256_16": "17a5caacefded8de",
+   "final_chars": 12656
+  },
+  {
+   "problem_id": "HO10-18-turbine-oil-whirl",
+   "generated_at": "2026-11-19T04:26:56.154986Z",
+   "histogram_before": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "histogram_after": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 12145,
+     "latency_s": 15.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Data Source 1 (ALREADY-RECORDED):** Lube-oil temperature sensor ($T_{oil}$). The pro",
+       "*   **Data Source 2 (ALREADY-RECORDED):** Bearing vibration sensor (velocity or accelerati",
+       "*   **Data Source 3 (ALREADY-RECORDED):** Shaft speed (RPM) telemetry.",
+       "*   **Inference Engine:** A lightweight edge-computer or PLC program. No new hardware.",
+       "*   **Procedure:**",
+       "1.  **Offline (One-time):** Extract the last 90 days of data where the turbine was in stea",
+       "2.  **Calibration (DERIVED):** Calculate the thermal sensitivity coefficient $\\alpha = \\fr",
+       "3.  **Real-time Monitoring:** Every second, read $T_{oil}(t)$ and $N(t)$ (shaft speed).",
+       "4.  **Calculation:** Compute the *estimated* current natural frequency $f_{n,est}(t) = f_{",
+       "5.  **Threshold Comparison (DERIVED):** The \"Whirl Trip\" threshold is defined as the frequ",
+       "6.  **Leading Indicator Logic:**",
+       "*   Calculate the *rate of approach* $V_{approach} = \\frac{d(f_{n,est} - f_{fail})}{dt}$.",
+       "*   Time-to-Threshold $T_{remaining} = \\frac{f_{n,est}(t) - f_{warn}}{V_{approach}}$.",
+       "*   **Constraint Bind:** The \"21 days\" is a *USER CONSTRAINT*. We do not predict the *time",
+       "*   **Alternative Robust Logic:** Since temperature changes slowly, the \"21 days\" warning ",
+       "*   $T_{oil}$: **ALREADY-RECORDED** (Problem states \"existing... lube-oil temperature\").",
+       "*   $V_{vib}$: **ALREADY-RECORDED** (Problem states \"existing bearing vibration\"). Used *o",
+       "*   $N_{rpm}$: **ALREADY-RECORDED** (Problem states \"shaft speed\").",
+       "*   $T_{ref}$, $f_{ref}$, $f_{fail}$: **DERIVED** from *ALREADY-RECORDED* historical vibra",
+       "*   $\\alpha$ (sensitivity): **DERIVED** from the *ALREADY-RECORDED* correlation between $T",
+       "*   $T_{critical}$: **DERIVED** from $\\alpha$ and $f_{fail}$.",
+       "*   **Standard Practice:** Monitor vibration amplitude. Trip when $V_{amp} > Threshold$.",
+       "*   **Proposed Practice:** Monitor $T_{oil}$ trend. Warn when $T_{oil}$ projects to cross ",
+       "*   **Installability:** SAME. No new sensors. Uses existing DCS/SCADA tags.",
+       "*   **Operability:** SAME. Runs on existing PLC/edge controller.",
+       "*   **Maintenance:** LOWER. Vibration sensors have a high false-alarm rate and require con",
+       "*   **Cost Class:** SAME. No hardware. Software cost only.",
+       "*   **Feasibility Note:** The \"21 days\" warning is achieved by the *slow* dynamics of ther",
+       "1.  **Data Retrieval:** Pull 1 year of historical data for $T_{oil}$, $V_{vib}$, and $N_{r",
+       "2.  **Calibration:**",
+       "*   Identify the \"Whirl Event\" in the history: A period where $V_{vib}$ crossed the trip l",
+       "*   Record the temperature $T_{event}$ at that time.",
+       "*   Calculate the \"Safe\" temperature $T_{safe}$ as the lowest temperature observed in 1 ye",
+       "*   Assume a linear relationship between $T_{oil}$ and the *probability* of whirl (or crit",
+       "3.  **Simulation (Back-test):**",
+       "*   Slide a 21-day window forward through the historical data.",
+       "*   For each day $t$, use the temperature trend of the preceding 7 days to project $T_{oil",
+       "*   If $T_{oil}(t+21) < T_{critical}$, issue a \"Virtual Warning\" at day $t$.",
+       "*   Check if a Whirl Event occurred between day $t$ and $t+21$.",
+       "4.  **Pass/Fail Thresholds:**",
+       "*   **False Alarm Rate (FA):** Number of Virtual Warnings that did *not* lead to a Whirl E",
+       "*   **Missed Detection:** Number of Whirl Events where no Virtual Warning was issued 21 da",
+       "5.  **Duration:** 1 year of historical data for validation.",
+       "6.  **Kill Criterion:** If the temperature trend is too noisy (e.g., daily fluctuations $>",
+       "*   **Primary Stated Indicator:** **Lube-Oil Temperature.**",
+       "*   **Why Primary:** The failure mechanism (oil whirl) is governed by the oil film's rheol"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "167e2c634df02a27",
+     "signature": {
+      "digest": "0ea038b5c6f378fa",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false
+    },
+    {
+     "stage": "repair_1",
+     "chars": 11530,
+     "latency_s": 16.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **ALREADY-RECORDED:** The problem states \"use only the existing ... lube-oil temperatu",
+       "*   **DERIVED:** Viscosity and Damping are physical properties, not sensors.",
+       "*   **CALCULATED:** The lead time is a computed variable.",
+       "*   **NO NEW SENSORS:** No hardware installation. Only software logic on existing DCS/PLC.",
+       "*   **Installability:** Zero hardware burden. Standard practice requires vibration probes;",
+       "*   **Operability:** Operator receives a single \"Days-to-Trip\" metric instead of complex w",
+       "*   **Maintenance:** No probe maintenance. Oil temperature sensors are maintained by stand",
+       "*   **Cost Class:** Lower than standard practice (which requires proximity probe installat",
+       "*   **Operational Loss:** None. It is a predictive warning, does not modulate operation.",
+       "*   **Parity:** SAME burden class (software/logic on existing DCS), DIFFERENT mechanism (p"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "Wait, the problem states the turbine runs at 3000 RPM. If whirl occurs at ~50% of critical, and critical is high, whirl shoul",
+       "*Correction:* The problem says \"no new sensors\", but implies existing logs exist. If we don't have a \"healthy\" vibration log, we use"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "2021fb2fa3cd79b7",
+     "signature": {
+      "digest": "f61a91b3253d9941",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false,
+     "findings_disclosed": [
+      "USER_LABEL_FABRICATED_CONSTRAINT",
+      "BILL_UNTAGGED: *   **ALREADY-RECORDED:** The problem states \"use only the existing ... lube-oil temperatu; *   **DERIVED:** V",
+      "REASONING_THRASH_LEAK: Wait, the problem states the turbine runs at 3000 RPM. If whirl occurs at ~50% of critical, and critical is hi"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 9499,
+     "latency_s": 11.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   ALREADY-RECORDED: \"bearing vibration\" (existing RMS channel, standard practice) — *Der",
+       "*   ALREADY-RECORDED: \"lube-oil temperature\" (existing transmitter) — *Derivation: The pro",
+       "*   ALREADY-RECORDED: \"shaft speed\" (existing tachometer/transmitter) — *Derivation: The p",
+       "*   *Note:* No new sensors, no proximity probes, no new hardware. Only existing tags are u",
+       "*   DERIVED: The whirl threshold is NOT a new sensor. It is a *calculated* limit based on ",
+       "*   Procedure: The DCS compares the real-time WII to a *calculated* threshold. The thresho"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "83ca48094b8f8661",
+     "signature": {
+      "digest": "de051775efa2db08",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   ALREADY-RECORDED: \"bearing vibration\" (existing RMS channel, standard practice) — *Der; *   ALREADY-RECORD"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 9365,
+     "latency_s": 13.3,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Spectral-Trend Instability Margin Inference.",
+       "*   **Notes on Bill:**",
+       "*   Row 1: No new sensors. Uses existing vibration channels (standard practice already has",
+       "*   Row 2: Reference data comes from the *bearing manufacturer's data sheet* (stated spec)",
+       "*   Row 3: The \"new\" part is the *inference logic*. It combines existing data streams to p",
+       "*   *Constraint Bind:* The primary stated indicator is **Vibration Trip**. My predictor su",
+       "*   **Standard Practice Burden:** Install vibration sensors, install temperature sensors, ",
+       "*   **My Approach Burden:**",
+       "*   *Hardware:* Zero new sensors. (Parity: Better).",
+       "*   *Software:* Requires engineering time to implement the \"Days to Trip\" logic in the DCS",
+       "*   *Maintenance:* None.",
+       "*   *Operational Loss:* The algorithm may produce false positives if temperature control i",
+       "*   *Parity Conclusion:* SAME burden class (software/configuration), DIFFERENT mechanism (",
+       "*   **Protocol:**",
+       "1.  Retrospective Data Analysis: Pull 1 year of historical data from DCS for 3 similar tur",
+       "2.  Identify all instances where the vibration trip actually occurred or where operators m",
+       "3.  Apply the \"Days to Trip\" algorithm to the data *prior* to each event.",
+       "4.  **Pass Criterion:** The algorithm output \"Days to Trip\" must have crossed the 21-day t",
+       "5.  **False Positive Rate:** Count instances where \"Days to Trip\" < 21 but no trip occurre",
+       "*   **Falsification:** If the algorithm fails to predict 21 days ahead in >50% of historic",
+       "*   **Primary Stated Indicator:** **Vibration Trip** (the event that defines failure).",
+       "*   **My Indicator:** **Predicted Days-to-Trip**.",
+       "*   **Why:** The problem asks to *warn* 21 days before the *trip*. My predictor calculates",
+       "*   **No New Sensors:** Confirmed. Uses only existing Vibration, Temp, Speed signals.",
+       "*   **DEPLOYED-PART CLAUSE:** No modification to bearing, shaft, or housing. Only software",
+       "*   **PERMITTED-SET CLAUSE:** The constraint says \"use only existing... no new sensors.\" M",
+       "*   **DIRECTION-OF-EFFECT:** Correctly identified: Rising Temp $\\rightarrow$ Falling Visco",
+       "*   **EXEMPLAR-REALITY:** No commercial exemplars named. All components are software/logic",
+       "*   **PREMISE-VALIDITY:** The problem states \"existing bearing vibration, lube-oil tempera",
+       "*   **CERTIFIED-SYSTEM:** N/A (Industrial).",
+       "*   **INPUT-AVAILABILITY:** All inputs are \"ALREADY-RECORDED\" per the constraint.",
+       "*   **COST-PRICING:** Operational cost of false positive is labor to check cooler. Order o"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "63906a67f376b162",
+     "signature": {
+      "digest": "493a237f6f6dd27c",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED",
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Spectral-Trend Instability Margin Inference.; *   **Notes on Bill:**; *   Row 1: No n"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "FLAG",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "stagnation_stop": false,
+   "repair_prompt_addendum_attempts": 2,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 12,
+   "final_sha256_16": "63906a67f376b162",
+   "final_chars": 9365
+  },
+  {
+   "problem_id": "HO10-19-pump-bearing-lube",
+   "generated_at": "2026-11-19T04:27:53.073503Z",
+   "histogram_before": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "histogram_after": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4919,
+     "latency_s": 5.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Input Streams:**",
+       "1.  Bearing Vibration (velocity) at 1x, 2x, and BPFO frequencies: ALREADY-RECORDED (existi",
+       "2.  Bearing Temperature: ALREADY-RECORDED (existing thermocouple or RTD, per user constrai",
+       "3.  Motor Current: ALREADY-RECORDED (existing CTs, per user constraint \"use only the ... m",
+       "*   **Reference/Thresholds:**",
+       "1.  Baseline Vibration Amplitude $A_{ref}$: DERIVED from the median of $A$ during the last",
+       "2.  Threshold Alert Level: DERIVED from physics. Seizure occurs when oil film thickness < ",
+       "3.  Time-to-Failure (TTF) Calculation: Linear extrapolation of the slope $dA/dT$ against c",
+       "*   **Standard Practice Burden:** Monthly oil sampling, lab analysis costs ($50-$200/sampl",
+       "*   **My Scheme Burden:** No new hardware. Software algorithm runs on existing PLC or SCAD",
+       "*   **Parity Conclusion:** My scheme is STRICTLY LIGHTER. It replaces a periodic, manual, "
+      ],
+      "PREDICTOR_VIOLATION": [
+       "COMMISSIONING_PROGRAM"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "ea7fc582fe512514",
+     "signature": {
+      "digest": "fc1260f85c0c351e",
+      "keys": [
+       "BILL_UNTAGGED",
+       "PREDICTOR_VIOLATION"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8080,
+     "latency_s": 17.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Data Stream 1: Motor Current (RMS):**",
+       "*   **Source:** ALREADY-RECORDED (Stated: \"existing ... motor current\").",
+       "*   **Processing:** Low-pass filter to remove ripple/commutation noise; calculate RMS over",
+       "2.  **Data Stream 2: Bearing Temperature:**",
+       "*   **Source:** ALREADY-RECORDED (Stated: \"existing ... bearing temperature\").",
+       "*   **Processing:** Linearize against motor current. Compute $T_{norm} = T_{meas} - k \\cdo",
+       "3.  **Data Stream 3: Bearing Vibration (RMS):**",
+       "*   **Source:** ALREADY-RECORDED (Stated: \"existing ... bearing vibration\").",
+       "*   **Processing:** Calculate RMS of high-frequency band (>1kHz) to isolate structural res",
+       "4.  **Baseline Derivation (DERIVED):**",
+       "*   **Source:** Stated physics + Nameplate.",
+       "*   **Method:** Establish the \"Healthy\" operating envelope using the minimum historical va",
+       "*   **Label:** DERIVED from stated existing data. No commissioning recording required; use",
+       "5.  **Algorithm:**",
+       "*   Calculate $R_{fail} = \\frac{d(T_{norm})}{d(time)}$ over a 7-day moving average.",
+       "*   **Threshold:** $R_{fail} > \\alpha$ where $\\alpha$ is set to trigger 30 days before the",
+       "*   **Secondary Check:** Vibration RMS must remain < 2x baseline to exclude mechanical dam",
+       "*   **Installability:** SAME. No new sensors. Uses existing 4-20mA or digital channels.",
+       "*   **Operability:** SAME. Automated calculation in existing DCS/PLC or edge gate.",
+       "*   **Maintenance:** SAME. No consumables.",
+       "*   **Operational Loss:** **Zero**. The predictor is non-invasive. It does not modulate th",
+       "*   **Cost Class:** SAME. Software implementation cost only."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "16df1cce3b92f13f",
+     "signature": {
+      "digest": "6a7f4ecce9e584ae",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Data Stream 1: Motor Current (RMS):**; *   **Source:** ALREADY-RECORDED (Stated: \"existing ... motor cur"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6676,
+     "latency_s": 8.1,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Data Stream 1: Motor Current (RMS & Spectrum)**",
+       "*   **Source:** ALREADY-RECORDED (Stated: \"existing ... motor current\").",
+       "*   **Action:** Extract 1-second window RMS values and spectral power at 2x and 3x line fr",
+       "2.  **Data Stream 2: Bearing Vibration (High-Frequency Envelope)**",
+       "*   **Source:** ALREADY-RECORDED (Stated: \"existing ... bearing vibration\").",
+       "*   **Action:** Apply band-pass filter (e.g., 10–50 kHz) and Hilbert envelope demodulation",
+       "3.  **Data Stream 3: Bearing Temperature**",
+       "*   **Source:** ALREADY-RECORDED (Stated: \"existing ... bearing temperature\").",
+       "*   **Action:** Log ambient-corrected bearing temperature trend.",
+       "4.  **Baseline Derivation (Reference Dataset)**",
+       "*   **Source:** DERIVED from **Stated Existing Data**.",
+       "*   **Action:** Use the first 500 hours of post-installation or post-oil-change data (labe",
+       "5.  **Prediction Algorithm (Edge Compute/SCADA Block)**",
+       "*   **Source:** DERIVED from **Stated Physics** (Lambda ratio transition).",
+       "*   **Action:** Calculate real-time $\\rho_{live}$. Compute Deviation Score $D = \\frac{\\rho",
+       "*   **Installability:** 0% change. Uses existing sensors. No drilling, no new wiring.",
+       "*   **Operability:** Negligible CPU load on existing PLC/SCADA (simple correlation math).",
+       "*   **Maintenance:** Zero. No new moving parts or consumables.",
+       "*   **Rough Cost Class:** SAME as standard practice (which also uses these sensors). The \"",
+       "*   **Operational Loss:** Zero. No throughput or energy impact."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "908ed39a8f0bedaa",
+     "signature": {
+      "digest": "62a2aaf87c747d87",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED",
+      "BILL_UNTAGGED: 1.  **Data Stream 1: Motor Current (RMS & Spectrum)**; *   **Source:** ALREADY-RECORDED (Stated: \"existing ..."
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6980,
+     "latency_s": 12.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installability:** 0 new hardware. Uses existing PLC tags. Burden: Negligible.",
+       "*   **Operability:** Requires 1 hour of engineering time to map tags and tune the baseline",
+       "*   **Maintenance:** None. Burden: Zero.",
+       "*   **Cost Class:** Standard Practice (Oil Sampling/Lab): High recurring cost ($200-$500/t",
+       "*   **Operational Loss:** None. The system operates at full duty. The \"cost\" is purely com",
+       "*   **Parity:** This mechanism is **LIGHTER** than standard practice (oil sampling) and **"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "8305bdc1a5caae6e",
+     "signature": {
+      "digest": "b0a61988ad86d4a8",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED",
+      "BILL_UNTAGGED: *   **Installability:** 0 new hardware. Uses existing PLC tags. Burden: Negligible.; *   **Operability:** Requ"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "FLAG",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "stagnation_stop": false,
+   "repair_prompt_addendum_attempts": 2,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 13,
+   "final_sha256_16": "8305bdc1a5caae6e",
+   "final_chars": 6980
+  },
+  {
+   "problem_id": "HO10-20-compressor-surge",
+   "generated_at": "2026-11-19T04:28:36.771852Z",
+   "histogram_before": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "histogram_after": {
+    "stochastic chemical dosing and thermal hysteresis cycling": 1,
+    "closed-loop antiscalant dosing coupled with periodic high-velocity flushing.": 1,
+    "thermal-setpoint hysteresis cycling": 1,
+    "passive redox potential elevation via oxygen injection and co₂ ammonia ratio sta": 1,
+    "temperature and agitation procedure retuning": 1,
+    "load-step feed profile": 1,
+    "feed-ratio retuning and load-ramp procedure": 1,
+    "inhibitor dosage & temperature setpoint co-optimization": 1,
+    "scheduled reverse-flow pulse + temperature-setpoint retune": 1,
+    "inorganic passivant dosing & thermal setpoint adjustment": 1,
+    "operational setpoint retuning and duty cycle modification": 1,
+    "** load-ramp procedure (time-varying operating point)": 1,
+    "thermal subcooling margin adjustment": 1,
+    "scheduled agitation/temperature duty cycle": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 8987,
+     "latency_s": 12.7,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Input Streams (All ALREADY-RECORDED per problem statement):**",
+       "1.  Suction Pressure ($P_s$): ALREADY-RECORDED (stated \"existing suction... pressure\").",
+       "2.  Discharge Pressure ($P_d$): ALREADY-RECORDED (stated \"existing... discharge... pressur",
+       "3.  Flow Rate ($Q$): ALREADY-RECORDED (stated \"existing... flow\").",
+       "4.  Motor Current ($I$): ALREADY-RECORDED (stated \"existing... motor current\").",
+       "*   **References/Thresholds (All DERIVED):**",
+       "1.  **Clean Machine Surge Point ($Q_{s0}$):** DERIVED from stated device specs (8 bar cent",
+       "2.  **Ideal Current at Operating Point ($I_{ideal}$):** DERIVED from stated physics. $I_{i",
+       "3.  **Fouling Accumulation Rate ($k$):** DERIVED from historical trend of $I$ vs. time. No",
+       "4.  **Trip Threshold:** 0% Surge Margin.",
+       "*   **Components/Instruments/Procedure:**",
+       "*   **No New Sensors:** Constraint satisfied.",
+       "*   **No Dynamic Pressure Probe:** Constraint satisfied (uses steady-state $P_s, P_d$).",
+       "*   **Procedure:**",
+       "1.  Calculate Instantaneous Pressure Ratio $\\Pi = P_d/P_s$.",
+       "2.  Calculate Specific Volume $v_s$ from $P_s$ and stated suction conditions (ASSUMPTION: ",
+       "3.  Map Operating Point to Performance Map using $Q$ and $\\Pi$.",
+       "4.  Calculate Efficiency Deviation $\\Delta \\eta = I_{measured}/I_{ideal} - 1$.",
+       "5.  Convert $\\Delta \\eta$ to Surge Flow Shift $\\Delta Q_s$ using stated physics relation (",
+       "6.  Compute Current Surge Margin $SM$.",
+       "7.  Project $SM(t+14d)$ using linear fouling trend $k$ from existing logs.",
+       "8.  If $SM(t+14d) < 0$, issue alarm.",
+       "*   **Installability:** SAME class as standard practice (software/computing layer only). S",
+       "*   **Operability:** SAME. Runs on existing PLC/SCADA.",
+       "*   **Maintenance:** SAME. No physical sensors to maintain.",
+       "*   **Cost:** LOWER. No new hardware.",
+       "*   **Conclusion:** Same burden class (or lower), different mechanism (static efficiency-b",
+       "*   **Protocol:**",
+       "1.  Retrieve 3 months of logged data for $P_s, P_d, Q, I$ for the target compressor.",
+       "2.  Identify a known surge trip event (historical) or a period of high flow reduction.",
+       "3.  Apply the predictor algorithm to the historical data up to 14 days *before* the trip.",
+       "4.  Check if the predicted \"Time-to-Surge\" (TTS) crosses zero within the 14-day window.",
+       "*   **Instruments:** Computer with data access. No physical instruments.",
+       "*   **Pass/Fail Thresholds:**",
+       "*   Predicted Alarm must occur $\\geq$ 14 days before the actual historical trip.",
+       "*   False Alarm Rate (FA) calculated over the 3-month test window must be $\\leq$ 1 FA/year",
+       "*   **Duration:** 1 week of data processing.",
+       "*   **Kill Criterion:** If the predictor fails to identify the historical trip with >14 da",
+       "*   **Primary Indicator:** **Surge Margin.** This is the problem's primary stated indicato",
+       "*   **Why:** The failure is defined as \"surge margin loss.\" All other variables (Pressure,",
+       "*   **Secondary Indicators:** Motor Current (used as efficiency proxy), Pressure/Flow (use"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "Wait, fouling *reduces* maximum flow capacity. Let's correct the physical intuition: Fouling increases diffusion, reducing th"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "50efdf911b290653",
+     "signature": {
+      "digest": "64eb31dd283bae1d",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8382,
+     "latency_s": 11.3,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Input Streams (All ALREADY-RECORDED per problem statement):",
+       "1. Suction Pressure ($P_s$): ALREADY-RECORDED (Stated: \"existing suction... pressure\")",
+       "2. Discharge Pressure ($P_d$): ALREADY-RECORDED (Stated: \"discharge... pressure\")",
+       "3. Flow Rate ($Q$): ALREADY-RECORDED (Stated: \"flow\")",
+       "4. Motor Current ($I_{motor}$): ALREADY-RECORDED (Stated: \"motor current\")",
+       "- Reference/Baseline: DERIVED from Manufacturer Nameplate Data and Initial Commissioning L",
+       "- Threshold: DERIVED. Surge Trip Margin is typically 10-15% of flow at constant pressure. ",
+       "- Installability: ZERO (software only).",
+       "- Operability: Negligible (automated).",
+       "- Maintenance: ZERO (no hardware to fail).",
+       "- Cost Class: Software license/development (one-time) + negligible computing resources.",
+       "- Operational Loss: The predictor itself causes no operational loss. However, the *action*",
+       "- UNPRICED_OPERATIONAL_LOSS: Throughput reduction during the 14-day warning period is esti"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1ce51e2bd755704f",
+     "signature": {
+      "digest": "73a7e4bdc1b06719",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": false,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Input Streams (All ALREADY-RECORDED per problem statement):; 1. Suction Pressure ($P_s$): ALREADY-RECORDED ("
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 11372,
+     "latency_s": 13.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Data Acquisition Interface (Software):**",
+       "*   **Description:** Connects to the existing DCS/PLC tags for Suction Pressure ($P_s$), D",
+       "*   **Input Source:** ALREADY-RECORDED: \"existing suction/discharge pressure, flow and mot",
+       "*   **Reference/Threshold:** DERIVED (Stated Physics): Nominal Surge Margin limit is typic",
+       "2.  **Kinematic Stability Derivative Algorithm (Software):**",
+       "*   **Description:** A time-series analysis module that computes the rolling 7-day average",
+       "*   **Input Source:** ALREADY-RECORDED: $P_d, P_s, Q$.",
+       "*   **Reference/Threshold:** DERIVED (Stated Physics): The nominal value of $K$ at the des",
+       "3.  **Motor Current Correlation Filter (Software):**",
+       "*   **Description:** Uses Motor Current ($I_m$) to distinguish between *fouling* (high $I_",
+       "*   **Input Source:** ALREADY-RECORDED: \"motor current\".",
+       "*   **Reference/Threshold:** DERIVED (Stated Spec): The relationship between $I_m$ and $Q,",
+       "4.  **Operational Response Protocol (Procedure):**",
+       "*   **Description:** If the predictor output flag `SM_14DAY_LOW` is TRUE, the operator ini",
+       "*   **Input Source:** N/A (Action based on software output).",
+       "*   **Cost/Trade-off:** OPERATIONAL LOSS: Reducing discharge pressure by 1-2% may reduce p",
+       "*   **Standard Practice Burden:** Installation of dynamic pressure probes (forbidden here)",
+       "*   **This Proposal's Burden:**",
+       "*   **Installability:** Zero. No hardware. Software configuration on existing DCS.",
+       "*   **Operability:** Low. Operator receives a single flag. If flagged, execute standard \"s",
+       "*   **Maintenance:** Zero. No mechanical parts.",
+       "*   **Rough Cost Class:** LOW. Software development/integration cost only. No recurring ha",
+       "*   **Parity Conclusion:** This approach is LIGHTER than the standard practice (which ofte",
+       "*   **Protocol:**",
+       "1.  Extract 6 months of historical data for $P_s, P_d, Q, I_m$ from the DCS.",
+       "2.  Identify periods in the history where a surge trip *almost* occurred or where SM was m",
+       "3.  Apply the Kinematic Stability Derivative Algorithm to this historical data.",
+       "4.  **Pass/Fail Threshold:** The algorithm must have flagged the \"14-day warning\" conditio",
+       "5.  **Kill Criterion:** If the algorithm fails to distinguish between a process demand cha",
+       "*   **Primary Stated Indicator:** **Surge Margin Loss**. The mechanism directly infers thi",
+       "*   **Secondary Indicator:** **Motor Current**. This supplements the primary indicator by ",
+       "*   **Why:** The problem states \"warn >=14 days before surge trip.\" Surge trip is defined ",
+       "*   **Driving Variable:** Surge Margin ($SM$).",
+       "*   **Mechanism Movement:** The *degradation process* moves $SM$ *down*. The *predictor* d",
+       "*   **Effect on Failure Driver:** The failure driver is $SM \\leq 0$. The mechanism ensures",
+       "*   **Signed Statement:** The degradation imposes a *negative* drift on $SM$. The predicto"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "3b0ba0df9532ac63",
+     "signature": {
+      "digest": "d4028003e1583a4d",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Data Acquisition Interface (Software):**; *   **Description:** Connects to the existing DCS/PLC tags for"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7783,
+     "latency_s": 10.2,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Historical Data Extract Interface**",
+       "*   **Description:** Software module (SQL/API query) that extracts time-series data for Su",
+       "*   **Input Stream:** ALREADY-RECORDED DCS historian logs for $P_s, P_d, Q, I_m$.",
+       "*   **Reference/Threshold:** DERIVED from Manufacturer's Performance Curve (stated spec) f",
+       "2.  **Surge Margin Drift Calculator**",
+       "*   **Description:** Algorithm that computes the current Operating Point Margin ($M_{curr}",
+       "*   **Reference/Threshold:** DERIVED from Physics: Surge Line equation from nameplate data",
+       "3.  **Predictive Alarm Logic**",
+       "*   **Description:** Setpoint trigger that warns when $M_{curr} - R_{drift} \\times (14 \\te",
+       "*   **Reference/Threshold:** DERIVED: $M_{critical}$ is set at 5% surge margin (standard s",
+       "4.  **Operational Action Interface**",
+       "*   **Description:** Automated or manual procedure to increase anti-surge valve opening or",
+       "*   **Installability:** SAME. No new sensors, probes, or wiring. Uses existing DCS/PLC inf",
+       "*   **Operability:** HEAVIER. Requires periodic review of drift logs to ensure the algorit",
+       "*   **Maintenance:** LOWER. No dynamic pressure probes to calibrate, clean, or replace. Th",
+       "*   **Rough Cost Class:** LOWER. Cost is software configuration and engineering hours vs. ",
+       "*   **Operational Loss:** ZERO for the prediction mechanism. If the *response* to the warn",
+       "*   **Protocol:** Retrieve 90 days of DCS logs for $P_s, P_d, Q, I_m$. Identify a period w",
+       "*   **Instruments:** Laptop with DCS export tool; Python/MATLAB for regression analysis.",
+       "*   **Pass/Fail Thresholds:**",
+       "1.  **Falsification of Prediction:** Run the drift calculator on the data *leading up to* ",
+       "2.  **False Positive Rate:** Run the calculator on 90 days of stable, healthy operation. T",
+       "3.  **FA Rate Simulation:** Simulate 10 random healthy periods. FA/compressor/year must be",
+       "*   **Duration:** Test script runs in seconds; historical review takes 1-2 days.",
+       "*   **Kill Criterion:** If the drift rate $R_{drift}$ calculated from $P_r$ and $Q$ logs d",
+       "*   **Primary Indicator:** Surge Margin ($SM$). This is the failure driver.",
+       "*   **Secondary Indicator:** Motor Current ($I_m$). Used to cross-check power input agains",
+       "*   **Permitted Set:** \"Use only the existing suction/discharge pressure, flow and motor c",
+       "*   **Mechanism Compliance:** The bill uses ONLY these existing signals. No new sensors. N",
+       "*   **Deployed Part Clause:** No modification to compressor hardware. The mechanism is pur",
+       "*   **Direction of Effect:** Moves Surge Margin UP by early intervention. Correct directio",
+       "*   **Exemplar Reality:** No commercial hardware exemplars named because no new hardware i"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "42189f867c15d2a6",
+     "signature": {
+      "digest": "5a94cfa7db6d8abd",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "schema": "repair_convergence/1.0.0"
+     },
+     "repair_prompt_had_addendum": true,
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Historical Data Extract Interface**; *   **Description:** Software module (SQL/API query) that extracts "
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "stagnation_stop": false,
+   "repair_prompt_addendum_attempts": 2,
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 8,
+   "final_sha256_16": "42189f867c15d2a6",
+   "final_chars": 7783
   }
  ]
 }
