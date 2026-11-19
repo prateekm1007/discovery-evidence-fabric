@@ -2930,7 +2930,7 @@
    "status": "OPEN",
    "session_id": "builder-r103s1",
    "role": "EXECUTOR",
-   "kind": "standard",
+   "kind": "task",
    "base_sha": "ff507b341",
    "lease_expiry": "2026-11-22T23:59:00Z",
    "artifact_paths": [
@@ -2942,7 +2942,7 @@
     "eval/r103s1_status.json",
     "eval/r103_notice_scan_verification.json"
    ],
-   "notes": "Art. 29(b): claimed before any instrument byte. Disjointness: zero overlap with the c-0119 artifact set (the v15 generation lane, audit/holdout_v15/*, scripts/r105_*, eval/holdout_v15_generation/* are R105's canonical paths — untouched); no v15 problem byte read (the holdout integrity holds); no rubric byte read. The r100 prereg (eval/r100_core_mechanism_prereg.json) is implemented BYTE-FAITHFULLY with its parameters as module defaults — the prereg text is immutable for v14; the module is the reusable instrument for the auditor's v16 authoring. Custody: vault restored round-open (r77 path, 6 keys, digests COMMITTED_RECORD_MATCH); zero values in any record."
+   "notes": "Art. 29(b): claimed before any instrument byte. Disjointness: zero overlap with the c-0119 artifact set (the v15 generation lane, audit/holdout_v15/*, scripts/r105_*, eval/holdout_v15_generation/* are R105's canonical paths — untouched); no v15 problem byte read (the holdout integrity holds); no rubric byte read. The r100 prereg (eval/r100_core_mechanism_prereg.json) is implemented BYTE-FAITHFULLY with its parameters as module defaults — the prereg text is immutable for v14; the module is the reusable instrument for the auditor's v16 authoring. Custody: vault restored round-open (r77 path, 6 keys, digests COMMITTED_RECORD_MATCH); zero values in any record. KIND CORRECTION (self-caught by the Art. 29 suite at push+20min, disclosed Art. 5): the claim was staked with kind='standard' — an out-of-enum value (the registry enum is measurement/one_shot/task); corrected to 'task' (a multi-artifact instrument build, not a one-shot generation, not a quota-consuming measurement). The correction is forward-only on this OPEN claim's live entry (the cf95d1ab9 own-claim correction precedent); no historical claim touched."
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",

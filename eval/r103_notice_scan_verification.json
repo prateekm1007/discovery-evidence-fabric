@@ -1,0 +1,84 @@
+{
+ "record": "R103_NOTICE_SCAN_VERIFICATION/1.0.0",
+ "session": "builder-r103s1",
+ "lane": "auditor R104 direction: independently verify R105's NOTICE scan (2422208ee) — the two provisional candidates (MS Industrial-Foundation-Models weights-license, UniFault license) resolved and typed in NOTICE.md with correct attributions",
+ "audited_sha": "ff507b341",
+ "audited_notice_rows": {
+  "microsoft/Industrial-Foundation-Models": "NOTICE.md lines 143-151 (the R101/c-0116 landing @ 1d387e81e, byte-identical at ff507b341)",
+  "UniFault (emadeldeen24/UniFault)": "NOTICE.md lines 152-159 (the R101/c-0116 landing @ 1d387e81e, byte-identical at ff507b341)",
+  "r105_scan_commit": "2422208ee touched only the new 'External model releases scanned' section (lines 221-252) — the MS IFM/UniFault rows are UNCHANGED by R105; the two candidates' resolution predates the R105 scan rows and the auditor's task is the independent primary-source check of BOTH rows' license attributions"
+ },
+ "primary_source_checks": [
+  {
+   "candidate": "MS Industrial-Foundation-Models (code repo license + weights license + base-weights dependency + archived status)",
+   "checks": [
+    {
+     "claim_in_notice": "Code repo MIT (LICENSE verified)",
+     "primary_source": "GitHub API /repos/microsoft/Industrial-Foundation-Models (authenticated read, header auth, token never logged) + raw LICENSE bytes at raw.githubusercontent.com/microsoft/Industrial-Foundation-Models/main/LICENSE",
+     "observed": "license.spdx_id == 'MIT'; LICENSE file opens 'MIT License / Copyright (c) Microsoft Corporation.'",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES"
+    },
+    {
+     "claim_in_notice": "weights distributed as GTL DELTA checkpoints (microsoft/LLaMA-2-13b-GTL-Delta on HuggingFace, model card `license: mit`)",
+     "primary_source": "HuggingFace API /api/models/microsoft/LLaMA-2-13b-GTL-Delta + the model card README front-matter (unauthenticated public read)",
+     "observed": "id == 'microsoft/LLaMA-2-13b-GTL-Delta'; public, not gated; tags include 'license:mit'; README front-matter 'license: mit' with license_link pointing to the IFM repo LICENSE; card names the IFMs family (7B + 13B GTL-Delta checkpoints) and links the Microsoft IFMs repo + paper arXiv:2310.07338",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES"
+    },
+    {
+     "claim_in_notice": "the composite artifact depends on the LLaMA-2 base weights under Meta's LLaMA-2 Community License, which downstream use inherits",
+     "primary_source": "the GTL-Delta model card's own text (same read)",
+     "observed": "card states 'The model is finetuned on over 380 tabular datasets based on LLaMA-2' — the delta-checkpoint artifact is unusable without the LLaMA-2 base weights, whose distribution is governed by Meta's LLaMA-2 Community License; the inheritance reading is the standard composite-artifact analysis and matches the card",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES (the dependency is the card's own statement; the Meta license terms for LLaMA-2 are public record)"
+    },
+    {
+     "claim_in_notice": "Repo archived by the owner 2026-09-15",
+     "primary_source": "GitHub API /repos/microsoft/Industrial-Foundation-Models (same authenticated read)",
+     "observed": "archived == true; last push 2024-08-19T09:53:23Z",
+     "verdict": "ARCHIVED_STATUS CONFIRMED_FROM_PRIMARY_BYTES; the exact archive DATE (2026-09-15) is builder-asserted (the GitHub API does not expose archived_at) — typed as such, not primary-verified"
+    }
+   ],
+   "row_verdict": "RESOLVED_AND_CORRECTLY_ATTRIBUTED — every license-relevant claim in the MS IFM row reproduces from primary bytes; the one non-license detail (archive date) is typed builder-asserted"
+  },
+  {
+   "candidate": "UniFault (emadeldeen24/UniFault)",
+   "checks": [
+    {
+     "claim_in_notice": "Code MIT (LICENSE verified)",
+     "primary_source": "GitHub API /repos/emadeldeen24/UniFault (authenticated read) + raw LICENSE bytes at raw.githubusercontent.com/emadeldeen24/UniFault/main/LICENSE",
+     "observed": "license.spdx_id == 'MIT'; LICENSE file opens 'MIT License / Copyright (c) 2025 Emadeldeen Eldele'",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES"
+    },
+    {
+     "claim_in_notice": "arXiv 2504.01373 (the paper identity)",
+     "primary_source": "arXiv Atom API export.arxiv.org/api/query?id_list=2504.01373",
+     "observed": "title 'UniFault: A Fault Diagnosis Foundation Model from Bearing Data'; authors Emadeldeen Eldele, Mohamed Ragab, Xu Qing, ... (first author == the LICENSE copyright holder); abstract: machine fault diagnosis foundation model, generalization across datasets",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES"
+    },
+    {
+     "claim_in_notice": "a tiny checkpoint download is published in the README",
+     "primary_source": "raw README.md bytes (same authenticated read)",
+     "observed": "README line 6: 'Tiny Model [Download Link](https://tinyurl.com/mtdytebs)' + pretrained_models/ loading instructions",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES"
+    },
+    {
+     "claim_in_notice": "cited-by 24",
+     "primary_source": "Semantic Scholar Graph API (attempted 2026-11-19T18:2xZ)",
+     "observed": "HTTP 429 rate-limited at check time",
+     "verdict": "NOT_PRIMARY_VERIFIED (builder-asserted figure, non-license descriptive detail; typed per Art. 8 — unknown stays unknown, never silently promoted)"
+    },
+    {
+     "claim_in_notice": "No NOTICE file [in the repo]",
+     "primary_source": "the repo tree via the GitHub API (contents listing)",
+     "observed": "no NOTICE/NOTICE.md at repo root in the default branch listing",
+     "verdict": "CONFIRMED_FROM_PRIMARY_BYTES"
+    }
+   ],
+   "row_verdict": "RESOLVED_AND_CORRECTLY_ATTRIBUTED — every license-relevant claim reproduces from primary bytes; the citation count is typed not-primary-verified (non-license detail)"
+  }
+ ],
+ "verification_method": "live primary-source reads (GitHub API + raw file bytes; HuggingFace API + model card bytes; arXiv Atom API), authenticated via the vault GH_PAT in header only (never logged, never committed — digests-only custody per Art. 17); every quoted byte string above is reproduced from the fetched response, not from the NOTICE row",
+ "verdict": "BOTH PROVISIONAL CANDIDATES RESOLVED: the MS Industrial-Foundation-Models row and the UniFault row in NOTICE.md are typed with correct license attributions, and every license-relevant claim independently reproduces from primary bytes. Two non-license descriptive details are honestly typed: the IFM archive DATE (builder-asserted; archived-STATUS confirmed) and the UniFault citation count (not primary-verified at check time, 429). No code adopted in either row (the scan lane's standing rule) — the verification touches zero engine bytes.",
+ "zero_generation": true,
+ "disjointness": "disjoint from holdout-v15-generation (c-0119): zero v15 bytes read, zero canonical-path writes outside this claim's artifact set",
+ "not_claimed": "no acceptance, no score, no rubric byte — the auditor consumes this record for the AM92 scan-lane ledger"
+}
