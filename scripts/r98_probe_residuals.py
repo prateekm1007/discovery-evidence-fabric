@@ -4,12 +4,13 @@ text mined from the sealed v12 ledger (read-only, committed bytes) and
 report current verdict + the fired markers. Output drives the typed
 vocabulary extension decision table."""
 import json, re, sys
-sys.path.insert(0, "/home/z/my-project/discovery-evidence-fabric")
+from pathlib import Path
+_REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_REPO))
 from discovery_fabric.engine.tool_grounded_critic import (
     A_CLASS_RE, B_CLASS_RE, C_ACTION_RE, C_NOUN_RE, classify_bill_row)
 
-led = json.load(open("/home/z/my-project/discovery-evidence-fabric/"
-                     "eval/holdout_v12_generation/events.json"))
+led = json.load(open(str(_REPO) + "/eval/holdout_v12_generation/events.json"))
 texts = {}
 for e in led.get("events", []):
     if e.get("attempts"):

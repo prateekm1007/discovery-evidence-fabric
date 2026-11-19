@@ -22,8 +22,9 @@ import glob
 import re
 import subprocess
 import os
+from pathlib import Path
 
-REPO = "/home/z/my-project/discovery-evidence-fabric"
+REPO = str(Path(__file__).resolve().parents[1])  # worktree-relative
 OUT = (REPO + "/eval/holdout_v13_generation/p5_viability.json")
 MIN_CONFIRMED = 1
 

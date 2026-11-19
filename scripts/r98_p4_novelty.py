@@ -26,8 +26,12 @@ import json
 import glob
 import os
 import sys
+from pathlib import Path
 
-REPO = "/home/z/my-project/discovery-evidence-fabric"
+REPO = str(Path(__file__).resolve().parents[1])  # worktree-relative
+# (auditor Art. 1 v1.3.0: path-bound instruments are UNVERIFIED — the
+# harness must recompute from the clone it lives in, never a sandbox
+# absolute path)
 OUT = (REPO + "/eval/holdout_v13_generation/p4_novelty.json")
 THRESHOLD = 0.2
 MIN_ROWS = 5
@@ -60,10 +64,23 @@ def main() -> int:
     print(f"prior-art docs: {len(prior)} (v9-v12 solution rows); "
           f"candidates: {len(cand)} (v13 rows)")
     corpus = [t for _, t in prior] + [t for _, t in cand]
-    vec = TfidfVectorizer(
+    # the PREREG-TYPED union space (the prereg is the registered
+    # method; the code must match it, never the reverse — Art. 6):
+    # sklearn TfidfVectorizer char_wb ngram (3,5) UNION word (1,2),
+    # BOTH fit once over prior+candidates, hstacked (each matrix is
+    # L2-normalized by sklearn, so the union space weights each
+    # analyzer equally); deterministic given sorted corpus order.
+    import numpy as np
+    from scipy.sparse import hstack
+    vec_char = TfidfVectorizer(
         analyzer="char_wb", ngram_range=(3, 5), min_df=2,
         max_features=200000)
-    X = vec.fit_transform(corpus)
+    vec_word = TfidfVectorizer(
+        analyzer="word", ngram_range=(1, 2), min_df=2,
+        max_features=200000)
+    Xc = vec_char.fit_transform(corpus)
+    Xw = vec_word.fit_transform(corpus)
+    X = hstack([Xc, Xw]).tocsr()
     n_prior = len(prior)
     P, C = X[:n_prior], X[n_prior:]
     sims = cosine_similarity(C, P)  # candidates x prior
@@ -90,10 +107,14 @@ def main() -> int:
         "claim": "c-0113",
         "computed_at": "recomputed from committed bytes (Art. 29(c))",
         "method": {
-            "embedding": ("sklearn TfidfVectorizer — union space "
-                          "fit ONCE over prior+candidates"),
-            "analyzer": "char_wb, ngram (3,5), min_df 2, max_features "
-                        "200000",
+            "embedding": ("sklearn TfidfVectorizer — the prereg-typed "
+                          "UNION space: char_wb ngram (3,5) UNION "
+                          "word ngram (1,2), both fit ONCE over "
+                          "prior+candidates and hstacked (each "
+                          "L2-normalized; the union weights each "
+                          "analyzer equally)"),
+            "analyzer": "char_wb (3,5) + word (1,2) union, min_df 2, "
+                        "max_features 200000 each",
             "equivalence_note": ("the disclosed SPECTER2-or-equivalent "
                                  "(preregistration): SPECTER2 weights "
                                  "unreachable offline; TF-IDF char "
