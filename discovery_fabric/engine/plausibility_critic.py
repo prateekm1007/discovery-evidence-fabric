@@ -1179,8 +1179,29 @@ def _check_doi_crossref(answer):
             out.append({"doi": doi, "resolved": True,
                         "venue": venue[:120]})
         except urllib.error.HTTPError as e:
-            out.append({"doi": doi, "resolved": False,
-                        "status": getattr(e, "code", None)})
+            status = getattr(e, "code", None)
+            if status in (400, 404):
+                # DEFINITIVE client errors: the DOI as written does
+                # not resolve (400 malformed / 404 unknown) — the
+                # citation is unverifiable and the KILL stands
+                # (the oracle keeps its teeth: a fabricated citation
+                # still dies, on any runner, any network state)
+                out.append({"doi": doi, "resolved": False,
+                            "status": status})
+            else:
+                # INFRA errors (403 wall / 429 rate-limit / 5xx): the
+                # runner's shared IP being throttled by Crossref is
+                # INFRASTRUCTURE, never scientific evidence (Art. 15
+                # — infra failure is never scientific rejection; the
+                # pre-existing flake killed CLEAN corpus rows when
+                # Crossref throttled the CI runner: 2 of the last 5
+                # surface runs reded on it). Typed fail-open FLAG —
+                # the authoritative read stays the auditor's (the
+                # same semantics the machine's direction check runs
+                # under); the DOI leg keeps its strength on the
+                # deterministic paths.
+                out.append({"doi": doi, "resolved": None,
+                            "error": f"HTTP{status}"})
         except Exception as e:  # noqa: BLE001 — network/timeout/DNS
             out.append({"doi": doi, "resolved": None,
                         "error": type(e).__name__})
