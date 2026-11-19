@@ -1,0 +1,174 @@
+{
+ "record": "R96_REAL_DATA_CONFORMAL/1.0.0",
+ "executed_at": "2026-11-19T07:05:42.168346Z",
+ "executor": "builder-r96s1",
+ "claim": "c-0112",
+ "work_id": "p3-conformal-engine-wiring",
+ "engine_module": "discovery_fabric/engine/conformal_predictor.py",
+ "datasets": [
+  {
+   "record": "CONFORMAL_PREDICTOR_ENGINE/1.0.0",
+   "dataset": "C-MAPSS FD001 (train_FD001.csv; real turbofan degradation telemetry, 100 units, 21 sensor channels; the pre-registered informative set ['s4', 's12', 's13', 's15', 's20', 's21'])",
+   "custody": {
+    "dataset_id": "penikmatrumput/nasa-cmapss-rul",
+    "file": "train_FD001.csv",
+    "url": "https://huggingface.co/datasets/penikmatrumput/nasa-cmapss-rul/resolve/main/train_FD001.csv",
+    "license": "cc0-1.0 (the dataset card's declared license; NASA C-MAPSS, Saxena et al. 2008 — public domain release)",
+    "license_url": "https://huggingface.co/datasets/penikmatrumput/nasa-cmapss-rul",
+    "loader": "own (this script parses the raw 26-column CSV: unit, cycle, 3 settings, 21 sensors; no header row per the C-MAPSS release)",
+    "sha256_16": "2258c94d842a9349",
+    "bytes": 3488284,
+    "fetched_at": "2026-11-19T07:05:42.491363Z",
+    "header_row_detected": true
+   },
+   "pre_registered": {
+    "sensors": [
+     "s4",
+     "s12",
+     "s13",
+     "s15",
+     "s20",
+     "s21"
+    ],
+    "fit_fraction": 0.6,
+    "lags": 8,
+    "confidence": 0.9,
+    "ensemble": false,
+    "random_state": 17,
+    "period_assumption": {
+     "period_seconds": 21600.0,
+     "basis": "TYPED ASSUMPTION (Art. 9): 1 FD001 cycle = 1 flight cycle ~ 6 h; the raw per-cycle alert rate + its CI ride alongside as the assumption-free measurement"
+    },
+    "adaptive": {
+     "window": 64,
+     "refit_every": 8,
+     "note": "pre-registered BEFORE any coverage number was computed on the full set (the 3-unit probe typed the design, the constants were fixed at that point, then frozen)"
+    }
+   },
+   "pooled": {
+    "n_unit_sensor_series": 600,
+    "walk_steps": 49758,
+    "alerts": 23457,
+    "coverage": 0.5285783190642711,
+    "fa_budget": {
+     "record": "CONFORMAL_PREDICTOR_ENGINE/1.0.0",
+     "alerts_measured": 23457,
+     "n_steps": 49758,
+     "alert_rate": 0.47142168093572895,
+     "alert_rate_ci95": [
+      0.4670379805512205,
+      0.4758097936342768
+     ],
+     "period_seconds": 21600.0,
+     "period_assumption": "TYPED ASSUMPTION (Art. 9): the per-year conversion uses the caller-declared sampling period; the raw alert rate + CI is the assumption-free measurement",
+     "steps_per_year": 1461.0,
+     "fa_per_year": 688.7470758471,
+     "fa_per_year_ci95": [
+      682.3424895853332,
+      695.1581084996784
+     ],
+     "declared_alpha": 0.05,
+     "guarantee_note": "the interval carries coverage >= 1-alpha in distribution; the FA budget is the MEASURED walk-forward alert rate converted at the declared period — the two are typed separately and never conflated"
+    },
+    "adaptive": {
+     "walk_steps": 49758,
+     "alerts": 6587,
+     "coverage": 0.8676192773021424,
+     "fa_budget": {
+      "record": "CONFORMAL_PREDICTOR_ENGINE/1.0.0",
+      "alerts_measured": 6587,
+      "n_steps": 49758,
+      "alert_rate": 0.13238072269785764,
+      "alert_rate_ci95": [
+       0.12943129464625588,
+       0.1353869088707045
+      ],
+      "period_seconds": 21600.0,
+      "period_assumption": "TYPED ASSUMPTION (Art. 9): the per-year conversion uses the caller-declared sampling period; the raw alert rate + CI is the assumption-free measurement",
+      "steps_per_year": 1461.0,
+      "fa_per_year": 193.40823586157,
+      "fa_per_year_ci95": [
+       189.09912147817985,
+       197.80027386009928
+      ],
+      "declared_alpha": 0.05,
+      "guarantee_note": "the interval carries coverage >= 1-alpha in distribution; the FA budget is the MEASURED walk-forward alert rate converted at the declared period — the two are typed separately and never conflated"
+     },
+     "note": "the adaptive trailing-window scheme quantifies the CURRENT residual population under real degradation drift — the static collapse is the typed expected behavior (the shift leg's live proof), not a defect of the guarantee"
+    }
+   },
+   "per_sensor_adaptive": [
+    {
+     "sensor": "s12",
+     "walk_n": 8293,
+     "alerts": 746,
+     "adaptive_coverage": 0.9100446159411552
+    },
+    {
+     "sensor": "s13",
+     "walk_n": 8293,
+     "alerts": 1486,
+     "adaptive_coverage": 0.8208127336307729
+    },
+    {
+     "sensor": "s15",
+     "walk_n": 8293,
+     "alerts": 1497,
+     "adaptive_coverage": 0.8194863137585916
+    },
+    {
+     "sensor": "s20",
+     "walk_n": 8293,
+     "alerts": 997,
+     "adaptive_coverage": 0.8797781261304715
+    },
+    {
+     "sensor": "s21",
+     "walk_n": 8293,
+     "alerts": 1194,
+     "adaptive_coverage": 0.8560231520559508
+    },
+    {
+     "sensor": "s4",
+     "walk_n": 8293,
+     "alerts": 667,
+     "adaptive_coverage": 0.9195707222959122
+    }
+   ],
+   "refusals_typed": {},
+   "typed_next_lever": "the residual adaptive gap (pooled < the declared 0.90) is dominated by the FD001 operational-condition structure (3 operating regimes cause level shifts the trailing window pays for per transition): the typed next lever is settings-CONDITIONED calibration (cluster the calibration window by the 3 declared operating settings before the residual quantile) — pre-registered for the next round, never tuned into this one's numbers",
+   "full_per_unit_table": {
+    "committed": false,
+    "reason": "Art. 27: diagnostics commit only when they gate a decision — the decision-gating views (pooled + per-sensor adaptive) are committed; the 600-row per-unit table is RECOMPUTABLE byte-identically from the committed loader + the pre-registered constants (the fetch digest is in custody)",
+    "n_rows": 600
+   }
+  },
+  {
+   "record": "CONFORMAL_PREDICTOR_ENGINE/1.0.0",
+   "dataset": "DavidNguyen/XJTU-SY_Bearing_Datasets",
+   "format": "multi-part RAR archives (Data/....part01.rar..part05)",
+   "source": "https://huggingface.co/datasets/DavidNguyen/XJTU-SY_Bearing_Datasets",
+   "license": "unspecified on the mirror card (the upstream XJTU-SY release, Wang et al. 2018, is a public academic bearing-dataset release; the license row stays UNRESOLVED until the mirror card declares one — typed, never guessed)",
+   "loader": "own (planned: RAR part concat + extract -> per-bearing 1Hz vibration CSV -> RMS per 1-min file)",
+   "status": "INFRA_SKIP",
+   "reason": "the mirror ships the telemetry as multi-part RAR archives; no RAR extractor is present in this sandbox and a partial archive is never parsed (typed fail-closed)",
+   "typed_at": "2026-11-19T07:06:56.603098Z",
+   "note": "infrastructure failure is never scientific rejection (Art. 15): the loader contract is committed; the eval lands when the hosting is reachable (the next round's typed next step)"
+  },
+  {
+   "record": "CONFORMAL_PREDICTOR_ENGINE/1.0.0",
+   "dataset": "CWRU Bearing Data Center (engineering.case.edu)",
+   "format": "raw .mat (12kHz/48kHz DriveEnd/FanEnd)",
+   "source": "https://engineering.case.edu/bearingdatacenter",
+   "license": "public academic release (the CWRU BDC page; the mirror cards found on HF are QA-style derivatives, not the raw telemetry — typed)",
+   "loader": "own (planned: scipy.io.loadmat -> DriveEnd vibration -> RMS windows)",
+   "status": "INFRA_SKIP",
+   "reason": "the raw .mat host (engineering.case.edu) is unreachable from this sandbox and the HF mirror hits are QA-style derivatives, not the raw telemetry (typed fail-closed)",
+   "typed_at": "2026-11-19T07:06:56.603114Z",
+   "note": "infrastructure failure is never scientific rejection (Art. 15): the loader contract is committed; the eval lands when the hosting is reachable (the next round's typed next step)"
+  }
+ ],
+ "honesty_note": "the coverage numbers are MEASURED walk-forward coverage on real telemetry; the FA budgets are the MEASURED alert rates converted at the TYPED declared periods (the assumption-free raw rates ride alongside); the typed skips carry the gap as evidence (Art. 15) — nothing is fabricated, nothing silently assumed (Art. 9)",
+ "digest_note": "canonical_digest covers the wall-clock-stripped projection (Art. 15/F64: no wall-clock bytes inside hashed inputs); a re-run reproduces it byte-identically",
+ "canonical_digest": "0e8b1ffa4481924a"
+}
