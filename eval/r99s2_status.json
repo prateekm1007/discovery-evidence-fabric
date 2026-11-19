@@ -35,8 +35,8 @@
  },
  "remote_ci": {
   "pushed_sha": "66c669577",
-  "remote_ci_conclusion": "pending",
-  "note": "finalized by the post-push read (r41_remote_ci_read.py --apply or the typed unauthenticated fallback): GH_PAT is ABSENT from this reprovisioned sandbox's custody (typed), so the read is either unauthenticated (public repo; the IP hit the 60/hr unauthenticated limit at ~11:00Z, reset ~12:00Z typed) or typed 'unreadable' with the API response quoted — an asserted green is forbidden (D2)"
+  "remote_ci_conclusion": "unreadable",
+  "note": "TYPED READ ATTEMPTS (both quoted from the API responses, never asserted): (1) ~11:05Z unauthenticated GET /commits/39489a780/check-runs -> rate limit exceeded for egress IP 8.212.10.159 (60/60 anonymous core quota); (2) ~12:10Z unauthenticated GET /commits/66c669577/check-runs + /commits/0a15f59f1/check-runs -> rate limit exceeded for egress IPs 47.57.242.119 / 47.57.232.232 (the sandbox egress ROTATES, so each fresh IP may already be quota-exhausted; the unauthenticated fallback is UNRELIABLE here); (3) the authenticated path (r41_remote_ci_read.py) is unavailable — GH_PAT absent from this window's custody (the Art. 28 escalation stands). The base tips' last AUTHENTICATED read stands at the executor's r100s1 record (66c669577 lineage: success). THIS record's own chain (8310273fc..36ef9f493) is UNPUSHED (credential-blocked) so it has no check-runs to read; 'unreadable' is the honest conclusion, no green claimed (D2)"
  },
  "PUSH_BLOCKED_typed": {
   "state": "the verifier lane is COMMITTED locally (8310273fc on builder-r99s1, a clean fast-forward on top of the remote tip 66c669577 — diff-against-remote verified) but the PUSH IS BLOCKED: the sandbox reprovision lost every credential (no .env.keys / .netrc / .git-credentials / gh CLI / env tokens anywhere in the home tree, all typed; the git credential helper /home/z/.git-vault-cred.sh is absent) and the ONLY owner-delivered credential this window is the HF token, which is HF-scoped and cannot push to GitHub",
