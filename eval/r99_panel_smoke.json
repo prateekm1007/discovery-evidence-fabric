@@ -1,0 +1,168 @@
+{
+ "record": "R99_BLIND_PANEL/1.0.0",
+ "mode": "smoke-3-burned-rows",
+ "blindness_contract": {
+  "agent_sees": [
+   "anonymized problem statement",
+   "anonymized solution text"
+  ],
+  "agent_never_sees": [
+   "generator identity",
+   "model names",
+   "other agents' ratings",
+   "rubric",
+   "problem_id / run provenance"
+  ],
+  "shuffle_seed": 9851,
+  "label_map_local_only": true
+ },
+ "agents": [
+  {
+   "id": "A1",
+   "family": "cohere",
+   "model": "cohere/command-a",
+   "transport": "xkiro",
+   "max_tokens": 512
+  },
+  {
+   "id": "A2",
+   "family": "cohere",
+   "model": "cohere/command-a-plus",
+   "transport": "xkiro",
+   "max_tokens": 1400
+  },
+  {
+   "id": "A3",
+   "family": "z-ai-sdk",
+   "model": "z-ai chat (sdk default)",
+   "transport": "zai-cli"
+  }
+ ],
+ "best_effort_family_widening": [
+  {
+   "family": "openai/gpt-5.6-terra",
+   "status": "unavailable",
+   "error": "<HTTPError 503: 'Service Unavailable'>"
+  },
+  {
+   "family": "anthropic/claude-sonnet-4.6",
+   "status": "unavailable",
+   "error": "<HTTPError 503: 'Service Unavailable'>"
+  }
+ ],
+ "panel_valid": true,
+ "agents_served": [
+  "A1",
+  "A2",
+  "A3"
+ ],
+ "families_served": [
+  "cohere",
+  "z-ai-sdk"
+ ],
+ "generator_family_isolated": true,
+ "ratings": [
+  {
+   "label": "R01",
+   "anon_sha16": "c67c524c472ed91c",
+   "ratings": {
+    "A1": {
+     "non_obviousness": 4,
+     "viability": 5,
+     "rationale": "The proposal effectively combines duty-cycled PCI injection with counter-phased blast humidity modulation to reduce time-averaged raceway temperature, leveraging existing control systems without hardware changes, which is both innovative and practical.",
+     "recognizes_known_practice": false,
+     "agent": "A1",
+     "served": "cohere/command-a",
+     "family": "cohere",
+     "latency_s": 2.4
+    },
+    "A2": {
+     "non_obviousness": 4,
+     "viability": 4,
+     "rationale": "Duty-cycling PCI injection while inversely raising blast humidity reduces peak raceway temperature, directly lowering copper erosion at the tuyere nose.",
+     "recognizes_known_practice": false,
+     "agent": "A2",
+     "served": "cohere/command-a-plus",
+     "family": "cohere",
+     "latency_s": 4.1
+    },
+    "A3": {
+     "non_obviousness": 4,
+     "viability": 3,
+     "rationale": "The solution is viable but carries a significant risk of thermal instability and operational penalties due to the large, rapid swings in PCI flow, which are not adequately mitigated by the proposed humidity modulation.",
+     "recognizes_known_practice": false,
+     "agent": "A3",
+     "served": "glm-4-plus",
+     "family": "z-ai-sdk",
+     "latency_s": 1.5
+    }
+   }
+  },
+  {
+   "label": "R02",
+   "anon_sha16": "357993f09371b5f4",
+   "ratings": {
+    "A1": {
+     "non_obviousness": 4,
+     "viability": 5,
+     "rationale": "The proposal leverages a nuanced understanding of thermal gradient control and dissolution kinetics to address the problem without requiring tank redesign, making it both innovative and practical within the given constraints.",
+     "recognizes_known_practice": false,
+     "agent": "A1",
+     "served": "cohere/command-a",
+     "family": "cohere",
+     "latency_s": 3.0
+    },
+    "A2": {
+     "non_obviousness": 4,
+     "viability": 3,
+     "rationale": "The proposal relies on a physically questionable assumption that a modest crown cooling will lower local melt viscosity and boost stone dissolution, which lacks empirical support.",
+     "recognizes_known_practice": false,
+     "agent": "A2",
+     "served": "cohere/command-a-plus",
+     "family": "cohere",
+     "latency_s": 12.3
+    },
+    "A3": {
+     "non_obviousness": 4,
+     "viability": 3,
+     "rationale": "The core idea of deliberately lowering the crown temperature to increase thermal gradient and enhance convection is novel and well-supported by the physics, but the specific 25K drop for 30 minutes every 4 hours is an unproven operational parameter that risks thermal shock to the refractory.",
+     "recognizes_known_practice": false,
+     "agent": "A3",
+     "served": "glm-4-plus",
+     "family": "z-ai-sdk",
+     "latency_s": 1.9
+    }
+   }
+  },
+  {
+   "label": "R03",
+   "anon_sha16": "60e403b4faa7132c",
+   "ratings": {
+    "A1": {
+     "non_obviousness": 4,
+     "viability": 5,
+     "rationale": "The proposal effectively leverages thermodynamic principles to reduce heat-stable salt accumulation by modulating lean loading and reclaim scheduling, avoiding thermal stress spikes without requiring redesign.",
+     "recognizes_known_practice": false,
+     "agent": "A1",
+     "served": "cohere/command-a",
+     "family": "cohere",
+     "latency_s": 1.7
+    },
+    "A2": {
+     "error": "ValueError(\"no JSON object in reply: ''\")",
+     "agent": "A2"
+    },
+    "A3": {
+     "non_obviousness": 2,
+     "viability": 4,
+     "rationale": "The proposal is viable as it operates within constraints and leverages available signals, but its core mechanism of lowering lean loading to reduce HSS accumulation is a known, standard industrial practice, not a novel insight.",
+     "recognizes_known_practice": true,
+     "agent": "A3",
+     "served": "glm-4-plus",
+     "family": "z-ai-sdk",
+     "latency_s": 1.5
+    }
+   }
+  }
+ ]
+}

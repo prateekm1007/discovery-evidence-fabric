@@ -71,6 +71,45 @@ is public-domain factual knowledge and is encoded in our own files
   relations (D4 extension, planned).
 - allenai/SPECTER2 (Apache-2.0) — paper-novelty embeddings (D4,
   planned; TF-IDF cosine gate first per AM44 D3).
+  R99 RUNTIME REALITY (AM85 direction 3): the weights ARE now fetched
+  and served from the vault HF token (allenai/specter2_base +
+  allenai/specter2 proximity adapter, loaded via the adapter stack
+  per the model card; zero generation). The live calibration typed a
+  METHOD FINDING: SPECTER2's within-industrial-text scale is
+  domain-cohesive (faithful paraphrases 0.039-0.050; extremal
+  cross-domain anchors 0.13-0.15 from a textbook control; the burned
+  v13 corpus 0/30 at an absolute 0.2 gate, distances 0.049-0.062) —
+  the AM85 0.2 ABSOLUTE gate is scale-invalid for SPECTER2 on
+  within-domain texts; the semantic novelty gate is typed
+  DISTRIBUTION-CALIBRATED (min-distance > the prior corpus's own
+  pairwise p95) with the absolute numbers disclosed verbatim
+  (eval/r99_p4_specter2_calibration.json). TF-IDF remains the AM85
+  absolute-gate leg; SPECTER2 corroborates semantically.
+- CoRector/cohere + z-ai SDK — BLIND PANEL VENDORS (R99, AM85
+  direction 4): the blind cross-family rating panel serves
+  cohere/command-a and cohere/command-a-plus over the xkiro
+  transport (browser UA per the R58 contract) and the z-ai SDK chat
+  model; each vendor is used per its own API terms; no vendor sees
+  generator identity, other agents' ratings, or any rubric
+  (scripts/r99_blind_panel.py, the typed blindness contract).
+- China/global AI4Science scan (AM85 direction 6; license-verified
+  via live web read 2026-11-19):
+  - Time-MoE (github.com/Time-MoE/Time-MoE, ICLR'25 Spotlight,
+    Apache-2.0) — billion-scale MoE time-series FM; the FM-eval leg
+    candidate for the conformal FA-control real-data runs (typed
+    next step in the MAPIE row above).
+  - MOMENT (github.com/moment-timeseries-foundation-model/moment,
+    Auton Lab CMU, MIT) — open time-series FM family; second FM-eval
+    candidate, same typed next step.
+  - Intern-S1 (github.com/InternLM/Intern-S1, Shanghai AI Lab,
+    Apache-2.0) — scientific multimodal FM; scanned for the
+    novelty/viability legs (no code adopted this round; the panel
+    and FM-eval lanes are the typed adoption surfaces).
+- pyribs (BSD-3-Clause) — NOT ADOPTED, typed: no pyribs import
+  exists anywhere in the tree; the quality-diversity mechanics are
+  the c-0110 AIDE controller + the histogram caps (our own
+  implementation). No attribution obligations arise; the row exists
+  so the AM85 worldwide-module check is honest about non-use.
 - UKGovernmentBEIS/inspect_ai (MIT) — standard eval transcripts (D8,
   planned).
 - SwanHubX/SwanLab (Apache-2.0) — experiment tracking ledger (D8,
