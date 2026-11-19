@@ -30,10 +30,17 @@ AUDIT_REF = "origin/audit/r11-auditor-verdict-20261114"
 RECORD = "R99_DISJOINTNESS_GUARD/1.0.0"
 
 
-def assemble_prior_corpus(prior_versions=range(1, 13)) -> str:
+def assemble_prior_corpus(prior_versions=range(1, 13),
+                          include_dev12=True,
+                          min_chars=100000) -> str:
     """The full prior problem text: v1-v12 (audit branch) + dev12 by
     default (the battery pin); the v14 lane passes range(1, 14) to
-    include the v13 problems (the AM87 FULL v1-v13 corpus)."""
+    include the v13 problems (the AM87 FULL v1-v13 corpus).
+
+    Pairwise mode passes include_dev12=False and min_chars=0 for a
+    SINGLE version's text (a one-version slice can be small by
+    design; the vacuity floor is enforced on the FULL assembly,
+    which every pairwise run also records)."""
     text = ""
     for v in prior_versions:
         # v13 is builder-authored on the QUEUE branch (no audit-ref
@@ -52,14 +59,15 @@ def assemble_prior_corpus(prior_versions=range(1, 13)) -> str:
                 f"(typed abort — a silently skipped version is the "
                 f"vacuity class; fetch the refs first)")
         text += r.stdout.decode("utf-8", "replace").lower()
-    r = subprocess.run(["git", "show", "HEAD:eval/problems_dev12.json"],
-                       capture_output=True, cwd=str(REPO))
-    if r.returncode == 0:
-        text += r.stdout.decode("utf-8", "replace").lower()
-    if len(text) <= 100000:
+    if include_dev12:
+        r = subprocess.run(["git", "show", "HEAD:eval/problems_dev12.json"],
+                           capture_output=True, cwd=str(REPO))
+        if r.returncode == 0:
+            text += r.stdout.decode("utf-8", "replace").lower()
+    if len(text) <= min_chars:
         raise RuntimeError(
             f"prior corpus assembly failed ({len(text)} chars <= "
-            f"100000; typed abort — the vacuous-check class never "
+            f"{min_chars}; typed abort — the vacuous-check class never "
             f"again; fetch the audit ref first)")
     return text
 
@@ -228,6 +236,76 @@ DOMAIN_HEAD_MAPS = {"v13": V13_DOMAIN_HEAD, "v14": V14_DOMAIN_HEAD,
                     "v15": V15_DOMAIN_HEAD}
 
 
+def derive_target_version(problems: list) -> int:
+    """The target set's OWN version, derived from its problem ids
+    (\"HO15-01-...\" -> 15; the \"HO<NN>\" first segment). Raises
+    typed when the ids carry no HO<NN> prefix (unknown shape ->
+    refuse, never guess)."""
+    segs = {p["problem_id"].split("-")[0].upper() for p in problems}
+    if len(segs) != 1:
+        raise RuntimeError(
+            f"target problem ids carry {len(segs)} distinct first "
+            f"segments {sorted(segs)} (typed abort — the target "
+            f"version must be derivable to enforce the "
+            f"self-comparison refusal; never guess)")
+    seg = next(iter(segs))
+    digits = seg[2:] if seg.startswith("HO") else ""
+    if not digits.isdigit():
+        raise RuntimeError(
+            f"target id segment {seg!r} is not the HO<NN> form "
+            f"(typed abort — the target version must be derivable "
+            f"to enforce the self-comparison refusal)")
+    return int(digits)
+
+
+def check_self_comparison(target_version: int, prior_versions) -> None:
+    """THE AUDITOR R105 D7 RULE (typed, fail-closed): a set checked
+    against a corpus CONTAINING itself is a self-comparison — every
+    row's own device/failure words are in the corpus, so the clash
+    count is meaningless (the deleted 54/55-clash 'self-clash proof'
+    usage). Refused BEFORE any corpus assembly."""
+    if target_version in set(prior_versions):
+        raise RuntimeError(
+            f"SELF_COMPARISON_REFUSED: target v{target_version} is "
+            f"inside the prior-corpus range "
+            f"v{min(prior_versions)}-v{max(prior_versions)} — a set "
+            f"checked against itself is meaningless (the auditor "
+            f"R105 verdict D7 deleted the self-clash-proof usage; "
+            f"typed refusal, exit 2). Legitimate forms check the "
+            f"target against corpora EXCLUDING it.")
+
+
+def run_pairwise(problems: list, domain_head: dict, target_version: int,
+                 prior_versions, record: dict) -> dict:
+    """Pairwise mode: the target set checked against EACH prior
+    version ALONE (+ dev12 alone) — the pairwise-disjointness chain
+    as committed JSON artifacts (the auditor R105 D6 item), not
+    prose-only status lines. Returns the record; the caller writes
+    it."""
+    pairs = []
+    for v in prior_versions:
+        text = assemble_prior_corpus(range(v, v + 1),
+                                     include_dev12=False, min_chars=0)
+        clashes = check_problems(problems, domain_head, prior_text=text)
+        pairs.append({"target": f"v{target_version}", "prior": f"v{v}",
+                      "prior_chars": len(text), "clashes": clashes,
+                      "count": len(clashes)})
+    text = assemble_prior_corpus(range(1, 1), include_dev12=True,
+                                 min_chars=0)
+    if len(text) <= 1000:
+        raise RuntimeError(
+            f"dev12 bank unreadable/empty for the pairwise record "
+            f"({len(text)} chars; typed abort — an empty prior in a "
+            f"pairwise row is the vacuity class, never a pass)")
+    clashes = check_problems(problems, domain_head, prior_text=text)
+    pairs.append({"target": f"v{target_version}", "prior": "dev12",
+                  "prior_chars": len(text), "clashes": clashes,
+                  "count": len(clashes)})
+    record["pairs"] = pairs
+    record["pairwise_total_clashes"] = sum(p["count"] for p in pairs)
+    return record
+
+
 def main() -> int:
     """CLI: check a committed problems file against the prior corpus.
     Exit 0 = clean; exit 1 = clashes (typed, printed); exit 2 = abort.
@@ -239,14 +317,31 @@ def main() -> int:
     audit branch, not the queue HEAD). --versions extends the prior
     corpus (v14 REQUIRES 1-13). Fail-closed: a problem whose id prefix
     has NO entry in the selected map aborts typed — an unchecked row
-    is never a pass (the vacuity class, typed)."""
+    is never a pass (the vacuity class, typed).
+
+    SELF-COMPARISON (auditor R105 verdict D7): the target version is
+    derived from its own problem ids; a target inside the corpus
+    range is refused typed (exit 2, SELF_COMPARISON_REFUSED) BEFORE
+    any corpus assembly — the meaningless self-clash-proof usage is
+    deleted.
+
+    PAIRWISE RECORDS (auditor R105 verdict D6):
+      r99_disjointness_guard.py <ref>:audit/holdout_v15/... --map v15
+          --versions 1-14 --pairwise-json eval/r99_disjointness_pairwise_records.json
+    writes the per-pair (target vs each prior version + dev12) record."""
     import sys
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     opts = [a for a in sys.argv[1:] if a.startswith("--")]
-    if len(args) != 1:
+    pairwise_out = None
+    for o in opts:
+        if o.startswith("--pairwise-json"):
+            pairwise_out = o.split("=", 1)[-1]
+    if len(args) != 1 or (pairwise_out is not None
+                          and len(args) != 1):
         print("usage: r99_disjointness_guard.py "
               "<[REF:]audit/holdout_vNN/..._problems.json> "
-              "[--map v13|v14|v15] [--versions 1-13]")
+              "[--map v13|v14|v15] [--versions 1-13] "
+              "[--pairwise-json OUT]")
         return 2
     spec, = args
     ref = "HEAD"
@@ -278,6 +373,45 @@ def main() -> int:
               f"(typed abort — an unchecked row is never a pass): "
               f"{unknown}")
         return 2
+    # THE AUDITOR R105 D7 RULE — before any corpus assembly: a target
+    # inside the prior-corpus range is a self-comparison (a set
+    # checked against itself); typed refusal, never a clash count.
+    try:
+        target_version = derive_target_version(problems)
+        check_self_comparison(target_version, prior_versions)
+    except RuntimeError as e:
+        print(str(e))
+        return 2
+    if pairwise_out is not None:
+        record = {
+            "record": "R99_DISJOINTNESS_PAIRWISE/1.0.0",
+            "target_version": target_version,
+            "target_spec": f"{ref}:{path}",
+            "prior_versions": [f"v{v}" for v in prior_versions],
+            "note": ("the auditor R105 verdict D6 item: the pairwise "
+                     "disjointness chain as committed JSON artifacts "
+                     "(target vs EACH prior version alone + dev12 "
+                     "alone), not prose-only status lines"),
+        }
+        record = run_pairwise(problems, sel_map, target_version,
+                              prior_versions, record)
+        with open(REPO / pairwise_out, "w") as f:
+            json.dump(record, f, indent=1, ensure_ascii=False)
+            f.write("\n")
+        bad = [p for p in record["pairs"] if p["count"]]
+        if bad:
+            for p in bad:
+                for c in p["clashes"][:3]:
+                    print(f"  {p['target']} vs {p['prior']}: "
+                          f"{c['problem_id']} {c['token']!r}")
+            print(f"PAIRWISE VIOLATIONS on {len(bad)} pair(s) "
+                  f"(record written to {pairwise_out})")
+            return 1
+        print(f"{RECORD}: pairwise 0 clashes — {len(record['pairs'])} "
+              f"pairs ({', '.join(p['prior'] for p in record['pairs'])}) "
+              f"({len(problems)} rows checked, word-boundary domain "
+              f"heads); record written to {pairwise_out}")
+        return 0
     prior_text = assemble_prior_corpus(prior_versions)
     clashes = check_problems(problems, sel_map, prior_text)
     if clashes:

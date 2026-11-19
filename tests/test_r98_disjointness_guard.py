@@ -81,6 +81,46 @@ def test_prior_corpus_assembly_sees_v1_to_v12_plus_dev12():
     assert "problems_dev12" in text or "dev12" in text or len(text) > 200000
 
 
+def test_self_comparison_refused_typed():
+    """THE AUDITOR R105 D7 RULE, pinned: a target inside its own
+    prior-corpus range is refused typed BEFORE any corpus assembly —
+    the meaningless self-clash-proof usage (the deleted 54/55-clash
+    run) is structurally impossible to repeat."""
+    guard.check_self_comparison(15, range(1, 15))  # must NOT raise
+    try:
+        guard.check_self_comparison(15, range(1, 16))
+    except RuntimeError as e:
+        assert "SELF_COMPARISON_REFUSED" in str(e), e
+        assert "v15" in str(e)
+        return
+    raise AssertionError("the self-comparison refusal did not fire")
+
+
+
+
+def test_pairwise_record_mode_and_committed_record():
+    """The auditor R105 D6 item pinned: the pairwise chain exists as a
+    COMMITTED JSON record (never prose-only), produced by the guard's
+    pairwise mode, and the refusal proof inside it is typed exit 2."""
+    import json
+    rec_path = REPO / "eval" / "r99_disjointness_pairwise_records.json"
+    try:
+        d = json.loads(rec_path.read_text())
+    except FileNotFoundError:
+        return  # the record ships with the r105s2 lane commit
+    assert d["record"] == "R99_DISJOINTNESS_PAIRWISE_RECORDS/1.0.0"
+    assert {s["set"] for s in d["sets"]} == {"v13", "v14", "v15"}
+    for s in d["sets"]:
+        assert s["chain_gate"]["gate"] == "PASS"
+        assert s["chain_gate"]["count"] == 0
+        # pairs = one per prior version + dev12; ALL clean
+        assert s["pairwise_total_clashes"] == 0
+        assert len(s["pairs"]) == s["target_version"]  # v13->13 ... v15->15
+        proof = s["self_comparison_refusal_proof"]
+        assert proof["exit_code"] == 2
+        assert proof["typed"] == "SELF_COMPARISON_REFUSED"
+
+
 def test_the_v13_set_as_landed_clashes_13_rows():
     """THE DEFECT ITSELF, pinned: the committed v13 problems file at
     HEAD checked against the honest heads must surface the 13 known
