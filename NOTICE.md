@@ -37,7 +37,12 @@ is public-domain factual knowledge and is encoded in our own files
   steps). Our own code, no upstream bytes.
 - WecoAI/aideml (MIT) — `aide/agent.py`, `aide/journal.py`, `aide/interpreter.py`
   candidate-population tree search patterns (D2 direction; the current V8.1.1
-  population search is our own implementation, informed by the AIDE architecture).
+  population search is our own implementation, informed by the AIDE architecture;
+  R95 claim c-0110 lands the engine-native repair-slot controller
+  `discovery_fabric/engine/aide_tree_search.py` — best-first parent selection on
+  the machine's own finding surface, metric-pruned frontier, diverse
+  process-only angle roster, incumbent-parity mode; pattern copy only, zero
+  upstream code bytes).
 - noahshinn/reflexion (MIT) — the verbal self-reflection MEMORY pattern
   (failure signature + lesson carried across repair attempts, quoted back
   neutrally); copied as a pattern into `scripts/r80_repair_convergence.py`
@@ -107,6 +112,15 @@ benchmark result; it is treated as motivation only, never as evidence.
   AFTER a reflection-augmented repair), instead of burning the fixed
   repair budget on non-improving repairs. Same two implementations
   and same pattern-copy-only terms as above.
+- WecoAI/aideml (MIT; AM82 direction 2) — the best-first tree-search
+  pattern over diverse candidates, metric-pruned: copied into
+  `discovery_fabric/engine/aide_tree_search.py` (claim c-0110) — the
+  single-chain repair loop becomes a best-first population search over
+  distinct structural repair angles, scored ONLY by the machine's own
+  finding surface (scan battery + critic + type gate), budget-matched
+  (the controller adds zero LLM calls), incumbent-parity mode
+  (population=False reduces exactly to the frozen single chain).
+  Pattern copy only — zero upstream code bytes.
 - ChemMCP (Apache-2.0; license-verified AM81/R93) — chemistry-tool
   integration pattern (LLM calls chemistry tools instead of guessing
   chemistries; planned P2 generation-side complement, AM81).
