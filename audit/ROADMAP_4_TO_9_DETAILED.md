@@ -57,3 +57,28 @@ Deep research of GitHub/global sources; licenses read via GitHub API. Copy only 
 
 ### Integration discipline
 Every copied technique: (1) attribution+NOTICE; (2) a deterministic acceptance test wired into CI (exists-but-does-not-gate is a defect); (3) ablated at matched budget on DEV before adoption, deleted if it doesn't earn its place; (4) no frozen-file edits without a conscious CI-gated re-freeze; (5) generation-side improvement, not just another detection bind (AM78 P3).
+
+
+## COPYABLE TECHNIQUES — UPDATE 2 (R93, worldwide incl. China; license-verified via GitHub API)
+Continuing the worldwide search per owner directive. New license-verified copyable items mapped to current gaps:
+
+### Time-series foundation models (P3 predictors — replace hand-rolled inference)
+- Time-MoE (Time-MoE/Time-MoE, Apache-2.0, ICLR 2025 Spotlight): time-series foundation model scaled to 2.4B params, zero-shot forecast/anomaly. Acceptance: predictors validated on C-MAPSS/XJTU-SY/CWRU with conformal FA control (MAPIE).
+- MOMENT (moment-timeseries-foundation-model/moment, MIT, ICML'24): open time-series foundation model family (forecast/anomaly/classification/imputation/embeddings); pre-trainable on own data. Acceptance: same predictor gate.
+- (TimesFM/Chronos already in Update 1; Moirai EXCLUDED CC BY-NC.)
+
+### Chemistry tool integration (the inverted-equilibrium / chemistry-correctness lever)
+- ChemMCP (osu-nlp-group/chemmcp, Apache-2.0): MCP-compatible chemistry toolkit for LLM agents — wire equilibrium/property tools into the generation loop so chemistry claims are tool-verified, not guessed.
+- CACTUS (pnnl/cactus, BSD-2-Clause): LLM agent + cheminformatics tools (PNNL). Complement to ChemCrow (MIT).
+- Cantera (BSD-3, Update 1) remains the strongest fix: equilibrate() COMPUTES equilibrium composition; check the claimed direction against the computed result (kills the HO10-03/HO11-03 class at the source).
+
+### Convergence / self-evolution (the repair-loop convergence gate, AM78 P2)
+- Awesome-Self-Evolving-Agents (XMUDeepLIT, Xiamen U) — PAPER LIST only (no code license; use as a survey of self-evolving patterns, not copyable code). Reflexion (MIT) + Self-Refine (Apache-2.0) remain the copyable convergence patterns (already prototyped in scripts/r80_repair_convergence.py, c-0105 — DEV-stage, NOT yet wired into the frozen machine).
+
+### Quality diversity (monoculture)
+- qdpy (Map-Elites/CVT-Map-Elites/NSLC/SAIL) + VQ-Elites (unsupervised problem-agnostic QD) complement pyribs (MIT, Update 1).
+
+### Frontier model class (AM78 P5 — acceptance runs need a serving frontier model)
+- Intern-S1-Pro (Shanghai AI Lab, open-sourced Feb 2026, trillion-param science multimodal): POTENTIAL frontier-class generator, but GitHub license NONE/unverified — DO NOT copy until license confirmed; track as a candidate serving model for acceptance runs (the owner-funded-allowance path remains primary).
+
+### Integration discipline (unchanged, AM79): attribution+NOTICE, CI-wired acceptance test, matched-budget DEV ablation before adoption, no frozen edits without CI-gated re-freeze, generation-side improvement not just detection binds. NOTE F81: the c-0105 convergence prototype's Reflexion/Self-Refine attribution is MISSING from NOTICE.md — fix before wiring into the frozen machine.
