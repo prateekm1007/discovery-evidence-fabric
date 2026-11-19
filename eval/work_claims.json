@@ -2649,6 +2649,15 @@
    "finding": "commit lacks Session:/Work-Id: trailers (Art. 29(a)) — caught by tests/test_article29_parallel_coordination.py on this push's own CI read; the same push also carried the session's first claim (c-0104) before the session was registered in sessions{}",
    "status": "DISCLOSED_PENDING_REMEDIATION",
    "note": "F36 typed allowance pattern (the R47 precedent): pushed history is never rewritten (Art. 4); remediation is forward — the remediation commit registers session builder-r80s1, registers THIS violation typed, and itself carries Session: builder-r80s1 + Work-Id: holdout-v11-generation trailers; all builder-r80s1 commits from this disclosure onward carry trailers. The commit's CONTENT is unaffected: the verifier record eval/r92_v11_verifier_c0104.json (verdict VERIFIED) and the c-0102/c-0104 registry flips stand as landed."
+  },
+  {
+   "sha": "aababd100",
+   "session": "builder-r80s1",
+   "detected_by": "builder-r80s1",
+   "detected_at": "2026-11-19T04:42:02Z",
+   "finding": "commit carries Session:/Work-Id: on ONE line (a formatting defect of the c-0107 commit command): git parses that as a single malformed Session trailer with the Work-Id inline in its value, so the Work-Id TRAILER is absent — caught by tests/test_article29_parallel_coordination.py on the push's own CI read (the same F36-class validator, second instance in this session: 63d6b3f5c lacked trailers outright, aababd100 carried them malformed)",
+   "status": "DISCLOSED_PENDING_REMEDIATION",
+   "note": "F36 typed allowance pattern (the R47 precedent): pushed history is never rewritten (Art. 4); remediation is forward — the remediation commit registers THIS violation typed, itself carries Session: builder-r80s1 + Work-Id: chemistry-computed-equilibrium-dev as SEPARATE trailer lines, and every builder-r80s1 commit from here onward carries properly-formatted trailers (session self-check: git log -1 --format='%(trailers)' must show BOTH lines separately BEFORE pushing). Content unaffected: the c-0107 chemistry prototype (scripts/r80_chemistry_equilibrium.py + 12 CI-wired tests + workflow wiring + NOTICE attribution) is green and stands as landed."
   }
  ],
  "canonical_claim_violations": [
