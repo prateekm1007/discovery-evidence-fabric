@@ -8,7 +8,7 @@
   "AUDIT_LEDGER.json"
  ],
  "audited_heads": {
-  "queue/dev12_r7": "e660ae71b",
+  "queue/dev12_r7": "0eb7c23d9",
   "r11_1.0.0": "eff41950660ce8eae35cf75cf943c79cbbbbc1df"
  },
  "findings": [
@@ -2936,6 +2936,19 @@
     "Worldwide update 3 (license-verified): CRITIC tool-grounding (microsoft/ICLR23 + CriticEval MIT) for generation-time chemistry verification (wire Cantera/ChemMCP/CACTUS into critic/generator); AIDE (WecoAI/aideml MIT) tree search to replace single-chain repair (population search over diverse candidates, metric-pruned); ChemAgent (137 tools), MatClaw (code-first materials agent), K-Dense-AI/scientific-agent-skills (177 skills), synthesis-agent (Materials Project similarity search).",
     "Score stays 5. The path to 6: wire CRITIC tool-grounding (c-0107 Cantera + ChemMCP) into the generator so chemistry claims are tool-verified at generation time; wire AIDE tree search to replace the single-chain repair loop; v12 sealed one-shot -> mean>=3.25 CI>3.0."
    ]
+  },
+  {
+   "id": "AM83",
+   "date": "2026-11-19",
+   "status": "ISSUED",
+   "reason": "R96 auditor: R95 c-0110 AIDE tree-search VERIFIED + c-0109 canonical acknowledged + failure chain typed + D2 discipline restored",
+   "changes": [
+    "R95 VERIFIED from committed bytes: c-0110 AIDE tree-search (305 lines, 14 CI-wired tests, 34.7% engine share F63-clean) implements all claimed features: population search (diversity not memory), best-first parent selection, metric-pruned top-2 frontier, DISTINCT process-only structural angles (sha256 content-seeded, never Python hash), budget-matched (zero added LLM calls, incumbent-parity mode population=False). NOTICE WecoAI/aideml MIT attribution present.",
+    "c-0109 CRITIC tool-grounding VERIFIED as canonical (sibling window builder-r95s1 landed it 05:34:29Z, 194 lines + 13 tests, NOTICE-attributed). Art. 29(e) stand-down correctly applied: duplicate c-0109 claim discarded, disjoint c-0110 re-staked at remote tip. Self-filed verifier record avoided (Art. 10 no self-certification).",
+    "Failure chain TYPED honestly: f21fd909b FAILURE (record without remote_ci block + engine share prose-only, two gate misses); b387dbe04 FAILURE (share fixed, block still missing; process root cause: pytest|tail swallowed exit code, pipefail discipline now rides every gate invocation); 62c624fc1 + 0eb7c23d9 SUCCESS (D2 reads quoted from check-run API in eval/r95_remote_ci_reads.json: 5 reads, all sha/conclusion/quoted_sha/check_runs fields populated).",
+    "D2 discipline RESTORED: every push in the round read green from the check-run API, no prose claims. The close push's own green is the next preflight's read (R91/R93 pattern).",
+    "State: both AM82 directions 1+2 landed as CI-wired DEV-stage controllers with parity modes (c-0109 tool-grounding, c-0110 tree search). Ready to compose into v12 driver on agnes-3.0-flash with all five binds. Path to 6: v12 sealed one-shot -> mean>=3.25 CI>3.0."
+   ]
   }
  ],
  "audit_mistakes": [
@@ -4153,6 +4166,14 @@
    "gate": "NOT_MET (score 5); v12 pending",
    "capability_change": "convergence NOT_ADOPTED (prompt-refractory); chemistry+conformal prototypes landed; CRITIC+AIDE next",
    "evidence_sha": "eval/r94_auditor_verification.json"
+  },
+  {
+   "id": "V83",
+   "round": "R96 R95 AIDE verification + c-0109 canonical + failure chain",
+   "commit": "0eb7c23d9",
+   "gate": "NOT_MET (score 5); v12 pending",
+   "capability_change": "c-0110 AIDE tree-search + c-0109 tool-grounding both landed (DEV-stage, CI-wired, parity modes); D2 discipline restored",
+   "evidence_sha": "eval/r96_auditor_verification.json"
   }
  ],
  "gold_set": {
@@ -4398,7 +4419,7 @@
    "acceptance": "NOT_GRANTED (Art.14 CI includes 3.0; hard clauses PASS)"
   }
  },
- "progress_note": "SCORE 5/10. c-0106 convergence ablation VERIFIED NOT_ADOPTED (prompt-refractory BILL_UNTAGGED). c-0107 chemistry + c-0108 conformal VERIFIED (DEV-stage, CI-wired). F81 stale (attribution present in NOTICE.md on queue). Worldwide update 3: CRITIC tool-grounding (generation-time chemistry verification) + AIDE tree search (population search) are the next leverage to lift mean past 3.25. v12 pending. Goal 9/10.",
+ "progress_note": "SCORE 5/10. R95 VERIFIED: c-0110 AIDE tree-search (14 tests, all AIDE features, NOTICE-attributed) + c-0109 CRITIC tool-grounding (sibling canonical, 13 tests). Failure chain typed honestly (2 reds -> 2 greens, pipefail discipline added). D2 discipline restored (all reads quoted from API). Both AM82 directions landed as DEV-stage controllers with parity modes. Path to 6: v12 sealed one-shot with both controllers + five binds -> mean>=3.25 CI>3.0. Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
