@@ -22,7 +22,7 @@ is public-domain factual knowledge and is encoded in our own files
 | tespy | MIT | https://github.com/oemof/tespy | thermal engineering plant cycles |
 | Cantera | BSD-3-Clause | https://github.com/Cantera/cantera | computed chemical equilibrium (AM80 direction 3: `equilibrate()` verifies claimed chemistry directions at generation time — the computed complement to the registry equilibrium-direction scan; suite `tests/test_r80_chemistry_equilibrium.py`, c-0107) |
 | detect-secrets (Yelp) | Apache-2.0 | https://github.com/Yelp/detect-secrets | secret scanning (D8; gitleaks binary substitution noted in the run record) |
-| scikit-learn-contrib MAPIE | BSD-3-Clause | https://github.com/scikit-learn-contrib/MAPIE | conformal prediction intervals (D5, planned) |
+| scikit-learn-contrib MAPIE | BSD-3-Clause | https://github.com/scikit-learn-contrib/MAPIE | conformal prediction intervals (D5; the fixture-stage conformal FA-control prototype `scripts/r80_conformal_fa.py` is in tree, claim c-0108 — computed coverage 0.915 walk-forward at confidence 0.90 on the synthetic fixture, immediate typed FA on an injected level shift; the Time-MoE/MOMENT FM evals + the real C-MAPSS/XJTU-SY/CWRU runs are the typed next steps) |
 
 ## Planned copies (AM43 directions D2–D8; attribution in-band at adoption)
 
