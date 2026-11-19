@@ -19,7 +19,7 @@
   "permitted_measures (the SUPERSEDING per-problem enforcement, r103s1 — format-complete collector, mechanism-class kill rule)",
   "ammonia_strip_direction (engine CHECKS registry direction bind)"
  ],
- "window_started_at": "2026-11-19T17:45:34Z",
+ "window_started_at": "2026-11-19T17:54:13Z",
  "events": [
   {
    "problem_id": "HO15-01-jet-dye-unlevel",
@@ -4938,6 +4938,2458 @@
    "onrow_answer_claims": 22,
    "final_sha256_16": "4a7d665a9ac72a11",
    "final_chars": 7146
+  },
+  {
+   "problem_id": "HO15-21-comber-nip",
+   "generated_at": "2026-11-19T17:54:13Z",
+   "row_wall_s": 37.5,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 5419,
+     "latency_s": 7.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Input Streams (ALREADY-RECORDED):**",
+       "*   **Reference/Thresholds (DERIVED):**",
+       "*   **Procedure:**",
+       "1.  Normalize motor current: $I_{norm} = I_{MOTOR} / SPEED_{FB}$.",
+       "3.  Monitor $F_{index}$ for a sustained downward drift exceeding 5% from $I_{ideal\\_norm}$",
+       "*   **Feasibility Note:** This scheme relies on the *inverse* relationship of motor curren"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "7cc4e2a27114015e",
+     "corrections": {
+      "corrected": 13,
+      "normalized": 0,
+      "left_flagged": 6,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "de051775efa2db08",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 10163,
+     "latency_s": 14.7,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Motor Current ($I$):** Stated as \"existing ... motor current\".",
+       "- **$NTI_{baseline}$:** Derived from **stated existing data** (last 30 days of noil-free o",
+       "*   **Installability:** Zero physical installation. Uses existing PLC I/Os already connect",
+       "1. Retrieve 6 months of logged $I$, $Speed$, and $Noil Rate$ data from the plant historian",
+       "4. For each trip event, check the $NTI$ value in the 14-day window preceding it.",
+       "- **Fail:** If $NTI$ did not trend upward in >50% of historical cases, the mechanism is in",
+       "*   **Primary Stated Indicator:** **Noil Rate**. This is the definition of the failure.",
+       "*   **Predicted Indicator:** **NTI (Motor Current / Speed²)**.",
+       "*   **Why:** NTI is a *leading* indicator of the mechanical state ($\\tau_{jaw}$) that *cau",
+       "*   **Premise-Validity:** Assumes the motor current is electrically correlated with jaw to",
+       "*   *Revised Mechanism Class:* **Torque Pulsation Detection**.",
+       "*   *Physics:* Nipper jamming/wear introduces a periodic mechanical load disturbance at th",
+       "*   *Direction:* Driving variable = **Current Ripple Amplitude** (at cylinder freq). Mecha",
+       "*   *This is more robust for combers where jaw actuation is separate from main drive torqu",
+       "4. For each trip, check the Ripple Amplitude in the 14-day window preceding it.",
+       "- **Pass:** In >90% of historical trip events, the Ripple Amplitude exceeded 2x the 30-day"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "*Correction:** If the nipper is mechanically linked to the main cylinder (standard for many older combers), current reflects total lo"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "4ebb5f4953bb2a1b",
+     "corrections": {
+      "corrected": 20,
+      "normalized": 0,
+      "left_flagged": 16,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "node_metric": [
+      2,
+      1,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "41300f9ae96b4259",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Motor Current ($I$):** Stated as \"existing ... motor current\".; - **$NTI_{baseline}$:** Derived from **sta",
+      "REASONING_THRASH_LEAK: *Correction:** If the nipper is mechanically linked to the main cylinder (standard for many older combers), cu"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6335,
+     "latency_s": 8.0,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   Healthy state: Current Ripple $\\delta I < 0.5$ Amps (ASSUMPTION: based on typical 400V",
+       "*   Failing state: Current Ripple $\\delta I > 1.5$ Amps.",
+       "*   The system must trigger a \"Warning\" at $\\delta I = 1.0$ Amps, which is >14 days before",
+       "2.  Noil Rate: Permitted (stated \"noil rate\")."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "f52fe2e635fc5e3e",
+     "corrections": {
+      "corrected": 20,
+      "normalized": 0,
+      "left_flagged": 4,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "b23d5ea0382c4680",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   Healthy state: Current Ripple $\\delta I < 0.5$ Amps (ASSUMPTION: based on typical 400V; *   Failing state:"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6068,
+     "latency_s": 7.6,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Healthy Combers:** $\\delta I$ must remain < 0.3 A for 100% of the period.",
+       "*   **Failing Comber:** $\\delta I$ must cross 0.3 A at least 14 days before the recorded \"",
+       "*   **FA Check:** False alarms must be < 1 per year. If $\\delta I$ > 0.3 A occurs during v",
+       "4.  **Kill Criterion:** If $\\delta I$ does not correlate temporally with the onset of incr",
+       "*   **Primary Indicator:** Noil Rate is the quality trip driver. Motor Current Ripple is t",
+       "*   **Permitted Set:** \"No new sensors, no nipper inspection.\" The bill uses only existing"
+      ],
+      "PREDICTOR_VIOLATION": [
+       "COMMISSIONING_PROGRAM"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "32a43a7f0e8f047f",
+     "corrections": {
+      "corrected": 10,
+      "normalized": 0,
+      "left_flagged": 6,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n3",
+     "parent_id": "n2",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      2,
+      0,
+      0
+     ],
+     "pruned": "metric_pruned",
+     "signature": {
+      "digest": "05335acabbbf18a0",
+      "keys": [
+       "BILL_UNTAGGED",
+       "PREDICTOR_VIOLATION"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Healthy Combers:** $\\delta I$ must remain < 0.3 A for 100% of the period.; *   **Failing Comber:** $\\del",
+      "PREDICTOR_VIOLATION: COMMISSIONING_PROGRAM"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED",
+    "PREDICTOR_VIOLATION"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "corrections_total": 63,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 4,
+   "delivered_node_id": "n2",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 4,
+   "final_sha256_16": "f52fe2e635fc5e3e",
+   "final_chars": 6335
+  },
+  {
+   "problem_id": "HO15-22-tfo-twister",
+   "generated_at": "2026-11-19T17:54:50Z",
+   "row_wall_s": 28.8,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 5768,
+     "latency_s": 7.2,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   *Rationale:* Stated in user_variables. Used to normalize current against RPM.",
+       "*   *Rationale:* Stated in user_variables. Source of the friction torque proxy.",
+       "*   *Derivation Source:* Stated physics. For a 2:1 twister, the relationship between norma",
+       "*   **Procedure:**",
+       "2.  Compute $I_{norm} = I_{motor} / \\sqrt{speed}$ (since $P \\propto I \\cdot V \\approx I \\c",
+       "3.  Calculate the rolling mean and standard deviation of $I_{norm}$ over a 14-day window u",
+       "*   **Maintenance:** Same class. No calibration of new sensors. The threshold self-updates"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "*Correction:* To satisfy the \"21 days before failure\" constraint, we assume the \"failure\" event in the test is the point where curren"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "468eb93f94082e78",
+     "corrections": {
+      "corrected": 9,
+      "normalized": 0,
+      "left_flagged": 7,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      2,
+      1,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "61cdeafc312f03ad",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 6793,
+     "latency_s": 8.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Speed:** Available (Stated).",
+       "*   **Current:** Available (Stated).",
+       "*   **Vibration:** Available (Stated).",
+       "*   **Bearing Geometry:** Stated spec (Nameplate).",
+       "*   **Failure:** Not available online (Prevents physical verification)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "89ef35427a203ba5",
+     "corrections": {
+      "corrected": 7,
+      "normalized": 0,
+      "left_flagged": 5,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "8d428943b0a36870",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Speed:** Available (Stated).; *   **Current:** Available (Stated).; *   **Vibration:** Available (Stated"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 5301,
+     "latency_s": 6.5,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- *Threshold Derivation:* $K_{threshold}$ and $V_{threshold}$ set at 50% of the historical"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "c723bd44f8411e04",
+     "corrections": {
+      "corrected": 4,
+      "normalized": 0,
+      "left_flagged": 1,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "17263136bbeccfb3",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - *Threshold Derivation:* $K_{threshold}$ and $V_{threshold}$ set at 50% of the historical"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 4718,
+     "latency_s": 6.6,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "direction_check": null,
+     "sha256_16": "c6266fd4cdd603a3",
+     "corrections": {
+      "corrected": 1,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n3",
+     "parent_id": "n2",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "node_metric": [
+      0,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "68f9ece52d68dd20",
+      "keys": [],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [],
+   "repair_budget_burned_full": true,
+   "stop_reason": "CONVERGED_ZERO_FINDINGS",
+   "corrections_total": 21,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 4,
+   "delivered_node_id": "n3",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 9,
+   "final_sha256_16": "c6266fd4cdd603a3",
+   "final_chars": 4718
+  },
+  {
+   "problem_id": "HO15-23-texture-heater",
+   "generated_at": "2026-11-19T17:55:19Z",
+   "row_wall_s": 34.4,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4715,
+     "latency_s": 5.3,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Reference Baseline: The \"healthy\" crimp proxy expected value at given power/speed is DER",
+       "- Procedure: The predictor runs on the PLC/SCADA system using only these three existing da"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "7be62fe8ff5b2b4a",
+     "corrections": {
+      "corrected": 5,
+      "normalized": 0,
+      "left_flagged": 2,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "63c7cd658158dff8",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5998,
+     "latency_s": 7.7,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "4.  Run the algorithm on the clean period: Alert must NOT trigger.",
+       "5.  Run the algorithm on the dirty period: Alert must trigger $\\ge$ 30 days before the rec",
+       "*   **Primary Indicator:** Heater Power ($P$) at constant Speed ($V$).",
+       "*   **Why:** Degradation reduces heat transfer efficiency. To maintain 200°C, the controll",
+       "*   **New Sensors:** None.",
+       "*   **Heater Inspection:** None.",
+       "*   **PREMISE-VALIDITY:** Assumes $P$ and $V$ logs exist (stated in constraint).",
+       "*   **MECHANISM-DIVERSITY:** Single mechanism class."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "ce39d2341a2fde1b",
+     "corrections": {
+      "corrected": 14,
+      "normalized": 0,
+      "left_flagged": 8,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "afebe0a3bf331655",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 4.  Run the algorithm on the clean period: Alert must NOT trigger.; 5.  Run the algorithm on the dirty period:"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 9540,
+     "latency_s": 10.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **Data Acquisition Module (Software/Firmware):**",
+       "2. **Baseline Characterization (Offline/Initial Commissioning):**",
+       "3. **Degradation Predictor Algorithm:**",
+       "4. **Alert Interface:**",
+       "- Rough Cost: Negligible (software config).",
+       "4. Run the algorithm on the Dirty period: Verify that an alert triggers $\\geq$ 30 days bef"
+      ],
+      "PREDICTOR_VIOLATION": [
+       "BASELINE_PROGRAM"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "2482983d591faab7",
+     "corrections": {
+      "corrected": 14,
+      "normalized": 0,
+      "left_flagged": 6,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      2,
+      0,
+      0
+     ],
+     "pruned": "metric_pruned",
+     "signature": {
+      "digest": "05335acabbbf18a0",
+      "keys": [
+       "BILL_UNTAGGED",
+       "PREDICTOR_VIOLATION"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **Data Acquisition Module (Software/Firmware):**; 2. **Baseline Characterization (Offline/Initial Commissio",
+      "PREDICTOR_VIOLATION: BASELINE_PROGRAM"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7036,
+     "latency_s": 10.6,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Maintenance**: Standard practice involves replacing probes/cameras. This solution in"
+      ],
+      "PREDICTOR_VIOLATION": [
+       "COMMISSIONING_PROGRAM"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "62370a5434ccb374",
+     "corrections": {
+      "corrected": 4,
+      "normalized": 0,
+      "left_flagged": 1,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n3",
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      2,
+      0,
+      0
+     ],
+     "pruned": "metric_pruned",
+     "signature": {
+      "digest": "8fd0018d5a23f7ae",
+      "keys": [
+       "BILL_UNTAGGED",
+       "PREDICTOR_VIOLATION"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Maintenance**: Standard practice involves replacing probes/cameras. This solution in",
+      "PREDICTOR_VIOLATION: COMMISSIONING_PROGRAM"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED",
+    "PREDICTOR_VIOLATION"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "corrections_total": 37,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 4,
+   "delivered_node_id": "n1",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 4,
+   "final_sha256_16": "ce39d2341a2fde1b",
+   "final_chars": 5998
+  },
+  {
+   "problem_id": "HO15-24-calender-roll",
+   "generated_at": "2026-11-19T17:55:54Z",
+   "row_wall_s": 32.2,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7456,
+     "latency_s": 8.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Data Source:** Plant Historian/SCADA database.",
+       "2.  **Input Streams (ALREADY-RECORDED):**",
+       "*   **DERIVED:** \"Healthy Baseline Curve\": The relationship between $Nip\\_Load$ and $Motor",
+       "*   **Threshold:** The warning threshold is set at a deviation of $\\Delta I$ (Current) of ",
+       "1.  Ingest `Nip_Load`, `Roll_Speed`, and `Motor_Current` from the SCADA historian.",
+       "2.  Normalize Motor Current by dividing by Roll Speed to isolate the force component (torq",
+       "3.  Compare the normalized current against the load baseline.",
+       "4.  Compute the rate of drift ($d(I)/dt$) over a 7-day moving window.",
+       "1.  **Retrospective Validation (Falsification Test):**",
+       "*   Run the algorithm (drift detection in $I$ vs $Load/Speed$) on the data *prior* to thes",
+       "*   **Kill Criterion:** If the False Alarm Rate (FA) over the 12-month retrospective perio",
+       "*   **No Roll Inspection:** Complies by using data-driven inference rather than physical m"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1583b75cc96222c5",
+     "corrections": {
+      "corrected": 20,
+      "normalized": 0,
+      "left_flagged": 12,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "9ff721b0c1507d39",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 7574,
+     "latency_s": 8.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Data Access Gateway**:",
+       "*   **Inputs**: Motor Current (I), Roll Speed (N), Nip Load/Pressure (P).",
+       "2.  **Wear Inference Model (The Predictor)**:",
+       "*   **Description**: A regression or machine-learning model deployed on an existing edge c",
+       "*   **Operational Loss**: 0 (The mechanism is passive). The only \"cost\" is the potential f",
+       "*   **Rough Cost Class**: Same or Lower than standard practice (no new hardware)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "de9c150a5ea9fd00",
+     "corrections": {
+      "corrected": 10,
+      "normalized": 0,
+      "left_flagged": 6,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "de051775efa2db08",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **Data Access Gateway**:; *   **Inputs**: Motor Current (I), Roll Speed (N), Nip Load/Pressure (P).; 2.  *"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6223,
+     "latency_s": 7.6,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "-   **Inputs**: Nip Load Setpoint ($P_{set}$) and Actual ($P_{act}$), Roll Speed ($N$), Mo",
+       "-   **Derivation**: Baseline $K_{0}$ is DERIVED from the manufacturer's nameplate efficien"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "Wait, the failure is \"roll-deflection-wear\". Wear leads to quality trip. The mechanism detects the *pre-cursor* of quality de"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "a92fc8580a96693f",
+     "corrections": {
+      "corrected": 9,
+      "normalized": 0,
+      "left_flagged": 2,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      2,
+      1,
+      0
+     ],
+     "pruned": "metric_pruned",
+     "signature": {
+      "digest": "6539ace4c820d14c",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: -   **Inputs**: Nip Load Setpoint ($P_{set}$) and Actual ($P_{act}$), Roll Speed ($N$), Mo; -   **Derivation**",
+      "REASONING_THRASH_LEAK: Wait, the failure is \"roll-deflection-wear\". Wear leads to quality trip. The mechanism detects the *pre-cursor"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 6233,
+     "latency_s": 8.0,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Maintenance**: Annual re-validation of baseline if roll is replaced."
+      ],
+      "PREDICTOR_VIOLATION": [
+       "COMMISSIONING_PROGRAM"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "796e0bf8b9d3e638",
+     "corrections": {
+      "corrected": 10,
+      "normalized": 0,
+      "left_flagged": 1,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n3",
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      2,
+      0,
+      0
+     ],
+     "pruned": "metric_pruned",
+     "signature": {
+      "digest": "8fd0018d5a23f7ae",
+      "keys": [
+       "BILL_UNTAGGED",
+       "PREDICTOR_VIOLATION"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Maintenance**: Annual re-validation of baseline if roll is replaced.",
+      "PREDICTOR_VIOLATION: COMMISSIONING_PROGRAM"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED",
+    "PREDICTOR_VIOLATION"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "corrections_total": 49,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 4,
+   "delivered_node_id": "n1",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 7,
+   "final_sha256_16": "de9c150a5ea9fd00",
+   "final_chars": 7574
+  },
+  {
+   "problem_id": "HO15-25-fabric-compactor",
+   "generated_at": "2026-11-19T17:56:26Z",
+   "row_wall_s": 44.0,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7861,
+     "latency_s": 8.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Input Streams (ALREADY-RECORDED):**",
+       "*   `motor_current`: Real-time RMS current or peak current during the compression stroke (",
+       "*   `belt_speed`: Position/velocity encoder or inferred from motor RPM (stated in user var",
+       "*   `flow_rate` / `pressure`: From the typed plan's `signals_used`. In this compactor cont",
+       "2.  **Reference/Baseline (DERIVED):**",
+       "*   **Threshold Derivation:** The \"Quality Trip\" corresponds to a specific minimum tension",
+       "3.  **Procedure:**",
+       "*   Map $R$ to an estimated shrinkage percentage $\\%Shrink = (1 - R) \\cdot 100$."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "daa43fe8ab0c4b66",
+     "corrections": {
+      "corrected": 9,
+      "normalized": 0,
+      "left_flagged": 8,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "afebe0a3bf331655",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 9176,
+     "latency_s": 29.3,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **PLC/SCADA Logic Update:**",
+       "2.  **Threshold Derivation (Calculation, not hardware):**",
+       "3.  **HMI/Alarm Configuration:**",
+       "1.  Access the Historian/PLC.",
+       "2.  Extract 12 months of `Motor_Current` and `Belt_Speed` data.",
+       "*   **Lead Time:** The median delta must be $\\ge$ 45 days.",
+       "*   **Kill Criterion:** If the historical data shows that the current deviation does *not*",
+       "*   **Why Current is Primary (under constraints):** In a compressive-shrink compactor, fel",
+       "*   **No Belt Inspection:** Confirmed. The mechanism is purely electrical/data-based."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "ca03fb7917824261",
+     "corrections": {
+      "corrected": 28,
+      "normalized": 0,
+      "left_flagged": 9,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "e45655051e1c3395",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  **PLC/SCADA Logic Update:**; 2.  **Threshold Derivation (Calculation, not hardware):**; 3.  **HMI/Alarm Co"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 4819,
+     "latency_s": 6.0,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "direction_check": null,
+     "sha256_16": "805883bfcedf1c5f",
+     "corrections": {
+      "corrected": 0,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "node_metric": [
+      0,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "68f9ece52d68dd20",
+      "keys": [],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 2,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [],
+   "repair_budget_burned_full": false,
+   "stop_reason": "CONVERGED_ZERO_FINDINGS",
+   "corrections_total": 37,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 3,
+   "delivered_node_id": "n2",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 5,
+   "final_sha256_16": "805883bfcedf1c5f",
+   "final_chars": 4819
+  },
+  {
+   "problem_id": "HO15-26-sanfor-belt",
+   "generated_at": "2026-11-19T17:57:10Z",
+   "row_wall_s": 28.3,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6639,
+     "latency_s": 11.8,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Procedure:**",
+       "*   **Input Streams (Data-Source Rule Compliance):**",
+       "*   Reference $K_{healthy}$: Tagged **DERIVED** from stated physics (steady-state torque b",
+       "*   **Threshold:**",
+       "*   Primary Indicator: Drift in Specific Current $K(t)$.",
+       "*   Rationale: A $5\\%$ rise in specific current indicates a significant drop in effective ",
+       "*   **Conclusion:** SAME burden class, DIFFERENT mechanism (physics-based inference vs. vi",
+       "*   For the failed belt: The algorithm must flag $\\Delta K > 5\\%$ at least 45 days before ",
+       "*   **Primary Stated Indicator:** The problem states \"quality trip\" is the failure. The *l",
+       "*   **Why this is the primary indicator:** The problem explicitly forbids \"no belt inspect",
+       "*   **Secondary Indicator:** Belt Speed (used only for normalization in $K(t)$, not for fa",
+       "*   **Compliance Check:**",
+       "*   >=45 days warning: Achieved by setting threshold at $5\\%$ drift (CALCULATED from physi",
+       "*   <=1 FA/year: Ensured by the \"sustained for 7 days\" filter, eliminating transient noise",
+       "*   No new sensors: Complied (uses existing $I, v$).",
+       "*   No belt inspection: Complied."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "e1d102189c1e27b7",
+     "corrections": {
+      "corrected": 19,
+      "normalized": 0,
+      "left_flagged": 16,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "d3da37618c5bb9ad",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 7681,
+     "latency_s": 9.9,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  Access Historian database for the last 12 months of `Motor_Current_AMPS` and `Belt_Spe",
+       "4.  Plot the ratio $R = I_{current} / I_{ref}$ vs. time for the 60 days preceding each fai",
+       "*   **Primary Indicator:** Motor Current (at normalized speed). This is the primary stated",
+       "*   **Secondary Indicator:** Belt Speed. Used only to normalize the current signal (since ",
+       "*   **Tension:** The constraint asks for a predictor using \"shrinkage proxy.\" If \"shrinkag"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "dc098e3b218aa62e",
+     "corrections": {
+      "corrected": 12,
+      "normalized": 0,
+      "left_flagged": 5,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "8d428943b0a36870",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1.  Access Historian database for the last 12 months of `Motor_Current_AMPS` and `Belt_Spe; 4.  Plot the ratio"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 5446,
+     "latency_s": 6.6,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "direction_check": null,
+     "sha256_16": "5557cc6799a26866",
+     "corrections": {
+      "corrected": 0,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      0,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "68f9ece52d68dd20",
+      "keys": [],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 2,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [],
+   "repair_budget_burned_full": false,
+   "stop_reason": "CONVERGED_ZERO_FINDINGS",
+   "corrections_total": 31,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 3,
+   "delivered_node_id": "n2",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 10,
+   "final_sha256_16": "5557cc6799a26866",
+   "final_chars": 5446
+  },
+  {
+   "problem_id": "HO15-27-dye-hx-foul",
+   "generated_at": "2026-11-19T17:57:38Z",
+   "row_wall_s": 38.9,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 10889,
+     "latency_s": 13.0,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "BILL_SECTION_MISSING": [
+       "no IMPLEMENTATION BILL section"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "wait, in a batch or flow dyeing process, $m_l$ is fixed by batch size. $T_{liq,out}$ is controlled by $m_s$ (or pressure)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "bc4ce0b66aed86a0",
+     "corrections": {
+      "corrected": 0,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      2,
+      1,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "dae4ab731a0868bd",
+      "keys": [
+       "BILL_SECTION_MISSING",
+       "REASONING_THRASH_LEAK"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 11646,
+     "latency_s": 14.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "f75_type_gate": {
+      "forced_by": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+     },
+     "scan": {
+      "REASONING_THRASH_LEAK": [
+       "Wait, the mechanism is a PREDICTOR, not a remedy. The obligation asks for the DIRECTION-OF-EFFECT for the \"remedy\" in standar"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "8c2f6cb8fc533133",
+     "corrections": {
+      "corrected": 0,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "node_metric": [
+      1,
+      1,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "c4175837673536df",
+      "keys": [
+       "REASONING_THRASH_LEAK"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "REASONING_THRASH_LEAK: Wait, the mechanism is a PREDICTOR, not a remedy. The obligation asks for the DIRECTION-OF-EFFECT for the \"rem"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 6264,
+     "latency_s": 11.6,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "direction_check": null,
+     "sha256_16": "72aaf7ce8fc6c53f",
+     "corrections": {
+      "corrected": 0,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      0,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "68f9ece52d68dd20",
+      "keys": [],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 2,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [],
+   "repair_budget_burned_full": false,
+   "stop_reason": "CONVERGED_ZERO_FINDINGS",
+   "corrections_total": 0,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 3,
+   "delivered_node_id": "n2",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 8,
+   "final_sha256_16": "72aaf7ce8fc6c53f",
+   "final_chars": 6264
+  },
+  {
+   "problem_id": "HO15-28-tannery-drum",
+   "generated_at": "2026-11-19T17:58:17Z",
+   "row_wall_s": 47.3,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7693,
+     "latency_s": 11.5,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Reference/Threshold (DERIVED):** The baseline \"Healthy\" torque ripple ratio $R_{base"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "38669a9078a0d7bb",
+     "corrections": {
+      "corrected": 8,
+      "normalized": 0,
+      "left_flagged": 1,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "17263136bbeccfb3",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 12990,
+     "latency_s": 19.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Input Streams:** ALREADY-RECORDED: Motor RMS Current ($I$), Drum Speed ($\\omega$) fr",
+       "*   **Row 3: Alert System**",
+       "*   **Standard Practice Burden:** Install new eddy-current probes ($$$), calibrate, wire, ",
+       "*   **Your Burden:**",
+       "2.  Run for 3 months.",
+       "3.  When a drum fails (bearing/gear), retrospectively check the TSDI trend in the 30 days ",
+       "*   Drum Speed: Used for normalization.",
+       "*   **No Teardown:** Complied.",
+       "*   **Driving Quantity:** Wear Depth ($d$).",
+       "*   **Why Lowers Damage Integral:** By providing a 30-day warning, it allows **preventive ",
+       "*   **Vibration:**",
+       "*   **Trade:** None. The cost is only in software development (one-time). The \"cost\" is th",
+       "*   **BASELINE_PROGRAM:** The \"zero\" baseline is a **single-point calibration** (7 days), ",
+       "*   **NOVELTY:** The novelty is the **use of electrical torque ripple (Current/Speed ratio"
+      ],
+      "REASONING_THRASH_LEAK": [
+       "*Correction:** The constraint says \"use only the existing... vibration\". This implies vibration data *exists* and is recorded (likely"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "794ae8840c445d3a",
+     "corrections": {
+      "corrected": 35,
+      "normalized": 0,
+      "left_flagged": 14,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "node_metric": [
+      2,
+      1,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "af38a95483e13475",
+      "keys": [
+       "BILL_UNTAGGED",
+       "REASONING_THRASH_LEAK"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED",
+      "BILL_UNTAGGED: *   **Input Streams:** ALREADY-RECORDED: Motor RMS Current ($I$), Drum Speed ($\\omega$) fr; *   **Row 3: Alert",
+      "REASONING_THRASH_LEAK: *Correction:** The constraint says \"use only the existing... vibration\". This implies vibration data *exists* "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 5289,
+     "latency_s": 6.2,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- *Fast Fourier Transform (FFT) Module*: Implemented in the PLC or dedicated controller's ",
+       "- *Sideband Detection Algorithm*: Compares the power spectrum of $I_{rms}$ at specific sid",
+       "- *Vibration Correlation Filter*: Uses existing vibration data to filter out non-mechanica"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "7351170af2a6fc94",
+     "corrections": {
+      "corrected": 10,
+      "normalized": 0,
+      "left_flagged": 3,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "4947edb34129cbaf",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - *Fast Fourier Transform (FFT) Module*: Implemented in the PLC or dedicated controller's ; - *Sideband Detect"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 8450,
+     "latency_s": 10.4,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Operability:** SAME CLASS. Both require periodic review of trends. My scheme adds 10",
+       "*   **Rough Cost Class:** STANDARD PRACTICE: $500–$1000 per drum (sensors + labor + instal",
+       "1.  Collect 6 months of historical PLC data for 10 drums: 5 with confirmed bearing/gear fa",
+       "*   **Monitored Indicator:** I monitor **Motor Current** ($I_{motor}$).",
+       "*   **Why:** $I_{motor}$ is the *electrical proxy* for $\\tau_{fric}$. It is a secondary in"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "52afc8cf49330133",
+     "corrections": {
+      "corrected": 9,
+      "normalized": 0,
+      "left_flagged": 5,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n3",
+     "parent_id": "n2",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "8d428943b0a36870",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Operability:** SAME CLASS. Both require periodic review of trends. My scheme adds 10; *   **Rough Cost C"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "corrections_total": 62,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 4,
+   "delivered_node_id": "n3",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 18,
+   "final_sha256_16": "52afc8cf49330133",
+   "final_chars": 8450
+  },
+  {
+   "problem_id": "HO15-29-sammying-roll",
+   "generated_at": "2026-11-19T17:59:04Z",
+   "row_wall_s": 37.5,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6978,
+     "latency_s": 8.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1.  **Data Streams (ALREADY-RECORDED):**",
+       "2.  **Reference/Derivation (DERIVED):**",
+       "*   **Nominal Baseline ($K_0$):** Derived from the machine's commissioning data or a perio",
+       "3.  **Procedure:**",
+       "*   Normalize Motor Current ($I$) by Roller Pressure ($P$): Compute $R = I/P$ at 1-second ",
+       "*   Filter $R$ with a 30-minute moving average to suppress process variability.",
+       "*   **Moisture Gate:** Only trigger the warning if the Moisture Proxy is within its normal",
+       "*   **Installability:** ZERO. Uses existing PLC I/O. No new hardware. (Standard practice: "
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "b2d7783d51bcb757",
+     "corrections": {
+      "corrected": 9,
+      "normalized": 0,
+      "left_flagged": 8,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "afebe0a3bf331655",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5785,
+     "latency_s": 10.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Nominal Baseline ($I_{0}$):** DERIVED from the plant’s existing operational logs of ",
+       "*   **Service Class:** Standard IT/OT configuration service (STANDARD_BILL: matches the co",
+       "*   **Parity:** Same burden class (low cost, low intrusion), different mechanism (inferent"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "91c2b1074351d981",
+     "corrections": {
+      "corrected": 11,
+      "normalized": 0,
+      "left_flagged": 3,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "4947edb34129cbaf",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Nominal Baseline ($I_{0}$):** DERIVED from the plant’s existing operational logs of ; *   **Service Clas"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 4505,
+     "latency_s": 5.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "direction_check": null,
+     "sha256_16": "e517d8d04bb5d00e",
+     "corrections": {
+      "corrected": 5,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n2",
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "node_metric": [
+      0,
+      1,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "b809a2c396f00efe",
+      "keys": [],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "TEST_DURATION_REALTIME"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7070,
+     "latency_s": 12.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "3. Predictive Scheduling Logic:"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "b1b1b76d0a58cf42",
+     "corrections": {
+      "corrected": 13,
+      "normalized": 0,
+      "left_flagged": 1,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n3",
+     "parent_id": "n2",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      1,
+      1,
+      0
+     ],
+     "pruned": "metric_pruned",
+     "signature": {
+      "digest": "4283ce2ff4f0e6b4",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "FLAG",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": [
+      "USER_LABEL_FABRICATED_CONSTRAINT",
+      "BILL_UNTAGGED: 3. Predictive Scheduling Logic:"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 3,
+   "critic_verdict": "FLAG",
+   "residual_finding_keys": [
+    "BILL_UNTAGGED"
+   ],
+   "repair_budget_burned_full": true,
+   "stop_reason": "BUDGET_EXHAUSTED",
+   "corrections_total": 38,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 4,
+   "delivered_node_id": "n2",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 13,
+   "final_sha256_16": "e517d8d04bb5d00e",
+   "final_chars": 4505
+  },
+  {
+   "problem_id": "HO15-30-setting-out",
+   "generated_at": "2026-11-19T17:59:42Z",
+   "row_wall_s": 14.4,
+   "histogram_before": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "histogram_after": {
+    "thermal duty and chemical dosing retune": 1,
+    "open-loop dosing ratio lock via pre-existing conductivity feedback": 1,
+    "closed-loop kinetic duty-cycle modulation of mechanical squeegee parameters via": 1,
+    "asymmetric nozzle pressure duty cycling": 1,
+    "closed-loop conductivity-driven dosing setpoint adjustment.": 1,
+    "** closed-loop process parameter retuning": 1,
+    "procedural tension-timing decoupling": 1,
+    "speed-compensated tension biasing and creel pre-loading": 1,
+    "** dual-axis operating point optimization (heater setpoint + finish chemistry ra": 1,
+    "stoichiometric-dosing/cure-temp co-optimization.": 1,
+    "chemistry dosing retuning": 1,
+    "configuration — lime dosing retune with sulfide lag": 1,
+    "basification-driven speciation lockdown (ph/duty configuration)": 1,
+    "temperature setpoint and dosing parameter adjustment** (c)": 1,
+    "** operational duty-cycle and setpoint retuning. (c)": 1,
+    "operating-point shift via closed-loop bypass recirculation and duty-cycle gating": 1,
+    "statistical process drift inference via existing telemetry": 1,
+    "** exogenous state-space modeling via existing telemetry (c)": 1,
+    "firmware-based temporal correlation inference on existing plc data.": 1,
+    "** telemetry-based threshold-crossing predictor (no hardware changes).": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 6023,
+     "latency_s": 7.3,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Components:",
+       "- Derivation:",
+       "- CALCULATED Baseline Efficiency Index ($\\eta_{base}$): Derived from stated specs. For a h",
+       "- Procedure:",
+       "- If $\\Delta > 10\\%$, trigger \"Immediate Quality Trip Risk\" (imminent failure).",
+       "- Conclusion: Same burden class, different mechanism (electromechanical efficiency vs. man"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "9773e2cc01f5ef31",
+     "corrections": {
+      "corrected": 11,
+      "normalized": 0,
+      "left_flagged": 6,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n0",
+     "parent_id": null,
+     "angle": null,
+     "node_metric": [
+      1,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "de051775efa2db08",
+      "keys": [
+       "BILL_UNTAGGED"
+      ],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     }
+    },
+    {
+     "stage": "repair_1",
+     "chars": 4884,
+     "latency_s": 7.1,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {},
+     "direction_check": null,
+     "sha256_16": "74887ffaa1588e49",
+     "corrections": {
+      "corrected": 0,
+      "normalized": 0,
+      "left_flagged": 0,
+      "chemistry_rewrites": 0
+     },
+     "node_id": "n1",
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "node_metric": [
+      0,
+      0,
+      0
+     ],
+     "pruned": null,
+     "signature": {
+      "digest": "68f9ece52d68dd20",
+      "keys": [],
+      "critic": "CLEAN",
+      "type_gate": "MATCH"
+     },
+     "findings_disclosed": []
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "non_schedule_first",
+   "repairs": 1,
+   "critic_verdict": "CLEAN",
+   "residual_finding_keys": [],
+   "repair_budget_burned_full": false,
+   "stop_reason": "CONVERGED_ZERO_FINDINGS",
+   "corrections_total": 11,
+   "chemistry_rewrites_total": 0,
+   "distinct_candidates": 2,
+   "delivered_node_id": "n1",
+   "onrow_sign_contradictions": 0,
+   "onrow_answer_claims": 8,
+   "final_sha256_16": "74887ffaa1588e49",
+   "final_chars": 4884
   }
  ]
 }
