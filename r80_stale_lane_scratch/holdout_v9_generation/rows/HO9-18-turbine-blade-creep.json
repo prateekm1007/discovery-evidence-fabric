@@ -1,0 +1,102 @@
+{
+ "problem_id": "HO9-18-turbine-blade-creep",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9c0a12a9feb1": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:d7858b3c988b": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:d5ae6f3b5f8d": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:42:17.743719Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**\nStandard practice delivers a **monitoring/indication scheme** (vibration or tip-clearence probes) that detects imminent rub. My mechanism departs by using a **thermo-fluidic inference** of creep strain rate from *existing, non-intrusive* EGT and fuel-flow data, predicting time-to-rub via a physics-based damage integrator, without adding sensors or modifying the blade.\n\n**PHYSICS CHECK**\nGoverning relation: Creep rate $\\dot{\\epsilon} \\propto \\exp(-Q/RT)$ (Arrhenius).\nDriving variable: Temperature $T$ (via EGT spread).\nDIRECTION-OF-EFFECT: Driving variable = $T_{blade}$; mechanism moves $T_{blade}$ **down** (by operating at lower EGT/fuel-rich correction during high-load); this **reduces** the creep damage integral $\\int \\dot{\\epsilon} dt$.\nMagnitude: A 10°C drop in peak EGT reduces creep rate by ~30–50% (typical for superalloys at 1100°C). Predicting \"time-to-rub\" requires integrating this rate against the known clearance gap $G_{initial} - G_{rub}$.\n*Note on Constraint:* The prompt forbids new sensors but allows use of *existing* EGT spread, fuel flow, and shaft speed. This is a **data-driven predictor**, not a hardware change.\n\n**IMPLEMENTATION BILL**\n*(All rows use existing instrumentation; no new hardware. \"ALREADY-RECORDED\" tags verify data availability.)*\n\n1.  **Data Acquisition Module (Software)**: (a) Existing DCS/SCADA historical logs of EGT Spread (max-min EGT), Fuel Flow (Wf), and Shaft Speed (N1/N2). *Tag: ALREADY-RECORDED (stated in problem: \"use only the existing...\")*.\n2.  **Thermal Model Calibration (Offline)**: (a) Use historical EGT vs. Wf/N1 data to derive a lookup table or regression model mapping $(Wf, N1)$ to $T_{blade, max}$. *Tag: DERIVED (from stated existing data)*.\n3.  **Creep Damage Integrator (Algorithm)**: (b) Implements a numerical integration of $\\dot{\\epsilon}(T(t))$ over the duty cycle. Reference threshold $G_{rub}$ is derived from design specs (stated clearance limit). *Tag: DERIVED (stated spec + physics)*.\n4.  **Alert Logic**: (c) Compares projected Time-to-Rub (TTR) against a 90-day warning window. If TTR < 90 days, triggers operator alert. *Tag: PROCEDURE (no hardware)*.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability**: Zero. No installation required; uses existing DCS.\n*   **Operability**: Negligible. Runs on existing control system CPU.\n*   **Maintenance**: Zero. No physical wear.\n*   **Cost Class**: Software license/development only. Significantly lower than tip-clearance probes (which require engine disassembly and sensor integration).\n*   **Operational Loss**: Zero. The predictor itself does not change engine operation. *Note:* If the *remedy* (see below) involves reducing EGT, there is a throughput cost, but the *predictor* (this question) has zero operational loss.\n\n**EXECUTABLE TEST**\n*   **Protocol**: Back-test the algorithm against historical maintenance records where blades were replaced due to creep/rub.\n*   **Instruments**: Historical DCS logs (EGT, Wf, N1) and maintenance log dates.\n*   **Pass/Fail**: For every historical rub event, the algorithm must have generated a warning $\\geq$ 90 days prior with $\\leq$ 1 False Alarm per turbine per year.\n*   **Kill Criterion**: If back-test shows TTR prediction error > 30 days or FA rate > 1/year, the model's creep coefficient or thermal correlation is invalid.\n\n**CONSTRAINT BIND**\nPrimary Stated Indicator: **Exhaust Gas Temperature (EGT) Spread** (and Fuel Flow/Shaft Speed).\nReason: These are the only permitted inputs. The predictor uses EGT to infer blade temperature, which drives creep. This is the *primary* driver of creep elongation.\n\n**RESOLUTION OF TYPED FINDINGS & OBLIGATIONS**\n\n1.  **DEPLOYED-PART CLAUSE**: The mechanism is **pure software/algorithm**. No physical part of the turbine (blade, disk, housing) is modified. No new hardware is installed on the deployed part. The \"new catalog parts\" are *none*; the solution is a schedule/analysis protocol.\n2.  **PERMITTED-SET CLAUSE**: The problem states: \"use only the existing exhaust temperature spread, fuel flow and shaft speed; no new sensors\". This is an **exhaustive parameter/data set**. No physical measure (dosing, machining) is in class. The bill contains **no hardware rows**, only data/algorithm rows. This complies.\n3.  **DIRECTION-OF-EFFECT CLAUSE**:\n    *   *Driving Variable*: Blade Creep Strain Rate $\\dot{\\epsilon}$.\n    *   *Mechanism Action*: The *predictor* does not move the variable; it *measures* the integral. However, the *remedy* implied by a positive warning is to **reduce EGT** (e.g., via derating or mixture control).\n    *   *Signed Statement*: Reducing EGT **lowers** $T_{blade}$, which **exponentially lowers** $\\dot{\\epsilon}$, thereby **reducing** the damage integral. This is the correct direction (away from failure).\n4.  **EXEMPLAR-REALITY / CERTIFIED-SYSTEM**: No commercial hardware exemplars are named because none are installed. The \"exemplar\" is standard DCS/SCADA historical log extraction, which is a universal, stocked service in power plant/gas turbine operations.\n5.  **PREMISE-VALIDITY**: The problem states EGT, Fuel Flow, and Shaft Speed *exist* and are *recorded*. The mechanism references only these. No missing ports or channels are assumed.\n6.  **BILL_UNTAGGED**: All bill rows are tagged.\n    *   Row 1: ALREADY-RECORDED.\n    *   Row 2: DERIVED.\n    *   Row 3: DERIVED.\n    *   Row 4: PROCEDURE.\n7.  **APPARATUS_ROW**: No monitoring/instrumentation rows are added to the deployed bill. The standard practice (tip probes) *would* have instrumentation rows; this solution has *zero* instrumentation rows on the physical asset, using only the existing DCS. This satisfies \"no new sensors\".\n8.  **COST-PRICING CLAUSE**: The *predictor* has no operational cost. If the *response* to a warning is \"derate the engine,\" that is a separate operational decision. The predictor's cost is $0$ operational loss.\n9.  **MECHANISM-DIVERSITY CLAUSE**: MECHANISM CLASS: **Thermo-Fluidic Creep Integration**. This is a distinct class from \"Vibration Monitoring\" or \"Clearance Sensing.\"\n\n**FINAL ANSWER SUMMARY**\nA software-based creep damage integrator using **existing EGT, Fuel Flow, and Shaft Speed** data. It calculates the accumulated creep strain by integrating the Arrhenius creep rate against the blade temperature inferred from EGT. It warns when the predicted time-to-rub clearance loss is < 90 days. No new sensors, no blade modification, no new hardware.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Installability**: Zero. No installation required; uses existing DCS.",
+    "*   **Operability**: Negligible. Runs on existing control system CPU.",
+    "*   **Maintenance**: Zero. No physical wear.",
+    "*   **Cost Class**: Software license/development only. Significantly lower than tip-cleara",
+    "*   **Operational Loss**: Zero. The predictor itself does not change engine operation. *No",
+    "*   **Protocol**: Back-test the algorithm against historical maintenance records where bla",
+    "*   **Instruments**: Historical DCS logs (EGT, Wf, N1) and maintenance log dates.",
+    "*   **Pass/Fail**: For every historical rub event, the algorithm must have generated a war",
+    "*   **Kill Criterion**: If back-test shows TTR prediction error > 30 days or FA rate > 1/y",
+    "1.  **DEPLOYED-PART CLAUSE**: The mechanism is **pure software/algorithm**. No physical pa",
+    "2.  **PERMITTED-SET CLAUSE**: The problem states: \"use only the existing exhaust temperatu",
+    "3.  **DIRECTION-OF-EFFECT CLAUSE**:",
+    "*   *Driving Variable*: Blade Creep Strain Rate $\\dot{\\epsilon}$.",
+    "*   *Mechanism Action*: The *predictor* does not move the variable; it *measures* the inte",
+    "*   *Signed Statement*: Reducing EGT **lowers** $T_{blade}$, which **exponentially lowers*",
+    "4.  **EXEMPLAR-REALITY / CERTIFIED-SYSTEM**: No commercial hardware exemplars are named be",
+    "5.  **PREMISE-VALIDITY**: The problem states EGT, Fuel Flow, and Shaft Speed *exist* and a",
+    "6.  **BILL_UNTAGGED**: All bill rows are tagged.",
+    "*   Row 1: ALREADY-RECORDED.",
+    "*   Row 2: DERIVED.",
+    "*   Row 3: DERIVED.",
+    "*   Row 4: PROCEDURE.",
+    "7.  **APPARATUS_ROW**: No monitoring/instrumentation rows are added to the deployed bill. ",
+    "8.  **COST-PRICING CLAUSE**: The *predictor* has no operational cost. If the *response* to",
+    "9.  **MECHANISM-DIVERSITY CLAUSE**: MECHANISM CLASS: **Thermo-Fluidic Creep Integration**."
+   ]
+  }
+ },
+ "declared_template_prose": "**thermo-fluidic creep integration**. this is a distinct class from \"vibration m",
+ "allowed_row_outside": 0,
+ "sha256_16": "779d53dc0d4fc127",
+ "smoke": false
+}

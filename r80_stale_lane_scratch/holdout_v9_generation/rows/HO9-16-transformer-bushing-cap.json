@@ -1,0 +1,78 @@
+{
+ "problem_id": "HO9-16-transformer-bushing-cap",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    30,
+    33,
+    7
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:bf9ddfc8f362": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:1853485a6d1e": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:a7d0d99a27a3": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:39:57.156039Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**\n*   **Standard Practice Class:** The standard practice for this problem class delivers a **DESIGN CHANGE / MONITORING INDICATION** by performing **offline insulation power-factor (tan-delta) testing** (requiring removal of load and application of test voltage) to measure capacitance and dielectric loss, providing a direct physical measurement of insulation degradation.\n*   **My Mechanism Departure:** My mechanism delivers the **SAME CLASS OF OUTCOME** (a leading indicator for tan-delta/capacitance drift) but departs by using **online differential diagnosis via existing load-side signals**. It infers the change in the bushing's capacitive impedance vector relative to its inductive reference using the **ratio of Load Current ($I_L$) to Bushing Leakage Current ($I_{lk}$)**, which is physically sensitive to the phase shift of the leakage component driven by tan-delta ($\\tan \\delta$). This avoids any offline intervention.\n*   **Failure-Physics Connection:** Tan-delta ($\\tan \\delta$) represents the ratio of resistive (lossy) current to capacitive (displacement) current in the insulation system. As insulation degrades, $\\tan \\delta$ increases, increasing the real power component of the leakage. The load current $I_L$ is the primary driving field. The leakage current $I_{lk}$ scales with voltage (and thus load magnitude). By normalizing $I_{lk}$ against $I_L$ (or more precisely, against the voltage magnitude which is proportional to load in a stiff system), we isolate the phase-dependent leakage component that shifts with $\\tan \\delta$, allowing detection of drift without external excitation.\n\n**PHYSICS CHECK**\n*   **Governing Relation:** The leakage current through a bushing is modeled as $I_{lk} = V \\cdot Y_{ins} = V \\cdot C_{eq} \\omega (\\cos \\phi + j \\sin \\phi)$, where $\\phi = \\arctan(\\tan \\delta)$. In the time domain, the in-phase (resistive) component of leakage current is $I_{res} = V \\cdot G_{eq}$, where $G_{eq} = \\omega C_{eq} \\tan \\delta$.\n*   **Magnitude Verification:** For a 145 kV condenser bushing, typical $C_{eq}$ is ~100 pF–1 nF. Typical healthy $\\tan \\delta$ is ~0.005–0.01. Degraded $\\tan \\delta$ approaches 0.05–0.1.\n    *   Healthy $I_{res} \\approx (145 \\times 10^3 / \\sqrt{3}) \\cdot (2\\pi 60 \\cdot 10^{-9} \\cdot 0.005) \\approx 83.3 \\cdot 1.88 \\cdot 5 \\cdot 10^{-3} \\approx 0.8 \\mu A$.\n    *   The *total* leakage current $I_{lk}$ is dominated by the capacitive part: $I_{cap} \\approx 83.3 \\cdot 1.88 \\approx 157 \\mu A$.\n    *   The *change* in leakage current magnitude is small relative to noise, but the **phase** or **component** changes significantly.\n    *   *Correction for Online Inference:* We cannot measure phase directly without a vector scope. However, the **Load Current $I_L$** provides the voltage phase reference (assuming a stable grid, $V \\propto I_L$). The leakage current $I_{lk}$ is a known quantity recorded by existing meters. The **key insight** is that at high load, the bushing voltage is slightly higher than at no-load, but more importantly, the **ratio $I_{lk} / I_L$** is not constant.\n    *   *Wait, strict physics check:* $I_{lk}$ is primarily $V \\cdot j\\omega C$. $I_L$ is $V/Z_{load}$. If the load impedance $Z_{load}$ changes, $V$ changes slightly. But the failure is insulation drift.\n    *   *Refined Mechanism:* The standard \"no new sensors\" constraint usually implies using **existing SCADA data**. SCADA records $I_{lk}$ (as a magnitude or vector if the meter is advanced, but typically magnitude is standard for leakage meters) and $I_{L}$ and $T_{oil}$.\n    *   *Crucial Physics Defect:* If $I_{lk}$ is recorded only as magnitude, we cannot separate $G$ and $C$ from $|V(\\omega C + j\\omega C \\tan\\delta)| = \\omega C V \\sqrt{1+\\tan^2\\delta}$. For small $\\tan\\delta$, $|I_{lk}| \\approx \\omega C V$. Drift in $\\tan\\delta$ alone (if $C$ is stable) causes **negligible** change in $|I_{lk}|$ ($\\Delta |I_{lk}| / |I_{lk}| \\approx \\tan^2\\delta / 2$). A 10x increase in $\\tan\\delta$ (0.01 to 0.1) changes magnitude by ~0.5%. This is below noise.\n    *   *Alternative Physics:* The **Leakage Current** includes a component that is in-phase with voltage (resistive loss). Many modern bushing leakage meters record **both magnitude and phase relative to a reference**, or they use a **zero-crossing comparator** to record the **duty cycle** or **average value** of the half-wave.\n    *   *Constraint Check:* \"Use only the existing bushing leakage current...\" If the meter only outputs magnitude, we are stuck. **However**, the problem states \"existing bushing leakage current\" as the input. In high-voltage transformer monitoring, \"leakage current monitoring\" often refers to **differential leakage current** or **AC magnitude**.\n    *   *Re-evaluating the \"No New Sensors\" + \"No Offline Test\" + \"Predictor\" requirement:*\n        If we assume the \"existing leakage current\" is just a magnitude scalar, we cannot detect tan-delta drift directly via magnitude.\n        **BUT**, there is a **thermal-mechanical correlation**. Tan-delta increases are often caused by moisture ingress or aging. Moisture ingress affects **capacitance** slightly and **resistivity**.\n        *   *Let's look at the Load Current dependence.* The bushing voltage $V$ varies slightly with system load. $I_{lk} \\propto V$. $I_L \\propto V$ (for a constant load impedance). So $I_{lk}/I_L$ is roughly constant **unless** the insulation properties change or temperature changes.\n        *   **Temperature Effect:** $I_{lk}$ has a temperature coefficient. $C$ changes with temperature. $\\tan\\delta$ changes with temperature.\n        *   **The Predictable Signal:** The **derivative** of $I_{lk}$ with respect to $T_{oil}$ and $I_L$.\n        *   *Standard Practice:* Offline tan-delta.\n        *   *My Mechanism:* **Temperature-Compensated Leakage Residual.**\n        *   *Physics:* $I_{lk}(V, T) \\approx \\omega C(T) V \\sec(\\delta(T))$.\n        *   For most synthetic ester or mineral oil impregnated paper, $C$ is stable. $\\delta$ increases with T.\n        *   If we record $I_{lk}$, $T_{oil}$, and $I_L$ (as a proxy for $V$), we can form a **residual**:\n            $$R = I_{lk} - k \\cdot I_{L} \\cdot f(T_{oil})$$\n            Where $k$ is a baseline constant and $f(T)$ is the thermal coefficient.\n        *   *Failure Mode:* When the insulation degrades, the **baseline** $k$ shifts, or the **sensitivity** to temperature shifts. Specifically, a drifting tan-delta will cause the leakage current to deviate from the expected thermal-load correlation **even when normalized**.\n        *   *Actually, the most robust online indicator for tan-delta drift using only magnitude leakage current, oil temp, and load current is the **Drift Rate of the Normalized Leakage Ratio**.*\n        *   **Driving Variable:** Insulation resistance $R_{ins}$ (decreasing) / Tan-Delta (increasing).\n        *   **Mechanism:** Calculate $L_{norm} = I_{lk} / I_{L}$. In a healthy bushing, $I_{lk}/I_{L}$ is primarily determined by the ratio of the capacitive susceptance of the bushing to the load admittance. As $\\tan\\delta$ increases, the **real power** in the leakage increases. Does this change $I_{lk}/I_{L}$?\n            *   $I_{lk} = V \\sqrt{G^2 + B^2}$. $I_L = V / |Z_L|$.\n            *   Ratio $= |Z_L| \\sqrt{G^2 + B^2}$.\n            *   If $G$ (conductance, related to $\\tan\\delta$) increases, the ratio **increases**.\n            *   $G = \\omega C \\tan\\delta$.\n            *   So, $\\Delta (\\frac{I_{lk}}{I_L}) \\propto \\Delta (\\omega C \\tan\\delta)$.\n            *   Since $C$ is stable, this isolates $\\tan\\delta$.\n            *   **Magnitude Check:**\n                *   $I_{lk} \\approx 150 \\mu A$ (Capacitive dominant).\n                *   $I_L \\approx 100 A$ (at 100 MVA, 145 kV, $I \\approx 400 A$ line-to-neutral? No, $S = \\sqrt{3} V I$. $100 MVA / (1.732 \\cdot 145) \\approx 400 A$. Let's say $I_L$ varies 0-400 A.\n                *   Wait, $I_{lk}$ is in **Amperes**? No, leakage current from bushing to ground is usually in **Microamps**. $150 \\mu A$.\n                *   $I_L$ is in **Amperes**. $400 A$.\n                *   The ratio $I_{lk}/I_L$ is $150 \\mu A / 400 A = 0.375 \\mu A/A$.\n                *   If $\\tan\\delta$ doubles, $G$ doubles. But $B \\gg G$. $\\sqrt{G^2+B^2} \\approx B + G^2/2B$. The change is **quadratically small**.\n                *   **Physics Check Failure:** If $G \\ll B$, changes in $\\tan\\delta$ do **not** significantly change the magnitude of $I_{lk}$ relative to $I_L$. The \"Leakage Current\" meter might be measuring the **resistive component** directly? No, it measures total leakage.\n                *   **Revised Physics Approach:** We cannot rely on magnitude change of total leakage.\n                *   **Alternative:** The **Load Current** $I_L$ is not just a proxy for Voltage. It creates a **drop** in the system. But more importantly, the **Top-Oil Temperature** $T_{oil}$ is a proxy for the **Thermal State** of the insulation.\n                *   **The Real Indicator:** **Leakage Current Thermal Stability.**\n                *   Healthy insulation has a stable temperature coefficient. Degraded insulation (high $\\tan\\delta$) dissipates more heat locally? No, the bushing is on the outside. The tank temperature drives the insulation temperature.\n                *   If $\\tan\\delta$ is drifting up, it is often due to **moisture** or **aging**.\n                *   Let's look at the **constraint**: \"use only the existing bushing leakage current, top-oil temperature and load current\".\n                *   If I cannot detect $\\tan\\delta$ drift via magnitude, I must look for **Correlation Breaks**.\n                *   **Mechanism:** **Divergence of Leakage-Load Thermal Model.**\n                *   Build a baseline model $M(I_{lk}, T, I_L)$ from **existing historical data** (the problem implies \"existing... current\", meaning logged data).\n                *   The model assumes $I_{lk}$ is primarily $V \\cdot j\\omega C_{nom}$.\n                *   As $\\tan\\delta$ rises, the **in-phase component** of leakage current grows. This component is **dissipative**.\n                *   While the total magnitude doesn't change much, the **ratio of Leakage Current to Load Current** at **zero load** (if available) vs **full load** might differ? No, $V$ is constant.\n                *   **Wait.** If the meter only gives magnitude, and magnitude is insensitive to $\\tan\\delta$, the predictor **cannot** be based on magnitude alone.\n                *   **Is there a \"existing\" signal I am missing?**\n                *   \"Existing bushing leakage current\" in many modern systems is a **vector** or **phase-sensitive** measurement because the meter needs to distinguish between capacitive charging current and resistive leakage. If it just output magnitude, it wouldn't be very useful for diagnostics. **Assumption:** The \"existing leakage current\" signal is a **scalar magnitude** (most common for simple alarms).\n                *   **If scalar only:** We must use **Temperature** as the primary driver.\n                *   **Physics:** $\\tan\\delta$ is temperature dependent.\n                *   **Novelty:** The standard practice is **Offline**. My practice is **Online**.\n                *   **Mechanism:** **Anomalous Thermal Coefficient of Leakage.**\n                *   A healthy bushing has a known $\\alpha_T$ for its capacitance/leakage. A degrading bushing (due to moisture or aging) exhibits a **shifted**",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_SECTION_MISSING": [
+    "no IMPLEMENTATION BILL section"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "77e6ff4f77faf13c",
+ "smoke": false
+}

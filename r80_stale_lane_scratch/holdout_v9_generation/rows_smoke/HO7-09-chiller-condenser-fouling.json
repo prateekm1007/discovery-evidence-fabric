@@ -1,0 +1,122 @@
+{
+ "problem_id": "HO7-09-chiller-condenser-fouling",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot) [SMOKE mechanics-only]",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P1",
+   "P35",
+   "P5"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "boundary",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "smoke_synthetic",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P35",
+   "measure_class": "boundary",
+   "signals_used": [
+    "pressure",
+    "temperature"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": null,
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:afd77eeb8f05": "novel",
+   "noncand:MS:BOUNDARY_CONDITION_CHANGE:326122632a41": "borderline-judge",
+   "cand:MS:DIRECT_TRANSFER:dd71191d06de": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "triz_principle": "P35",
+  "measure_class": "boundary",
+  "signals_used": [
+   "pressure",
+   "temperature"
+  ],
+  "selection_rule": "smoke_synthetic"
+ },
+ "generated_at": "2026-11-18T07:12:46.149859Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT —\n*   **Standard Practice:** The field-standard practice for this problem class delivers a **MONITORING/INDICATION** scheme via **Direct Pressure Drop (ΔP)** measurement across the condenser, where a rising ΔP at constant flow indicates fouling. It typically uses a differential pressure sensor or infers from suction pressure (forbidden here).\n*   **Mechanism Departure:** My proposal delivers the SAME monitoring outcome (fouling detection) via **Thermal-Electrical Efficiency Inversion**. I do not measure pressure; I infer the condenser's effective thermal resistance by calculating the *expected* compressor power from the condenser water enthalpy rise (via existing flow and ΔT sensors) and comparing it to the *actual* compressor power input. Fouling reduces heat rejection efficiency, forcing the compressor to work harder than the water side physics dictates for the given heat load.\n*   **Failure-Physics Connection:** Fouling adds thermal resistance ($R_{foul}$), lowering the condenser's overall heat transfer coefficient ($U$). To reject the same heat load $Q$, the condensing temperature ($T_{cond}$) must rise. For a centrifugal chiller, discharge/head pressure rises exponentially with $T_{cond}$, causing compressor input power ($P_{input}$) to rise. The water-side temperature difference ($\\Delta T_{water} = T_{out} - T_{in}$) is governed by $Q = \\dot{m} c_p \\Delta T_{water}$. While $\\Delta T_{water}$ itself is relatively insensitive to fouling at steady-state part-load (because the chiller modulates flow or load), the *energy* required to push the refrigerant through the system increases disproportionately. The mismatch between the \"power implied by water-side heat transfer\" and \"actual electrical power\" is the leading indicator of the efficiency collapse caused by fouling.\n\nPHYSICS CHECK —\n*   **Governing Relation:** The core relationship is the Second Law inefficiency penalty. Ideally, for a reversible Carnot cycle, $P_{ideal} = \\dot{Q}_{reject} \\frac{T_c - T_e}{T_e}$ (approx). In real machines, $P_{input} = \\frac{\\dot{Q}_{reject}}{EER}$. The EER degrades as condensing pressure rises.\n*   **Magnitude Verification:** At 900 kW, a 10% increase in condenser approach due to fouling might raise condensing temp by ~1-2°C. This can increase compressor power by 5-15%. The water-side $\\Delta T$ might change only 0.1-0.2°C (masked by control systems adjusting flow or load slightly). Therefore, the power deviation ($\\Delta P_{input}$) is measurable and significantly larger in relative magnitude than the temperature signal alone would suggest, allowing early detection (14 days out) if the trend is monitored.\n*   **Direction-of-Effect:** Driving variable = **Condenser Fouling Factor ($R_f$)**. The mechanism monitors the **increase** in $R_f$ by observing the **increase** in Compressor Input Power ($P_{in}$) that is *not accounted for* by the Water-Side Heat Load ($Q_{water}$). This **raises** the alarm probability as $R_f$ increases. The mechanism does not *change* the fouling; it detects it. The \"remedy\" is the alert. The direction of the *alarm* is correct: as failure progresses ($R_f \\uparrow$), the indicator value ($P_{in}/Q_{water}$ ratio) moves **UP**, triggering the threshold.\n\nIMPLEMENTATION BILL —\n*   **MECHANISM CLASS:** Post-Hoc Efficiency Deviation Monitor (Software-Only).\n\n1.  **Data Ingestion Module:**\n    *   *Item:* PLC/SCADA Historian Tag Mapping.\n    *   *Procurement Tag:* (a) No new hardware. Uses existing BMS/SCADA database.\n    *   *Input Streams:*\n        *   $T_{cw,in}$, $T_{cw,out}$: **ALREADY-RECORDED** (Problem constraint: \"existing condenser-water inlet/outlet temperature\").\n        *   $\\dot{m}_{cw}$: **ALREADY-RECORDED** (Problem constraint: \"existing condenser-water flow meter\").\n        *   $P_{in}$: **ALREADY-RECORDED** (Problem constraint: \"compressor input power\").\n    *   *Reference:* No new sensors. No refrigerant pressure taps.\n\n2.  **Calculation Engine:**\n    *   *Item:* Daily Rolling Window Calculation Script.\n    *   *Procurement Tag:* (b) Software license/development hours for the BMS vendor or in-house OT team.\n    *   *Logic:*\n        1.  Calculate Water-Side Heat Load: $Q_{water} = \\dot{m}_{cw} \\cdot c_p \\cdot (T_{cw,out} - T_{cw,in})$.\n        2.  Calculate Specific Power: $SP = P_{in} / Q_{water}$ (kW/kW).\n        3.  Normalize for Ambient: $SP_{norm} = SP \\cdot f(T_{cw,in})$. *Note: Condenser performance depends on inlet water temp. Fouling trend must be isolated from ambient variation.*\n        4.  Compute Baseline: $SP_{baseline}$ is the median $SP_{norm}$ over the previous 90 days when $T_{cw,in} < 25^\\circ C$ (stable reference period). *Derived from existing data.*\n        5.  Compute Deviation: $\\Delta SP = SP_{norm} - SP_{baseline}$.\n\n3.  **Alert Logic:**\n    *   *Item:* Threshold Comparator.\n    *   *Procurement Tag:* (a) Existing BMS alarm function.\n    *   *Threshold:* $\\Delta SP > 0.05$ kW/kW (5% efficiency drop) sustained for 48 hours.\n    *   *Rationale:* A 5% drop in EER is a significant operational cost driver and indicative of ~15-20% fouling buildup on typical tubes. This occurs well before high-head trip.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —\n*   **Installability:** Standard practice (ΔP transducer) requires installing a D/P sensor across the condenser. My approach requires **zero** new physical sensors. Lower burden.\n*   **Operability:** Standard practice is continuous. My approach is continuous calculation on existing historical data. Equivalent.\n*   **Maintenance:** No sensor calibration or drift to maintain (no new sensors). **Zero** maintenance burden for the monitoring layer itself.\n*   **Rough Cost Class:** Standard practice: ~$2k-$5k (sensors + wiring + calibration). My approach: ~$500-$2k (software configuration labor). **Cheaper.**\n*   **Operational Loss:** **Zero.** The monitoring does not change the duty cycle or throughput. It is purely informational.\n\nEXECUTABLE TEST —\n*   **Protocol:**\n    1.  Access the BMS historian for the target chiller.\n    2.  Extract 1 year of data including periods of known clean condenser (after chemical cleaning) and known fouled periods (just before high-head trip).\n    3.  Run the calculation engine ($SP_{norm}$ vs Time).\n    4.  Overlay the calculated $\\Delta SP$ trend with the actual timeline.\n    5.  Identify the \"True Positive\" moment: The day the condenser was cleaned.\n    6.  Measure the lead time: How many days before the \"High Head Trip\" event did $\\Delta SP$ cross the 0.05 kW/kW threshold?\n    7.  Measure False Alarms: Count instances where $\\Delta SP > 0.05$ for 48 hours but no subsequent cleaning or trip occurred within 14 days.\n*   **Pass/Fail Thresholds:**\n    *   **Lead Time:** $\\geq 14$ days before high-head trip.\n    *   **False Alarm Rate:** $\\leq 1$ per year.\n*   **Kill Criterion:** If the $\\Delta SP$ signal is dominated by ambient temperature fluctuations (cooling tower performance) such that the fouling trend is not separable without a new reference variable (which is forbidden), the predictor is killed. *Mitigation:* The normalization function $f(T_{cw,in})$ must be derived from the physics of the specific chiller's EER curve. If the data shows high noise in $SP_{norm}$ even when $T_{cw,in}$ is stable, the mechanism fails.\n*   **Validation Source:** Uses ONLY already-recorded data (as per constraint). No new sensors.\n\nCONSTRAINT BIND —\n*   **Primary Stated Indicator:** **Compressor Input Power** is the primary failure driver indicator (power creep leads to trip).\n*   **Supplementary Indicator:** **Condenser Water ΔT** is used to calculate the Heat Load ($Q_{water}$), which normalizes the power signal. It does not replace power; it contextualizes it.\n*   **Compliance Check:**\n    *   *Existing Sensors Only:* Yes (T_in, T_out, Flow, P_in).\n    *   *No New Sensors:* Yes.\n    *   *No Refrigerant Taps:* Yes.\n    *   *14-Day Warning:* Achieved by the slow accumulation rate of fouling vs. the exponential power rise.\n    *   *< 1 False Alarm/Year:* Achieved by using a robust median baseline and a hysteresis time-window (48hr sustained) to filter transient load spikes.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** Post-Hoc Efficiency Deviation Monitor (Software-Only).",
+    "1.  **Data Ingestion Module:**",
+    "*   *Item:* PLC/SCADA Historian Tag Mapping.",
+    "*   *Input Streams:*",
+    "*   $T_{cw,in}$, $T_{cw,out}$: **ALREADY-RECORDED** (Problem constraint: \"existing condens",
+    "*   $\\dot{m}_{cw}$: **ALREADY-RECORDED** (Problem constraint: \"existing condenser-water fl",
+    "*   $P_{in}$: **ALREADY-RECORDED** (Problem constraint: \"compressor input power\").",
+    "*   *Reference:* No new sensors. No refrigerant pressure taps.",
+    "2.  **Calculation Engine:**",
+    "*   *Item:* Daily Rolling Window Calculation Script.",
+    "*   *Logic:*",
+    "1.  Calculate Water-Side Heat Load: $Q_{water} = \\dot{m}_{cw} \\cdot c_p \\cdot (T_{cw,out} ",
+    "2.  Calculate Specific Power: $SP = P_{in} / Q_{water}$ (kW/kW).",
+    "3.  Normalize for Ambient: $SP_{norm} = SP \\cdot f(T_{cw,in})$. *Note: Condenser performan",
+    "4.  Compute Baseline: $SP_{baseline}$ is the median $SP_{norm}$ over the previous 90 days ",
+    "5.  Compute Deviation: $\\Delta SP = SP_{norm} - SP_{baseline}$.",
+    "3.  **Alert Logic:**",
+    "*   *Item:* Threshold Comparator.",
+    "*   *Threshold:* $\\Delta SP > 0.05$ kW/kW (5% efficiency drop) sustained for 48 hours.",
+    "*   *Rationale:* A 5% drop in EER is a significant operational cost driver and indicative ",
+    "*   **Installability:** Standard practice (ΔP transducer) requires installing a D/P sensor",
+    "*   **Operability:** Standard practice is continuous. My approach is continuous calculatio",
+    "*   **Maintenance:** No sensor calibration or drift to maintain (no new sensors). **Zero**",
+    "*   **Rough Cost Class:** Standard practice: ~$2k-$5k (sensors + wiring + calibration). My",
+    "*   **Operational Loss:** **Zero.** The monitoring does not change the duty cycle or throu",
+    "*   **Protocol:**",
+    "1.  Access the BMS historian for the target chiller.",
+    "2.  Extract 1 year of data including periods of known clean condenser (after chemical clea",
+    "3.  Run the calculation engine ($SP_{norm}$ vs Time).",
+    "4.  Overlay the calculated $\\Delta SP$ trend with the actual timeline.",
+    "5.  Identify the \"True Positive\" moment: The day the condenser was cleaned.",
+    "6.  Measure the lead time: How many days before the \"High Head Trip\" event did $\\Delta SP$",
+    "7.  Measure False Alarms: Count instances where $\\Delta SP > 0.05$ for 48 hours but no sub",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Lead Time:** $\\geq 14$ days before high-head trip.",
+    "*   **False Alarm Rate:** $\\leq 1$ per year.",
+    "*   **Kill Criterion:** If the $\\Delta SP$ signal is dominated by ambient temperature fluc",
+    "*   **Validation Source:** Uses ONLY already-recorded data (as per constraint). No new sen",
+    "*   **Primary Stated Indicator:** **Compressor Input Power** is the primary failure driver",
+    "*   **Supplementary Indicator:** **Condenser Water ΔT** is used to calculate the Heat Load",
+    "*   **Compliance Check:**",
+    "*   *Existing Sensors Only:* Yes (T_in, T_out, Flow, P_in).",
+    "*   *No New Sensors:* Yes.",
+    "*   *No Refrigerant Taps:* Yes.",
+    "*   *14-Day Warning:* Achieved by the slow accumulation rate of fouling vs. the exponentia",
+    "*   *< 1 False Alarm/Year:* Achieved by using a robust median baseline and a hysteresis ti"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "derived feature input 'Thermal-Electrical Efficiency Inversion' is not derivable from the permitted signals"
+   ]
+  }
+ },
+ "declared_template_prose": "** post-hoc efficiency deviation monitor (software-only).",
+ "allowed_row_outside": 0,
+ "sha256_16": "1d38bbbc2e7e798b",
+ "smoke": true
+}

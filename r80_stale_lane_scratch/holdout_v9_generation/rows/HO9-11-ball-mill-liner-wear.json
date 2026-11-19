@@ -1,0 +1,92 @@
+{
+ "problem_id": "HO9-11-ball-mill-liner-wear",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    40,
+    4,
+    16
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:0fd8d7317192": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:08aab152dd7e": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:33:24.953717Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\n\n*   **Question-Answered:** Mitigate accelerated liner wave-profile wear by implementing a \"Pulse-and-Hold\" duty cycle for the mill speed and a coarse-grain-dominated ball charge, utilizing only the permitted axes of speed setpoint retuning and charge makeup chemistry/size selection.\n*   **Standard Practice:** Standard practice maintains continuous grinding at a constant critical speed (typically 70-80% of critical) with a mixed-size ball charge to maximize throughput and steady-state impact energy.\n*   **Your Mitigation:** The mitigation departs by decoupling the operational duty from continuous steady-state. It uses **periodic high-speed pulsing** (to break the wave profile) combined with **coarse-only ball makeup** (to increase discrete impact magnitude while reducing contact area), driven by the existing VFD and feeder logic.\n*   **Adjacent-Technique Clearance:** The closest existing practice is \"speed modulation\" used in SAG mills to control energy efficiency. This mitigation differs because it is not for energy optimization but for **geometric wear redistribution** via inertial loading spikes, and it explicitly forbids fine ball makeup to prevent abrasive slurry generation that accelerates liner corrosion-erosion.\n*   **Mechanism:** The driving physics of wave-profile wear is the **steady-state centrifugal force distribution** that creates a persistent high-stress band on the liner. By periodically increasing speed to 90-100% of critical for short durations, the ball charge transitions from cascading to cataracting, generating higher-impact, localized shear that disrupts the established \"polishing\" orbit of the balls against the liner. Simultaneously, removing fine balls (making up with coarse only) increases the individual ball impact energy, causing deeper, less frequent indentation that prevents the shallow, uniform abrasive scouring characteristic of wave-profile wear.\n\nPHYSICS CHECK\n\n*   **Governing Relation:** Liner wear rate $W$ is proportional to the product of impact frequency $f$, impact energy $E$, and a geometric factor $G$ dependent on the ball trajectory. For wave-profile wear, $G$ is maximized at steady sub-critical speeds where balls travel in fixed spiral paths.\n*   **Magnitude Verification:**\n    *   $E_{impact} \\propto m g h \\approx m g R (1 - \\cos \\alpha)$.\n    *   At steady 75% critical speed, ball paths are stable spirals; $G$ is high due to continuous contact.\n    *   At pulse 95% critical speed, the centrifugal force $F_c = m \\omega^2 R$ exceeds gravity significantly. Balls lift and fall in large ballistic arcs. The contact time per ball is reduced, but $E_{impact}$ increases by $\\sim (1.3)^2 \\approx 1.7\\times$.\n    *   The **net effect** on the *specific* wave profile is that the high-energy impacts erode the peaks of the wave profile faster than the valleys, effectively \"leveling\" the profile (geometric compensation) rather than deepening it via abrasive slurry flow. The coarse ball makeup reduces the number of balls $N$, reducing total abrasive slurry generation (fines), which lowers the chemical-erosion component of wear.\n*   **DIRECTION-OF-EFFECT:**\n    *   Driving variable: **Steady-state abrasive contact frequency at constant impact energy**.\n    *   Mechanism moves it: **UP** (impact energy) and **DOWN** (contact frequency via coarse balls) **and DOWN** (geometric steady-state factor via speed pulsing).\n    *   This **reduces** the failure driver (progressive wave deepening via steady abrasive polishing).\n\nIMPLEMENTATION BILL\n\n*   **MECHANISM CLASS:** Operational Duty Cycling and Charge Grading.\n\n1.  **VFD Speed Setpoint Profile:** (c) **Parameter Change.** Reprogram the existing Variable Frequency Drive (VFD) to execute a \"Pulse-and-Hold\" schedule.\n    *   *Specification:* Base speed: 72% of critical (existing setpoint). Pulse speed: 95% of critical. Pulse duration: 15 seconds. Hold duration: 5 minutes.\n    *   *Attachment:* Existing VFD on the mill main drive motor. No new hardware.\n2.  **Ball Charge Makeup Procedure:** (c) **Procedure Change.** Alter the ball charging procedure at the ball feeder.\n    *   *Specification:* Discontinue discharge of balls < 50 mm diameter into the mill. Use only the existing coarse fraction (50-90 mm) from the stockpile for makeup. The existing trommel or ball separator (standard mill infrastructure) is adjusted to retain fines in the circuit or discard them, ensuring the active charge in the mill becomes coarser over time.\n    *   *Attachment:* Existing ball feeder and ball separator/control logic.\n3.  **Feed Rate Adjustment:** (c) **Parameter Change.** Reduce the ore feed rate to 80% of the original design tonnage.\n    *   *Specification:* Set the raw feed belt speed to 80% of baseline. This lowers the slurry solid content, reducing abrasive carry-over and allowing the coarse balls to achieve higher ballistic heights without excessive slurry drag.\n    *   *Attachment:* Existing raw feed belt drive/speed controller.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n\n*   **Hardware Cost:** **Zero.** The bill requires no new sensors, no new valves, no new liners, and no custom parts. It utilizes the VFD, feeders, and ball chargers already present in the standard practice.\n*   **Operational Loss:**\n    *   *Throughput:* The reduction in feed rate (to 80%) results in a ~20% reduction in instantaneous throughput during the \"Hold\" phases if strictly time-batched, OR it is a permanent derate. However, the question asks for mitigation of wear. If the goal is sustained lifetime, a 20% throughput reduction is the cost.\n    *   *Energy:* The VFD pulses to 95% critical for 15s every 5 mins. This increases specific energy by $\\sim 10\\%$ during pulses, but the low speed for the remaining 95% of the time keeps average energy near baseline or slightly lower than continuous high-speed. Net energy penalty is estimated at < 5% over the duty cycle.\n    *   *Burden Class:* **Same-or-Lower.** The complexity is purely software/procedural. It removes the burden of frequent liner replacement.\n\nEXECUTABLE TEST\n\n*   **Protocol:**\n    1.  Install liner with known baseline wave profile geometry (measured by laser scan or wire probe at t=0).\n    2.  Run the mill for 30 days under the proposed \"Pulse-and-Hold\" + Coarse-Only makeup procedure.\n    3.  Simultaneously run a twin mill (or the same mill in a previous period) under standard continuous 72% critical + mixed ball makeup.\n    4.  Measure liner wear depth at the wave profile location at t=30 days.\n*   **Instruments:** Existing portable laser profile meter or standard depth micrometer (standard practice inspection tools). No new online sensors.\n*   **Pass/Fail Threshold:**\n    *   **PASS:** The rate of deepening of the wave profile (mm/month) is reduced by $\\geq 50\\%$ compared to the standard practice baseline, OR the total liner mass loss is reduced by $\\geq 30\\%$ while maintaining acceptable particle size distribution (P80) at the coarser feed rate.\n    *   **FAIL:** Wear rate does not decrease, OR the P80 size specification for the ore product is violated due to the coarser ball charge and lower feed rate (quality failure).\n*   **Duration:** 30 days (approx. 100-150 cycles of the pulse pattern).\n*   **Kill Criterion:** If the ball charge becomes too coarse (ball count drops below 30% of design volume), grinding efficiency collapses and product quality fails.\n\nFEASIBILITY BIND COMPLIANCE\n\n*   **Constraint Check:** The problem states \"no mill or liner redesign; allowed measures: ball-charge makeup chemistry/size selection, mill-speed setpoint retuning, or feed-rate/load procedure only\".\n*   **Compliance:**\n    *   \"Mill-speed setpoint retuning\" -> Implemented via VFD Pulse-and-Hold (Bill Row 1).\n    *   \"Ball-charge makeup... size selection\" -> Implemented via Coarse-Only makeup (Bill Row 2).\n    *   \"Feed-rate/load procedure\" -> Implemented via Feed Rate reduction (Bill Row 3).\n    *   No new hardware, no liner modification, no custom parts. All items are (c) parameter/procedure changes on existing equipment.\n\nINPUT-AVAILABILITY CLAUSE\n\n*   **Signals Required:**\n    *   *Mill Speed:* From existing VFD feedback (already present).\n    *   *Ball Charge Level:* From existing ball feeder weight sensor or discharge gate logic (already present).\n    *   *Feed Rate:* From existing belt scale or speed meter (already present).\n*   **Availability:** All required signals are standard process variables monitored in the existing DCS/PLC system. No new sensors are installed.\n\nCOST-PRICING CLAUSE\n\n*   **Operational Cost:** The primary cost is a **20% reduction in nominal throughput** due to the feed rate derate and the energy penalty of the high-speed pulses.\n*   **Net Positive:** This is traded against the **extended liner life**. Liner replacement is a major cost (high material + downtime). If the mitigation extends liner life from 6 months to 12 months, the 20% throughput reduction for 6 months is offset by the 6 months of extra production and the saved liner replacement cost (materials + 2-day outage). The trade is positive because liner downtime is highly expensive.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** Operational Duty Cycling and Charge Grading.",
+    "*   *Specification:* Base speed: 72% of critical (existing setpoint). Pulse speed: 95% of ",
+    "*   *Attachment:* Existing VFD on the mill main drive motor. No new hardware.",
+    "*   *Specification:* Discontinue discharge of balls < 50 mm diameter into the mill. Use on",
+    "*   *Attachment:* Existing ball feeder and ball separator/control logic.",
+    "*   *Specification:* Set the raw feed belt speed to 80% of baseline. This lowers the slurr",
+    "*   *Attachment:* Existing raw feed belt drive/speed controller.",
+    "*   **Hardware Cost:** **Zero.** The bill requires no new sensors, no new valves, no new l",
+    "*   **Operational Loss:**",
+    "*   *Throughput:* The reduction in feed rate (to 80%) results in a ~20% reduction in insta",
+    "*   *Energy:* The VFD pulses to 95% critical for 15s every 5 mins. This increases specific",
+    "*   *Burden Class:* **Same-or-Lower.** The complexity is purely software/procedural. It re"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: Steady-state cascading/cataracting action at sub-critical speeds maintains a persistent, high-contact frequency abrasive scouring that progressively dee"
+   ]
+  }
+ },
+ "declared_template_prose": "** operational duty cycling and charge grading.",
+ "allowed_row_outside": 0,
+ "sha256_16": "12f5badc5c962402",
+ "smoke": false
+}

@@ -1,0 +1,109 @@
+{
+ "problem_id": "HO9-08-flotation-bubble-coalescence",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:41bbbea3b77f": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:f5353ccef64d": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:28:11.776979Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**\n**Question Answered:** I propose a mitigation involving the **retuning of the air-rate procedure and froth depth setpoint** to create a \"shallow-froth, high-velocity\" operating regime that kinetically suppresses bubble coalescence and stabilizes the froth interface.\n\n**Standard Practice vs. Mitigation:**\n*   **Standard Practice:** Operators typically run the flotation column at a deep froth depth (often 0.5–1.0 m) to maximize residence time and hold capacity, using a moderate air rate. This deep, static zone allows large bubbles to form, coalesce, and burst prematurely, destabilizing the froth and washing back valuable particles (cutting recovery).\n*   **My Mitigation:** I deliberately retune the setpoints to reduce the froth depth significantly (e.g., to 0.2–0.3 m) while simultaneously increasing the air rate to maintain the same volumetric air flux but at a much higher superficial velocity. This creates a thin, highly dynamic froth layer where the high shear and rapid bubble turnover kinetically prevent the coalescence time required for large stable bubbles to form. The \"departure\" is the inversion of the conventional \"deep froth for stability\" heuristic to \"shallow, high-velocity froth for kinetic stability.\"\n\n**Adjacent-Technique Clearance:**\n*   **Closest Existing Practice:** The \"high-air-rate\" operation used in rougher columns to improve entrainment.\n*   **Departure:** Standard high-air-rate practice usually maintains or increases froth depth to prevent spillover. My mitigation couples high air rate specifically with *reduced* froth depth, shifting the physics from bulk entrainment to interfacial kinetic suppression of coalescence.\n\n**Mechanism:**\nThe driving mechanism of failure is the **coalescence time** ($t_{coalescence}$) required for two bubbles to merge, which is inversely proportional to the shear rate and directly dependent on the drainage time of the liquid film between them. By reducing the froth depth (shortening the drainage path) and increasing the air rate (increasing shear and collision frequency without allowing time for film drainage), the system enters a regime where $t_{residence} < t_{coalescence}$. The bubbles are swept into the launder before they can coalesce, stabilizing the froth and improving particle capture efficiency.\n\n**PHYSICS CHECK**\nThe governing physical relation for bubble stability in a froth is the ratio of the coalescence time to the residence time in the froth. Coalescence is suppressed when the shear rate $\\dot{\\gamma}$ is high enough to rupture the liquid film between colliding bubbles faster than it can drain.\n$$ t_{residence} \\approx \\frac{H_{froth}}{v_{superficial}} $$\n$$ \\dot{\\gamma} \\propto \\frac{v_{superficial}}{L_{char}} $$\nWhere $H_{froth}$ is the froth depth and $v_{superficial}$ is the superficial gas velocity.\n*   **Magnitude Verification:** Standard practice often operates with $H_{froth} = 0.8 \\text{ m}$ and $v = 0.02 \\text{ m/s}$ (low shear, long drainage time $\\to$ coalescence). My mitigation sets $H_{froth} = 0.25 \\text{ m}$ and increases $v$ to $0.04 \\text{ m/s}$ (doubled air rate).\n    *   Standard: $t_{res} = 40 \\text{ s}$. High drainage time allows coalescence.\n    *   Mitigation: $t_{res} = 6.25 \\text{ s}$. The high shear from $0.04 \\text{ m/s}$ velocity in a short column prevents film stabilization. The failure driver (coalescence) is reduced because the bubbles are discharged before the coalescence physics can occur.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving variable:** Froth Residence Time / Bubble Coalescence Probability.\n*   **The mechanism moves it:** DOWN by 84% (from 40s to 6.25s) via geometric depth reduction and velocity increase.\n*   **This:** REDUCES the coalescence driver, stabilizing the froth.\n\n**IMPLEMENTATION BILL**\nEvery row is tagged with its procurement class. Note that this intervention requires **zero new hardware**. It is a pure parameter/procedure change.\n\n1.  **Froth Depth Setpoint Retuning:**\n    *   **Description:** Adjust the existing level controller setpoint on the column (typically a level switch or radar/DP transmitter already installed for the standard practice) from the current operational value (e.g., 0.8 m) to a new target of 0.25 m.\n    *   **Tag:** (c) **Parameter Change** to existing control system. No new instrumentation is added; the existing level loop is simply re-configured.\n    *   **Stated Infrastructure:** The problem states a \"flotation column, 15 m.\" Standard flotation columns are equipped with froth depth control (level instrumentation) as part of basic operation.\n\n2.  **Air-Rate Procedure Adjustment:**\n    *   **Description:** Increase the volumetric air feed rate via the existing air supply system (blowers/fans) to maintain the new superficial velocity. This is achieved by adjusting the existing air damper position or variable speed drive (VSD) setpoint on the existing blower, which is standard equipment for air rate control.\n    *   **Tag:** (c) **Duty/Configuration Change** on existing air supply equipment. No new blowers or lines are installed.\n    *   **Stated Infrastructure:** The problem states \"air-rate procedure only\" is an allowed measure. The physical hardware for air rate (blowers, dampers) is implied by the device type.\n\n3.  **Chemistry/Dosing Check (Verification Step):**\n    *   **Description:** Verify that the existing frother dosing rate (per the standard practice's own bill) is sufficient to maintain froth stability at the new shallow depth. No new frother type is introduced; the *rate* may be fine-tuned if needed, but the *selection* remains from the standard stock catalog of approved reagents.\n    *   **Tag:** (a) **Existing Material/Procedure.** The frother is already part of the standard practice. We are only verifying its dosage compatibility with the new operating point.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Hardware Burden:**\n    *   **Standard Practice:** Requires froth depth instrumentation, air blowers, and chemical dosing systems.\n    *   **My Intervention:** Uses **only** the existing froth depth instrumentation and air blowers. **Zero** new hardware.\n    *   **Conclusion:** Same-or-lower (Zero hardware addition).\n*   **Installation/Commissioning Burden:**\n    *   **Standard Practice:** No new installation.\n    *   **My Intervention:** No new installation. Only setpoint changes on the HMI/PLC.\n    *   **Conclusion:** Same (Zero physical installation).\n*   **Operational Loss Pricing:**\n    *   **Curtailment/Derate:** The intervention does **not** reduce throughput or energy delivery to the primary process. In fact, increasing air rate *increases* the energy input to the blower.\n    *   **Loss Calculation:** The operational loss is **zero** in terms of production output loss. The trade-off is a slight increase in blower energy consumption.\n    *   **Why it nets positive:** The increase in blower energy is negligible compared to the value of the copper recovery gain from stabilizing the froth. The \"loss\" is minimal energy cost, which is outweighed by the metallurgical gain.\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  Baseline Run: Operate the column for 24 hours at standard settings (Deep froth, low air rate). Measure recovery and froth stability (e.g., via froth sample collection and gas holdup estimation if available, or simply recovery %).\n    2.  Intervention Run: For the next 24 hours, retune the froth depth setpoint to 0.25 m and increase the air rate to achieve the target superficial velocity (e.g., double the current volumetric flow).\n    3.  Recovery Run: Return to baseline for 24 hours.\n*   **Instruments:** Use the standard plant instruments: Column weight (if available) or downstream concentrator grade/recovery data. The \"falsifier\" is the **Recovery Rate** of copper in the concentrate.\n*   **Pass/Fail Thresholds:**\n    *   **Pass:** Copper recovery in the concentrate increases by >2% relative to the baseline run.\n    *   **Fail (Kill Criterion):** If copper recovery decreases or remains flat (<1% increase) for 24 consecutive hours, the mechanism is falsified. This would imply that the shallow froth is not capturing particles effectively (e.g., due to insufficient frother dosing), requiring a re-evaluation of the chemistry rate, not the depth/air rate logic.\n*   **Duration:** 72 hours total (3 shifts/24h blocks).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Froth Depth Setpoint Retuning:**",
+    "*   **Description:** Adjust the existing level controller setpoint on the column (typicall",
+    "*   **Stated Infrastructure:** The problem states a \"flotation column, 15 m.\" Standard flo",
+    "2.  **Air-Rate Procedure Adjustment:**",
+    "*   **Description:** Increase the volumetric air feed rate via the existing air supply sys",
+    "*   **Stated Infrastructure:** The problem states \"air-rate procedure only\" is an allowed ",
+    "3.  **Chemistry/Dosing Check (Verification Step):**",
+    "*   **Description:** Verify that the existing frother dosing rate (per the standard practi",
+    "*   **Hardware Burden:**",
+    "*   **Standard Practice:** Requires froth depth instrumentation, air blowers, and chemical",
+    "*   **My Intervention:** Uses **only** the existing froth depth instrumentation and air bl",
+    "*   **Conclusion:** Same-or-lower (Zero hardware addition).",
+    "*   **Installation/Commissioning Burden:**",
+    "*   **Standard Practice:** No new installation.",
+    "*   **My Intervention:** No new installation. Only setpoint changes on the HMI/PLC.",
+    "*   **Conclusion:** Same (Zero physical installation).",
+    "*   **Operational Loss Pricing:**",
+    "*   **Curtailment/Derate:** The intervention does **not** reduce throughput or energy deli",
+    "*   **Loss Calculation:** The operational loss is **zero** in terms of production output l",
+    "*   **Why it nets positive:** The increase in blower energy is negligible compared to the ",
+    "*   **Protocol:**",
+    "1.  Baseline Run: Operate the column for 24 hours at standard settings (Deep froth, low ai",
+    "2.  Intervention Run: For the next 24 hours, retune the froth depth setpoint to 0.25 m and",
+    "3.  Recovery Run: Return to baseline for 24 hours.",
+    "*   **Instruments:** Use the standard plant instruments: Column weight (if available) or d",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Pass:** Copper recovery in the concentrate increases by >2% relative to the baseline",
+    "*   **Fail (Kill Criterion):** If copper recovery decreases or remains flat (<1% increase)",
+    "*   **Duration:** 72 hours total (3 shifts/24h blocks)."
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "f426d1c501e3bb70",
+ "smoke": false
+}

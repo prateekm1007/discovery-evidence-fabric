@@ -1,0 +1,103 @@
+{
+ "record": "R80_VERIFIER_C0102/1.0.0",
+ "session": "builder-r80s1",
+ "claim": "c-0104",
+ "verifies": "c-0102 (work_id holdout-v11-generation) — the sealed holdout v11 one-shot (executor builder-r91s1, landed b822f50ab/771e5a2b9)",
+ "verdict": "VERIFIED",
+ "method": "Art. 29(c) verifier RECOMPUTE from committed bytes: the committed instrument's own _parse_slice and verify_seal imported read-only (c-0103 method); the committed attestation.json bytes are NOT rewritten (Art. 4); never a re-run — zero LLM, zero quota, zero gateway calls, zero problem bytes newly consumed beyond reading the committed slice/packet/rows/events.",
+ "seal": {
+  "expected_prefix": "1493bb84cccf027f",
+  "recomputed_prefix": "1493bb84cccf027f",
+  "doc_and_prereg_match": true,
+  "verified_exact": true
+ },
+ "attestation_recompute": {
+  "record": "HOLDOUT_V11_GENERATION_ATTESTATION/1.0.0",
+  "executor_id": "builder-r91s1@holdout-v11-generation",
+  "registered_model": "agnes-3.0-flash",
+  "registered_upstream": "agnes",
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "binds": [
+   "F75_deliverable_class",
+   "chemistry_elicitation",
+   "formula_direction",
+   "element_conservation",
+   "equilibrium_direction"
+  ],
+  "rows_committed": 30,
+  "gateway_completed_calls": 167,
+  "gateway_error_lines": 0,
+  "all_calls_requested_registered": true,
+  "all_calls_served_registered": true,
+  "all_calls_upstream_registered": true,
+  "serving_key_digests": [
+   "5c4dffd28fe4",
+   "d0c666a3842f"
+  ],
+  "resumed_slice_merge": true,
+  "field_matches": {
+   "record": true,
+   "registered_model": true,
+   "registered_upstream": true,
+   "measured_path": true,
+   "binds": true,
+   "rows_committed": true,
+   "gateway_completed_calls": true,
+   "gateway_error_lines": true,
+   "all_calls_requested_registered": true,
+   "all_calls_served_registered": true,
+   "all_calls_upstream_registered": true,
+   "serving_key_digests": true,
+   "resumed_slice_merge": true,
+   "executor_id_prefix": true
+  },
+  "attestation_recompute_matches_committed_record": true
+ },
+ "rows": {
+  "rows_committed": 30,
+  "unique_problem_ids": true,
+  "all_non_smoke": true,
+  "critic_verdicts": {
+   "CLEAN": 24,
+   "FLAG": 6
+  },
+  "residual_finding_keys": {
+   "BILL_UNTAGGED": 25,
+   "APPARATUS_ROW": 3,
+   "DEV_NEED": 4,
+   "PHYSICS_DIRECTION_UNSTATED": 2,
+   "DIRECTION_CHECK_UNAVAILABLE": 1,
+   "UNPRICED_DUTY_CYCLE": 1,
+   "REASONING_THRASH_LEAK": 3,
+   "PREDICTOR_VIOLATION": 3
+  },
+  "onrow_sign_contradictions_total": 0,
+  "winner_rule": {
+   "non_schedule_first": 30
+  },
+  "repairs_histogram": {
+   "1": 3,
+   "2": 1,
+   "3": 26
+  },
+  "repair_budget_burned_full_rows": 26,
+  "committed_attestation_sha256_16": "86046640add9dbc6"
+ },
+ "run_record_claims_recompute": {
+  "critic_24_clean_6_flag": true,
+  "sign_contradictions_zero": true,
+  "repairs_hist_1_2_26": true,
+  "burned_full_26_of_30": true,
+  "winner_non_schedule_first_30": true
+ },
+ "incident_typed_disclosure": {
+  "what": "The committed instrument's `attest` mode (scripts/r91_v11_one_shot.py attest) calls _write_attestation, which WRITES its recomputed output into the live eval/holdout_v11_generation/attestation.json — invoked as documented, it rewrote exactly ONE field in place: window_ended_at (committed 2026-11-18T22:33:47.040075Z -> recompute-run stamp). All countable fields were byte-identical; no other field moved.",
+  "handling": "Self-caught before any commit; the committed bytes were restored immediately via git checkout -- (post-restore sha256_16 86046640add9dbc6, byte-exact); the recompute was then redone through the pure-compute path only (the c-0103 method: import the parser, never call the writer).",
+  "instrument_untouched_in_this_lane": true,
+  "recommendation": "A builder round should patch attest mode to be genuinely read-only (print the recomputed attestation; never write the committed path) with a CI-wired test asserting the artifact's sha is unchanged across an attest invocation — the defect bites every future verifier lane. Not done here: the lane is VERIFIER (Art. 29(c) recompute only) and the instrument may be seal/prereg-pinned; cross-lane edits are typed proposals, not silent fixes (Art. 5)."
+ },
+ "honesty_notes": [
+  "window_started_at/window_ended_at are run-time stamps of the ORIGINAL generation window (committed values preserved; the recompute cannot re-derive wall-clock stamps and does not claim to).",
+  "The scorer/critic verdicts recomputed here are the machine's own typed outputs from committed bytes; the AUDITOR's scoring of the 30 rows vs the PRIVATE rubric is a separate lane and is untouched."
+ ]
+}

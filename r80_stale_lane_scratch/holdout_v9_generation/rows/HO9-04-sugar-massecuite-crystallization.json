@@ -1,0 +1,109 @@
+{
+ "problem_id": "HO9-04-sugar-massecuite-crystallization",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:0bed5847ba94": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:1975da47489f": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:22:21.880538Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**\n\n*   **Question Answered:** Mitigate crystal size distribution (CSD) spread by implementing a **Feed-Rate Modulation Procedure** that decouples mass input from solvent evaporation kinetics, thereby flattening the supersaturation peak that drives secondary nucleation.\n*   **Standard Practice:** Standard vacuum pan operation typically uses constant or step-wise feed rates synchronized with batch start/end or simple time-intervals, often allowing transient supersaturation spikes during feeding to trigger uncontrolled primary nucleation (secondary nuclei), which widens the CSD by introducing fine crystals.\n*   **My Mitigation:** A **\"Suction-Lagged Feed Gating\" procedure**. Instead of constant feed, the feed valve is opened/closed in short, discrete bursts. The *opening* of the burst is triggered by a drop in the vacuum system's suction pressure (indicating increased evaporation demand) and the *closing* is triggered by a subsequent rise in vacuum pressure (indicating evaporation rate has stabilized). This creates a feedback loop *without new hardware* (using existing vacuum gauges and feed valve actuators) that ensures feed rate tracks evaporation rate, keeping supersaturation constant rather than spiking.\n*   **Adjacent-Technique Clearance:** The closest existing practice is \"constant feed rate\" or \"time-based batch feeding.\" My departure is the *arrangement* of using the existing vacuum pressure signal (already present for process control) to modulate the existing feed valve, creating a proportional-integral-like behavior via on/off bursting (bang-bang control). It is not a new controller; it is a new *procedure* for operating existing equipment.\n*   **Mechanism:** The driving mechanism of CSD spread is **secondary nucleation** caused by supersaturation transients ($\\Delta S$) exceeding a critical threshold. By gating feed in response to vacuum fluctuations (which proxy for evaporation rate), we clamp $\\Delta S$ to a narrow band, suppressing secondary nucleation.\n\n**PHYSICS CHECK**\n\n*   **Governing Relation:** The nucleation rate $J$ is exponentially sensitive to supersaturation $S$: $J \\propto \\exp\\left(-\\frac{B}{(\\ln S)^2}\\right)$. CSD spread $\\sigma$ is driven by the ratio of primary to secondary nucleation events. Secondary nucleation dominates when local $S$ exceeds $S_{crit}$.\n*   **Direction-of-Effect:**\n    *   **Driving Variable:** Supersaturation Transient Amplitude ($\\Delta S_{transient}$).\n    *   **Mechanism Action:** The mechanism moves $\\Delta S_{transient}$ **DOWN** by decoupling feed rate from time and coupling it to evaporation demand (vacuum fluctuation).\n    *   **Result:** This **reduces** the probability of exceeding $S_{crit}$, thereby suppressing secondary nucleation and narrowing the CSD.\n*   **Magnitude Verification:** Standard constant feed can cause $\\Delta S$ spikes of 5-10% of mean supersaturation during agitation changes. Gated feeding with a 30-second burst cycle limits the mass addition per unit time to match the evaporation rate. Assuming evaporation rate $E$ is steady, feed rate $F$ is now $F = E \\pm \\epsilon$ where $\\epsilon$ is the lag error. The resulting supersaturation fluctuation $\\delta S \\propto \\epsilon$. By tuning the burst duty cycle to the vacuum response time, $\\epsilon$ can be reduced to <1% of mean, reducing secondary nucleation probability by orders of magnitude (due to exponential sensitivity), thus tightening CSD.\n*   **Signed Statement:** The active ingredient is **Feed Gating**. It imposes a **negative** correlation between feed events and supersaturation spikes (by only feeding when vacuum pressure rises, i.e., evaporation is lagging, but stopping before saturation builds). This **lowers** the damage integral of $J(S)$ over the duty cycle by reducing the time-averaged value of $J$ associated with secondary nuclei.\n\n**IMPLEMENTATION BILL**\n\n*   **MECHANISM CLASS:** **Suction-Lagged Feed Gating Procedure**\n\n| Row | Item / Action | Tag | Specification |\n| :--- | :--- | :--- | :--- |\n| 1 | **Feed Valve Actuation Signal Modification** | (c) | Reconfigure the existing feed valve controller (already present) to accept a \"Gating\" input. No new valve; use the existing pneumatic/solenoid actuator. |\n| 2 | **Vacuum Pressure Setpoint Logic** | (c) | Program the existing vacuum control loop to output a \"Low Pressure\" (High Vacuum) and \"High Pressure\" (Low Vacuum) threshold signal. These are standard alarm/limit settings on existing DCS/PLC. |\n| 3 | **Feed Gate Procedure (SOP)** | (c) | **Operational Change:** Operator/Control Logic rule: \"Open feed valve when Vacuum Pressure > Threshold A (evaporation demand high). Close feed valve when Vacuum Pressure < Threshold B (evaporation saturated/lagging).\" Thresholds set to 2-3 kPa apart to prevent chattering. |\n| 4 | **Burst Duration Limiting** | (c) | Configure the existing feed timer (or add a standard 10-min mechanical timer if PLC not available, but PLC is stated in modern plants) to limit any single open period to max 30 seconds. This prevents bulk accumulation even if the logic fails. |\n| 5 | **Verification Instrument** | (a) | Use existing vacuum gauge and existing feed flow meter (if present) or visual level check on the sugar syrup feed tank (standard practice). No new sensors. |\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n\n*   **Hardware:** The bill adds **0** new physical components. All items are reconfigurations of existing controls (PLC/DCS) and valves.\n*   **Installation:** Burden is **Lower** than standard practice (which often involves just turning on a constant feed). No installation work; only parameter setting in the existing HMI/SCADA.\n*   **Operation:**\n    *   **Operational Loss:** The gate closes the feed valve for ~30-60% of the cycle depending on vacuum dynamics. This reduces the *average* feed rate compared to constant flow. However, the vacuum pan operates in a batch mode; the total mass of sugar added per batch is fixed by the batch recipe. The gating merely changes the *distribution* of addition time.\n    *   **Cycle Time Impact:** To deliver the same total mass at a lower average rate, the batch feeding phase extends. Estimated extension: 10-15% longer feeding time per batch.\n    *   **Throughput:** Negligible impact on overall plant throughput as feeding is a small fraction of the total crystallization time.\n    *   **Quality Gain:** Significant reduction in CSD spread (targeting <5% vs standard 10-15%).\n*   **Parity Conclusion:** Same-or-lower hardware burden. Operational loss is a small extension of batch time, offset by quality improvement (reduced fines, better filtration). Net positive.\n\n**EXECUTABLE TEST**\n\n*   **Protocol:**\n    1.  Run a standard batch with Constant Feed (Control) for 3 consecutive batches. Measure CSD using a laser diffraction particle size analyzer (standard lab equipment) or optical microscopy (if available).\n    2.  Configure the \"Suction-Lagged Feed Gating\" procedure in the DCS. Set Threshold A (Vac) to 2 kPa above nominal operating vacuum, Threshold B to 2 kPa below nominal. Set max open time to 30s.\n    3.  Run 3 consecutive batches with the Gating procedure.\n    4.  Compare the standard deviation ($\\sigma$) of the crystal size distribution and the percentage of crystals <100 microns (fines) between Control and Gating groups.\n*   **Instruments:** Existing DCS logs (Vacuum Pressure, Valve Status), Lab Particle Size Analyzer (LDA) or Optical Microscope + Image Analysis software.\n*   **Pass/Fail Thresholds:**\n    *   **Fail:** If $\\sigma_{Gating} \\ge \\sigma_{Control}$ or if Fines%_Gating > Fines%_Control.\n    *   **Pass:** If $\\sigma_{Gating} < 0.8 \\times \\sigma_{Control}$ AND Fines%_Gating < Fines%_Control.\n*   **Duration:** 1 week (3 days for control, 3 days for test, 1 day for analysis).\n*   **Kill Criterion:** If the vacuum pressure fluctuation is too noisy to allow stable gating (chattering > 10 openings/min), the mechanism is not feasible for this specific plant's vacuum stability; adjust thresholds or abandon in favor of feed-rate ramping.\n\n**CONSTRAINT COMPLIANCE CHECK:**\n\n*   **Allowed Measures:** \"feed-rate/circulation procedure only\". This intervention is a **feed-rate procedure**.\n*   **Exclusions:** \"no pan or coil redesign\". No hardware changes.\n*   **Direction of Effect:** Moves Supersaturation Transients **Down**. Correct.\n*   **Input Availability:** Uses Vacuum Pressure (stated/standard in vacuum pans) and Feed Valve (stated/standard). No new sensors.\n*   **Deployed Part Clause:** The pan, coils, and valves are used as-is. Only control logic is changed.\n*   **Permitted Set Clause:** Drawn from \"procedure\" class. No physical device added.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** **Suction-Lagged Feed Gating Procedure**",
+    "*   **Hardware:** The bill adds **0** new physical components. All items are reconfigurati",
+    "*   **Installation:** Burden is **Lower** than standard practice (which often involves jus",
+    "*   **Operation:**",
+    "*   **Operational Loss:** The gate closes the feed valve for ~30-60% of the cycle dependin",
+    "*   **Cycle Time Impact:** To deliver the same total mass at a lower average rate, the bat",
+    "*   **Throughput:** Negligible impact on overall plant throughput as feeding is a small fr",
+    "*   **Quality Gain:** Significant reduction in CSD spread (targeting <5% vs standard 10-15",
+    "*   **Parity Conclusion:** Same-or-lower hardware burden. Operational loss is a small exte",
+    "*   **Protocol:**",
+    "1.  Run a standard batch with Constant Feed (Control) for 3 consecutive batches. Measure C",
+    "2.  Configure the \"Suction-Lagged Feed Gating\" procedure in the DCS. Set Threshold A (Vac)",
+    "3.  Run 3 consecutive batches with the Gating procedure.",
+    "4.  Compare the standard deviation ($\\sigma$) of the crystal size distribution and the per",
+    "*   **Instruments:** Existing DCS logs (Vacuum Pressure, Valve Status), Lab Particle Size ",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Fail:** If $\\sigma_{Gating} \\ge \\sigma_{Control}$ or if Fines%_Gating > Fines%_Contr",
+    "*   **Pass:** If $\\sigma_{Gating} < 0.8 \\times \\sigma_{Control}$ AND Fines%_Gating < Fines",
+    "*   **Duration:** 1 week (3 days for control, 3 days for test, 1 day for analysis).",
+    "*   **Kill Criterion:** If the vacuum pressure fluctuation is too noisy to allow stable ga",
+    "*   **Allowed Measures:** \"feed-rate/circulation procedure only\". This intervention is a *",
+    "*   **Exclusions:** \"no pan or coil redesign\". No hardware changes.",
+    "*   **Direction of Effect:** Moves Supersaturation Transients **Down**. Correct.",
+    "*   **Input Availability:** Uses Vacuum Pressure (stated/standard in vacuum pans) and Feed",
+    "*   **Deployed Part Clause:** The pan, coils, and valves are used as-is. Only control logi",
+    "*   **Permitted Set Clause:** Drawn from \"procedure\" class. No physical device added."
+   ],
+   "APPARATUS_ROW": [
+    "1.  Run a standard batch with Constant Feed (Control) for 3 consecutive batches. Measure CSD using a laser dif"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ]
+  }
+ },
+ "declared_template_prose": "** **suction-lagged feed gating procedure**",
+ "allowed_row_outside": 0,
+ "sha256_16": "fa2c4319bbd1c0dd",
+ "smoke": false
+}

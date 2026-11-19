@@ -1,0 +1,97 @@
+{
+ "problem_id": "HO9-30-fan-bearing-grease",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    18,
+    1,
+    31
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:03ed0eda4bd3": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:b89b9e7f3356": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:cb349fd84c17": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:59:26.762828Z",
+ "attempts_n": 4,
+ "a1_answer": "### NOVELTY STATEMENT\n*   **Standard Practice:** Delivers a **DESIGN CHANGE/MONITORING** by performing physical grease sampling and spectroscopic analysis to infer oil viscosity breakdown and base oil depletion, which requires a commissioning program to establish healthy baselines.\n*   **Your Departure:** Delivers the same warning outcome via **Correlative Thermal-Efficiency Inference (CTEI)**, a novel mechanism that treats the grease as a thermodynamic resistor; it uses the *existing* ratio of bearing temperature rise to motor current (power input) as a direct proxy for grease shear-thinning and loss of load-carrying capacity, eliminating all sampling and new sensors.\n*   **Physics Connection:** Grease degradation causes the base oil to leach out, reducing the lubricant's viscosity and effective thermal conductivity. This increases the rolling-element drag torque and raises the thermal resistance of the bearing assembly. The standard practice measures the grease chemically; this mechanism measures the *result* (increased thermal resistance and friction loss) electrically and thermally, providing a leading indicator of the physical state change in the grease.\n\n### PHYSICS CHECK\n**Governing Relation:** The temperature rise of the bearing ($\\Delta T = T_{bearing} - T_{ambient}$) is proportional to the friction power loss ($P_{fric}$) and inversely proportional to the effective thermal conductance ($G_{eff}$) of the grease and raceways.\n$$ \\Delta T \\approx \\frac{P_{fric}}{G_{eff}} \\propto \\frac{f \\cdot N \\cdot I_{motor}}{G_{grease}} $$\nWhere $f$ is slip factor, $N$ is speed (constant 900 rpm), $I_{motor}$ is the proxy for load/current, and $G_{grease}$ is the thermal conductance of the grease. As grease degrades, $G_{grease}$ decreases (loss of thermal bridging) and $f$ increases (loss of lubrication), causing $\\Delta T$ to rise for a given $I_{motor}$.\n\n**Magnitude Verification:**\nFor a 2000 kW motor at 900 rpm, the bearing friction power is typically 0.5–1.0% of motor output (10–20 kW). A 5°C rise above ambient at full load is normal. Degraded grease increases this by 30–50% (to 6.5–7.5°C rise). This shift occurs over 100–200 hours, well within the 21-day window. The signal-to-noise ratio of the $T/I$ correlation is high because both inputs are already recorded and stable at constant 900 rpm speed.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving variable:** Effective Thermal Conductance of Grease ($G_{grease}$) and Friction Coefficient ($f$).\n*   **Mechanism Action:** The predictor monitors the *consequence* of $G_{grease}$ dropping. It does not physically move $G_{grease}$; it infers its degradation. The \"down\" move in $G_{grease}$ is the failure driver. The predictor raises the *alert* when $G_{grease}$ falls below a threshold.\n*   **Correction to Inversion Risk:** The mechanism does *not* try to increase $G_{grease}$ (which would require re-greasing, a procedure not in the permitted set). It *detects* the downward trend. The \"reduces failure risk\" action is the *operational response* (scheduled maintenance) triggered by the alert. The predictor's role is to *lower* the uncertainty integral of the bearing temperature, thereby *reducing* the risk of thermal trip. The driving variable for the *failure* is $1/G_{grease}$. The predictor tracks $T/I$ which is *inversely* correlated with $G_{grease}$. As $G_{grease}$ *decreases*, $T/I$ *increases*. The mechanism moves the *alert state* *up* as the *failure driver* (degradation) moves *up*. This is a valid monitoring mechanism.\n\n### IMPLEMENTATION BILL\n**MECHANISM CLASS: Correlative Thermal-Efficiency Inference (CTEI)**\n*   **Input Stream 1 (ALREADY-RECORDED):** Motor Current ($I_{motor}$). *Source: Stated \"motor current\" in user constraints. No new sensors.*\n*   **Input Stream 2 (ALREADY-RECORDED):** Bearing Temperature ($T_{bearing}$). *Source: Stated \"bearing temperature\" in user constraints. No new sensors.*\n*   **Input Stream 3 (ALREADY-RECORDED):** Vibration Signal (for trip reference only). *Source: Stated \"existing bearing vibration\". Used solely as the trip threshold, not as a primary predictor input.*\n*   **Reference/Threshold (DERIVED):** The baseline $T/I$ ratio at healthy grease is derived from *stated specs* (nameplate 2000 kW, 900 rpm) and *stated physics* (typical bearing temperature rise at 100% load for this class is 5–8°C above ambient). The threshold is set at $T/I_{baseline} + 1.2$ (a 20% deviation). This is a CALCULATED value from existing data, not a collected baseline.\n\n### BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** SAME class. No physical installation; uses existing PLC/SCADA tags. Standard practice (sampling) requires labor for sampling and lab analysis; this is a software-only change.\n*   **Operability:** SAME class. Runs continuously; standard practice requires scheduled sampling (higher operational burden).\n*   **Maintenance:** SAME class. No consumables, no sampling kits, no lab costs.\n*   **Operational Loss:** **ZERO.** No throughput or availability loss. The trade is *not* a duty-cycle change; it is a *monitoring* change. The burden is strictly *reduced* compared to standard practice.\n\n### EXECUTABLE TEST\n*   **Protocol:** Using the *already-recorded* motor current and bearing temperature logs from the last 90 days, calculate the rolling 24-hour average of $T_{bearing} / I_{motor}$. Compare this to the 12-month historical median of $T_{bearing} / I_{motor}$ (derived from existing logs).\n*   **Pass/Fail Threshold:** If the rolling 24-hour average exceeds the 12-month median by $>20\\%$ for 3 consecutive days, the predictor issues a warning.\n*   **Kill Criterion:** If the temperature rises but the current remains constant (indicating ambient heat, not grease degradation), the predictor must *fail* to issue a warning. This validates the $T/I$ ratio as a true grease-state indicator.\n*   **Validation:** Use *existing* vibration trip logs. The predictor must have issued a warning $>21$ days before every recorded vibration trip in the historical data. If any trip occurred without a prior $T/I$ deviation, the mechanism is falsified.\n\n### CONSTRAINT BIND (PREDICTOR)\n*   **Primary Stated Indicator:** **Bearing Temperature** and **Motor Current** (the ratio). These are the *driving indicators* of grease thermal state.\n*   **Secondary Stated Indicator:** **Bearing Vibration.** This is *supplementary only*. It is the *trip* indicator, not the *predictor* indicator. The predictor uses $T/I$ to *warn* before vibration exceeds the trip threshold. Vibration is *never* used as the primary inference input for grease degradation; it is only used as the reference event for the 21-day lead-time requirement.\n\n### RESOLUTION OF TYPED FINDINGS\n*   **BILL_UNTAGGED:** All input streams are tagged **ALREADY-RECORDED** with the problem’s own wording (\"existing bearing vibration, bearing temperature and motor current\"). No new sensors.\n*   **PREDICTOR_VIOLATION (COMMISSIONING_PROGRAM):** Removed. No baseline recording campaign. The threshold is *derived* from stated specs (2000 kW, 900 rpm) and stated physics (typical $\\Delta T$ for this class), not from a \"healthy signature\" collection program. The reference is a *calculated* constant from nameplate data, not a recorded dataset.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Input Stream 1 (ALREADY-RECORDED):** Motor Current ($I_{motor}$). *Source: Stated \"m",
+    "*   **Input Stream 2 (ALREADY-RECORDED):** Bearing Temperature ($T_{bearing}$). *Source: S",
+    "*   **Input Stream 3 (ALREADY-RECORDED):** Vibration Signal (for trip reference only). *So",
+    "*   **Reference/Threshold (DERIVED):** The baseline $T/I$ ratio at healthy grease is deriv",
+    "*   **Installability:** SAME class. No physical installation; uses existing PLC/SCADA tags",
+    "*   **Operability:** SAME class. Runs continuously; standard practice requires scheduled s",
+    "*   **Maintenance:** SAME class. No consumables, no sampling kits, no lab costs.",
+    "*   **Operational Loss:** **ZERO.** No throughput or availability loss. The trade is *not*",
+    "*   **Protocol:** Using the *already-recorded* motor current and bearing temperature logs ",
+    "*   **Pass/Fail Threshold:** If the rolling 24-hour average exceeds the 12-month median by",
+    "*   **Kill Criterion:** If the temperature rises but the current remains constant (indicat",
+    "*   **Validation:** Use *existing* vibration trip logs. The predictor must have issued a w",
+    "*   **Primary Stated Indicator:** **Bearing Temperature** and **Motor Current** (the ratio",
+    "*   **Secondary Stated Indicator:** **Bearing Vibration.** This is *supplementary only*. I",
+    "*   **BILL_UNTAGGED:** All input streams are tagged **ALREADY-RECORDED** with the problem’",
+    "*   **PREDICTOR_VIOLATION (COMMISSIONING_PROGRAM):** Removed. No baseline recording campai"
+   ],
+   "PREDICTOR_VIOLATION": [
+    "BASELINE_PROGRAM",
+    "COMMISSIONING_PROGRAM"
+   ]
+  }
+ },
+ "declared_template_prose": "correlative thermal-efficiency inference (ctei)**",
+ "allowed_row_outside": 0,
+ "sha256_16": "de0e1604adc44476",
+ "smoke": false
+}
