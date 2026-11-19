@@ -51,14 +51,20 @@ import re
 
 from r26_catalog_scan import _bill_rows
 
-from discovery_fabric.engine import measure_guard  # noqa: E402
-# AM91 (claim c-0116): the per-problem permitted-measure enforcement
-# lives in the ENGINE (measure_guard.py + the committed taxonomy) —
-# this harness only wires it. The guard reads the permitted span from
-# user_variables AND constraint (the v14 structural miss) and
-# enforces class-membership over EVERY bill row at EVERY nesting
-# depth; its KILLs ride the same findings convention as the rest of
-# the scan (a key present == a finding; silence == clean).
+from discovery_fabric.engine import permitted_measures  # noqa: E402
+# AM91 (claim c-0116) wired; R103 (claim c-0118) SUPERSEDED the
+# original measure_guard surface with permitted_measures.py (the
+# verifier recompute typed the original's defects: the row walk found
+# ZERO bill rows on 22/30 burned answers — the '*'-bullet/'|'-table
+# water formats unmatched — and the subset semantics false-killed
+# conformant rows once formats were covered; eval/
+# r103_verifier_record.json + the Art. 16 retirement ledger). The
+# superseding guard reads the permitted span from user_variables AND
+# constraint, handles every bill format (bullet/digit/paren/asterisk/
+# Row-N/table), skips sub-structure and annotation labels, and kills
+# on out-of-set substantive measures (the auditor's labelled truth:
+# exactly HO14-12 among the 30 burned rows; 179-row corpus
+# calibration, 0 false kills).
 
 ALLOWED_SPAN = re.compile(
     r"allowed measures?\s*[:\-]?\s*(.+?)(?:\.|;|$)", re.I)
@@ -257,21 +263,19 @@ def _bill_rows_scoped(answer: str) -> list:
 
 
 def _merge_guard(out: dict, problem: dict, answer: str) -> dict:
-    """AM91: the engine per-problem permitted-measure guard. KILLs
-    ride the findings convention; CLEAN/NOT_APPLICABLE contribute
-    nothing (silence == clean)."""
+    """AM91/R103: the engine per-problem permitted-measure guard
+    (permitted_measures.enforce_answer). KILLs ride the findings
+    convention; silence == clean. Fail-closed typed on a guard crash."""
     try:
-        g = measure_guard.permitted_measures_check(problem, answer)
+        g = permitted_measures.enforce_answer(problem, answer)
     except Exception as e:  # noqa: BLE001 — a guard crash must never
         # degrade into silence (fail-closed typed state)
         out["PERMITTED_MEASURE_GUARD_ERROR"] = [
             f"{type(e).__name__}: {e}"]
         return out
-    if g["verdict"] == "KILL":
-        out["PERMITTED_MEASURE_SET_VIOLATION"] = [
-            f"verdict={g['verdict']} form={g['form']} "
-            f"permitted_classes={g['permitted_classes']}"
-        ] + g["kill_reasons"][:4]
+    for k, v in g.items():
+        if v:
+            out[k] = list(v)
     return out
 
 
