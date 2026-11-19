@@ -1,0 +1,182 @@
+{
+ "problem_id": "HO15-08-carpet-tuft-pile",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r105s1@holdout-v15-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r105_v15_one_shot/1.0.0 — the sealed v15 one-shot (the AM90 textile/leather blind-acceptance set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.2 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched; [c-0112] engine-native conformal FA-control); ALL FIVE BINDS = the frozen battery, byte-identical; the per-problem permitted-measure enforcement = the SUPERSEDING permitted_measures engine guard (r103s1 verifier duty, calibrated on 179 committed rows) + the ammonia direction bind in the engine CHECKS registry; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v15-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:09aab391368e": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:56be02ffcd11": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 2,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 20.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      6247,
+      6250
+     ],
+     "unit": "percent",
+     "quantity": "20.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 30.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      6727,
+      6730
+     ],
+     "unit": "percent",
+     "quantity": "30.0 percent",
+     "dimension": "dimensionless"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T17:41:59Z",
+ "attempts_n": 2,
+ "row_wall_s": 17.0,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nQuestion answered: I propose a procedure-only intervention that mitigates pile-height variation by retuning the yarn tension setpoint to a higher constant value and synchronizing the pile-height loop-control setpoint ramp to the machine's specific speed phases, utilizing only the allowed creel procedure and setpoint retuning. Standard practice typically uses a static, baseline tension setpoint and a fixed pile-height target that does not account for speed-induced inertia or yarn feed slippage, leading to dynamic deviations. My mitigation is a genuine departure because it treats tension not as a constant but as a speed-compensated parameter within the existing control architecture, and it adjusts the \"creel procedure\" to a strict tension-banding protocol that eliminates slack accumulation in the tubes. The adjacent-technique clearance is that this differs from standard \"auto-tuning\" of PID loops because it applies a fixed, conservative bias to the tension variable (a process parameter change) rather than an adaptive algorithm change, avoiding instability risks while directly addressing the physical slip mechanism. The mechanism attacks the driving physics by ensuring that the force available at the tufting needle always exceeds the minimum threshold required to prevent yarn slippage and elastic recovery during the high-speed phases of the cycle.\n\nPHYSICS CHECK\nDIRECTION-OF-EFFECT: driving variable = yarn tension at the feed point ($T$); the mechanism moves it UP by increasing the static setpoint and tightening the creel path to eliminate slack; this REDUCES the variance in delivered yarn length ($\\Delta L$) by increasing the effective modulus of the yarn feed system and preventing instantaneous slack that causes variable pile height.\n\nThe governing relation is that pile height $H$ is determined by the length of yarn cut or looped. Variance in $H$ arises from variance in the take-up length, which is a function of tension $T$. The slip mechanism occurs when local tension drops below the threshold $T_{min}$ required to maintain frictional grip or overcome elastic recoil. The driving variable for the failure (variation) is the tension deficit $\\Delta T = T_{min} - T_{local}$. By raising the global setpoint $T_{set}$ such that $T_{set} > T_{min}$ across all speed phases, and by standardizing the creel procedure to remove elastic slack (pre-loading the system), the effective tension $T_{effective}$ becomes more constant. The magnitude verification: if standard practice has tension variance of $\\pm 15\\%$ due to speed fluctuations, and we increase the base tension by $20\\%$ and eliminate slack, the relative variance $\\sigma_T / T$ decreases because the denominator $T$ increases while the absolute noise sources (creel friction, inertia) remain proportional to speed, not absolute tension. This reduces the probability of the tension falling below the critical slippage threshold, thereby linearizing the relationship between feed speed and delivered yarn length.\n\nINPUT-AVAILABILITY CLAUSE:\n- Required Input 1: Yarn Tension Setpoint. Source: Existing creel tension controller (stated in problem as allowing \"yarn-tension setpoint retuning\").\n- Required Input 2: Pile-Height Setpoint. Source: Existing loop control system (stated in problem as allowing \"pile-height/loop-control setpoint retuning\").\n- Required Input 3: Creel/Tube-Feed Configuration. Source: Physical arrangement of the yarn tubes (stated in problem as allowing \"creel/tube-feed procedure only\").\nAll inputs are derivable from the permitted measures. No new instrumentation is required.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Speed-Compensated Tension Biasing and Creel Pre-Loading\n\n(a) Yarn tension setpoint retuning: Increase the base tension setpoint in the creel controller from the standard value $T_{std}$ to $T_{std} \\times 1.20$. This is a parameter change to the existing control system.\n(b) Pile-height/loop-control setpoint retuning: Adjust the pile-height target in the loop control to correspond to the new higher tension state, ensuring the cut length remains consistent with the tighter yarn feed. This is a parameter change to the existing control system.\n(c) Creel/tube-feed procedure: Implement a standardized \"zero-slack\" loading protocol where each yarn tube is tensioned to a specific preload before the start of production, and the path through the guides is inspected to ensure no bending radius is below the material minimum. This is a procedural change to the standard startup routine.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installation/Commissioning Burden: Zero. No new hardware is installed. The intervention consists of three parameter adjustments and one procedural update. The standard practice also involves setting tension and loading yarns; the burden class is identical (operator time for setup), but the procedure is more rigorous. (a)\n- Operational Loss Pricing: The duty cycle of the machine is unchanged. There is no curtailment of production hours. However, the increased tension ($20\\%$ higher) increases the mechanical load on the creel drive motors and the yarn. The energy cost increase is estimated at $<1\\%$ due to increased frictional drag in the guides. The risk of yarn breakage increases if the tension exceeds the yarn's ultimate tensile strength (UTS). The operator must verify that $T_{std} \\times 1.20 < 0.8 \\times UTS_{yarn}$. This is a standard quality check. The trade-off is a slightly higher wear rate on guide parts, which is mitigated by the existing maintenance schedule. The net operational loss is near-zero as throughput is maintained and the variation reduction prevents waste from off-spec carpet. (a)\n- Parity Conclusion: The intervention is strictly within the burden class of standard practice. It requires no new procurement, no new hardware, and no change to machine speed. The burden is lower in terms of rework/waste cost, and equal in terms of setup time. (a)\nEXECUTABLE TEST\nProtocol:\n1.  Run the tufting machine at a constant speed for 1 hour using standard practice (Standard Bill). Measure pile height variation ($\\sigma_{H, std}$) across a 10m sample of carpet.\n2.  Apply the Intervention Bill: Retune tension setpoint by +20%, adjust pile-height setpoint accordingly, and perform the zero-slack creel loading procedure.\n3.  Run the tufting machine at the same constant speed for 1 hour using the Intervention Bill. Measure pile height variation ($\\sigma_{H, int}$) across a 10m sample of carpet.\nInstruments: Tape measure or laser displacement sensor (already available for QC in carpet manufacturing).\nPass/Fail Thresholds: The intervention passes if $\\sigma_{H, int} < 0.7 \\times \\sigma_{H, std}$ (a 30% reduction in standard deviation of pile height). Additionally, no yarn breakage events must occur during the 1-hour test.\nDuration: 2 hours total (1 hour per condition) plus setup.\nKill Criterion: If $\\sigma_{H, int} \\ge \\sigma_{H, std}$ OR if the average tension recorded during the test exceeds $0.8 \\times UTS_{yarn}$, the mechanism is invalid (either ineffective or unsafe).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 1,
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "5d00cc36958efa2d",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 1,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "b2a035f23290bbf4",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n1",
+    "n0"
+   ],
+   "final_node_id": "n1",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 2,
+   "closed": true
+  },
+  "delivered_node_id": "n1",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "speed-compensated tension biasing and creel pre-loading",
+ "allowed_row_outside": 0,
+ "sha256_16": "58554bfbbd450ec0",
+ "smoke": false
+}
