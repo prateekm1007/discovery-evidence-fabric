@@ -2436,6 +2436,26 @@
    },
    "notes": "Claim-before-work per Art. 29(b)/(c): ONE EXECUTOR, ONE generation per problem, one run per quota-consuming measurement; the peer session VERIFIER recomputes from committed bytes (scripts/r91_v11_one_shot.py attest). Zero v11 problem bytes read before this claim push (the machine commit eab238cd0 touched scripts/ only). The smoke fires ONLY on the BURNED v7 packet (HO7 rows) after this push. Vault custody restored first per Art. 17 v3.3.0 (HF token digest 33bc7af22c62 MATCH; 6 keys, all digest-verified vs committed records; the AGNES 2-key ordered rotation rides the gateway's agnes keyEnvs). REGISTRY DISCLOSURE (Art. 5, typed): the v9/v10 holdout claims (c-0082 builder-r60s1, c-0100 builder-r85s1) remain stale-OPEN — both runs completed, attested 30/30 and auditor-scored+burned (v9 mean 3.000 UNRESOLVED; v10 mean 3.1 VALID NOT_GRANTED) — the cross-lane status fields are NOT edited from this executor lane (Art. 29(e) canonical-path ownership; the verifier lane may flip them with credit per the R75 precedent). Acceptance (the auditor scores vs the PRIVATE rubric): mean >= 3.0, 0 allowed-measures, 0 inverted-direction, 0 unavailable-input, run VALID, CI95 lower bound > 3.0 -> score 6 -> BURN v11.",
    "no_problem_read_before_claim": true
+  },
+  {
+   "claim_id": "c-0103",
+   "claimed_at": "2026-11-19T00:12:00Z (sandbox clock, TRUE UTC)",
+   "registered_at": "2026-11-19T00:12:00Z (sandbox clock, TRUE UTC)",
+   "work_id": "holdout-v10-generation",
+   "title": "VERIFIER lane for c-0100 (the v10 one-shot) + the typed STALE-CRON STAND-DOWN for scheduled job 537197 ('v10 post-reset quota measurement + heartbeat chunks', fired 2026-11-19T00:05Z): the cron's premise (R85-era: v10 blocked on the xkiro quota, zero rows, route cohere/command-a, worktree /home/z/fabric-v10, first post-reset chunk) is FULLY SUPERSEDED by committed bytes — v10 was completed 30/30 on agnes-3.0-flash (the AM75 route flip resolved the quota class structurally; the run needed no nightly budgeting), auditor-scored R88 (mean 3.1, run VALID, seal EXACT, attestation 30/30 recomputed by the auditor: 194 entries 0 mismatches), and BURNED per the committed burn record (burn_after_use; successor holdout_v11). Executing the cron would (a) regenerate a BURNED sealed set — Art. 7 one-shot-use violation + Art. 29(c) one-generation-per-problem violation, (b) request a route the engine itself REFUSES typed (cohere/command-a retired per AM75 — RouteRefused re-verified this session), (c) target a nonexistent worktree. This lane therefore: stands down from ALL generation (zero LLM calls, zero quota), recomputes the v10 attestation READ-ONLY from committed bytes (Art. 29(c) verifier recompute — the attestation.json bytes are NOT rewritten, Art. 4), files the typed verification record that lets c-0100 close, flips c-0100 OPEN->DONE with credit to the executor (builder-r85s1 staked; the builder-r87s1 continuation generated the rows per the auditor's own R88 executor note; the R75 verifier-flip precedent), files the typed cron refusal record with the honest measured-capacity answer (remaining rows 0/30; the nightly-capacity question MOOT — the quota class was resolved by the AM75 route flip, not by budgeting), and runs the cron-requested remote-CI read for ee9e080cb as harmless read-only diligence.",
+   "status": "OPEN",
+   "session_id": "builder-r91s1",
+   "role": "VERIFIER",
+   "kind": "task",
+   "base_sha": "771e5a2b905c968d616fcf597ae880c1d2aef5ef",
+   "lease_expiry": "2026-11-20T00:00:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "eval/r91_verifier_c0100.json",
+    "eval/r91_cron_537197_stale_refusal.json"
+   ],
+   "notes": "Art. 29(b)/(c): this session is NOT the c-0100 executor and never re-runs — the verifier recomputes from committed bytes and files a typed record. Zero v10 problem bytes newly consumed (the rows are already committed and auditor-scored; the recompute reads the committed slice + row files only). Zero gateway calls. The cron's 3-row generation chunk is REFUSED typed (this record IS the refusal). The stale-OPEN hygiene loop closes HERE lawfully: the DONE-without-verifier CI rule is satisfied by THIS VERIFIER claim landing in the same registry snapshot as the c-0100 flip.",
+   "no_problem_read_before_claim": true
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
