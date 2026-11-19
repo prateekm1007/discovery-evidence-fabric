@@ -1,0 +1,232 @@
+{
+ "problem_id": "HO14-30-lamella-clarifier",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v14-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r100_v14_one_shot/1.0.0 — the sealed v14 one-shot (the AM88/CORR-7 corrected set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.1 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v14-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:fa95b104f92b": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:b1752f67b316": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:feba05df3548": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 3,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 100.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      1108,
+      1115
+     ],
+     "unit": "day",
+     "quantity": "100.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      2432,
+      2438
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3391,
+      3397
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T12:34:18Z",
+ "attempts_n": 4,
+ "row_wall_s": 32.9,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using visual plate inspection or manual sampling.\nMy mechanism departs by deriving a calculated \"Plate Load Density Index\" from existing sludge flow and flush frequency to predict carryover.\nFailure-physics connection: Sludge buildup on inclined plates reduces hydraulic loading capacity; when accumulation rate exceeds flush removal rate, solids bypass into effluent. The index tracks the net accumulation over time relative to the plate's physical capacity limit.\n\nPHYSICS CHECK\nGoverning relation: Plate accumulation mass $M_{acc}$ accumulates via sludge loading $L_{sludge}$ and is removed via flush events $F$. Carryover occurs when $M_{acc} > M_{max}$ (plate capacity).\nDIRECTION-OF-EFFECT: driving variable = $M_{acc}$ (plate sludge mass); the mechanism moves it DOWN by INCREASING flush frequency or DECREASING sludge flow input via diversion; this REDUCES the failure driver (net accumulation).\nMagnitude verification: Assuming typical plate loading $\\approx 0.1$ g/m²·day. If $M_{max} \\approx 10$ g/m², time to failure is 100 days at 1.0 flush/day. Predictor warns at $M_{acc} = 0.7 M_{max}$.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Data-driven accumulation index prediction.\n1. **Sludge Flow Telemetry Access (a)**\n   - **Tag:** ALREADY-RECORDED (a)\n   - **Detail:** Access existing flow meter data logs for sludge return flow ($Q_{sludge}$). No new hardware installed. (a)\n2. **Flush Frequency Log (a)**\n   - **Tag:** ALREADY-RECORDED (a)\n   - **Detail:** Access existing SCADA/plant records for plate flush valve actuation events. No new hardware installed. (a)\n3. **Turbidity Monitoring Link (b)**\n   - **Tag:** ALREADY-RECORDED (a)\n   - **Detail:** Use existing effluent turbidity sensor. Threshold trip is the failure marker.\n4. **Prediction Logic Module (b)**\n   - **Tag:** CALCULATED (c)\n   - **Detail:** Software algorithm calculating Accumulation Index $I_{acc} = \\sum (Q_{sludge} \\Delta t) - \\sum (Flush\\_Removal\\_Factor \\cdot I_{flush})$. Warn when $I_{acc} > I_{critical} - 14d\\_margin$. (c)\n5. **Warning Interface (c)**\n   - **Tag:** ALREADY-EXISTING (a)\n   - **Detail:** Utilize existing DCS/HMI alarm panel to display \"SLUDGE BUILDUP RISK\". No new displays.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability:** Zero physical installation. All data sources exist. (a)\n- **Operability:** Automated. Operator receives alarm 14 days before trip. (c)\n- **Maintenance:** None for new components. Software maintenance only. (a)\n- **Operational Loss:** Zero direct operational loss. Potential indirect loss if false positive causes unnecessary flush, costing $\\approx \\$50-\\$100$ per event (water/chemicals). Frequency capped at 1 FA/clarifier/year via hysteresis in logic.\n- **Cost Class:** Same as standard software licensing. No capital expenditure for hardware.\nEXECUTABLE TEST\nProtocol: Run algorithm on 12 months of historical data.\nInstruments: None (data only).\nPass/Fail: Algorithm must flag $T_{warn}$ such that $T_{trip} - T_{warn} \\ge 14$ days in all historical incidents.\nKill Criterion: If historical data does not correlate accumulation index to turbidity trip within 14-day window, mechanism is invalid.\n\nCONSTRAINT BIND\nPrimary indicator: Plate sludge buildup (manifesting as turbidity trip).\nSecondary indicator: Accumulation Index (supplements primary by leading it by 14 days).\nReason: Turbidity is the failure marker; Accumulation Index is the leading indicator derived from allowed variables (sludge flow, flush freq).\n\nRISK/TENSION\nTENSION: The problem prohibits \"plate inspection\". This mechanism respects this by using only flow/flush data. No physical access to plates is required.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Detail:** Use existing effluent turbidity sensor. Threshold trip is the failure marker",
+    "- **Detail:** Utilize existing DCS/HMI alarm panel to display \"SLUDGE BUILDUP RISK\". No ne",
+    "- **Operational Loss:** Zero direct operational loss. Potential indirect loss if false pos",
+    "- **Cost Class:** Same as standard software licensing. No capital expenditure for hardware"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "4d0f7b48f2e6241e",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "65aa8aa0228231db",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "eafbd485b12deb1a",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "e45655051e1c3395",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "b23d5ea0382c4680",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n2"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "data-driven accumulation index prediction.",
+ "allowed_row_outside": 0,
+ "sha256_16": "7e18706204d1b463",
+ "smoke": false
+}

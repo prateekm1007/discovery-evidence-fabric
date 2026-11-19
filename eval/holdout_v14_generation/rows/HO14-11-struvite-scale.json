@@ -1,0 +1,686 @@
+{
+ "problem_id": "HO14-11-struvite-scale",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r95s1@holdout-v14-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r100_v14_one_shot/1.0.0 — the sealed v14 one-shot (the AM88/CORR-7 corrected set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.1 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v14-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   [
+    3,
+    34,
+    31
+   ]
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "duty_cycle"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DIRECT_TRANSFER:d93dc7f024d2": "borderline-judge"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": "scaling",
+  "applicable_checks": [
+   "langelier_lsi",
+   "fouling_u_degradation"
+  ],
+  "engine_candidates": {
+   "runs": [
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": -0.2550896287611879,
+     "unit": "dimensionless",
+     "direction_of_effect": "improves",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ASSUMPTION",
+       "value": 25.0,
+       "unit": "degC",
+       "assumption": "committed reference value for langelier_lsi.temp_degC — labelled assumption, Art. 9"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l",
+      "temp_degC"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "improves",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    },
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": -0.2550896287611879,
+     "unit": "dimensionless",
+     "direction_of_effect": "improves",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ASSUMPTION",
+       "value": 25.0,
+       "unit": "degC",
+       "assumption": "committed reference value for langelier_lsi.temp_degC — labelled assumption, Art. 9"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l",
+      "temp_degC"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "improves",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "cand:MS:DIRECT_TRANSFER:d93dc7f024d2"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "cand:MS:DIRECT_TRANSFER:d93dc7f024d2"
+    },
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": -0.2550896287611879,
+     "unit": "dimensionless",
+     "direction_of_effect": "improves",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ASSUMPTION",
+       "value": 25.0,
+       "unit": "degC",
+       "assumption": "committed reference value for langelier_lsi.temp_degC — labelled assumption, Art. 9"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l",
+      "temp_degC"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "improves",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    }
+   ],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 24
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 9,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 50.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      2913,
+      2916
+     ],
+     "unit": "percent",
+     "quantity": "50.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 30.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      2987,
+      2991
+     ],
+     "unit": "degC",
+     "quantity": "30.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 0.1,
+     "unit_raw": "m/s",
+     "source_field": "a1_answer",
+     "source_span": [
+      4678,
+      4685
+     ],
+     "unit": "m/s",
+     "quantity": "0.1 m/s",
+     "dimension": "[length] / [time]"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 20.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4870,
+      4873
+     ],
+     "unit": "percent",
+     "quantity": "20.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-5",
+     "value": 7.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      5727,
+      5732
+     ],
+     "unit": "day",
+     "quantity": "7.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-6",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      5904,
+      5910
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-7",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      6161,
+      6167
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-8",
+     "value": 5.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      6239,
+      6241
+     ],
+     "unit": "percent",
+     "quantity": "5.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-9",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      6493,
+      6499
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": [
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": -0.16027972749141828,
+     "unit": "dimensionless",
+     "direction_of_effect": "improves",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ROW_CLAIM",
+       "claim_id": "nc-2",
+       "unit": "degC"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [
+      "temp_degC"
+     ],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l"
+     ],
+     "unbound_row_claims": [
+      "nc-1",
+      "nc-3",
+      "nc-4",
+      "nc-5",
+      "nc-6",
+      "nc-7",
+      "nc-8",
+      "nc-9"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "improves",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [
+      "nc-1",
+      "nc-2",
+      "nc-3",
+      "nc-4",
+      "nc-5",
+      "nc-6",
+      "nc-7",
+      "nc-8",
+      "nc-9"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere"
+    }
+   ]
+  },
+  "answer_bound_inputs": 1,
+  "answer_assumption_inputs": 7,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "triz_principle": "P31",
+  "measure_class": "chemistry",
+  "signals_used": [
+   "ph",
+   "conductivity"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T12:16:56Z",
+ "attempts_n": 2,
+ "row_wall_s": 19.6,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\n\nWhat is being proposed: A pure parameter-retuning intervention on the existing chemical dosing and flow-control systems that shifts the operating point to a sustained sub-saturation regime with respect to struvite nucleation, while maintaining sufficient upflow velocity to prevent seed agglomeration.\n\nWhat standard practice does: Standard practice maintains the pH setpoint at or above 8.2 to maximize magnesium ammonium phosphate (MAP) formation and typically operates at a constant Mg/P molar ratio close to 1:1, accepting that localized concentration gradients near the wall cause transient supersaturation, leading to crystal nucleation and scaling.\n\nYour mitigation is a genuine departure: It decouples the chemical equilibrium from the wall boundary layer by enforcing a continuous, closed-loop (via existing sensors) pH setpoint reduction to 7.8–8.0, combined with a Mg/P ratio retuning to 1.5:1. This exploits the sharp drop in struvite solubility product ($K_{sp}$) effective supersaturation index (SI) at slightly lower pH, ensuring the bulk solution remains SI < 0 (undersaturated) even in the presence of localized wall cooling or evaporation effects, thereby thermodynamically preventing nucleation rather than mechanically scrubbing it.\n\nAdjacent-technique clearance: The closest existing practice is \"continuous acid dosing for pH control\" in wastewater treatment. The difference here is the *target operating point*: standard practice aims for maximum phosphate recovery (higher pH), whereas this mitigation intentionally sacrifices marginal recovery efficiency to enforce a thermodynamic non-nucleation zone (SI < -0.1), using the existing conductivity and pH signals to drive the dosing pumps, without adding any new hardware.\n\nMechanism by which the intervention attacks the failure's driving physics: Struvite scaling is driven by the local supersaturation index (SI) of Mg²⁺, NH₄⁺, and PO₄³⁻. Scaling occurs when SI > 0. The intervention moves the driving variable (SI) DOWN by lowering the free ammonia concentration (via pH drop) and altering the activity coefficients through ionic strength changes (via Mg/P ratio shift), such that even in the worst-case boundary layer, SI remains negative.\n\nMECHANISM CLASS: Sub-saturation Operating Point Retuning\n\nPHYSICS CHECK\n\nGoverning physical relation: The equilibrium constant for struvite is defined by $K_{sp} = [Mg^{2+}][NH_4^+][PO_4^{3-}]$. The Supersaturation Index is $SI = \\log(IAP/K_{sp})$. Scaling initiates when $SI > 0$.\n\nDirection-of-effect:\nDIRECTION-OF-EFFECT: driving variable = Supersaturation Index (SI); the mechanism moves it DOWN by ~0.5–1.0 log units via pH reduction from 8.2 to 7.9 and Mg/P ratio increase to 1.5; this REDUCES the thermodynamic driving force for crystal nucleation.\n\nMagnitude verification: The fraction of total ammonia as free ammonia ($NH_3$) drops by approximately 50% for every 0.5 pH unit decrease at typical wastewater temperatures (20–30°C). Since struvite formation kinetics are highly dependent on the $NH_4^+/NH_3$ equilibrium, lowering pH from 8.2 to 7.9 reduces the effective ammonium activity contributing to the ion activity product (IAP) by a factor of 3–5. Simultaneously, increasing Mg/P to 1.5 ensures no phosphate depletion, but the dominant effect is the pH-driven drop in free ammonia. This shifts the SI from a typical scaling-prone range of +0.2 to +0.5 down to -0.3 to 0, keeping the wall boundary layer in the undersaturated regime.\n\nINPUT-AVAILABILITY:\n1. pH signal: Sourced from the existing inline pH electrode stated in the problem infrastructure.\n2. Conductivity signal: Sourced from the existing inline conductivity meter stated in the problem infrastructure.\n3. Mg/P Ratio: Calculated from the flowmeter readings of the magnesium source and phosphate source lines (stated infrastructure). All inputs are within the permitted signal set.\n\nIMPLEMENTATION BILL\n\nMECHANISM CLASS: Sub-saturation Operating Point Retuning\n\n(a) Existing inline pH electrode and controller: Used as-is. No new hardware.\n(b) Existing acid dosing pump (H₂SO₄ or HCl) and base dosing pump: Used as-is. The acid pump is a standard metering pump already procured for pH control.\n(c) Controller setpoint retune: Change the pH target from 8.2 ± 0.1 to 7.9 ± 0.1 in the existing control logic.\n(d) Mg/P ratio retune: Adjust the dosing rate of the magnesium source relative to the phosphate source to achieve a molar ratio of 1.5:1. This is a parameter change on the existing peristaltic or diaphragm dosing pumps.\n(e) Upflow velocity check: Verify that the existing air supply blower or pump maintains a superficial upflow velocity > 0.1 m/s. No change to blower settings required; confirm via existing pressure/flow indicators.\n(f) Seed addition procedure: Increase the seed crystal dosing rate from the existing seed bin by 20% using the standard volumetric feeder. This is a procedural change on existing equipment.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n\nInstallation: 0 hours. All components are already installed.\nCommissioning: < 4 hours to adjust setpoints in the existing DCS/PLC.\nOperation: Unchanged. The reactor continues to operate continuously.\nMaintenance: Unchanged. No new parts to maintain.\nCost: $0 additional capital. Consumables cost is unchanged (acid/base rates vary within existing supply).\nOperational Loss: Zero. The reactor throughput is unchanged. The slight decrease in pH does not reduce reactor capacity, only the saturation index. The Mg/P ratio change does not affect energy input.\nParity Conclusion: Same burden class. The intervention is purely software/parameter level.\nEXECUTABLE TEST\n\nProtocol:\n1. Baseline: Operate at pH 8.2, Mg/P 1.0:1 for 7 days. Record wall temperature and conductivity. Visual inspection for crystal growth.\n2. Intervention: Switch controller to pH 7.9 setpoint and Mg/P 1.5:1 ratio. Maintain for 14 days.\n3. Monitoring: Use the existing conductivity meter to track bulk solution stability. Use existing visual inspection ports to check for scale on the glass/quartz liner.\n\nPass/Fail Thresholds:\n- Pass: No visible crystal nucleation on the walls after 14 days of operation at the new setpoint. Conductivity remains stable within ±5% of baseline, indicating no accumulation of unreacted salts.\n- Fail: Any visible crystal growth or \"shower\" of crystals observed in the inspection window within the first 48 hours of the new setpoint, indicating the SI is still > 0 locally.\n\nDuration: 14 days.\nKill Criterion: If pH control fails to hold at 7.9 due to acid dosing limitations, or if the Mg/P ratio cannot be sustained without causing magnesium precipitation (check via conductivity spike), abort the test and revert. The falsification is the observation of scaling despite the sub-saturation target.\n\nCONSTRAINT BIND VERIFICATION\n- Allowed measures: Mg/P molar-ratio chemistry dosing retuning (used), pH setpoint retuning (used), upflow-velocity/seed procedure only (seed procedure adjusted, upflow verified but not changed). All within permitted set.\n- Exclusions: No reactor redesign (complied). No new hardware (complied).\n- Performance bounds: pH 7.9 is within the standard operating envelope for fluidized bed reactors (typically 7.0–9.0).\n\nDEPLOYED-PART CLAUSE VERIFICATION\n- No machining, coating, or modification of reactor walls or internals.\n- Mechanism composed entirely of parameter changes on existing dosing pumps and controller setpoints.\n\nEXEMPLAR-REALITY CLAUSE VERIFICATION\n- No new commercial products named. Acid (HCl/H₂SO₄) and seeds are standard consumables already used in the plant.\n\nPREMISE-VALIDITY CLAUSE VERIFICATION\n- References only existing pH electrodes, conductivity meters, and dosing pumps stated in the problem infrastructure.\n\nCERTIFIED-SYSTEM-AS-SOLD CLAUSE VERIFICATION\n- No new hardware added. No new consumables introduced.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 1,
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "fe9ccc7310768061",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 1,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "a10f3da81c8676a8",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n1",
+    "n0"
+   ],
+   "final_node_id": "n1",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 2,
+   "closed": true
+  },
+  "delivered_node_id": "n1",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "sub-saturation operating point retuning",
+ "allowed_row_outside": 0,
+ "sha256_16": "e70ff0a647bf1536",
+ "smoke": false
+}

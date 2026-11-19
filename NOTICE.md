@@ -117,6 +117,19 @@ is public-domain factual knowledge and is encoded in our own files
   - CWRU bearing data (Case Western Reserve University) — candidate
     3, standard academic attribution, license re-verified at
     adoption time before any bytes are pulled.
+- China/global AI4Science scan continuation (live web read
+  2026-11-19, the FM-eval leg):
+  - FISHER — a foundation model for multi-modal industrial systems
+    (2026; the RMIS benchmark, 19 sub-datasets across anomaly
+    detection and diagnosis tasks) — scanned as an FM-eval candidate
+    for the industrial multi-modal leg; no code adopted; license and
+    weights availability re-verified at adoption time.
+  - "Data-Layer Mismatch in Industrial Motor Fault Diagnosis"
+    (IEEE, 2026) — an applicability study of time-series foundation
+    models on industrial motor data; scanned for the conformal
+    FA-control leg's external-validity framing (the data-layer
+    mismatch caveat is the honest external-viability note for any
+    TSFM adoption); no code adopted.
 - pyribs (BSD-3-Clause) — NOT ADOPTED, typed: no pyribs import
   exists anywhere in the tree; the quality-diversity mechanics are
   the c-0110 AIDE controller + the histogram caps (our own

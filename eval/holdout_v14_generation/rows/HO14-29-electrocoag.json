@@ -1,0 +1,250 @@
+{
+ "problem_id": "HO14-29-electrocoag",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v14-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r100_v14_one_shot/1.0.0 — the sealed v14 one-shot (the AM88/CORR-7 corrected set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.1 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v14-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   [
+    35,
+    20,
+    15
+   ]
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:743516b45b7e": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:709c712fabe8": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 4,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 10.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      752,
+      755
+     ],
+     "unit": "percent",
+     "quantity": "10.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 21.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      1098,
+      1104
+     ],
+     "unit": "day",
+     "quantity": "21.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 21.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      2312,
+      2318
+     ],
+     "unit": "day",
+     "quantity": "21.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 21.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3324,
+      3330
+     ],
+     "unit": "day",
+     "quantity": "21.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "triz_principle": "P31",
+  "measure_class": "chemistry",
+  "signals_used": [
+   "ph",
+   "conductivity"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T12:33:34Z",
+ "attempts_n": 4,
+ "row_wall_s": 44.2,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme (efficiency tracking or periodic weighing). My mechanism departs by using a DERIVED passivation-resistance ratio from ALREADY-RECORDED voltage/current telemetry to predict the trip, avoiding any new hardware or weighing. The failure-physics connection is that passivation oxide layers increase ohmic resistance, shifting the polarization curve and degrading current efficiency before mass loss reaches critical thresholds.\n\nPHYSICS CHECK\nGoverning relation: Passivation resistance $R_p$ is derived from the non-faradaic voltage component. The total cell voltage $V = E_{rev} + iR_p + \\eta_{act}$. As $R_p$ rises, the voltage-current slope increases.\nMagnitude verification: A 10% increase in $R_p$ yields a measurable shift in the slope $\\Delta V/\\Delta I$. The mechanism uses this slope shift as the leading indicator.\nDIRECTION-OF-EFFECT: driving variable = passivation resistance ($R_p$); the mechanism monitors its increase to predict efficiency drop; this reduces the risk of unannounced efficiency trip by providing 21 days lead time.\nSIGNED STATEMENT (AM37 D1): The driving quantity is $R_p$; the mechanism tracks its positive trend; this sign is the failure driver itself, so the monitor does not mitigate but predicts, allowing intervention.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Derived Resistance Monitoring via Existing Telemetry\n\n1. **Data Ingestion (Firmware/SCADA Logic):**\n   *   **Component:** Custom calculation block in existing SCADA.\n   *   **Input:** ALREADY-RECORDED cell voltage and current signals (stated in problem: \"use only the existing cell voltage, current and conductivity\"). (a)\n   *   **Tag (a):** Procurement of existing SCADA license update for calculation block (standard catalog software license).\n\n2. **Reference Baseline Establishment:**\n   *   **Component:** Historical data analysis script.\n   *   **Source:** DERIVED from ALREADY-RECORDED operational logs of healthy electrodes (stated: existing telemetry).\n   *   **Tag (b):** Procurement of data analytics engineer time for one-time setup (standard service class).\n\n3. **Alert Generation:**\n   *   **Component:** SCADA alarm server configuration. (c)\n   *   **Action:** Trigger alert when predicted efficiency drops below trip threshold in >21 days. (c)\n   *   **Tag (c):** Procurement of standard alarm configuration service (no new hardware).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Zero new sensors; uses existing PLC/SCADA tags. Parity with standard practice (which often requires installing weigh cells or probes). (a)\n*   **Operability:** Automated calculation; no manual intervention. Operational loss: Zero (no throughput impact).\n*   **Maintenance:** None. No physical parts to maintain. (a)\n*   **Cost Class:** Negligible software license and labor; same order of magnitude as standard practice's data analysis costs, but without hardware installation burden.\n*   **FA/Cell/Year:** Target <=1. Achieved by 21-day lead time allowing planned maintenance.\nEXECUTABLE TEST\n*   **Protocol:** Run back-test on 12 months of ALREADY-RECORDED data from a cell with known electrode replacement dates.\n*   **Instruments:** SCADA historical database.\n*   **Pass/Fail:** The predictor must flag a risk of efficiency trip at least 21 days before the actual replacement/trip event. False alarm rate <1 per cell per year.\n*   **Kill Criterion:** If the voltage-current slope shift does not correlate with efficiency loss in historical data, the mechanism is falsified.\n\nCONSTRAINT BIND\nPrimary indicator: Efficiency trip (as stated in problem). My predictor uses passivation resistance as the leading indicator for this primary indicator. The mechanism supplements the primary efficiency metric with a physically derived resistance metric, not replacing it.\n\nRISK\nThe assumption that voltage-current slope is a reliable proxy for passivation state must be validated on historical data. If conductivity fluctuations dominate the voltage signal, a high-pass filter or regression-based isolation of the ohmic component is required (derived from existing data).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Data Ingestion (Firmware/SCADA Logic):**",
+    "*   **Component:** Custom calculation block in existing SCADA.",
+    "2. **Reference Baseline Establishment:**",
+    "*   **Component:** Historical data analysis script.",
+    "*   **Source:** DERIVED from ALREADY-RECORDED operational logs of healthy electrodes (stat",
+    "3. **Alert Generation:**",
+    "*   **Operability:** Automated calculation; no manual intervention. Operational loss: Zero",
+    "*   **Cost Class:** Negligible software license and labor; same order of magnitude as stan",
+    "*   **FA/Cell/Year:** Target <=1. Achieved by 21-day lead time allowing planned maintenanc"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "e291e534c0cb34e0",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      1,
+      1,
+      0
+     ],
+     "signature": "3722e915d89eeebc",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "8b9803185db50113",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "617ddc33686ac8f3",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n1",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "e45655051e1c3395",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n1"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "derived resistance monitoring via existing telemetry",
+ "allowed_row_outside": 0,
+ "sha256_16": "3583143d423443df",
+ "smoke": false
+}
