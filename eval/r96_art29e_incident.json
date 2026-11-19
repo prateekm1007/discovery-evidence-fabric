@@ -1,0 +1,33 @@
+{
+ "record": "R96_ART29E_INCIDENT/1.0.0",
+ "session": "builder-r96s1",
+ "date": "2026-11-19",
+ "article": "Art. 29(e) (EPISTEMIC_CONSTITUTION.md v3.3.0 @ 0eb7c23d9)",
+ "what": [
+  "05:55-06:10Z: this window (builder-r96s1, fresh sandbox reprovision) fetched state, FULL-read both constitutions (0eb7c23d9 / d33c57357), read eval/r96_auditor_verification.json + audit/holdout_v12/PREREGISTRATION.json, restored the vault (6 keys, digests verified) and authored a v12 one-shot machine (scripts/r96_v12_one_shot.py, commit 7040d98bc local) with its dry-run PASS zero-LLM — under the honest belief that the executor lane for holdout-v12-generation was unclaimed in THIS window (the round-open message directed THIS lane to run the v12 one-shot).",
+  "06:33Z: the push of 7040d98bc to queue/dev12_r7 was REFUSED non-fast-forward — the PARALLEL session builder-r95s1 had already authored its frozen machine (scripts/r97_v12_one_shot.py @ a067d31aa) and staked claim c-0111 (the lock push 68617c736, GREEN by authenticated check-run read at 06:40:31Z). Art. 29(e) stand-down was applied and typed in the follow-up commit fb0e41d76 (claim c-0112 on the disjoint P3 lane).",
+  "06:47Z THE VIOLATION (self-caught within one command): the rebase command picked BOTH local commits, not only the disjoint claim — pick 1 (7040d98bc, the DUPLICATE machine) applied cleanly on top of the remote tip 68617c736 BECOMING 541b6cf8f, and while pick 2 (the c-0112 claim) sat in a mid-conflict state on eval/work_claims.json, the queued push command pushed HEAD — landing the rebased DUPLICATE on the remote queue tip. The exact act Art. 29(e) forbids (never rebase a duplicate) was performed BY THIS SESSION."
+ ],
+ "damage_assessment": {
+  "what_landed": "541b6cf8f on queue/dev12_r7 = the duplicate machine file scripts/r96_v12_one_shot.py + its commit message (trailers Session: builder-r96s1, Work-Id: holdout-v12-generation)",
+  "what_did_NOT_land": "no duplicate claim (the c-0112 pick was still in conflict); no rows; no generation; no gateway; no quota spend — the Art. 29(c) one-generation rule is INTACT (zero generation from this file, ever)",
+  "ci_state": "the landing commit touches scripts/ only (non-canonical paths) and carries trailers — the Art. 29 CI is green on it; the violation is a DISCIPLINE violation (Art. 29(e) rebasing a duplicate), not a registry/measurement violation",
+  "executor_lane_impact": "NONE — builder-r95s1's canonical machine (r97) and their claim (c-0111) are untouched; their run continues on their own artifact paths; the duplicate file is never imported by any committed surface (their machine is self-contained, byte-mirroring the frozen loop per the r93 convention)"
+ },
+ "false_premise_correction (Art. 9 duty to correct, builder-side Art. 5)": "the landing commit message states the machine was authored 'BEFORE the holdout-v12-generation claim' — TRUE of the AUTHORING instant (05:5xZ local) but MISLEADING at the LANDING instant (06:47Z): claim c-0111 existed on the remote since 68617c736 before the rebased copy landed. The canonical reading is this record, not that message. The message is never silently rewritten (Art. 4); this correction is the authoritative record.",
+ "disposition": {
+  "the_duplicate_machine": "DISCARDED — scripts/r96_v12_one_shot.py @ 541b6cf8f is typed NEVER-EXECUTE: it is not the frozen machine of any claim, it must not be run (any run from it would be an Art. 29(c) duplicate generation), and the canonical v12 machine is exclusively scripts/r97_v12_one_shot.py (builder-r95s1, claim c-0111). The file stays in the tree (history is evidence, Art. 4) carrying this record as its only lawful meaning.",
+  "this_sessions_lane": "VERIFIER for c-0111 (recompute from committed bytes after the executor lands eval/holdout_v12_generation/; typed verification record; never a re-run) + EXECUTOR of the disjoint claim c-0112 (p3-conformal-engine-wiring, re-staked in the same push as this record)."
+ },
+ "root_cause": "the remediation rebase used a bare 'git rebase origin/queue/dev12_r7' on a branch carrying BOTH the duplicate and the disjoint claim — the duplicate was silently included in the pick list, and the push raced the mid-conflict state (HEAD detached at the last applied pick). The missing guard: a pre-push assertion that the pushed commit set contains NO file belonging to a work_id this session does not execute.",
+ "guard_adopted_forward": [
+  "no bare rebase on a multi-commit lane: a stand-down lane rebases ONLY the disjoint claim (single-commit branch or explicit rebase --onto scope)",
+  "no push while a rebase is mid-conflict (the push command is barred until 'git status' reports a clean, non-rebase state)",
+  "every push is preceded by a work_id ownership check: the pushed tree must not add/modify files whose work_id belongs to another session's OPEN claim (checked against the remote registry snapshot at push time)"
+ ],
+ "verification_of_the_canonical_lane": {
+  "c0111_claim": "EXECUTOR builder-r95s1, OPEN, base 0eb7c23d9, lease 2026-11-21T23:59:00Z (read from the remote registry snapshot at 68617c736)",
+  "lock_push_ci": "68617c736 surface SUCCESS — authenticated check-run API read at 2026-11-19T06:40:31Z (quoted, not asserted)",
+  "canonical_machine": "scripts/r97_v12_one_shot.py @ a067d31aa (authored before the c-0111 claim push, the F62 lesson, per its own commit record)"
+ }
+}
