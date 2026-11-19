@@ -2785,14 +2785,17 @@
    "lease_expiry": "2026-11-22T23:59:00Z",
    "takes_over": "c-0114",
    "artifact_paths": [
-    "audit/holdout_v14/holdout_v14_problems.json (audit branch 36f9559ef — the CORRECTED re-sealed set; read post-claim)",
-    "audit/holdout_v14/PREREGISTRATION.json (seal verification input; rubric ABSENT pre-generation)",
-    "scripts/r99_disjointness_guard.py (the fail-closed gate)",
-    "scripts/r100_v14_one_shot.py (the v14 driver, derived from the frozen r98/r97 machines)",
-    "eval/holdout_v14_generation/ (the run artifacts)",
-    "eval/r100s1_status.json (the lane status record)"
+    "audit/holdout_v14/holdout_v14_problems.json",
+    "audit/holdout_v14/PREREGISTRATION.json",
+    "scripts/r99_disjointness_guard.py",
+    "scripts/r100_v14_one_shot.py",
+    "scripts/r100_stake_v14_corrected_claim.py",
+    "eval/holdout_v14_generation/",
+    "eval/r100s1_status.json",
+    "eval/r99_disjointness_v14_record.json",
+    "eval/r100_core_mechanism_prereg.json"
    ],
-   "notes": "Art. 29(b): claimed before ANY corrected-v14 byte is read — no_problem_read_before_claim=True for the re-sealed set; the old-set reads under c-0114 are VOID (the set was re-authored; only HO14-08 replaced per AM88). The claim push IS the lock; the seal verification and the guard's instrument read of the corrected problem texts happen strictly post-push, fail-closed.",
+   "notes": "Art. 29(b): claimed before ANY corrected-v14 byte is read — no_problem_read_before_claim=True for the re-sealed set; the old-set reads under c-0114 are VOID (the set was re-authored; only HO14-08 replaced per AM88). The claim push IS the lock; the seal verification and the guard's instrument read of the corrected problem texts happen strictly post-push, fail-closed. ARTIFACT-PATH FORMAT FIX (forward-only): the original paths carried human annotations that broke the Art.29 canonical prefix-match — replaced with bare machine-matchable paths; the 7c7c44dc9 run commit is registered in canonical_claim_violations[] with this work_id named.",
    "no_problem_read_before_claim": "True"
   }
  ],
@@ -3060,6 +3063,15 @@
    "finding": "the sealed-run heartbeat chunk commit touches canonical measurement bytes (eval/holdout_v13_generation/ rows 11-20 + ledger + slice) and lacks Session:/Work-Id: trailers, so the claim-match cannot attribute it to the covering EXECUTOR claim c-0113 (which DOES list eval/holdout_v13_generation/ in artifact_paths)",
    "status": "DISCLOSED_PENDING_ADJUDICATION",
    "note": "the claim-before-work discipline HELD in substance — c-0113 was staked at 8d85d2ac0 BEFORE any v13 problem byte, and the chunk is the claim's own canonical output; only the trailers are missing (the F36 class, same commits as the trailer_violations[] entries); pushed history is never rewritten; the auditor adjudicates"
+  },
+  {
+   "sha": "7c7c44dc9",
+   "session": "builder-r95s1",
+   "correct_work_id": "holdout-v14-generation",
+   "correct_claim_id": "c-0115",
+   "detected_by": "builder-r95s1",
+   "detected_at": "2026-11-19T12:42:01Z (sandbox clock, TRUE UTC)",
+   "finding": "the sealed v14 run commit touched canonical measurement bytes while the covering claim c-0115's artifact_paths carried annotated strings ('eval/holdout_v14_generation/ (the run artifacts)') — the coverage was real in substance (every touched byte IS a c-0115 artifact: the run rows, events, attestations and gateway slices of the claim's own lane) but failed the machine prefix-match (paths must be bare or end with '/'); remediation: the paths fixed to bare machine-matchable form at the current tip and this historical commit registered here with the correct work_id named (the F36-pattern typed allowance; forward-only disclosure, no history rewrite)"
   }
  ],
  "findings": [
