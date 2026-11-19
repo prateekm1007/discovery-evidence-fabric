@@ -28,6 +28,17 @@ is public-domain factual knowledge and is encoded in our own files
 - WecoAI/aideml (MIT) — `aide/agent.py`, `aide/journal.py`, `aide/interpreter.py`
   candidate-population tree search patterns (D2 direction; the current V8.1.1
   population search is our own implementation, informed by the AIDE architecture).
+- noahshinn/reflexion (MIT) — the verbal self-reflection MEMORY pattern
+  (failure signature + lesson carried across repair attempts, quoted back
+  neutrally); copied as a pattern into `scripts/r80_repair_convergence.py`
+  (AM79 roadmap P2 convergence lane; our own code, no upstream bytes; the
+  frozen-side wiring is a typed next step under the CI-gated re-freeze
+  discipline).
+- madaan/self-refine (Apache-2.0) — the structured feedback→refine→STOP
+  criterion pattern (stop on a provably non-improving repair — exact
+  failure-signature repeat — instead of fixed budget burn); copied as a
+  pattern into `scripts/r80_repair_convergence.py` (AM79 roadmap P2
+  convergence lane; our own code, no upstream bytes).
 - stanfordnlp/dspy GEPA (MIT — corrected from Apache-2.0 by the R47
   byte verification; the standalone gepa-ai/gepa is also MIT) —
   `dspy/teleprompt/gepa/` offline prompt compilation against the
