@@ -76,22 +76,27 @@ Note: the "4x more medals" figure for AIDE tree search is the AIDE
 project's own README claim (vendor-reported), not an independent
 benchmark result; it is treated as motivation only, never as evidence.
 
-## Adopted pattern copies (R92 roadmap, license-verified 2026-11-18)
+## Pattern copies in tree (R92 roadmap, license-verified 2026-11-18; ADOPTION gated on the matched-budget live ablation)
 
 - noahshinn/reflexion (MIT) — the verbal self-reflection MEMORY
   pattern: per-row attempt history (persisted / resolved / new
   finding keys) composed into a reflection addendum on the repair
-  directive from the second repair onward. Implemented in
+  directive from the second repair onward. Two independent
+  implementations of the pattern are in tree: the fixture-stage
+  prototype `scripts/r80_repair_convergence.py` (R80, claim c-0105,
+  zero LLM) and the engine-native controller
   `discovery_fabric/engine/repair_convergence.py` (R93, claim
-  c-0104). PATTERN copy only — zero upstream code bytes (the
-  upstream implementation is an agent framework); the pattern is
-  re-implemented against the frozen V7.7 loop's own finding surface.
+  c-0106, the live-ablation instrument). PATTERN copies only — zero
+  upstream code bytes (the upstream implementation is an agent
+  framework); both are re-implemented against the frozen V7.7 loop's
+  own finding surface. On adoption, Art. 16 accounting retires the
+  scripts-side prototype (superseded by the engine module).
 - madaan/self-refine (Apache-2.0) — the structured STOP criterion
   pattern: stop refining when the feedback signature stops changing
   (here: identical finding signature across the stagnation window
   AFTER a reflection-augmented repair), instead of burning the fixed
-  repair budget on non-improving repairs. Same module, same round,
-  same pattern-copy-only terms.
+  repair budget on non-improving repairs. Same two implementations
+  and same pattern-copy-only terms as above.
 
 ## Datasets (public; our own loaders, per AM43)
 
