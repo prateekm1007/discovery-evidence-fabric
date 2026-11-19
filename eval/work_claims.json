@@ -275,6 +275,11 @@
    "registered_at": "2026-11-19T05:47:04Z (sandbox clock, TRUE UTC)",
    "role": "builder",
    "note": "R95 session-1: continuation of the r80s1 conversation lineage (same builder lane, new context window; the r80s1 session itself remains registered — c-0105/c-0107/c-0108 its work). This session's work: the CRITIC tool-grounding lane c-0109 (discovery_fabric/engine/tool_grounded_critic.py + the 13-test CI battery, the machine's own base_scan as oracle, computed 42.8% corpus correction) + the custody re-check (the sandbox recycle reverted .env.keys to the pre-bootstrap state — re-ran scripts/r77_vault_restore.py, 6 keys + HF session-only, 0600, digests COMMITTED_RECORD_MATCH). Registration typed FORWARD after the CI validator caught the Art. 29(a) miss on the c-0109 push (self-caught, never silent; the claims carry this session id)."
+  },
+  "builder-r96s1": {
+   "registered_at": "2026-11-19T06:45:00Z (sandbox clock, TRUE UTC)",
+   "role": "builder",
+   "note": "R96 session-1: fresh sandbox reprovision (the prior fabric-v10/fabric-r95 worktrees died with the recycle; this window re-fetched state, FULL-read both constitutions @ 0eb7c23d9 / d33c57357, read eval/r96_auditor_verification.json + audit/holdout_v12/PREREGISTRATION.json, restored the vault from the owner-delivered HF master token (6 keys, digests verified, 0600 gitignored, values never logged) and rebuilt the CORR-3 credential helper. This window authored a duplicate v12 machine (scripts/r96_v12_one_shot.py @ local-only 7040d98bc) and its push was refused non-fast-forward because the PARALLEL session builder-r95s1 had ALREADY staked the same work_id holdout-v12-generation (claim c-0111, the lock push 68617c736 GREEN by authenticated check-run read). Art. 29(e) applied verbatim: same-work_id non-fast-forward => STAND DOWN to VERIFIER, never rebase a duplicate. The duplicate machine commit is DISCARDED (local-only, never pushed, never rebased onto the queue tip; the canonical frozen machine is builder-r95s1's scripts/r97_v12_one_shot.py @ a067d31aa). This session takes the VERIFIER role for c-0111 (recompute from committed bytes when eval/holdout_v12_generation/ lands; typed verification record to follow; never a re-run, Art. 29(c)) and executes the DISJOINT unclaimed item claim c-0112 (the P3 conformal-engine lane) per Art. 29(b)."
   }
  },
  "claims": [
@@ -2660,6 +2665,36 @@
      "the v12 sealed one-shot runs BOTH controllers (c-0109 corrector + c-0110 tree) with all five binds on agnes-3.0-flash — the auditor's path-to-6 gate (mean >=3.25, 0 inverted, CI > 3.0)",
      "the machine-side wiring of the c-0109 corrector rides the CI-gated re-freeze discipline in the v12 driver composition"
     ]
+   }
+  },
+  {
+   "claim_id": "c-0112",
+   "claimed_at": "2026-11-19T06:45:00Z (sandbox clock, TRUE UTC)",
+   "work_id": "p3-conformal-engine-wiring",
+   "title": "P3 roadmap item 3 (eval/roadmap_4_to_9.md @ the queue tip): CONFORMAL PREDICTORS wired INTO THE ENGINE — the c-0108 fixture mechanics (scripts/r80_conformal_fa.py, ensemble=False, the lag-order contract, typed FA alerts) become a native engine module (discovery_fabric/engine/conformal_predictor.py) + OWN dataset loaders for the real C-MAPSS/XJTU-SY/CWRU telemetry + walk-forward conformal evals where FA <=1/year becomes a COMPUTED property (coverage >= 1-alpha carried by the interval, never a guessed threshold). Zero-LLM, zero quota contention with the sealed v12 run (the executor's gateway lane is untouched; no gateway is started by this lane; no key rotation). License verification rides the loaders (MAPIE BSD-3-Clause in NOTICE.md already; the datasets' own terms verified per-loader, typed). Fail-closed typed on unreachable datasets (Art. 15 INFRA_SKIP — a harness with a typed refusal is committed, never a fabricated result).",
+   "status": "OPEN",
+   "registered_at": "2026-11-19T06:45:00Z (sandbox clock, TRUE UTC)",
+   "session_id": "builder-r96s1",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "base_sha": "68617c736",
+   "lease_expiry": "2026-11-21T23:59:00Z",
+   "takes_over": null,
+   "artifact_paths": [
+    "discovery_fabric/engine/conformal_predictor.py",
+    "tests/test_conformal_predictor_engine.py",
+    "scripts/r96_real_data_conformal.py",
+    "scripts/r96_claim_c0112.py",
+    "scripts/r96_flip_c0112.py",
+    "eval/r96_conformal_engine_record.json",
+    "eval/r96s1_status.json"
+   ],
+   "notes": "Claim-before-work per Art. 29(b): pushed BEFORE any P3-lane work byte. DISJOINT from the executor lane c-0111 (builder-r95s1): no shared paths (their artifact_paths = scripts/r97_v12_one_shot.py, eval/holdout_v12_generation/, NOTICE.md; this lane touches the engine module + its own tests/scripts/eval records; the NOTICE.md MAPIE row ALREADY carries the c-0108 computed numbers — no NOTICE edit is planned; if a dataset license requires a NOTICE row, the disjoint-content edit rides its own commit per the rebase-disjoint rule). The verifier duty for c-0111 rides this session (recompute from committed bytes after the executor lands; the verification record names the claim it verifies). Art. 27 pre-declaration: this lane's engine lines land in discovery_fabric/engine/conformal_predictor.py (>=30% share expected; the measured number is computed at the work push).",
+   "no_problem_read_before_claim": true,
+   "stand_down_disclosure": {
+    "article": "Art. 29(e)",
+    "event": "this window's v12-machine push was refused non-fast-forward: the parallel session builder-r95s1 staked holdout-v12-generation first (c-0111, lock push 68617c736, CI GREEN by authenticated check-run read at 2026-11-19T06:40:31Z)",
+    "handling": "stand down to VERIFIER for c-0111; the duplicate machine commit 7040d98bc is DISCARDED (local-only, never pushed, never rebased); this session executes the disjoint unclaimed item c-0112 instead (the Art. 29(b) duty); the executor lane's sealed run is untouched"
    }
   }
  ],
