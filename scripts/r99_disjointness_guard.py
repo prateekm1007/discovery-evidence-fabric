@@ -136,12 +136,15 @@ V13_DOMAIN_HEAD = {
 }
 
 # The v14 set's domain heads (the AUDITOR-AUTHORED water/wastewater
-# set @ audit branch ca9b2d52b, seal 73222ce2feb8ab32; derived from
-# the committed problem device/failure fields by the executor AFTER
-# the c-0114 claim push — the mandated pre-run instrument read).
-# Identifying SYSTEM tokens (industry/equipment/process), generic
-# engineering nouns excluded per the guard's contract. Family-adjacent
-# v13 rows (coagulation/GAC/UV/chloramination/struvite) keep their
+# set, CORRECTED per AM88/CORR-7 @ audit branch 36f9559ef, re-sealed
+# 7707a0b4520c2a52; derived from the committed problem device/failure
+# fields by the executor AFTER the claim push — the mandated pre-run
+# instrument read). HO14-08 was RE-DERIVED for the corrected row
+# (constructed-wetland substrate clogging replaces the clashing MBR
+# row; the stale ~mbr entry no longer identifies the row and would
+# false-clash v8-08). Identifying SYSTEM tokens (industry/equipment/
+# process), generic engineering nouns excluded per the guard's
+# contract. Family-adjacent rows keep their
 # honest family tokens — if they clash, the guard types it (the
 # fail-closed contract is the auditor's own prereg requirement).
 V14_DOMAIN_HEAD = {
@@ -152,11 +155,11 @@ V14_DOMAIN_HEAD = {
     "HO14-05": ["quartz sleeve", "medium-pressure", "~uv disinfection"],
     "HO14-06": ["ozone transfer", "fine-bubble diffuser"],
     "HO14-07": ["chlorination contact basin"],
-    "HO14-08": ["membrane bioreactor", "~mbr"],
+    "HO14-08": ["constructed wetland", "substrate clogging"],
     "HO14-09": ["anammox", "nitrite-oxidizer"],
     "HO14-10": ["enhanced biological phosphorus", "glycogen-accumulating"],
     "HO14-11": ["~struvite", "fluidized-bed"],
-    "HO14-12": ["ammonia stripping", "packed tower"],
+    "HO14-12": ["ammonia stripping"],
     "HO14-13": ["thermal hydrolysis", "cambi"],
     "HO14-14": ["trickling filter", "ponding"],
     "HO14-15": ["sequencing batch reactor", "decant"],
