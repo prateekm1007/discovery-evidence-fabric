@@ -1,5 +1,5 @@
 {
- "record": "R110S2_P3_STAGE5_HF_ACCEPTANCE_CORROBORATION/1.0.0",
+ "record": "R110S2_P3_STAGE5_HF_ACCEPTANCE_CORROBORATION/1.1.0",
  "at": "2026-11-20T13:19:30Z (sandbox clock, TRUE UTC)",
  "executor": "builder-r109s2",
  "claim": "c-0148",
@@ -35,7 +35,7 @@
     2.787113,
     11.541787
    ],
-   "rms_last_over_first_ratio": 23.3342,
+   "rms_last_over_first_ratio": 6.5473,
    "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation",
    "sliding": {
     "n_walk": 37,
@@ -86,7 +86,7 @@
     1.969904,
     3.125512
    ],
-   "rms_last_over_first_ratio": 2.795,
+   "rms_last_over_first_ratio": 2.0115,
    "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation",
    "sliding": {
     "n_walk": 50,
@@ -178,5 +178,22 @@
  "protocol_provenance": "walk_pair + constants reused VERBATIM from scripts/r105s2_p3_stage5_xjtu.py (the committed stage-5 bytes; the local path untouched, default --source local)",
  "zero_llm_calls": true,
  "no_acceptance_claims": true,
- "verifier_framing": "this window's own acceptance run (executed BEFORE the twin session's commits landed; the run is NOT re-executed — the recorded bytes are the measurement). Filed per Art. 29(c) as the VERIFIER-side second execution on a NEW canonical path after the Art. 29(e) stand-down: the twin's own acceptance evidence lives in the canonical record 1.1.0 (acceptance_vs_committed) and eval/r110s2_hf_upload_record.json; BOTH runs reach IDENTICAL match-vs-committed outcomes from independent sandboxes"
+ "verifier_framing": "this window's own acceptance run (executed BEFORE the twin session's commits landed; the run is NOT re-executed — the recorded bytes are the measurement). Filed per Art. 29(c) as the VERIFIER-side second execution on a NEW canonical path after the Art. 29(e) stand-down: the twin's own acceptance evidence lives in the canonical record 1.1.0 (acceptance_vs_committed) and eval/r110s2_hf_upload_record.json; BOTH runs reach IDENTICAL match-vs-committed outcomes from independent sandboxes",
+ "amendments": [
+  {
+   "at": "2026-11-20T14:20:00Z (sandbox clock, TRUE UTC)",
+   "by": "builder-r112s1-a4c6de62",
+   "work_id": "r112-f87-ratio-unify (claim c-156; the R111 direction 7 part 2)",
+   "reason": "F87 (auditor R111, P3): the field name rms_last_over_first_ratio carried DIFFERENT formulas in sibling records — endpoint (ch[-1]/ch[0]) here vs the canonical mean-of-5 (np.mean(ch[-5:])/np.mean(ch[:5]), the stage-5 protocol_typed authority) in eval/r105s2_p3_stage5_xjtu_record.json; non-invalidating (the underlying rms_first5/rms_last5 anchors are byte-identical across both records), unify per the verdict",
+   "change": "the two rms_last_over_first_ratio values recomputed under the canonical mean-of-5 formula; every other field unchanged; the old endpoint values preserved here (Art. 4: never silently rewrite)",
+   "old_values_endpoint_formula": {
+    "Bearing3_1": 23.3342,
+    "Bearing3_2": 2.795
+   },
+   "new_values_mean_of_5_formula": {
+    "Bearing3_1": 6.5473,
+    "Bearing3_2": 2.0115
+   }
+  }
+ ]
 }

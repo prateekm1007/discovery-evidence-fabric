@@ -1,0 +1,50 @@
+{
+ "record": "R112_F87_RATIO_UNIFY/1.0.0",
+ "at": "2026-11-20T14:22:00Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r112s1-a4c6de62",
+ "claim": "c-156 (r112-f87-ratio-unify; the R111 direction 7 part 2)",
+ "closes": "F87 (auditor R111, P3): corroboration rms_last_over_first_ratio=23.3342 (endpoint) vs canonical 6.5473 (mean-of-5) — same field name, different formula; non-invalidating; unified",
+ "canonical_formula": {
+  "field": "rms_last_over_first_ratio",
+  "formula": "np.mean(ch[-5:]) / np.mean(ch[:5])",
+  "name": "mean-of-5",
+  "authority": "the stage-5 protocol_typed (the committed protocol implementation scripts/r105s2_p3_stage5_xjtu.py, the ratio line: float(np.mean(ch[-5:]) / np.mean(ch[:5]))); the canonical record eval/r105s2_p3_stage5_xjtu_record.json is the value authority — UNCHANGED by this unify (it already carried the canonical formula)",
+  "recomputed_from": "the committed rms_first5/rms_last5 anchor arrays (bytes over claims; the anchors are byte-identical across the sibling records — the F87 finding was formula-only, never a data disagreement)"
+ },
+ "formula_lineage_before_unify": [
+  {
+   "record": "eval/r105s2_p3_stage5_xjtu_record.json",
+   "formula": "mean-of-5",
+   "values": {
+    "Bearing3_1": 6.5473,
+    "Bearing3_2": 2.0115
+   },
+   "role": "the canonical protocol record — the authority, unchanged"
+  },
+  {
+   "record": "eval/r110s2_hf_acceptance_corroboration.json",
+   "formula": "endpoint (ch[-1]/ch[0])",
+   "values": {
+    "Bearing3_1": 23.3342,
+    "Bearing3_2": 2.795
+   },
+   "role": "the verifier-side second acceptance run — the field name reused with the endpoint formula; AMENDED to the canonical formula by this work item (see the record's own amendments[] block, v1.0.0 -> v1.1.0)"
+  },
+  {
+   "record": "eval/r110_d5_xjtu_six_bearings.json",
+   "formula": "endpoint (ch[-1]/ch[0])",
+   "values_note": "all six bearings carry the endpoint formula (the Dir-5 tool's ratio line); NOT rewritten here — the record is the c-155 recompute's diff BASELINE and rewriting the baseline would destroy the sensitivity comparison; the c-155 record (eval/r112_d5_sensitivity_recompute.json) carries BOTH formulas per bearing and declares the canonical going forward",
+   "role": "the Dir-5 six-bearing measurement — same endpoint class, typed, superseded value-authority for this field by the c-155 recompute record"
+  }
+ ],
+ "verification": {
+  "accept_criterion": "the ratio field byte-consistent across both records (the R111 direction 7)",
+  "byte_consistent": true,
+  "evidence": "after the amendment, results.{Bearing3_1,Bearing3_2}.rms_last_over_first_ratio in eval/r110s2_hf_acceptance_corroboration.json == the same fields in eval/r105s2_p3_stage5_xjtu_record.json == 6.5473 / 2.0115 (recomputed live from the committed anchor arrays at amend time; the assertions ran green)",
+  "unchanged_fields": "every other field in the corroboration record is byte-identical (the walk legs, coverage, alarms, adaptation blocks, the match_vs_committed block — the F87 finding was non-invalidating by construction: the anchors were already identical)"
+ },
+ "forward_rule": "every record that carries the field name rms_last_over_first_ratio uses the canonical mean-of-5 formula; the endpoint form, where needed for a legacy comparison, must carry a distinct field name (rms_last_over_first_ratio_endpoint_legacy)",
+ "art4_compliance": "the corroboration record's amendment is additive-disclosed (amendments[] block with the old endpoint values + the reason; version 1.0.0 -> 1.1.0); the canonical record is untouched; no history rewritten",
+ "zero_llm_calls": true,
+ "no_acceptance_claims": true
+}
