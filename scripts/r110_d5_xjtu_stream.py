@@ -123,7 +123,8 @@ def stream_bearing(bearing, members, arm, log):
             minute = int(name.split("/")[-1].split(".")[0])
             rms, nrows = rms_last_column(data)
             entries[minute] = (rms, nrows)
-            del data, buf
+            del data
+        del buf  # freed AFTER the whole span (the member loop reuses it)
         log(f"    span {si + 1}/{len(spans)} done "
             f"({sum(m['comp_size'] for m in span) // 2**20} MB)")
     minutes = sorted(entries)
