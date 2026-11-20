@@ -3543,6 +3543,8 @@
    "lease_expiry": "2026-11-22T23:59:00Z",
    "title": "the R110 direction 4 EXECUTION (the auditor's one-pager for the owner decision): eval/xjtu_sy_disk_requirement.md — the exact disk calculation (RAR5 parts + extracted CSVs + working space), the value proposition (full 15-bearing life courses vs the verified 173-file sample), and the alternatives (the peer's zip64 streaming subset r110 tooling, a smaller benchmark, cloud storage, cleanup of re-fetchable weights); figures from the committed D7/c-0144 verified numbers + a live df read at authoring time",
    "registered_at": "2026-11-20T09:06:00Z (sandbox clock)",
+   "claimed_at": "2026-11-20T09:06:00Z (sandbox clock)",
+   "artifact_paths": ["eval/xjtu_sy_disk_requirement.md"],
    "completed_at": "2026-11-20T09:18:00Z (sandbox clock)",
    "artifact": "eval/xjtu_sy_disk_requirement.md",
    "status_note": "the one-pager landed: byte-derived requirement (extracted ~12.2GB, in-place ~16-17GB — REFINES the typed ~11GB estimate upward, disclosed in-doc), live df read, four options with the peer-built streaming tool as the recommended default; option B (cloud custody via the restored repo.write scope) explicitly gated on the owner decision. Verifier duty: recompute the derivation from eval/p3_realdata/xjtu_sy_listing.txt + eval/r110_d5_zip_index.json (Art. 29(c) — the recompute, never a re-run).",
@@ -3554,11 +3556,22 @@
    "session_id": "builder-r109s2",
    "role": "EXECUTOR",
    "kind": "task",
-   "status": "OPEN",
+   "status": "DONE",
    "base_sha": "683da18e8",
    "lease_expiry": "2026-11-22T23:59:00Z",
    "title": "the OWNER-DIRECTED HF streaming custody lane (the R110 coder directions, this window): (1) create the PRIVATE HF dataset repo xjtu-sy-bearing-rar (the master token's live repo.write scope — the v3.3.0 zero-perms typed state is obsolete, live whoami verified); (2) stream-upload the XJTU-SY CSVs grouped per bearing folder FROM the verified DavidNguyen mirror zip via the peer's range-fetch tooling class — fetch member -> upload member -> discard, ONE member buffer peak, zero extraction to sandbox disk; (3) the RAR-parts acceptance item is typed BLOCKED-SOURCE honestly (the 6 RAR5 parts are absent post-reprovision and the gdown source carries NO committed file ids — the committed sha256 manifest stays the verification target if the original bytes ever reappear; the mirror zip is the verified alternative source per the peer's Dir-5); (4) the stage-5 loader gains --source hf|local (backward compatible) + a mock CI fixture (no real HF calls in CI); (5) the acceptance run: the stage-5 walk pair executed from HF-sourced bytes must match the committed 173-file sample numbers",
-   "registered_at": "2026-11-20T11:55:00Z (sandbox clock)"
+   "registered_at": "2026-11-20T11:55:00Z (sandbox clock)",
+   "claimed_at": "2026-11-20T11:55:00Z (sandbox clock)",
+   "artifact_paths": [
+    "scripts/r110s2_hf_stream_upload.py",
+    "scripts/r105s2_p3_stage5_xjtu.py",
+    "tests/test_r105s2_p3_stage5_xjtu.py",
+    "eval/xjtu_sy_hf_manifest.json",
+    "eval/r110s2_hf_upload_record.json",
+    "eval/r105s2_p3_stage5_xjtu_record.json"
+   ],
+   "completed_at": "2026-11-20T13:30:00Z (sandbox clock, TRUE UTC)",
+   "status_note": "the lane executed and verified end-to-end: repo live (private, 401 on unauth read, namespace whoami-resolved prateekm1); the prior session's 9216-member flat upload VERIFIED from repo bytes vs the mirror zip CD crc32; 51 v1-collision-layout files deleted (68b2b44ecf); 37 truncated members (the prior session's range-fetch class, all Bearing3_1) repaired from the mirror with per-member crc asserts (1e55dcc43c); sha256 manifest 9216 files 0 mismatches (85b3ec1913, committed + repo root); stage-5 --source hf|local + the 3-test mock fixture; the acceptance run from HF-sourced bytes IDENTICAL to the committed 173-file numbers (173/173 sha256-checked); loader peak footprint one csv (~1.5MB). Incidents typed in the round record (v1 crash + layout collision, two disk-full events, the hub version drift). The RAR-parts acceptance item stays BLOCKED-SOURCE as claimed; the manifest stays the verification target if the original bytes ever reappear"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",

@@ -1,10 +1,20 @@
 {
- "record": "R105S2_P3_STAGE5_XJTU/1.0.0",
- "ran_at": "2026-11-20T04:44:23Z (sandbox clock, TRUE UTC)",
- "executor": "builder-r105s2",
- "claim": "c-0130 (p3-datasets-model-d7d8; auditor direction 7)",
+ "record": "R105S2_P3_STAGE5_XJTU/1.1.0",
+ "ran_at": "2026-11-20T13:07:10Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s2",
+ "claim": "c-0148 item (4)+(5): the HF streaming path",
+ "data_source": "hf_streaming",
+ "hf_streaming": {
+  "data_source": "hf_streaming",
+  "hf_repo": "prateekm1/xjtu-sy-bearing-rar",
+  "hf_repo_type": "dataset",
+  "streaming_mode": "per-bearing-folder",
+  "max_local_footprint_mb": 2,
+  "max_local_footprint_note": "steady-state peak = ONE csv (~1.5MB) held in /tmp, deleted immediately after its RMS is taken; the one-span upload/manifest buffers (<=64MB) belong to the upload lane, not this loader",
+  "integrity_check": "sha256 per file vs the committed manifest (eval/xjtu_sy_hf_manifest.json + the repo root copy)",
+  "manifest_file": "eval/xjtu_sy_hf_manifest.json"
+ },
  "dataset": {
-  "sample_dir": "/home/z/my-project/p3_data_cache/xjtu_sample",
   "n_files": 173,
   "bearings": {
    "Bearing3_1": 73,
@@ -38,15 +48,9 @@
     "Bearing3_2": 2496
    }
   },
-  "flat_dir_attribution": {
-   "note": "the task context described Bearing3_1/Bearing3_2 subfolders; the sample dir is FLAT (no subfolders, no sampler manifest, RAR deleted after sampling). Attribution recovered via the sampler-preserved source mtimes vs the RAR listing (minute precision) — asserted unambiguous here; full map in eval/r105s2_p3_stage5_xjtu_attribution.json",
-   "n_ambiguous": 0,
-   "n_no_match": 0
-  },
   "citation": "B. Wang, Y. Lei, N. Li, N. Li, IEEE Trans. Reliability 69(1):401-412, 2020, DOI 10.1109/TR.2018.2882682 (requested citation)",
-  "extraction": "7zz 25.01 (static binary, /home/z/my-project/tools/7zz) from the 6-part RAR5 set — the unblock the auditor direction 7 asked for",
   "csv_structure_verified": {
-   "file": "Bearing3_1/47.csv",
+   "file": "Bearing3_1/47.csv (HF repo prateekm1/xjtu-sy-bearing-rar)",
    "first_two_lines": [
     "Horizontal_vibration_signals,Vertical_vibration_signals",
     "0.29202699661254883,0.13744830153882504"
@@ -59,7 +63,22 @@
    ],
    "rms_column": "last column (Vertical_vibration_signals) — the typed 'last column is the vibration signal' rule, kept"
   },
-  "alarm_per_machine_year_conversion": "NOT-APPLICABLE: the sampled cadence is ~23-27-minute intervals of life, not the native 1-minute cadence — the CWRU-style per-machine-year conversion would misstate the duty; disclosed, not computed"
+  "alarm_per_machine_year_conversion": "NOT-APPLICABLE: the sampled cadence is ~23-27-minute intervals of life, not the native 1-minute cadence — the CWRU-style per-machine-year conversion would misstate the duty; disclosed, not computed",
+  "hf_repo": "prateekm1/xjtu-sy-bearing-rar",
+  "hf_repo_type": "dataset",
+  "streaming_mode": "per-bearing-folder, one csv at a time (fetch -> RMS -> delete; peak local footprint = one csv)",
+  "tmp_dir": "/tmp/hf_cache_stage5 (cleaned after the run)",
+  "sample_selection": "pinned by the committed attribution record (73 + 100 minutes), so the HF path reproduces the committed 173-file sample exactly",
+  "integrity": {
+   "sha256_checked": 173,
+   "mismatches": 0,
+   "manifest_coverage": "173/173"
+  },
+  "flat_dir_attribution": {
+   "note": "not needed on the HF path: files are stored under per-bearing folders; the committed attribution map is cross-checked (counts + archive-life bounds) and kept",
+   "n_ambiguous": 0,
+   "n_no_match": 0
+  }
  },
  "protocol_typed": {
   "channel": "RMS of the vibration column per file (float64), files ordered by numeric minute index",
@@ -117,7 +136,7 @@
      "p3s2.CTX"
     ],
     "committed_walk_bytes_untouched": true,
-    "walk_leg_wall_clock_ms": 808.1,
+    "walk_leg_wall_clock_ms": 885.3,
     "typed_attempt_error_verbatim": "unit 73 < 2*CTX+20 (typed floor)",
     "typed_attempt_wall_clock_ms": 0.0
    }
@@ -169,11 +188,18 @@
      "p3s2.CTX"
     ],
     "committed_walk_bytes_untouched": true,
-    "walk_leg_wall_clock_ms": 1023.2,
+    "walk_leg_wall_clock_ms": 1076.8,
     "typed_attempt_error_verbatim": "unit 100 < 2*CTX+20 (typed floor)",
     "typed_attempt_wall_clock_ms": 0.0
    }
   }
+ },
+ "acceptance_vs_committed": {
+  "target": "the stage-5 walk pair executed from HF-sourced bytes must match the committed 173-file sample numbers (claim c-0148 item (5))",
+  "committed_record_sha256": "f0394c864807088c188269fd2d61f50bd17befcb508052b54cc212d3fe1d2384",
+  "fields_compared": "per bearing: n_points, minute bounds, rows/file bounds, protocol_status, rms_first5/last5, per leg: n_walk, coverage, alarms, alarms_per_1000",
+  "identical": true,
+  "diffs": []
  },
  "honest_note": "the RMS life-course is non-stationary (run-to-failure); the sliding-vs-static comparison is the drift lesson re-measured on real bearing data",
  "no_acceptance_claims": true
