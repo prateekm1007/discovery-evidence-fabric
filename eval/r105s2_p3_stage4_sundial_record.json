@@ -1,0 +1,111 @@
+{
+ "record": "R105S2_P3_STAGE4_SUNDIAL/1.0.0",
+ "ran_at": "2026-11-20T04:24:23Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r105s2",
+ "claim": "c-0130 (p3-datasets-model-d7d8; auditor direction 8)",
+ "protocol": "the SAME sliding-conformal protocol as stage 3 (K=100, N_CONSEC=3, alpha=0.10, identical legs and fit halves) — the budget is matched by construction",
+ "model": "thuml/sundial-base-128m, Apache-2.0, ICML'25 Oral; greedy-free flow-matching generation, num_samples=4 sample-mean as the point forecast; the transformers cache shims typed (same bridge as stage 2)",
+ "census": {
+  "FD001": 37,
+  "FD002": 92
+ },
+ "results": {
+  "FD001/sundial-base-128m/sliding": {
+   "n_units": 37,
+   "coverage_median": 0.7156,
+   "alarms_per_1000_median": 34.722
+  },
+  "FD002/sundial-base-128m/sliding": {
+   "n_units": 40,
+   "coverage_median": 0.8901,
+   "alarms_per_1000_median": 0.0
+  },
+  "CWRU/sundial-base-128m/sliding": {
+   "hp0": {
+    "normal_file": 97,
+    "fault_file": 105,
+    "healthy": {
+     "n_walk": 102,
+     "coverage": 0.9118,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault": {
+     "n_walk": 101,
+     "coverage": 0.9604,
+     "alarms": 1,
+     "alarms_per_1000": 9.901
+    }
+   },
+   "hp1": {
+    "normal_file": 98,
+    "fault_file": 106,
+    "healthy": {
+     "n_walk": 202,
+     "coverage": 0.9158,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault": {
+     "n_walk": 151,
+     "coverage": 0.7748,
+     "alarms": 8,
+     "alarms_per_1000": 52.98
+    }
+   },
+   "hp2": {
+    "normal_file": 99,
+    "fault_file": 107,
+    "healthy": {
+     "n_walk": 202,
+     "coverage": 0.896,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault": {
+     "n_walk": 152,
+     "coverage": 0.7303,
+     "alarms": 9,
+     "alarms_per_1000": 59.211
+    }
+   },
+   "hp3": {
+    "normal_file": 100,
+    "fault_file": 108,
+    "healthy": {
+     "n_walk": 202,
+     "coverage": 0.8911,
+     "alarms": 1,
+     "alarms_per_1000": 4.95
+    },
+    "fault": {
+     "n_walk": 152,
+     "coverage": 0.7697,
+     "alarms": 7,
+     "alarms_per_1000": 46.053
+    }
+   }
+  }
+ },
+ "matched_budget_table": {
+  "note": "same fit halves/K/alpha/walk lengths across arms; params: sundial 128M vs bolt 205M; fit cost: BOTH zero-shot (no fit); the wall-clock rows are the per-unit batched call",
+  "inference_ms_median": 2022.9,
+  "bolt_stage3_ms_median": 4996.2
+ },
+ "comparison_vs_bolt": {
+  "FD001": {
+   "sundial_coverage": 0.7156,
+   "bolt_coverage": 0.887,
+   "sundial_gate_ge_090": false,
+   "bolt_gate_ge_090": false
+  },
+  "FD002": {
+   "sundial_coverage": 0.8901,
+   "bolt_coverage": 0.8982,
+   "sundial_gate_ge_090": false,
+   "bolt_gate_ge_090": false
+  }
+ },
+ "winner_typed": "TYPED ON THE MEASUREMENTS (not an acceptance claim): the arm with the higher coverage_median per leg wins the leg; a <0.02 coverage gap with the same gate state = typed tie; the auditor owns the verdict",
+ "no_acceptance_claims": true
+}

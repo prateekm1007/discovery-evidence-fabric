@@ -1,0 +1,324 @@
+{
+ "record": "R105S2_SCORE9_POSTCUTOFF_STATUS/1.0.0",
+ "ran_at": "2026-11-20T04:54:42Z",
+ "executor": "builder-r105s2",
+ "claim": "c-0129 (p3-score9-lane-d4d5d6; the direction-4/5 rerun)",
+ "lane": "the auditor verdict 2026-11-20 directions 4+5: the corpus rebuilt on a MEASURED generator cutoff + the parse-repair retry, then the full 30-batch rerun",
+ "cutoff_basis": {
+  "probe_record": "eval/r105s2_agnes_cutoff_probe.json",
+  "latest_event_answered_correctly": "2025-08-07",
+  "conservative_bound": "2025-05-07",
+  "corpus_date_range": [
+   "2025-10-20",
+   "2026-11-04"
+  ],
+  "all_after_conservative_bound": true,
+  "auditor_test_100pct_postcutoff": true
+ },
+ "corpus_provenance": {
+  "source": "Crossref works API (query=chemistry, journal-article, has-abstract:true, from-pub-date; the polite pool) — OpenAlex was IP-throttled 429 (typed infra state, Art. 15); abstracts are the publishers' deposited abstracts (JATS tags stripped); the source is attributed per-item (the DOI)",
+  "author_separation": "item fields authored by the z-ai transport (NOT the agnes generator); the z-ai/J1 family overlap is DISCLOSED (J2 cohere independent; the BOTH-RECOVERED rule limits bias)",
+  "typed_caveat": "the rebuilt corpus is NOT the MOOSE-Chem2 curated corpus: the ground truths are authored from publisher abstracts — the task calibration differs from the m2 run; the recovery-rate COMPARISON across the two corpora is typed NOT-APPLICABLE"
+ },
+ "run": {
+  "harness": "scripts/r106_score9_inspect_task.py (the committed harness; the corpus/checkpoint paths env-overridable, defaults unchanged — Art. 4)",
+  "generators_judges": "agnes-3.0-flash generation (ONE per item) + z-ai judge J1 + xkiro/cohere judge J2; the judge/generator separation kept",
+  "usage": {
+   "agnes_calls": 32,
+   "agnes_tokens": 21183,
+   "xkiro_calls": 29,
+   "xkiro_tokens": 20712,
+   "zai_calls": 29,
+   "agnes_repair_calls": 2
+  },
+  "parse_repair": {
+   "repair_calls": 2,
+   "exhaustion_items": 1,
+   "auditor_test_zero_losses": false,
+   "typed_state": "the direction-5 test is NOT fully met: 1/30 item remains at typed ITEM_GENERATION_PARSE_EXHAUSTION AFTER the repair retry (the retry reduced the m2 run's 5/30 to 1/30; the residual is disclosed, fail-closed to NOT_RECOVERED in the arithmetic)"
+  }
+ },
+ "results": {
+  "n_items": 30,
+  "n_ok": 29,
+  "J1_hist": {
+   "PARTIAL": 18,
+   "NOT_RECOVERED": 7,
+   "RECOVERED": 4
+  },
+  "J2_hist": {
+   "RECOVERED": 5,
+   "PARTIAL": 22,
+   "NOT_RECOVERED": 2
+  },
+  "adjudicated_hist": {
+   "PARTIAL": 25,
+   "RECOVERED": 2,
+   "NOT_RECOVERED": 2
+  },
+  "independent_recompute": {
+   "method": "rp.adjudicate from the raw J1/J2 bytes",
+   "tally": {
+    "PARTIAL": 25,
+    "RECOVERED": 2,
+    "NOT_RECOVERED": 2
+   },
+   "driver_agreement": "29/29"
+  },
+  "acceptance_full_30": {
+   "n_items": 30,
+   "recovered": 2,
+   "partial": 25,
+   "not_recovered": 3,
+   "recovery_rate": 0.0667,
+   "bar": 0.4,
+   "recovery_bar_met": false,
+   "min_hits": 12,
+   "agent_validated": true
+  }
+ },
+ "typed_conclusion": "the post-cutoff recovery rate is 0.0667 vs the 0.40 bar — NOT MET (2 RECOVERED / 25 PARTIAL / 3 NOT_RECOVERED, agent_validated true); the m2 run's 0.30 was an UPPER bound on easier, pre-cutoff material; the cross-corpus comparison is typed NOT-APPLICABLE (different ground-truth calibration); the score-9 bar remains NOT MET and the score stands 7/10 per the ledger — the auditor owns the verdict",
+ "per_item": [
+  {
+   "item_id": "pc-01",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "RECOVERED",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "1cc76ab78320100c"
+  },
+  {
+   "item_id": "pc-02",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "132054c1a39a0303"
+  },
+  {
+   "item_id": "pc-03",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "3f7d4a0ef8b44f2d"
+  },
+  {
+   "item_id": "pc-04",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "7cb425f52988d77c"
+  },
+  {
+   "item_id": "pc-05",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "a243d2e0fd773808"
+  },
+  {
+   "item_id": "pc-06",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "30d23e882d65244b"
+  },
+  {
+   "item_id": "pc-07",
+   "state": "OK",
+   "J1": "RECOVERED",
+   "J2": "RECOVERED",
+   "adjudicated": "RECOVERED",
+   "generation_sha16": "816492c5bbee584b"
+  },
+  {
+   "item_id": "pc-08",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "46220f346bbda75f"
+  },
+  {
+   "item_id": "pc-09",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "4a1055ea42dab703"
+  },
+  {
+   "item_id": "pc-10",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "NOT_RECOVERED",
+   "adjudicated": "NOT_RECOVERED",
+   "generation_sha16": "512e7954f5b0847f"
+  },
+  {
+   "item_id": "pc-11",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "82cf0bcd814305bb"
+  },
+  {
+   "item_id": "pc-12",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "e04064e715951a21"
+  },
+  {
+   "item_id": "pc-13",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "f21d515afb909428"
+  },
+  {
+   "item_id": "pc-14",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "NOT_RECOVERED",
+   "adjudicated": "NOT_RECOVERED",
+   "generation_sha16": "541aa02d4bffc84e"
+  },
+  {
+   "item_id": "pc-15",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "09d514dd33599c8d"
+  },
+  {
+   "item_id": "pc-16",
+   "state": "OK",
+   "J1": "NOT_RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "a92946c518240dd6"
+  },
+  {
+   "item_id": "pc-17",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "cd3a18c7b4dc8cfd"
+  },
+  {
+   "item_id": "pc-18",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "f05eaf92130f3c46"
+  },
+  {
+   "item_id": "pc-19",
+   "state": "OK",
+   "J1": "RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "ddebc04016274bcb"
+  },
+  {
+   "item_id": "pc-20",
+   "state": "OK",
+   "J1": "RECOVERED",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "66ee42ded4a2fd9c"
+  },
+  {
+   "item_id": "pc-21",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "RECOVERED",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "bc37f3a85896e61b"
+  },
+  {
+   "item_id": "pc-22",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "RECOVERED",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "55bb0421586529bd"
+  },
+  {
+   "item_id": "pc-23",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "94382ffa57fcc029"
+  },
+  {
+   "item_id": "pc-24",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "496bb05c26dae192"
+  },
+  {
+   "item_id": "pc-25",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "5c5c974cff0eff20"
+  },
+  {
+   "item_id": "pc-26",
+   "state": "ITEM_GENERATION_PARSE_EXHAUSTION",
+   "J1": null,
+   "J2": null,
+   "adjudicated": "PARTIAL",
+   "generation_sha16": null
+  },
+  {
+   "item_id": "pc-27",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "bec01619243b2888"
+  },
+  {
+   "item_id": "pc-28",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "f01a10722dcf753e"
+  },
+  {
+   "item_id": "pc-29",
+   "state": "OK",
+   "J1": "PARTIAL",
+   "J2": "PARTIAL",
+   "adjudicated": "PARTIAL",
+   "generation_sha16": "83de9b37e833034b"
+  },
+  {
+   "item_id": "pc-30",
+   "state": "OK",
+   "J1": "RECOVERED",
+   "J2": "RECOVERED",
+   "adjudicated": "RECOVERED",
+   "generation_sha16": "296dccc2f383b274"
+  }
+ ],
+ "no_acceptance_or_score_claims": true
+}
