@@ -320,6 +320,11 @@
    "registered_at": "2026-11-20T13:40:00Z (sandbox clock, TRUE UTC)",
    "role": "builder",
    "note": "R111 session-1 — the F85 re-key: a UNIQUE executor id per sandbox window (the VF-1 identity-collision recommendation; this window is a fresh sandbox after the R110s2 twin-window round). Registered BEFORE any claim (Art. 29(a))."
+  },
+  "builder-r112s1-a4c6de62": {
+   "registered_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R112 session-1 — the F85 re-key enacted in THIS window: a UNIQUE executor id per sandbox window with a per-window nonce (builder-r112s1-a4c6de62; the R111 ruling's example form), registered BEFORE any claim (Art. 29(a)). This window is the continuation of the R110s2 verifier lineage (the stand-down + corroboration window) in a fresh sandbox; the twin window builder-r111s1 holds the six R111 claims c-149..c-154 and this window takes ONLY the disjoint unclaimed lanes (the R111 directions 4 and 7-part-2)."
   }
  },
  "claims": [
@@ -3682,6 +3687,40 @@
    "title": "the F86 fix (the auditor direction 7): a bounded pytest basetemp + an autouse cleanup fixture; the full battery must leave /tmp <=1GB",
    "registered_at": "2026-11-20T13:42:00Z (sandbox clock)",
    "claimed_at": "2026-11-20T13:42:00Z (sandbox clock)"
+  },
+  {
+   "work_id": "r112-d5-sensitivity-recompute",
+   "claim_id": "c-155",
+   "session_id": "builder-r112s1-a4c6de62",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "status": "OPEN",
+   "base_sha": "80328c84650c442c35f191cbfbade8c569d947e5",
+   "lease_expiry": "2026-11-23T23:59:00Z",
+   "artifact_paths": [
+    "scripts/r112_d5_sensitivity_recompute.py",
+    "eval/r112_d5_sensitivity_recompute.json"
+   ],
+   "title": "the R111 direction 4 (the Dir-5 truncation sensitivity recompute): the 6-bearing RMS + walk pair RE-RUN from the REPAIRED HF repo bytes (the 131+37 truncation union now repaired), per-bearing delta table vs the committed Dir-5 record (eval/r110_d5_xjtu_six_bearings.json); delta=0 OR typed honest shift; coverage decisions confirmed stable (recompute-from-committed-bytes discipline for the comparison target, fresh stream for the recomputed side)",
+   "registered_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "claimed_at": "2026-11-20T14:05:00Z (sandbox clock)"
+  },
+  {
+   "work_id": "r112-f87-ratio-unify",
+   "claim_id": "c-156",
+   "role": "EXECUTOR",
+   "session_id": "builder-r112s1-a4c6de62",
+   "kind": "task",
+   "status": "OPEN",
+   "base_sha": "80328c84650c442c35f191cbfbade8c569d947e5",
+   "lease_expiry": "2026-11-23T23:59:00Z",
+   "artifact_paths": [
+    "eval/r110s2_hf_acceptance_corroboration.json",
+    "eval/r112_f87_ratio_unify.json"
+   ],
+   "title": "the R111 direction 7 part 2 (F87): unify rms_last_over_first_ratio to ONE formula — the canonical stage-5 mean-of-5 (np.mean(ch[-5:])/np.mean(ch[:5]), the protocol_typed authority) — across the corroboration record (23.3342 endpoint -> the mean-of-5 value, additive Art. 4 amendment block) and the canonical stage-5 record; ratio field byte-consistent after the unify",
+   "registered_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "claimed_at": "2026-11-20T14:05:00Z (sandbox clock)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
@@ -4003,6 +4042,14 @@
    "what": "builder-r95s1 staked c-0116 (physics-sign-guards-dev) at a0ae03b1e and died of context exhaustion before any artifact; its lineage continuation builder-r103s1 staked the same lane as c-0116 (r103-v14-defect-binds) without seeing the landed claim (the push raced; the rebase auto-merged both claims into the registry, duplicating the claim_id).",
    "fix": "c-0116 (r95s1) -> TAKEN_OVER with the dead-lease note; the continuation's claim renumbered c-0117, SAME work_id (physics-sign-guards-dev) per the Art.29(d) same-work takeover rule (the c-0114->c-0115 pattern), takes_over=c-0116. One executor remains on the lane.",
    "at": "2026-11-19T16:05:00Z (sandbox clock)"
+  },
+  {
+   "id": "F85_C0148_IDENTITY_COLLISION",
+   "severity": "P2",
+   "detected_by": "auditor-R111 (VF-1 in the R110s2 verifier record, c37631a27) — registered forward-only by builder-r112s1-a4c6de62 per the R111 verdict direction 3",
+   "detected_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "finding": "Two distinct sandbox windows executed CONCURRENTLY under the SAME session id builder-r109s2 during the c-0148 HF-streaming custody lane (the twin's full execution 46a7ffadc + this lineage's salvaged duplicate, resolved by the Art. 29(e) stand-down at c37631a27): the registry cannot distinguish the two executors — the Art. 29(a) stable-identity contract strained. NO measurement invalidated (the two independent acceptance runs reached identical match-vs-committed outcomes; the auditor R111 verified both). The RULING (F85, P2): a UNIQUE session id per sandbox window, registered before claim; collisions logged forward-only. Enacted: this registry's session ids are now unique per window (builder-r111s1, builder-r112s1-a4c6de62).",
+   "status": "DISCLOSED_RULING_ENACTED"
   }
  ],
  "claim_kind_violations": [
