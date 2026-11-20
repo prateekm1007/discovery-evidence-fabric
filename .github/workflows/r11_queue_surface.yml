@@ -46,7 +46,13 @@ jobs:
           # R80 (c-0108 lineage): mapie joins — the conformal FA-control
           # suite (tests/test_r80_conformal_fa.py) imports mapie
           # (BSD-3-Clause, NOTICE.md); same collection-failure class.
-          python3 -m pip install --quiet pytest py pygments pint cantera mapie
+          # R111 (c-150, F83): huggingface-hub joins — the stage-5
+          # streaming fixture (tests/test_r105s2_p3_stage5_xjtu.py)
+          # monkeypatches huggingface_hub.hf_hub_download (the mocked
+          # seam imports the real module); the fixture's own docstring
+          # says the HF module is small and pure-python. torch stays
+          # OUT (the fixture lazy-loads the protocol chain, F83).
+          python3 -m pip install --quiet pytest py pygments pint cantera mapie huggingface-hub
       - name: Deterministic regression surfaces (zero LLM)
         run: |
           set -e
@@ -111,6 +117,7 @@ jobs:
             tests/test_article15_cross_seed_determinism.py \
             tests/test_article17_message_scan.py \
             tests/test_article22_measured_path.py \
+            tests/test_r105s2_p3_stage5_xjtu.py \
             tests/test_r64_v9_preflight.py \
             tests/test_r77_vault_restore.py \
             tests/test_r70_f75_binds.py \

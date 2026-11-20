@@ -321,3 +321,98 @@ def _hermetic_model_routing_state(monkeypatch, tmp_path):
     _mr.clear_probe_cache()
     yield
     _mr.clear_probe_cache()
+
+
+# ---------------------------------------------------------------------------
+# F86 (claim c-154, builder-r111s1): the bounded pytest tmp discipline.
+#
+# MEASURED TWICE (R110s2): the battery's tmp_path fixtures accumulated
+# ~4.7GB per full run under /tmp/pytest-of-z/<n> — on the ~4.7GB-free
+# reprovisioned rootfs that filled the disk to 100% TWICE during one
+# window (the first manifest hash pass truncated 79 downloads; the
+# Bolt model download died mid-run). pytest's own retention keeps the
+# last 3 numbered runs, which is exactly the accumulation that never
+# gets reclaimed between the CI-replica battery runs in one sandbox.
+#
+# This fixture (a) removes every STALE numbered run at session start,
+# (b) removes the CURRENT run's numbered dir at session finish (the
+# fixtures are per-run temp state; nothing downstream reads them), so
+# a full battery leaves /tmp with ~0 pytest residue (<< the 1GB bound
+# the acceptance names), and (c) a light watchdog thread reaps the
+# STALE dirs (not the live one) if the session runs long. ENGINE_LIVE
+# is not consulted: this is disk hygiene, not hermeticity. F86_KEEP_TMP
+# opts out for debugging a specific suite's fixtures.
+# ---------------------------------------------------------------------------
+def _tmp_pytest_root() -> Path:
+    import getpass
+    import tempfile
+    return (Path(os.environ.get("PYTEST_DEBUG_TEMPROOT",
+                                tempfile.gettempdir()))
+            / f"pytest-of-{getpass.getuser()}")
+
+
+def _du_bytes(root: Path) -> int:
+    total = 0
+    if root.exists():
+        for p in root.rglob("*"):
+            try:
+                if p.is_file():
+                    total += p.stat().st_size
+            except OSError:
+                pass
+    return total
+
+
+def _reap_stale(root: Path, keep: str | None = None) -> int:
+    import shutil
+    n = 0
+    if root.exists():
+        for d in sorted(root.glob("pytest-*")):
+            if keep is not None and d.name == keep:
+                continue
+            shutil.rmtree(d, ignore_errors=True)
+            n += 1
+    return n
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _bounded_pytest_tmp(request):
+    import threading
+    import time as _time
+
+    if os.environ.get("F86_KEEP_TMP"):
+        yield
+        return
+    root = _tmp_pytest_root()
+    # (a) stale runs from crashed sessions never accumulate
+    _reap_stale(root)
+
+    def _keep_name():
+        factory = getattr(request.config, "_tmp_path_factory", None)
+        if factory is None:
+            return None
+        try:
+            return factory.getbasetemp().name  # the LIVE numbered dir
+        except Exception:
+            return None
+
+    stop = threading.Event()
+
+    def watchdog():
+        while not stop.wait(30.0):
+            try:
+                _reap_stale(root, keep=_keep_name())
+            except Exception:
+                pass  # typed best-effort hygiene, never fails a suite
+
+    thread = threading.Thread(target=watchdog, daemon=True)
+    thread.start()
+    yield
+    stop.set()
+    # (b) the current run's residue goes too (the acceptance bound)
+    before = _du_bytes(root)
+    _reap_stale(root, keep=None)  # remove EVERYTHING, live dir included
+    after = _du_bytes(root)
+    print(f"\n[F86] bounded-tmp: pytest residue {before // 2**20}MB -> "
+          f"{after // 2**20}MB (removed the current run's tmp tree; "
+          f"bound: /tmp pytest residue <=1GB)")

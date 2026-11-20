@@ -33,28 +33,15 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "scripts" / "r105s2_p3_stage5_xjtu.py"
 
-# the stage-5 module pulls the committed stage-3 -> stage-2 chain,
-# whose module level imports torch — the CI surface env (r11_queue_
-# surface.yml installs pytest/py/pygments/pint/cantera/mapie, no
-# torch) cannot import it. Typed skip, not a failure: this fixture
-# verifies the streaming seam; the full protocol env is the local
-# verifier's job (the c-0148 acceptance run, --source hf, real arm).
-try:
-    import torch  # noqa: F401
-    _TORCH = True
-except ImportError:
-    _TORCH = False
-
-s5 = None
-if _TORCH:
-    _spec = importlib.util.spec_from_file_location("s5_test", SCRIPT)
-    s5 = importlib.util.module_from_spec(_spec)
-    sys.modules["s5_test"] = s5
-    _spec.loader.exec_module(s5)
-
-pytestmark = pytest.mark.skipif(
-    not _TORCH, reason="torch unavailable in this env (CI surface); "
-    "the streaming fixture runs where the stage-2 chain imports")
+# F83 (claim c-150): the stage-5 module LAZY-loads the stage-3 ->
+# stage-2 chain (module __getattr__, PEP 562), so importing it needs
+# NO torch — the streaming seam runs in the CI surface env
+# (pytest/py/pygments/pint/cantera/mapie + huggingface-hub, no torch).
+# The torch skip is GONE: this file must execute 0-skipped in CI.
+_spec = importlib.util.spec_from_file_location("s5_test", SCRIPT)
+s5 = importlib.util.module_from_spec(_spec)
+sys.modules["s5_test"] = s5
+_spec.loader.exec_module(s5)
 
 HEADER = "Horizontal_vibration_signals,Vertical_vibration_signals"
 AMP = {"Bearing3_1": 0.5, "Bearing3_2": 1.25}

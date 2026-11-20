@@ -119,14 +119,36 @@ MIN_PRIME = 20                   # typed
 CTX_COMMITTED = 96               # the committed stage-2/3 constant
 BEARINGS = ["Bearing3_1", "Bearing3_2"]
 
-# the committed protocol modules (stage 3 -> stage 2 -> stage 1)
-_s3 = importlib.util.spec_from_file_location(
-    "p3s3", REPO / "scripts" / "r105s2_p3_stage3.py")
-p3s3 = importlib.util.module_from_spec(_s3)
-sys.modules["p3s3"] = p3s3
-_s3.loader.exec_module(p3s3)
-p3s1 = p3s3.p3s1
-p3s2 = p3s3.p3s2
+# the committed protocol modules (stage 3 -> stage 2 -> stage 1),
+# LAZY-loaded (F83, claim c-150): the chain's module level imports
+# torch, which the CI surface env does not install — the streaming
+# seam (hf_fetch_csv, attribution, RMS) must import torch-less. The
+# attributes resolve on FIRST ACCESS via the module __getattr__
+# (PEP 562); walk_pair/BoltArm consumers get the identical committed
+# modules, just later. Zero behavior change where torch exists.
+_PROTOCOL = None
+
+
+def _load_protocol():
+    global p3s1, p3s2, p3s3, _PROTOCOL
+    if _PROTOCOL is None:
+        spec = importlib.util.spec_from_file_location(
+            "p3s3", REPO / "scripts" / "r105s2_p3_stage3.py")
+        p3s3 = importlib.util.module_from_spec(spec)
+        sys.modules["p3s3"] = p3s3
+        spec.loader.exec_module(p3s3)
+        p3s1 = p3s3.p3s1
+        p3s2 = p3s3.p3s2
+        _PROTOCOL = p3s3
+    return _PROTOCOL
+
+
+def __getattr__(name):
+    if name in ("p3s1", "p3s2", "p3s3"):
+        _load_protocol()
+        return globals()[name]
+    raise AttributeError(
+        f"module {__name__!r} has no attribute {name!r}")
 
 _name_re = re.compile(
     r"^\s+XJTU-SY_Bearing_Datasets/\S+/(Bearing3_[12])/(\d+)\.csv\s*$")
