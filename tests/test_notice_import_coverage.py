@@ -29,7 +29,7 @@ IMPORT_TO_NOTICE = {
     "pytest": "pytest",
     "PIL": "Pillow",
     "pypdf": "pypdf",
-    "fitz": "PyMuPDF",
+    "pdfplumber": "pdfplumber",
     "cadquery": "cadquery",
     "OCP": "OCP",
     "sfepy": "sfepy",

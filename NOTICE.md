@@ -40,8 +40,11 @@ is public-domain factual knowledge and is encoded in our own files
 | rdkit | BSD-3-Clause | https://github.com/rdkit/rdkit | cheminformatics (SMILES mining in `discovery_fabric/engine/patent_claim_extract.py`) |
 | reportlab | BSD-3-Clause | https://hg.reportlab.com/hg-public/ | PDF rendering (tooling) |
 | Pillow (PIL) | MIT-CMU | https://github.com/python-pillow/Pillow | image I/O (render/tooling paths) |
-| pypdf | BSD-3-Clause | https://github.com/py-pdf/pypdf | PDF reading (package quality gate) |
-| PyMuPDF (fitz) | **AGPL-3.0 or commercial — EXCLUDED-BY-RULE, typed disclosure** | https://github.com/pymupdf/PyMuPDF | TYPED LICENSE-RULE CONFLICT: imported by `discovery_fabric/engine/package_quality_gate/view.py` + `gates.py` (page text + block-rect geometry). The standing rule is MIT/Apache/BSD-only; NO upstream bytes are copied (pip dependency only), but the IMPORT CONFLICT is disclosed here rather than hidden (Art. 5). Typed direction: the block-geometry leg needs a BSD replacement (pypdf lacks block rects) before the row can retire — the swap is a typed next step, the row is NOT claimed clean. |
+| pypdf | BSD-3-Clause | https://github.com/py-pdf/pypdf | PDF reading — the gate's page-text primary (package quality gate) |
+| pdfplumber | MIT | https://github.com/jsvine/pdfplumber | PDF line/block rect geometry (the gate's collision/clipping legs; the R109 D6 AGPL-retirement successor) |
+| poppler-utils (pdftotext/pdftoppm) | GPL-2.0 — SEPARATE PROCESS ONLY, EXCLUDED-BY-RULE waived as subprocess | https://poppler.freedesktop.org/ | CLI fallbacks invoked as external binaries (never imported, no linkage, no upstream bytes vendored): `pdftotext` text fallback + `pdftoppm` the gate's 36-dpi blank-render leg |
+
+**Retired (Art. 16 accounting — the R109 D6 swap, eval/retirement_ledger.json):** PyMuPDF (fitz) — was the package_quality_gate's page-text + block-rect primary; retired on the AGPL-3.0-or-commercial license-rule conflict (the standing rule is MIT/Apache/BSD-only). Successors: pypdf (page text), pdfplumber (block geometry), pdftoppm (rendered ink coverage). Zero fitz imports remain in the tree (test-covered: `tests/test_notice_import_coverage.py`).
 
 ## Planned copies (AM43 directions D2–D8; attribution in-band at adoption)
 

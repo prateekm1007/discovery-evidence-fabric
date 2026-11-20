@@ -982,6 +982,68 @@ def gate_N_artifact_fidelity(pv: PackageView, canonical: Optional[dict]) -> Gate
 
 
 # ---------------------------------------------------------------- Gate P
+def _pqg_line_blocks(lines: list) -> list:
+    """Cluster pdfplumber text lines into paragraph-ish block rects —
+    the MuPDF 'blocks' semantics the collision gate was calibrated on.
+    Consecutive lines merge when the vertical gap is <= 0.5 line
+    heights AND the horizontal ranges overlap >= 30% of the narrower
+    line. Coordinates are (x0, top, x1, bottom), y growing downward —
+    the same orientation the fitz blocks used (the fitz primary
+    retired: AGPL excluded by rule, the R109 D6 swap)."""
+    blocks: list = []
+    open_b = None  # [x0, top, x1, bottom, text]
+    for ln in sorted(lines, key=lambda L: (L["top"], L["x0"])):
+        rect = (float(ln["x0"]), float(ln["top"]),
+                float(ln["x1"]), float(ln["bottom"]))
+        h = rect[3] - rect[1]
+        if open_b is not None:
+            gap = rect[1] - open_b[3]
+            ox = min(open_b[2], rect[2]) - max(open_b[0], rect[0])
+            ow = max(0.0, ox) / max(1e-6, min(open_b[2] - open_b[0],
+                                              rect[2] - rect[0]))
+            if gap <= 0.5 * max(h, 1.0) and ow >= 0.30:
+                open_b[0] = min(open_b[0], rect[0])
+                open_b[1] = min(open_b[1], rect[1])
+                open_b[2] = max(open_b[2], rect[2])
+                open_b[3] = max(open_b[3], rect[3])
+                open_b[4] += " " + (ln.get("text") or "")
+                continue
+            blocks.append(((open_b[0], open_b[1], open_b[2], open_b[3]),
+                           open_b[4]))
+        open_b = [rect[0], rect[1], rect[2], rect[3], ln.get("text") or ""]
+    if open_b is not None:
+        blocks.append(((open_b[0], open_b[1], open_b[2], open_b[3]),
+                       open_b[4]))
+    return blocks
+
+
+def _pqg_render_gray_36(pdf: Path, page_no: int) -> Optional[bytes]:
+    """The fitz-pixmap leg's successor: one 36-dpi grayscale render via
+    the poppler pdftoppm binary (BSD, no AGPL). Returns the PGM raster
+    bytes, or None when the render produces nothing usable."""
+    out = subprocess.run(
+        ["pdftoppm", "-gray", "-r", "36", "-f", str(page_no + 1),
+         "-l", str(page_no + 1), "-singlefile", str(pdf)],
+        capture_output=True, timeout=120)
+    if out.returncode != 0 or not out.stdout.startswith(b"P5"):
+        return None
+    data = out.stdout
+    # P5 PGM header: magic, width, height, maxval, then the raster
+    pos, fields = 2, []
+    while len(fields) < 3:
+        while pos < len(data) and data[pos:pos + 1].isspace():
+            pos += 1
+        if pos < len(data) and data[pos:pos + 1] == b"#":
+            while pos < len(data) and data[pos:pos + 1] != b"\n":
+                pos += 1
+            continue
+        start = pos
+        while pos < len(data) and not data[pos:pos + 1].isspace():
+            pos += 1
+        fields.append(int(data[start:pos]))
+    return data[pos + 1:]
+
+
 def gate_P_pdf_visual_qa(pv: PackageView, canonical: Optional[dict]) -> GateResult:
     g = GateResult("P", "PDF visual QA: every PDF rendered and inspected — "
                         "collision/overflow/clipping/blank-page/broken-symbol/"
@@ -1002,44 +1064,58 @@ def gate_P_pdf_visual_qa(pv: PackageView, canonical: Optional[dict]) -> GateResu
                 g.fail("P-BLANK-PAGE", f"{name} page {i+1}: no text content "
                        f"(unexpected blank page)")
         try:
-            import fitz
-            doc = fitz.open(str(path))
-            for pno in range(len(doc)):
-                page = doc[pno]
-                blocks = [b for b in page.get_text("blocks") if b[4].strip()]
-                # collision: heavy overlap between text blocks (calibrated:
-                # golden references show 0.0% overlap; the attack fixture 41%)
-                for i in range(len(blocks)):
-                    for j in range(i + 1, len(blocks)):
-                        r1, r2 = fitz.Rect(blocks[i][:4]), fitz.Rect(blocks[j][:4])
-                        inter = r1 & r2
-                        if not inter.is_empty and inter.get_area() > 200:
-                            m = min(r1.get_area(), r2.get_area())
-                            if m > 1 and inter.get_area() / m > 0.30:
-                                g.fail("P-TEXT-COLLISION", f"{name} page "
-                                       f"{pno+1}: text blocks overlap "
-                                       f"{inter.get_area()/m:.0%} "
-                                       f"({blocks[i][4][:28]!r} vs "
-                                       f"{blocks[j][4][:28]!r})")
-                # clipping: text outside the page box
-                for b in blocks:
-                    if (b[0] < -2 or b[1] < -2 or b[2] > page.rect.width + 2
-                            or b[3] > page.rect.height + 2):
-                        g.fail("P-TEXT-CLIPPED", f"{name} page {pno+1}: text "
-                               f"block extends outside the page box")
-                # ink coverage (rendered): near-blank rendered page
-                pix = page.get_pixmap(dpi=36)
-                samples = pix.samples
-                nonwhite = sum(1 for k in range(0, len(samples), 97)
-                               if samples[k] < 245)
-                frac = nonwhite / max(1, len(samples) // 97)
-                if frac < 0.004 and len(pages[pno].strip()) < 40:
-                    g.fail("P-BLANK-RENDER", f"{name} page {pno+1}: rendered "
-                           f"page is visually blank")
-            doc.close()
+            import pdfplumber
+            warned_no_render = False
+            with pdfplumber.open(str(path)) as doc:
+                for pno, page in enumerate(doc.pages):
+                    lines = page.extract_text_lines() or []
+                    blocks = [(r, t) for (r, t) in _pqg_line_blocks(lines)
+                              if t.strip()]
+                    # collision: heavy overlap between text blocks (calibrated:
+                    # golden references show 0.0% overlap; the attack fixture
+                    # 41% — the fitz block thresholds, pdfplumber rects)
+                    for i in range(len(blocks)):
+                        for j in range(i + 1, len(blocks)):
+                            r1, r2 = blocks[i][0], blocks[j][0]
+                            iw = min(r1[2], r2[2]) - max(r1[0], r2[0])
+                            ih = min(r1[3], r2[3]) - max(r1[1], r2[1])
+                            if iw <= 0 or ih <= 0:
+                                continue
+                            inter = iw * ih
+                            if inter > 200:
+                                m = min((r1[2] - r1[0]) * (r1[3] - r1[1]),
+                                        (r2[2] - r2[0]) * (r2[3] - r2[1]))
+                                if m > 1 and inter / m > 0.30:
+                                    g.fail("P-TEXT-COLLISION", f"{name} page "
+                                           f"{pno+1}: text blocks overlap "
+                                           f"{inter/m:.0%} "
+                                           f"({blocks[i][1][:28]!r} vs "
+                                           f"{blocks[j][1][:28]!r})")
+                    # clipping: text outside the page box
+                    for (r, txt) in blocks:
+                        if (r[0] < -2 or r[1] < -2 or r[2] > page.width + 2
+                                or r[3] > page.height + 2):
+                            g.fail("P-TEXT-CLIPPED", f"{name} page {pno+1}: text "
+                                   f"block extends outside the page box")
+                    # ink coverage (rendered): near-blank rendered page
+                    try:
+                        samples = _pqg_render_gray_36(path, pno)
+                    except FileNotFoundError:
+                        if not warned_no_render:
+                            g.warn("P-NO-RENDER", "pdftoppm unavailable: "
+                                   "blank-render QA degraded to text-only")
+                            warned_no_render = True
+                        samples = None
+                    if samples:
+                        nonwhite = sum(1 for k in range(0, len(samples), 97)
+                                       if samples[k] < 245)
+                        frac = nonwhite / max(1, len(samples) // 97)
+                        if frac < 0.004 and len(pages[pno].strip()) < 40:
+                            g.fail("P-BLANK-RENDER", f"{name} page {pno+1}: rendered "
+                                   f"page is visually blank")
         except ImportError:
-            g.warn("P-NO-FITZ", "PyMuPDF unavailable: geometry QA degraded to "
-                   "text-only checks")
+            g.warn("P-NO-GEOMETRY", "pdfplumber unavailable: geometry QA "
+                   "degraded to text-only checks")
         except Exception as e:
             g.fail("P-PDF-ERROR", f"{name}: PDF inspection error {e}")
         # missing equation in a section that must typeset them

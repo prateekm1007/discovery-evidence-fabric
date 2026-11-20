@@ -10,7 +10,9 @@ Supported inputs:
   - a package ZIP (extracted to a temp dir)
   - canonical invention state (dict or JSON file) for identity/fidelity gates
 
-No engine imports. Standard library + pypdf/fitz only.
+No engine imports. Standard library + pypdf only (the fitz/PyMuPDF
+primary retired — AGPL excluded by rule; the retirement is accounted in
+eval/retirement_ledger.json and NOTICE.md).
 """
 from __future__ import annotations
 
@@ -25,11 +27,6 @@ import tempfile
 import zipfile
 from pathlib import Path
 from typing import Any, Optional
-
-try:
-    import fitz  # PyMuPDF
-except ImportError:  # pragma: no cover
-    fitz = None
 
 BUYER_PDF_PATTERN = re.compile(r"^\d+_.*\.pdf$")
 KNOWN_EVIDENCE_CLASSES = [
@@ -211,12 +208,14 @@ class PackageView:
     # ------------------------------------------------------------------ pdf
     @staticmethod
     def _pdf_pages_text(path: Path) -> list[str]:
-        # primary: fitz gives page-aligned text (no formfeed artifacts)
+        # primary: pypdf (BSD-3, in-tree) — the PdfReader page list maps
+        # 1:1 to the document pages, so page alignment holds with no
+        # formfeed artifacts (the fitz primary retired: AGPL excluded
+        # by rule — the R109 D6 swap, Art. 16 accounting)
         try:
-            import fitz
-            doc = fitz.open(str(path))
-            pages = [page.get_text() for page in doc]
-            doc.close()
+            from pypdf import PdfReader
+            r = PdfReader(str(path))
+            pages = [(pg.extract_text() or "") for pg in r.pages]
             if any(p.strip() for p in pages):
                 return pages
         except Exception:
@@ -234,13 +233,7 @@ class PackageView:
                 return pages
         except Exception:
             pass
-        # fallback: pypdf
-        try:
-            from pypdf import PdfReader
-            r = PdfReader(str(path))
-            return [(pg.extract_text() or "") for pg in r.pages]
-        except Exception:
-            return []
+        return []
 
     def pdf_full_text(self, name: str) -> str:
         return "\n".join(self.pdfs.get(name, []))
