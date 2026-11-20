@@ -1,0 +1,36 @@
+{
+ "record": "R112_AUDITOR_VERIFICATION/1.0.0",
+ "auditor_session": "auditor-r112s1",
+ "audited_queue_tip": "d434a111bfdd1d8c3c7f48815abb7099e3d8585a",
+ "constitutions_read": "EPISTEMIC v3.3.0 FULL (29 arts+4 amendments+Art.28 addendum, byte-unchanged) + AUDITOR v1.3.0 FULL (unchanged)",
+ "HEADLINE_FINDING": {
+  "id": "F88",
+  "severity": "HIGH",
+  "title": "REMOTE CI RED on the final tip d434a111b \u2014 check-run 136356963170 surface completed/FAILURE (exit 1 at workflow line 140, constitution-enforcement block, 92s early-step failure). The builder typed PENDING on the PARENT 4881f831a (8 ETag-304 entries appended to eval/r110_ci_read.json) and reported local-green, but NEVER read the tip's own FAILED run. D2/Art.1/Art.7: local green is not the remote verdict; the tip is RED.",
+  "suspects": [
+   "test_remote_ci_rule.py on the appended 'state':'pending' entries (out-of-enum conclusion / no terminal remote_ci_conclusion)",
+   "test_article29_parallel_coordination.py on the claim-id format drift: peer c-155/c-156 (3-digit) vs r111 c-0150..c-0155 (4-digit) \u2014 numeric collision c-155 vs c-0155 or format-regex fail"
+  ],
+  "fix": "read the tip job log, identify the exact failing test, fix forward, re-push, READ THE TIP'S OWN check-run to success (quoted). No score claim while RED."
+ },
+ "verified_from_bytes": {
+  "F83": "CLOSED \u2014 test wired into r11_queue_surface.yml constitution block; huggingface-hub in install line; torch skip deleted; loader PEP562 __getattr__ lazy-load present; test imports torch-less",
+  "F84": "CLOSED \u2014 stage1/2/3/5 + r111 scripts REPO=parents[1]; two fresh-clone acceptance identical, canonical sha 27bf8b77 byte-stable (builder record r111_f84_freshclone_repro.json)",
+  "F86": "CLOSED \u2014 tests/conftest.py _bounded_pytest_tmp session-autouse (stale reaper + session-finish cleanup + 30s watchdog); residue 4KB << 1GB",
+  "F87": "CLOSED by peer bea95bd \u2014 ratio unified mean-of-5; corroboration v1.1.0 (23.3342->6.5473, 2.795->2.0115); endpoint-legacy field rule",
+  "F85": "CLOSED \u2014 builder-r111s1 unique re-key registered before claims; peer nonce form builder-r112s1-a4c6de62; c-0148 collision registered forward-only F85_C0148_IDENTITY_COLLISION P2",
+  "dir5_score9": "VERIFIED r111_score9_rerun.json \u2014 5/30=0.1667 Wilson[0.0734,0.3356], 0 parse exhaustions, 24 PARTIAL/1 NOT_RECOVERED, bar 0.4 NOT met; recompute from committed eval-log + deterministic engine module, zero LLM; RCA typed (cross-corpus m2-vs-pc caveat; both-judge fail-closed caps RECOVERED). CAPABILITY PROGRESS: parse contract clean (0 vs 5/30).",
+  "dir6_score8": "VERIFIED r111_score8_calibration.py \u2014 within-domain robust-z on committed question_type split; degenerate-MAD disclosed (both domains MAD=0 -> median-centering); calibration_pass=TRUE reproduces burned acceptance; agreement 0.6875<0.70 honest negative (rater variance, not scale). Recompute-only CORR-9 honored.",
+  "dir4_p3": "VERIFIED accept_line \u2014 2/15 FM-arm bearings >=0.90 (Bearing1_2 0.9012, Bearing2_2 0.9383), target>=3 NOT met, typed honest negative; Sundial tracks Bolt per bearing, prototype underperforms (0.06-0.74 vs 0.72-0.94); Sundial quadratic-batch OOM -> chunked forward fix. CAPABILITY PROGRESS: P3 now MEASURED on full resolution (was sampled)."
+ },
+ "report_vs_bytes": "report claim-ids 'c-149..c-154' / 'c-151/c-152 OPEN' drift from committed registry c-0150..c-0155 (measurements c-0152 p3 / c-0153 score9). Art.7 bytes authoritative; minor, unify.",
+ "capability_state": {
+  "score": 7,
+  "score8": "NOT MET (agreement 0.6875<0.70; third family unfunded; MAD=0 degenerate normalization cannot create spread)",
+  "score9": "NOT MET (0.1667 genuine recovery miss; bar 0.40 calibrated on m2 curated GTs, post-cutoff abstract GTs + both-judge rule structurally cap recovery)",
+  "p3": "full-resolution measured, honest negative 2/15; alarm-rule/conformal calibration on long channels is the next lever"
+ },
+ "art27": "0 engine lines (measurement+custody round); NO_CAPABILITY_CHANGE typed exception; capability PROGRESS recorded (P3 full-res measured, score-9 parse clean, score-8 calibration reproduced) but no gate cleared",
+ "roadmap": "6 done; 7 stands; 8 pending score-8 (funding+rater spread); 9 pending score-9 (recovery lever or auditor prereg re-calibration) + unattended batch",
+ "no_acceptance_or_score_change": true
+}
