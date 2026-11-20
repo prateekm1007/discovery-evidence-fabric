@@ -255,6 +255,28 @@ def parse_generator_output(text: str) -> Dict[str, Any]:
     return parse_strict_json(text, GENERATOR_OUTPUT_KEYS, "generator")
 
 
+# --- the ONE repair retry (auditor direction 5, claim c-0129): a
+# JSON parse failure gets exactly ONE repair call at a mild
+# temperature with the raw output + the parse error + the schema
+# echoed back. Two failures = typed exhaustion (never a silent
+# fallback; the repair is DISCLOSED in the item record).
+REPAIR_TEMPERATURE = 0.3
+
+
+def repair_prompt(raw_text: str, error: str) -> str:
+    """The repair directive: the model sees ITS OWN raw output, the
+    typed parse error, and the required JSON schema; it returns ONLY
+    the corrected JSON object. Deterministic apart from the mild
+    temperature (the repair is a RECOVERY action, not a re-roll)."""
+    return (
+        "Your previous response failed strict JSON parsing:\n\n"
+        f"RAW OUTPUT (truncated to 2000 chars):\n{raw_text[:2000]}\n\n"
+        f"PARSE ERROR:\n{error}\n\n"
+        "Return ONLY a corrected single JSON object with EXACTLY these "
+        f"keys: {list(GENERATOR_OUTPUT_KEYS)}. No prose, no markdown "
+        "fences, no commentary.")
+
+
 def parse_judge_output(text: str) -> Dict[str, Any]:
     d = parse_strict_json(text, JUDGE_OUTPUT_KEYS, "judge")
     rec = str(d["recovery"]).strip().upper()

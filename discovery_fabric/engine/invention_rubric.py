@@ -41,9 +41,10 @@ import json
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-INVENTION_RUBRIC_VERSION = "invention_rubric/2.0.0"  # 2.0.0: baseline-union retired, named-technique KNOWN gate, prior-art distance
+INVENTION_RUBRIC_VERSION = "invention_rubric/2.1.0"  # 2.1.0 (D6, c-0129): the two TRUTH-BEARING axes added (direction_correctness, magnitude_plausibility) — the auditor's anti-saturation direction: scores stop clustering at 4
 
-AXES = ("novelty", "feasibility", "testability", "constraint_compliance")
+AXES = ("novelty", "feasibility", "testability", "constraint_compliance",
+        "direction_correctness", "magnitude_plausibility")
 
 #: controller signatures — a predictor question answered with a
 #: CONTROLLER is a routing regression (owner R11 item 6); it also
@@ -434,6 +435,107 @@ def score_answer(problem: Dict[str, Any], answer: str,
         reasons["constraint_compliance"].append(
             f"the arm's typed delivery state is {contract_state} — "
             "the honesty instrumentation did not fully pass")
+
+    # ---- direction_correctness (0-4, D6 truth-bearing): the answer's
+    # causal claims must target the problem's OWN failure quantity and
+    # move it the IMPROVING way. A claim that raises the failure
+    # quantity is a truth violation (0-1); claims targeting other
+    # quantities are neutral, not wrong. No attributable claims = the
+    # neutral anchor 2 with the coverage typed (never silently a 4).
+    fail_txt = " ".join(str(problem.get(k) or "") for k in
+                        ("failure", "failure_mode", "question"))
+    stop = {"the", "and", "with", "from", "that", "this", "when",
+            "which", "will", "shall", "must", "into", "under", "over"}
+    fail_terms = {w for w in re.findall(r"[a-z][a-z-]{4,}",
+                                        fail_txt.lower()) if w not in stop}
+    IMPROVE_RE = re.compile(
+        r"\b(reduc\w+|improv\w+|low(er|ers|ered)|eliminat\w+|"
+        r"preven\w+|minimiz\w+|avoid\w+|suppress\w+|mitigat\w+)",
+        re.IGNORECASE)
+    DEGRADE_RE = re.compile(
+        r"\b(increas\w+|rais\w+|worsen\w+|aggravat\w+|amplif\w+|"
+        r"exacerbat\w+)", re.IGNORECASE)
+    claim_re = re.compile(
+        r"\b(?:redu\w+|improv\w+|low\w+|eliminat\w+|preven\w+|"
+        r"minimiz\w+|avoid\w+|suppress\w+|mitigat\w+|increas\w+|"
+        r"rais\w+|worsen\w+|aggravat\w+|amplif\w+|exacerbat\w+)\s+"
+        r"(?:the\s+|this\s+)?([a-z][a-z-]{4,38})")
+    n_ok = n_bad = 0
+    for m in claim_re.finditer(a):
+        obj = m.group(1).lower()
+        if not any(t in obj or obj in t for t in fail_terms):
+            continue                        # not the failure quantity
+        span = m.group(0)
+        if IMPROVE_RE.search(span):
+            n_ok += 1
+        elif DEGRADE_RE.search(span):
+            n_bad += 1                      # RAISES the failure quantity
+    if n_bad > 0:
+        scores["direction_correctness"] = 1
+        reasons["direction_correctness"].append(
+            f"{n_bad} causal claim(s) move the problem's own failure "
+            f"quantity the WRONG way ({n_ok} improving) — a "
+            "truth-bearing violation, not a style issue")
+    elif n_ok >= 2:
+        scores["direction_correctness"] = 4
+        reasons["direction_correctness"].append(
+            f"{n_ok} causal claim(s) target the failure quantity "
+            "improving; none move it the wrong way")
+    elif n_ok == 1:
+        scores["direction_correctness"] = 3
+        reasons["direction_correctness"].append(
+            "one improving causal claim on the failure quantity; "
+            "thin causal coverage")
+    else:
+        scores["direction_correctness"] = 2
+        reasons["direction_correctness"].append(
+            "no causal claim attributable to the problem's own "
+            "failure quantity (typed neutral anchor — coverage "
+            "disclosed, never silently a 4)")
+
+    # ---- magnitude_plausibility (0-4, D6 truth-bearing): the numeric
+    # claims stay inside typed envelopes; a percent-improvement claim
+    # far beyond the problem's own stated headroom (10x) is a truth
+    # violation; >200% unconditional improvement is implausible.
+    pct = [float(x) for x in re.findall(r"(\d{1,4}(?:\.\d+)?)\s?%", a)]
+    prob_pct = [float(x) for x in re.findall(r"(\d{1,3}(?:\.\d+)?)\s?%",
+                                             prob_txt)]
+    mp = 4
+    if pct:
+        big = max(pct)
+        if prob_pct and big > 10.0 * max(prob_pct):
+            mp = 0
+            reasons["magnitude_plausibility"].append(
+                f"a {big:.0f}% claim vs the problem's own stated "
+                f"magnitude ({max(prob_pct):.1f}%) — a >10x "
+                "overclaim against the stated headroom")
+        elif big > 200:
+            mp = 1
+            reasons["magnitude_plausibility"].append(
+                f"an unconditional {big:.0f}% improvement claim — "
+                "beyond any typed plausible envelope")
+        elif big > 80:
+            mp = 2
+            reasons["magnitude_plausibility"].append(
+                f"{big:.0f}% improvement claimed — severe-effect "
+                "envelope (needs full bottleneck removal, which the "
+                "answer must and may not demonstrate)")
+        elif big > 50:
+            mp = 3
+            reasons["magnitude_plausibility"].append(
+                f"{big:.0f}% improvement claimed — aggressive but "
+                "within the severe envelope")
+        else:
+            reasons["magnitude_plausibility"].append(
+                f"all {len(pct)} percent claim(s) within the plausible "
+                "envelope (max "
+                f"{big:.0f}%)")
+    else:
+        mp = 2
+        reasons["magnitude_plausibility"].append(
+            "no percent claims to envelope-check (typed neutral "
+            "anchor — coverage disclosed)")
+    scores["magnitude_plausibility"] = mp
 
     return {"rubric_version": INVENTION_RUBRIC_VERSION,
             "scorer": "coder_deterministic_v1",

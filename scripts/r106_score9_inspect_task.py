@@ -139,13 +139,38 @@ def rediscovery_solver():
         try:
             gen = rp.parse_generator_output(gen_text)
         except ValueError as e:
-            done = {"item_id": item_id,
-                    "state": "ITEM_GENERATION_PARSE_EXHAUSTION",
-                    "detail": str(e)[:200], "recovery": "PARTIAL"}
-            cp["completed_items"][item_id] = done
-            save_checkpoint(cp)
-            state.store.set("result", done)
-            return state
+            # the ONE repair retry (auditor direction 5, c-0129): a
+            # mild-temperature repair call that sees its own raw
+            # output + the typed parse error + the schema. Two
+            # failures = typed exhaustion (the repair is DISCLOSED
+            # in the item record, never silent).
+            repair_attempted = True
+            try:
+                rep_model = get_model(
+                    f"openai-api/agnes/{AGNES_MODEL}",
+                    base_url=AGNES_BASE,
+                    api_key=vault_key("AGNES_API_KEY"))
+                rep_out = await rep_model.generate(
+                    rp.repair_prompt(gen_text, str(e)[:300]),
+                    config=GenerateConfig(
+                        max_tokens=600 + REASONING_HEADROOM,
+                        temperature=rp.REPAIR_TEMPERATURE))
+                gen_text2 = rep_out.completion
+                cp["usage"]["agnes_calls"] += 1
+                cp["usage"]["agnes_repair_calls"] = \
+                    cp["usage"].get("agnes_repair_calls", 0) + 1
+                gen = rp.parse_generator_output(gen_text2)
+            except ValueError as e2:
+                done = {"item_id": item_id,
+                        "state": "ITEM_GENERATION_PARSE_EXHAUSTION",
+                        "detail": str(e2)[:200],
+                        "repair_attempted": True,
+                        "first_error": str(e)[:200],
+                        "recovery": "PARTIAL"}
+                cp["completed_items"][item_id] = done
+                save_checkpoint(cp)
+                state.store.set("result", done)
+                return state
 
         # ---- judges (engine transports, two families) ----
         jp = rp.judge_prompt(item, gen)
