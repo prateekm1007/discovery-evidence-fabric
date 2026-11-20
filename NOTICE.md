@@ -14,15 +14,34 @@ is public-domain factual knowledge and is encoded in our own files
 
 | Component | License | Upstream | Use here |
 |---|---|---|---|
-| CoolProp | MIT | http://coolprop.org | fluid thermophysical properties (D1 computed physics) |
-| ht (Caleb Bell) | MIT | https://github.com/CalebBell/ht | heat-transfer correlations |
-| fluids | MIT | https://github.com/CalebBell/fluids | fluid mechanics / pressure drop / NPSH |
-| thermo | MIT | https://github.com/CalebBell/thermo | chemical thermodynamics |
-| chemicals | MIT | https://github.com/CalebBell/chemicals | chemical property data |
-| tespy | MIT | https://github.com/oemof/tespy | thermal engineering plant cycles |
-| Cantera | BSD-3-Clause | https://github.com/Cantera/cantera | computed chemical equilibrium (AM80 direction 3: `equilibrate()` verifies claimed chemistry directions at generation time — the computed complement to the registry equilibrium-direction scan; suite `tests/test_r80_chemistry_equilibrium.py`, c-0107) |
+| CoolProp | MIT | http://coolprop.org | fluid thermophysical properties (D2 ENGINE-NATIVE: `discovery_fabric/engine/physics_library_checks.py` `check_fluid_property_direction`, claim c-0128; suite `tests/test_physics_library_checks.py`) |
+| ht (Caleb Bell) | MIT | https://github.com/CalebBell/ht | heat-transfer correlations (D2 ENGINE-NATIVE: `physics_library_checks.py` `check_convective_htc_direction` via `ht.conv_internal.Nu_conv_internal`; suite `tests/test_physics_library_checks.py`) |
+| fluids | MIT | https://github.com/CalebBell/fluids | fluid mechanics (D2 ENGINE-NATIVE: `physics_library_checks.py` `check_pipe_pressure_drop` via `fluids.friction_factor`; suite `tests/test_physics_library_checks.py`) |
+| Cantera | BSD-3-Clause | https://github.com/Cantera/cantera | computed chemical equilibrium (D2 ENGINE-NATIVE: `physics_library_checks.py` `check_equilibrium_direction` on gri30.yaml — the port of the `scripts/r80_chemistry_equilibrium.py` mechanism, c-0107; the r80 script stays imported by `engine/tool_grounded_critic.py`, so its Art. 16 retirement RIDES that module's migration — typed, not silent; suite `tests/test_physics_library_checks.py`) |
 | detect-secrets (Yelp) | Apache-2.0 | https://github.com/Yelp/detect-secrets | secret scanning (D8; gitleaks binary substitution noted in the run record) |
-| scikit-learn-contrib MAPIE | BSD-3-Clause | https://github.com/scikit-learn-contrib/MAPIE | conformal prediction intervals (D5; the fixture-stage conformal FA-control prototype `scripts/r80_conformal_fa.py` is in tree, claim c-0108 — computed coverage 0.915 walk-forward at confidence 0.90 on the synthetic fixture, immediate typed FA on an injected level shift; the Time-MoE/MOMENT FM evals + the real C-MAPSS/XJTU-SY/CWRU runs are the typed next steps) |
+| scikit-learn-contrib MAPIE | BSD-3-Clause | https://github.com/scikit-learn-contrib/MAPIE | conformal prediction intervals (D5; the fixture-stage conformal FA-control prototype `scripts/r80_conformal_fa.py` is in tree, claim c-0108 — computed coverage 0.915 walk-forward at confidence 0.90 on the synthetic fixture; the REAL-DATA legs are MEASURED on the P3 lane: `eval/r105s2_p3_stage1_record.json` … `stage3b`, claims c-0125 — CWRU detection 12/12 FA 0/4; C-MAPSS 0.94 stable / 0.50 drift; sliding+FM 0.887-0.9118) |
+| scikit-learn | BSD-3-Clause | https://github.com/scikit-learn/scikit-learn | the Ridge one-step predictor of the conformal FA-control prototype (imported by `scripts/r80_conformal_fa.py`, the committed bytes the P3 lane runs verbatim) |
+| AIDE (WecoAI/aideml) | MIT | https://github.com/WecoAI/aideml | the best-first candidate-population tree-search pattern — credited in the module header of `discovery_fabric/engine/aide_tree_search.py`; pattern copy only, zero upstream code bytes (the dedicated row the auditor's direction 3 asked for; the prose entries above remain) |
+| pint | BSD-3-Clause | https://github.com/hgrecco/pint | unit discipline (imported by `discovery_fabric/engine/physics_checks.py` — bare dimensional floats are typed refusals) |
+| numpy | BSD-3-Clause | https://github.com/numpy/numpy | array layer (engine + eval tooling) |
+| scipy | BSD-3-Clause | https://github.com/scipy/scipy | sparse/linalg/stats (engine + eval tooling: `loadmat`, `spearmanr`, sparse scans) |
+| pandas | BSD-3-Clause | https://github.com/pandas-dev/pandas | tabular corpus handling (score-9 corpus readers) |
+| matplotlib | BSD-3-Clause | https://github.com/matplotlib/matplotlib | diagnostic figures (scripts; never a gate input) |
+| pytest | MIT | https://github.com/pytest-dev/pytest | the CI test runner (every article CI check runs under it) |
+| PyTorch | BSD-3-Clause | https://github.com/pytorch/pytorch | FM-eval tensor layer (the P3 lane FM arms, claims c-0125) |
+| transformers | Apache-2.0 | https://github.com/huggingface/transformers | Time-MoE-50M loading (trust_remote_code; the cache-API compatibility shims are typed in `scripts/r105s2_p3_stage2.py`) |
+| huggingface_hub | Apache-2.0 | https://github.com/huggingface/huggingface_hub | weight/dataset fetch via the vault token (digest-verified custody, Art. 17) |
+| Chronos / Chronos-Bolt (amazon) | Apache-2.0 | https://github.com/amazon-science/chronos-forecasting | the FM arms of the P3 real-data conformal lane (`amazon/chronos-bolt-base`; `chronos 2.3.2` `predict_quantiles` returns (quantiles, mean) — typed in `scripts/r105s2_p3_stage2.py`; claims c-0125) |
+| Sundial (thuml) | Apache-2.0 | https://github.com/thuml/Time-Series-Library | Tsinghua time-series FM (the D8 arm of the auditor verdict 2026-11-20; `thuml/sundial-base-128m`; measured under the same conformal protocol — see the P3 stage records) |
+| cadquery | Apache-2.0 | https://github.com/CadQuery/CADQuery | parametric CAD geometry (the CAD gate layer) |
+| OCP (OpenCascade) | Apache-2.0 (OCCT 7.8+; earlier releases LGPL-2.1-with-exception) | https://github.com/Open-Cascade-SAS/OCCT | the CAD kernel under cadquery |
+| sfepy | BSD-3-Clause | https://github.com/sfepy/sfepy | FEM mechanics checks (script harnesses) |
+| trimesh | MIT | https://github.com/mikedh/trimesh | mesh geometry handling |
+| rdkit | BSD-3-Clause | https://github.com/rdkit/rdkit | cheminformatics (SMILES mining in `discovery_fabric/engine/patent_claim_extract.py`) |
+| reportlab | BSD-3-Clause | https://hg.reportlab.com/hg-public/ | PDF rendering (tooling) |
+| Pillow (PIL) | MIT-CMU | https://github.com/python-pillow/Pillow | image I/O (render/tooling paths) |
+| pypdf | BSD-3-Clause | https://github.com/py-pdf/pypdf | PDF reading (package quality gate) |
+| PyMuPDF (fitz) | **AGPL-3.0 or commercial — EXCLUDED-BY-RULE, typed disclosure** | https://github.com/pymupdf/PyMuPDF | TYPED LICENSE-RULE CONFLICT: imported by `discovery_fabric/engine/package_quality_gate/view.py` + `gates.py` (page text + block-rect geometry). The standing rule is MIT/Apache/BSD-only; NO upstream bytes are copied (pip dependency only), but the IMPORT CONFLICT is disclosed here rather than hidden (Art. 5). Typed direction: the block-geometry leg needs a BSD replacement (pypdf lacks block rects) before the row can retire — the swap is a typed next step, the row is NOT claimed clean. |
 
 ## Planned copies (AM43 directions D2–D8; attribution in-band at adoption)
 

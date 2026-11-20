@@ -91,7 +91,8 @@ def distinct_principles(seeds: list) -> bool:
 
 __all__ = ["PRINCIPLES", "CONTRADICTION_MAP", "seed_for",
            "distinct_principles", "DUTY_CYCLE_FAMILY_RX",
-           "load_matrix", "matrix_principles"]
+           "load_matrix", "matrix_principles",
+           "matrix_cell_for_family", "matrix_seeded_pool"]
 
 
 # ---------------------------------------------------------------------------
@@ -128,3 +129,80 @@ def matrix_principles(improving: int, worsening: int) -> list:
             f"({improving}, {worsening})")
     return list(load_matrix()["matrix"].get(f"{improving}_{worsening}",
                                             []))
+
+
+def matrix_cell_for_family(family_principles: tuple) -> dict:
+    """The D1 bridge (auditor direction 1, claim c-0128): DERIVE the
+    (improving, worsening) engineering-parameter cell from the family
+    itself — no invented classical pairings. Deterministic scan: the
+    matrix cell (sorted by (improving, worsening)) whose
+    recommendation list CONTAINS family_principles[0] as its first
+    entry; ties prefer the cell that also contains family_principles
+    [1]. Returns {improving, worsening, cell_principles, source}
+    where cell_principles = matrix_principles(improving, worsening)
+    (the matrix, not the keyword tuple, is the principle SOURCE from
+    here on). A family with no containing cell returns source=
+    'no_matrix_cell' with empty cell_principles (typed — the seeding
+    path falls back to the keyword pool and tags it)."""
+    if not family_principles:
+        return {"improving": None, "worsening": None,
+                "cell_principles": [], "source": "no_matrix_cell"}
+    first = family_principles[0]
+    second = family_principles[1] if len(family_principles) > 1 else None
+    best = None
+    for imp in range(1, 40):
+        for wor in range(1, 40):
+            if imp == wor:
+                continue
+            cell = load_matrix()["matrix"].get(f"{imp}_{wor}", [])
+            if not cell or cell[0] != first:
+                continue
+            rank = (0 if (second is not None and len(cell) > 1
+                          and cell[1] == second) else 1)
+            if best is None or rank < best[0]:
+                best = (rank, imp, wor, list(cell))
+    if best is None:
+        return {"improving": None, "worsening": None,
+                "cell_principles": [], "source": "no_matrix_cell"}
+    return {"improving": best[1], "worsening": best[2],
+            "cell_principles": best[3], "source": "triz_matrix_cell"}
+
+
+def matrix_seeded_pool(family_principles: tuple) -> dict:
+    """The D1 seeding pool: the matrix cells' principles, ordered with
+    the family's own seeds first. Cell set (deterministic): the best
+    cell (contains seed[0] first, prefers seed[1]) PLUS up to 5 more
+    cells in scan order whose lists contain seed[0] — the union keeps
+    the matrix as the principle SOURCE while widening thin cells (a
+    single-principle cell would starve the distinct-principles bind).
+    Falls back to the keyword tuple ONLY when no matrix cell contains
+    it (typed, tagged — the >=80% matrix-sourced bind is measured on
+    the tags, not assumed)."""
+    cell = matrix_cell_for_family(family_principles)
+    if cell["source"] != "triz_matrix_cell":
+        return {"principles": list(family_principles),
+                "source": "keyword_fallback", "cell": cell}
+    first = family_principles[0]
+    cells = [cell["cell_principles"]]
+    seen_keys = {(cell["improving"], cell["worsening"])}
+    for imp in range(1, 40):
+        for wor in range(1, 40):
+            if imp == wor or (imp, wor) in seen_keys:
+                continue
+            lst = load_matrix()["matrix"].get(f"{imp}_{wor}", [])
+            if lst and lst[0] == first:
+                cells.append(lst)
+                seen_keys.add((imp, wor))
+                if len(cells) >= 6:
+                    break
+        if len(cells) >= 6:
+            break
+    allp = [x for c in cells for x in c]
+    # the family's own seeds ALWAYS survive (they are the identifier
+    # layer; a thin cell union must not drop a family seed)
+    ordered = [p for p in family_principles]
+    for p in allp:
+        if p not in ordered:
+            ordered.append(p)
+    return {"principles": ordered, "source": "triz_matrix_cell",
+            "cell": cell, "n_cells": len(cells)}

@@ -142,13 +142,18 @@ def enumerate_plans(problem: dict) -> list:
     item = anchor_item(problem)
     ops = {op["operator_id"]: op for op in ms.TRANSFORMATION_OPERATORS}
     plans = []
-    # 1. evidence-anchored operators whose typed contract binds
+    # 1. evidence-anchored operators whose typed contract binds —
+    #    principle pool matrix-sourced (D1, c-0128), tagged
     for op_id, cls in OP_CLASS.items():
         contract = ops[op_id]["input_contract"]
         state = contract(item, problem)
         if not state.get("satisfied"):
             continue
-        pr = CLASS_PRINCIPLES[cls][0]
+        ints = tuple(int(x[1:]) for x in CLASS_PRINCIPLES[cls])
+        pool_res = tp.matrix_seeded_pool(ints)
+        pr_list = ["P%d" % x for x in pool_res["principles"]] or \
+            CLASS_PRINCIPLES[cls]
+        pr = pr_list[0]
         plans.append({
             "operator_id": op_id,
             "measure_class": cls,
@@ -157,13 +162,29 @@ def enumerate_plans(problem: dict) -> list:
             "contract_satisfied": True,
             "contract_state": {k: v for k, v in state.items()
                                if k != "operator"},
+            "principle_source": pool_res["source"],
+            "matrix_cell": (pool_res["cell"] or {}).get(
+                "improving") is not None and
+                f"{pool_res['cell']['improving']}_" +
+                f"{pool_res['cell']['worsening']}" or None,
         })
-    # 2. knowledge-first (always legal per the probe)
+    # 2. knowledge-first (always legal per the probe) — D1 (auditor
+    #    direction 1, claim c-0128): the principle pool comes from the
+    #    classical TRIZ matrix cells via tp.matrix_seeded_pool (the
+    #    keyword family stays the IDENTIFIER; the matrix owns the
+    #    principle list). The pool provenance is tagged on every plan
+    #    (principle_source) — the >=80% matrix-sourced bind is MEASURED
+    #    on the tags, never assumed.
     seed_pr, seed_family = tp.seed_for(json.dumps(problem))
     kf_cls = "duty_cycle" if tp.DUTY_CYCLE_FAMILY_RX.search(
         json.dumps(problem)) else seed_class(seed_family)
-    kf_principles = [seed_pr] + [p for p in CLASS_PRINCIPLES.get(
-        kf_cls, CLASS_PRINCIPLES["configuration"]) if p != seed_pr]
+    pool_res = tp.matrix_seeded_pool(seed_pr if seed_pr else ())
+    kf_principles = ["P%d" % x for x in pool_res["principles"]]
+    if not kf_principles:
+        kf_principles = list(CLASS_PRINCIPLES.get(
+            kf_cls, CLASS_PRINCIPLES["configuration"]))
+        pool_res = {"source": "class_fallback", "cell": None,
+                    "n_cells": 0}
     plans.append({
         "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
         "measure_class": kf_cls,
@@ -172,9 +193,16 @@ def enumerate_plans(problem: dict) -> list:
         "contract_satisfied": True,
         "contract_state": {"basis": "problem-statement anchor"},
         "_kf_pool": kf_principles,
+        "principle_source": pool_res["source"],
+        "matrix_cell": (pool_res["cell"] or {}).get(
+            "improving") is not None and
+            f"{pool_res['cell']['improving']}_" +
+            f"{pool_res['cell']['worsening']}" or None,
     })
     # 3. fill to K with knowledge-first principle variants
     pool = plans[-1].get("_kf_pool", [])
+    fill_source = plans[-1].get("principle_source", "class_fallback")
+    fill_cell = plans[-1].get("matrix_cell")
     used_pr = {p["principle_id"] for p in plans}
     for pr in pool:
         if len(plans) >= K:
@@ -188,6 +216,8 @@ def enumerate_plans(problem: dict) -> list:
             "signals_used": plans[-1]["signals_used"],
             "contract_satisfied": True,
             "contract_state": {"basis": "problem-statement anchor"},
+            "principle_source": fill_source,
+            "matrix_cell": fill_cell,
         })
         used_pr.add(pr)
     # 4. schedule cap: at most ceil(K/6) duty_cycle plans; demote the
