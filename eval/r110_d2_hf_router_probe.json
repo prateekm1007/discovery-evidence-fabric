@@ -1,0 +1,76 @@
+{
+ "record": "R110_D2_HF_ROUTER_PROBE/1.0.0",
+ "at": "2026-11-20T08:10:39Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s1",
+ "direction": "the auditor R110 direction 2 (the HF Inference Providers router; the funded-credential stop rule)",
+ "token_permission_test": "the live /v1/models read IS the test",
+ "census": {
+  "status": 200,
+  "latency_s": 0.3,
+  "error": null,
+  "n_models_listed": 163,
+  "target_ids_listed": [
+   "Qwen/Qwen3-32B",
+   "deepseek-ai/DeepSeek-V3.2",
+   "meta-llama/Llama-3.3-70B-Instruct",
+   "openai/gpt-oss-120b"
+  ],
+  "sample_ids": [
+   "BSC-LT/ALIA-40b-instruct-2606",
+   "ByteDance-Seed/UI-TARS-1.5-7B",
+   "CohereLabs/aya-expanse-32b",
+   "CohereLabs/aya-vision-32b",
+   "CohereLabs/c4ai-command-a-03-2025",
+   "CohereLabs/c4ai-command-r-08-2024",
+   "CohereLabs/c4ai-command-r7b-12-2024",
+   "CohereLabs/c4ai-command-r7b-arabic-02-2025",
+   "CohereLabs/command-a-plus-05-2026-bf16",
+   "CohereLabs/command-a-reasoning-08-2025"
+  ]
+ },
+ "probes": [
+  {
+   "model": "Qwen/Qwen3-32B",
+   "family": "qwen/alibaba",
+   "status": "HTTP_402",
+   "latency_s": 0.2,
+   "error_body_excerpt": "{\"error\":\"Purchase pre-paid credits to continue using Inference Providers.\"}",
+   "served": false
+  },
+  {
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "family": "deepseek",
+   "status": "HTTP_402",
+   "latency_s": 0.2,
+   "error_body_excerpt": "{\"error\":\"Purchase pre-paid credits to continue using Inference Providers.\"}",
+   "served": false
+  },
+  {
+   "model": "meta-llama/Llama-3.3-70B-Instruct",
+   "family": "meta",
+   "status": "HTTP_402",
+   "latency_s": 0.3,
+   "error_body_excerpt": "{\"error\":\"Purchase pre-paid credits to continue using Inference Providers.\"}",
+   "served": false
+  },
+  {
+   "model": "openai/gpt-oss-120b",
+   "family": "openai",
+   "status": "HTTP_402",
+   "latency_s": 0.3,
+   "error_body_excerpt": "{\"error\":\"Purchase pre-paid credits to continue using Inference Providers.\"}",
+   "served": false
+  }
+ ],
+ "typed_conclusion": "0/4 targets served with real usage bytes; the third family remains UNFUNDED (402 credits exhausted, permission verified fine) — panel_valid_score8 stays blocked on funding; the funded-key ask is the owner's checklist item",
+ "families_served": [],
+ "new_families_vs_existing_panel": [],
+ "panel_third_family_unlocked": false,
+ "panel_valid_families_projected": [
+  "agnes",
+  "cohere",
+  "glm/zai"
+ ],
+ "exact_error_verbatim": "{\"error\":\"Purchase pre-paid credits to continue using Inference Providers.\"}",
+ "typed_state": "CREDITS_EXHAUSTED__LANE_STOPPED (the direction's stop rule fired): the token's Inference Providers permission is CONFIRMED (census 200, 163 models, all 4 targets listed) — the failure is purely the credit balance (402 on all 4 chat calls, uniform body). Per the direction: the exact error is recorded and the lane STOPS. The checklist item activates for the owner: a funded third-family key (OpenAI or Anthropic API) or an xkiro pay tier — flagged once, not nagged"
+}
