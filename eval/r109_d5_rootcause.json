@@ -1,0 +1,127 @@
+{
+ "record": "R109_D5_ROOTCAUSE/1.0.0",
+ "at": "2026-11-20T07:36:49Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s1",
+ "claim": "c-0134 (r109-lane-d5d8-score9; the R108 direction 5)",
+ "basis": "committed bytes only: r105s2_score9_postcutoff_status.json + r106_score9_corpus_postcutoff/sampled_items.jsonl + rediscovery_protocol.adjudicate (rule bytes)",
+ "n_items": 30,
+ "n_ok": 29,
+ "parse_exhausted_items": [
+  "pc-26"
+ ],
+ "label_matrix_J1xJ2": {
+  "J1=NOT_RECOVERED|J2=NOT_RECOVERED": 2,
+  "J1=NOT_RECOVERED|J2=PARTIAL": 5,
+  "J1=PARTIAL|J2=PARTIAL": 15,
+  "J1=PARTIAL|J2=RECOVERED": 3,
+  "J1=RECOVERED|J2=PARTIAL": 2,
+  "J1=RECOVERED|J2=RECOVERED": 2
+ },
+ "adjudicated_hist": {
+  "PARTIAL": 26,
+  "RECOVERED": 2,
+  "NOT_RECOVERED": 2
+ },
+ "adjudication_rule_counterfactuals": {
+  "note": "the bar is 0.40 (=12/30); these are DESIGN data for the auditor's score-9 read — the rule itself is constitution-anchored (fail closed toward the middle class), not a finding against the run",
+  "rule_BOTH_actual": 0.069,
+  "rule_ANY_single_judge": 0.2414,
+  "rule_J1_only": 0.1379,
+  "rule_J2_only": 0.1724,
+  "any_rule_hits": 7,
+  "bar_hits_needed": 12
+ },
+ "ground_truth_feature_table_by_outcome": {
+  "RECOVERED": {
+   "n": 2,
+   "gt_len_median": 304.0,
+   "gt_numeric_median": 0.0,
+   "gt_hedged_share": 0.0,
+   "survey_len_median": 855.5,
+   "n_inspiration_median": 1.0,
+   "item_ids": [
+    "pc-07",
+    "pc-30"
+   ]
+  },
+  "PARTIAL": {
+   "n": 25,
+   "gt_len_median": 311,
+   "gt_numeric_median": 0,
+   "gt_hedged_share": 0.0,
+   "survey_len_median": 872,
+   "n_inspiration_median": 2,
+   "item_ids": [
+    "pc-01",
+    "pc-02",
+    "pc-03",
+    "pc-04",
+    "pc-05",
+    "pc-06",
+    "pc-08",
+    "pc-09",
+    "pc-11",
+    "pc-12",
+    "pc-13",
+    "pc-15",
+    "pc-16",
+    "pc-17",
+    "pc-18",
+    "pc-19",
+    "pc-20",
+    "pc-21",
+    "pc-22",
+    "pc-23",
+    "pc-24",
+    "pc-25",
+    "pc-27",
+    "pc-28",
+    "pc-29"
+   ]
+  },
+  "NOT_RECOVERED": {
+   "n": 2,
+   "gt_len_median": 276.0,
+   "gt_numeric_median": 0.5,
+   "gt_hedged_share": 0.0,
+   "survey_len_median": 816.0,
+   "n_inspiration_median": 1.0,
+   "item_ids": [
+    "pc-10",
+    "pc-14"
+   ]
+  }
+ },
+ "not_recovered_detail": [
+  {
+   "item_id": "pc-10",
+   "J1": "NOT_RECOVERED",
+   "J2": "NOT_RECOVERED",
+   "gt_len": 235,
+   "gt_numeric_tokens": 0,
+   "public_date": "2026-04-09",
+   "generation_sha16": "512e7954f5b0847f"
+  },
+  {
+   "item_id": "pc-14",
+   "J1": "NOT_RECOVERED",
+   "J2": "NOT_RECOVERED",
+   "gt_len": 317,
+   "gt_numeric_tokens": 1,
+   "public_date": "2026-09-29",
+   "generation_sha16": "541aa02d4bffc84e"
+  }
+ ],
+ "typed_limits": "descriptive only: n=30 with 2 RECOVERED — no significance tests are claimed; the feature table says where the classes differ, not why (the causal read needs the raw rationale bytes, see the gap record)",
+ "raw_judgment_bytes_gap": {
+  "finding": "the raw per-item J1/J2 rationale bytes and the raw generation texts of the post-cutoff rerun are NOT in the committed tree: the harness checkpoint defaulted to /tmp/r106_score9_checkpoint.json (the r105s2 sandbox) and only per-item LABELS + generation sha16 digests are committed in the status record",
+  "consequence": "the D8 swap-family re-judge of the 2 RECOVERED items cannot read the original generation bytes — a bias probe must REGENERATE (fresh agnes generations, disclosed digests) and re-judge under a swapped family; the fresh-clone reproduction rule (auditor Art. 1 v1.3.0) is not met by the rerun's rationale layer as committed",
+  "fix_for_reruns": "commit the per-item raw judgment + generation bytes (or a typed content-addressed bundle) BESIDE the status record; the checkpoint path moves off /tmp to a committed artifact path"
+ },
+ "typed_conclusion": "the 0.0667 outcome decomposes as: the BOTH-RECOVERED adjudication rule (the single-judge RECOVERED population is 9 items — under the permissive ANY rule the rate would be 0.2414, still below the 0.40 bar and its 12-hit floor); the label matrix shows J2 (xkiro/cohere) rates systematically HIGHER than J1 (z-ai) — the disagreement is judge-calibration-shaped, not generation-shaped; the ground-truth feature table carries the corpus-side signals; the MOOSE-Chem2 2025 probe is typed UNAVAILABLE (upstream has zero 2025 items), so the direction-5 option (a) is closed and the score-9 corpus-quality leg is an instrument decision for the auditor",
+ "moose_chem2_2025_probe": {
+  "method": "HF datasets API search (MOOSE-Chem2 / MOOSE-Chem / moose-chem: all EMPTY) + the authenticated GitHub contents read of the upstream repo the m2 corpus actually came from (eval/r106_score9_corpus/sampling_record.json: github.com/ZonglinY/MOOSE-Chem2 @ 5b289372fe77, Data/chem_research_2024_finegrained.xlsx)",
+  "result": "the upstream Data/ carries ONLY chem_research_2024_finegrained.xlsx + processed_research_direction.json — ZERO 2025 items exist in the curated corpus (typed UNAVAILABLE, the R108 direction-5 option (a) is closed)",
+  "consequence": "with the measured cutoff bound 2025-05-07, a 100%-post-cutoff rediscovery corpus CANNOT be MOOSE-Chem2-served at all: the curated material tops out at 2024. The post-cutoff ground truths are necessarily abstract-derived (as rebuilt) or auditor-authored sealed 2025+ items (the v15-class instrument); the corpus-quality leg is the auditor's instrument decision, staged here"
+ }
+}
