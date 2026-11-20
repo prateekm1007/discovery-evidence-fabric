@@ -1,0 +1,78 @@
+{
+ "record_type": "verifier-record",
+ "claim": "c-0138",
+ "verifies": "c-0130 (builder-r105s2, work_id p3-datasets-model-d7d8)",
+ "verifier_session": "builder-r109s2",
+ "at": "2026-11-20T08:05:00Z (sandbox clock, TRUE UTC)",
+ "base_sha": "d17fca7f1 (the artifacts unchanged since 6c02c0919, merged at b024b24ad; verified at the tip)",
+ "method": "Art. 29(c) - the recompute, NEVER a re-run. Zero re-serves, zero quota, zero LLM calls, zero sealed bytes, zero network. Every number below is recomputed from the COMMITTED BYTES by the verifier's OWN code (scripts/r109s2_c0130_verify.py, zero imports of the executor's stage drivers - auditor Art. 13 discipline; the recompute log is committed beside this record as eval/r109s2_c0130_recompute_log.json). The raw C-MAPSS unit channels, the CWRU RMS segments, and the 173-file XJTU sample are sandbox-local (absent in this sandbox): legs that depend on them are typed UNVERIFIED-FROM-COMMIT, never guessed.",
+ "recompute": {
+  "D8_sundial_stage4": {
+   "cross_record_bolt_numbers": "PASS - the comparison table's Bolt numbers byte-match the committed stage-3 record: FD001 0.887, FD002 0.8982, wall-clock 4996.2 (the stage-3 matched_budget_table key)",
+   "cwru_exact_fractions": "PASS - all 8 CWRU legs (4 pairs x healthy/fault) recompute exactly: coverage = round(hits/n_walk, 4) with INTEGRAL hits (93/102, 97/101, 185/202, 117/151, 181/202, 111/152, 180/202, 117/152) and alarms_per_1000 = round(1000*alarms/n_walk, 3) exactly (0.0, 9.901, 0.0, 52.98, 0.0, 59.211, 4.95, 46.053); the fault-alarm quadruple 1/8/9/7 and the healthy quadruple 0/0/0/1 both recompute from the committed per-leg rows",
+   "winner_tie_rule": "PASS - FD001 gap 0.887-0.7156=0.1714 >= 0.02 -> Bolt wins the leg (as typed); FD002 gap 0.8982-0.8901=0.0081 < 0.02 with the SAME gate state (both < 0.90) -> TYPED TIE (as typed); all four gate flags correctly false",
+   "matched_budget_unit_sets": "TYPED (code-read) - stage-3 and stage-4 filter units at the SAME n>=2*96+20=212 floor; FD001 runs ALL eligible units in both (37); FD002 draws random.Random(17).sample(range(92), 40) as the FIRST rng call in both scripts -> identical unit sets GIVEN the same raw C-MAPSS bytes (deterministic loader). The raw unit channels are uncommitted: the n_units match (37/37, 40/40) + the code identity is the verifiable part; the channel bytes are UNVERIFIED-FROM-COMMIT",
+   "fd_legs": "TYPED - the FD001/FD002 per-unit rows are NOT committed (only n_units + medians); the medians (0.7156, 0.8901, 34.722, 0.0) are trusted-from-record; the alarms_per_1000_median 34.722 is fraction-consistent (= 1000*5/144, a plausible n_walk=144 unit)",
+   "census": "TYPED -> VF-1 - stage-4's census {FD001: 37, FD002: 92} counts the n>=212 filter (the code condition len(u) >= 2*96+20); stage-3's census prose (62/100, 152/260) counts n>=192 under the mislabeled key 'n_eligible_ge_2ctx_plus20'",
+   "wall_clock": "TYPED -> VF-2 - Sundial's inference_ms_median 2022.9 is arm.last_ms (the LAST predict_batch call per unit/walk - per-call); Bolt's 4996.2 is stage-3's timing around the FULL sliding_walk (2 predict calls + overhead) under the per-call-labeled key; the '2.5x faster' claim compares per-call vs per-walk"
+  },
+  "D7_xjtu_stage5": {
+   "listing_lives_recompute": "PASS - the verifier's INDEPENDENT parser (own regexes, not the executor's) re-parses the committed listing: 7707 csv entries, 9.51 GiB, 14 bearing folders (B1_1..B1_5, B2_1..B2_5, B3_1..B3_4; B3_5 absent = the partiality), lives B3_1 2538 / B3_2 2496 - EXACT match to the record's archive_lives",
+   "attribution_structure": "PASS - the archive time SETS overlap at 12:03 (B3_1 11:56..12:03, B3_2 12:03..12:10 - range-disjointness is FALSE), but ZERO minute indices carry EQUAL archive times for the two bearings: the mtime discriminates the bearing at EVERY minute index (structural, re-derived); the executor's 0-ambiguous assertion is therefore CONSISTENT with the committed listing for every attributed file",
+   "attribution_integrity": "PASS - all 173 entries resolve into the committed listing as (bearing, minute) pairs with minute <= life, 0 bad, 0 duplicate minute indices per bearing; counts 73/100; first/last 47/2538 (B3_1) and 1/2484 (B3_2) exactly as recorded",
+   "cadence_recompute": "PASS - step medians 27 (B3_1, over 72 steps) and 23 (B3_2, over 99 steps), ranges [25,55] and [7,119] - exact match under the executor's sorted[len//2] median definition (re-derived from the code); the sampled-cadence-vs-typed-cadence mismatch is honestly disclosed in-record",
+   "coverage_exact_fractions": "PASS - B3_1: n_walk 73-36=37, sliding AND static coverage 30/37=0.8108 with 1 alarm each (27.027/1000); B3_2: n_walk 100-50=50, sliding 33/50=0.66 with 3 alarms (60.0), static 28/50=0.56 with 4 alarms (80.0) - the sliding remedy +0.10 coverage / -1 alarm on the real degradation leg, exactly as recorded",
+   "ctx_adaptation_math": "PASS - B3_1: 73 < 212 (the typed violation, verbatim error in-record), CTX=min(96,(73-20)//2)=26, 73>=2*26+20=72 KEPT; B3_2: 100 < 212, CTX=min(96,(100-20)//2)=40, 100>=2*40+20=100 KEPT (exactly at the floor); the walk-function bytes untouched, the module constants re-set per leg and disclosed",
+   "rms_ratio_recompute": "PASS - mean(last5)/mean(first5) recomputed from the committed endpoint arrays: B3_1 6.5473 (x6.5), B3_2 2.0115 (x2.0) - exact match; the full RMS series is NOT committed (the sample is sandbox-local): the ratios verify, the series is UNVERIFIED-FROM-COMMIT beyond the endpoints",
+   "degradation_span": "PASS - both ratios exceed the script's own 1.05 onset flag; no honest_flags were appended, matching the code path; the last-5 RMS of B3_1 (11.54 at minute 2538 = the archive life's end) is consistent with 'degradation onset spanned'",
+   "effective_window": "TYPED -> VF-4",
+   "mtime_bucket_precision": "TYPED -> VF-5",
+   "extraction_census_provenance": "TYPED -> VF-6"
+  },
+  "scripts_reproducibility": {
+   "parse": "PASS - scripts/r105s2_p3_stage3.py, r105s2_p3_stage4_sundial.py, r105s2_p3_stage5_xjtu.py all ast-parse at the tip (the display artifact note: one apparent 'channelalf:n]' corruption in stage-3 line 115 was investigated byte-level via od and is a DISPLAY-PIPELINE artifact of this sandbox's tooling, NOT file corruption - the committed bytes are 'channel[half:n]' and parse clean)",
+   "logic_vs_records": "PASS - the census/floor/subsample/adaptation/walk code paths read line-by-line; every recorded field traces to a code path (the wall-clock and census definitional gaps are typed in VF-1/VF-2, not code-record mismatches)"
+  }
+ },
+ "findings": [
+  {
+   "id": "VF-1",
+   "severity": "P3 - census REPORTING mislabeled/underlabeled across stage-3/stage-4 (the legs themselves match)",
+   "finding": "stage-3's census key 'n_eligible_ge_2ctx_plus20' counts len(u) >= 2*CTX = 192, not 2*CTX+20 = 212 (the prose 'FD001 62/100 eligible, FD002 152/260 eligible' likewise reports the >=192 counts); the ACTUAL unit filter in BOTH stages is >=212 (37 FD001 / 92 FD002 - stage-4's census block reports these but does not state its threshold). A reader comparing 62/152 (stage-3) with 37/92 (stage-4) without the code sees an unexplained eligibility collapse. The measured legs are IDENTICAL across arms (same filter + same seed-17 first-call subsample - code-verified); no measurement is affected.",
+   "fix_path": "a typed correction note on the c-0130 claim (appended below, forward-only) + the next stage record labels census keys with their true thresholds (n_ge_192 / n_ge_212)."
+  },
+  {
+   "id": "VF-2",
+   "severity": "P2 - the wall-clock matched-budget rows mix metric definitions; the '2.5x faster' claim is definitionally unsound",
+   "finding": "stage-3's 'inference_batched_call_ms_median' 4996.2 is timed around the FULL sliding_walk call (2 predict_batch invocations + numpy overhead) - a PER-WALK metric under a PER-CALL label; stage-4's Sundial 'inference_ms_median' 2022.9 is arm.last_ms - genuinely PER-CALL (the last batched predict). The commit message (6c02c0919) and the c-0130 claim notes state 'wall-clock median 2023ms vs 4996ms (Sundial 2.5x faster on CPU)', comparing per-call vs per-walk. Bolt's per-call equivalent is NOT committed, so the honest same-definition ratio is NOT derivable from committed bytes (each Bolt walk makes 2 predict calls; the walk-batch call is the larger). The qualitative direction (Sundial faster) is supported even against the wider metric (2022.9 < 4996.2), but the 2.5x figure conflates call counts.",
+   "fix_path": "relabel stage-3's key as per-walk (or record per-call timings on the next run); amend the 2.5x claim to 'faster; the same-definition ratio is uncommitted' - the typed correction is appended on c-0130 below."
+  },
+  {
+   "id": "VF-3",
+   "severity": "P3 - the c-0130 registry note's CWRU comparison quadruples match no single committed record pair",
+   "finding": "the c-0130 claim note reads 'CWRU detection Sundial 8/9/7 fault alarms vs Bolt 0/0/0/1'. Sundial's committed fault-alarm quadruple is 1/8/9/7 (the hp0 leg's single alarm dropped in the note). 'Bolt 0/0/0/1' matches the stage-3b DUAL-interval arm's alarms_fixed fault detection, NOT the stage-3 SLIDING Bolt arm (0/2/2/4) that the commit message's 'Bolt's sliding absorbed them' phrase references - the arm is unnamed in the note. The qualitative claim (Sundial detects the real faults where Bolt does not) holds against BOTH Bolt variants (25 total fault alarms vs 8 sliding / 1 dual), but the note's numbers as written are not citable to any one committed pair.",
+   "fix_path": "the typed correction is appended on c-0130 below (forward-only; the historical note text preserved)."
+  },
+  {
+   "id": "VF-4",
+   "severity": "P3 - the adapted XJTU legs' effective conformal window is below the nominal parameters; not disclosed in-record",
+   "finding": "on the adapted legs the sliding residual buffer (deque maxlen=K=100) never fills: B3_1 primes 36-26=10 residuals and walks 37 (max 47); B3_2 primes 50-40=10 and walks 50 (max 60). 'k_kept: 100' is the NOMINAL deque cap (never reached); 'min_prime_kept: 20' holds only as the inequality floor (the actual priming is 10 residuals on BOTH legs - the committed inequality n >= 2*CTX+min_prime guarantees priming >= min_prime/2, i.e. 10, not 20). On the C-MAPSS legs (n>=212) the buffer does reach 100 mid-walk, so the sliding legs' effective window differs ACROSS datasets (47-60 vs 100). The within-XJTU sliding-vs-static comparison is unaffected (both legs share the channel and the short buffer); cross-dataset comparability of the sliding coverage numbers is the affected claim.",
+   "fix_path": "the next XJTU record types effective_window (prime_len + max_buffer) beside the nominal k/min_prime; no committed number changes."
+  },
+  {
+   "id": "VF-5",
+   "severity": "P3 - the mtime attribution validates the bearing exactly but the minute index only to HH:MM-bucket granularity",
+   "finding": "the attribution matches the sample files' preserved mtimes (HH:MM) against the archive listing per (bearing, minute). The BEARING choice is structurally discriminated (zero minute indices carry equal archive times across the two bearings - verifier-recomputed). But the MINUTE INDEX rests on the filename stems being true minute indices: within one bearing each HH:MM value covers 288-395 minute indices, so an intra-bucket minute shift (e.g. n -> n+3 within the same HH:MM) would pass the identical check. The record's 'asserted unambiguous' is true for the bearing attribution; the minute-index precision is sampler-trusted, corroborated bucket-level only. The cadence/coverage/life-course claims inherit this trust.",
+   "fix_path": "the full-resolution re-extract (typed when disk allows, direction 7) re-derives the minute indices from the archive paths directly - the bucket trust then retires with the sample."
+  },
+  {
+   "id": "VF-6",
+   "severity": "P3 - the extraction-source census exists only in the commit message; uncommitted counts cited as typed evidence",
+   "finding": "the 6c02c0919 commit message cites 'the re-fetched 6-part set (4.2G, gdown) indexes 7650 csv files (vs the older 6141 listing - both still partial vs the official 15-bearing set, typed)'. Verifier grep: NEITHER 7650 nor 6141 appears in any committed artifact; the re-fetched parts were deleted after extraction with no hash record against the stage-1 manifest (eval/p3_realdata/xjtu_sy_parts_manifest.txt). The committed listing - the only verifiable census basis - carries 7707 csv entries across 14 bearing folders (9.51 GiB; B3_5 absent = the partiality), which also contradicts the '6141 older listing' figure (the listing was committed ONCE, at stage 1 a1186296d, with 7707). The ATTRIBUTION is unaffected (it matched against the committed listing); the 'both still partial' typing partly rides on uncommitted counts.",
+   "fix_path": "the next extraction records the fetched parts' sha256s against the manifest BEFORE extraction and commits the 7zz index census beside the sample manifest."
+  }
+ ],
+ "corrections_registered": "VF-1/VF-2/VF-3 typed corrections appended forward-only on the c-0130 claim entry in eval/work_claims.json (this push); the historical note text preserved verbatim (Art. 4).",
+ "honest_state": "D8 verified PASS: the cross-record Bolt numbers byte-match, all 8 CWRU legs recompute as exact fractions, the winner/tie rules apply as typed; the FD legs' per-unit rows and the raw channels are UNVERIFIED-FROM-COMMIT (medians trusted-from-record; the unit-set identity is code-verified). D7 verified PASS: the archive lives, the attribution structure AND integrity, the cadence, the coverage fractions, the CTX adaptation math, and the RMS ratios all recompute EXACTLY from committed bytes; the RMS series and the sample mtimes are UNVERIFIED-FROM-COMMIT (endpoint arrays and structural properties verified). Six findings stand (VF-1..VF-6, one P2 + five P3 - none invalidates a committed measurement; VF-2 corrects a derived claim's magnitude, not its direction). The 0-ambiguous/0-no-match attribution counts are trusted-from-record with the discriminating structure verifier-recomputed. NO acceptance/score claims - the auditor scores from committed bytes.",
+ "zero_claims": "this record verifies executor work; it claims no acceptance bar, no score, no direction completion on the auditor's checklist, and no re-run of any quota-consuming measurement."
+}
