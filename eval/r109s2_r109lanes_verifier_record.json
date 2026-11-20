@@ -1,0 +1,61 @@
+{
+ "record_type": "verifier-record",
+ "claims": ["c-0140", "c-0141", "c-0142", "c-0143", "c-0144"],
+ "verifies": "c-0133 (r109-lane-d6-pymupdf), c-0134 (r109-lane-d5d8-score9), c-0135 (r109-lane-d2d3-score8), c-0136 (r109-lane-d4-gate-staging), c-0137 (r109-lane-d7-xjtu-full) — all builder-r109s1, all DONE",
+ "verifier_session": "builder-r109s2",
+ "at": "2026-11-20T08:55:00Z (sandbox clock, TRUE UTC)",
+ "base_sha": "314048a0b (the lanes' artifacts committed 9faa16c4a..fe8ad627f + 3ddc8fd69; verified at the tip)",
+ "method": "Art. 29(c) - the recompute, NEVER a re-run. Zero re-serves, zero quota, zero LLM calls, zero sealed bytes, zero network. Every number recomputed from the COMMITTED BYTES by the verifier's OWN code (scripts/r109s2_r109lanes_verify.py, zero executor-driver imports; the log committed as eval/r109s2_r109lanes_recompute_log.json). 18 checks = 12 PASS / 0 FAIL / 6 TYPED.",
+ "recompute": {
+  "c-0140_d6_pymupdf": {
+   "zero_fitz_imports": "PASS - the verifier's own AST-level sweep over ALL 133 tracked .py files: ZERO fitz imports (the engine's remaining 'fitz' strings are comments/docstrings naming the retired primary)",
+   "notice_and_ledger": "PASS - NOTICE carries the Art. 16 retirement sentence + the three successor rows (pypdf BSD-3 text primary, pdfplumber MIT geometry, poppler-utils GPL-2.0 subprocess-only); the retirement ledger carries R109-D6-PYMUPDF-AGPL-RETIREMENT with the removed-item list",
+   "suites": "PASS - verifier-run this session: test_notice_import_coverage 2/2, test_r443_domain_applicability 19/19, test_r440_package_quality_gate 9/9 (the golden P-04/P-07 fixtures + the blind corpus on the ported geometry)",
+   "poppler_license_note": "TYPED - the render leg swaps an AGPL import for a GPL-2.0 SUBPROCESS (never imported, no linkage, disclosed in NOTICE); the direction's test 'zero AGPL dependencies' is MET; the waiver is typed, not silent"
+  },
+  "c-0141_d5d8_score9": {
+   "label_matrix": "PASS - the verifier's independent re-tally over the 29 OK items of the committed r105s2_score9_postcutoff_status.json reproduces the record's J1xJ2 matrix EXACTLY (2 BOTH-REC, 3 J1=PARTIAL|J2=REC, 15 BOTH-PARTIAL, 5 J1=NR|J2=PARTIAL, 2 J1=REC|J2=PARTIAL, 2 BOTH-NR)",
+   "counterfactuals": "PASS - hist 26/2/2 == record; ANY-rule 7/29=0.2414, J1-only 4/29=0.1379, J2-only 5/29=0.1724, BOTH 2/29=0.069, bar 12 hits — the 'no adjudication leniency reaches the 0.40 bar' claim is arithmetically SOUND",
+   "j2_leniency_shape": "PASS - 5 J1=NR|J2=PARTIAL + 3 J2-only-REC vs 2 J1-only-REC, ZERO reverse-shape rows — the judge-calibration-shaped reading is supported",
+   "item_ids": "PASS - BOTH-RECOVERED {pc-07, pc-30}, NOT_RECOVERED {pc-10, pc-14}, parse-exhausted {pc-26} — all match",
+   "commit_message_missummary": "TYPED - the peer's commit 1898249cc prose says '9 single-judge-RECOVERED' (prose quadruples summing 33 over 29 items); the record's matrix gives 5 (3+2, summing 29 exactly) — the CANONICAL record is correct and self-consistent (any-rule 7 = 2+5); the commit message mis-summarized it (P3, prose-vs-record)",
+   "d8_raw_bytes": "PASS - the generation sha16 digests recompute from the raw files (508a057ee01cb785 / 50fbdfe43f3d7ba9); all 8 judge outputs re-derived from RAW BYTES (4 zai from choices-content, 4 xkiro from the recovery field): all RECOVERED — ZERO adjudication flips under the family swap, exactly as recorded",
+   "d8_identical_bytes_linkage": "TYPED - the judge outputs do not EMBED the generation digest; the identical-bytes claim is filename + record-convention linked, not content-addressed. The raw generations ARE committed (digest-verified), so the probe is fresh-clone reproducible; a digest field inside each judge output would close the linkage gap (typed for the reruns, the D5 record's own fix_for_reruns pattern)"
+  },
+  "c-0142_d2d3_score8": {
+   "probe_consistency": "PASS - 7 probe rows across 5 families (openai/anthropic/deepseek/google/xai), every row 403/404 with zero served chars; the agnes catalog: 10 models, agnes-family only; the xkiro catalog: 69 models incl. the probed families — the 'families served stay {agnes, zai}' conclusion matches the committed evidence",
+   "vault_state_cross_sandbox": "TYPED - the vault_keys_present claim (AGNES pair + XKIRO) is the EXECUTOR's sandbox state (restored via the owner re-delivered master token per their session note); THIS sandbox's vault carries GITHUB_PAT + HF_TOKEN only — trusted-from-record (cross-sandbox), consistent with the r109s1 registration note + the r77 restore exit 0; the 11 UNFUNDED direct transports hold in BOTH sandboxes (the third-family blocker is funding, not code — as typed)",
+   "pre_registration": "PASS - 4 rubric axes x 7 behavioral anchors, all complete; the fixed calibration-set source (eval/r105s2_rubric_spread_v15.json) exists; ZERO v16 artifacts exist in the tree — the pre-registration demonstrably precedes any v16 scoring (the Art. 6 discipline the record claims)",
+   "wilson_ci_power_note": "TYPED - the record cites ~[0.51, 0.85]; the verifier recompute at p=0.7, n=30, z=1.96 gives [0.52, 0.83] — the endpoints are slightly wide; the CONCLUSION is unaffected (the interval contains sub-bar values -> a 0.70 point estimate is UNRESOLVED unless the CI clears the bar, auditor Art. 14) — P3 precision note"
+  },
+  "c-0143_d4_gate_staging": {
+   "staged_numbers": "PASS - EVERY staged number recomputes exactly from the committed r106_core_mechanism_gate_run.json: 30 rows (min/median/max 0.037168/0.058551/0.095697), prior p95 0.158496, anchor dists 0.10399/0.069696, both leg gaps (-0.054506/-0.015706), the evaluated-side MAD 0.007085, the z-range [-3.02, 5.24], the anchor-z 6.41, n_novel 0, the nearest-prior composition v9-v14 (the domain-mismatch evidence)",
+   "mad_convention": "TYPED - the staged z statistics use the UNSCALED MAD (z=(x-med)/MAD); the sigma-consistent convention scales by 1.4826 (which would give z-range [-2.04, 3.54], anchor-z 4.33). Internally consistent under the unscaled convention; the v16 definition must pre-register WHICH convention alongside k (the record's own 'k pre-registered' clause) — P3 convention-pinning note"
+  },
+  "c-0144_d7_xjtu_full": {
+   "disk_blocker": "PASS - the probe's figures (total 9.8 / used 3.6 / free 5.7 GB) match THIS sandbox's independent df read (same rootfs, drift within rounding); the ~11 GB requirement exceeds the ceiling; the >=12 GB resume condition is conservative and typed; the 173-file two-bearing sample stands as the committed real-bytes coverage (verifier-confirmed in c-0138: the attribution + archive lives recompute exactly)"
+  }
+ },
+ "findings": [
+  {
+   "id": "VF-7",
+   "severity": "P3 - commit-message prose mis-summarizes the canonical record (the D5 lane)",
+   "finding": "commit 1898249cc's prose says '9 single-judge-RECOVERED' with a quadruple list summing to 33 over 29 OK items; the record's matrix (verifier-recomputed exactly) gives 5 single-judge-RECOVERED (3+2) summing to 29. The canonical record is correct; the commit prose is wrong. Same class as the c-0130 registry-note imprecision (VF-3 of the c-0138 record).",
+   "fix_path": "none needed for the record (it is correct); the round-close discipline should quote matrices from the record, not from memory."
+  },
+  {
+   "id": "VF-8",
+   "severity": "P3 - the D8 judge outputs lack an embedded generation digest",
+   "finding": "the identical-bytes claim (both panels judged the SAME regenerated generation) is linked by filename convention + the record, not content-addressed: the xkiro outputs carry GT + verdict + rationale but no generation digest; the zai outputs are raw choices responses. The generations ARE committed and digest-verified, so the probe is fresh-clone reproducible; the linkage inside each judgment is the gap.",
+   "fix_path": "the rerun harness embeds generation_sha16 in every judge output (the D5 record's own fix_for_reruns pattern)."
+  },
+  {
+   "id": "VF-9",
+   "severity": "P3 - two pre-registration precision gaps (D3/D4)",
+   "finding": "(i) the Wilson CI power note cites ~[0.51, 0.85]; the exact interval at p=0.7, n=30, z=1.96 is [0.52, 0.83] — slightly wide, conclusion unaffected; (ii) the staged MAD-z numbers use the UNSCALED MAD without naming the convention (the 1.4826-scaled variant would read z-range [-2.04, 3.54], anchor-z 4.33) — the v16 definition must pin the convention alongside k.",
+   "fix_path": "the v16 authoring (the auditor's) names both: the exact CI endpoints and the MAD convention; the pre-registered k clause gets the convention sentence."
+  }
+ ],
+ "honest_state": "all five DONE R109 lanes verify from committed bytes: the D6 AGPL retirement is real (zero AST-level fitz imports, accounting complete, suites green on the ported geometry); the D5 root-cause analysis is arithmetically sound (the label matrix, the counterfactuals, and the J2-leniency asymmetry all recompute exactly; no adjudication leniency reaches the 0.40 bar — 7 < 12); the D8 bias probe's raw bytes re-derive every verdict (zero flips on the 2 RECOVERED items, digests exact); the D2 probe record is internally consistent with the {agnes, zai} served-set conclusion and the UNFUNDED typing; the D3 pre-registration is complete and demonstrably precedes any v16 scoring; the D4 staged numbers recompute exactly from the committed gate-run bytes; the D7 disk blocker's arithmetic matches the independent df read. Three P3 findings stand (VF-7..VF-9 — prose-vs-record, digest-linkage, precision gaps; none invalidates a committed measurement). The cross-sandbox vault state (the executor's AGNES/XKIRO keys) is trusted-from-record. NO acceptance/score claims — the auditor scores from committed bytes.",
+ "zero_claims": "this record verifies executor work; it claims no acceptance bar, no score, no direction completion on the auditor's checklist, and no re-run of any quota-consuming measurement."
+}
