@@ -59,6 +59,7 @@ NO acceptance claims — measurements for the auditor.
 """
 from __future__ import annotations
 
+import argparse
 import datetime
 import datetime as dt
 import importlib.util
@@ -208,7 +209,32 @@ def walk_pair(channel: np.ndarray, arm, label: str) -> dict:
             "adaptation": adaptation}
 
 
-def main():
+def parse_args(argv=None):
+    """The owner-directed source flag (claim c-0148): --source hf
+    streams the committed 173-file sample from the owner's PRIVATE HF
+    dataset repo per-file (ephemeral cache, one csv peak); --source
+    local (DEFAULT) is the committed flat-dir path, byte-identical
+    behavior. The hf implementation lives in
+    scripts/r110s2_hf_stage5_source.py (lazily imported — zero import
+    cost and zero behavior change on the default path)."""
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--source", choices=["local", "hf"],
+                    default="local")
+    return ap.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    if args.source == "hf":
+        import importlib.util as _ilu
+        _hf = _ilu.spec_from_file_location(
+            "r110s2_hf_stage5_source",
+            Path(__file__).resolve().parent
+            / "r110s2_hf_stage5_source.py")
+        _hfm = importlib.util.module_from_spec(_hf)
+        sys.modules["r110s2_hf_stage5_source"] = _hfm
+        _hf.loader.exec_module(_hfm)
+        return _hfm.run_hf_source(sys.modules[__name__])
     now = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y-%m-%dT%H:%M:%SZ")
 
