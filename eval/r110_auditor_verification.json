@@ -1,0 +1,76 @@
+{
+ "record": "R110_AUDITOR_VERIFICATION/1.0.0",
+ "auditor_session": "auditor-r110s1",
+ "audited_queue_tip": "7cfbe5e531d830daa56960881a5dc7db60508234",
+ "constitutions_read": "EPISTEMIC v3.3.0 FULL + AUDITOR v1.3.0 FULL this round",
+ "remote_ci": {
+  "sha": "7cfbe5e531d830daa56960881a5dc7db60508234",
+  "check_run_id": 136312035906,
+  "name": "surface",
+  "status": "completed",
+  "conclusion": "success",
+  "started": "2026-11-20T13:19:18Z",
+  "completed": "2026-11-20T13:21:43Z",
+  "note": "auditor egress read (sandbox PAT rate-limited; auditor IP not limited) \u2014 closes the builder's typed-INCOMPLETE D2 gap"
+ },
+ "c0148_hf_streaming": {
+  "verdict": "VERIFIED",
+  "acceptance": "173/173 sha256-checked, 0 mismatches, IDENTICAL to committed 173-file sample",
+  "recomputed": {
+   "Bearing3_1_sliding": "30/37=0.8108",
+   "Bearing3_2_sliding": "33/50=0.66",
+   "Bearing3_2_static": "28/50=0.56",
+   "ctx_floors": "73>=2*26+20=72; 100>=2*40+20=100",
+   "census": "9216 csv + 20 non-csv = 9236"
+  },
+  "manifest": "9216 files, crc_mismatches=[], 37 Bearing3_1 truncated members repaired (HF commit 1e55dcc43c, manifest 85b3ec1913)",
+  "hf_repo": "prateekm1/xjtu-sy-bearing-rar private (unauth web 404 = not publicly readable)",
+  "loader": "--source hf|local present; per-file fetch->RMS->delete; sha256 fail-closed; attribution cross-check"
+ },
+ "vault_restore": {
+  "state": "LIVE",
+  "agnes": "both rotation keys live, agnes-3.0-flash probed 2 calls/152 tokens",
+  "hf_master": "33bc7af22c62 live repo.write (old b5aaf542b2fd dead/rotated)",
+  "significance": "generator unblocked; v3.3.0 zero-perms typed state obsolete"
+ },
+ "findings": [
+  {
+   "id": "F83",
+   "severity": "MEDIUM",
+   "title": "mock CI test tests/test_r105s2_p3_stage5_xjtu.py NOT in r11_queue_surface.yml \u2014 gates nothing (F78 class, 10th instance); compounded by torch-skip (CI installs no torch)",
+   "fix": "lazy-import stage-2/3 chain so the streaming seam runs torch-less; wire the test into the workflow",
+   "acceptance": "test present in workflow AND executed (not skipped) in CI"
+  },
+  {
+   "id": "F84",
+   "severity": "MEDIUM",
+   "title": "loader REPO hardcoded /home/z/my-project/... \u2014 F64 sandbox-path-bound evidence; the IDENTICAL acceptance is not fresh-clone reproducible",
+   "fix": "REPO=Path(__file__).resolve().parents[1]; re-run acceptance from a fresh clone path",
+   "acceptance": "173/173 sha, IDENTICAL, record sha256 stable across two fresh-clone runs"
+  },
+  {
+   "id": "F85",
+   "severity": "LOW",
+   "title": "two windows under builder-r109s2 executed c-0148 concurrently (F37/F49 shared-id class); reconciled as union, HF repo re-verified end-to-end, idempotent recompute (not validity-voiding); executor field r109s2 vs round R110 naming drift",
+   "fix": "unique executor id per sandbox window, registered before claim",
+   "acceptance": "no two windows share an executor id on one work_id"
+  },
+  {
+   "id": "F86",
+   "severity": "LOW",
+   "title": "disk-full recurrence: pytest tmp_path ~4.7GB/run in /tmp/pytest-of-z; two disk-full events corrupted downloads/model cache",
+   "fix": "bounded --basetemp + autouse cleanup fixture",
+   "acceptance": "full battery leaves /tmp footprint <=1GB"
+  }
+ ],
+ "capability_state": {
+  "score": 7,
+  "score8": "NOT MET (third family unfunded HF-router 402; agreement 0.5875; gate calibration failed)",
+  "score9": "NOT MET (0.0667 post-cutoff; peer re-authored 30 items zero parse exhaustions \u2014 re-run pending)",
+  "xjtu": "FULL 15-bearing 9216-CSV set now streamable from private HF repo \u2014 P3 full-resolution measurement unblocked without local extraction",
+  "peer_r109s1": "Dir-3 re-author 30 items, Dir-5 6 bearings zip64 range-streaming + Wilson CIs, Dir-7 prereg c-0146 \u2014 acknowledged, not duplicated"
+ },
+ "art27": "0 engine lines this lane; NO_CAPABILITY_CHANGE + typed custody/enablement exception (vault restore + HF streaming custody)",
+ "roadmap": "6 done; 7 stands (v15); 8 pending score-8 gates; 9 pending score-9 + unattended batch",
+ "no_acceptance_or_score_change": true
+}
