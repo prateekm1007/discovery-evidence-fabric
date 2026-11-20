@@ -78,20 +78,23 @@ def main():
     enc = load_specter2_encoder("/home/z/my-project/models_cache", None)
 
     # ---- tau calibration (BEFORE any generation) ----
+    # the GT vectors are encoded ONCE and reused (the cached-vector
+    # fix: 30 encodes, not ~22.5k)
     pos, neg = [], []
+    gts = [enc.encode(it["ground_truth"]["finegrained_hypothesis"])
+           for it in items]
+    mains = [enc.encode(it["ground_truth"]["main_hypothesis"])
+             for it in items]
     for i, it in enumerate(items):
-        gt = it["ground_truth"]["finegrained_hypothesis"]
-        gv = enc.encode(gt)
+        gv = gts[i]
         for e in it["key_elements"]:
             ev = enc.encode(e)
             pos.append(cosine_distance(ev, gv))
             for j, other in enumerate(items):
                 if j == i:
                     continue
-                neg.append(cosine_distance(ev, enc.encode(
-                    other["ground_truth"]["finegrained_hypothesis"])))
-            neg.append(cosine_distance(ev, enc.encode(
-                it["ground_truth"]["main_hypothesis"])))
+                neg.append(cosine_distance(ev, gts[j]))
+            neg.append(cosine_distance(ev, mains[i]))
     max_neg, min_pos = max(neg), min(pos)
     tau = round((max_neg + min_pos) / 2, 4)
     calib = {"tau": tau, "max_negative_cosine_distance": max_neg,
