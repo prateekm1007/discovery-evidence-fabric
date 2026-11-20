@@ -76,10 +76,6 @@ is public-domain factual knowledge and is encoded in our own files
   failure-signature repeat — instead of fixed budget burn); copied as a
   pattern into `scripts/r80_repair_convergence.py` (AM79 roadmap P2
   convergence lane; our own code, no upstream bytes).
-- stanfordnlp/dspy GEPA (MIT — corrected from Apache-2.0 by the R47
-  byte verification; the standalone gepa-ai/gepa is also MIT) —
-  `dspy/teleprompt/gepa/` offline prompt compilation against the
-  labelled bind corpus (D5, planned; DEV-only, never touches v8).
 - openai/preparedness PaperBench (MIT) — hierarchical rubric leaf-node
   schema (D6, planned; the PRIVATE rubric stays in owner-side private
   custody per F60 — EnvCommons/PaperBench itself carries no license

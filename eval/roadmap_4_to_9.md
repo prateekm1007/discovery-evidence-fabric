@@ -63,7 +63,7 @@
 
 **Gap:** hand-tuned directive; no search; asserted FA-rates; no speed budget.
 
-1. **GEPA (MIT)** compiles the generation directive offline against DEV labels with **held-out DEV slices**; metric = the now-trustworthy computed checks + scan battery; reflection on the strongest servable route; generation stays on the registered model. Pre-registered gain on a slice the optimizer never saw.
+1. ~~GEPA (MIT) compiles the generation directive offline against DEV labels~~ **DELETED (the R110 auditor direction 6 delete branch, 2026-11-20): the tree carries ZERO dspy/gepa bytes (no vendored module, no import anywhere — the auditor's own verification), so 'compile' would mean building the entire harness from nothing against an unproven gain; the direction's delete branch applies. The NOTICE row is retired (eval/retirement_ledger.json) and the compile lever is closed.** The directive-improvement lever this item carried moves to the score-9 instrument rebuild (the R110 direction 3: the preregistered engine-vs-bare control answers the same 'is the engine directive earning its complexity' question with a stronger instrument).
 2. **AIDE-style best-first search — only now** (copy `agent.py`/`journal.py`, MIT + NOTICE): search over typed plans scored by computed checks. Searching earlier = searching noise.
 3. **Conformal predictors**: MAPIE + telemanom (verify license text) with **our own loaders** for C-MAPSS/XJTU-SY/CWRU; conformal thresholds make FA ≤1/year a computed property (coverage ≥1−α).
 4. **Speed**: per-problem wall-time in the events ledger; median ≤2 min, worst ≤5 min; 429-safe backoff; gateway + judge queue only.
@@ -106,7 +106,7 @@ FULL constitution reads → claim-before-work (push = mutex) → executor/verifi
 - [ ] **P0:** owner custody+rotation ⬜ · CI fix ⬜ · all-refs gitleaks report ⬜ · measured path ✅
 - [ ] **P1:** physics_checks + pint ⬜ · enum schema + scanners deleted ⬜ · engine route integrated (negative cases proven) ⬜ · gate ≥80%/0/0/0 ⬜
 - [ ] **P2:** TRIZ JSON ⬜ · K≥3 population + cap 1/6 ⬜ · TF-IDF novelty ⬜ · matched-budget ablations ⬜ · **v9 accepted (≥3.0, CI>3.0)** ⬜
-- [ ] **P3:** GEPA held-out gain ⬜ · best-first search ⬜ · conformal predictors ⬜ · speed budget ⬜ · **two sets ≥3.3, engine on path** ⬜
+- [ ] **P3:** ~~GEPA held-out gain~~ **DELETED (the R110 direction 6)** ⬜ · best-first search ⬜ · conformal predictors ⬜ · speed budget ⬜ · **two sets ≥3.3, engine on path** ⬜
 - [ ] **P4:** prior-art distance ⬜ · calibrated blind panel ⬜ · canaries ⬜ · **≥50% viable+non-obvious** ⬜
 - [ ] **P5:** ≥30 post-cutoff rediscovery ⬜ · T1+T2 validated candidate ⬜ · **unattended 30-batch** ⬜
 - [ ] Durable commit of this roadmap + AM46 (queued, next push-capable round)
