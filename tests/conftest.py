@@ -363,13 +363,33 @@ def _du_bytes(root: Path) -> int:
     return total
 
 
-def _reap_stale(root: Path, keep: str | None = None) -> int:
+def _reap_stale(root: Path, keep: str | None = None,
+                min_age_s: float = 600.0) -> int:
+    """Remove pytest-N tmp dirs. Three guards measured in after the
+    F88 cascade (the reaper deleted a LIVE dir twice):
+      1. the glob is pytest-[0-9]* — "pytest-current" is pytest 9's
+         own LOCK SYMLINK (make_numbered_dir's _force_symlink) and
+         must NEVER be touched;
+      2. a dir newer than min_age_s belongs to a LIVE session (this
+         one or a concurrent one) and is skipped; OUR live dir is
+         additionally protected by name (keep), and the session-finish
+         pass removes OUR dir explicitly via the cached name;
+      3. fail-closed: keep=None in the watchdog means it never runs
+         (the session-finish pass passes an explicit mode instead).
+    Returns the count of removed dirs."""
     import shutil
+    import time as _t
     n = 0
     if root.exists():
-        for d in sorted(root.glob("pytest-*")):
+        for d in sorted(root.glob("pytest-[0-9]*")):
             if keep is not None and d.name == keep:
                 continue
+            try:
+                age = _t.time() - d.stat().st_mtime
+            except OSError:
+                continue
+            if age < min_age_s:
+                continue  # a live session (ours or concurrent)
             shutil.rmtree(d, ignore_errors=True)
             n += 1
     return n
@@ -377,42 +397,47 @@ def _reap_stale(root: Path, keep: str | None = None) -> int:
 
 @pytest.fixture(scope="session", autouse=True)
 def _bounded_pytest_tmp(request):
-    import threading
-    import time as _time
-
+    """The F86 disk-hygiene fixture, FINAL form (the R112 window):
+    a session-START stale reap (age-guarded, so a concurrent live
+    session's fresh dir is never touched) + a session-FINISH cleanup
+    (OUR numbered dir removed by NAME + the still-stale others). The
+    intermediate designs (a 30s watchdog thread) are RETIRED: they
+    measured as the cause of two 78-ERROR battery cascades — the
+    per-tick getbasetemp() contended on pytest's own tmp lock, the
+    `pytest-*` glob ate pytest 9's `pytest-current` lock symlink, and
+    the unguarded reaper deleted the LIVE dir. The acceptance bound
+    (/tmp pytest residue <=1GB after a full battery) needs no
+    watchdog: nothing accumulates (the start reap) and nothing leaks
+    (the finish reap)."""
     if os.environ.get("F86_KEEP_TMP"):
         yield
         return
     root = _tmp_pytest_root()
-    # (a) stale runs from crashed sessions never accumulate
+    # (a) stale runs from crashed sessions never accumulate (the age
+    # guard protects any concurrent live session's fresh dir)
     _reap_stale(root)
 
-    def _keep_name():
-        factory = getattr(request.config, "_tmp_path_factory", None)
-        if factory is None:
-            return None
-        try:
-            return factory.getbasetemp().name  # the LIVE numbered dir
-        except Exception:
-            return None
-
-    stop = threading.Event()
-
-    def watchdog():
-        while not stop.wait(30.0):
-            try:
-                _reap_stale(root, keep=_keep_name())
-            except Exception:
-                pass  # typed best-effort hygiene, never fails a suite
-
-    thread = threading.Thread(target=watchdog, daemon=True)
-    thread.start()
+    # our own numbered dir, resolved once (the fail-closed lesson: a
+    # raising getbasetemp() must not disable the finish cleanup's
+    # name-targeted part, only make it best-effort)
+    factory = getattr(request.config, "_tmp_path_factory", None)
+    keep = None
+    try:
+        if factory is not None:
+            keep = factory.getbasetemp().name
+    except Exception:
+        keep = None
     yield
-    stop.set()
-    # (b) the current run's residue goes too (the acceptance bound)
+    # (b) the current run's residue goes too (the acceptance bound):
+    # OUR dir removed by NAME; other dirs only if STALE (>10 min —
+    # a concurrent session's fresh dir is protected by the age guard)
     before = _du_bytes(root)
-    _reap_stale(root, keep=None)  # remove EVERYTHING, live dir included
+    if keep is not None:
+        import shutil
+        shutil.rmtree(root / keep, ignore_errors=True)
+    n_stale = _reap_stale(root, keep=keep)
     after = _du_bytes(root)
     print(f"\n[F86] bounded-tmp: pytest residue {before // 2**20}MB -> "
-          f"{after // 2**20}MB (removed the current run's tmp tree; "
-          f"bound: /tmp pytest residue <=1GB)")
+          f"{after // 2**20}MB (removed our run's tree "
+          f"{keep or 'unknown'} + {n_stale} stale; bound: /tmp pytest "
+          f"residue <=1GB)")

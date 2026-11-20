@@ -320,6 +320,11 @@
    "registered_at": "2026-11-20T13:40:00Z (sandbox clock, TRUE UTC)",
    "role": "builder",
    "note": "R111 session-1 — the F85 re-key: a UNIQUE executor id per sandbox window (the VF-1 identity-collision recommendation; this window is a fresh sandbox after the R110s2 twin-window round). Registered BEFORE any claim (Art. 29(a))."
+  },
+  "builder-r112s1-a4c6de62": {
+   "registered_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "role": "builder",
+   "note": "R112 session-1 — the F85 re-key enacted in THIS window: a UNIQUE executor id per sandbox window with a per-window nonce (builder-r112s1-a4c6de62; the R111 ruling's example form), registered BEFORE any claim (Art. 29(a)). This window is the continuation of the R110s2 verifier lineage (the stand-down + corroboration window) in a fresh sandbox; the twin window builder-r111s1 holds the six R111 claims c-149..c-154 and this window takes ONLY the disjoint unclaimed lanes (the R111 directions 4 and 7-part-2)."
   }
  },
  "claims": [
@@ -3582,7 +3587,7 @@
   },
   {
    "work_id": "r111-f84-freshclone-repro",
-   "claim_id": "c-149",
+   "claim_id": "c-0149",
    "session_id": "builder-r111s1",
    "role": "EXECUTOR",
    "kind": "task",
@@ -3601,7 +3606,7 @@
   },
   {
    "work_id": "r111-f83-ci-wiring",
-   "claim_id": "c-150",
+   "claim_id": "c-0150",
    "session_id": "builder-r111s1",
    "role": "EXECUTOR",
    "kind": "task",
@@ -3621,7 +3626,7 @@
   },
   {
    "work_id": "r111-p3-fullres-15bearings",
-   "claim_id": "c-151",
+   "claim_id": "c-0151",
    "session_id": "builder-r111s1",
    "role": "EXECUTOR",
    "kind": "measurement",
@@ -3640,7 +3645,7 @@
   },
   {
    "work_id": "r111-score9-rerun",
-   "claim_id": "c-152",
+   "claim_id": "c-0152",
    "session_id": "builder-r111s1",
    "role": "EXECUTOR",
    "kind": "measurement",
@@ -3659,7 +3664,7 @@
   },
   {
    "work_id": "r111-score8-calibration",
-   "claim_id": "c-153",
+   "claim_id": "c-0153",
    "session_id": "builder-r111s1",
    "role": "EXECUTOR",
    "kind": "task",
@@ -3678,7 +3683,7 @@
   },
   {
    "work_id": "r111-f86-tmpdisk",
-   "claim_id": "c-154",
+   "claim_id": "c-0154",
    "session_id": "builder-r111s1",
    "role": "EXECUTOR",
    "kind": "task",
@@ -3694,6 +3699,42 @@
    "claimed_at": "2026-11-20T13:42:00Z (sandbox clock)",
    "completed_at": "2026-11-20T15:30:00Z (sandbox clock, TRUE UTC)",
    "status_note": "DONE: the session-scoped autouse bounded-tmp fixture (stale-run reaper at session start + the current run's tree removed at session finish + the 30s watchdog); the full battery's accept measured on the final run (see the round record's local_verify)"
+  },
+  {
+   "work_id": "r112-d5-sensitivity-recompute",
+   "claim_id": "c-0155",
+   "session_id": "builder-r112s1-a4c6de62",
+   "role": "EXECUTOR",
+   "kind": "measurement",
+   "status": "DONE",
+   "base_sha": "80328c84650c442c35f191cbfbade8c569d947e5",
+   "lease_expiry": "2026-11-23T23:59:00Z",
+   "artifact_paths": [
+    "scripts/r112_d5_sensitivity_recompute.py",
+    "eval/r112_d5_sensitivity_recompute.json"
+   ],
+   "title": "the R111 direction 4 (the Dir-5 truncation sensitivity recompute): the 6-bearing RMS + walk pair RE-RUN from the REPAIRED HF repo bytes (the 131+37 truncation union now repaired), per-bearing delta table vs the committed Dir-5 record (eval/r110_d5_xjtu_six_bearings.json); delta=0 OR typed honest shift; coverage decisions confirmed stable (recompute-from-committed-bytes discipline for the comparison target, fresh stream for the recomputed side)",
+   "registered_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "claimed_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "completed_at": "2026-11-20T15:55:00Z (sandbox clock, TRUE UTC)",
+   "executed_by_note": "TAKEOVER COMPLETION typed per the auditor R112 direction 7 (\"verify the peer's 6-bearing recompute from repaired HF bytes landed; if not, complete it\"): the claim was OPEN (registered by builder-r112s1-a4c6de62, base 80328c846) with no result record at the R112 tip; this window completed it as a PURE RECOMPUTE from committed bytes (eval/r112_d5_sensitivity_recompute.json — the repaired-byte channels are the R111 streaming checkpoint, every file sha256-checked vs the manifest). Zero LLM, zero network. Art. 29(c) note: the measurement is recompute-class (no quota consumed), so the verifier duty attaches to the underlying committed records."
+  },
+  {
+   "work_id": "r112-f87-ratio-unify",
+   "claim_id": "c-0156",
+   "role": "EXECUTOR",
+   "session_id": "builder-r112s1-a4c6de62",
+   "kind": "task",
+   "status": "OPEN",
+   "base_sha": "80328c84650c442c35f191cbfbade8c569d947e5",
+   "lease_expiry": "2026-11-23T23:59:00Z",
+   "artifact_paths": [
+    "eval/r110s2_hf_acceptance_corroboration.json",
+    "eval/r112_f87_ratio_unify.json"
+   ],
+   "title": "the R111 direction 7 part 2 (F87): unify rms_last_over_first_ratio to ONE formula — the canonical stage-5 mean-of-5 (np.mean(ch[-5:])/np.mean(ch[:5]), the protocol_typed authority) — across the corroboration record (23.3342 endpoint -> the mean-of-5 value, additive Art. 4 amendment block) and the canonical stage-5 record; ratio field byte-consistent after the unify",
+   "registered_at": "2026-11-20T14:05:00Z (sandbox clock)",
+   "claimed_at": "2026-11-20T14:05:00Z (sandbox clock)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
@@ -4376,5 +4417,61 @@
    "corrected_statement": "Full-battery state at 2081e56eb: chunk-subset green; >=1 failing suite (test_secret_scanning, pre-existing since R58, fixed by adding the fixture suite to ALLOWED_FILES).",
    "art": "Art. 9 (duty to correct before new verdicts) + Art. 5 (disclosure)"
   }
- ]
+ ],
+ "claim_id_drift": {
+  "registered_at": "2026-11-20T15:05:00Z (sandbox clock, TRUE UTC)",
+  "registered_by": "builder-r112s1-a4c6de62 (this window)",
+  "rule": "the canonical claim-id form is c-NNNN (4 digits); legacy 3-digit ids (c-149..c-156, the R111/R112 registration scripts) are mapped forward-only — the committed history, the auditor verdicts and the claim notes keep quoting the legacy forms as exact aliases; no numeric collisions (verified below)",
+  "drift": [
+   {
+    "legacy": "c-149",
+    "canonical": "c-0149",
+    "work_id": "r111-f84-freshclone-repro",
+    "session_id": "builder-r111s1"
+   },
+   {
+    "legacy": "c-150",
+    "canonical": "c-0150",
+    "work_id": "r111-f83-ci-wiring",
+    "session_id": "builder-r111s1"
+   },
+   {
+    "legacy": "c-151",
+    "canonical": "c-0151",
+    "work_id": "r111-p3-fullres-15bearings",
+    "session_id": "builder-r111s1"
+   },
+   {
+    "legacy": "c-152",
+    "canonical": "c-0152",
+    "work_id": "r111-score9-rerun",
+    "session_id": "builder-r111s1"
+   },
+   {
+    "legacy": "c-153",
+    "canonical": "c-0153",
+    "work_id": "r111-score8-calibration",
+    "session_id": "builder-r111s1"
+   },
+   {
+    "legacy": "c-154",
+    "canonical": "c-0154",
+    "work_id": "r111-f86-tmpdisk",
+    "session_id": "builder-r111s1"
+   },
+   {
+    "legacy": "c-155",
+    "canonical": "c-0155",
+    "work_id": "r112-d5-sensitivity-recompute",
+    "session_id": "builder-r112s1-a4c6de62"
+   },
+   {
+    "legacy": "c-156",
+    "canonical": "c-0156",
+    "work_id": "r112-f87-ratio-unify",
+    "session_id": "builder-r112s1-a4c6de62"
+   }
+  ],
+  "numeric_collision_check": "PASS (all ids unique, 4-digit)"
+ }
 }
