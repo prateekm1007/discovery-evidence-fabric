@@ -30,6 +30,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
+import os
+
 from inspect_ai import Task, task                      # noqa: E402
 from inspect_ai.dataset import Sample                  # noqa: E402
 from inspect_ai.model import get_model, GenerateConfig  # noqa: E402
@@ -39,8 +41,11 @@ from inspect_ai.scorer import Score, scorer, Target    # noqa: E402
 from discovery_fabric.engine import rediscovery_protocol as rp  # noqa
 from discovery_fabric.engine import route_adapter as ra         # noqa
 
-CORPUS = REPO / "eval/r106_score9_corpus/sampled_items.jsonl"
-CHECKPOINT = Path("/tmp/r106_score9_checkpoint.json")
+CORPUS = Path(os.environ.get(
+    "SCORE9_CORPUS",
+    str(REPO / "eval/r106_score9_corpus/sampled_items.jsonl")))
+CHECKPOINT = Path(os.environ.get(
+    "SCORE9_CHECKPOINT", "/tmp/r106_score9_checkpoint.json"))
 AGNES_BASE = "https://apihub.agnes-ai.com/v1"
 AGNES_MODEL = "agnes-3.0-flash"
 JUDGE_VISIBLE_TOKENS = 512
