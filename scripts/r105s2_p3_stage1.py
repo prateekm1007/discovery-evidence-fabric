@@ -55,7 +55,11 @@ import numpy as np
 from scipy.io import loadmat
 from scipy.stats import spearmanr
 
-REPO = Path("/home/z/my-project/discovery-evidence-fabric")
+# the r110s2 path-robustness deviation (typed, disclosed; the
+# r105s2 session checkout location -> the script's own parent;
+# DISJOINT from the twin-window loader rewrite — the same
+# deviation class as the r108s2 cred-helper path pin)
+REPO = Path(__file__).resolve().parents[1]
 CACHE = Path("/home/z/my-project/p3_data_cache")
 OUT = REPO / "eval" / "r105s2_p3_stage1_record.json"
 CMAPSS_DIR = CACHE / "cmapss" / "CMAPSSData"

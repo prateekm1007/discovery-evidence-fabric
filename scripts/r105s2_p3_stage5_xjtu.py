@@ -98,7 +98,13 @@ from pathlib import Path
 
 import numpy as np
 
-REPO = Path("/home/z/my-project/discovery-evidence-fabric")
+# the r110s2 path-robustness fix-forward (VERIFIER, typed + disclosed):
+# the rewrite re-introduced the r105s2 session's hardcoded checkout
+# path; the worktree-safe value is the script's own parent (the
+# same deviation class as the r108s2 cred-helper path pin; the twin
+# window's sandbox masked the defect). SAMPLE/LISTING stay absolute
+# (local-branch-only paths; the --source hf branch never touches them).
+REPO = Path(__file__).resolve().parents[1]
 SAMPLE = Path("/home/z/my-project/p3_data_cache/xjtu_sample")
 LISTING = Path("/home/z/my-project/p3_data_cache/xjtu_sy_listing.txt")
 ATTR_OUT = REPO / "eval" / "r105s2_p3_stage5_xjtu_attribution.json"

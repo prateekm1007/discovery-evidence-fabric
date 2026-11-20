@@ -1,0 +1,182 @@
+{
+ "record": "R110S2_P3_STAGE5_HF_ACCEPTANCE_CORROBORATION/1.0.0",
+ "at": "2026-11-20T13:19:30Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s2",
+ "claim": "c-0148",
+ "owner_direction": "the HF-streaming acceptance item: the stage-5 walk pair run from HF-sourced bytes must match the committed 173-file sample run",
+ "source": {
+  "mode": "hf_streaming",
+  "repo_id": "prateekm1/xjtu-sy-bearing-rar",
+  "repo_type": "dataset",
+  "repo_private": true,
+  "repo_tip_sha": "aa6b4fa18ea1e9c0b0b3089b7de951436bbb7d9f",
+  "streaming_mode": "per-file hf_hub_download -> RMS -> immediate delete (ephemeral /tmp cache)",
+  "max_local_footprint_bytes_one_csv": 1343685,
+  "sample_reconstruction": "the EXACT committed 173-minute set from the committed attribution record"
+ },
+ "results": {
+  "Bearing3_1": {
+   "n_points": 73,
+   "minute_index_first": 47,
+   "minute_index_last": 2538,
+   "rows_per_file_min": 32768,
+   "rows_per_file_max": 32768,
+   "rms_first5": [
+    0.494629,
+    0.509805,
+    0.49553,
+    0.537398,
+    0.527928
+   ],
+   "rms_last5": [
+    0.611349,
+    0.701569,
+    1.153921,
+    2.787113,
+    11.541787
+   ],
+   "rms_last_over_first_ratio": 23.3342,
+   "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation",
+   "sliding": {
+    "n_walk": 37,
+    "coverage": 0.8108,
+    "alarms": 1,
+    "alarms_per_1000": 27.027
+   },
+   "static": {
+    "n_walk": 37,
+    "coverage": 0.8108,
+    "alarms": 1,
+    "alarms_per_1000": 27.027
+   },
+   "protocol_adaptation": {
+    "reason": "sampled channel n=73 < committed floor 2*CTX+min_prime=212 (the sampled ~23-27-minute cadence, not a protocol re-fit)",
+    "ctx_adapted": 26,
+    "ctx_kept_committed_for_typed_attempt": 96,
+    "k_kept": 100,
+    "min_prime_kept": 20,
+    "committed_inequality_kept": "n >= 2*CTX + min_prime",
+    "modules_set_consistently": [
+     "p3s3.CTX",
+     "p3s2.CTX"
+    ],
+    "committed_walk_bytes_untouched": true,
+    "walk_leg_wall_clock_ms": 940.9,
+    "typed_attempt_error_verbatim": "unit 73 < 2*CTX+20 (typed floor)",
+    "typed_attempt_wall_clock_ms": 0.0
+   }
+  },
+  "Bearing3_2": {
+   "n_points": 100,
+   "minute_index_first": 1,
+   "minute_index_last": 2484,
+   "rows_per_file_min": 32768,
+   "rows_per_file_max": 32768,
+   "rms_first5": [
+    1.118261,
+    1.066713,
+    1.114664,
+    1.240771,
+    1.125072
+   ],
+   "rms_last5": [
+    2.402682,
+    1.635869,
+    2.262397,
+    1.969904,
+    3.125512
+   ],
+   "rms_last_over_first_ratio": 2.795,
+   "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation",
+   "sliding": {
+    "n_walk": 50,
+    "coverage": 0.66,
+    "alarms": 3,
+    "alarms_per_1000": 60.0
+   },
+   "static": {
+    "n_walk": 50,
+    "coverage": 0.56,
+    "alarms": 4,
+    "alarms_per_1000": 80.0
+   },
+   "protocol_adaptation": {
+    "reason": "sampled channel n=100 < committed floor 2*CTX+min_prime=212 (the sampled ~23-27-minute cadence, not a protocol re-fit)",
+    "ctx_adapted": 40,
+    "ctx_kept_committed_for_typed_attempt": 96,
+    "k_kept": 100,
+    "min_prime_kept": 20,
+    "committed_inequality_kept": "n >= 2*CTX + min_prime",
+    "modules_set_consistently": [
+     "p3s3.CTX",
+     "p3s2.CTX"
+    ],
+    "committed_walk_bytes_untouched": true,
+    "walk_leg_wall_clock_ms": 1099.2,
+    "typed_attempt_error_verbatim": "unit 100 < 2*CTX+20 (typed floor)",
+    "typed_attempt_wall_clock_ms": 0.0
+   }
+  }
+ },
+ "match_vs_committed": {
+  "Bearing3_1": {
+   "sliding_coverage_alarms_match": true,
+   "static_coverage_alarms_match": true,
+   "rms_endpoints_match": true,
+   "committed": {
+    "sliding": {
+     "coverage": 0.8108,
+     "alarms": 1,
+     "n_walk": 37
+    },
+    "static": {
+     "coverage": 0.8108,
+     "alarms": 1
+    }
+   },
+   "hf_run": {
+    "sliding": {
+     "coverage": 0.8108,
+     "alarms": 1,
+     "n_walk": 37
+    },
+    "static": {
+     "coverage": 0.8108,
+     "alarms": 1
+    }
+   }
+  },
+  "Bearing3_2": {
+   "sliding_coverage_alarms_match": true,
+   "static_coverage_alarms_match": true,
+   "rms_endpoints_match": true,
+   "committed": {
+    "sliding": {
+     "coverage": 0.66,
+     "alarms": 3,
+     "n_walk": 50
+    },
+    "static": {
+     "coverage": 0.56,
+     "alarms": 4
+    }
+   },
+   "hf_run": {
+    "sliding": {
+     "coverage": 0.66,
+     "alarms": 3,
+     "n_walk": 50
+    },
+    "static": {
+     "coverage": 0.56,
+     "alarms": 4
+    }
+   }
+  }
+ },
+ "acceptance": true,
+ "protocol_provenance": "walk_pair + constants reused VERBATIM from scripts/r105s2_p3_stage5_xjtu.py (the committed stage-5 bytes; the local path untouched, default --source local)",
+ "zero_llm_calls": true,
+ "no_acceptance_claims": true,
+ "verifier_framing": "this window's own acceptance run (executed BEFORE the twin session's commits landed; the run is NOT re-executed — the recorded bytes are the measurement). Filed per Art. 29(c) as the VERIFIER-side second execution on a NEW canonical path after the Art. 29(e) stand-down: the twin's own acceptance evidence lives in the canonical record 1.1.0 (acceptance_vs_committed) and eval/r110s2_hf_upload_record.json; BOTH runs reach IDENTICAL match-vs-committed outcomes from independent sandboxes"
+}
