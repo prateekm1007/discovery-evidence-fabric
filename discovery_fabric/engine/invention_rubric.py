@@ -41,7 +41,7 @@ import json
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-INVENTION_RUBRIC_VERSION = "invention_rubric/2.2.0"  # 2.2.0 (F92/F91, R113 dirs 3+4): direction axis question_type-gated (predictor rows exempt) + the three R113-adjudicated false-positive classes guarded (baseline-context, participial-consequence, threshold-object inversion); cure-kinetics claims route through the engine's COMPUTED relation (thermoset_cure_residual_direction) — the regex stays an INPUT (Art. 3/6/8), never a retroactive gate. 2.1.0 (D6, c-0129): the two TRUTH-BEARING axes added (direction_correctness, magnitude_plausibility) — the auditor's anti-saturation direction: scores stop clustering at 4
+INVENTION_RUBRIC_VERSION = "invention_rubric/2.2.1"  # 2.2.1 (VF-R114-2, R115 dir 4, c-0164): guard 2b — the DIRECT gerund consequence chain ("increases raising breaks", no comma) excluded as mechanism description when the sentence carries no intervention-agent signal; agent-ful proposed interventions stay violations (the asymmetric principle). 2.2.0 (F92/F91, R113 dirs 3+4): direction axis question_type-gated (predictor rows exempt) + the three R113-adjudicated false-positive classes guarded (baseline-context, participial-consequence, threshold-object inversion); cure-kinetics claims route through the engine's COMPUTED relation (thermoset_cure_residual_direction) — the regex stays an INPUT (Art. 3/6/8), never a retroactive gate. 2.1.0 (D6, c-0129): the two TRUTH-BEARING axes added (direction_correctness, magnitude_plausibility) — the auditor's anti-saturation direction: scores stop clustering at 4
 
 AXES = ("novelty", "feasibility", "testability", "constraint_compliance",
         "direction_correctness", "magnitude_plausibility")
@@ -491,6 +491,18 @@ def score_answer(problem: Dict[str, Any], answer: str,
         SUBORDINATOR_RE = re.compile(
             r"\b(as|since|when|because|while|although|though|"
             r"whereas)\s+[^,.;:]{0,60}$", re.IGNORECASE)
+        # guard 2b vocabulary (VF-R114-2, R115 dir 4): the DIRECT
+        # gerund consequence chain ("increases raising breaks" — no
+        # comma) and the intervention-agent signals whose presence
+        # keeps a claim scorable
+        CONSEQ_GERUND_RE = re.compile(
+            r"\b(?:raising|rising|causing|leading|driving|producing|"
+            r"creating|triggering)\b", re.IGNORECASE)
+        AGENT_RE = re.compile(
+            r"\b(we|i)\b|propose\w*|proposed|intervention|adding|"
+            r"add\b|introduc\w+|replac\w+|recommend\w*|adopt\w*|"
+            r"apply\w*|install\w*|inject\w*|coat\w*|select\w*|"
+            r"us(e|ing)|switch\w*|swap\w*", re.IGNORECASE)
         # threshold/margin objects: a DEGRADE-class verb on them moves
         # the failure AWAY (HO15-10: "raising the delamination
         # threshold" is improving, not a violation)
@@ -528,6 +540,22 @@ def score_answer(problem: Dict[str, Any], answer: str,
                     and (before.rstrip().endswith((",", ";", ":"))
                          or SUBORDINATOR_RE.search(
                              a[max(0, m.start() - 80):m.start()]))):
+                continue
+            # guard 2b — direct-gerund consequence chain (VF-R114-2,
+            # R115 dir 4): a DEGRADE-class present-tense verb whose
+            # OBJECT IS a consequence gerund ("increases raising
+            # breaks" — the chain without a comma) or which is
+            # IMMEDIATELY FOLLOWED by one, is the mechanism's own
+            # chain, not a claim — EXCLUDED only when the sentence
+            # carries NO intervention-agent signal (a proposed
+            # intervention that raises the failure quantity stays a
+            # violation even with a trailing gerund; the asymmetric
+            # principle guard 3 already uses)
+            if (degrade and not improve
+                    and (CONSEQ_GERUND_RE.fullmatch(obj.strip())
+                         or CONSEQ_GERUND_RE.search(
+                             a[m.end():m.end() + 40]))
+                    and not AGENT_RE.search(a[sent_start + 1:m.end()])):
                 continue
             # guard 3 — threshold objects, ASYMMETRIC inversion
             # (HO15-10): a DEGRADE-class verb on a protective
