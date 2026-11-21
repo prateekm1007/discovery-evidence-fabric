@@ -1262,6 +1262,12 @@ REFERENCE_SCENARIOS = {
         "t_proposed_degC": 60.0, "intent": "PROMOTE_DESORPTION"},
     "aqueous_molarity_saturation_bound": {"solute": "naoh",
                                           "molarity_mol_per_l": 15.3},
+    # F91 (R113 dir 4): the cure-kinetics computed relation's reference
+    # scenario (150->120C, Ea 60 kJ/mol — the HO15-10 adjudicated pair;
+    # runs RUN/worsens per the computed k2/k1=0.272171)
+    "thermoset_cure_residual_direction": {"t1_degC": 150.0,
+                                          "t2_degC": 120.0,
+                                          "ea_kj_mol": 60.0},
     "arrhenius_rate_ratio": {"ea_kj_mol": 80.0, "t1_degC": 60.0,
                              "t2_degC": 80.0},
     "fouling_u_degradation": {"u_clean_w_m2k": 2000.0,
