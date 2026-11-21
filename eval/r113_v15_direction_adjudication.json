@@ -1,0 +1,56 @@
+{
+ "record": "R113_V15_DIRECTION_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r113s1",
+ "audited_queue_tip": "2fd3308dc66b9ef47882620423688f7c77231b2e",
+ "trigger": "invention_rubric/2.1.0 direction_correctness axis flagged 4 v15 rows =1 (wrong-direction); coder asked adjudication (if confirmed inverted, v15 zero-inverted clause fails)",
+ "method": "Art.2 FULL read of each flagged row's a1_answer DIRECTION-OF-EFFECT + mechanism vs the problem failure quantity; Art.3 the regex axis is an INPUT not a verdict",
+ "adjudications": [
+  {
+   "row": "HO15-03-rotary-print-paste",
+   "rubric_flag": 1,
+   "verdict": "FALSE_POSITIVE",
+   "reason": "regex caught the failure-mechanism description ('mu rises','increases v'); the mitigation RAISES shear rate + lowers intrusion pressure to REDUCE screen clog as viscosity drifts up \u2014 correct direction; tau=mu*gammadot held constant is consistent"
+  },
+  {
+   "row": "HO15-05-warp-sizing",
+   "rubric_flag": 1,
+   "verdict": "FALSE_POSITIVE",
+   "reason": "regex caught 'yarn elongation increases, raising break probability' = the FAILURE mechanism (low PVA), not the mitigation; mitigation restores PVA toward target when conductivity low -> reduces drift -> reduces breaks \u2014 correct direction. Minor premise quibble (PVA non-ionic, conductivity proxy weak) = magnitude/premise, NOT inversion"
+  },
+  {
+   "row": "HO15-10-fabric-coat-adhesion",
+   "rubric_flag": 1,
+   "verdict": "MAGNITUDE_PREMISE_CONCERN_not_confirmed_inversion",
+   "reason": "lower cure temp 150->120C claimed to reduce residual oligomer f_res 15%-><2% contradicts Arrhenius thermoset cure kinetics (lower T -> lower conversion -> MORE residual); the stoichiometry axis (crosslinker to peak) is correct and may dominate the net f_res reduction; PRIMARY claimed direction (reduce f_res) plausible via stoichiometry, so NOT a confirmed primary-direction inversion. The temperature-axis claim is physically unsubstantiated -> generator-defect finding F91, re-check via engine vant_hoff/arrhenius relations on future sets"
+  },
+  {
+   "row": "HO15-20-drawframe-lap",
+   "rubric_flag": 1,
+   "verdict": "FALSE_POSITIVE",
+   "reason": "PREDICTOR row: correctly monitors RISING motor current as the worsening-lapping signal; answer explicitly states 'does not invert the sign (does not assume lower current = more lapping)'. The regex axis (designed for interventions) misfires on predictors detecting a rising failure indicator \u2014 correct detection direction"
+  }
+ ],
+ "confirmed_primary_direction_inversions": 0,
+ "v15_zero_inverted_clause": "NOT violated (0 confirmed inversions; 3 regex false-positives + 1 secondary-axis magnitude concern)",
+ "v15_acceptance": "STANDS (mean 3.90, R105 adjudication unchanged); score 7 HOLDS",
+ "rubric_finding": {
+  "id": "F92",
+  "severity": "MEDIUM",
+  "title": "invention_rubric/2.1.0 direction_correctness is a crude regex that misfires on (a) predictors detecting a rising failure indicator and (b) failure-mechanism descriptions ('X increases, raising failure'); 3 of 4 flags are false positives",
+  "fix": "gate the axis on question_type=intervention-proposal only; negation-aware parsing; OR use the engine's computed direction binds (vant_hoff/arrhenius/ammonia/equilibrium) as the authority, not the regex. The regex is an INPUT (Art.3), never a retroactive gate (Art.6/8)"
+ },
+ "generator_finding": {
+  "id": "F91",
+  "severity": "MEDIUM",
+  "title": "HO15-10 cure-temperature direction claim (lower T reduces residual oligomer) contradicts thermoset cure kinetics; unsubstantiated f_res(T) relation",
+  "fix": "route such claims through the engine's computed cure/arrhenius relation; re-check on future sets; does not retroactively void v15"
+ },
+ "stale_tip_note": "coder cited tip 80328c846 (local rolled-back HEAD); true remote tip 2fd3308dc (Art.7 viewport-vs-reality); CI green at ca974daa1/2fd3308dc chain",
+ "capability_state": {
+  "score": 7,
+  "score8": "NOT MET (agreement 0.6875<0.70; third family unfunded)",
+  "score9": "NOT MET (0.1667 new instrument / 0.067 old)",
+  "F30": "novelty-vs-feasibility CRITICAL open"
+ },
+ "no_score_change": true
+}
