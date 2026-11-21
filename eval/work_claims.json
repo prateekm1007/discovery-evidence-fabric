@@ -3832,6 +3832,25 @@
    "notes": "TYPED ART. 29(b) DEVIATION (disclosed, Art. 5): the EXECUTION pre-dates this claim — the R113 window (builder-r113s1 lineage, same channel) wrote the code and ran the 93/93 local battery, but its context closed before the push; this claim is filed at push time per the R114 auditor direction 2 ('push is NOT blocked'). The claim-before-work lock could not be filed from a closed window; the work-before-claim ordering is disclosed here rather than hidden. No canonical measurement paths are touched (zero LLM, zero quota, zero sealed bytes — deterministic rescore from committed bytes only). The peer's c-0159 (D3 verifier recompute) is DISJOINT. | CLOSED: executed in 80f20e1fb (the code + rescore + pins/whitelist); the round-close filing (r114s2_status.json + custody + owner-action register) rides the same push; the remote-CI re-read for the acceptance quote is the follow-up commit once the run completes (TYPED PENDING at this commit, never guessed).",
    "completed_at": "2026-11-21T19:45:00Z (sandbox clock, TRUE UTC)",
    "completion_commit": "80f20e1fb"
+  },
+  {
+   "work_id": "r114-f93-arrhenius-magnitude-fix",
+   "claim_id": "c-0162",
+   "role": "EXECUTOR",
+   "session_id": "builder-r114s2-c9c03209",
+   "kind": "task",
+   "status": "OPEN",
+   "base_sha": "230c855e9",
+   "lease_expiry": "2026-11-23T23:59:00Z",
+   "artifact_paths": [
+    "discovery_fabric/engine/physics_checks.py",
+    "tests/test_physics_checks.py",
+    "eval/r114_f93_correction.json"
+   ],
+   "title": "R114 dir 3 (F93, the auditor's finding): the arrhenius_rate_ratio Ea/R x1000 magnitude bug — the exponent divides J/mol Ea by (R * 1000) so every computed magnitude is wrong by 1000x in the exponent (sign-safe, which is why the sign-only tests never caught it); fix the divisor, add a CLOSED-FORM MAGNITUDE test (not sign-only), file the Art. 4 correction record (87 committed check-result objects across 19 files carry magnitude-wrong values, ALL direction-binding-only — no decision consumed a magnitude), and verify thermoset_cure_residual_direction + every other relation does NOT inherit the bug",
+   "registered_at": "2026-11-21T20:10:00Z (sandbox clock, TRUE UTC)",
+   "claimed_at": "2026-11-21T20:10:00Z (sandbox clock, TRUE UTC)",
+   "notes": "claim-before-work PROPER this time (the c-0160 deviation was the closed-window exception, typed there). c-0161 is RESERVED for the engine-bare fresh run per the R114 auditor's dir-4 naming — this claim takes c-0162 to avoid collision. Zero LLM, zero quota, zero sealed bytes (deterministic fix + test + record)."
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
