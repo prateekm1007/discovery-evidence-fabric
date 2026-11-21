@@ -62,6 +62,7 @@ def main():
     items = [json.loads(l) for l in
              SRC.read_text(encoding="utf-8").strip().split("\n")]
     print("items:", len(items), flush=True)
+    failed = []
     for it in items:
         tag = f"author_{it['item_id']}"
         path = RAW / f"{tag}.txt"
@@ -69,14 +70,30 @@ def main():
             print(tag, "SKIP (byte-resume)", flush=True)
             continue
         prompt = PROMPT.format(abstract=it["abstract"])
-        txt = ra.agnes_chat([{"role": "user", "content": prompt}],
-                            model="agnes-3.0-flash",
-                            visible_target=1000,
-                            timeout_s=300.0).get("content") or ""
+        txt = None
+        for attempt in (1, 2, 3):
+            try:
+                txt = ra.agnes_chat(
+                    [{"role": "user", "content": prompt}],
+                    model="agnes-3.0-flash", visible_target=1000,
+                    timeout_s=300.0).get("content") or ""
+                break
+            except Exception as e:  # noqa: BLE001
+                cls = type(e).__name__
+                print(tag, f"attempt {attempt} wall: {cls}: "
+                      f"{str(e)[:80]}", flush=True)
+                if "rate_limited" in str(e).lower() or "429" in str(e):
+                    time.sleep(150)
+                else:
+                    time.sleep(20)
+        if txt is None:
+            failed.append(it["item_id"])
+            print(tag, "TYPED_FAIL (quota wall persists)", flush=True)
+            continue
         path.write_text(txt, encoding="utf-8")
         print(tag, "written:", len(txt), "chars", flush=True)
         time.sleep(8)
-    print("STAGE_B_DONE", flush=True)
+    print("STAGE_B_DONE failed:", failed, flush=True)
 
 
 if __name__ == "__main__":
