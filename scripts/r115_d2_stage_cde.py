@@ -12,6 +12,7 @@ the RAW FILE TEXT verbatim; coverage = whole-text distance per the
 r110 CDE formula (no per-item formula shopping). Byte-skip resume at
 every level — no second generation ever (Art. 29(c))."""
 import json
+import os
 import re
 import sys
 import time
@@ -55,9 +56,25 @@ def agnes(prompt, tag, target=1000):
     path = RAW / f"{tag}.txt"
     if path.exists():
         return path.read_text(encoding="utf-8")
-    txt = ra.agnes_chat([{"role": "user", "content": prompt}],
-                        model="agnes-3.0-flash", visible_target=target,
-                        timeout_s=300.0).get("content") or ""
+    txt = None
+    for attempt in (1, 2, 3):
+        try:
+            txt = ra.agnes_chat([{"role": "user", "content": prompt}],
+                                model="agnes-3.0-flash",
+                                visible_target=target,
+                                timeout_s=300.0).get("content") or ""
+            break
+        except Exception as e:  # noqa: BLE001
+            print(tag, f"attempt {attempt} wall: "
+                  f"{type(e).__name__}: {str(e)[:60]}", flush=True)
+            if "rate_limited" in str(e).lower() or "429" in str(e):
+                time.sleep(150)
+            else:
+                time.sleep(20)
+    if txt is None:
+        raise RuntimeError(
+            f"INFRA_BLOCKED: agnes quota wall persisted for {tag} "
+            "(Art. 15; byte-skip resume makes any restart free)")
     path.write_text(txt, encoding="utf-8")
     time.sleep(8)
     return txt
@@ -94,29 +111,38 @@ def build_items():
     return items
 
 
-def bare_prompt_L0(it):
-    sv = it["served"]
-    return ("Background question: "
-            f"{sv['background_question']['text']}\n\n"
-            f"Paper title: {sv['title']}\n\n"
-            f"Paper abstract: {sv['abstract']['text']}\n\n"
-            "State your hypothesis for what the mechanism is and how "
-            "to exploit it. Answer directly in plain prose.")
+RUNG = "L0"  # env R115_RUNG: L0 (question+title+abstract) | LM1 (question+title only — the preregistered upper rung)
 
 
-def engine_prompt_L0(it):
+def bare_prompt(it):
     sv = it["served"]
+    parts = ["Background question: "
+             f"{sv['background_question']['text']}",
+             f"Paper title: {sv['title']}"]
+    if RUNG == "L0":
+        parts.append(f"Paper abstract: {sv['abstract']['text']}")
+    parts.append("State your hypothesis for what the mechanism is "
+                 "and how to exploit it. Answer directly in plain "
+                 "prose.")
+    return "\n\n".join(parts)
+
+
+def engine_prompt(it):
+    sv = it["served"]
+    abstract_block = ""
+    if RUNG == "L0":
+        abstract_block = ("PAPER ABSTRACT:\n"
+                          f"{sv['abstract']['text']}\n\n")
     return (
         "You are a chemistry research strategist. Using ONLY the "
-        "paper abstract and question below, propose ONE fine-grained, "
-        "testable research hypothesis: it must name a concrete "
-        "mechanism (what causes what, through what structural or "
-        "chemical route) and a verifiable predicted outcome.\n\n"
-        "PAPER ABSTRACT:\n"
-        f"{sv['abstract']['text']}\n\n"
-        "BACKGROUND QUESTION:\n"
-        f"{sv['background_question']['text']}\n\n"
-        "Answer with STRICT JSON only, no markdown, in exactly this "
+        "material below, propose ONE fine-grained, testable research "
+        "hypothesis: it must name a concrete mechanism (what causes "
+        "what, through what structural or chemical route) and a "
+        "verifiable predicted outcome.\n\n"
+        + abstract_block
+        + "BACKGROUND QUESTION:\n"
+        + f"{sv['background_question']['text']}\n\n"
+        + "Answer with STRICT JSON only, no markdown, in exactly this "
         "shape:\n{\"hypothesis\": \"<the full fine-grained "
         "hypothesis>\", \"key_mechanism\": \"<one sentence naming the "
         "core causal or structural mechanism>\", "
@@ -130,8 +156,10 @@ def guard_sentences(abstract_text):
 
 
 def main():
+    global RUNG
+    RUNG = os.environ.get("R115_RUNG", "L0")
     items = build_items()
-    print("items:", len(items), flush=True)
+    print("items:", len(items), "RUNG:", RUNG, flush=True)
     enc = load_specter2_encoder("/home/z/my-project/models_cache", None)
 
     # ---- tau calibration (BEFORE any generation) — the r110
@@ -170,7 +198,7 @@ def main():
     pilot = items[:PILOT_N]
     pilot_recs = []
     for it in pilot:
-        txt = agnes(bare_prompt_L0(it), f"bare_{it['item_id']}")
+        txt = agnes(bare_prompt(it), f"bare_{RUNG}_{it['item_id']}")
         tv = enc.encode(txt)
         rec = covered(tv, it["key_elements"]) / max(
             1, len(it["key_elements"]))
@@ -184,21 +212,35 @@ def main():
     print("PILOT_MEAN:", round(pilot_mean, 4),
           "band:", [BAND_LO, BAND_HI], flush=True)
 
-    ladder = {"pilot_n": PILOT_N, "rung": "L0", "pilot_mean_recall":
+    ladder = {"pilot_n": PILOT_N, "rung": RUNG, "pilot_mean_recall":
               round(pilot_mean, 4), "band": [BAND_LO, BAND_HI],
               "pilot_rows": pilot_recs}
     if not (BAND_LO <= pilot_mean <= BAND_HI):
-        ladder["typed"] = (
-            "ABORT: pilot out of band — the rung restart requires a "
-            "typed prereg amendment before any further arm call (the "
-            "L0 calls stay recorded as the ladder probe, never counted)")
+        if RUNG == "LM1":
+            ladder["typed"] = (
+                "DESIGN_FINDING: out of band at BOTH preregistered "
+                "rungs (L0 0.9305 ceiling, LM1 out-of-band) — max 2 "
+                "ladder probes reached per the prereg; the serving-set "
+                "axis cannot tune recall into [0.4, 0.75]; the "
+                "difficulty axis needs a different instrument class "
+                "(the auditor's dir-3 engineering-bind set is the "
+                "designated alternative). No engine verdict is "
+                "claimable from this lane.")
+            verdict = "TYPED_DESIGN_FINDING_BAND_UNREACHABLE"
+        else:
+            ladder["typed"] = (
+                "ABORT: pilot out of band — the preregistered upper "
+                "rung (LM1: title+question only) is the next probe; "
+                "the L0 calls stay recorded as the ladder probe, "
+                "never counted")
+            verdict = "TYPED_ABORT_OUT_OF_BAND"
         json.dump({"record": "R115_D2_HARDER_LADDER_PROBE/1.0.0",
                    "at": datetime.now(timezone.utc).strftime(
                        "%Y-%m-%dT%H:%M:%SZ"),
                    "calibration": calib, "ladder": ladder,
-                   "verdict": "TYPED_ABORT_OUT_OF_BAND"},
-                  open(RAW / "ladder_probe.json", "w"), indent=1)
-        print("TYPED_ABORT_OUT_OF_BAND", flush=True)
+                   "verdict": verdict},
+                  open(RAW / f"ladder_probe_{RUNG}.json", "w"), indent=1)
+        print(verdict, flush=True)
         return
 
     # ---- full run: remaining bare + engine for all 30 ----
@@ -206,8 +248,8 @@ def main():
     for it in items:
         iid = it["item_id"]
         gen[iid] = {
-            "bare": agnes(bare_prompt_L0(it), f"bare_{iid}"),
-            "engine": agnes(engine_prompt_L0(it), f"eng_{iid}"),
+            "bare": agnes(bare_prompt(it), f"bare_{RUNG}_{iid}"),
+            "engine": agnes(engine_prompt(it), f"eng_{RUNG}_{iid}"),
         }
         print(f"  {iid}: bare {len(gen[iid]['bare'])}c / "
               f"engine {len(gen[iid]['engine'])}c", flush=True)
@@ -218,7 +260,8 @@ def main():
         iid = it["item_id"]
         gtv = mains[items.index(it)]
         elements = it["key_elements"]
-        guard = guard_sentences(it["served"]["abstract"]["text"])
+        guard = (guard_sentences(it["served"]["abstract"]["text"])
+                 if RUNG == "L0" else [])
         row = {"item_id": iid, "n_elements": len(elements),
                "n_guard_sents": len(guard)}
         for arm_name in ("bare", "engine"):
@@ -230,12 +273,13 @@ def main():
             dists = sorted((cosine_distance(v, gtv), nm)
                            for nm, v in cands)
             rank = [nm for _, nm in dists].index("generation") + 1
-            rec_guard = covered(tv, guard)
+            rec_guard = covered(tv, guard) if guard else 0
             row[arm_name] = {
                 "elements_covered": cvd,
                 "element_recall": round(cvd / max(1, len(elements)), 4),
                 "guard_covered": rec_guard,
-                "guard_recall": round(rec_guard / max(1, len(guard)), 4),
+                "guard_recall": (round(rec_guard / max(1, len(guard)), 4)
+                                 if guard else None),
                 "rank_of_generation": rank,
                 "hit1": int(rank == 1),
                 "mrr": round(1.0 / rank, 4),
@@ -254,8 +298,9 @@ def main():
         return {"mean_diff": round(float(np.mean(diffs)), 4),
                 "ci95": [round(lo, 4), round(hi, 4)], "n_pairs": n}
 
-    comparison = {m: paired(m) for m in
-                  ("element_recall", "guard_recall", "hit1", "mrr")}
+    metrics = (["element_recall", "hit1", "mrr"]
+               + (["guard_recall"] if RUNG == "L0" else []))
+    comparison = {m: paired(m) for m in metrics}
     bare_mean = float(np.mean([r["bare"]["element_recall"]
                                for r in rows]))
     eng_mean = float(np.mean([r["engine"]["element_recall"]
@@ -268,7 +313,13 @@ def main():
         "executor": "builder-r115s1-8e860700",
         "claim": "c-0163 (r115-harder-corpus; R115 dir 2)",
         "prereg": "eval/r115_harder_corpus_prereg.json + amendment_1",
-        "difficulty_mechanism": "served = question+title+abstract L0 (the same-model survey spoiler removed)",
+        "rung": RUNG,
+        "difficulty_mechanism": (
+            "served = question+title+abstract L0 (the same-model "
+            "survey spoiler removed)" if RUNG == "L0" else
+            "served = question+title only LM1 (the preregistered "
+            "upper rung — the model must PREDICT the mechanism from "
+            "prior knowledge, not read it)"),
         "n_items": len(rows),
         "tau_calibration": calib,
         "ladder": ladder,
