@@ -180,9 +180,43 @@ def stage_a():
     print(f"stage A: {len(out_rows)} fetched, {len(misses)} typed out")
 
 
-def stage_b():
+def _agnes_rr(messages, visible_target, timeout_s=300.0, max_attempts=12):
+    """Round-robin AGNES call across the vault's 2-key rotation with
+    typed 429 rotation + bounded backoff (the r67s2 per-key-bucket
+    pattern at the adapter layer; key bytes never leave the vault).
+    A 429'd call produced NO generation — retrying it is not a second
+    generation (Art. 29(c) one-shot preserved by the byte-skip)."""
     from r7_queue_runner import _load_key_vault  # noqa: E402
     _load_key_vault()
+    from discovery_fabric.engine import route_adapter as ra  # noqa
+    keys = [k for k in (ra.resolve_vault_key("AGNES_API_KEY"),
+                        ra.resolve_vault_key("AGNES_API_KEY_2")) if k]
+    assert keys, "no AGNES keys in the vault"
+    last = None
+    for attempt in range(max_attempts):
+        key = keys[attempt % len(keys)]
+        try:
+            return ra.agnes_chat(messages, model="agnes-3.0-flash",
+                                 visible_target=visible_target,
+                                 timeout_s=timeout_s,
+                                 api_key=key)
+        except Exception as e:  # noqa: BLE001
+            last = e
+            typed = getattr(e, "kind", "") or ""
+            if typed == "rate_limited":
+                wait = 30.0 + 15.0 * (attempt // len(keys))
+                print(f"    [429 rotation -> key slot "
+                      f"{(attempt + 1) % len(keys)}, backoff {wait:.0f}s]")
+                time.sleep(wait)
+                continue
+            if typed == "transport":
+                time.sleep(20.0)
+                continue
+            raise
+    raise last
+
+
+def stage_b():
     from discovery_fabric.engine import route_adapter as ra  # noqa
     RAW.mkdir(exist_ok=True, parents=True)
     src = DIR_A / "fetched_abstracts.jsonl"
@@ -202,24 +236,22 @@ def stage_b():
         if iid in done_ids:
             continue
         prompt = AUTHOR_PROMPT.format(abstract=r["abstract"])
-        txt = ra.agnes_chat(
+        txt = _agnes_rr(
             [{"role": "user", "content": prompt}],
-            model="agnes-3.0-flash", visible_target=1400,
-            timeout_s=300.0).get("content") or ""
+            visible_target=1400).get("content") or ""
         usage["agnes_calls"] += 1
         (RAW / f"author_{iid}.txt").write_text(txt, encoding="utf-8")
         try:
             d = strict_json(txt, SCHEMA_KEYS)
         except Exception:  # ONE repair retry (the r110 pattern)
             usage["repair_calls"] += 1
-            rep = ra.agnes_chat(
+            rep = _agnes_rr(
                 [{"role": "user", "content":
                   "Your previous reply failed strict JSON parsing. "
                   "Return ONLY the corrected JSON object, same "
                   "schema, no markdown.\n\nYour previous reply:\n"
                   + txt[-1500:]}],
-                model="agnes-3.0-flash", visible_target=1400,
-                timeout_s=300.0).get("content") or ""
+                visible_target=1400).get("content") or ""
             (RAW / f"author_{iid}_repair.txt").write_text(
                 rep, encoding="utf-8")
             try:
@@ -335,10 +367,9 @@ def stage_cde():
         path = RAW / f"{tag}.txt"
         if path.exists():
             return path.read_text(encoding="utf-8")
-        txt = ra.agnes_chat(
+        txt = _agnes_rr(
             [{"role": "user", "content": prompt}],
-            model="agnes-3.0-flash", visible_target=target,
-            timeout_s=300.0).get("content") or ""
+            visible_target=target).get("content") or ""
         path.write_text(txt, encoding="utf-8")
         time.sleep(8)
         return txt
