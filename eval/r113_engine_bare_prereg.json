@@ -1,0 +1,25 @@
+{
+ "record": "R113_ENGINE_BARE_PREREG/1.0.0 (PRE-REGISTRATION)",
+ "at": "2026-11-21T20:15:00Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r114s2-c9c03209",
+ "claim": "c-0161 (r113-engine-bare-fresh-run; the R114 auditor direction 4, the R113 direction 2 lineage)",
+ "instrument": "the r110 D3 design (eval/r110_d3_instrument_prereg.json) re-executed FRESH end-to-end — no r110 generation bytes are reused; every arm regenerates from a fresh stage-A fetch",
+ "corpus": "eval/r106_score9_corpus_postcutoff/sampled_items.jsonl (the committed post-cutoff corpus, 30 items, the same source as r110 stage A)",
+ "stages": {
+  "A_refetch": "Crossref works API query BY TITLE (read-only, polite pool, zero quota), per-item DOI/abstract(JATS-stripped)/publisher/date + the title-match score; match < 0.8 normalized token-overlap types the item OUT (fail-closed); output eval/r113_engine_bare_corpus/fetched_abstracts.jsonl",
+  "B_author": "agnes-3.0-flash (NOT a judge family), ONE call per item from the FETCHED abstract (+ ONE repair retry on strict-JSON parse failure, the r110 pattern); schema: background_question, background_survey, inspiration_papers[2-4], main_hypothesis, finegrained_hypothesis, key_elements[4-6], distractors[3]; raw bytes verbatim; output eval/r113_engine_bare_raw/items.jsonl + author_{id}.txt",
+  "CDE_arms_scoring": "tau calibration FIRST on the corpus's own pairs (positives = (key_element, own GT), negatives = (key_element, other GTs + own main); tau = midpoint(max neg, min pos) on the DISTANCE scale); bare arm = served material + minimal directive, ONE agnes generation; engine arm = rp.generator_prompt over the same served material, ONE agnes generation; judge-free scoring = graded key-element recall (SPECTER2 matcher at tau), survey recall, hit@1/MRR vs authored distractors, survey-faithfulness; engine-minus-bare PAIRED bootstrap 10k resamples SEED 113 with 95% CI; output eval/r113_engine_bare_result.json"
+ },
+ "leakage_controls": "the GT fields and key_elements never enter any generation prompt; the inspiration titles are the served set both arms see equally; the matcher is the deterministic SPECTER2 stack (no judge labels anywhere)",
+ "seed": 113,
+ "n_items_target": 30,
+ "one_generation_rule": "ONE generation per item per arm, ever (Art. 29(c) one-shot); the byte-skip resume (existing {tag}.txt files are never re-requested) makes interruptions resumable WITHOUT a second generation",
+ "weights_provenance": "allenai/specter2_base pytorch_model.bin 439740465 bytes sha256[:12] 801eda968fad + the committed adapter (allenai__specter2/pytorch_adapter.bin), cached at /home/z/my-project/models_cache; encoder smoke-verified this window (related-pair sim 0.941 > unrelated 0.785); the loader prints the adapters-available warning on load — BENIGN FOR CONSISTENCY (the twin's c-0159 recompute reproduced the r110 numbers 4/4 at 4dp through this exact stack; the same-stack consistency is what the paired comparison consumes)",
+ "acceptance_branches": {
+  "engine_wins": "engine-minus-bare delta positive on the primary metric (graded key-element recall) AND the 95% CI excludes 0 -> the engine value is proven (Art. 14/20 lineage)",
+  "typed_negative": "the CI covers 0 (either direction) -> the typed negative stands and the WEAK STAGE RETIRES (Art. 20: the engine scaffolding that does not beat the bare arm on the primary metric after 2 non-winning rounds — r110 + this run — is deleted in the same change that ships this result, with the retirement ledger accounting)",
+  "no_score_claim": "NO score-9 acceptance claimed from this instrument (the r110 typing stands: the comparison to the 0.0667 3-class number stays NOT-APPLICABLE)"
+ },
+ "quota_budget": "~90-110 agnes calls (30 author + ~30 bare + ~30 engine + repair retries) on the 2-key rotation (AGNES_API_KEY + AGNES_API_KEY_2, per-key buckets; the gateway rotation pattern r67s2)",
+ "zero_judge_calls": "the judges (zai/J1 + xkiro/cohere/J2) are NEVER invoked — judge-free by design"
+}
