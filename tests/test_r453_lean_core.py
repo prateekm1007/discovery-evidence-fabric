@@ -600,6 +600,19 @@ class TestDeletionAccounting(unittest.TestCase):
                     # proven by tests/test_r525_synth_span_neutrality.py;
                     # R525 directive Question A).
                     "discovery_fabric/a2/synthesize.py",
+                    # R113 F92/F91 AMENDMENT (disclosed): the
+                    # direction-axis question_type gate + the three
+                    # R113-adjudicated false-positive guards land in
+                    # engine/invention_rubric.py (v2.2.0) and the
+                    # cure-kinetics computed relation lands in
+                    # engine/physics_checks.py (the frozen registry's
+                    # own conventions; the Art. 3 degenerate battery
+                    # extended in lockstep; the registry pin in
+                    # tests/test_physics_checks.py moves with it;
+                    # acceptance evidence in
+                    # eval/r113_f92_f91_rescore.json)
+                    "discovery_fabric/engine/invention_rubric.py",
+                    "discovery_fabric/engine/physics_checks.py",
                     # R526 AMENDMENT (disclosed): the generate()-level
                     # routing-gap decomposition (Question A) and the
                     # post-rank phase-wall reconciliation (Question B)

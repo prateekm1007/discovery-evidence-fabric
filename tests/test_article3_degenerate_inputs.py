@@ -104,6 +104,11 @@ DEGENERATE_KWARGS: dict[str, dict] = {
                                            intent="PROMOTE_DESORPTION"),
     "aqueous_molarity_saturation_bound": dict(solute="naoh",
                                               molarity_mol_per_l=0.0),
+    # F91 (R113 dir 4): the cure-kinetics relation refuses absolute
+    # zero on its true division axis (1/T), same as arrhenius
+    "thermoset_cure_residual_direction": dict(t1_degC=150.0,
+                                               t2_degC=-273.15,
+                                               ea_kj_mol=60.0),
 }
 
 EXPECTED_REGISTRY = {
@@ -227,6 +232,11 @@ HEALTHY_KWARGS: dict[str, dict] = {
                                            intent="PROMOTE_DESORPTION"),
     "aqueous_molarity_saturation_bound": dict(solute="naoh",
                                               molarity_mol_per_l=15.3),
+    # F91 (R113 dir 4): a higher cure temperature computes RUN with
+    # residual falling (improves) — never over-refused
+    "thermoset_cure_residual_direction": dict(t1_degC=150.0,
+                                               t2_degC=165.0,
+                                               ea_kj_mol=60.0),
 }
 
 
