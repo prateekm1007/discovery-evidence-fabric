@@ -174,8 +174,12 @@ def test_registry_has_nineteen_relations():
     # ammonia_strip_direction, vant_hoff_adsorption_direction,
     # aqueous_molarity_saturation_bound); the pin moves with the
     # registry (a stale literal reds — the R60-F1 lesson applied).
-    assert len(pc.CHECKS) == 22, sorted(pc.CHECKS)
-    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 34
+    # R113 F91 (dirs 3+4): 22 -> 23 relations / 34 -> 35 failure
+    # classes (thermoset_cure_residual_direction, the new
+    # cure_kinetics class — the computed cure/Arrhenius relation the
+    # R113 adjudication routed HO15-10-class claims through).
+    assert len(pc.CHECKS) == 23, sorted(pc.CHECKS)
+    assert len(pc.CHECKS_BY_FAILURE_CLASS) == 35
 
 
 def test_every_check_refuses_garbage_rather_than_fabricating():

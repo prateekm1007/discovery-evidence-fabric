@@ -987,8 +987,74 @@ def aqueous_molarity_saturation_bound(solute: str,
                        {"error": f"{type(e).__name__}: {e}"})
 
 
+# ---------------------------------------------------------------------------
+# check 23: thermoset cure-vs-residual direction (F91, R113 dir 4).
+#   Isothermal cure at fixed time: the rate constant follows Arrhenius,
+#   k2/k1 = exp(-Ea/R * (1/T2 - 1/T1)); LOWERING the cure temperature
+#   lowers conversion and RAISES the residual oligomer fraction. A
+#   claim that a lower cure temperature REDUCES residual oligomer
+#   inverts the computed direction-of-effect — the R113 adjudication's
+#   HO15-10 class. The stoichiometry axis may dominate in reality; this
+#   check types the cure-temperature axis alone, computed, never from
+#   prose (the F57/F58 lesson applied per the auditor's fix menu).
+# ---------------------------------------------------------------------------
+def thermoset_cure_residual_direction(t1_degC: float, t2_degC: float,
+                                      ea_kj_mol: float = 60.0
+                                      ) -> Dict[str, Any]:
+    try:
+        ea = _q(ea_kj_mol, "kJ/mol").to("J/mol")
+        t1 = _q(t1_degC, "degC").to("K")
+        t2 = _q(t2_degC, "degC").to("K")
+        if float(t1.magnitude) <= 0.0 or float(t2.magnitude) <= 0.0:
+            return _result(
+                "thermoset_cure_residual_direction", "cure_kinetics",
+                "REFUSED", None, "dimensionless", "unavailable",
+                {"error": "out_of_domain: absolute temperatures must "
+                          "be > 0 K (got "
+                          f"T1={float(t1.magnitude)} K, "
+                          f"T2={float(t2.magnitude)} K) — typed "
+                          "refusal, never a raise (F-V5)"})
+        if float(ea.magnitude) <= 0.0:
+            return _result(
+                "thermoset_cure_residual_direction", "cure_kinetics",
+                "REFUSED", None, "dimensionless", "unavailable",
+                {"error": "out_of_domain: the cure activation energy "
+                          "must be > 0 (got "
+                          f"{float(ea.magnitude)} J/mol)"})
+        exponent = (-(float(ea.magnitude) / R_GAS.magnitude)
+                    * (1.0 / float(t2.magnitude)
+                       - 1.0 / float(t1.magnitude)))
+        exponent = max(-745.0, min(709.78, exponent))
+        ratio = math.exp(exponent)
+        # residual oligomer moves OPPOSITE to the rate constant at
+        # fixed cure time: k2 < k1 (ratio < 1) => conversion falls =>
+        # residual RISES (worsens); k2 > k1 => residual falls
+        if ratio < 1.0 - 1e-12:
+            direction = "worsens"
+        elif ratio > 1.0 + 1e-12:
+            direction = "improves"
+        else:
+            direction = "neutral"
+        return _result(
+            "thermoset_cure_residual_direction", "cure_kinetics",
+            "RUN", round(ratio, 6), "dimensionless", direction,
+            {"t1_degC": t1_degC, "t2_degC": t2_degC,
+             "ea_kj_mol": ea_kj_mol,
+             "computed_note": ("k2/k1 = %.6g; at fixed cure time "
+                               "conversion moves with k, so the "
+                               "residual oligomer fraction moves "
+                               "opposite to this ratio" % ratio)})
+    except (ValueError, TypeError, ZeroDivisionError,
+            OverflowError) as e:
+        return _result(
+            "thermoset_cure_residual_direction", "cure_kinetics",
+            "REFUSED", None, "dimensionless", "unavailable",
+            {"error": f"{type(e).__name__}: {e}"})
+
+
 CHECKS = {
     "arrhenius_rate_ratio": arrhenius_rate_ratio,
+    "thermoset_cure_residual_direction": thermoset_cure_residual_direction,
     "fouling_u_degradation": fouling_u_degradation,
     "langelier_lsi": langelier_lsi,
     "npsh_margin": npsh_margin,
@@ -1053,6 +1119,10 @@ CHECKS_BY_FAILURE_CLASS = {
     "ammonia_stripping": ["ammonia_strip_direction"],
     "adsorption_desorption": ["vant_hoff_adsorption_direction"],
     "caustic_cleaning": ["aqueous_molarity_saturation_bound"],
+    # F91 (R113 dir 4): the cure-kinetics class — claims about cure
+    # temperature vs residual oligomer route through the computed
+    # relation, never prose direction-matching
+    "cure_kinetics": ["thermoset_cure_residual_direction"],
 }
 
 
@@ -1192,6 +1262,12 @@ REFERENCE_SCENARIOS = {
         "t_proposed_degC": 60.0, "intent": "PROMOTE_DESORPTION"},
     "aqueous_molarity_saturation_bound": {"solute": "naoh",
                                           "molarity_mol_per_l": 15.3},
+    # F91 (R113 dir 4): the cure-kinetics computed relation's reference
+    # scenario (150->120C, Ea 60 kJ/mol — the HO15-10 adjudicated pair;
+    # runs RUN/worsens per the computed k2/k1=0.272171)
+    "thermoset_cure_residual_direction": {"t1_degC": 150.0,
+                                          "t2_degC": 120.0,
+                                          "ea_kj_mol": 60.0},
     "arrhenius_rate_ratio": {"ea_kj_mol": 80.0, "t1_degC": 60.0,
                              "t2_degC": 80.0},
     "fouling_u_degradation": {"u_clean_w_m2k": 2000.0,

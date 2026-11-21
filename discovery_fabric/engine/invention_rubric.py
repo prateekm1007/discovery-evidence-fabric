@@ -41,7 +41,7 @@ import json
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
-INVENTION_RUBRIC_VERSION = "invention_rubric/2.1.0"  # 2.1.0 (D6, c-0129): the two TRUTH-BEARING axes added (direction_correctness, magnitude_plausibility) — the auditor's anti-saturation direction: scores stop clustering at 4
+INVENTION_RUBRIC_VERSION = "invention_rubric/2.2.0"  # 2.2.0 (F92/F91, R113 dirs 3+4): direction axis question_type-gated (predictor rows exempt) + the three R113-adjudicated false-positive classes guarded (baseline-context, participial-consequence, threshold-object inversion); cure-kinetics claims route through the engine's COMPUTED relation (thermoset_cure_residual_direction) — the regex stays an INPUT (Art. 3/6/8), never a retroactive gate. 2.1.0 (D6, c-0129): the two TRUTH-BEARING axes added (direction_correctness, magnitude_plausibility) — the auditor's anti-saturation direction: scores stop clustering at 4
 
 AXES = ("novelty", "feasibility", "testability", "constraint_compliance",
         "direction_correctness", "magnitude_plausibility")
@@ -436,62 +436,135 @@ def score_answer(problem: Dict[str, Any], answer: str,
             f"the arm's typed delivery state is {contract_state} — "
             "the honesty instrumentation did not fully pass")
 
-    # ---- direction_correctness (0-4, D6 truth-bearing): the answer's
-    # causal claims must target the problem's OWN failure quantity and
-    # move it the IMPROVING way. A claim that raises the failure
-    # quantity is a truth violation (0-1); claims targeting other
-    # quantities are neutral, not wrong. No attributable claims = the
-    # neutral anchor 2 with the coverage typed (never silently a 4).
-    fail_txt = " ".join(str(problem.get(k) or "") for k in
-                        ("failure", "failure_mode", "question"))
-    stop = {"the", "and", "with", "from", "that", "this", "when",
-            "which", "will", "shall", "must", "into", "under", "over"}
-    fail_terms = {w for w in re.findall(r"[a-z][a-z-]{4,}",
-                                        fail_txt.lower()) if w not in stop}
-    IMPROVE_RE = re.compile(
-        r"\b(reduc\w+|improv\w+|low(er|ers|ered)|eliminat\w+|"
-        r"preven\w+|minimiz\w+|avoid\w+|suppress\w+|mitigat\w+)",
-        re.IGNORECASE)
-    DEGRADE_RE = re.compile(
-        r"\b(increas\w+|rais\w+|worsen\w+|aggravat\w+|amplif\w+|"
-        r"exacerbat\w+)", re.IGNORECASE)
-    claim_re = re.compile(
-        r"\b(?:redu\w+|improv\w+|low\w+|eliminat\w+|preven\w+|"
-        r"minimiz\w+|avoid\w+|suppress\w+|mitigat\w+|increas\w+|"
-        r"rais\w+|worsen\w+|aggravat\w+|amplif\w+|exacerbat\w+)\s+"
-        r"(?:the\s+|this\s+)?([a-z][a-z-]{4,38})")
-    n_ok = n_bad = 0
-    for m in claim_re.finditer(a):
-        obj = m.group(1).lower()
-        if not any(t in obj or obj in t for t in fail_terms):
-            continue                        # not the failure quantity
-        span = m.group(0)
-        if IMPROVE_RE.search(span):
-            n_ok += 1
-        elif DEGRADE_RE.search(span):
-            n_bad += 1                      # RAISES the failure quantity
-    if n_bad > 0:
-        scores["direction_correctness"] = 1
-        reasons["direction_correctness"].append(
-            f"{n_bad} causal claim(s) move the problem's own failure "
-            f"quantity the WRONG way ({n_ok} improving) — a "
-            "truth-bearing violation, not a style issue")
-    elif n_ok >= 2:
-        scores["direction_correctness"] = 4
-        reasons["direction_correctness"].append(
-            f"{n_ok} causal claim(s) target the failure quantity "
-            "improving; none move it the wrong way")
-    elif n_ok == 1:
-        scores["direction_correctness"] = 3
-        reasons["direction_correctness"].append(
-            "one improving causal claim on the failure quantity; "
-            "thin causal coverage")
-    else:
+    # ---- direction_correctness (0-4, D6 truth-bearing; v2.2.0 F92
+    # guards, the R113 adjudication): the answer's causal claims must
+    # target the problem's OWN failure quantity and move it the
+    # IMPROVING way. A claim that raises the failure quantity is a
+    # truth violation (0-1); claims targeting other quantities are
+    # neutral, not wrong. No attributable claims = the neutral anchor
+    # 2 with the coverage typed (never silently a 4).
+    # F92 (R113 dir 3): the axis is GATED on question_type — it reads
+    # intervention-proposals only; predictor-design rows monitor a
+    # signal direction and are never subject to it (the HO15-20
+    # false-positive class). The regex stays an INPUT (Art. 3/6/8) —
+    # never a retroactive gate; the three adjudicated false-positive
+    # classes are GUARDED (skipped as non-claims), never
+    # score-converted.
+    qtype = str(problem.get("question_type")
+                or "intervention-proposal")
+    if qtype == "predictor-design":
         scores["direction_correctness"] = 2
         reasons["direction_correctness"].append(
-            "no causal claim attributable to the problem's own "
-            "failure quantity (typed neutral anchor — coverage "
-            "disclosed, never silently a 4)")
+            "predictor-design row — the intervention-direction axis "
+            "does not apply (F92, the R113 adjudication: predictor "
+            "rows correctly monitor a worsening signal; reading their "
+            "monitoring language as a causal intervention claim is "
+            "the HO15-20 false-positive class)")
+    else:
+        fail_txt = " ".join(str(problem.get(k) or "") for k in
+                            ("failure", "failure_mode", "question"))
+        stop = {"the", "and", "with", "from", "that", "this", "when",
+                "which", "will", "shall", "must", "into", "under",
+                "over"}
+        fail_terms = {w for w in re.findall(r"[a-z][a-z-]{4,}",
+                                            fail_txt.lower())
+                      if w not in stop}
+        IMPROVE_RE = re.compile(
+            r"\b(reduc\w+|improv\w+|low(er|ers|ered)|eliminat\w+|"
+            r"preven\w+|minimiz\w+|avoid\w+|suppress\w+|mitigat\w+)",
+            re.IGNORECASE)
+        DEGRADE_RE = re.compile(
+            r"\b(increas\w+|rais\w+|worsen\w+|aggravat\w+|amplif\w+|"
+            r"exacerbat\w+)", re.IGNORECASE)
+        claim_re = re.compile(
+            r"\b(redu\w+|improv\w+|low\w+|eliminat\w+|preven\w+|"
+            r"minimiz\w+|avoid\w+|suppress\w+|mitig\w+|increas\w+|"
+            r"rais\w+|worsen\w+|aggravat\w+|amplif\w+|exacerbat\w+)\s+"
+            r"(?:the\s+|this\s+|its\s+)?([a-z][a-z-]{4,38})",
+            re.IGNORECASE)
+        # F92 guard machinery (the three R113-adjudicated
+        # false-positive classes):
+        BASELINE_CTX_RE = re.compile(
+            r"\b(standard\s+practice|current\s+practice|conventional|"
+            r"existing|presently|currently|the\s+baseline|as-?is|"
+            r"status\s+quo)\b[^.;]*$", re.IGNORECASE)
+        SUBORDINATOR_RE = re.compile(
+            r"\b(as|since|when|because|while|although|though|"
+            r"whereas)\s+[^,.;:]{0,60}$", re.IGNORECASE)
+        # threshold/margin objects: a DEGRADE-class verb on them moves
+        # the failure AWAY (HO15-10: "raising the delamination
+        # threshold" is improving, not a violation)
+        THRESHOLD_OBJECTS = {
+            "threshold", "thresholds", "margin", "margins",
+            "resistance", "strength", "strengths", "toughness",
+            "lifetime", "durability", "headroom", "safety",
+            "capacity", "tolerance", "robustness"}
+        n_ok = n_bad = 0
+        for m in claim_re.finditer(a):
+            verb, obj = m.group(1).lower(), m.group(2).lower()
+            if not any(t in obj or obj in t for t in fail_terms):
+                continue                    # not the failure quantity
+            sent_start = max(a.rfind(c, 0, m.start())
+                             for c in ".!?\n")
+            before = a[sent_start + 1:m.start()]
+            span = m.group(0)
+            improve = bool(IMPROVE_RE.search(span))
+            degrade = bool(DEGRADE_RE.search(span))
+            # guard 1 — descriptive-baseline context (HO15-03): a
+            # DEGRADE-class claim inside a sentence describing the
+            # STANDARD-PRACTICE state is the baseline's own failure,
+            # not the proposed intervention. IMPROVE-class claims
+            # always survive (an improving claim near baseline
+            # vocabulary is the fix — contrastive frames included)
+            if (degrade and not improve
+                    and BASELINE_CTX_RE.search(before)):
+                continue
+            # guard 2 — participial consequence form (HO15-05/10): a
+            # DEGRADE-class gerund after a comma or inside a
+            # subordinate clause is a mechanism DESCRIPTION.
+            # IMPROVE gerunds are kept (an intervention's purpose
+            # clauses legitimately count)
+            if (degrade and not improve and verb.endswith("ing")
+                    and (before.rstrip().endswith((",", ";", ":"))
+                         or SUBORDINATOR_RE.search(
+                             a[max(0, m.start() - 80):m.start()]))):
+                continue
+            # guard 3 — threshold objects, ASYMMETRIC inversion
+            # (HO15-10): a DEGRADE-class verb on a protective
+            # threshold/margin/resistance moves the failure AWAY
+            # (credit it). The inverse is deliberately NOT flipped:
+            # an IMPROVE-class verb on the failure quantity's own
+            # vocabulary stays the canonical improving claim (the
+            # HO15-14 lesson: "lower strength[-loss]" reduces the
+            # failure, never a violation)
+            if obj in THRESHOLD_OBJECTS and degrade and not improve:
+                improve, degrade = True, False
+            if improve:
+                n_ok += 1
+            elif degrade:
+                n_bad += 1                  # RAISES the failure qty
+        if n_bad > 0:
+            scores["direction_correctness"] = 1
+            reasons["direction_correctness"].append(
+                f"{n_bad} causal claim(s) move the problem's own "
+                f"failure quantity the WRONG way ({n_ok} improving) "
+                "— a truth-bearing violation, not a style issue")
+        elif n_ok >= 2:
+            scores["direction_correctness"] = 4
+            reasons["direction_correctness"].append(
+                f"{n_ok} causal claim(s) target the failure quantity "
+                "improving; none move it the wrong way")
+        elif n_ok == 1:
+            scores["direction_correctness"] = 3
+            reasons["direction_correctness"].append(
+                "one improving causal claim on the failure quantity; "
+                "thin causal coverage")
+        else:
+            scores["direction_correctness"] = 2
+            reasons["direction_correctness"].append(
+                "no causal claim attributable to the problem's own "
+                "failure quantity (typed neutral anchor — coverage "
+                "disclosed, never silently a 4)")
 
     # ---- magnitude_plausibility (0-4, D6 truth-bearing): the numeric
     # claims stay inside typed envelopes; a percent-improvement claim
@@ -535,6 +608,60 @@ def score_answer(problem: Dict[str, Any], answer: str,
         reasons["magnitude_plausibility"].append(
             "no percent claims to envelope-check (typed neutral "
             "anchor — coverage disclosed)")
+    # ---- F91 (R113 dir 4): cure-kinetics claims route through the
+    # engine's COMPUTED relation — the regexes below only EXTRACT the
+    # claim's own numbers (INPUTS, Art. 3); the computed sign of
+    # thermoset_cure_residual_direction is the authority, never prose
+    # direction-matching (the HO15-10 class: "cure temperature from
+    # 150\u00b0C to 120\u00b0C ... reduces $f_{res}$ from ~15% (at
+    # high temp/low dose) to <2%" inverts the computed direction —
+    # conversion FALLS at the lower cure temperature, so residual
+    # oligomer RISES)
+    TEMP_PAIR_RE = re.compile(
+        r"(\d{2,3})(?:\.\d+)?\s*\u00b0?\s*C\s*(?:\u2192|->|\bto\b)"
+        r"\s*(\d{2,3})(?:\.\d+)?\s*\u00b0?\s*C", re.IGNORECASE)
+    RESID_PAIR_RE = re.compile(
+        r"(\d{1,3}(?:\.\d+)?)\s*%[^\n]{0,60}?\bto\b[^\n]{0,20}?"
+        r"\s*<?\s*(\d{1,3}(?:\.\d+)?)\s*%", re.IGNORECASE)
+    RESID_VOCAB_RE = re.compile(
+        r"residual|f_\{?res|unreacted|oligomer|monomer", re.IGNORECASE)
+    CURE_WORD_RE = re.compile(r"cure", re.IGNORECASE)
+    cure_pair = None
+    for m in TEMP_PAIR_RE.finditer(a):
+        if CURE_WORD_RE.search(a[max(0, m.start() - 200):
+                                  m.end() + 200]):
+            cure_pair = (float(m.group(1)), float(m.group(2)))
+            break
+    resid_pair = None
+    for m in RESID_PAIR_RE.finditer(a):
+        if RESID_VOCAB_RE.search(a[max(0, m.start() - 200):
+                                    m.end() + 200]):
+            r1_, r2_ = float(m.group(1)), float(m.group(2))
+            if r2_ < r1_:
+                resid_pair = (r1_, r2_)
+                break
+    if cure_pair and resid_pair:
+        t1_c, t2_c = cure_pair
+        r1, r2 = resid_pair
+        claimed_residual_falls = r2 < r1
+        from discovery_fabric.engine import physics_checks as _pc  # lazy (F83)
+        comp = _pc.thermoset_cure_residual_direction(t1_c, t2_c)
+        if (claimed_residual_falls
+                and comp.get("direction_of_effect") == "worsens"):
+            mp = min(mp, 1)
+            reasons["magnitude_plausibility"].append(
+                f"F91 computed-relation catch: the answer claims cure "
+                f"temp {t1_c:g}\u00b0C\u2192{t2_c:g}\u00b0C reduces "
+                f"the residual oligomer fraction {r1:g}%\u2192{r2:g}%, "
+                "but the engine's computed "
+                "thermoset_cure_residual_direction "
+                f"(k2/k1={comp.get('value')}) says conversion FALLS "
+                "at the lower cure temperature, so residual oligomer "
+                "RISES — the claim inverts the computed "
+                "direction-of-effect (Arrhenius cure kinetics; the "
+                "stoichiometry axis may dominate in reality — "
+                "typed magnitude/premise concern, the R113 "
+                "adjudication's HO15-10 class)")
     scores["magnitude_plausibility"] = mp
 
     return {"rubric_version": INVENTION_RUBRIC_VERSION,
