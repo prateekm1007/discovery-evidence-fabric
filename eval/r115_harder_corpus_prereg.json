@@ -1,0 +1,42 @@
+{
+ "record": "R115_HARDER_CORPUS_PREREG/1.0.0 (PRE-REGISTRATION)",
+ "claim": "c-0163",
+ "session": "builder-r115s1-8e860700",
+ "at": "2026-11-21T20:40Z (sandbox clock, TRUE UTC)",
+ "trigger": "R115 dir 2 + F94 (HIGH): the r110 d3 corpus is SATURATED — bare element_recall mean 0.9833 with 27/30 items at 1.0, engine 0.9738 27/30 (verified from eval/r110_d3_instrument_result.json bytes this window; the auditor's independent recompute 0.9889/26 from the rescore record — both sources ceiling), so the engine-bare negative delta is UNINFORMATIVE (ceiling effect), not evidence of engine uselessness. The engine is NOT retired.",
+ "typed_finding_first": {
+  "the_saturation_mechanism": "the served material leaked the answer: the background_survey is authored by the SAME model (agnes-3.0-flash) from the SAME abstract as the key_elements, and at temperature 0 its 'domain background' paraphrase carries the key elements nearly verbatim. Bare recall 0.98 means the served text handed over ~every element. The difficulty variable is the SPOILER, not the underlying task.",
+  "implication": "the r110 element_recall benchmark is RETIRED as a discrimination instrument (R115 dir 8) and kept only as a sanity ceiling; the decisive test needs headroom."
+ },
+ "difficulty_mechanism": {
+  "the_single_change": "SERVED SET at rung L0 = background_question (authored, mechanism-free) + paper TITLE + paper ABSTRACT verbatim (JATS-stripped). The authored survey and the inspiration titles are REMOVED from the served set — they remain in the item record for the auditor's spot check. The arms must MINE the dense abstract without the same-model paraphrase layer.",
+  "what_stays_identical": "the GT authoring schema and prompt (r110 stage B byte-identical discipline, the survey is still AUTHORED for the record but not served); the matcher (the committed SPECTER2 stack); the tau protocol (corpus-own pairs, midpoint, both distributions recorded BEFORE any generation); the arms (bare minimal directive / engine rp.generator_prompt over the served material); the metrics; the paired percentile bootstrap (10,000 resamples, seed 110). Only the corpus and the served set change — the comparison isolates difficulty x scaffolding.",
+  "leakage_controls": "the GT fields and key_elements never enter any generation prompt; the served abstract is the paper's own text (the GT is grounded in it — the task stays fair: the information is present, the extraction is hard)"
+ },
+ "corpus_construction": {
+  "stage_a": "Crossref works API (read-only, polite pool, zero quota), SIX preregistered query terms: electrocatalyst degradation / perovskite solar cell stability / lithium battery cathode interface / polymer membrane fouling / enzyme immobilization stability / photocatalyst mechanism. filter=from-pub-date:2025-09-01,type:journal-article,has-abstract:true, rows 25 per term, relevance order; mechanical selection: round-robin across terms in query order taking the first ELIGIBLE work per term per round until 30 items.",
+  "eligibility": "JATS-stripped abstract >= 800 chars; DOI not in the r110 item DOIs (the old corpus is excluded by DOI, not by title); title + abstract present. A work failing eligibility types OUT (the fetch log carries it; n items reported).",
+  "output": "eval/r115_d2_harder_raw/items.jsonl + fetched log (the auditor's provenance)"
+ },
+ "pilot_ladder": {
+  "pilot": "the FIRST 12 items by item_id, bare arm ONLY, at L0.",
+  "band": "pilot bare element_recall in [0.4, 0.75] -> complete the run at L0 (all 30 items, both arms).",
+  "typed_ladder": "pilot < 0.4 -> typed ABORT; rung L1 = abstract-only + the FIRST sentence of the authored survey (domain framing only, preregistered slice, never the mechanism-bearing tail); the run restarts FRESH at L1 (the L0 calls stay recorded as the typed ladder probe, never counted in the run). pilot > 0.75 -> rung L-minus-1 = title + question only. Max 2 ladder probes; beyond that the design types INFRASTRUCTURE/DESIGN failure and reports.",
+  "why_pilot_included_in_run": "the pilot items are the run's first 12 (fixed by item_id order before any generation) — no separate pilot corpus, no selection bias, quota stays ~1x"
+ },
+ "metrics_judge_free": {
+  "graded_key_element_recall": "identical to r110: |{e in key_elements: distance(gen_text, e) <= tau}| / |key_elements| on the committed SPECTER2 stack; tau = the midpoint between the max negative and min positive on the corpus's OWN calibration pairs, computed BEFORE any generation, both distributions recorded",
+  "hypothesis_ranking": "hit@1 + MRR of the generation vs the 3 authored distractors, ranked by distance to the GT main_hypothesis (the r110-probe-verified representation: the generation's RAW FILE TEXT verbatim, main_hypothesis anchor)",
+  "abstract_faithfulness": "SURVEY-FAITHFULNESS IS SUBSTITUTED at L0 (no survey is served): the same graded recall against the SERVED ABSTRACT's own sentences (>= 8 words, first 12 by document order, preregistered) — the guard metric keeps its role (a generation that ignores the served material scores low) with the served surface it actually has. At L1 the served survey first sentence joins the guard set.",
+  "representation_discipline": "the r114 probe lesson is preregistered: gen text = the RAW FILE verbatim (both arms); the coverage formula (whole-text vs sentence-min) is selected GLOBALLY by record agreement and typed, never per-item"
+ },
+ "comparison": {
+  "primary": "engine-minus-bare on graded key-element recall, paired per item; 95% CI from the paired percentile bootstrap (10,000 resamples, seed 110, computed by code)",
+  "validity_condition": "bare mean element_recall in [0.4, 0.75] on the run (the F94 headroom requirement) — OUTSIDE the band the result types UNINFORMATIVE (ceiling or floor) and no engine verdict is claimed",
+  "typed": "positive-and-CI-excludes-0 = the staged evidence the auditor asked for (ENGINE_VALUE direction); else the typed honest negative + the weak-stage retirement stays the auditor's call (Art. 20). NO score-9 acceptance is claimed from this lane; the recovery gate (>= 0.40) needs the auditor's calibrated bar (R115 dir 7)."
+ },
+ "quota_disclosure_estimate": "~30 author + 30 bare + 30 engine + <= 24 ladder-probe bare = max 114 agnes calls on the 2-key rotation; zero judge-family calls; the ladder probes are typed and never counted",
+ "determinism": "the SPECTER2 stack is the committed cache path (weights provenance sha256[:12] on record per the twin's prereg discipline); the bootstrap seed is fixed; ALL raw bytes (authorings, generations, calibration tables, per-element match tables) commit verbatim for the fresh-clone rule",
+ "anti_tuning": "this prereg lands BEFORE stage A; changes after the first generation byte are typed findings; the tau calibration happens BEFORE any generation (no generation-dependent threshold); the corpus selection is mechanical (round-robin by relevance order) with no model in the loop; the served-set rungs are fixed above and cannot be re-cut after seeing generation quality",
+ "no_acceptance_claims": "the result stages for the auditor; the c-0161 twin reservation is respected (left idle; this lane files its own run claim c-0164 if the pilot lands in band and AGNES stays healthy)"
+}
