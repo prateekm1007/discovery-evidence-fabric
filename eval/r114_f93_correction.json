@@ -1,0 +1,152 @@
+{
+ "record": "R114_F93_CORRECTION/1.0.0 (Art. 4 — every correction creates a memory artifact)",
+ "session": "builder-r114s2-c9c03209",
+ "claim": "c-0162",
+ "at": "2026-11-21T20:20:00Z (sandbox clock, TRUE UTC)",
+ "finding": {
+  "found_by": "the R114 auditor (F93): the disclosed arrhenius_rate_ratio Ea/R magnitude bug is real — 1000x in the EXPONENT",
+  "defect": "physics_checks.arrhenius_rate_ratio computed exponent = -float(ea.magnitude / (R_GAS.magnitude * 1000)) * (1/T2 - 1/T1) — but ea.magnitude is ALREADY J/mol (pint converted the kJ/mol input at the top of the function), so dividing by (R * 1000) divides by 1000 TWICE; every computed magnitude was wrong by 1000x in the exponent (e.g. the committed reference scenario Ea=80 kJ/mol, 60->80 degC: quoted 1.0016369748, true 5.1327234711)",
+  "introduced": "R50, commit ebacc1c3a (the physics_checks engine slice, P0.2+P0.3+P1.1)",
+  "why_it_survived": "every test on the relation was SIGN-ONLY (test_arrhenius_known_answer_directions asserts >1/<1/==1; the F-V5 saturation pins asserted the clamp path; the on-row binding consumed direction); the one magnitude-carrying pin (test_arrhenius_exponent_saturation_disclosed_in_band's in-range tail) asserted 1.0 < value < 1.01 — pinning the BUGGY magnitude itself. The unit-checked r54 reimplementation existed since R54 but nobody cross-compared ENGINE magnitudes against DRIVER magnitudes for this relation"
+ },
+ "sign_safety": {
+  "adjudicated": "the R114 auditor's typing is confirmed at every level: all directions/verdicts the engine ever emitted STAND (the wrong-by-1000x exponent cannot flip a sign except across the exp(0) boundary, which is the isothermal neutral case — exact 0 there in both forms)",
+  "artifact_level_proof": "the r54 driver regenerated at the fixed engine: fraction 1.0 -> 1.0, sign_contradictions 0 -> 0, verdict P1_UNIT_CHECKED_PASS -> P1_UNIT_CHECKED_PASS; ONLY the 9 arrhenius value fields across 3 rows changed (HO7-02: 0.998200377481209 -> 0.16509341978284012 improves->improves; HO7-07: 1.0001551913858833 -> 1.167867393438719 worsens->worsens; HO7-11: 1.0016369747921925 -> 5.132723471074346 worsens->worsens); two consecutive runs byte-identical (sha256[:12] c16188deb30bc)"
+ },
+ "fix": {
+  "commit": "this commit (c-0162 execution): the divisor is the BARE gas constant (ea.magnitude / R_GAS.magnitude), with the in-band comment carrying the full defect history",
+  "magnitude_test": "tests/test_physics_checks.py::test_arrhenius_closed_form_magnitude — the test the suite lacked: 5 closed-form cases (including the reference scenario pair and the adjudicated cure pair) recomputed from independent literals at 1e-9 relative tolerance; a magnitude regression of ANY size reds, not just a sign flip; the saturation path is asserted honest (in-range values carry no 'saturated' key)",
+  "stale_pin_corrected": "test_arrhenius_exponent_saturation_disclosed_in_band's in-range tail moved from the buggy pin (1.0 < value < 1.01) to the true magnitude bracket (10.0 < value < 11.0), disclosed in-band"
+ },
+ "affected_committed_bytes": {
+  "survey": "19 files, 87 arrhenius check-result objects carry magnitude-wrong value fields at the pre-fix tip",
+  "decision_consumption": "NONE consumed a magnitude: 77 objects carry binding_rule=BINDING_IS_DIMENSIONAL_ONLY (the on-row sign-binding — direction only); 10 objects (eval/r61_p1_baseline_rows.json) are {check_id, direction, unit, value, verdict} baseline-coverage rows (direction/verdict consumers); every sign_check verdict in the r54-class records is DEFERRED or AGREES on direction",
+  "files": {
+   "eval/dev_convergence_ablation_r93/rows/HO10-07-maleic-catalyst-deactivation.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/dev_convergence_ablation_r93/rows/HO10-19-pump-bearing-lube.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/dev_convergence_ablation_r93/rows/HO10-30-fan-blade-erosion.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v10_generation/rows/HO10-07-maleic-catalyst-deactivation.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v10_generation/rows/HO10-19-pump-bearing-lube.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v10_generation/rows/HO10-30-fan-blade-erosion.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v11_generation/rows/HO11-15-phthalic-catalyst-deactivation.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v11_generation/rows/HO11-22-motor-insulation-aging.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v12_generation/rows/HO12-13-butadiene-extractive-distill.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v12_generation/rows/HO12-16-steam-turbine-rotor.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v13_generation/rows/HO13-03-amine-hss.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v13_generation/rows/HO13-05-pp-extruder-discoloration.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v13_generation/rows/HO13-19-ejector-vacuum-loss.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v13_generation/rows/HO13-29-cnc-spindle-preload.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v13_generation/rows/HO13-30-pv-inverter-caps.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v14_generation/rows/HO14-28-uv-h2o2-aop.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/holdout_v15_generation/rows/HO15-23-texture-heater.json": {
+    "n_objects": 4,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/r54_p1_unit_checked.json": {
+    "n_objects": 9,
+    "binding_rules": [
+     "BINDING_IS_DIMENSIONAL_ONLY"
+    ]
+   },
+   "eval/r61_p1_baseline_rows.json": {
+    "n_objects": 10,
+    "binding_rules": [
+     "None"
+    ]
+   }
+  },
+  "disposition": "the files stand as committed history (Art. 4 — never rewrite); the r54 record is REGENERATED with this push (the R108s2 freshness precedent: the artifact regenerates when engine content changes; the CI gates on the driver's verdict line, not byte identity); the historical holdout-row records keep their wrong value fields as history — any future consumer of those magnitudes must recompute through the fixed engine (typed here so no one cites them cold)"
+ },
+ "inheritance_check": {
+  "thermoset_cure_residual_direction": "DOES NOT INHERIT — verified numerically this window: k2/k1 at 150->120 degC, Ea=60 kJ/mol = 0.272171 (the closed form exp(-(60000/8.314462618)(1/393.15 - 1/423.15)) = 0.27217099143); the F91 relation was written with the bare-R divisor from the start (a distinct code path, physics_checks.py check 23); the r113 rescore record's quoted value 0.272171 is CORRECT and stands",
+  "vant_hoff_adsorption_direction": "does NOT inherit — line-class ln_ratio = (-dh_j / R_GAS.magnitude) * (1/t1 - 1/t0) with dh_j already J/mol, the bare-R divisor; verified live: -40 kJ/mol 25->60 degC PROMOTE_DESORPTION = 0.1836 improves",
+  "grep_audit": "no other R_GAS-adjacent '* 1000' divisor exists in the engine (the arrhenius line was the single instance)"
+ },
+ "instrument_observation_for_auditor": {
+  "note": "the r54 driver is a unit-checked RECOMPUTE of the registry — the R108s2 regeneration (5940e9749) embedded the buggy 1.0016 as freshly-'verified' output; today's regeneration embeds the correct 5.1327. The artifact-freshness discipline (verdict-gated, not byte-identity) let a magnitude-wrong value ride a GREEN gate for 6+ rounds. A magnitude cross-check (driver closed-form vs engine run_check) would have caught F93 at R54 — that cross-check NOW EXISTS as test_arrhenius_closed_form_magnitude (the engine is pinned to the closed form directly). Typed for the auditor's consideration: the same driver-verdict-vs-magnitude gap could exist on other registry relations; the Art. 19 independent-recompute pattern (the peer's c-0159 lane on the D3 instrument) is the general remedy",
+  "no_new_gate_claimed": "this record files the correction; no new article or CI gate is self-added (the magnitude test extends the existing suite per the R114 direction 3 acceptance)"
+ },
+ "zero_llm_zero_quota": "deterministic fix + test + regeneration + record; zero LLM calls, zero quota, zero sealed bytes; NO acceptance/score claims"
+}

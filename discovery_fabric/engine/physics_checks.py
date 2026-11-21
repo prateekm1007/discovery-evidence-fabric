@@ -81,7 +81,16 @@ def arrhenius_rate_ratio(ea_kj_mol: float, t1_degC: float,
                           f"T1={float(t1.magnitude)} K, "
                           f"T2={float(t2.magnitude)} K) — typed "
                           "refusal, never a raise (F-V5)"})
-        exponent = (-float(ea.magnitude / (R_GAS.magnitude * 1000))
+        # F93 (R114 dir 3, the auditor's finding): the divisor is the
+        # BARE gas constant — ea.magnitude is ALREADY J/mol (pint
+        # converted the kJ/mol input above), so the historical
+        # '(R_GAS.magnitude * 1000)' divided by 1000 twice and shrank
+        # the exponent 1000x (sign-safe — every direction/verdict the
+        # engine ever emitted stands — but every MAGNITUDE was wrong;
+        # the sign-only test suite could not see it). The correction
+        # record is eval/r114_f93_correction.json (Art. 4); the new
+        # closed-form magnitude test pins the arithmetic, not the sign.
+        exponent = (-float(ea.magnitude / R_GAS.magnitude)
                     * (1.0 / t2.magnitude - 1.0 / t1.magnitude))
         # F-V5 saturation bounds (the 1995f7e75 pattern): the exponent
         # saturates beyond the double range instead of raising

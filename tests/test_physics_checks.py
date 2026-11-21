@@ -45,6 +45,47 @@ def test_arrhenius_known_answer_directions():
     assert same["direction_of_effect"] == "neutral"
 
 
+def test_arrhenius_closed_form_magnitude():
+    # F93 (R114 dir 3, the auditor's finding): the MAGNITUDE test the
+    # sign-only suite lacked. The historical exponent divided the
+    # already-J/mol Ea by (R * 1000) — every magnitude wrong by 1000x
+    # in the exponent, every DIRECTION still right (which is exactly
+    # why the sign-only tests above never caught it). This test pins
+    # the closed form k2/k1 = exp(-Ea/R (1/T2 - 1/T1)) with Ea in
+    # J/mol against an independent literal recomputation — a magnitude
+    # regression of ANY size reds, not just a sign flip.
+    import math
+    R = 8.314462618  # J/(mol*K), the CODATA value the engine carries
+    cases = [
+        # (ea_kj_mol, t1_degC, t2_degC) — includes the REFERENCE
+        # SCENARIO pair (80, 60, 80) whose pre-fix value 1.0016369748
+        # was wrong (true 5.1327) and the adjudicated cure pair
+        # (60, 150, 120) shared with thermoset_cure_residual_direction
+        (80.0, 60.0, 90.0),   # big rise: ~10.87x
+        (80.0, 90.0, 60.0),   # symmetric drop: ~0.0920x
+        (60.0, 25.0, 35.0),   # the R113 demonstrated pair: ~2.19x
+        (80.0, 60.0, 80.0),   # the reference scenario: ~5.13x
+        (60.0, 150.0, 120.0),  # the cure axis: ~0.2722x
+    ]
+    for ea_kj, t1_c, t2_c in cases:
+        r = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=ea_kj,
+                         t1_degC=t1_c, t2_degC=t2_c)
+        assert r["verdict"] == "RUN", (ea_kj, t1_c, t2_c, r)
+        true_ratio = math.exp(
+            -(ea_kj * 1000.0 / R)
+            * (1.0 / (t2_c + 273.15) - 1.0 / (t1_c + 273.15)))
+        assert abs(r["value"] - true_ratio) < 1e-9 * max(1.0, true_ratio), (
+            f"magnitude regression: Ea={ea_kj} {t1_c}->{t2_c}C engine="
+            f"{r['value']} closed-form={true_ratio} (the F93 x1000 "
+            "exponent bug class — a magnitude error, not a sign one)")
+    # the saturation path stays honest: the disclosed clamp fires only
+    # beyond the double range, never on these in-range magnitudes
+    big = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=400.0,
+                       t1_degC=20.0, t2_degC=200.0)
+    assert big["verdict"] == "RUN"
+    assert "saturated" not in big["detail"]
+
+
 def test_fouling_u_degradation_sign_and_refusal():
     # added fouling resistance (rf_after > rf_before=0) loses duty
     degraded = pc.run_check("fouling_u_degradation",
@@ -235,7 +276,12 @@ def test_arrhenius_exponent_saturation_disclosed_in_band():
     ok = pc.run_check("arrhenius_rate_ratio", ea_kj_mol=80.0,
                       t1_degC=60.0, t2_degC=90.0)
     assert "saturated" not in ok["detail"]
-    assert 1.0 < ok["value"] < 1.01
+    # F93 (R114 dir 3): this pin previously asserted 1.0 < value < 1.01
+    # — it was pinning the BUGGY magnitude (the x1000 exponent bug:
+    # pre-fix 1.0008-ish for this pair). The correct closed-form value
+    # is ~10.87 (Ea/R = 9623 K, 1/363.15 - 1/333.15 = 2.48e-4); the
+    # pin now brackets the TRUE magnitude, unsaturated.
+    assert 10.0 < ok["value"] < 11.0
 
 
 def test_dewpoint_absurd_drybulb_typed_refusal_not_raise():
