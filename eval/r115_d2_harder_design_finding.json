@@ -1,0 +1,21 @@
+{
+ "record": "R115_D2_HARDER_DESIGN_FINDING/1.0.0",
+ "at": "2026-11-21T22:10Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r115s1-8e860700",
+ "claim": "c-0163 (r115-harder-corpus; R115 dir 2)",
+ "prereg": "eval/r115_harder_corpus_prereg.json + amendment_1 (engine_prompt_L0)",
+ "typed_outcome": "DESIGN_FINDING_BAND_UNREACHABLE — the preregistered ladder is exhausted (max 2 probes); bare element_recall cannot be tuned into [0.4, 0.75] by serving-set truncation on this instrument class; NO engine-bare delta is claimable from this lane and NO engine verdict is typed (the prereg's own branch).",
+ "the_ladder_evidence": [
+  {"rung": "r110-original (prior round, auditor F94)", "served": "question + survey + inspirations", "bare_mean_recall": 0.9833, "note": "27/30 at ceiling (verified from the committed record bytes this window); the auditor's independent recompute 0.9889/26 — both sources saturated"},
+  {"rung": "L0 (probe 1)", "served": "question + title + abstract verbatim (the same-model survey spoiler removed)", "bare_mean_recall": 0.9305, "probe_record": "eval/r115_d2_harder_raw/ladder_probe_L0.json", "tau": 0.1391, "n_pos_n_neg": [180, 5400], "note": "the spoiler removal moved saturation only 0.05"},
+  {"rung": "LM1 (probe 2)", "served": "question + title ONLY (the model must PREDICT the mechanism from prior knowledge, not read it)", "bare_mean_recall": 0.875, "probe_record": "eval/r115_d2_harder_raw/ladder_probe_LM1.json", "tau": 0.1391, "note": "hc-12 recall 1.0 FROM THE TITLE ALONE: the model named nanoplatelet/microsphere morphology routes, the supersaturation-gradient mechanism and crystallographic-axis growth rates with no abstract served — title density + frontier prior knowledge + semi-generic elements + the tau-midpoint matcher keep the score at ceiling"}
+ ],
+ "root_cause_typed": "THREE stacked mechanisms, not one: (1) the same-model survey spoiler (F94's theory — real but only 0.05 of the effect); (2) the GT elements are authored FROM the abstract and several are semi-generic (any competent domain hypothesis covers them); (3) the tau-midpoint matcher on whole-text distance is lenient for short generic sentences. The instrument class 'recall against abstract-derived GT' is a reading-comprehension-plus-prior-knowledge task that a frontier model saturates at EVERY information level — the headroom the F94 acceptance requires is structurally unreachable in this class.",
+ "consequences": [
+  "R115 dir 8 EMPIRICALLY CONFIRMED (on top of the prereg's declaration): the element_recall benchmark is retired as a DISCRIMINATION instrument — it cannot decide engine value at any information level; it survives only as a sanity ceiling.",
+  "The engine-value question moves ENTIRELY to the auditor's dir-3 axis: the verification binds' catch-rate on a fresh engineering set (where the binds demonstrably catch real direction/feasibility/measure defects) — the twin's second saturated-corpus negative (c-0161, all four CIs cover 0) plus this design finding close the recall-class case.",
+  "The twin's c-0161 retirement PROPOSAL (scoped to the generation scaffolding layer) stands staged for the auditor; this lane neither supports nor contests it — the recall class cannot adjudicate it (that is the finding)."
+ ],
+ "quota_ledger": "30 author + 12 L0 bare + 12 LM1 bare = 54 agnes calls this lane (byte-skip one-shot per item per rung; zero re-calls); the free-tier wall hit twice (stage B at 6/30, cleared by the 150s-backoff grind; no wall during the probes) — the shared two-key budget is the binding infra constraint (Art. 15 typed; the AWS path-B host remains the durable-unblock).",
+ "no_acceptance_claims": "no score change claimed; the design finding stages for the auditor"
+}
