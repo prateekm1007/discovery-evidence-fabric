@@ -24,6 +24,17 @@ def test_registry_exists_and_structured():
     assert len(reg["entries"]) >= 6, "arm lineage incomplete"
 
 
+def _entry_schema(e):
+    """Two number schemas live in the registry: the legacy novelty/
+    feasibility schema (the r31-era entries) and the F31e-lineage
+    delivered-defect schema (defect_rows/rows — the primary metric
+    since r121). The recompute paths differ; both must hold."""
+    v = e["variant_numbers"] or {}
+    if "defect_rows" in v:
+        return "defect_rows"
+    return "novelty"
+
+
 def test_every_citation_resolves_and_recomputes():
     reg = json.loads(REG.read_text(encoding="utf-8"))
     for e in reg["entries"]:
@@ -32,6 +43,21 @@ def test_every_citation_resolves_and_recomputes():
             continue
         path, key = e["metric_citation"].split(":")
         s = _overall(path, key)
+        if _entry_schema(e) == "defect_rows":
+            # the F31e-lineage schema: defect rows recompute from the
+            # cited record's committed bytes; LOWER defect_rows beats.
+            if isinstance(s, dict) and "defect_rows" in s:
+                assert s["defect_rows"] == \
+                    e["variant_numbers"]["defect_rows"], \
+                    f"registry number drift vs {path}"
+                assert s.get("rows") == e["variant_numbers"]["rows"], \
+                    f"registry row-count drift vs {path}"
+            inc = e["incumbent_numbers"]
+            if inc is not None and isinstance(s, dict) and "defect_rows" in s:
+                expect = s["defect_rows"] < inc["defect_rows"]
+                assert e["beats_incumbent"] == expect, \
+                    f"beats_incumbent drift vs {path} (defect schema)"
+            continue
         assert s["novelty_delta_mean"] == \
             e["variant_numbers"]["novelty_delta_mean"], \
             f"registry number drift vs {path}"
