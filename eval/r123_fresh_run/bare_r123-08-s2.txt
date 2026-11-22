@@ -1,0 +1,76 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implement a "Condenser Approach Temperature" (CAT) alarm and automated condenser water flow optimization loop using existing variables. The failure mode (wide condenser approach, high specific power) with a stable chilled water setpoint strongly indicates that the condenser heat rejection capability is degraded, typically due to low condenser water flow (pump issues, clogged strainers, or valve position errors) or fouling. Since new sensors are not allowed, we can derive the condenser approach temperature directly from existing measurements:
+
+1.  **Condenser Approach Temperature (ΔT_cond)** = (Condenser Water Outlet Temperature - Condenser Water Inlet Temperature - ΔT_evap) is not direct. The standard definition is:
+    **CAT = Condenser Water Outlet Temperature - Chilled Water Outlet Temperature** (if using water-to-water reference) OR more commonly:
+    **CAT = Condenser Water Outlet Temperature - Chilled Water Inlet Temperature + ΔT_evap_estimate**.
+    
+    *Correction for standard chiller diagnostics:* The most robust metric using only the stated sensors (Condenser water in/out, Evaporator water in/out, Compressor kW) is the **Condenser Approach Temperature** defined as:
+    **CAT = (Condenser Water Outlet Temp) - (Chilled Water Outlet Temp)** is not standard.
+    
+    Let's use the thermal definition: **CAT = T_cond_out - T_cw_in - ΔT_cw** is circular.
+    
+    Actually, the standard diagnostic metric is **Condenser Approach Temperature = (Condenser Water Outlet Temperature) - (Chilled Water Inlet Temperature + ΔT_evap)**? No.
+    
+    The correct physical relationship for a water-cooled chiller is:
+    **Condenser Approach Temperature (CAT) = T_cond_out - T_cw_in - ΔT_cw** is not an approach.
+    
+    **Standard Definition:** **CAT = T_cond_out - T_chilled_water_inlet** is incorrect.
+    
+    **Correct Metric:** The "Approach" is the difference between the leaving water temperature and the entering air/water temperature.
+    **CAT = T_cond_out - T_cw_in - (Q_reject / (m_cw * Cp))**? No, we don't have mass flow.
+    
+    Let's look at the data we *do* have:
+    - T_cond_in (CW inlet)
+    - T_cond_out (CW outlet)
+    - T_evap_in (CHW inlet)
+    - T_evap_out (CHW outlet)
+    - kW_compressor
+    
+    We can calculate the **Condenser Water ΔT**: ΔT_cw = T_cond_out - T_cond_in.
+    We can calculate the **Chiller Heat Rejection** roughly, but we don't have flow rates.
+    
+    However, a key diagnostic for "wide approach" and "high kW/ton" with stable cooling output is **low condenser water flow**. This manifests as a **large ΔT_cw** (T_cond_out - T_cond_in) for a given thermal load, or more directly, the **Condenser Approach Temperature** relative to the ambient or source.
+    
+    Since we lack flow, we cannot calculate exact CAT in °F/°C from first principles without flow. BUT, we can use the **Condenser Water Temperature Differential (ΔT_cw)** as a proxy. If the flow is low, ΔT_cw increases. If the condenser is fouled, T_cond_out rises.
+    
+    **Refined Mechanism:**
+    The failure signature "wide condenser approach" implies the condenser outlet temperature is too high relative to the inlet. Without flow meters, we cannot calculate the theoretical approach. However, we *can* calculate **T_cond_out**.
+    
+    A more robust mitigation using *only* existing sensors is to **Optimize Condenser Water Inlet Temperature and Monitor T_cond_out**.
+    
+    Actually, the most direct mitigation for "high COP loss due to wide condenser approach" using *only* T_cond_in, T_cond_out, T_evap_in, T_evap_out, and kW is to **Implement a T_cond_out Limit with a corresponding T_cond_in Offset** (i.e., an adaptive condenser temperature control).
+    
+    **Wait, the problem states the failure is *already* occurring.** We need to *mitigate* it.
+    
+    If the approach is wide, the condenser is inefficient. The causes are either:
+    1.  Low Condenser Water Flow (Pump/Strainer issue).
+    2.  Fouling (Condenser tubes/cooling tower).
+    3.  High Ambient (Cooling Tower issue).
+    
+    Since we cannot add sensors, we cannot directly measure flow to confirm #1. However, we *can* use the **Condenser Water ΔT (T_cond_out - T_cond_in)** as a surrogate for flow condition. If flow is low, ΔT is high. If flow is normal but fouled, T_cond_out will be high relative to T_cond_in for a given load.
+    
+    **Proposed Mitigation: Adaptive Condenser Setpoint Control with ΔT_cw Monitoring**
+    
+    **Mechanism:**
+    Implement a control strategy that lowers the condenser water inlet temperature setpoint (by increasing cooling tower fan speed and valve opening, if available, or simply prioritizing the chiller's cooling mode) and uses the calculated **Condenser Water Temperature Rise (ΔT_cw)** to trigger an alarm for potential flow restriction or fouling.
+    
+    **Implementation:**
+    1.  **Calculate ΔT_cw:** Use the existing sensors to compute `DeltaT_cw = T_cond_out - T_cond_in`.
+    2.  **Alarm on High ΔT_cw:** Set a high-limit alarm on `DeltaT_cw`. A high ΔT_cw indicates low condenser water flow (e.g., clogged strainer, low pump speed). This is a critical mitigation step because low flow causes the "wide approach" and high head pressure.
+    3.  **Alarm on High T_cond_out:** Set a high-limit alarm on `T_cond_out` relative to a baseline. If `DeltaT_cw` is normal but `T_cond_out` is high, it indicates fouling or insufficient heat rejection capacity (e.g., cooling tower not working, high ambient).
+    4.  **Optimization Loop:** If the building control system allows, adjust the condenser water inlet temperature setpoint to the minimum required to maintain a safe condenser water differential, thereby maximizing chiller efficiency (COP). Lowering T_cond_in reduces head pressure and compressor kW/ton.
+    
+    **Measures it Relies On:**
+    1.  **Existing Sensors:** T_cond_in, T_cond_out, T_evap_in, T_evap_out, Compressor kW.
+    2.  **Constraint Compliance:** No new instrumentation. The logic is pure computation from existing points.
+    3.  **Operational Action:** The mitigation is *diagnostic and protective*. It uses the existing data to pinpoint the root cause (Flow vs. Fouling) and allows operators to intervene (clean strainers, adjust cooling towers) to recover the "wide approach" and reduce kW/ton.
+
+    **Final Answer Structure:**
+    *   **Mechanism:** Implement a computed **Condenser Water Temperature Rise (ΔT_cw)** and **Condenser Outlet Temperature (T_cond_out)** monitoring strategy with setpoint optimization.
+    *   **Implementation:**
+        1.  Calculate `ΔT_cw = T_cond_out - T_cond_in`.
+        2.  Establish a high-limit alarm on `ΔT_cw` to detect low condenser water flow (clogged strainers/pumps), which is a primary cause of wide approach.
+        3.  Establish a high-limit alarm on `T_cond_out` (relative to ambient or historical baseline) to detect condenser fouling or cooling tower failure

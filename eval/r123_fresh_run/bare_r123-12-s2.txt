@@ -1,0 +1,16 @@
+**Mitigation Proposal: Thermostat-Band Widening and Compressor Duty-Cycle Optimization**
+
+**Mechanism:**
+The root cause of the symptoms (lengthened pull-down, rising suction temperature at constant duty, increased short-cycling) is typically a mismatch between the control setpoints and the actual heat load/heat ingress of the store. When heat load increases slightly (e.g., door leaks, ambient changes), the existing tight control band causes the compressors to reach the "stop" temperature quickly, but they cannot maintain it long enough before the temperature rises back to the "start" point, leading to short cycling. This short cycling prevents the compressors from running long enough to pull the suction temperature down effectively, causing the upward drift in suction temperature and longer pull-down times.
+
+**Implementation:**
+1.  **Adjust Room Thermostat Hysteresis:** Using the existing room thermostat array, widen the control band (hysteresis) between the "compressor start" and "compressor stop" temperature setpoints. For example, if the current band is 0.5°C (start at +2.0°C, stop at +1.5°C), widen it to 1.0°C (start at +2.0°C, stop at +1.0°C). This reduces the frequency of cycles, allowing each cycle to run longer.
+2.  **Modify Setpoints Based on Suction/Discharge Feedback:** Utilize the existing suction and discharge temperature transducers to implement a manual or rule-based setpoint shift. If the discharge temperature trends upward or the suction temperature does not drop as expected during a full compressor runtime cycle (as monitored by the runtime counters), manually lower the "compressor stop" setpoint of the room thermostat array. This forces the compressors to run longer to achieve a lower room temperature, which in turn pulls down the suction temperature more effectively before the cycle stops.
+3.  **Monitor Runtime Counters for Validation:** Track the compressor runtime counters over a 24-hour period. The goal is to increase the "duty time per cycle" (runtime before stopping) rather than the total number of cycles. A successful mitigation will show fewer cycles with longer individual runtimes, stabilizing the suction temperature lower during the pull-down phase.
+
+**Measures Relied Upon:**
+*   **Room Thermostat Array:** Used to adjust the start/stop temperature band and setpoint targets.
+*   **Suction/Discharge Temperature Transducers:** Used as qualitative indicators of system performance (e.g., high discharge temp indicates potential high load or low suction; low suction temp during full runtime indicates effective cooling). They guide the direction of setpoint adjustments.
+*   **Compressor Runtime Counters:** Used to measure cycle duration and frequency, providing the metric to verify that short cycling is reduced and that the new operating point provides sufficient cooling capacity within each cycle.
+
+This approach uses no new hardware, only existing sensors and control adjustments, to compensate for the increased thermal load or degraded heat exchange efficiency by optimizing the control logic to allow longer compressor runs.

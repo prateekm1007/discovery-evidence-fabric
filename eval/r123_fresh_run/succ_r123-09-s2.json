@@ -1,0 +1,58 @@
+{
+ "problem_id": "r123-09-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [fresh set] + bind check + bare reviewer fixes)",
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Tension Drift Compensation via Amperometric Feedback**\n\n**Mechanism:**\nImplement a **real-time drift compensation algorithm** that uses the differential change in drive and tail motor amperes as a proxy for belt tension variation and lateral drift. Since the belt drifts to the drive side, this causes an asymmetry in the effective friction load and belt wrap angle, subtly altering the torque demand on the motors. By continuously monitoring the *delta* (difference) in RMS amperes between the drive and tail motors, the system can detect the onset of drift and tension loss before the belt physically contacts the misalignment sensors (if any exist, though none are specified as new). The algorithm will trigger a **corrective tensioning pulse** or **adjustment of the tail puller motor speed** (if variable speed drives are used, though constraint says existing measurements only, so we assume fixed speed but we can use the tail motor's inherent load to infer position) to counteract the drift. However, a more robust approach using *only* existing sensors (ammeters and speed encoder) is to use the **speed encoder and ammeter combination** to calculate *effective belt speed* and *torque*, and detect anomalies. \n\nActually, the most direct mitigation using *only* ammeters and speed encoder is: **Implement a \"Tension Health Index\" based on the ratio of Drive Motor Amps to Belt Speed, and use this to dynamically schedule and verify tensioning cycles.** \n\nWait, the problem is *drift* and *shortening cycles*. Drift is lateral. Tensioning cycles are likely automatic. The issue is that the tensioning system is not compensating for the drift-induced tension changes effectively. \n\n**Revised Mechanism: Amperometric Drift Detection and Tensioning Trigger Optimization**\n\nUse the **differential amperage between drive and tail motors** as a drift indicator. When the belt drifts to the drive side, the drive side friction increases (more belt contact with the side roller/skirt), while the tail side friction may decrease or the effective tension distribution changes. This creates a measurable shift in the ratio of Drive Motor Amps to Tail Motor Amps. \n\n**Implementation:**\n1.  **Signal Processing:** Continuously calculate the ratio $R = \\frac{I_{drive}}{I_{tail}}$ using the existing ammeters. Also, monitor the belt speed $V_{belt}$ from the encoder to normalize for load changes. Create a normalized metric $M = \\frac{I_{drive} - k \\cdot I_{tail}}{V_{belt}}$, where $k$ is a calibrated constant.\n2.  **Drift Detection:** Establish a baseline for $M$ during normal, centered operation. When $M$ deviates significantly from the baseline in a specific direction (corresponding to drift to the drive side), interpret this as **excessive lateral friction and tension imbalance**.\n3.  **Mitigation Action:** Instead of relying solely on time-based tensioning cycles, **trigger a tensioning correction cycle when $M$ crosses a predefined threshold**. This ensures that tensioning is applied precisely when the drift-induced tension loss is significant, counteracting the drift by applying corrective tension that helps center the belt. Additionally, if the tail puller motor is adjustable, a brief pulse can be applied to re-center the belt (if the system allows for active centering via tail tension adjustment). If not, the tensioning cycle shortens the effective length, which can help re-center if the drift is consistent.\n4.  **Cycle Extension:** By triggering tensioning only when the drift-induced tension imbalance is detected (via $M$), you avoid unnecessary cycles and allow the tensioning system to work more efficiently. The \"shortening of cycles\" is a symptom of the system trying to compensate for the drift but failing because it's not addressing the root cause (lateral drift). By correcting the drift-induced tension imbalance, the belt remains centered, reducing the need for frequent, ineffective tensioning.\n\n**Measures it Relies On:**\n*   **Existing Ammeters:** Provide real-time current data for drive and tail motors.\n*   **Existing Belt-Speed Encoder:** Provides normalization for load changes and confirms the belt is moving (preventing false positives during stops).\n*   **Correlation:** There is a known physical correlation between lateral belt drift to the drive side and the differential torque demand on the drive vs. tail motors due to changes in belt wrap angle, skirt board friction, and tension distribution.\n\nThis approach uses only existing sensors to detect the *condition* causing the frequent tensioning (drift) and applies corrective action (tensioning) at the optimal time, thereby mitigating the shortening of tensioning cycles and the upward trend in drive motor amps.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "REASONING_THRASH_LEAK: Wait, the problem is *drift* and *shortening cycles*. Drift is lateral. Tensioning cycles are likely automatic",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycles' and the stated failure driver 'cycles' are the same action class (t",
+  "INPUT_UNAVAILABLE: required online signal 'continuously' is not among the permitted measures/signals; required online signal 'bel",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "Wait, the problem is *drift* and *shortening cycles*. Drift is lateral. Tensioning cycles are likely automatic. The issue is"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycles' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ],
+  "INPUT_UNAVAILABLE": [
+   "required online signal 'continuously' is not among the permitted measures/signals",
+   "required online signal 'belt speed' is not among the permitted measures/signals",
+   "derived feature input 'Amperometric Feedback' is not derivable from the permitted signals"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Amperometric Tensioning Gate**\n\n**Mechanism:**\nThe proposal replaces the existing time-based tensioning schedule with an event-driven trigger. A control logic block calculates a normalized drift index $M$ using the existing drive and tail motor ammeters and the belt-speed encoder. When $M$ exceeds a calibrated threshold indicating lateral drift toward the drive side, the system activates the existing tensioning actuator for a fixed, calibrated duration. If the actuator is a tail pulley adjuster, this action increases effective belt length and corrects the lateral bias. This prevents unnecessary tensioning events caused by normal load variations, thereby extending the operational interval between tensioning cycles. Simultaneously, by correcting drift before excessive friction develops, the drive motor current trend is stabilized.\n\n**Direction-of-Effect:**\n*   **Driving Variable:** The lateral position of the belt relative to the drive-side side rollers, inferred by the differential torque demand on the motors.\n*   **Direction:** As the belt drifts **toward the drive side**, the frictional load on the drive side increases relative to the tail side, causing the ratio of drive amperes to tail amperes (normalized by speed) to **increase**. An upward deviation in this metric signals the need for tensioning.\n\n**Implementation Bill:**\n1.  **Signal Acquisition:** Sample $I_{drive}$, $I_{tail}$, and $V_{belt}$ at 1 Hz.\n2.  **Metric Calculation:** Compute $M = \\frac{I_{drive} - k \\cdot I_{tail}}{V_{belt}}$. Calibrate $k$ during a baseline centered-belt run.\n3.  **Logic Gate:** Implement a setpoint $M_{th}$ and a hysteresis band. If $M > M_{th}$, set \"Tensioning Permitted\" to TRUE. If $M < M_{th} - Hysteresis$, set \"Tensioning Permitted\" to FALSE.\n4.  **Actuation:** The existing tensioning timer is overridden by the \"Tensioning Permitted\" flag. The timer only counts down when the flag is TRUE. Once the timer elapses, trigger the existing tensioning actuator for a fixed pulse width $P_{act}$.\n5.  **Safety Interlock:** Ensure tensioning does not initiate if $V_{belt}$ is below 50% of rated speed (stop condition).\n\n**Measures it Relies On:**\n*   **Existing Ammeters:** Provide $I_{drive}$ and $I_{tail}$.\n*   **Existing Belt-Speed Encoder:** Provides $V_{belt}$ for normalization and validity checks.\n*   **Existing Tensioning Actuator:** Executes the physical tension change. No new sensors are added.\n\n**Cost and Impact:**\n*   **Throughput/Availability:** No impact on conveyor speed or material throughput.\n*   **Energy:** Negligible increase in control energy. Potential reduction in drive motor energy due to reduced friction from proper centering.\n*   **Actuator Duty Cycle:** The fixed pulse width $P_{act}$ is set to match the mechanical travel time of the tensioning mechanism. The operational cost of the tensioning actuator is bounded by the maximum number of drift events per shift, which is expected to decrease significantly compared to time-based cycling.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Signal Acquisition:** Sample $I_{drive}$, $I_{tail}$, and $V_{belt}$ at 1 Hz.",
+   "2.  **Metric Calculation:** Compute $M = \\frac{I_{drive} - k \\cdot I_{tail}}{V_{belt}}$. C",
+   "3.  **Logic Gate:** Implement a setpoint $M_{th}$ and a hysteresis band. If $M > M_{th}$, ",
+   "4.  **Actuation:** The existing tensioning timer is overridden by the \"Tensioning Permitte",
+   "5.  **Safety Interlock:** Ensure tensioning does not initiate if $V_{belt}$ is below 50% o",
+   "*   **Existing Ammeters:** Provide $I_{drive}$ and $I_{tail}$.",
+   "*   **Existing Belt-Speed Encoder:** Provides $V_{belt}$ for normalization and validity ch",
+   "*   **Existing Tensioning Actuator:** Executes the physical tension change. No new sensors",
+   "*   **Throughput/Availability:** No impact on conveyor speed or material throughput.",
+   "*   **Energy:** Negligible increase in control energy. Potential reduction in drive motor ",
+   "*   **Actuator Duty Cycle:** The fixed pulse width $P_{act}$ is set to match the mechanica"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycles' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ]
+ }
+}

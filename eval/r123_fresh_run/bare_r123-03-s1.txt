@@ -1,0 +1,37 @@
+**Mitigation Proposal: Implementing a Thermal Efficiency-Based Maintenance Trigger (Suction Interference Detection)**
+
+**Mechanism**
+The rise in specific energy and discharge temperature, while holding discharge pressure and flow constant, indicates a loss in thermodynamic efficiency, most commonly caused by **suction valve (intake valve) failure** or **intercooling degradation**. When the suction valve leaks or sticks, some compressed air from the cylinder is re-expanded into the suction line or bypassed internally, causing the gas to undergo additional compression cycles without contributing to net output work. This "internal recirculation" significantly raises the discharge temperature and increases the power required per cubic meter of net delivered air.
+
+The mitigation relies on detecting this inefficiency using **existing sensors** by establishing a baseline for the specific power consumption and using discharge temperature as a real-time health indicator. The strategy is to **switch the compressor to a "constant power" operating mode with temperature-limited discharge pressure**, while simultaneously **increasing the suction filtration differential pressure monitoring frequency** (if the existing pressure transmitters across the filter can be logged) or, more critically, **enforcing a hard limit on discharge temperature to prevent mechanical damage** until the suction valve can be serviced.
+
+However, since the constraint strictly limits us to *existing* sensors (discharge pressure, discharge temperature, motor power meter) and forbids *new* instrumentation, the most actionable mitigation without hardware changes is a **Proactive Operational Limiting and Diagnostic Algorithm** using the existing signals to isolate the root cause and protect the asset.
+
+**Implementation**
+
+1.  **Baseline Establishment (Historical Data):**
+    *   Using the existing motor power meter and discharge pressure/temperature transmitters, log data during known-good operating periods.
+    *   Calculate the baseline **Specific Power Input (SPI)** = (Motor Power [kW]) / (Net Volumetric Flow [m³/h]). *Note: While net flow isn't directly measured by a new sensor, the plant likely has a downstream flow meter or the "delivered flow" is estimated from the pressure differential across the restriction or the system demand. If no flow meter exists, use the ratio of Power to Discharge Pressure at a fixed speed as a proxy for efficiency, or use Discharge Temperature as the primary efficiency surrogate.*
+    *   More practically, use the **Discharge Temperature (T_d)** as the primary anomaly indicator, since it is explicitly available. Establish the normal relationship between T_d and Discharge Pressure (P_d) and Power (W). A rise in T_d at constant P_d and W (or rising T_d at constant P_d and slightly higher W) signals inefficiency.
+
+2.  **Real-Time Monitoring and Alarm Logic (SCADA/PLC):**
+    *   Configure the existing control system to continuously calculate a **Temperature-to-Power Ratio** or simply monitor **Discharge Temperature** against a dynamic baseline.
+    *   **Algorithm:** If Discharge Temperature exceeds a predefined threshold (e.g., 5°C above the expected value for the current Discharge Pressure, or a 10% rise from the 30-day average at the same P_d and W), trigger a **"High Discharge Temperature" alarm**.
+    *   **Action 1 (Protective):** Automatically ramp down the compressor's Discharge Pressure setpoint by 10-15% (if variable speed) or reduce the load (if load/unload) to lower the compression ratio and thus the discharge temperature, preventing valve damage and oil coking. This immediately mitigates the thermal risk.
+    *   **Action 2 (Diagnostic Isolation):** Simultaneously, log the exact values of Power, P_d, and T_d. The combination of *high T_d* + *increased Power for the same P_d* is the signature of suction valve leakage. If T_d is high but Power is normal, it might be cooling system failure. This data helps the maintenance team prioritize the root cause.
+
+3.  **Preventive Maintenance Scheduling:**
+    *   Use the historical log of T_d excursions to track the trend. Schedule suction valve inspection/replacement based on the frequency and severity of these temperature excursions, rather than fixed time intervals. This targets the root cause identified by the sensor signature.
+
+**Measures Relied Upon (Existing Sensors Only)**
+
+*   **Discharge Temperature Transmitter (T_d):** Used as the primary indicator of thermodynamic inefficiency and thermal stress. The rise in T_d is the direct consequence of internal recirculation or cooling failure.
+*   **Discharge Pressure Transmitter (P_d):** Used to normalize the temperature reading. Temperature must be evaluated relative to the pressure ratio (which is related to P_d). A high T_d at low P_d is less critical than a high T_d at high P_d.
+*   **Compressor Motor Power Meter (W):** Used to confirm the energy rise. The problem states "specific energy... has risen," which is directly measured by W. The correlation between rising W and rising T_d confirms the inefficiency is internal (compression-related) rather than just external load.
+*   **Existing SCADA/PLC Logic:** Used to implement the alarms, trends, and setpoint adjustments without adding any new physical hardware.
+
+**Outcome**
+This mitigation does not fix the valve immediately but **mitigates the failure mode** by:
+1.  **Preventing catastrophic damage:** Reducing discharge pressure/temperature to protect the valves and oil.
+2.  **Identifying the root cause:** Using the sensor signature (High T_d + High W) to diagnose suction valve leakage, guiding targeted maintenance.
+3.  **Maintaining safe operation:** Ensuring the compressor continues to run within safe thermal limits until the valve can be repaired, using only the instrumentation already present.

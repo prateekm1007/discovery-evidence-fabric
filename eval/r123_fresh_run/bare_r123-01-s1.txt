@@ -1,0 +1,32 @@
+**Mitigation Proposal: Implement a Predictive Moisture Estimator Using Dry-Bulb/Dry-Bulb Temperature Differential and Feed Rate**
+
+**Mechanism:**
+Replace the reactive "moisture loop" (which likely waits for direct moisture measurement or long thermal lag) with a **feedforward predictive control** strategy based on a real-time "Dryer Efficiency Index." This index is derived from existing signals to estimate the *rate of moisture removal* versus the *rate of moisture input*. By predicting the exit product moisture before it physically manifests at the sensor, the controller can adjust the dryer inlet temperature or residence time (via speed) proactively.
+
+**Implementation:**
+1.  **Calculate Wetting Factor (WF):**
+    *   Compute the **Inlet Wet-Bulb Temperature ($T_{wb,in}$)** and **Inlet Dry-Bulb Temperature ($T_{db,in}$)**.
+    *   Compute the **Outlet Dry-Bulb Temperature ($T_{db,out}$)** and **Outlet Wet-Bulb Temperature ($T_{wb,out}$)**.
+    *   Calculate the **Effective Heat Availability** as the difference between the inlet air's potential cooling capacity and the actual exit conditions. A key proxy for air-side moisture absorption capacity is the **Psychrometric Moisture Potential**:
+        $$ \Delta \Psi = (T_{db,in} - T_{wb,in}) - (T_{db,out} - T_{wb,out}) $$
+        *Note: As the dryer becomes less efficient or overload occurs, the temperature difference between dry and wet bulb at the outlet will converge (lower $\Delta T$), indicating the air is saturated and losing drying capacity.*
+    *   Combine this with the **Feed Rate ($F$)** from the meter to create a normalized **Load Density**:
+        $$ \text{Load} = \frac{F}{\Delta \Psi_{in}} $$
+        Where $\Delta \Psi_{in} = T_{db,in} - T_{wb,in}$ is the maximum available drying power of the incoming air.
+
+2.  **Create a Reference Curve:**
+    *   Map historical data of $\text{Load}$ against known "Good" product moisture levels to establish a target threshold: $\text{Load}_{max}$.
+    *   If $\text{Load} > \text{Load}_{max}$, the dryer is thermodynamically overloaded relative to its current capacity.
+
+3.  **Control Logic (PID/FF):**
+    *   **Primary Control:** Use the **Feed Rate ($F$)** as the setpoint reference. Instead of controlling based on exit temperature (which is lagging and climbing), control the **Inlet Dry-Bulb Temperature ($T_{db,in}$)** to maintain the calculated $\Delta \Psi$ at a target level that keeps $\text{Load}$ within the stable range.
+    *   **Secondary Safety:** If $T_{db,out}$ exceeds a safe upper limit *while* the moisture estimate is high, this confirms inefficiency. The controller should then **reduce feed rate** (if process allows) or **increase inlet temperature** (if heating capacity allows) to restore the drying potential gap ($\Delta \Psi$).
+    *   **Anti-Windup:** Since the old loop reacted late, use the **Inlet Wet-Bulb vs. Dry-Bulb** spread as a leading indicator. If the inlet spread narrows unexpectedly (indicating humid air supply), preemptively lower the feed rate before exit moisture rises.
+
+**Measures Relied On:**
+1.  **Inlet Dry-Bulb & Wet-Bulb Probes:** Used to calculate the initial psychrometric properties of the drying medium (air), specifically the latent heat capacity ($\Delta T_{in} = T_{db,in} - T_{wb,in}$). This is the "fuel" for drying.
+2.  **Outlet Dry-Bulb & Wet-Bulb Probes:** Used to detect the "saturation point" of the exhaust. A rising $T_{db,out}$ coupled with a shrinking $\Delta T_{out}$ (dry-wet difference) signals that the air has reached its moisture holding capacity, meaning the product will retain more moisture. This provides the *early* warning that the exit temperature climb is a symptom of overload, not just a temperature control issue.
+3.  **Feed-Rate Meter:** Provides the numerator for the Load calculation. By normalizing heat input by mass flow, the system can distinguish between "more material" (requiring more heat or slower speed) and "less effective heat" (requiring higher temperature or drier air).
+
+**Why this fixes the problem:**
+The original failure is "late reaction" because the controller waits for the product to actually become too wet. The new mitigation uses the **thermodynamic state of the air** (via wet/dry bulb differentials) as a real-time proxy for drying *capacity*. Since air saturation occurs before product moisture exits, this method provides a leading indicator. The climbing exit temperature at constant feed rate is diagnosed as a system trying to compensate for reduced drying efficiency; the new logic addresses the root cause (capacity vs. load mismatch) rather than just symptomatically raising temperature.

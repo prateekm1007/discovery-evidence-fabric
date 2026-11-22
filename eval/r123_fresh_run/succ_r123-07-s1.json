@@ -1,0 +1,51 @@
+{
+ "problem_id": "r123-07-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [fresh set] + bind check + bare reviewer fixes)",
+ "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a **Pressure-Bounded Pulse-Cleaning Algorithm** that dynamically adjusts the compressed-air valve dwell time and pulse frequency based on the real-time differential pressure (DP) rise rate, using the clean-air plume opacity meter to validate cleaning efficacy and prevent over-cleaning that contributes to air consumption.\n\nThe core mechanism shifts from a fixed-time periodic cleaning to a **DP-triggered, opacity-verified cleaning mode**. The climbing DP after each cycle indicates that the filter media is re-encrusted before the next scheduled clean (due to excessive dust cake buildup or \"blinding\") while the rising air consumption suggests the valves are opening for too long or the system pressure is being compensated by a failing regulator, wasting air. The algorithm restricts air usage by only cleaning when DP exceeds a threshold and stopping immediately when opacity spikes drop (indicating clean fabric), thereby reducing total air volume per clean and preventing the cycle-by-cycle DP accumulation by ensuring each clean is *effective* rather than merely *frequent*.\n\n**Implementation:**\n1.  **Modify the PLC/Controller Logic:** Reprogram the existing cleaning timer to monitor the **baghouse DP taps** continuously. Establish a dynamic \"Clean-Initiate\" threshold (e.g., DP > 4.0 in. w.c.) and a \"Clean-Stop\" threshold (e.g., DP drop of 10% from peak or opacity meter reads >95% transmission).\n2.  **Opacity-Gated Termination:** Integrate the **clean-air plume opacity meter** as the primary stop criterion. The pulse sequence stops as soon as the opacity meter indicates the exhaust plume has cleared (low opacity). This prevents the \"blind\" extended pulsing that wastes compressed air and can re-blind the filter with loose dust.\n3.  **Regulator Diagnostics Loop:** Use the **compressed-air pressure regulator gauge** signal (if 4-20mA/Analog input available) or periodic manual logging to establish a baseline. If the DP rise rate post-clean is steep *and* the opacity meter shows persistent high opacity during initial pulses, the controller flags a \"Media Failure\" or \"Valve Leakage\" condition, reducing pulse frequency to a maintenance crawl (max 1 pulse/10 min) to isolate the issue without wasting air.\n\n**Measures It Relies On:**\n*   **Baghouse DP Taps:** Used to trigger the start of the cleaning sequence (replacing time-based timers) and to monitor the rate of DP recovery post-pulse. A slow DP drop indicates the fabric is \"blinded\" or the pulse is ineffective, prompting the opacity check.\n*   **Clean-Air Plume Opacity Meter:** Used as the **terminating condition** for the cleaning sequence. High opacity (low transmission) signifies that dust is still being discharged or the fabric is saturated; low opacity confirms the fabric is permeable and clean. This directly reduces air consumption by cutting off pulses the moment the fabric is clean, rather than running a fixed duration.\n*   **Compressed-Air Pressure Regulator Gauge:** Used to verify that the supply pressure remains stable during cleaning. If the gauge shows a significant pressure drop during pulse events while the DP does not recover, it indicates an under-sized air supply or a leaking manifold, prompting the operator to adjust the regulator or reduce pulse frequency to compensate, thereby conserving total air consumption.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (the",
+  "INPUT_UNAVAILABLE: required online signal 'rate of DP' is not among the permitted measures/signals",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ],
+  "INPUT_UNAVAILABLE": [
+   "required online signal 'rate of DP' is not among the permitted measures/signals"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "a: **a DP threshold crossing (the trigger variable), the direction: an *increase* in DP across the baghouse (the physical state indicating accumulated dust) causes the mechanism to actuate the air valves, and the result is a *decrease* in exhaust opacity and a *decrease* in the downstream DP, restoring permeability. The remedy is not to \"manage the cycle,\" but to **decouple cleaning actuation from time and couple it strictly to the physical state of the filter media**, using opacity as the termination proof.\n\n**Implementation:**\n1.  **Modify the PLC/Controller Logic:** Reprogram the existing cleaning sequence to monitor the **baghouse DP taps** continuously. Establish a static \"Clean-Initiate\" threshold (e.g., DP > 4.0 in. w.c.). The controller triggers a cleaning pulse only when this threshold is crossed, replacing the fixed-time timer.\n2.  **Opacity-Gated Termination:** Integrate the **clean-air plume opacity meter** as the primary stop criterion. The pulse sequence continues until the opacity meter indicates the exhaust plume has cleared (low opacity/high transmission). This prevents \"blind\" extended pulsing that wastes compressed air and can re-blind the filter with loose dust.\n3.  **Regulator Diagnostics Loop:** Use the **compressed-air pressure regulator gauge** (via manual logging or trend if available) to verify supply pressure stability. If the gauge shows a significant pressure drop during pulse events while the DP does not recover, the operator adjusts the regulator or reduces pulse frequency to compensate, conserving total air consumption.\n\n**Measures It Relies On:**\n*   **Baghouse DP Taps:** Used to trigger the start of the cleaning sequence (replacing time-based timers) and to monitor the post-pulse state. A failure of DP to drop after a pulse indicates the fabric is \"blinded,\" prompting reliance on the opacity check.\n*   **Clean-Air Plume Opacity Meter:** Used as the **terminating condition** for the cleaning sequence. High opacity (low transmission) signifies that dust is still being discharged or the fabric is saturated; low opacity confirms the fabric is permeable and clean. This directly reduces air consumption by cutting off pulses the moment the fabric is clean, rather than running a fixed duration.\n*   **Compressed-Air Pressure Regulator Gauge:** Used to verify that the supply pressure remains stable during cleaning. Significant drops indicate supply issues or leaks, prompting operator intervention to conserve air.\n\n**IMPLEMENTATION BILL**\n*   **Operational Cost:** Zero incremental energy cost. The change is purely logical (PLC reprogramming). Compressed air consumption is expected to *decrease* due to opacity-gated termination, reducing compressor load and electricity usage for compressed air generation.\n*   **Throughput/Affiliability Impact:** None. The baghouse is not a throttling device for process flow in this context; it is an emissions control device. Cleaning efficacy is maintained or improved by ensuring each pulse is effective (verified by opacity) rather than merely frequent.\n*   **Availability:** Improved system availability. By preventing \"blinding\" (excessive cake buildup) through state-based cleaning, the risk of catastrophic DP failure and forced shutdown is reduced. The regulator diagnostic loop adds a layer of preventive maintenance without reducing uptime.\n*   **Labor Cost:** Initial one-time engineering cost for PLC logic modification and threshold tuning. Ongoing cost: Minimal. Operator responsibility shifts from \"watching the timer\" to \"watching the opacity trend\" and \"checking the regulator gauge\" periodically. No new instrumentation or sensors required, as per constraints.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Operational Cost:** Zero incremental energy cost. The change is purely logical (PLC ",
+   "*   **Throughput/Affiliability Impact:** None. The baghouse is not a throttling device for",
+   "*   **Availability:** Improved system availability. By preventing \"blinding\" (excessive ca",
+   "*   **Labor Cost:** Initial one-time engineering cost for PLC logic modification and thres"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Labor Cost:** Initial one-time engineering cost for PLC logic modification and threshold tuning. Ongoing"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ],
+  "INPUT_UNAVAILABLE": [
+   "required online signal 'post-pulse state' is not among the permitted measures/signals"
+  ]
+ }
+}
