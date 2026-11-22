@@ -1,0 +1,80 @@
+{
+ "problem_id": "f31a-01-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [committed bytes] + bind check + bare reviewer fixes)",
+ "authored_bill": "**Mitigation Proposal: Fouling-Adjusted Heat Transfer Monitoring and Predictive Cleaning Trigger**\n\n**Mechanism:**\nImplement a software-based fault detection and diagnostic (FDD) loop that continuously calculates the *effective* overall heat transfer coefficient ($U_{eff}$) of the exchanger in real-time using only existing process variables. Instead of relying on a fixed temperature setpoint, the system monitors the *deviation* between the expected heat duty (based on mass flow and inlet/outlet temperature differences under clean conditions) and the actual heat duty. As fouling accumulates, $U_{eff}$ drops, causing the outlet temperature to rise for a given flow and load. The mitigation involves using this calculated performance degradation to trigger cleaning *before* the outlet temperature exceeds a critical limit, rather than waiting for a manual schedule or total failure.\n\n**Implementation:**\n1.  **Baseline Establishment:** During the initial \"clean\" state after a chemical cleaning, record the steady-state relationship between brine mass flow rate ($\\dot{m}$, from the flow meter), brine inlet temperature ($T_{in}$, from thermocouple), and brine outlet temperature ($T_{out}$, from thermocouple). Calculate the baseline log-mean temperature difference ($\\Delta T_{lm}$) and the associated baseline heat duty ($Q_{baseline} = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{in})$). Store the corresponding baseline $U_{clean} = Q_{baseline} / (A \\cdot \\Delta T_{lm})$ (where $A$ is known surface area).\n2.  **Real-Time Monitoring:** Create a continuous calculation routine that runs every minute:\n    *   Read current $\\dot{m}$, $T_{in}$, and $T_{out}$.\n    *   Calculate current $\\Delta T_{lm}$ (assuming shell-side temperature is stable or its variation is slow enough to be tracked via the brine-side energy balance).\n    *   Calculate current heat duty $Q_{current} = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{in})$.\n    *   Calculate current effective U-value: $U_{eff} = Q_{current} / (A \\cdot \\Delta T_{lm})$.\n3.  **Fouling Factor Estimation:** Compute the fouling resistance $R_f$ using the formula $R_f = \\frac{1}{U_{eff}} - \\frac{1}{U_{clean}}$. Track the trend of $R_f$ over time.\n4.  **Action Trigger:** Set a threshold on $R_f$ (e.g., when $R_f$ exceeds 20% of its maximum allowable value, or when $U_{eff}$ drops by 10% from $U_{clean}$). When this threshold is crossed, automatically generate a \"Cleaning Required\" alarm and suggest scheduling a chemical cleaning. This prevents the outlet temperature from creeping up to unacceptable levels by ensuring cleaning occurs based on actual thermal performance degradation rather than calendar time.\n\n**Measures Relied Upon:**\n*   **Brine Mass Flow Rate ($\\dot{m}$):** From the existing flow meter.\n*   **Brine Inlet Temperature ($T_{in}$):** From the existing inlet thermocouple.\n*   **Brine Outlet Temperature ($T_{out}$):** From the existing outlet thermocouple.\n*   **Known Physical Constants:** Brine specific heat capacity ($c_p$) and exchanger heat transfer area ($A$) are process knowledge, not new sensors.\n*   **Assumption of Quasi-Steady-State Shell-Side Conditions:** The method assumes that for the short-term monitoring intervals, the shell-side temperature profile is sufficiently stable or that its impact is dominated by the brine-side fouling trend. If shell-side conditions vary significantly, the baseline $U_{clean}$ might need periodic re-calibration during known clean periods, but no new hardware is added.\n\nThis approach uses *only* the existing instruments to derive a new performance metric (fouling resistance trend), enabling proactive maintenance and preventing the gradual rise in outlet temperature between cleanings.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_AS_REMEDY: the mechanism's active ingredient 'Heat' matches the problem's stated failure driver — a remedy may not be the",
+  "INPUT_UNAVAILABLE: required online signal 'system' is not among the permitted measures/signals; derived feature input 'the brine-",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_AS_REMEDY": [
+   "the mechanism's active ingredient 'Heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+  ],
+  "INPUT_UNAVAILABLE": [
+   "required online signal 'system' is not among the permitted measures/signals",
+   "derived feature input 'the brine-side energy balance)' is not derivable from the permitted signals"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Fouling-Adjusted Heat Transfer Monitoring and Predictive Cleaning Trigger**\n\n**Direction-of-Effect Statement:**\nThe driving variable for this failure is the accumulation of solid fouling deposits on the tube inner surfaces. The direction of the mechanical effect is a progressive *increase* in thermal resistance ($R_f$), which causes a *decrease* in the effective overall heat transfer coefficient ($U_{eff}$). Consequently, for a fixed heat load and flow rate, the brine outlet temperature ($T_{out}$) will *increase*. The proposed remedy does not add heat; rather, it detects the thermal degradation trend using existing cold-side signals to predict the point where performance limits are violated.\n\n**Mechanism:**\nImplement a software-based fault detection and diagnostic (FDD) loop that continuously calculates the *effective* overall heat transfer coefficient ($U_{eff}$) of the exchanger in real-time using only existing process variables. Instead of relying on a fixed temperature setpoint, the system monitors the *deviation* between the expected heat duty (based on mass flow and temperature differences under clean conditions) and the actual performance. As fouling accumulates, $U_{eff}$ drops, causing the outlet temperature to rise for a given flow and load. The mitigation involves using this calculated performance degradation to trigger cleaning *before* the outlet temperature exceeds a critical limit, rather than waiting for a manual schedule or total failure.\n\n**Implementation Bill:**\nThis section defines the required engineering actions, their timing, and cost implications. No new hardware is purchased; the cost is allocated to software configuration and operational labor.\n\n1.  **Software Configuration & Baseline Calibration (One-time Cost):**\n    *   **Action:** Engineer configures the DCS/SCADA logic to calculate $U_{eff}$ and $R_f$ as defined below.\n    *   **Labor:** 4 hours of engineering time for logic development and testing.\n    *   **Hardware:** $0 (uses existing controller logic).\n    *   **Cost:** Internal labor allocation only.\n\n2.  **Operational Monitoring (Recurring Cost):**\n    *   **Action:** The FDD loop runs every 5 minutes.\n    *   **Throughput/Energy Impact:** Negligible. The computational load is negligible on existing controllers. No change to pump speeds or compressor loads is required by the algorithm itself.\n    *   **Availability Impact:** Zero. The monitoring process does not interfere with process operation.\n\n3.  **Cleaning Schedule Adjustment (Operational Cost):**\n    *   **Action:** When the calculated fouling resistance $R_f$ crosses the threshold (defined below), a \"Cleaning Required\" alarm is generated.\n    *   **Labor:** Cleaning crew response time is reduced by ~24-48 hours compared to calendar-based schedules because the trigger is earlier and more accurate.\n    *   **Chemical Cost:** Chemical usage remains constant per cleaning event. However, by preventing severe fouling (which often requires more aggressive cleaning or mechanical scraping), we reduce the frequency of emergency shutdowns and potential tube damage.\n    *   **Product Loss:** Reduced. By triggering cleaning before $T_{out}$ exceeds the process limit, we avoid product rejection due to temperature excursion.\n\n**Implementation Details (Corrected):**\n1.  **Baseline Establishment:** During the initial \"clean\" state after a chemical cleaning, record the steady-state relationship between brine mass flow rate ($\\dot{m}$, from the flow meter), brine inlet temperature ($T_{in}$, from thermocouple), and brine outlet temperature ($T_{out}$, from thermocouple). Calculate the baseline log-mean temperature difference ($\\Delta T_{lm}$) and the associated baseline heat duty ($Q_{baseline} = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{in})$). Store the corresponding baseline $U_{clean} = Q_{baseline} / (A \\cdot \\Delta T_{lm})$ (where $A$ is known surface area).\n2.  **Real-Time Monitoring:** Create a continuous calculation routine that runs every 5 minutes:\n    *   Read current $\\dot{m}$, $T_{in}$, and $T_{out}$.\n    *   **Crucial Correction:** To avoid requiring unavailable shell-side temperatures, we define the \"Expected Clean Performance\" not as a fixed $\\Delta T_{lm}$, but as a dynamic function of the *known* brine-side inputs. We assume the shell-side fluid (refrigerant/heat source) operates at a nearly constant temperature or saturation pressure which is a known process constant ($T_{shell, nominal}$). The log-mean temperature difference is calculated using the *known* shell-side nominal temperature and the *measured* brine temperatures:\n        $$ \\Delta T_{lm} = \\frac{(T_{shell, nominal} - T_{in}) - (T_{shell, nominal} - T_{out})}{\\ln\\left(\\frac{T_{shell, nominal} - T_{in}}{T_{shell, nominal} - T_{out}}\\right)} $$\n        This removes the dependency on real-time shell-side sensing, which is not available.\n    *   Calculate current heat duty $Q_{current} = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{in})$.\n    *   Calculate current effective U-value: $U_{eff} = Q_{current} / (A \\cdot \\Delta T_{lm})$.\n3.  **Fouling Factor Estimation:** Compute the fouling resistance $R_f$ using the formula $R_f = \\frac{1}{U_{eff}} - \\frac{1}{U_{clean}}$. Track the trend of $R_f$ over time.\n4.  **Action Trigger:** Set a threshold on $R_f$ (e.g., when $R_f$ exceeds 20% of its maximum allowable value). When this threshold is crossed, automatically generate a \"Cleaning Required\" alarm. This prevents the outlet temperature from creeping up to unacceptable levels by ensuring cleaning occurs based on actual thermal performance degradation rather than calendar time.\n\n**Measures Relied Upon:**\n*   **Brine Mass Flow Rate ($\\dot{m}$):** From the existing flow meter.\n*   **Brine Inlet Temperature ($T_{in}$):** From the existing inlet thermocouple.\n*   **Brine Outlet Temperature ($T_{out}$):** From the existing outlet thermocouple.\n*   **Known Process Constants:** Brine specific heat capacity ($c_p$), exchanger heat transfer area ($A$), and the nominal shell-side operating temperature ($T_{shell, nominal}$). $T_{shell, nominal}$ is derived from the known refrigerant type and operating pressure setting, which is standard process knowledge, not a new sensor.\n*   **Assumption:** The shell-side temperature remains at the nominal saturation/operating value. If the shell-side load varies significantly, the $U_{clean}$ baseline may need re-calibration during known clean periods, but this requires no new hardware.\n\nThis approach uses *only* the existing instruments and known process constants to derive a new performance metric (fouling resistance trend), enabling proactive maintenance and preventing the gradual rise in outlet temperature between cleanings.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Software Configuration & Baseline Calibration (One-time Cost):**",
+   "*   **Action:** Engineer configures the DCS/SCADA logic to calculate $U_{eff}$ and $R_f$ a",
+   "*   **Labor:** 4 hours of engineering time for logic development and testing.",
+   "*   **Hardware:** $0 (uses existing controller logic).",
+   "*   **Cost:** Internal labor allocation only.",
+   "2.  **Operational Monitoring (Recurring Cost):**",
+   "*   **Action:** The FDD loop runs every 5 minutes.",
+   "*   **Throughput/Energy Impact:** Negligible. The computational load is negligible on exis",
+   "*   **Availability Impact:** Zero. The monitoring process does not interfere with process ",
+   "3.  **Cleaning Schedule Adjustment (Operational Cost):**",
+   "*   **Action:** When the calculated fouling resistance $R_f$ crosses the threshold (define",
+   "*   **Labor:** Cleaning crew response time is reduced by ~24-48 hours compared to calendar",
+   "*   **Chemical Cost:** Chemical usage remains constant per cleaning event. However, by pre",
+   "*   **Product Loss:** Reduced. By triggering cleaning before $T_{out}$ exceeds the process",
+   "1.  **Baseline Establishment:** During the initial \"clean\" state after a chemical cleaning",
+   "2.  **Real-Time Monitoring:** Create a continuous calculation routine that runs every 5 mi",
+   "*   Read current $\\dot{m}$, $T_{in}$, and $T_{out}$.",
+   "*   **Crucial Correction:** To avoid requiring unavailable shell-side temperatures, we def",
+   "*   Calculate current heat duty $Q_{current} = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{in})$",
+   "*   Calculate current effective U-value: $U_{eff} = Q_{current} / (A \\cdot \\Delta T_{lm})$",
+   "3.  **Fouling Factor Estimation:** Compute the fouling resistance $R_f$ using the formula ",
+   "4.  **Action Trigger:** Set a threshold on $R_f$ (e.g., when $R_f$ exceeds 20% of its maxi",
+   "*   **Brine Mass Flow Rate ($\\dot{m}$):** From the existing flow meter.",
+   "*   **Brine Inlet Temperature ($T_{in}$):** From the existing inlet thermocouple.",
+   "*   **Brine Outlet Temperature ($T_{out}$):** From the existing outlet thermocouple.",
+   "*   **Known Process Constants:** Brine specific heat capacity ($c_p$), exchanger heat tran",
+   "*   **Assumption:** The shell-side temperature remains at the nominal saturation/operating"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "Correction:** To avoid requiring unavailable shell-side temperatures, we define the \"Expected Clean Performance\" not as a fixed $\\De"
+  ],
+  "APPARATUS_ROW": [
+   "2.  **Operational Monitoring (Recurring Cost):**",
+   "*   **Availability Impact:** Zero. The monitoring process does not interfere with process operation.",
+   "2.  **Real-Time Monitoring:** Create a continuous calculation routine that runs every 5 minutes:"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_AS_REMEDY": [
+   "the mechanism's active ingredient 'Heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+  ],
+  "INPUT_UNAVAILABLE": [
+   "required online signal 'system' is not among the permitted measures/signals"
+  ]
+ }
+}
