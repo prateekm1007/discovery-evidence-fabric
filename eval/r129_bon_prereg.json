@@ -1,0 +1,34 @@
+{
+ "record": "R129_BON_PREREG/1.0.0",
+ "claim": "c-0205",
+ "work_id": "r129-bon-bindselect-round1",
+ "session": "builder-r129s1",
+ "role": "EXECUTOR",
+ "authored_at": "2026-11-22 (sandbox clock)",
+ "base_sha": "f404f2466",
+ "authority": "the R129 verdict dir 5 (Phase-B elite levers, ablation-gated) + the deep-research thesis: test-time compute on VERIFICATION/SELECTION by the trustworthy deterministic metric, not generation ceremony (Art. 20 governs; the retired AIDE population stays retired)",
+ "question": "Does verifier-guided best-of-n=2 + bind-select beat the incumbent single-shot bare+binds arm on delivered-defect count over the SAME 24 r125_f31e_set items, within 2 rounds (Art. 20)?",
+ "arm_under_test": {
+  "name": "bon2-bindselect",
+  "per_item": [
+   "two INDEPENDENT bare-author calls (byte-identical frozen authoring_prompt; the F31e d1/d2 draw mechanics — provider-side sampling gives distinct candidates)",
+   "the canonical check_layer bind battery on EACH raw candidate (the deterministic verifier)",
+   "reviewer-fix ONLY candidates with surfaced findings (the frozen v1 IMPROVED_DIRECTIVE bytes + the accepted Phase-A one-field response_format contract)",
+   "post-review defect scoring of EACH delivered candidate via bill_defect_classes (the canonical four defect classes, byte rule of the accepted scorers)"
+  ],
+  "selection_rule": "the candidate with FEWER bill_defect_classes entries on its delivered bytes is selected; exact tie (including 0-0) -> candidate 1 (preregistered deterministic tiebreak); a typed-failed candidate (TYPED_CALL_FAIL / TYPED_PARSE_FAIL) scores +inf in selection and is NEVER silently dropped; both candidates typed-fail -> the item is TYPED_CALL_FAIL and is excluded from the arm tally, counted in the record",
+  "n_candidates": 2,
+  "cost": "48 author calls + <=48 reviewer calls worst case on agnes-3.0-flash (the registered generator), workers 2, 8 s spacing, the established transport backoff (4 x 120 s on rate_limited/transport ONLY; parse failures never retried), byte-resume, per-leg transport_attempts recorded (the r128 dir-5 commitment)"
+ },
+ "incumbent": {
+  "name": "single-shot bare+binds (the cheapest working arm, Art. 20)",
+  "source": "the COMMITTED F31e accepted records (eval/r125_f31e_run/succ_d{1,2}_*.json, 48 rows over the same 24 items) — recomputed from committed bytes by the scorer, never assumed",
+  "expected": "pooled delivered-defect rows 2/48 (the accepted treated number) — the scorer must reproduce this from bytes before the gate is read"
+ },
+ "primary_metric": "delivered-defect rows on the canonical detector classes (input_availability, duty_pricing, constraint_violation, physics_direction_inversion) via bill_defect_classes on the delivered bill bytes — the byte rule of the accepted F31e/Phase-A scorers",
+ "gate_art20": "ROUND-1 WIN if selected-arm delivered-defect rows < incumbent recomputed delivered-defect rows on the same 24 items (incumbent pooled over both committed draws); EXACT TIE -> round 2 at n=3; WORSE -> DELETE the arm (Art. 20 auto-retire). No score claims from a speed/selection accept either way.",
+ "honest_bounds": "n=24 selected rows vs the incumbent's 48 committed rows: the comparison is on the SAME items but NOT the same number of draws; a win is typed as a round-1 accept of the ablation arm, NOT a capability-score event and NOT a significance claim (the item-clustered CI lesson of r128 stands — width typed, Art. 14)",
+ "variable_isolation": "the authoring bytes, the reviewer directive bytes, the schema contract and the detector are ALL the accepted frozen bytes; the ONLY variable is candidate count (1 -> 2) + the selection step; zero engine lines in this work (scripts/ + eval/ only — Art. 27 INFRASTRUCTURE/MEASUREMENT disclosure)",
+ "fail_closed": "parse failure = TYPED_PARSE_FAIL, no retry loop (the retired repair loop stays retired); quota probe fail at start = typed INFRA_QUOTA_WALL refusal, no run",
+ "quota_probe": "one agnes readiness call before the batch (the phaseA pattern)"
+}
