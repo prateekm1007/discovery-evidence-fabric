@@ -1,0 +1,55 @@
+{
+ "record": "R132_PANEL_PREREG/1.0.0",
+ "claim": "c-0211",
+ "base": "9ec48ff57",
+ "typed_at": "2026-11-23 (sandbox clock; true-UTC discipline typed in-dir-7 — the sandbox clock runs ~3.5h ahead of the commit timestamps' UTC)",
+ "authority": "the R131 auditor verdict DIR 2 (TOP — loop-owned panel via the HF router, AM46/CORR-R131-1) + the governing ROADMAP_PHASES_R48 P4 panel-calibration gate",
+ "judges": [
+  {
+   "model": "meta-llama/Llama-3.3-70B-Instruct",
+   "family": "meta-llama"
+  },
+  {
+   "model": "Qwen/Qwen3-32B",
+   "family": "qwen"
+  },
+  {
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "family": "deepseek"
+  },
+  {
+   "model": "CohereLabs/c4ai-command-r7b-12-2024",
+   "family": "cohere"
+  }
+ ],
+ "judge_exclusion": "all 4 families != the generator family (agnes via z-ai gateway) AND mutually distinct — provider AND model both outside the generator set (judge!=generator per P4)",
+ "corpora": {
+  "rcal": "the auditor's r5 per-axis labels (audit branch 60657db7d, eval/auditor_judgments_r11_r5.json — 10 pairs: a1/baseline arm bytes from the committed queue-branch pairs, the r10_judge_recalibrate loader pattern)",
+  "gold_auc": "the auditor's gold set (audit branch audit/gold_set/AUDITOR_GOLD_SET_v1.json — 6 BAD typed-defect specimens vs 4 GOOD; NOTE per its custody line this is the AUDITOR's self-check set read from the public audit branch for AUC-qualification ONLY — the panel qualification reads labels the auditor already made public; the builder does not calibrate against any UNEXPOSED holdout (v16 stays the auditor's sealed lane, dir 5))"
+ },
+ "protocol": {
+  "blind_swap": "the committed _rubric_prompt byte-exact (A/B randomized by sha256(problem_id::pair) parity per its own contract) + the r10 calibrated per-axis suffix (PER_AXIS_SUFFIX_V2); the judge never sees arm names",
+  "transport": "hf_router_chat (route_adapter/2.1.0, the proven funded path) — NOT the agnes gateway; one parse retry per leg (the _judge_judgment_call contract), raw output logged per record",
+  "order": "R-CAL FIRST: all 4 judges x 10 r5 pairs; then qualification is computed; only R-CAL-qualified judges (acc>=0.8 incl. ties, answered>=0.9) proceed to the panel tally"
+ },
+ "gate_preregistered": {
+  "rcal_qualify": "per judge: accuracy >= 0.8 on the 10 prefer labels (exact match incl. TIE) AND answered_rate >= 0.9 (valid parsed JSON object with the contract keys)",
+  "panel_agreement": "the qualified panel's per-pair majority-prefer vs the auditor labels: agreement >= 0.7; pairwise Cohen's kappa on prefer >= 0.6 (mean over qualified-judge pairs)",
+  "panel_auc": "the qualified panel's mean novelty score separates the 6 BAD from the 4 GOOD gold specimens: AUC >= 0.8 (Mann-Whitney U / (n1*n2), GOOD > BAD direction)",
+  "independence": "ALL gate numbers computed by scripts/r132_panel_recompute.py — an INDEPENDENT script reading ONLY the raw per-judge records (auditor Art. 13: never the producing driver's own summary)",
+  "pass_note": "this window delivers the CALIBRATION gate (the P4 'PANEL CALIBRATION GATE'); the >=50% viable+non-obvious production gate is a LATER window's rung — typed separately, never conflated"
+ },
+ "artifacts": [
+  "eval/r132_panel/<judge>__<pid>.json (raw per-leg records, unswapped+auditor labels for the >=20% cross-check)",
+  "eval/r132_panel_calibration.json (the recompute's output — the gate record)",
+  "scripts/r132_panel_calibrate.py (the driver)",
+  "scripts/r132_panel_recompute.py (the independent tally)"
+ ],
+ "frozen": [
+  "_rubric_prompt + PER_AXIS_SUFFIX_V2 bytes (committed)",
+  "the r5 labels + gold set (audit-branch bytes)",
+  "judge models (4, named above)",
+  "hf_router_chat transport"
+ ],
+ "power_note": "auditor Art. 14: n=10 pairs is the P4-spec'd calibration slice (the spec itself says '10-item slice'); the qualification is per-judge on 10 labels (power typed honestly as the spec's own n); the production panel gate (>=50% viable) will pre-register its own n"
+}
