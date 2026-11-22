@@ -139,14 +139,14 @@ def test_frozen_machine_untouched():
     re-freeze (claim c-0186, adjudication e8bbb5134a1e — the
     auditor-ordered detector-side distinction in
     scan_input_availability ONLY): the r40_machine_v77.py sha16
-    stays at the re-frozen pin and the machine call site still
+    stays at the re-frozen pin (#4, R125 dir-3) and the machine call site still
     imports the merged scan. The pin moved once before (R64s4
     conscious re-freeze) with the changed-file map disclosed in
     eval/r64_v9_preflight.json re_freeze_note."""
     import hashlib
     p = REPO / "scripts/r40_machine_v77.py"
     sha16 = hashlib.sha256(p.read_bytes()).hexdigest()[:16]
-    assert sha16 == "b95afc9006223bcd", sha16  # R124 F97 re-freeze (c-0186): scan_input_availability only; the formula-direction surface below unchanged
+    assert sha16 == "92485038719557e4", sha16  # R125 re-freeze #4 (c-0189 dir 3): scan_input_availability only; the formula-direction surface below unchanged
     src = p.read_text(encoding="utf-8")
     assert "from r70_stated_formula_scan import scan_stated_formula_direction" in src
     assert "vio.update(scan_stated_formula_direction(final))" in src

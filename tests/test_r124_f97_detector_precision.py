@@ -223,3 +223,89 @@ def test_probe_6_monitoring_narration_stays_silent():
     assert not r.get("INPUT_UNAVAILABLE"), \
         "the adjudicated narration example ('used to monitor " \
         "thermal outcomes') must not fire"
+
+
+# --- the R125 dir-3 generalization probes (unseen domains, frozen
+#     in eval/r125_f31d/generalization.jsonl's construction; NEW
+#     text, never in the calibration corpus) ---
+
+PROB_UV = {"problem_id": "gp-1", "device": "uv-reactor",
+           "failure": "Dose drifts.", "question": "Propose.",
+           "question_type": "intervention-proposal",
+           "constraint": "Use only existing sensors and existing "
+                         "measurements: the UV intensity sensor and "
+                         "the effluent flow meter already installed. "
+                         "No new instrumentation may be added."}
+PROB_KILN = {"problem_id": "gp-2", "device": "rotary-kiln",
+             "failure": "NOx creeps.", "question": "Propose.",
+             "question_type": "intervention-proposal",
+             "constraint": "Use only existing sensors and existing "
+                           "measurements: the oxygen analyzer and "
+                           "the kiln inlet thermocouple already "
+                           "installed. No new instrumentation may "
+                           "be added."}
+PROB_MILL = {"problem_id": "gp-3", "device": "cnc-mill",
+             "failure": "Tool wear.", "question": "Propose.",
+             "question_type": "intervention-proposal",
+             "constraint": "Use only existing sensors and existing "
+                           "measurements: the spindle motor current "
+                           "transducer and the spindle speed encoder "
+                           "already installed. No new instrumentation "
+                           "may be added."}
+
+
+def test_gp1_unseen_uv_fluorescence_fires():
+    b = _bill(
+        "Mechanism: the UV dose is controlled from an online DNA "
+        "fluorescence signal measured continuously in-line; the "
+        "lamp bank modulates based on the online fluorescence "
+        "reading taken each cycle during operation.")
+    r = m77.scan_input_availability(PROB_UV, b)
+    assert r.get("INPUT_UNAVAILABLE"), \
+        "an unseen-domain passive-frame genuine input must fire"
+
+
+def test_gp2_unseen_kiln_nox_fires():
+    b = _bill(
+        "Mechanism: the kiln burner is regulated using an online "
+        "NOx analyzer; the combustion is adjusted in response to "
+        "the online NOx measurement taken continuously during "
+        "production.")
+    r = m77.scan_input_availability(PROB_KILN, b)
+    assert r.get("INPUT_UNAVAILABLE"), \
+        "a short-specifier (NOx) genuine input must fire"
+
+
+def test_gp3_unseen_acoustic_emission_fires():
+    b = _bill(
+        "Mechanism: the tool-wear torque model is computed from "
+        "online acoustic emission energy captured in-service; the "
+        "feed is reduced based on the online acoustic emission "
+        "index.")
+    r = m77.scan_input_availability(PROB_MILL, b)
+    assert r.get("INPUT_UNAVAILABLE"), \
+        "a leg-2 capture with a participle tail must fire on the " \
+        "input list, not the prose"
+
+
+def test_gp4_unseen_permitted_bridge_stays_silent():
+    b = _bill(
+        "Mechanism: the feed rate is adjusted continuously based "
+        "on the online spindle speed and the motor current; both "
+        "signals are measured in-line during operation and used "
+        "as control inputs.")
+    r = m77.scan_input_availability(PROB_MILL, b)
+    assert not r.get("INPUT_UNAVAILABLE"), \
+        "permitted instrument quantities (encoder->speed, " \
+        "transducer->current) must not fire"
+
+
+def test_gp5_unseen_narration_stays_silent():
+    b = _bill(
+        "Mechanism: use the existing probes to monitor refractory "
+        "health; the continuous monitoring of refractory condition "
+        "is a proxy for overall kiln health and is critical for "
+        "safe operation.")
+    r = m77.scan_input_availability(PROB_KILN, b)
+    assert not r.get("INPUT_UNAVAILABLE"), \
+        "an unseen-domain monitoring narration must not fire"

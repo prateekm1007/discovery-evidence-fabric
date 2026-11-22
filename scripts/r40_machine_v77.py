@@ -261,7 +261,14 @@ _FUNC_WORDS = {
     "less", "least", "very", "such", "both", "either", "neither",
     "only", "just", "even", "still", "new", "existing", "already",
     "installed", "permitted", "allowed", "current", "existing",
+    "online", "inline", "offline", "realtime", "integrated",
+    "continuous", "continuously", "periodic", "periodically",
 }
+# adverbial placements that are ONGOING-MARKERS, never quantity
+# heads (the detector's own online vocabulary)
+_ADVERBIAL_HEADS = {"in-line", "in-service", "on-line", "inline",
+                    "real-time", "each-cycle", "during-operation",
+                    "during-production", "in-operation"}
 _ADJECTIVE_ENDINGS = ("ly",)
 # sensing/monitoring verbs and their derivatives NEVER head a
 # quantity noun phrase
@@ -269,6 +276,13 @@ _SENSE_ROOTS = ("sens", "monitor", "measur", "analyz", "analyse",
                 "track", "observ", "detect", "indicat", "interrog",
                 "assay", "spectroscop", "read", "record", "sampl",
                 "check", "verif", "confirm", "watch", "survey")
+# past participles / finite-verb forms never head a quantity np
+_VERB_FORMS = {"taken", "captured", "recorded", "derived",
+               "obtained", "based", "reduced", "computed",
+               "calculated", "estimated", "adjusted", "regulated",
+               "controlled", "modulated", "driven", "used",
+               "consumed", "fed", "sampled", "logged", "trended",
+               "acquired", "scanned", "probed", "polled"}
 # generic head nouns: they carry quantity content only through
 # their modifiers/prepositional content
 _GENERIC_HEADS = {"rate", "ratio", "value", "values", "delta",
@@ -345,6 +359,10 @@ def _is_noun_like(word: str) -> bool:
     if lw in _FUNC_WORDS:
         return False
     if lw.endswith(_ADJECTIVE_ENDINGS):
+        return False
+    if lw in _ADVERBIAL_HEADS:
+        return False
+    if lw in _VERB_FORMS:
         return False
     if any(lw.startswith(r) for r in _SENSE_ROOTS):
         return False
@@ -447,10 +465,15 @@ def scan_input_availability(prob: dict, a: str) -> dict:
         # A — grammar noise fails open, silent)
         qty = None
         qc = _QTY_COMPOUND.search(w)
-        if qc and _is_noun_like(qc.group(1).split("-")[0].split()[0] \
-                if qc.group(1).split("-")[0].split() else ""):
-            head = qc.group(1)
-            qty = head
+        if (qc and _is_noun_like(
+                qc.group(1).split("-")[0].split()[0]
+                if qc.group(1).split("-")[0].split() else "")
+                and _qty_content_stems(qc.group(1))):
+            # only a compound whose head carries PHYSICAL content
+            # ('viscosity-sensing'); a generic head ('signal
+            # measured') must fall through to the verb-object and
+            # passive parses — never shadow them
+            qty = qc.group(1)
         else:
             vm = re.search(r"(?:sens\w+|monitor\w*|measur\w+|"
                            r"analyz\w+|analyse\w+|interrogat\w+)\s+",
@@ -459,12 +482,50 @@ def scan_input_availability(prob: dict, a: str) -> dict:
                 np = _noun_phrase_after(w, vm.end())
                 if np and _is_noun_like(np.split()[0]):
                     qty = np
+                else:
+                    # the PASSIVE frame: the quantity is the
+                    # SUBJECT before the verb ('X measured
+                    # continuously in-line') — walk backward over
+                    # adverbs/adverbials to the nearest noun phrase
+                    pre = w[:vm.start()].strip()
+                    ptoks = re.findall(r"[A-Za-z][A-Za-z\-]*", pre)
+                    back = []
+                    for t in reversed(ptoks):
+                        tl = t.lower()
+                        if (tl in _FUNC_WORDS
+                                or tl.endswith(_ADJECTIVE_ENDINGS)
+                                or tl in _ADVERBIAL_HEADS):
+                            if back:
+                                break
+                            continue
+                        if not _is_noun_like(t):
+                            break
+                        back.insert(0, t)
+                        if len(back) >= 4:
+                            break
+                    np = " ".join(back)
+                    if np and _is_noun_like(np.split()[0]):
+                        qty = np
         if not qty:
             continue  # no noun-phrase quantity — narration, silent
         qty_stems = _qty_content_stems(qty)
         if not qty_stems:
-            continue  # a generic head with no physical content
-        if qty_stems & permitted_stems:
+            # short specifier tokens (NOx/CO2/O2/pH — shorter
+            # than the stemmer's >=4-char floor) still carry
+            # content: fire only if the specifier is NOT in the
+            # permitted span verbatim
+            short = [t for t in re.findall(r"[A-Za-z]{1,3}\d?",
+                                           _hnorm(qty))
+                     if len(t) <= 3 and t.lower() not in
+                     _FUNC_WORDS and t.lower() not in
+                     _GENERIC_HEADS]
+            if not short:
+                continue  # a generic head with no physical content
+            pl = _hnorm(m.group(1)).lower()
+            if any(t.lower() in pl for t in short):
+                continue  # the specifier IS permitted
+            qty_stems = {t.lower() for t in short}
+        elif qty_stems & permitted_stems:
             continue  # the quantity (or its instrument) is permitted
         # F97 rule B: RELIED-ON, not narrated. The window is judged
         # as a whole: a control frame MUST consume the quantity AND
@@ -506,7 +567,16 @@ def scan_input_availability(prob: dict, a: str) -> dict:
         cap = re.sub(r"\*|\([^)]*\)", " ", cap)
         # stray/unbalanced brackets from prose slicing are not
         # input-list grammar
-        cap = re.sub(r"[()\[\]{}]", " ", cap).strip()
+        cap = re.sub(r"[()\[\]{}]", " ", cap)
+        # cut at the first finite-verb/participle token: the input
+        # list ENDS there ('energy captured in-service; the feed
+        # is reduced' — the list is 'online acoustic emission
+        # energy')
+        cut = re.search(r"\b(?:" + "|".join(_VERB_FORMS)
+                        + r")\b", cap)
+        if cut:
+            cap = cap[:cut.start()]
+        cap = cap.strip()
         if (not cap or len(cap) > 55 or re.search(r"[,;:]", cap)
                 or re.search(r"\b(?:rather|which|assuming|reduces|"
                              r"proactively|terminate|while|since|"
@@ -516,6 +586,11 @@ def scan_input_availability(prob: dict, a: str) -> dict:
         words = cap.split()
         if words and all(t[0].isupper() for t in words):
             continue  # Title-Case technique caption (any length)
+        # leading ongoing-marker modifiers are input-list grammar,
+        # not content: skip them before the noun-like check
+        while (words and words[0].lower() in _FUNC_WORDS
+               | _ADVERBIAL_HEADS):
+            words = words[1:]
         if re.search(r"\b(?:valve\s+position|pump\s+speed|damper\s+"
                      r"position|vfd\s+speed|fan\s+speed|actuator|"
                      r"control\s+output|command|stroke)\b", cap,
