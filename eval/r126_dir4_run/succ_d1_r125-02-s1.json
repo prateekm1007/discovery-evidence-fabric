@@ -1,0 +1,56 @@
+{
+ "draw": "d1",
+ "problem_id": "r125-02-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor-v3 (committed F31e bare bytes + canonical check + directive-v2 reviewer [r122 verbatim + duty clause])",
+ "directive_v2_len": 1172,
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Tension Modulation via Motor Current Feedback**\n\n**Mechanism:**\nThe increase in motor current while maintaining correct outer diameter (gauge to print) indicates a hidden increase in internal stresses or friction drag within the draw block, likely due to slight wear, misalignment, or temperature drift. This hidden load is causing premature wire failure (breaks). By using the existing per-block motor ammeters as real-time proxy sensors for axial tension/load, we can actively modulate the line speed to keep the motor current within a safe baseline range, thereby preventing the accumulation of critical stress that leads to breaks.\n\n**Implementation:**\n1.  **Baseline Establishment:** Record the nominal motor current ($I_{nom}$) for the finish block (and potentially upstream blocks) during a period of stable production with zero breaks. Define a safe upper limit threshold $I_{max} = I_{nom} \\times 1.1$ (10% margin) and a target operating band.\n2.  **Control Logic:** Implement a feedback loop using the existing PLC and line-speed encoder. The control algorithm continuously samples the motor ammeter reading ($I_{act}$) of the finish block.\n3.  **Speed Adjustment:** \n    *   If $I_{act} > I_{max}$, the controller reduces the line speed setpoint by a small increment (e.g., 1-2%) per sampling cycle. Slowing the wire reduces the instantaneous tensile load and allows the thermal/mechanical load to dissipate or stabilize.\n    *   If $I_{act}$ remains above $I_{max}$ for a sustained period (indicating a hard mechanical fault, not just a transient load spike), the system triggers an automatic line stoppage using the break counter logic to prevent a hard wire snap.\n    *   If $I_{act} < I_{nom} \\times 0.9$, the system can cautiously increment the speed back towards the target, as the load is within acceptable limits.\n4.  **Break Counter Integration:** Use the existing break counter as a primary reset condition. If a break is detected, the system halts, and after manual restart, it initiates the process at a conservative low speed, allowing the current to stabilize before gradually ramping up.\n\n**Measures Relied On:**\n*   **Per-block Motor Ammeters:** Used as the primary feedback signal for axial load/tension. The assumption is that for a given wire material and cross-section, increased drawing force directly correlates with increased motor current.\n*   **Line-Speed Encoder:** Used to adjust the actual wire feed rate, which is the actuator variable for the tension control loop.\n*   **Break Counter:** Used as a failsafe state indicator. A non-zero count triggers a mandatory reset of the control logic to a safe, low-speed state, ensuring the mitigation strategy is re-evaluated after any failure event.\n\n**Why this works under the constraints:**\n*   No new sensors are added; only existing ammeters, encoders, and counters are used.\n*   It directly addresses the symptom of \"climbing motor current\" by preventing it from reaching the failure threshold through proactive speed reduction.\n*   It addresses \"multiplied breaks\" by removing the peak load conditions that cause the breaks, without requiring new diagnostics of the block internals.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Tension Modulation via Motor Current Feedback**\n\n**Mechanism:**\nThe increase in motor current while maintaining correct outer diameter (gauge to print) indicates a hidden increase in internal stresses or friction drag within the draw block, likely due to slight wear, misalignment, or temperature drift. This hidden load is causing premature wire failure (breaks). By using the existing per-block motor ammeters as real-time proxy sensors for axial tension/load, we can actively modulate the line speed to keep the motor current within a safe baseline range, thereby preventing the accumulation of critical stress that leads to breaks.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Finish block motor current ($I_{act}$), derived from the per-block motor ammeters.\n*   **Direction of Effect:** An increase in $I_{act}$ signifies increased mechanical load/friction. To counteract this and prevent wire breakage, the control system applies an **inverse** effect to the line speed setpoint. Specifically, when $I_{act}$ rises above the threshold, the line speed is **decreased**. This reduction in speed lowers the instantaneous tension demand on the wire and the block, allowing the mechanical system to stabilize and preventing the stress accumulation that leads to fracture. Conversely, if $I_{act}$ falls below the lower threshold, indicating reduced load, the speed is **increased** to maintain production throughput.\n\n**Implementation Bill:**\n\n1.  **Baseline Establishment:**\n    *   Record the nominal motor current ($I_{nom}$) for the finish block during a period of stable production with zero breaks.\n    *   Define thresholds:\n        *   $I_{max} = I_{nom} \\times 1.1$ (Upper limit)\n        *   $I_{min} = I_{nom} \\times 0.9$ (Lower limit)\n\n2.  **Control Logic (PLC Modification):**\n    *   Configure the existing PLC to sample the finish block motor ammeter signal ($I_{act}$) at a rate of 1 Hz.\n    *   Implement a discrete step-function control loop:\n        *   **Condition A:** If $I_{act} > I_{max}$, decrement the line speed setpoint by 1% per second (minimum speed floor: 80% of nominal).\n        *   **Condition B:** If $I_{act} < I_{min}$, increment the line speed setpoint by 1% per second (maximum speed ceiling: 100% of nominal).\n        *   **Condition C:** If $I_{act}$ is between $I_{min}$ and $I_{max}$, hold the line speed setpoint constant.\n    *   **Failsafe Logic:** If $I_{act} > I_{max}$ for 30 continuous seconds, OR if the break counter increments, trigger an immediate line stop.\n\n3.  **Break Counter Integration:**\n    *   Monitor the existing break counter input.\n    *   Upon detecting a break (counter value increases), the PLC forces the line speed setpoint to 0 and halts the machine.\n    *   Upon manual restart, the PLC initiates the line at 50% nominal speed and enables the automatic ramp-up logic (Condition B) only after 60 seconds of stable operation below $I_{max}$.\n\n**Measures Relied On:**\n\n*   **Per-block Motor Ammeters (Finish Block):**\n    *   **Input:** Raw current measurement ($I_{act}$).\n    *   **Derivation:** Used directly as the feedback signal. The relationship is linear: $I_{act} \\propto \\text{Drawing Force}$. No new sensors are added.\n*   **Line-Speed Encoder:**\n    *   **Input:** Actual line speed (used for safety interlocks and display).\n    *   **Derivation:** The actuator is the line speed drive. The encoder provides the measured value $v_{actual}$. The control output is a setpoint $v_{set}$. The encoder confirms the actuator response but does not provide the primary feedback for tension; it provides the speed state for safety limits.\n*   **Break Counter:**\n    *   **Input:** Digital increment signal indicating a wire break.\n    *   **Derivation:** Used as a binary state signal ($B = 1$ if break detected). This triggers the reset condition in the control logic.\n\n**OPERATIONAL COST:**\nThe periodic modulation of line speed (±1% steps per second under load changes) reduces average throughput by no more than 2% under normal wear-drift conditions, as the system only reduces speed when current rises significantly above nominal, and only by small incremental steps. In the event of a hard fault, the line stops (0% throughput) for the duration of the reset, which is bounded by the time required for manual intervention and restart protocol.\n\n**Why this works under the constraints:**\n*   No new sensors are added; only existing ammeters, encoders, and counters are used.\n*   It directly addresses the symptom of \"climbing motor current\" by preventing it from reaching the failure threshold through proactive speed reduction.\n*   It addresses \"multiplied breaks\" by removing the peak load conditions that cause the breaks, without requiring new diagnostics of the block internals.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Baseline Establishment:**",
+   "*   Record the nominal motor current ($I_{nom}$) for the finish block during a period of s",
+   "*   Define thresholds:",
+   "*   $I_{max} = I_{nom} \\times 1.1$ (Upper limit)",
+   "*   $I_{min} = I_{nom} \\times 0.9$ (Lower limit)",
+   "2.  **Control Logic (PLC Modification):**",
+   "*   Configure the existing PLC to sample the finish block motor ammeter signal ($I_{act}$)",
+   "*   Implement a discrete step-function control loop:",
+   "*   **Condition A:** If $I_{act} > I_{max}$, decrement the line speed setpoint by 1% per s",
+   "*   **Condition B:** If $I_{act} < I_{min}$, increment the line speed setpoint by 1% per s",
+   "*   **Condition C:** If $I_{act}$ is between $I_{min}$ and $I_{max}$, hold the line speed ",
+   "*   **Failsafe Logic:** If $I_{act} > I_{max}$ for 30 continuous seconds, OR if the break ",
+   "3.  **Break Counter Integration:**",
+   "*   Monitor the existing break counter input.",
+   "*   Upon detecting a break (counter value increases), the PLC forces the line speed setpoi",
+   "*   Upon manual restart, the PLC initiates the line at 50% nominal speed and enables the a",
+   "*   **Per-block Motor Ammeters (Finish Block):**",
+   "*   **Input:** Raw current measurement ($I_{act}$).",
+   "*   **Derivation:** Used directly as the feedback signal. The relationship is linear: $I_{",
+   "*   **Line-Speed Encoder:**",
+   "*   **Input:** Actual line speed (used for safety interlocks and display).",
+   "*   **Derivation:** The actuator is the line speed drive. The encoder provides the measure",
+   "*   **Break Counter:**",
+   "*   **Input:** Digital increment signal indicating a wire break.",
+   "*   **Derivation:** Used as a binary state signal ($B = 1$ if break detected). This trigge",
+   "*   No new sensors are added; only existing ammeters, encoders, and counters are used.",
+   "*   It directly addresses the symptom of \"climbing motor current\" by preventing it from re",
+   "*   It addresses \"multiplied breaks\" by removing the peak load conditions that cause the b"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Derivation:** Used directly as the feedback signal. The relationship is linear: $I_{act} \\propto \\text{D"
+  ]
+ }
+}

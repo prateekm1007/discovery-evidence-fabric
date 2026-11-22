@@ -1,0 +1,55 @@
+{
+ "draw": "d2",
+ "problem_id": "r125-07-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor-v3 (committed F31e bare bytes + canonical check + directive-v2 reviewer [r122 verbatim + duty clause])",
+ "directive_v2_len": 1172,
+ "authored_bill": "Mitigation: Implement a \"Thermal Load Limiting\" control strategy using the existing pump motor ammeter and reservoir thermometers.\n\n**Mechanism:**\nThe pressure drop at the end of the stroke combined with high temperatures indicates that the hydraulic fluid has degraded in viscosity or the system is suffering from excessive internal leakage due to thermal expansion, causing the pump to work inefficiently (high current draw) and lose pressure. By correlating the pump motor ammeter (a proxy for system load/power demand) with the reservoir temperature, we can detect when the system is approaching a thermal threshold where pressure loss becomes critical. The mitigation involves automatically reducing the duty cycle or stroke speed before the temperature limit is breached, preventing the pressure drop from affecting part quality and preventing catastrophic overheating.\n\n**Implementation:**\n1.  **Set Thermal Threshold:** Define a maximum allowable reservoir temperature (e.g., 70°C) based on oil specifications.\n2.  **Establish Load-Temperature Correlation:** Use the hour-run counter to track total operating time and the pump motor ammeter to log peak/current load during strokes. Create a lookup table or simple algorithm that determines the \"safe\" maximum stroke speed or duty cycle limit as a function of the current reservoir temperature.\n    *   *Example Logic:* If Reservoir Temp < 60°C, run at 100% speed. If Reservoir Temp 60–70°C, run at 80% speed. If Reservoir Temp > 70°C, run at 50% speed or insert mandatory cooling pauses (monitored by hour-run counter and temperature stabilization).\n3.  **Control Action:** Modify the existing press cycle controller (which already reads these sensors) to automatically scale down the hydraulic pump speed (via VFD or variable speed pump control, if available, or by extending stroke duration/reducing cycles per hour) when the reservoir thermometer reads high. This reduces the heat generation rate (lower ammeter draw per unit time) and allows the system to cool more effectively during the extended dwell time, maintaining pressure stability.\n\n**Measures It Relies On:**\n*   **Reservoir Thermometer:** Primary input for temperature-based gating.\n*   **Pump Motor Ammeter:** Used to verify that reducing speed/duty cycle actually reduces load/current, ensuring the control loop is responding to the actual thermal source.\n*   **Hour-Run Counter:** Used to track total accumulated stress and ensure that the \"cooling pauses\" or reduced duty cycles are accounted for in the maintenance schedule, preventing over-accumulation of hours at low efficiency.\n*   **Existing Sensors:** No new sensors; leverages the installed thermometers, ammeter, and hour counter to create a closed-loop thermal management protocol.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**IMPLEMENTATION BILL**\n*   **Control Logic Update:** Modify the press cycle controller firmware or PLC logic to accept the reservoir temperature (T_res) and pump motor current (I_m) as gating inputs for the stroke speed/duty cycle.\n*   **Parameter Setup:** Define the thermal threshold (T_max, e.g., 70°C) and the speed modulation curve (S(T_res)) in the controller configuration.\n*   **Monitoring:** Enable logging of the hour-run counter and peak ammeter values to verify thermal load reduction.\n*   **No New Hardware:** The implementation relies exclusively on the existing reservoir thermometer, manifold thermometer, pump motor ammeter, and hour-run counter.\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** Reservoir Temperature (T_res) as measured by the reservoir thermometer.\n*   **Direction:** An **increase** in T_res causes a **decrease** in the commanded stroke speed/duty cycle.\n*   **Mechanism:** Lowering the stroke speed reduces the rate of hydraulic energy dissipation (heat generation), which allows the reservoir temperature to stabilize or decrease, thereby preventing the thermal expansion-induced internal leakage that causes pressure drop at the end of the stroke.\n\n**OPERATIONAL COST**\n*   The modulation of stroke speed reduces average throughput by no more than 50% during high-thermal-load conditions (T_res > 70°C), bounded by the 50% speed limit defined in the control logic. Under normal conditions (T_res < 60°C), throughput impact is 0%.\n\n**CORRECTED PROPOSAL**\n\n**Mitigation:** Implement a \"Thermal Load Limiting\" control strategy using the existing pump motor ammeter and reservoir thermometers.\n\n**Mechanism:**\nThe pressure drop at the end of the stroke combined with high temperatures indicates that the hydraulic fluid has degraded in viscosity or the system is suffering from excessive internal leakage due to thermal expansion, causing the pump to work inefficiently (high current draw) and lose pressure. By correlating the pump motor ammeter (a proxy for system load/power demand) with the reservoir temperature, we can detect when the system is approaching a thermal threshold where pressure loss becomes critical. The mitigation involves automatically reducing the duty cycle or stroke speed before the temperature limit is breached, preventing the pressure drop from affecting part quality and preventing catastrophic overheating.\n\n**Implementation:**\n1.  **Set Thermal Threshold:** Define a maximum allowable reservoir temperature (e.g., 70°C) based on oil specifications.\n2.  **Establish Load-Temperature Correlation:** Use the hour-run counter to track total operating time and the pump motor ammeter to log peak/current load during strokes. Create a lookup table or simple algorithm that determines the \"safe\" maximum stroke speed or duty cycle limit as a function of the current reservoir temperature.\n    *   *Example Logic:* If Reservoir Temp < 60°C, run at 100% speed. If Reservoir Temp 60–70°C, run at 80% speed. If Reservoir Temp > 70°C, run at 50% speed or insert mandatory cooling pauses (monitored by hour-run counter and temperature stabilization).\n3.  **Control Action:** Modify the existing press cycle controller (which already reads these sensors) to automatically scale down the hydraulic pump speed (via VFD or variable speed pump control, if available, or by extending stroke duration/reducing cycles per hour) when the reservoir thermometer reads high. This reduces the heat generation rate (lower ammeter draw per unit time) and allows the system to cool more effectively during the extended dwell time, maintaining pressure stability.\n\n**Measures It Relies On (Input Derivation):**\n*   **Reservoir Thermometer:** Primary input for temperature-based gating. Value used directly as T_res.\n*   **Pump Motor Ammeter:** Used to verify that reducing speed/duty cycle actually reduces load/current. Value used as I_m to confirm thermal source reduction. Derived signal: \"Load State\" = I_m > I_nominal (where I_nominal is a configured constant based on the motor's nameplate rating).\n*   **Hour-Run Counter:** Used to track total accumulated stress. Value used as H_accum to ensure that the \"cooling pauses\" or reduced duty cycles are accounted for in the maintenance schedule.\n*   **Manifold Thermometer:** Used as a secondary check for local hot spots. Value used directly as T_manifold to ensure no localized overheating occurs during the extended dwell times.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Control Logic Update:** Modify the press cycle controller firmware or PLC logic to a",
+   "*   **Parameter Setup:** Define the thermal threshold (T_max, e.g., 70°C) and the speed mo",
+   "*   **Monitoring:** Enable logging of the hour-run counter and peak ammeter values to veri",
+   "*   **No New Hardware:** The implementation relies exclusively on the existing reservoir t",
+   "*   **Driving Variable:** Reservoir Temperature (T_res) as measured by the reservoir therm",
+   "*   **Direction:** An **increase** in T_res causes a **decrease** in the commanded stroke ",
+   "*   **Mechanism:** Lowering the stroke speed reduces the rate of hydraulic energy dissipat",
+   "*   The modulation of stroke speed reduces average throughput by no more than 50% during h",
+   "1.  **Set Thermal Threshold:** Define a maximum allowable reservoir temperature (e.g., 70°",
+   "2.  **Establish Load-Temperature Correlation:** Use the hour-run counter to track total op",
+   "*   *Example Logic:* If Reservoir Temp < 60°C, run at 100% speed. If Reservoir Temp 60–70°",
+   "3.  **Control Action:** Modify the existing press cycle controller (which already reads th",
+   "*   **Reservoir Thermometer:** Primary input for temperature-based gating. Value used dire",
+   "*   **Pump Motor Ammeter:** Used to verify that reducing speed/duty cycle actually reduces",
+   "*   **Hour-Run Counter:** Used to track total accumulated stress. Value used as H_accum to",
+   "*   **Manifold Thermometer:** Used as a secondary check for local hot spots. Value used di"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 's a secondary check' shares no allowed-list stem (Use only existing sensors and existing measurements: the reservoir and manifold ...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Monitoring:** Enable logging of the hour-run counter and peak ammeter values to verify thermal load redu",
+   "*   *Example Logic:* If Reservoir Temp < 60°C, run at 100% speed. If Reservoir Temp 60–70°C, run at 80% speed."
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ }
+}
