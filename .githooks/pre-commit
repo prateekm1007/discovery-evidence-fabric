@@ -80,3 +80,30 @@ if python3 -c "import detect_secrets" >/dev/null 2>&1; then
 else
   echo "pre-commit: detect-secrets module unavailable — secret scan SKIPPED for this commit (typed degradation; pip install detect-secrets)" >&2
 fi
+
+# R128 dir-1 (owner): the no-red-close + claim-collision guards.
+#
+# (a) Whenever a round record (eval/r*_status.json) is staged, the two
+#     gates whose absence produced the last red round-closes (the
+#     missing pushed_sha scalar + the Art. 27 ledger) run BEFORE the
+#     commit is allowed: a red suite refuses the commit locally, so a
+#     red tip can only happen via the typed --no-verify escape (which
+#     must then be disclosed in the commit message).
+# (b) Whenever the claims registry or the counter is staged, the
+#     allocation guard verifies every new claim id came monotonically
+#     from eval/claim_next_id.txt (the counter advances in the same
+#     commit; refs/claims/next is the cross-session lock pushed after
+#     the commit — a non-FF ref push = the other session advanced it
+#     first = re-derive before pushing claims).
+STAGED_STATUS=$(git diff --cached --name-only | grep -E '^eval/r[0-9]+s?[0-9]*_status\.json$' || true)
+if [ -n "$STAGED_STATUS" ]; then
+  echo "pre-commit: round record staged — running the remote-CI + Art. 27 gates (dir 1)"
+  python3 -m pytest tests/test_remote_ci_rule.py tests/test_article27_capability_budget.py -q -p no:warnings >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "pre-commit: the round-record gates are RED — commit refused (dir 1: no red round-closes; fix the record or use --no-verify and DISCLOSE it in the commit message)" >&2
+    exit 1
+  fi
+fi
+if git diff --cached --name-only | grep -qE '^eval/(work_claims\.json|claim_next_id\.txt)$'; then
+  python3 "$(dirname "$0")/../scripts/r128_claim_guard.py" || exit $?
+fi

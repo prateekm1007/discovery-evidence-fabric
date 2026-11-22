@@ -83,7 +83,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-ROUTE_ADAPTER_VERSION = "route_adapter/2.0.0"
+ROUTE_ADAPTER_VERSION = "route_adapter/2.1.0"
 
 REPO = Path(__file__).resolve().parents[2]
 VAULT = REPO / ".env.keys"
@@ -358,6 +358,141 @@ def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
                       response_format=response_format)
 
 
+def bedrock_converse(messages: List[dict], model_id: str,
+                     region: str = "us-east-1",
+                     max_tokens: int = 4000, timeout_s: float = 300.0,
+                     api_key: Optional[str] = None) -> Dict[str, Any]:
+    """One Amazon Bedrock Converse call over plain HTTPS — the r128
+    dir-4 owner direction. NO AWS SDK and NO EC2 host: an API key
+    works as a plain bearer token (AWS_BEARER_TOKEN_BEDROCK) on
+    POST https://bedrock-runtime.<region>.amazonaws.com/model/<id>/converse.
+    Additive transport: the agnes path is byte-unchanged. Typed
+    refusals on every failure class (F67: degenerate inputs refuse,
+    never crash); the response dict carries {content, model, usage}
+    with usage = the Converse inputTokens/outputTokens bytes."""
+    key = api_key if api_key is not None else \
+        resolve_vault_key("AWS_BEARER_TOKEN_BEDROCK")
+    if not key:
+        raise RouteRefused("missing_key", "bedrock",
+                           "no AWS_BEARER_TOKEN_BEDROCK in the vault "
+                           "(env-only, digests-only — F45 custody)")
+    if not messages or not all(
+            isinstance(m, dict) and m.get("role") and m.get("content")
+            for m in messages):
+        raise RouteRefused("degenerate_input", "bedrock",
+                           "messages must be non-empty {role, content} "
+                           "dicts (typed refusal, F67)")
+    if not model_id or "/" not in model_id:
+        raise RouteRefused("degenerate_input", "bedrock",
+                           f"model_id '{model_id}' must be an inference-"
+                           "profile or foundation-model id (typed refusal)")
+    # Converse message shape: role/content map from the OpenAI dicts
+    # (user/assistant pass through); system text is NOT carried in
+    # messages — the caller folds any system line into the first user
+    # turn, as the F31e composition already does (directive then problem).
+    body = json.dumps({
+        "messages": [{"role": m["role"], "content": [{"text": m["content"]}]}
+                     for m in messages],
+        "inferenceConfig": {"maxTokens": max_tokens, "temperature": 0.0},
+    }).encode("utf-8")
+    url = (f"https://bedrock-runtime.{region}.amazonaws.com"
+           f"/model/{model_id}/converse")
+    req = urllib.request.Request(
+        url, data=body, method="POST",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json",
+                 "User-Agent": BROWSER_UA})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout_s) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = e.read().decode("utf-8")[:180]
+        except Exception:  # noqa: BLE001
+            pass
+        kind = {402: "payment_required", 403: "auth",
+                429: "rate_limited"}.get(e.code, f"http_{e.code}")
+        raise RouteRefused(kind, "bedrock",
+                           f"HTTP {e.code}: {detail}") from e
+    except Exception as e:  # noqa: BLE001
+        raise RouteRefused("transport", "bedrock",
+                           f"{type(e).__name__}: {str(e)[:140]}") from e
+    try:
+        out = data["output"]["message"]["content"]
+        text = "".join(str(part.get("text") or "")
+                       for part in out if isinstance(part, dict))
+        usage = data.get("usage") or {}
+    except (KeyError, TypeError) as e:
+        raise RouteRefused("malformed_response", "bedrock",
+                           f"missing {e} in the Converse envelope") from e
+    return {"content": text, "model": model_id,
+            "finish_reason": data.get("stopReason"),
+            "usage": {"prompt_tokens": usage.get("inputTokens"),
+                      "completion_tokens": usage.get("outputTokens"),
+                      "cached_tokens": usage.get("cacheReadInputTokens")},
+            "raw": data}
+
+
+def hf_router_chat(messages: List[dict], model: str,
+                   max_tokens: int = 4000, timeout_s: float = 300.0,
+                   api_key: Optional[str] = None) -> Dict[str, Any]:
+    """One Hugging Face Inference Providers call (r128 dir-4: the
+    SECOND funded path) — POST https://router.huggingface.co/v1/
+    chat/completions, OpenAI-compatible, bearer HF_TOKEN (env-only,
+    digests-only). Typed refusals: missing_key, payment_required
+    (HTTP 402 — the measured no-credits state), rate_limited, auth."""
+    key = api_key if api_key is not None else \
+        resolve_vault_key("HF_TOKEN")
+    if not key:
+        raise RouteRefused("missing_key", "hf_router",
+                           "no HF_TOKEN in the vault (env-only, "
+                           "digests-only — F45 custody)")
+    if not messages:
+        raise RouteRefused("degenerate_input", "hf_router",
+                           "empty messages (typed refusal, F67)")
+    body = json.dumps({"model": model, "messages": messages,
+                       "max_tokens": max_tokens,
+                       "temperature": 0.0}).encode("utf-8")
+    req = urllib.request.Request(
+        "https://router.huggingface.co/v1/chat/completions",
+        data=body, method="POST",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json",
+                 "User-Agent": BROWSER_UA})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout_s) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = e.read().decode("utf-8")[:180]
+        except Exception:  # noqa: BLE001
+            pass
+        kind = {402: "payment_required", 401: "auth",
+                403: "auth", 429: "rate_limited"}.get(
+                    e.code, f"http_{e.code}")
+        raise RouteRefused(kind, "hf_router",
+                           f"HTTP {e.code}: {detail}") from e
+    except Exception as e:  # noqa: BLE001
+        raise RouteRefused("transport", "hf_router",
+                           f"{type(e).__name__}: {str(e)[:140]}") from e
+    try:
+        choice = data["choices"][0]
+        text = str(choice["message"]["content"])
+        usage = data.get("usage") or {}
+    except (KeyError, IndexError, TypeError) as e:
+        raise RouteRefused("malformed_response", "hf_router",
+                           f"missing {e} in the envelope") from e
+    return {"content": text, "model": data.get("model", model),
+            "finish_reason": choice.get("finish_reason"),
+            "usage": {"prompt_tokens": usage.get("prompt_tokens"),
+                      "completion_tokens": usage.get("completion_tokens"),
+                      "cached_tokens": ((usage.get("prompt_tokens_details")
+                                         or {}).get("cached_tokens"))},
+            "raw": data}
+
+
 def registered_route() -> Dict[str, Any]:
     """The registered generator route (AM75): identity evidence for
     every generation ledger that must name its route."""
@@ -382,5 +517,6 @@ def require_registered_model(model: str) -> None:
 
 __all__ = ["ROUTE_ADAPTER_VERSION", "ROUTE_REGISTRY", "RouteRefused",
            "resolve_vault_key", "xkiro_chat", "agnes_chat",
+           "bedrock_converse", "hf_router_chat",
            "registered_route", "require_registered_model",
            "BROWSER_UA", "REASONING_HEADROOM"]

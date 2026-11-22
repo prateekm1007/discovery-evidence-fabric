@@ -79,14 +79,23 @@ def quota_probe() -> bool:
 
 def call_with_transport_backoff(prompt: str, visible_target: int,
                                 response_format=None,
-                                what: str = "") -> dict:
+                                what: str = "",
+                                attempts_out: list | None = None) -> dict:
     """The ESTABLISHED AGNES transport pattern (the committed F31e
     runner: 4 attempts, 120 s sleeps) restored by the amendment —
     catching ONLY the rate_limited/transport refusal classes;
     auth/missing_key fail immediately. PARSE failures are NEVER
-    retried (that is the g2 gate, fail-closed elsewhere)."""
+    retried (that is the g2 gate, fail-closed elsewhere).
+    r128 dir-5: each transport attempt is appended to attempts_out so
+    the per-leg absorbed-backoff count lands IN THE COMMITTED RECORD
+    (the amendment's 'counted separately and reported' commitment; the
+    historical '8 backoffs' figure recomputes from the wall-clock
+    anomalies of the re-run — 8 legs > 100 s — this field makes future
+    runs recomputable directly)."""
     last: Exception | None = None
     for attempt in (1, 2, 3, 4):
+        if attempts_out is not None:
+            attempts_out.append(attempt)
         try:
             return ra.agnes_chat(
                 [{"role": "user", "content": prompt}],
@@ -133,9 +142,12 @@ def one_problem(prob: dict) -> dict:
     ca = {"leg": "author", "attempts": 1}
     try:
         ta = time.monotonic()
+        att_a: list = []
         resp = call_with_transport_backoff(
             authoring_prompt(prob), 1200,
-            what=f"{pid}/author")
+            what=f"{pid}/author", attempts_out=att_a)
+        ca["attempts"] = max(ca["attempts"], len(att_a))
+        ca["transport_attempts"] = len(att_a)
         ca["latency_s"] = round(time.monotonic() - ta, 2)
         ca["usage"] = usage_snapshot(resp)
         bill = resp.get("content") or ""
@@ -162,6 +174,7 @@ def one_problem(prob: dict) -> dict:
         return rec
     # leg 3: the schema-enforced reviewer (frozen v1 bytes)
     cr = {"leg": "reviewer", "attempts": 1}
+    att_r: list = []
     prompt = (IMPROVED_DIRECTIVE + "\n\nORIGINAL PROBLEM:\n"
               + json.dumps({k: prob.get(k, "") for k in
                             ("problem_id", "device", "failure",
@@ -174,7 +187,9 @@ def one_problem(prob: dict) -> dict:
         tr = time.monotonic()
         resp = call_with_transport_backoff(
             prompt, 4000, response_format=FIX_SCHEMA,
-            what=f"{pid}/reviewer")
+            what=f"{pid}/reviewer", attempts_out=att_r)
+        cr["attempts"] = max(cr["attempts"], len(att_r))
+        cr["transport_attempts"] = len(att_r)
         cr["latency_s"] = round(time.monotonic() - tr, 2)
         cr["usage"] = usage_snapshot(resp)
         raw = resp.get("content") or ""
