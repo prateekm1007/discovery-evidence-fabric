@@ -1,0 +1,65 @@
+{
+ "problem_id": "r125-01-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 3.87,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 792,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 3.79,
+   "usage": {
+    "prompt_tokens": 1137,
+    "completion_tokens": 1189,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"### Mitigation Proposal: Adaptive Volumetric Compensation Loop Using Cycl",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "### Mitigation Proposal: Adaptive Volumetric Compensation Loop Using Cycle-Time and Check-Weighter Feedback\n\n**Mechanism:**\nThe core issue is a positive feedback loop where increased part weight leads to longer screw recovery times, which likely causes further volumetric inaccuracies or material degradation, compounding the drift. To mitigate this without new hardware, we will implement a **Closed-Loop Adaptive Volumetric Compensation** algorithm. This mechanism uses the existing check-weigher data as the ground truth for part mass and the cycle-time logger to detect the recovery time anomaly. It then dynamically adjusts the volumetric shot (shot size) setpoint on the *next* cycle (or after a small buffer) to counteract the drift, rather than holding the barrel setpoints static.\n\n**Implementation:**\n1.  **Data Integration:** The existing cycle-time logger and check-weigher data are streamed into the machine’s HMI/PLC controller. The check-weigher provides the measured mass ($M_{measured}$) of each part, and the cycle-time logger records the recovery time ($T_{recovery}$).\n2.  **Drift Detection:** Calculate the moving average of $M_{measured}$ over the last $N$ parts (e.g., $N=10$). Simultaneously, track the moving average of $T_{recovery}$. If $M_{average}$ exceeds the target mass ($M_{target}$) by more than a defined tolerance (e.g., $\\pm 0.5\\%$) AND $T_{recovery}$ has increased beyond its baseline historical average, trigger the compensation logic.\n3.  **Adaptive Setpoint Adjustment:** The controller computes a correction factor $\\Delta V$ for the volumetric shot size. Since the part is too heavy, the screw is likely packing too much material or the volumetric shot is too large. The algorithm reduces the volumetric shot setpoint by a step size proportional to the mass error:\n    $$V_{new} = V_{current} - \\alpha \\cdot \\frac{M_{average} - M_{target}}{M_{target}}$$\n    where $\\alpha$ is a tuning constant (gain) that ensures stability.\n4.  **Recovery Time Monitoring:** Before accepting the new $V_{new}$, the system verifies that $T_{recovery}$ is trending down or stable. If $T_{recovery}$ continues to grow despite reducing the shot size, the algorithm flags a potential material consistency issue (e.g., moisture content changes) and holds the shot size while alerting the operator, preventing excessive reduction that could cause short shots.\n5.  **Feedback Loop:** After each adjustment, the new $M_{measured}$ values are fed back into the moving average. This creates a self-correcting loop that continuously aligns the volumetric shot with the actual material density/viscosity changes, compensating for the drift that causes both weight gain and recovery time increase.\n\n**Measures It Relies On:**\n*   **Check-Weigher:** Provides the direct, real-time measurement of part mass, which is the primary indicator of the drift away from target weight.\n*   **Cycle-Time Logger:** Provides the recovery time metric, which serves as a secondary indicator of material behavior (viscosity/density changes) and process stability. The correlation between increased recovery time and increased weight confirms the drift is process-related rather than just sensor noise.\n*   **Existing Sensors (Barrel Zone Thermocouples):** While not directly used for compensation in this specific algorithm, they are monitored to ensure the process remains within safe thermal limits. If the check-weigher indicates weight drift but thermocouples show unstable temperatures, the system prioritizes temperature stabilization before applying volumetric compensation, preventing thermal shock to the material or machine.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "### Mitigation Proposal: Adaptive Volumetric Compensation Loop Using Cycle-Time and Check-Weighter Feedback\n\n**Mechanism:**\nThe core issue is a positive feedback loop where increased part weight leads to longer screw recovery times, which likely causes further volumetric inaccuracies or material degradation, compounding the drift. To mitigate this without new hardware, we will implement a **Closed-Loop Adaptive Volumetric Compensation** algorithm. This mechanism uses the existing check-weigher data as the ground truth for part mass and the cycle-time logger to detect the recovery time anomaly. It then dynamically adjusts the volumetric shot (shot size) setpoint on the *next* cycle (or after a small buffer) to counteract the drift, rather than holding the barrel setpoints static.\n\n**Direction of Effect:**\n*   **Driving Variable:** The deviation of the part's measured mass from the target mass ($M_{average} - M_{target}$) and the relative change in screw recovery time ($T_{recovery} - T_{baseline}$).\n*   **Mechanism Direction:** An increase in measured part mass ($M_{measured} > M_{target}$) indicates that the volumetric shot size is too large or material density is higher than expected, causing the screw to pack more material. The system responds by **decreasing** the volumetric shot size setpoint ($V_{shot}$).\n*   **Expected Consequence:** Decreasing the shot size reduces the volume of material injected per cycle, which lowers the part mass back toward the target and reduces the volume of material the screw must re-melt and recover, thereby **decreasing** the screw recovery time ($T_{recovery}$) and breaking the positive feedback loop of drift and slowing cycle times.\n\n**Implementation:**\n1.  **Data Integration:** The existing cycle-time logger and check-weigher data are streamed into the machine’s HMI/PLC controller. The check-weigher provides the measured mass ($M_{measured}$) of each part, and the cycle-time logger records the recovery time ($T_{recovery}$).\n2.  **Drift Detection:** Calculate the moving average of $M_{measured}$ over the last $N$ parts (e.g., $N=10$). Simultaneously, track the moving average of $T_{recovery}$. If $M_{average}$ exceeds the target mass ($M_{target}$) by more than a defined tolerance (e.g., $\\pm 0.5\\%$) AND $T_{recovery}$ has increased beyond its baseline historical average, trigger the compensation logic.\n3.  **Adaptive Setpoint Adjustment:** The controller computes a correction factor $\\Delta V$ for the volumetric shot size. Since the part is too heavy, the screw is likely packing too much material or the volumetric shot is too large. The algorithm reduces the volumetric shot setpoint by a step size proportional to the mass error:\n    $$V_{new} = V_{current} - \\alpha \\cdot \\frac{M_{average} - M_{target}}{M_{target}}$$\n    where $\\alpha$ is a tuning constant (gain) that ensures stability.\n4.  **Recovery Time Monitoring:** Before accepting the new $V_{new}$, the system verifies that $T_{recovery}$ is trending down or stable. If $T_{recovery}$ continues to grow despite reducing the shot size, the algorithm flags a potential material consistency issue (e.g., moisture content changes) and holds the shot size while alerting the operator, preventing excessive reduction that could cause short shots.\n5.  **Feedback Loop:** After each adjustment, the new $M_{measured}$ values are fed back into the moving average. This creates a self-correcting loop that continuously aligns the volumetric shot with the actual material density/viscosity changes, compensating for the drift that causes both weight gain and recovery time increase.\n\n**Implementation Bill:**\n*   **Control Logic Module:** PLC program block implementing the adaptive compensation algorithm (calculation of moving averages, error term, and gain application).\n*   **Data Interfaces:** Communication links from the Check-Weigher output and Cycle-Time Logger to the PLC/HMI for data ingestion.\n*   **HMI/SCADA Updates:** Configuration of new trend screens to visualize $M_{average}$, $T_{recovery}$, and $V_{shot}$, and setting up alarm triggers for the defined tolerance breaches.\n*   **Tuning Parameters:** Configuration of gain $\\alpha$ and baseline values $M_{target}$ and $T_{baseline}$ in the PLC memory.\n\n**Measures It Relies On:**\n*   **Check-Weigher:** Provides the direct, real-time measurement of part mass ($M_{measured}$), which is the primary indicator of the drift away from target weight. This is a permitted existing measurement.\n*   **Cycle-Time Logger:** Provides the recovery time metric ($T_{recovery}$), which serves as a secondary indicator of material behavior (viscosity/density changes) and process stability. This is a permitted existing measurement derived from the logger's timestamped cycle events.\n*   **Existing Sensors (Barrel Zone Thermocouples):** While not directly used for compensation in this specific algorithm, they are monitored to ensure the process remains within safe thermal limits. If the check-weigher indicates weight drift but thermocouples show unstable temperatures, the system prioritizes temperature stabilization before applying volumetric compensation, preventing thermal shock to the material or machine. These are permitted existing measurements.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Control Logic Module:** PLC program block implementing the adaptive compensation alg",
+   "*   **Data Interfaces:** Communication links from the Check-Weigher output and Cycle-Time ",
+   "*   **HMI/SCADA Updates:** Configuration of new trend screens to visualize $M_{average}$, ",
+   "*   **Tuning Parameters:** Configuration of gain $\\alpha$ and baseline values $M_{target}$",
+   "*   **Check-Weigher:** Provides the direct, real-time measurement of part mass ($M_{measur",
+   "*   **Cycle-Time Logger:** Provides the recovery time metric ($T_{recovery}$), which serve",
+   "*   **Existing Sensors (Barrel Zone Thermocouples):** While not directly used for compensa"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'for compensation in this specific algorithm' shares no allowed-list stem (Use only existing sensors and existing measurements: the barrel zone thermocoupl...)"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 7.68,
+ "status": "DELIVERED_REVIEWED"
+}

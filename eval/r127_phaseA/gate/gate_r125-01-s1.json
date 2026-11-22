@@ -1,0 +1,91 @@
+{
+ "problem_id": "r125-01-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 8.62,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 806,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 3.32,
+   "usage": {
+    "prompt_tokens": 1181,
+    "completion_tokens": 1025,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n\"corrected_proposal\": \"**Mitigation Proposal: Adaptive Shot-Weight Targeting via Cycle-Time Compen",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal: Adaptive Shot-Weight Targeting via Cycle-Time Compensation**\n\n**Mechanism:**\nThe increase in screw recovery time and part weight at constant barrel setpoints indicates that the plasticization efficiency has decreased (likely due to material degradation, moisture, or nozzle wear), causing the screw to pack more material than intended for the same back-pressure and shear profile. The mitigation mechanism involves dynamically adjusting the injection shot volume (fill volume) to counteract the trend of excessive mass, using the *cycle-time logger* as the real-time diagnostic sensor and the *check-weigher* as the validation/correction sensor. Since we cannot add sensors, we use the existing cycle-time drift as a proxy for melt viscosity/temperature changes to preemptively adjust the shot, and use the check-weigher data to close the loop on the actual result.\n\n**Implementation:**\n1.  **Baseline Mapping:** Use the cycle-time logger to establish a historical baseline of \"Normal\" screw recovery times corresponding to target part weights (from check-weigher data).\n2.  **Drift Detection Logic:** Implement a control rule in the existing machine PLC/NC:\n    *   Continuously monitor the *screw recovery time* from the cycle-time logger.\n    *   If the recovery time exceeds the baseline threshold by more than 5% (indicating higher melt viscosity or lower effective temperature despite constant setpoints), the machine will automatically reduce the injection fill volume (shot size) by a calculated compensation factor (e.g., 1-2% per 10% increase in recovery time). This reduces the mass packed into the cavity, offsetting the increased specific volume/mass tendency.\n3.  **Closed-Loop Correction via Check-Weigher:**\n    *   The check-weigher measures the actual mass of every Nth part (or every part, if high-speed).\n    *   Calculate the *Weight Error* = (Measured Mass - Target Mass).\n    *   Apply a PID-style correction: If the weight is still above target despite the recovery-time-based reduction, further decrease the shot volume by a small step (e.g., 0.5% per 1g overage). If below target, increase it.\n    *   This uses the *check-weigher* not just for scrap sorting, but as the primary feedback element for shot adjustment, while the *cycle-time logger* provides the leading indicator (predictive compensation) for thermal/plasticization drift.\n\n**Measures Relied Upon:**\n*   **Barrel Zone Thermocouples:** No active adjustment to setpoints is made (per constraint: \"same barrel setpoints\"), but their data is implicitly assumed stable. The mitigation does *not* rely on changing temperature; it relies on the fact that temperature is constant, so the drift in recovery time is a valid proxy for material/plasticization changes.\n*   **Cycle-Time Logger:** Provides the *predictive* signal (screw recovery time) to anticipate weight drift before it fully manifests at the check-weigher, allowing for smoother, earlier correction.\n*   **Check-Weigher:** Provides the *absolute truth* for part mass, enabling the final closed-loop correction of the shot volume. It also validates that the mitigation is reducing scrap at the quality gate.\n\n**Why This Works:**\nThe core failure is that constant barrel setpoints are no longer sufficient to maintain consistent melt properties, leading to over-packing. By using the *cycle-time logger* to detect the plasticization delay (longer recovery = more viscous melt = needs less volume to achieve same cavity fill density) and the *check-weigher* to correct the final mass, we effectively decouple the shot volume from the fixed setpoints and adapt it to the actual material behavior. No new hardware is added; only the control logic is enhanced to utilize existing data streams.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "REASONING_THRASH_LEAK: correction: If the weight is still above target despite the recovery-time-based reduction, further decrease th",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "correction: If the weight is still above target despite the recovery-time-based reduction, further decrease the shot volume by a sm"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Adaptive Shot-Weight Targeting via Cycle-Time Compensation**\n\n**IMPLEMENTATION BILL:**\n*   **Hardware:** Existing machine PLC/NC controller, Cycle-Time Logger, Check-Weigher, Barrel Zone Thermocouples (read-only). No new sensors or actuators installed.\n*   **Software/Logic:** Update PLC program to implement drift detection logic and closed-loop weight correction loop.\n*   **Data Logging:** Log recovery time deltas and check-weigher errors for post-processing verification.\n\n**Mechanism:**\n**DIRECTION-OF-EFFECT:** The driving variable is an **increase** in screw recovery time (indicating decreased plasticization efficiency/volume per unit mass). This mechanical drift drives an **increase** in packed material mass per fixed stroke, causing part weight to trend **above** target. The mitigation mechanism involves dynamically adjusting the injection shot volume (fill volume) to counteract this trend, using the *cycle-time logger* as the real-time diagnostic sensor and the *check-weigher* as the validation/correction sensor. Since we cannot add sensors, we use the existing cycle-time drift as a proxy for melt viscosity/temperature changes to preemptively adjust the shot, and use the check-weigher data to close the loop on the actual result.\n\n**Implementation:**\n1.  **Baseline Mapping:** Use the cycle-time logger to establish a historical baseline of \"Normal\" screw recovery times corresponding to target part weights (from check-weigher data).\n2.  **Drift Detection Logic:** Implement a control rule in the existing machine PLC/NC:\n    *   Continuously monitor the *screw recovery time* from the cycle-time logger.\n    *   If the recovery time exceeds the baseline threshold by more than 5% (indicating higher melt viscosity or lower effective temperature despite constant setpoints), the machine will automatically reduce the injection fill volume (shot size) by a calculated compensation factor (e.g., 1-2% per 10% increase in recovery time). This reduces the mass packed into the cavity, offsetting the increased specific volume/mass tendency.\n3.  **Closed-Loop Correction via Check-Weigher:**\n    *   The check-weigher measures the actual mass of every Nth part (or every part, if high-speed).\n    *   Calculate the *Weight Error* = (Measured Mass - Target Mass).\n    *   Apply a step-down correction: If the weight is above target, further decrease the shot volume by a fixed step (e.g., 0.5% per 1g overage). If below target, increase it.\n    *   This uses the *check-weigher* not just for scrap sorting, but as the primary feedback element for shot adjustment, while the *cycle-time logger* provides the leading indicator (predictive compensation) for thermal/plasticization drift.\n\n**Measures Relied Upon (Traceability & Derivation):**\n*   **Barrel Zone Thermocouples:** \n    *   *Source:* Existing barrel zone thermocouples (T1-T4).\n    *   *Use:* Used exclusively to verify that setpoints remain constant. The logic assumes `Temp_Actual ≈ Temp_Setpoint`. No active adjustment is made. The drift in recovery time is interpreted as material change, not temperature change, because temperature readings are stable.\n*   **Cycle-Time Logger:** \n    *   *Source:* Existing cycle-time logger.\n    *   *Input Signal:* `T_recovery` (Screw recovery time).\n    *   *Derived Signal:* `Drift_Ratio = (T_recovery_current - T_recovery_baseline) / T_recovery_baseline`.\n    *   *Logic:* Drift Detection triggers when `Drift_Ratio > 0.05`.\n*   **Check-Weigher:** \n    *   *Source:* Existing check-weigher.\n    *   *Input Signal:* `M_part` (Actual mass of sampled part).\n    *   *Derived Signal:* `W_error = M_part - M_target`.\n    *   *Logic:* Correction step magnitude is derived from `|W_error|` to adjust Shot Volume.\n\n**Why This Works:**\nThe core failure is that constant barrel setpoints are no longer sufficient to maintain consistent melt properties, leading to over-packing. By using the *cycle-time logger* to detect the plasticization delay (longer recovery = more viscous melt = needs less volume to achieve same cavity fill density) and the *check-weigher* to correct the final mass, we effectively decouple the shot volume from the fixed setpoints and adapt it to the actual material behavior. No new hardware is added; only the control logic is enhanced to utilize existing data streams.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Hardware:** Existing machine PLC/NC controller, Cycle-Time Logger, Check-Weigher, Ba",
+   "*   **Software/Logic:** Update PLC program to implement drift detection logic and closed-l",
+   "*   **Data Logging:** Log recovery time deltas and check-weigher errors for post-processin",
+   "1.  **Baseline Mapping:** Use the cycle-time logger to establish a historical baseline of ",
+   "2.  **Drift Detection Logic:** Implement a control rule in the existing machine PLC/NC:",
+   "*   Continuously monitor the *screw recovery time* from the cycle-time logger.",
+   "*   If the recovery time exceeds the baseline threshold by more than 5% (indicating higher",
+   "3.  **Closed-Loop Correction via Check-Weigher:**",
+   "*   The check-weigher measures the actual mass of every Nth part (or every part, if high-s",
+   "*   Calculate the *Weight Error* = (Measured Mass - Target Mass).",
+   "*   Apply a step-down correction: If the weight is above target, further decrease the shot",
+   "*   This uses the *check-weigher* not just for scrap sorting, but as the primary feedback ",
+   "*   **Barrel Zone Thermocouples:**",
+   "*   *Source:* Existing barrel zone thermocouples (T1-T4).",
+   "*   *Use:* Used exclusively to verify that setpoints remain constant. The logic assumes `T",
+   "*   **Cycle-Time Logger:**",
+   "*   *Source:* Existing cycle-time logger.",
+   "*   *Input Signal:* `T_recovery` (Screw recovery time).",
+   "*   *Derived Signal:* `Drift_Ratio = (T_recovery_current - T_recovery_baseline) / T_recove",
+   "*   *Logic:* Drift Detection triggers when `Drift_Ratio > 0.05`.",
+   "*   **Check-Weigher:**",
+   "*   *Source:* Existing check-weigher.",
+   "*   *Input Signal:* `M_part` (Actual mass of sampled part).",
+   "*   *Derived Signal:* `W_error = M_part - M_target`.",
+   "*   *Logic:* Correction step magnitude is derived from `|W_error|` to adjust Shot Volume."
+  ],
+  "REASONING_THRASH_LEAK": [
+   "correction: If the weight is above target, further decrease the shot volume by a fixed step (e.g., 0.5% per 1g overage). If below t"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Data Logging:** Log recovery time deltas and check-weigher errors for post-processing verification.",
+   "*   Continuously monitor the *screw recovery time* from the cycle-time logger."
+  ],
+  "CONVERSION": [
+   "ADDED_SENSING_CHANNEL_ON_REGULATED_DEVICE: added physical sensing channel on a regulated device: **DIRECTION-OF-EFFECT:** The driving variable is an **increase** in screw recovery time (indicating decreased plasticization efficiency/volume per unit mass). T"
+  ]
+ },
+ "wall_clock_s": 11.95,
+ "status": "DELIVERED_REVIEWED"
+}

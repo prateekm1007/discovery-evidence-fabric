@@ -38,7 +38,8 @@ from r121_successor_run import check_layer  # noqa: E402
 from r125_f31e_run import IMPROVED_DIRECTIVE, authoring_prompt  # noqa: E402
 
 V = "agnes-3.0-flash"
-WORKERS = 4
+WORKERS = 2
+SPACING_S = 8
 PRINT_LOCK = threading.Lock()
 
 # the Phase-A output contract (the prereg's variable): one required
@@ -76,6 +77,39 @@ def quota_probe() -> bool:
         return False
 
 
+def call_with_transport_backoff(prompt: str, visible_target: int,
+                                response_format=None,
+                                what: str = "") -> dict:
+    """The ESTABLISHED AGNES transport pattern (the committed F31e
+    runner: 4 attempts, 120 s sleeps) restored by the amendment —
+    catching ONLY the rate_limited/transport refusal classes;
+    auth/missing_key fail immediately. PARSE failures are NEVER
+    retried (that is the g2 gate, fail-closed elsewhere)."""
+    last: Exception | None = None
+    for attempt in (1, 2, 3, 4):
+        try:
+            return ra.agnes_chat(
+                [{"role": "user", "content": prompt}],
+                model=V, visible_target=visible_target,
+                timeout_s=300.0, response_format=response_format)
+        except ra.RouteRefused as e:
+            if e.kind in ("auth", "missing_key"):
+                raise
+            last = e
+            print(f"    {what} transport attempt {attempt} "
+                  f"refused ({e.kind}); backoff 120s", flush=True)
+            if attempt < 4:
+                time.sleep(120)
+        except Exception as e:  # noqa: BLE001
+            last = e
+            print(f"    {what} transport attempt {attempt} "
+                  f"failed {type(e).__name__}; backoff 120s",
+                  flush=True)
+            if attempt < 4:
+                time.sleep(120)
+    raise last if last else RuntimeError("transport backoff exhausted")
+
+
 def usage_snapshot(resp: dict) -> dict:
     u = (resp or {}).get("usage") or {}
     ptd = u.get("prompt_tokens_details") or {}
@@ -99,9 +133,9 @@ def one_problem(prob: dict) -> dict:
     ca = {"leg": "author", "attempts": 1}
     try:
         ta = time.monotonic()
-        resp = ra.agnes_chat(
-            [{"role": "user", "content": authoring_prompt(prob)}],
-            model=V, visible_target=1200, timeout_s=300.0)
+        resp = call_with_transport_backoff(
+            authoring_prompt(prob), 1200,
+            what=f"{pid}/author")
         ca["latency_s"] = round(time.monotonic() - ta, 2)
         ca["usage"] = usage_snapshot(resp)
         bill = resp.get("content") or ""
@@ -136,11 +170,11 @@ def one_problem(prob: dict) -> dict:
               + "\n\nSURFACED FINDINGS (fix these):\n"
               + "\n".join(f"- {f}" for f in findings))
     try:
+        time.sleep(SPACING_S)
         tr = time.monotonic()
-        resp = ra.agnes_chat(
-            [{"role": "user", "content": prompt}],
-            model=V, visible_target=4000, timeout_s=300.0,
-            response_format=FIX_SCHEMA)
+        resp = call_with_transport_backoff(
+            prompt, 4000, response_format=FIX_SCHEMA,
+            what=f"{pid}/reviewer")
         cr["latency_s"] = round(time.monotonic() - tr, 2)
         cr["usage"] = usage_snapshot(resp)
         raw = resp.get("content") or ""
