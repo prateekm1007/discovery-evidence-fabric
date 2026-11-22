@@ -1,1 +1,61 @@
-null
+{
+ "record": "R130S3_AUDITOR_RECOMPUTE/1.0.0",
+ "auditor_session": "auditor-r131s1",
+ "authority": "Auditor Art.13 independent tally recompute from raw committed bytes (never the producing driver's summary)",
+ "source": "eval/r130s3_diffmin_replay/*.json @ queue/dev12_r7 bc6f33d63690 (96 per-leg records, fetched via contents API)",
+ "method": "per record: arm=record.arm; defect_row iff len(record.score.defects)>=1; healed iff record.score.healed; parse_first_try; ok",
+ "v1": {
+  "rows": 48,
+  "defect_rows": 2,
+  "defect_pids": [
+   [
+    "r125-06-s1",
+    "d1",
+    "duty_pricing"
+   ],
+   [
+    "r125-12-s2",
+    "d2",
+    "duty_pricing"
+   ]
+  ],
+  "healed": 0,
+  "parse_first_try": 48,
+  "typed_fail_legs": 0
+ },
+ "v2": {
+  "rows": 48,
+  "defect_rows": 2,
+  "defect_pids": [
+   [
+    "r125-01-s2",
+    "d2",
+    "duty_pricing"
+   ],
+   [
+    "r125-09-s2",
+    "d1",
+    "duty_pricing"
+   ]
+  ],
+  "healed": 0,
+  "parse_first_try": 48,
+  "typed_fail_legs": 0
+ },
+ "gate_recompute": {
+  "v2_defect_rows<=v1_defect_rows": true,
+  "v2_healed>=v1_healed": true,
+  "verdict": "FOLD (no-regression, as preregistered)"
+ },
+ "match_vs_scoring_json": "EXACT vs eval/r130s3_diffmin_scoring.json (2/2 defect rows, 0/0 heal, pids identical, 96/96 parse-first-try, 0 typed fails)",
+ "fold_byte_identity": {
+  "v1_len": 567,
+  "M5_len": 195,
+  "v2_len": 762,
+  "M5_source": "scripts/r130_gepa_reviewer.py M5 literal (m5_minimal=IMPROVED_DIRECTIVE+M5)",
+  "byte_identical": true,
+  "v1_provenance": "eval/r122_lever_prereg.json the_lever.improved_directive_bytes UNTOUCHED"
+ },
+ "diff": 0,
+ "fix_forward_note": "This file was committed as a null placeholder in c41ab7bb6829 (sandbox /tmp cache miss); rebuilt from the verified recompute and fix-forwarded here (Auditor Art.9). The recompute numbers were independently obtained from the 96 committed records before the verdict."
+}
