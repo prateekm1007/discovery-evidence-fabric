@@ -41,10 +41,25 @@ V = "agnes-3.0-flash"
 # F31b/F31c bare arms) — imported byte-exact
 from r118_authoring_run import AUTHORING_DIRECTIVE  # noqa: E402
 
-# the twin's FROZEN improved-directive bytes (the dir-3 lever)
+# the twin's FROZEN improved-directive bytes (the dir-3 lever) + the
+# R130 dir-3 FOLD (claim c-0209, builder-r130s3): the diff-minimization
+# countermeasure for the reviewer's over-rewriting failure mode
+# (MF-1 in eval/MECHANISM_FINDINGS.json), appended to the v1
+# provenance bytes — which stay UNTOUCHED in eval/r122_lever_prereg.json
+# and remain the sha-pinned incumbent baseline for the twin's GEPA
+# round-2 comparison. The clause bytes are the twin's m5_minimal M5
+# (eval/r130_gepa_reviewer.py) verbatim; the fold gate is the held-out
+# no-regression re-test (eval/r130s3_diffmin_scoring.json:gate = FOLD:
+# v2 2/48 <= v1 2/48 defect rows, heal 0 >= 0, paired 48+48 legs).
+M5_DIFFMIN_CLAUSE = (
+    "\n\nMINIMAL-DIFF RULE: change ONLY the sentences the findings "
+    "touch. Every other sentence of the ORIGINAL proposal is carried "
+    "over verbatim. Do not restate, reorganize, or reword untouched "
+    "content.")
 IMPROVED_DIRECTIVE = json.loads(
     (REPO / "eval" / "r122_lever_prereg.json")
-    .read_text(encoding="utf-8"))["the_lever"]["improved_directive_bytes"]
+    .read_text(encoding="utf-8"))["the_lever"][
+        "improved_directive_bytes"] + M5_DIFFMIN_CLAUSE
 
 
 def items():

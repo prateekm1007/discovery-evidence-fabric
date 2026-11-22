@@ -1,0 +1,84 @@
+{
+ "record": "R130S3_DIFFMIN_SCORING/1.0.0",
+ "claim": "c-0209",
+ "session": "builder-r130s3",
+ "arm_pair": "v1 (frozen incumbent bytes) vs v2 (v1 + M5, byte-identical to the twin's m5_minimal)",
+ "corpus": "the 48 committed F31e pre-review bills (succ_d{1,2} authored_bill + surfaced_findings), disjoint from the GEPA compile corpus",
+ "v1": {
+  "rows": 48,
+  "defect_rows": 2,
+  "defect_rows_detail": [
+   {
+    "pid": "r125-06-s1",
+    "draw": "d1",
+    "classes": [
+     "duty_pricing"
+    ]
+   },
+   {
+    "pid": "r125-12-s2",
+    "draw": "d2",
+    "classes": [
+     "duty_pricing"
+    ]
+   }
+  ],
+  "per_class": {
+   "input_availability": 0,
+   "duty_pricing": 2,
+   "constraint_violation": 0,
+   "physics_direction_inversion": 0
+  },
+  "healed": 0,
+  "typed_fail_legs": [],
+  "parse_first_try": 48,
+  "transport": {
+   "legs": 48,
+   "backoff_legs": 7,
+   "max_attempts": 2
+  }
+ },
+ "v2": {
+  "rows": 48,
+  "defect_rows": 2,
+  "defect_rows_detail": [
+   {
+    "pid": "r125-09-s2",
+    "draw": "d1",
+    "classes": [
+     "duty_pricing"
+    ]
+   },
+   {
+    "pid": "r125-01-s2",
+    "draw": "d2",
+    "classes": [
+     "duty_pricing"
+    ]
+   }
+  ],
+  "per_class": {
+   "input_availability": 0,
+   "duty_pricing": 2,
+   "constraint_violation": 0,
+   "physics_direction_inversion": 0
+  },
+  "healed": 0,
+  "typed_fail_legs": [],
+  "parse_first_try": 48,
+  "transport": {
+   "legs": 48,
+   "backoff_legs": 15,
+   "max_attempts": 2
+  }
+ },
+ "gate": {
+  "defect_rows": 2,
+  "rows": 48,
+  "verdict": "FOLD",
+  "no_regression_defects": true,
+  "no_regression_heal": true,
+  "v1_defect_rows": 2,
+  "note": "the preregistered dir-3 fold gate: FOLD iff v2 defect rows <= v1 AND v2 heal >= v1 (paired, same 48 held-out inputs); no score claims"
+ }
+}
