@@ -1,0 +1,161 @@
+{
+ "record": "R130S3_R131_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r131s1",
+ "audited_queue_tip": "bc6f33d63690 (builder-r130s3 close, claim c-0209 DONE)",
+ "current_queue_tip": "19fc85578bc4 (builder-r121s1-3e8a41d7 R131 GEPA-round2 prereg, claim c-0210 OPEN)",
+ "audit_branch_parent": "f97bbbd4a008b7863f32db253a80b05fda1bad61",
+ "read_record": "FULL: EPISTEMIC_CONSTITUTION.md@bc6f33d63 (153ac62efca36c2d), AUDITOR_CONSTITUTION.md@audit-tip (3775f869a1c19a96), AUDIT_LEDGER.json, ROADMAP_PHASES_R48 (AM46), r129/r130 adjudications, r130s3 prereg/scoring/status/KB + 96 replay records, r131 prereg, fold patch, Art.27 test, surface workflow. See audit/preflight/r130s3_preflight.json.",
+ "R130S3_FOLD_VERDICT": {
+  "verdict": "VERIFIED \u2014 the diff-minimization fold is honest, preregistered, byte-identical to the twin's m5_minimal, and passes its no-regression gate. Independent recompute matches to the digit (eval/r130s3_auditor_recompute.json, diff=0).",
+  "recompute": "v1 2/48 (r125-06-s1 d1, r125-12-s2 d2 duty_pricing), v2 2/48 (r125-01-s2 d2, r125-09-s2 d1 duty_pricing), heal 0/0, 96/96 parse-first-try, 0 typed fails. GATE FOLD (2<=2, 0>=0) as preregistered \u2014 NO regression, NOT improvement.",
+  "byte_identity": "v1=567c (eval/r122_lever_prereg.json, UNTOUCHED) + M5=195c = 762c; M5 byte-identical to scripts/r130_gepa_reviewer.py m5_minimal. GEPA-round2 frozen-v1 baseline preserved.",
+  "claim_before_work": "c-0209 prereg pushed first (269343a57); claim_next_id monotonic c-0210->c-0211; Art.29 satisfied.",
+  "D2_ci": "check-run IDs VERIFIED via /commits/{sha}/check-runs: 137314980753(f85ffe556 success),137319021739(269343a57 success),137326166609(12fffcf60 success),137327567121(bc6f33d63 success); b7eda71d8 red(137312978577) root-caused(trailer gate)+fixed. Coder citations CORRECT.",
+  "art27": "engine_line_share=0 disclosed as 'infrastructure' \u2014 a WIRED DISCLOSED_ROUND_TYPES category; gate passes legitimately (not a violation). Architectural debt noted separately (R131-F2).",
+  "mechanism_kb": "eval/MECHANISM_FINDINGS.json MF-1..4 evidence-cited and honest; MF-2 (duty_pricing ~2/48-per-draw rate-floor, 3 disjoint draws zero pid overlap) is a genuine insight \u2014 class-rate is the stable instrument, item-level defect pins would over-fit.",
+  "secrets": "in-channel tokens NOT committed (handoff files 0 hits, .env.keys gitignored, 40 messages 0 hits, CI all-refs+message secret gates green)."
+ },
+ "R131_PREREG_ACCEPTED": {
+  "claim": "c-0210 r131-gepa-round2-verdict (builder-r121s1-3e8a41d7, OPEN)",
+  "verdict": "ACCEPTED \u2014 rigorous Art.20 round-2 falsification contract. Headroom corpus (48 F31e pre-review pairs where v1 breaks bills ~2/48). Two-sided preregistered pooling: v1 pooled 4/96 (committed draw A 2/48 + twin live v1 draw B 2/48, zero re-run); m5 pooled (2+X)/96 incl the twin's UNFAVORABLE c-0209 v2 draw (no cherry-picking). STRICTLY BEATS iff X<=1; TIE X=2; LOSE X>=3 -> arm DELETED. Verifier-recompute-first executed (c-0209 numbers re-tallied, all check out).",
+  "note": "Corpus is the F31e reviewer-broke-clean-bill class (satisfies R130 ROUND2_INPUT_REQUIREMENT spirit; the r129 ss/bon3 pids were examples of the same class). The other session stands down to VERIFIER (Art.29(c))."
+ },
+ "CORRECTIONS_ART9": [
+  {
+   "id": "CORR-R131-1",
+   "withdraws": "R130 adjudication score_rationale/path_to_8: 'score-8 panel (>=3 Bedrock families)' + 'AWS host is the owner-gated bottleneck'",
+   "correction": "The governing roadmap AM46 (R49 owner directive, landed R52 d2a8550825af 2026-11-17) makes P4/P5 AGENT-RUN: panel = >=3 judge agents, >=2 model families distinct from generator AND each other, on gateway+judge queue; 'Only owner act: P0 one-time custody+rotation'; 'no rented compute'. The HF router is LIVE (meta-llama callable, R128). The score-8 panel is LOOP-OWNED, NOT Bedrock-specific and NOT owner-gated on AWS. Idling on AWS violates Art.28 + AM46. A rented EC2 host is arguably disallowed by the no-rented-compute rule.",
+   "severity": "HIGH"
+  },
+  {
+   "id": "CORR-R131-2",
+   "withdraws": "'Score-9 axis ACCEPTED' (R126) as implying roadmap P5 progress",
+   "correction": "The F31e delivered-defect-rate result is a script-path viability SUB-METRIC, not the roadmap P5 score-9 gate (post-cutoff rediscovery + unattended 30-batch + T1/T2 external proof). Roadmap score remains 7. Rename the axis in records.",
+   "severity": "MEDIUM"
+  },
+  {
+   "id": "CORR-R131-3",
+   "withdraws": "R129 GOVERNANCE_FINDING 'AUDITOR_CONSTITUTION.md not in canonical tree' + R130 path_to_8(1) 'still open' + handoff 'auditor must author'",
+   "correction": "AUDITOR_CONSTITUTION.md v1.3.0 IS canonical at the audit-branch root since R57 (43e450e1c4df, 2026-11-17), present at tip f97bbbd4a008, digest 3775f869a1c19a96 byte-verified. Auditor files are canonical on the audit branch (Art.28: auditor never pushes queue). CLOSED. Coder reads it from the audit-branch TIP + digest pin, not a floating history SHA.",
+   "severity": "MEDIUM"
+  }
+ ],
+ "FINDINGS": [
+  {
+   "id": "R131-F1",
+   "severity": "HIGH",
+   "title": "AWS-bottleneck/Bedrock-only panel framing contradicts governing AM46 (loop-owned agent panel)",
+   "evidence": "audit/ROADMAP_PHASES_R48 P4/P5 AGENT-RUN; AUDIT_LEDGER amendments AM46 (2026-11-17, 'Ceiling-~7 RETIRED; goal 9/10 fully agent-run; Only owner act P0'); r130 adjudication score_rationale; HF router live (R128). Corrected CORR-R131-1; direction DIR2.",
+   "status": "OPEN_CORRECTED"
+  },
+  {
+   "id": "R131-F2",
+   "severity": "MEDIUM",
+   "title": "Capability logic (check_layer binds, reviewer/authoring directives) housed in scripts/; F31e measured path imports engine.route_adapter (transport) only, not engine_route->mechanism_space; 0 engine lines R130S2/S3 (F63 pattern)",
+   "evidence": "scripts/r125_f31e_run.py imports (from r121_successor_run import check_layer; IMPROVED_DIRECTIVE constant); fold patch 12fffcf60; Art.27 infrastructure disclosure (legal). Direction DIR4.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F3",
+   "severity": "MEDIUM",
+   "title": "Score-7 'two consecutive sealed sets >=3.3' not strictly satisfied: v12 GRANTED 3.400, v13 REVOKED, v14 NOT_GRANTED 3.267, v15 GRANTED 3.900 \u2014 v12/v15 non-consecutive",
+   "evidence": "AUDIT_LEDGER sealed_instruments v9-v15; V95 (R105 score7 on v15). v16 (mean>=3.3) gives a consecutive v15->v16 pair to consolidate. Direction DIR5.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F4",
+   "severity": "LOW-MEDIUM",
+   "title": "Provenance path citation dangling: prereg + MECHANISM_FINDINGS cite eval/r130_gepa_reviewer.py (404); actual file scripts/r130_gepa_reviewer.py (M5 byte-identical there)",
+   "evidence": "contents API eval/r130_gepa_reviewer.py 404; scripts/r130_gepa_reviewer.py M5 literal matches. Art.1/21 label integrity. Direction DIR6.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F5",
+   "severity": "LOW",
+   "title": "Counter authorities diverged: refs/claims/counter=203 vs eval/claim_next_id.txt=c-0211 vs 205 claims (max c-0210); c-0206 skipped with no record",
+   "evidence": "refs/claims/counter blob 'claim_counter=203'; work_claims.json (c-0206 absent). Art.29 monotonic next-id test passes (green) \u2014 hygiene, not gate failure. Direction DIR7.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F6",
+   "severity": "LOW",
+   "title": "R131 prereg typed_at 2026-11-22T23:05Z postdates its push (19:36Z) by ~3.5h \u2014 sandbox wall-clock skew claimed 'TRUE UTC'",
+   "evidence": "eval/r131_gepa_round2_prereg.json typed_at vs commit committer date. Claim-before-work satisfied structurally (prereg is tip, no run records). Direction DIR7.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R129-GOV-CLOSED",
+   "severity": "MEDIUM",
+   "title": "AUDITOR_CONSTITUTION.md canonical commit",
+   "evidence": "present at audit-branch root since R57 43e450e1c4df; tip f97bbbd4a008 digest 3775f869a1c19a96 verified",
+   "status": "CLOSED"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0_custody_scope": "MET \u2014 secret scans green (all refs + commit messages); rubric private custody (v14/v15 unauth 404); measured path declared engine_route->mechanism_space (R47). Caveat: F31e path script-driven (R131-F2).",
+  "P1_checkable_claims": "MET (score 5) \u2014 computed physics (12-relation; pint/cantera/mapie in CI), schema enums wired; prose-scanner deletion still P2-gated (v3.2.0 typed deviation).",
+  "P2_generation_quality": "MET (score 6) \u2014 v15 newly-sealed n30 mean 3.9 CI[3.79,4.01] 0/0/0 GRANTED.",
+  "P3_optimize_speed": "PARTIAL (score 7 carried) \u2014 speed R127 median 22.055s/worst 144.16s, 0 parse retries, backoff 8/8; GEPA r1 TIE/r2 OPEN(c-0210); BoN r1 WIN/r2 ADOPT(c-0208); conformal C-MAPSS/XJTU-SY/CWRU tests in CI. Two-consecutive->=3.3 clause needs v16 (R131-F3).",
+  "P4_real_novelty": "NOT MET (->8) \u2014 AGENT-RUN blind cross-family panel: agreement>=0.7(alpha>=0.6), AUC>=0.8, >=0.2 cosine separation, 0 canary, >=50% viable+non-obvious. LOOP-OWNED, ready via HF router (R131-F1/DIR2); infra exists (test_r103_blind_panel, test_r106_panel_agreement).",
+  "P5_external_proof": "NOT MET (->9) \u2014 AGENT-RUN: >=30 post-cutoff patents/papers rediscovered, >=40% key mechanisms recovered, >=1 T1+T2 agent-validated candidate, unattended 30-batch 0 human interventions. Substantial execution remains."
+ },
+ "SCORE": {
+  "value": 7,
+  "basis": "ledger V95 (R105): v15 GRANTED mean 3.9 CI[3.79,4.01] 0/0/0; v12 GRANTED 3.400. Carried unchanged.",
+  "caveat": "two-consecutive->=3.3 not strict (R131-F3); v16 consolidates.",
+  "goal": "9/10 fully agent-run (AM46; ~7 ceiling RETIRED).",
+  "path_to_8": "P4 loop-owned panel (DIR2) + v16 sealed set (DIR5).",
+  "path_to_9": "P5 rediscovery + unattended batch.",
+  "no_score_change": true
+ },
+ "DIRECTIONS": [
+  {
+   "dir": 1,
+   "title": "FULL constitution read + vault (every session)",
+   "acceptance": "FULL-read EPISTEMIC_CONSTITUTION.md from queue/dev12_r7@19fc85578bc4 (all 29 arts+4 amendments+Art.28 addendum; sha256[:16]=153ac62efca36c2d) AND AUDITOR_CONSTITUTION.md from audit/r11-auditor-verdict-20261114 TIP (3775f869a1c19a96) \u2014 branch tip, not floating history SHA. Vault env-only (in-channel GH_PAT+HF; digests-only). 0 digest mismatches; secret-grep=0."
+  },
+  {
+   "dir": 2,
+   "title": "TOP: score-8 panel \u2014 LOOP-OWNED per AM46, NO AWS wait",
+   "acceptance": "panel_calibration.json committed: >=3 judge agents, >=2 model families distinct from agnes AND each other (HF router live), R-CAL each (accuracy>=0.8, answered_rate>=0.9), blind+position-swapped, agreement>=0.7 (alpha>=0.6) on 10-item slice, AUC>=0.8 known-novel>known-obvious, auditor cross-check>=20% (family disclosed), 0 judge==generator."
+  },
+  {
+   "dir": 3,
+   "title": "GEPA round-2 (twin c-0210 executes; other session VERIFIER)",
+   "acceptance": "arm ADOPTED iff (2+X)/96 < 4/96 (X<=1) with CI excluding tie; else DELETED (Art.20) + MF-5 KB update. VERIFIER recompute from committed bytes; 0 duplicate runs (Art.29(c))."
+  },
+  {
+   "dir": 4,
+   "title": "Migrate capability logic into the engine (F63)",
+   "acceptance": ">=1 round >=30% changed lines in discovery_fabric/engine/ moving check_layer+IMPROVED_DIRECTIVE into engine; test_article22_measured_path extended to assert F31e path imports engine_route->mechanism_space (green). OR typed product decision (script pipeline = product; archive unused engine surface) recorded as successor to eval/measured_path_decision_r47.json."
+  },
+  {
+   "dir": 5,
+   "title": "v16 sealed set (AUDITOR authors; consolidates score-7 + feeds 8)",
+   "acceptance": "v16 n>=30 fresh cluster disjoint v1-v15, rubric private/encrypted custody, hash pre-registered, one-shot, burn after; GRANTED mean>=3.3 CI lower>3.0 0/0/0; v15->v16 consecutive >=3.3. Builder runs dir-3 harness under claim-before-work on landing."
+  },
+  {
+   "dir": 6,
+   "title": "Fix dangling provenance citation",
+   "acceptance": "eval/r130s3_correction.json committed (forward, no silent rewrite); every path in MECHANISM_FINDINGS.json resolves to a committed blob (eval/r130_gepa_reviewer.py -> scripts/r130_gepa_reviewer.py); 0 dangling."
+  },
+  {
+   "dir": 7,
+   "title": "Coordination hygiene",
+   "acceptance": "single counter authority (reconcile refs/claims/counter=203 vs claim_next_id.txt=c-0211); c-0206 skipped-ID typed record; prereg timestamps true UTC (typed_at<=push committed_at or typed clock-skew)."
+  },
+  {
+   "dir": 8,
+   "title": "Progress honesty",
+   "acceptance": "0 records label the F31e sub-metric as roadmap score-9 gate (rename 'delivered-defect-rate viability sub-metric'); every score names basis+gate state; '~7 ceiling' framing deleted (AM46 retired)."
+  }
+ ],
+ "DELETE_LIST": [
+  "'AWS host bottleneck / >=3 Bedrock families' framing (replaced by AM46 loop-owned cross-family panel)",
+  "'~7 ceiling' (AM46 RETIRED; goal 9 fully agent-run)",
+  "'score-9 axis ACCEPTED' label for the F31e sub-metric (rename)",
+  "m1/m4 stay dropped from candidate pool (recorded; code untouched)"
+ ],
+ "NO_NEW_CODE_DELETIONS": "retired ceremony stays retired; no new guards/claim kinds (KB is a record file).",
+ "recompute_pointer": "eval/r130s3_auditor_recompute.json (Art.13, diff=0)"
+}

@@ -1632,6 +1632,62 @@
     12,
     27
    ]
+  },
+  {
+   "id": "R131-F1",
+   "round": "R131",
+   "severity": "HIGH",
+   "title": "AWS-bottleneck/Bedrock-only panel framing contradicts governing AM46 (loop-owned agent panel)",
+   "evidence": "audit/ROADMAP_PHASES_R48 P4/P5 AGENT-RUN; AUDIT_LEDGER amendments AM46 (2026-11-17, 'Ceiling-~7 RETIRED; goal 9/10 fully agent-run; Only owner act P0'); r130 adjudication score_rationale; HF router live (R128). Corrected CORR-R131-1; direction DIR2.",
+   "status": "OPEN_CORRECTED"
+  },
+  {
+   "id": "R131-F2",
+   "round": "R131",
+   "severity": "MEDIUM",
+   "title": "Capability logic (check_layer binds, reviewer/authoring directives) housed in scripts/; F31e measured path imports engine.route_adapter (transport) only, not engine_route->mechanism_space; 0 engine lines R130S2/S3 (F63 pattern)",
+   "evidence": "scripts/r125_f31e_run.py imports (from r121_successor_run import check_layer; IMPROVED_DIRECTIVE constant); fold patch 12fffcf60; Art.27 infrastructure disclosure (legal). Direction DIR4.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F3",
+   "round": "R131",
+   "severity": "MEDIUM",
+   "title": "Score-7 'two consecutive sealed sets >=3.3' not strictly satisfied: v12 GRANTED 3.400, v13 REVOKED, v14 NOT_GRANTED 3.267, v15 GRANTED 3.900 \u2014 v12/v15 non-consecutive",
+   "evidence": "AUDIT_LEDGER sealed_instruments v9-v15; V95 (R105 score7 on v15). v16 (mean>=3.3) gives a consecutive v15->v16 pair to consolidate. Direction DIR5.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F4",
+   "round": "R131",
+   "severity": "LOW-MEDIUM",
+   "title": "Provenance path citation dangling: prereg + MECHANISM_FINDINGS cite eval/r130_gepa_reviewer.py (404); actual file scripts/r130_gepa_reviewer.py (M5 byte-identical there)",
+   "evidence": "contents API eval/r130_gepa_reviewer.py 404; scripts/r130_gepa_reviewer.py M5 literal matches. Art.1/21 label integrity. Direction DIR6.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F5",
+   "round": "R131",
+   "severity": "LOW",
+   "title": "Counter authorities diverged: refs/claims/counter=203 vs eval/claim_next_id.txt=c-0211 vs 205 claims (max c-0210); c-0206 skipped with no record",
+   "evidence": "refs/claims/counter blob 'claim_counter=203'; work_claims.json (c-0206 absent). Art.29 monotonic next-id test passes (green) \u2014 hygiene, not gate failure. Direction DIR7.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F6",
+   "round": "R131",
+   "severity": "LOW",
+   "title": "R131 prereg typed_at 2026-11-22T23:05Z postdates its push (19:36Z) by ~3.5h \u2014 sandbox wall-clock skew claimed 'TRUE UTC'",
+   "evidence": "eval/r131_gepa_round2_prereg.json typed_at vs commit committer date. Claim-before-work satisfied structurally (prereg is tip, no run records). Direction DIR7.",
+   "status": "OPEN"
+  },
+  {
+   "id": "R129-GOV-CLOSED",
+   "round": "R131",
+   "severity": "MEDIUM",
+   "title": "AUDITOR_CONSTITUTION.md canonical commit",
+   "evidence": "present at audit-branch root since R57 43e450e1c4df; tip f97bbbd4a008 digest 3775f869a1c19a96 verified",
+   "status": "CLOSED"
   }
  ],
  "amendments": [
@@ -4412,6 +4468,31 @@
    "acceptance": "GRANTED",
    "score": 7,
    "evidence_sha": "eval/holdout_v15_auditor_score.json"
+  },
+  {
+   "id": "V96",
+   "round": "R131 audit of R130S3 fold + R131 prereg",
+   "commit": "f97bbbd4a008b7863f32db253a80b05fda1bad61",
+   "gate": "R130S3 FOLD VERIFIED (recompute diff=0); R131 prereg ACCEPTED",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r130s3_auditor_adjudication.json",
+   "corrections": [
+    "CORR-R131-1",
+    "CORR-R131-2",
+    "CORR-R131-3"
+   ],
+   "findings": [
+    "R131-F1",
+    "R131-F2",
+    "R131-F3",
+    "R131-F4",
+    "R131-F5",
+    "R131-F6"
+   ],
+   "closed": [
+    "R129-GOV-CLOSED"
+   ]
   }
  ],
  "gold_set": {
@@ -4709,7 +4790,7 @@
    "acceptance": "GRANTED (mean 3.9, CI[3.79, 4.01], 0/0/0)"
   }
  },
- "progress_note": "SCORE 7/10. v15 ACCEPTED (mean 3.9, CI[3.79, 4.01], 0/0/0, VALID). v15 BURNED (Art.7). Score-8 lane (blind panel + SPECTER2 anchor-relative gate) and Score-9 lane (post-cutoff rediscovery + unattended 30-batch) next. Goal 9/10.",
+ "progress_note": "SCORE 7/10 (carried R131, no change). v15 ACCEPTED mean 3.9 CI[3.79,4.01] 0/0/0 BURNED; v12 ACCEPTED 3.400. R130S3 diff-min fold VERIFIED (independent recompute diff=0; FOLD no-regression 2/48<=2/48). R131 GEPA-round2 prereg ACCEPTED (c-0210 OPEN, twin lane; X<=1 strict-beat-or-delete). CORRECTIONS: AWS-bottleneck framing withdrawn (AM46 loop-owned panel); 'score-9 axis' renamed viability sub-metric; R129 governance finding CLOSED (AUDITOR_CONSTITUTION canonical at audit tip since R57). Score-7 two-consecutive->=3.3 needs v16 to consolidate (R131-F3). Path to 8: P4 loop-owned cross-family panel (HF router live) + v16 sealed set. Path to 9: P5 agent-run rediscovery + unattended 30-batch. Goal 9/10 fully agent-run (AM46; ~7 ceiling retired).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -4797,6 +4878,11 @@
    "date": "2026-11-17",
    "ruling": "Blind AI panels admissible for P4/P5 iff: >=3 agents, >=2 families != generator and each other; R-CAL qualified rungs; blind+position-swapped+structured; agreement>=0.7/alpha>=0.6 and AUC>=0.8 on known-novel/obvious controls pre-registered; auditor cross-check>=20% with family disclosed; judge!=generator structural. qwen-3.8-max eligible (c-0026 MET); deepseek only after c-0043; third family from judge queue.",
    "status": "ACTIVE"
+  },
+  {
+   "id": "RULING-R131-AM46",
+   "date": "2026-11-23",
+   "ruling": "The score-8/9 lanes are LOOP-OWNED per governing roadmap AM46 (R52). P4 panel = blind cross-family AI panel (>=3 judges, >=2 non-generator families) on gateway+judge queue; NOT Bedrock-specific, NOT owner-gated on AWS; no rented compute. The '~7 ceiling' is RETIRED; goal 9/10 fully agent-run. Only owner act: P0 one-time custody+rotation. The R130 'AWS bottleneck' framing is withdrawn (CORR-R131-1)."
   }
  ],
  "corrections": [
@@ -4827,6 +4913,33 @@
    "withdrawn": "v14 as authored R99 (seal 73222ce2feb8ab32) claimed domain-disjoint",
    "corrected": "v14 HO14-08-mbr-fouling CLASHED v8-08 (municipal MBR wastewater, PVDF hollow-fibre, membrane-irreversible-fouling) \u2014 device-exact + failure-family repeat, the CORR-6 class. AUDITOR authoring error (I missed v8-08 when authoring v14). Builder's fail-closed r99 guard caught it PRE-RUN (no generation, no quota). FIXED: HO14-08 replaced with HO14-08-cwetland-clog (constructed-wetland substrate clogging, fresh). New seal 7707a0b4520c2a52. Rubric updated. Builder's guard extension (v1-v13 corpus, audit-ref source, honest stem-level head derivation, false-friend adjudication, independent verifier recompute) is exemplary fail-closed discipline.",
    "reason": "Art.9 duty-to-correct + Art.13 fresh-problem integrity. The guard works \u2014 it caught the auditor's own error."
+  },
+  {
+   "id": "CORR-R131-1",
+   "round": "R131",
+   "date": "2026-11-23",
+   "withdraws": "R130 adjudication score_rationale/path_to_8: 'score-8 panel (>=3 Bedrock families)' + 'AWS host is the owner-gated bottleneck'",
+   "correction": "The governing roadmap AM46 (R49 owner directive, landed R52 d2a8550825af 2026-11-17) makes P4/P5 AGENT-RUN: panel = >=3 judge agents, >=2 model families distinct from generator AND each other, on gateway+judge queue; 'Only owner act: P0 one-time custody+rotation'; 'no rented compute'. The HF router is LIVE (meta-llama callable, R128). The score-8 panel is LOOP-OWNED, NOT Bedrock-specific and NOT owner-gated on AWS. Idling on AWS violates Art.28 + AM46. A rented EC2 host is arguably disallowed by the no-rented-compute rule.",
+   "severity": "HIGH",
+   "authority": "Auditor Art.9 duty to correct; Art.8 consistency"
+  },
+  {
+   "id": "CORR-R131-2",
+   "round": "R131",
+   "date": "2026-11-23",
+   "withdraws": "'Score-9 axis ACCEPTED' (R126) as implying roadmap P5 progress",
+   "correction": "The F31e delivered-defect-rate result is a script-path viability SUB-METRIC, not the roadmap P5 score-9 gate (post-cutoff rediscovery + unattended 30-batch + T1/T2 external proof). Roadmap score remains 7. Rename the axis in records.",
+   "severity": "MEDIUM",
+   "authority": "Auditor Art.9 duty to correct; Art.8 consistency"
+  },
+  {
+   "id": "CORR-R131-3",
+   "round": "R131",
+   "date": "2026-11-23",
+   "withdraws": "R129 GOVERNANCE_FINDING 'AUDITOR_CONSTITUTION.md not in canonical tree' + R130 path_to_8(1) 'still open' + handoff 'auditor must author'",
+   "correction": "AUDITOR_CONSTITUTION.md v1.3.0 IS canonical at the audit-branch root since R57 (43e450e1c4df, 2026-11-17), present at tip f97bbbd4a008, digest 3775f869a1c19a96 byte-verified. Auditor files are canonical on the audit branch (Art.28: auditor never pushes queue). CLOSED. Coder reads it from the audit-branch TIP + digest pin, not a floating history SHA.",
+   "severity": "MEDIUM",
+   "authority": "Auditor Art.9 duty to correct; Art.8 consistency"
   }
  ],
  "rulings": [
