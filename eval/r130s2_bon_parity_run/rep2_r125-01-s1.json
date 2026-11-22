@@ -1,0 +1,160 @@
+{
+ "problem_id": "r125-01-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 54.08,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.56,
+     "usage": {
+      "prompt_tokens": 268,
+      "completion_tokens": 809,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.67,
+     "usage": {
+      "prompt_tokens": 1154,
+      "completion_tokens": 1388,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n\"corrected_proposal\": \"**Mitigation Proposal: Dynamic Barrel Temperature Compensation via Closed-L",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Dynamic Barrel Temperature Compensation via Closed-Loop Cycle-Time and Check-Weight Feedback**\n\n**Mechanism:**\nThe drift in part weight and increased screw recovery time at constant barrel setpoints indicates a change in material melt viscosity or flow characteristics, likely due to material batch variability, machine wear, or environmental factors affecting heat transfer. Since new sensors cannot be added, this mitigation repurposes the existing **cycle-time logger** and **check-weigher** as indirect \"state\" signals to infer the actual melt condition and dynamically adjust the **barrel zone thermocouples' setpoints** (the actuators) to compensate for the drift, thereby stabilizing part weight and recovery time.\n\n**Implementation:**\n1.  **Baseline Re-establishment:** For a defined initial period (e.g., 20 cycles), record the mean part weight from the check-weigher and the corresponding screw recovery time from the cycle-time logger. Map these values to the current barrel zone temperature setpoints to create a new \"calibrated baseline\" for the current operating condition.\n2.  **Real-Time Monitoring & Error Calculation:** On each subsequent cycle, immediately after the check-weigher records the part weight ($W_{act}$) and the cycle-time logger records the screw recovery time ($T_{rec}$), calculate a composite error signal. \n    *   Define a weight deviation: $\\Delta W = W_{act} - W_{target}$.\n    *   Define a recovery time deviation: $\\Delta T = T_{rec} - T_{rec, baseline}$.\n    *   Create a combined drift indicator $D$. If part weight is high AND recovery time is long, this strongly suggests the melt is too viscous or the fill phase is incomplete/suboptimal, requiring a temperature adjustment.\n3.  **Adaptive Setpoint Adjustment:** Implement a simple control law (e.g., a Proportional controller or a lookup table) that adjusts the barrel zone temperature setpoints based on $D$. \n    *   *Logic:* If $W_{act}$ is consistently above target and $T_{rec}$ is increasing, the system interprets this as a need for lower viscosity to improve flow and reduce cycle time/weight inconsistency. The controller will *lower* the setpoints for the mid-to-rear barrel zones (where melting and heating occur) by a small, predefined step (e.g., 1-2°C).\n    *   Conversely, if $W_{act}$ is below target and $T_{rec}$ is very short (indicating over-shoot or incomplete fill), the controller will *raise* the setpoints.\n4.  **Constraint Check:** This process uses only the existing check-weigher (for $W_{act}$), cycle-time logger (for $T_{rec}$), and barrel zone thermocouples (as the actuation point for setpoint changes). No new sensors are introduced. The PLC/machine controller simply runs this logic in its existing cycle monitoring software.\n\n**Measures it Relies On:**\n*   **Check-Weigher Accuracy:** The check-weigher must provide reliable, high-frequency part weight data.\n*   **Cycle-Time Logger Resolution:** The logger must capture screw recovery time with sufficient granularity to detect small drifts (typically milliseconds).\n*   **Thermocouple Responsiveness:** The barrel zone thermocouples must respond to setpoint changes within a reasonable timeframe (less than the time constant of the material drift, which is weeks, so this is easily satisfied).\n*   **Causality Correlation:** There must be a known, consistent relationship between part weight/recovery time and required barrel temperature for the specific material and mold used. This is typically true in injection molding; higher viscosity (cooler melt) leads to longer recovery times and often higher residual stress/weight variations depending on packing. This mitigation exploits that correlation.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Dynamic Barrel Temperature Compensation via Closed-Loop Cycle-Time and Check-Weight Feedback**\n\n**Mechanism:**\nThe drift in part weight and increased screw recovery time at constant barrel setpoints indicates a change in material melt viscosity or flow characteristics. This mitigation repurposes the existing **cycle-time logger** and **check-weigher** as indirect 'state' signals to infer the actual melt condition and dynamically adjust the **barrel zone thermocouples' setpoints** to compensate for the drift.\n\n**Implementation Bill:**\n1.  **Baseline Re-establishment:** For a defined initial period (e.g., 20 cycles), record the mean part weight from the check-weigher and the corresponding screw recovery time from the cycle-time logger. Map these values to the current barrel zone temperature setpoints to create a new 'calibrated baseline' for the current operating condition.\n2.  **Real-Time Monitoring & Error Calculation:** On each subsequent cycle, immediately after the check-weigher records the part weight ($W_{act}$) and the cycle-time logger records the screw recovery time ($T_{rec}$), calculate a composite error signal.\n    *   Define a weight deviation: $\\Delta W = W_{act} - W_{target}$.\n    *   Define a recovery time deviation: $\\Delta T = T_{rec} - T_{rec, baseline}$.\n    *   Create a combined drift indicator $D$. If part weight is high AND recovery time is long, this strongly suggests the melt is too viscous or the fill phase is incomplete/suboptimal, requiring a temperature adjustment.\n3.  **Adaptive Setpoint Adjustment:** Implement a simple control law that adjusts the barrel zone temperature setpoints based on $D$.\n    *   *Logic:* If $W_{act}$ is consistently above target and $T_{rec}$ is increasing, the system interprets this as a need for lower viscosity to improve flow. The controller will *lower* the setpoints for the mid-to-rear barrel zones by a small, predefined step (e.g., 1-2°C).\n    *   Conversely, if $W_{act}$ is below target and $T_{rec}$ is very short, the controller will *raise* the setpoints.\n4.  **Constraint Check:** This process uses only the existing check-weigher, cycle-time logger, and barrel zone thermocouples. No new sensors are introduced.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\nThe primary driving variable is the **Melt Viscosity ($\\eta$)** (which is inversely correlated with Barrel Zone Temperature, $T_{barrel}$). The mechanical direction is: An **Increase** in Melt Viscosity (caused by a **Decrease** in $T_{barrel}$) leads to an **Increase** in Screw Recovery Time ($T_{rec}$) due to higher resistance during back-filling, and potentially an **Increase** in Part Weight ($W_{act}$) if the packing pressure is maintained against a higher viscosity melt, resulting in less pressure drop during packing. Conversely, a **Decrease** in Melt Viscosity (caused by an **Increase** in $T_{barrel}$) leads to a **Decrease** in $T_{rec}$ and may lead to a **Decrease** in $W_{act}$ if the material is less dense or if cavitation/flash occurs. The control law acts to reverse the detected drift in $T_{rec}$ and $W_{act}$ by adjusting $T_{barrel}$ in the direction that lowers viscosity if $T_{rec}$ is high, or raises it if $T_{rec}$ is low.\n\n**Input Signal Derivation & Source Mapping:**\n*   **$W_{act}$ (Actual Part Weight):** Derived directly from the **Check-weigher**. The check-weigher outputs the measured mass of the ejected part after cooling. $W_{act} = \\text{Check-Weigher Output}$.\n*   **$T_{rec}$ (Screw Recovery Time):** Derived from the **Cycle-Time Logger**. The logger records timestamps for major machine phases. $T_{rec} = t_{\\text{screw-back-complete}} - t_{\\text{injection-complete}}$, where $t_{\\text{screw-back-complete}}$ is the timestamp when the screw reaches its maximum retracted position and $t_{\\text{injection-complete}}$ is the timestamp when the injection phase ends. Both timestamps are existing logged events.\n*   **$W_{target}$ (Target Part Weight):** Derived from the **Check-weigher** historical data or predefined engineering specification. If derived from data: $W_{target} = \\text{Mean}(W_{act})$ over the baseline period of 20 cycles recorded in Step 1.\n*   **$T_{rec, baseline}$ (Baseline Recovery Time):** Derived from the **Cycle-Time Logger** historical data. $T_{rec, baseline} = \\text{Mean}(T_{rec})$ over the baseline period of 20 cycles recorded in Step 1.\n*   **$\\Delta W$ and $\\Delta T$:** Derived mathematically from the above: $\\Delta W = W_{act} - W_{target}$ and $\\Delta T = T_{rec} - T_{rec, baseline}$.\n*   **Drift Indicator $D$:** Derived from logic on $\\Delta W$ and $\\Delta T$. $D = \\text{sign}(\\Delta T) \\cdot \\text{sign}(\\Delta W)$. If $\\Delta T > 0$ and $\\Delta W > 0$, $D = \\text{Positive Drift}$ (requires $T_{barrel}$ decrease). If $\\Delta T < 0$ and $\\Delta W < 0$, $D = \\text{Negative Drift}$ (requires $T_{barrel}$ increase).\n\n**Measures it Relies On:**\n*   **Check-Weigher Accuracy:** The check-weigher must provide reliable part weight data.\n*   **Cycle-Time Logger Resolution:** The logger must capture screw recovery time with sufficient granularity.\n*   **Thermocouple Responsiveness:** The barrel zone thermocouples must respond to setpoint changes.\n*   **Causality Correlation:** There must be a known, consistent relationship between part weight/recovery time and required barrel temperature.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Baseline Re-establishment:** For a defined initial period (e.g., 20 cycles), record ",
+     "2.  **Real-Time Monitoring & Error Calculation:** On each subsequent cycle, immediately af",
+     "*   Define a weight deviation: $\\Delta W = W_{act} - W_{target}$.",
+     "*   Define a recovery time deviation: $\\Delta T = T_{rec} - T_{rec, baseline}$.",
+     "*   Create a combined drift indicator $D$. If part weight is high AND recovery time is lon",
+     "3.  **Adaptive Setpoint Adjustment:** Implement a simple control law that adjusts the barr",
+     "*   *Logic:* If $W_{act}$ is consistently above target and $T_{rec}$ is increasing, the sy",
+     "*   Conversely, if $W_{act}$ is below target and $T_{rec}$ is very short, the controller w",
+     "4.  **Constraint Check:** This process uses only the existing check-weigher, cycle-time lo",
+     "*   **$W_{act}$ (Actual Part Weight):** Derived directly from the **Check-weigher**. The c",
+     "*   **$T_{rec}$ (Screw Recovery Time):** Derived from the **Cycle-Time Logger**. The logge",
+     "*   **$W_{target}$ (Target Part Weight):** Derived from the **Check-weigher** historical d",
+     "*   **$T_{rec, baseline}$ (Baseline Recovery Time):** Derived from the **Cycle-Time Logger",
+     "*   **$\\Delta W$ and $\\Delta T$:** Derived mathematically from the above: $\\Delta W = W_{a",
+     "*   **Drift Indicator $D$:** Derived from logic on $\\Delta W$ and $\\Delta T$. $D = \\text{s",
+     "*   **Check-Weigher Accuracy:** The check-weigher must provide reliable part weight data.",
+     "*   **Cycle-Time Logger Resolution:** The logger must capture screw recovery time with suf",
+     "*   **Thermocouple Responsiveness:** The barrel zone thermocouples must respond to setpoin",
+     "*   **Causality Correlation:** There must be a known, consistent relationship between part"
+    ],
+    "APPARATUS_ROW": [
+     "2.  **Real-Time Monitoring & Error Calculation:** On each subsequent cycle, immediately after the check-weighe"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 6.97,
+     "usage": {
+      "prompt_tokens": 268,
+      "completion_tokens": 945,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 5.83,
+     "usage": {
+      "prompt_tokens": 1324,
+      "completion_tokens": 1003,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Real-Time Screw Recovery Time Compensation Loop\\n\\nM",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Real-Time Screw Recovery Time Compensation Loop**\n\n**Mechanism:**\nEstablish a closed-loop corrective mechanism that uses the existing cycle-time logger to dynamically adjust the shot volume (fill position) in real-time. The core insight is that as material properties drift (causing heavier parts and longer recovery times at a fixed setpoint), the relationship between the *current* screw recovery time and the *target* part weight deviates. By monitoring the trend of screw recovery time and correlating it with the check-weigher data, the system can proactively reduce the injection volume before the part weight exceeds the upper specification limit. This prevents scrap at the quality gate by ensuring the machine does not inject excess material as the process degrades.\n\n**Implementation:**\n1.  **Baseline & Trend Analysis:** Using the existing cycle-time logger and check-weigher, calculate the rolling average (e.g., 10-cycle) of screw recovery time and part weight. Identify the \"normal\" operating window where part weight is at target and recovery time is nominal.\n2.  **Dynamic Fill Adjustment Logic:** Implement a simple PID or feed-forward control algorithm in the machine’s existing PLC/NC system (no new hardware required, just parameter updates to existing controllers).\n    *   **Input 1:** Deviation of current screw recovery time from its rolling baseline (detected via cycle-time logger).\n    *   **Input 2:** Last 3 check-weigher measurements (mean and trend).\n    *   **Action:** If screw recovery time increases beyond a defined threshold *and* check-weigher trend indicates weight is rising, automatically decrease the shot volume (fill stroke) by a calculated step size (e.g., 0.1% per deviation unit). This step size is derived from historical data correlating recovery time drift to required volume reduction.\n    *   **Constraint Check:** If check-weigher indicates weight is already above target, apply a larger corrective reduction. If weight is below target, pause reduction or slowly increase volume if recovery time stabilizes.\n3.  **Operator Alert & Override:** The system logs all adjustments and alerts the operator via the existing HMI (Human-Machine Interface) when auto-adjustments are active, allowing for manual override if necessary. The HMI displays the real-time screw recovery time trend and check-weigher average.\n\n**Measures Relied Upon:**\n*   **Screw Recovery Time:** Used as the primary *predictive* indicator of process drift. An increase in recovery time at constant barrel temperatures and pressures indicates increased melt viscosity or material degradation, which often correlates with higher required injection pressure/volume to achieve full fill, or indicates that the current volume setting is now resulting in a heavier part due to altered material behavior (e.g., moisture absorption changing density/flow). *Note: In many cases, increased recovery time can indicate that the material is not filling efficiently, requiring a larger volume or higher pressure; however, if the part weight is also drifting up, it suggests the current volume is excessive for the new material state. The check-weigher confirms the weight direction, while recovery time confirms the process state. The mitigation adjusts volume to find the optimal fill for the drifted state.*\n*   **Check-Weigher Measurements:** Used as the *confirmatory* and *final* control variable. The system ensures that part weight stays within tolerance. The check-weigher provides the ground truth for the \"output\" of the process, validating the effectiveness of the volume adjustment.\n*   **Cycle-Time Logger:** Provides the historical and real-time data for screw recovery time, enabling the calculation of trends and deviations from baseline. It also ensures that the cycle time itself remains within acceptable limits, preventing secondary issues like excessive cycle time that could affect production rate.\n*   **Barrel Zone Thermocouples:** While not directly adjusted in this mitigation (as the constraint states \"same barrel setpoints\"), their readings are logged and used to confirm that temperature deviations are not the primary cause of the drift. If temperatures are stable, the drift is likely material-related, making volume adjustment the correct compensatory action. The thermocouples serve as a diagnostic check to rule out thermal issues, ensuring the screw recovery time anomaly is not due to a broken heater or thermocouple, but rather a material/process interaction.\n\nThis approach uses only existing sensors (check-weigher, cycle-time logger, thermocouples) and existing hardware (PLC/HMI) to dynamically correct for process drift, reducing scrap by preventing over-weight parts before they reach the quality gate.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Real-Time Screw Recovery Time Compensation Loop\n\nMechanism:\nEstablish a closed-loop corrective mechanism that uses the existing cycle-time logger to dynamically adjust the shot volume (fill position) in real-time. The core insight is that as material properties drift (causing heavier parts and longer recovery times at a fixed setpoint), the relationship between the *current* screw recovery time and the *target* part weight deviates. By monitoring the trend of screw recovery time and correlating it with the check-weigher data, the system can proactively reduce the injection volume before the part weight exceeds the upper specification limit. This prevents scrap at the quality gate by ensuring the machine does not inject excess material as the process degrades.\n\nDIRECTION-OF-EFFECT:\n*   **Driving Variable:** Deviation of current screw recovery time (from rolling baseline) AND check-weigher trend (weight rising).\n*   **Mechanism Direction:** When screw recovery time increases (indicating higher melt viscosity/degradation) and check-weigher indicates rising weight, the actuator (injection volume/fill stroke) is reduced.\n*   **Resulting Effect:** Decreasing the injection volume directly reduces the mass of material injected per cycle, thereby correcting the part weight back towards the target and mitigating the scrap generation at the quality gate.\n\nImplementation:\n1.  **Baseline & Trend Analysis:** Using the existing cycle-time logger and check-weigher, calculate the rolling average (e.g., 10-cycle) of screw recovery time and part weight. Identify the \"normal\" operating window where part weight is at target and recovery time is nominal.\n2.  **Dynamic Fill Adjustment Logic:** Implement a simple PID or feed-forward control algorithm in the machine’s existing PLC/NC system (no new hardware required, just parameter updates to existing controllers).\n    *   **Input 1:** Deviation of current screw recovery time from its rolling baseline.\n    *   **Input 2:** Last 3 check-weigher measurements (mean and trend).\n    *   **Action:** If screw recovery time increases beyond a defined threshold *and* check-weigher trend indicates weight is rising, automatically decrease the shot volume (fill stroke) by a calculated step size. This step size is derived from historical data correlating recovery time drift to required volume reduction.\n    *   **Constraint Check:** If check-weigher indicates weight is already above target, apply a larger corrective reduction. If weight is below target, pause reduction or slowly increase volume if recovery time stabilizes.\n3.  **Operator Alert & Override:** The system logs all adjustments and alerts the operator via the existing HMI (Human-Machine Interface) when auto-adjustments are active, allowing for manual override if necessary. The HMI displays the real-time screw recovery time trend and check-weigher average.\n\nImplementation Bill:\n| Component | Action | Operational Cost Impact |\n|-----------|--------|-------------------------|\n| PLC/NC Controller | Update control logic to monitor recovery time trend and adjust fill stroke | No energy increase; minor CPU load offset by avoided scrap cost |\n| HMI | Display adjusted fill stroke and alert operator | No availability loss; enables proactive intervention |\n| Injection Actuator | Modulate fill stroke (duty cycle of volume per cycle) | Throughput maintained; energy use remains within normal variance band |\n\nMeasures Relied Upon:\n*   **Screw Recovery Time:** \n    *   *Source:* Cycle-time logger.\n    *   *Derivation:* $RecoveryTime_{i} = CycleTime_{i} - (ShotTime_{i} + HoldTime_{i} + CoolingTime_{i})$, where ShotTime, HoldTime, and CoolingTime are discrete segments logged by the cycle-time logger.\n    *   *Role:* Primary predictive indicator of process drift.\n*   **Check-Weigher Measurements:** \n    *   *Source:* Check-weigher.\n    *   *Derivation:* $Weight_{i}$ is the direct measurement from the check-weigher sensor at each cycle.\n    *   *Role:* Confirmatory and final control variable.\n*   **Cycle-Time Logger:** \n    *   *Source:* Cycle-time logger.\n    *   *Derivation:* Provides raw timestamps for segment boundaries to compute RecoveryTime as defined above.\n*   **Barrel Zone Thermocouples:** \n    *   *Source:* Barrel zone thermocouples.\n    *   *Derivation:* $Temp_{zone,j}$ is the direct measurement from the thermocouple in zone j.\n    *   *Role:* Diagnostic check to confirm temperature stability; ensures drift is material-related, not thermal.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Screw Recovery Time:**",
+     "*   *Source:* Cycle-time logger.",
+     "*   *Derivation:* $RecoveryTime_{i} = CycleTime_{i} - (ShotTime_{i} + HoldTime_{i} + Cooli",
+     "*   *Role:* Primary predictive indicator of process drift.",
+     "*   **Check-Weigher Measurements:**",
+     "*   *Source:* Check-weigher.",
+     "*   *Derivation:* $Weight_{i}$ is the direct measurement from the check-weigher sensor at ",
+     "*   *Role:* Confirmatory and final control variable.",
+     "*   **Cycle-Time Logger:**",
+     "*   *Source:* Cycle-time logger.",
+     "*   *Derivation:* Provides raw timestamps for segment boundaries to compute RecoveryTime a",
+     "*   **Barrel Zone Thermocouples:**",
+     "*   *Source:* Barrel zone thermocouples.",
+     "*   *Derivation:* $Temp_{zone,j}$ is the direct measurement from the thermocouple in zone ",
+     "*   *Role:* Diagnostic check to confirm temperature stability; ensures drift is material-r"
+    ],
+    "APPARATUS_ROW": [
+     "*   *Derivation:* $Weight_{i}$ is the direct measurement from the check-weigher sensor at each cycle."
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal: Dynamic Barrel Temperature Compensation via Closed-Loop Cycle-Time and Check-Weight Feedback**\n\n**Mechanism:**\nThe drift in part weight and increased screw recovery time at constant barrel setpoints indicates a change in material melt viscosity or flow characteristics. This mitigation repurposes the existing **cycle-time logger** and **check-weigher** as indirect 'state' signals to infer the actual melt condition and dynamically adjust the **barrel zone thermocouples' setpoints** to compensate for the drift.\n\n**Implementation Bill:**\n1.  **Baseline Re-establishment:** For a defined initial period (e.g., 20 cycles), record the mean part weight from the check-weigher and the corresponding screw recovery time from the cycle-time logger. Map these values to the current barrel zone temperature setpoints to create a new 'calibrated baseline' for the current operating condition.\n2.  **Real-Time Monitoring & Error Calculation:** On each subsequent cycle, immediately after the check-weigher records the part weight ($W_{act}$) and the cycle-time logger records the screw recovery time ($T_{rec}$), calculate a composite error signal.\n    *   Define a weight deviation: $\\Delta W = W_{act} - W_{target}$.\n    *   Define a recovery time deviation: $\\Delta T = T_{rec} - T_{rec, baseline}$.\n    *   Create a combined drift indicator $D$. If part weight is high AND recovery time is long, this strongly suggests the melt is too viscous or the fill phase is incomplete/suboptimal, requiring a temperature adjustment.\n3.  **Adaptive Setpoint Adjustment:** Implement a simple control law that adjusts the barrel zone temperature setpoints based on $D$.\n    *   *Logic:* If $W_{act}$ is consistently above target and $T_{rec}$ is increasing, the system interprets this as a need for lower viscosity to improve flow. The controller will *lower* the setpoints for the mid-to-rear barrel zones by a small, predefined step (e.g., 1-2°C).\n    *   Conversely, if $W_{act}$ is below target and $T_{rec}$ is very short, the controller will *raise* the setpoints.\n4.  **Constraint Check:** This process uses only the existing check-weigher, cycle-time logger, and barrel zone thermocouples. No new sensors are introduced.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\nThe primary driving variable is the **Melt Viscosity ($\\eta$)** (which is inversely correlated with Barrel Zone Temperature, $T_{barrel}$). The mechanical direction is: An **Increase** in Melt Viscosity (caused by a **Decrease** in $T_{barrel}$) leads to an **Increase** in Screw Recovery Time ($T_{rec}$) due to higher resistance during back-filling, and potentially an **Increase** in Part Weight ($W_{act}$) if the packing pressure is maintained against a higher viscosity melt, resulting in less pressure drop during packing. Conversely, a **Decrease** in Melt Viscosity (caused by an **Increase** in $T_{barrel}$) leads to a **Decrease** in $T_{rec}$ and may lead to a **Decrease** in $W_{act}$ if the material is less dense or if cavitation/flash occurs. The control law acts to reverse the detected drift in $T_{rec}$ and $W_{act}$ by adjusting $T_{barrel}$ in the direction that lowers viscosity if $T_{rec}$ is high, or raises it if $T_{rec}$ is low.\n\n**Input Signal Derivation & Source Mapping:**\n*   **$W_{act}$ (Actual Part Weight):** Derived directly from the **Check-weigher**. The check-weigher outputs the measured mass of the ejected part after cooling. $W_{act} = \\text{Check-Weigher Output}$.\n*   **$T_{rec}$ (Screw Recovery Time):** Derived from the **Cycle-Time Logger**. The logger records timestamps for major machine phases. $T_{rec} = t_{\\text{screw-back-complete}} - t_{\\text{injection-complete}}$, where $t_{\\text{screw-back-complete}}$ is the timestamp when the screw reaches its maximum retracted position and $t_{\\text{injection-complete}}$ is the timestamp when the injection phase ends. Both timestamps are existing logged events.\n*   **$W_{target}$ (Target Part Weight):** Derived from the **Check-weigher** historical data or predefined engineering specification. If derived from data: $W_{target} = \\text{Mean}(W_{act})$ over the baseline period of 20 cycles recorded in Step 1.\n*   **$T_{rec, baseline}$ (Baseline Recovery Time):** Derived from the **Cycle-Time Logger** historical data. $T_{rec, baseline} = \\text{Mean}(T_{rec})$ over the baseline period of 20 cycles recorded in Step 1.\n*   **$\\Delta W$ and $\\Delta T$:** Derived mathematically from the above: $\\Delta W = W_{act} - W_{target}$ and $\\Delta T = T_{rec} - T_{rec, baseline}$.\n*   **Drift Indicator $D$:** Derived from logic on $\\Delta W$ and $\\Delta T$. $D = \\text{sign}(\\Delta T) \\cdot \\text{sign}(\\Delta W)$. If $\\Delta T > 0$ and $\\Delta W > 0$, $D = \\text{Positive Drift}$ (requires $T_{barrel}$ decrease). If $\\Delta T < 0$ and $\\Delta W < 0$, $D = \\text{Negative Drift}$ (requires $T_{barrel}$ increase).\n\n**Measures it Relies On:**\n*   **Check-Weigher Accuracy:** The check-weigher must provide reliable part weight data.\n*   **Cycle-Time Logger Resolution:** The logger must capture screw recovery time with sufficient granularity.\n*   **Thermocouple Responsiveness:** The barrel zone thermocouples must respond to setpoint changes.\n*   **Causality Correlation:** There must be a known, consistent relationship between part weight/recovery time and required barrel temperature.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

@@ -1,0 +1,136 @@
+{
+ "problem_id": "r125-11-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 50.76,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.73,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 835,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.65,
+     "usage": {
+      "prompt_tokens": 1201,
+      "completion_tokens": 1039,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Closed-Loop Die Gap Tuning via Melt Pressure Oscilla",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Die Gap Tuning via Melt Pressure Oscillation Damping**\n\n**Mechanism:**\nThe core mechanism is to implement a feedback control loop that uses the existing melt pressure transducer to detect and dampen the die pressure oscillations driving the gauge variation. Since the oscillating pressure causes the polymer melt to expand and contract within the die gap, it creates periodic thickness variations across the web. By actively adjusting the die gap (assuming hydraulic or pneumatic die actuation is part of the standard line, which is implied by the need for mitigation without *new* sensors) based on the high-frequency components of the melt pressure signal, the system can counteract the volumetric changes in the melt, stabilizing the exit gauge. The line-speed encoder provides the reference frequency for separating pressure oscillations (which may be coupled to drive or pump harmonics) from steady-state pressure, allowing for targeted damping.\n\n**Implementation:**\n1.  **Signal Processing:** Use the existing line-speed encoder to derive a real-time \"revolutions per second\" or a synchronized timing signal. Filter the melt pressure transducer signal using a bandpass filter centered on the frequency bands where the oscillations are occurring (typically linked to pump eccentricity, die gap resonance, or upstream metering pump issues). This isolation allows the control system to distinguish process-relevant oscillations from noise or steady-state pressure.\n2.  **Control Law:** Implement a negative feedback control law that modulates the die gap actuator position (e.g., adjusting the hydraulic pressure of die gap actuators if equipped, or adjusting the take-off speed if the die is fixed but the line has speed variation capability) in anti-phase to the detected pressure oscillation amplitude. Specifically, when melt pressure rises above its mean (indicating potential volume expansion and thinner film due to die swell effects), the control loop slightly opens the gap or reduces backpressure; when pressure drops, it tightens the gap. This acts as a dynamic damper for the melt flow instability.\n3.  **Integration:** The existing PLC or DCS, which already reads the pressure, temperature, and speed encoder, is programmed to execute this logic. The temperature transducer is used to maintain a stable viscosity baseline, ensuring that the pressure-based compensation is not confounded by thermal effects. If the die gap is not actively adjustable via existing actuators, the mitigation shifts to **active take-up speed modulation**: the encoder data is used to micro-modulate the line speed in anti-phase to the pressure oscillations, effectively stretching or compressing the web instantaneously to counteract the thickness pulse before it cools and sets. Given the constraint of \"existing sensors,\" speed modulation is the most robust physical actuator available on any extrusion line without adding hardware.\n\n**Measures it Relies On:**\n1.  **Causal Linkage:** The assumption that die pressure oscillations are the primary driver of the gauge variation and that this variation manifests as periodic thickness changes across the web.\n2.  **Sufficient Bandwidth of Actuator:** The existing line-speed drive (if using speed modulation) or die gap actuator (if using gap modulation) has sufficient bandwidth and authority to respond to the oscillation frequencies detected by the pressure transducer without inducing new instabilities.\n3.  **Signal Integrity:** The existing pressure transducer has adequate frequency response to accurately capture the oscillating component without significant phase lag that would destabilize the feedback loop.\n4.  **Process Stability:** The polymer melt viscosity remains relatively constant, ensured by the existing temperature transducers, so that pressure changes are primarily due to flow dynamics rather than thermal state changes.\n\n**Why this works under constraints:**\nThis mitigation uses **only** the existing melt pressure, temperature, and line-speed encoder. It does not add new gauges (like LIDAR or beta-gauge). It directly targets the root cause (oscillating pressure) using available measurement signals and existing line actuators (speed or gap), thereby reducing trim scrap by stabilizing the web gauge in real-time.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Closed-Loop Die Gap Tuning via Melt Pressure Oscillation Damping\n\nMechanism:\nThe core mechanism is to implement a feedback control loop that uses the existing melt pressure transducer to detect and dampen the die pressure oscillations driving the gauge variation. Since the oscillating pressure causes the polymer melt to expand and contract within the die gap, it creates periodic thickness variations across the web. By actively adjusting the take-up speed (utilizing the existing line-speed drive as the actuator, as die gap actuation may not be present or sufficient) based on the high-frequency components of the melt pressure signal, the system can counteract the volumetric changes in the melt, stabilizing the exit gauge. The line-speed encoder provides the reference frequency for separating pressure oscillations (which may be coupled to drive or pump harmonics) from steady-state pressure, allowing for targeted damping.\n\nDirection-of-Effect Statement:\n*   **Driving Variable:** High-frequency component of the Melt Pressure signal (derived from Melt Pressure Transducer).\n*   **Mechanism Direction:** When Melt Pressure increases (positive deviation from mean), the control law modulates the Take-Up Speed to slightly *decrease* (or compress web density/compensate for expansion) to counteract gauge thinning caused by pressure-induced volume changes. When Melt Pressure decreases (negative deviation), the Take-Up Speed is modulated to slightly *increase* to maintain gauge consistency. The direction of speed modulation is anti-phase to the pressure oscillation to dampen the effective gauge variation.\n\nImplementation:\n1.  **Signal Processing:** \n    *   *Input Source:* Line-Speed Encoder (existing).\n    *   *Derivation:* Derive 'Revolutions Per Second' (RPS) or synchronized timing signal from the raw pulse count of the Line-Speed Encoder.\n    *   *Input Source:* Melt Pressure Transducer (existing).\n    *   *Derivation:* Extract high-frequency oscillation component via a bandpass filter centered on identified harmonic frequencies. The center frequency is derived from the correlation between Melt Pressure peaks and Line-Speed Encoder period (RPS).\n2.  **Control Law:** \n    *   Implement a negative feedback control law that modulates the line-speed setpoint in anti-phase to the detected pressure oscillation amplitude. \n    *   *Logic:* When Melt Pressure (from Melt Pressure Transducer) rises above its moving mean, reduce the instantaneous Take-Up Speed setpoint. When Melt Pressure drops below its moving mean, increase the instantaneous Take-Up Speed setpoint. \n    *   *Input Source:* Temperature Transducer (existing).\n    *   *Derivation:* Calculate viscosity compensation factor. If Temperature (from Temperature Transducer) deviates from baseline, adjust the gain of the pressure-to-speed control law to account for melt viscosity changes, ensuring pressure changes are not misinterpreted as flow dynamics when they are thermal state changes.\n3.  **Integration:** The existing PLC or DCS reads the Melt Pressure, Temperature, and Line-Speed Encoder signals. It computes the control output and adjusts the drive setpoint for the take-up motor.\n\nImplementation Bill:\n1.  **Hardware Costs:** $0.00. No new sensors, actuators, or PLC hardware are added. All components (Melt Pressure Transducer, Temperature Transducer, Line-Speed Encoder, Drive, PLC/DCS) are existing.\n2.  **Software/Engineering Costs:** Estimated 80 hours of PLC/DCS programming and tuning for the bandpass filter, feedback loop, and gain scheduling based on Temperature input.\n3.  **Operational Cost Impact:** \n    *   *Throughput/Availability:* The duty cycle of the speed modulation is continuous during operation. The amplitude of speed modulation is designed to be <0.5% of nominal speed. Impact on nominal line speed is negligible (<0.1% throughput variance). No planned downtime for installation as it is a soft change.\n    *   *Energy:* Modulating take-up speed involves minor variations in motor torque/load. Estimated energy impact is <0.5% of drive energy consumption, effectively unpriced due to insignificance relative to baseline energy costs.\n\nMeasures it Relies On:\n1.  **Causal Linkage:** Melt Pressure oscillations (from Melt Pressure Transducer) are the primary driver of gauge variation. \n2.  **Sufficient Bandwidth of Actuator:** The existing line-speed drive has sufficient bandwidth to respond to the oscillation frequencies without inducing new instabilities.\n3.  **Signal Integrity:** The Melt Pressure Transducer and Line-Speed Encoder have adequate frequency response and signal-to-noise ratio to support the control loop.\n4.  **Process Stability:** Melt viscosity (inferred from Temperature Transducer) remains within a controlled range, allowing pressure-based compensation to be valid.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Hardware Costs:** $0.00. No new sensors, actuators, or PLC hardware are added. All c",
+     "2.  **Software/Engineering Costs:** Estimated 80 hours of PLC/DCS programming and tuning f",
+     "3.  **Operational Cost Impact:**",
+     "*   *Throughput/Availability:* The duty cycle of the speed modulation is continuous during",
+     "*   *Energy:* Modulating take-up speed involves minor variations in motor torque/load. Est",
+     "1.  **Causal Linkage:** Melt Pressure oscillations (from Melt Pressure Transducer) are the",
+     "2.  **Sufficient Bandwidth of Actuator:** The existing line-speed drive has sufficient ban",
+     "3.  **Signal Integrity:** The Melt Pressure Transducer and Line-Speed Encoder have adequat",
+     "4.  **Process Stability:** Melt viscosity (inferred from Temperature Transducer) remains w"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 6.32,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 447,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.01,
+     "usage": {
+      "prompt_tokens": 779,
+      "completion_tokens": 717,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Closed-Loop Die Gap Stabilization via Melt Pressure ",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Die Gap Stabilization via Melting Pressure Oscillation Dampening**\n\n**Mechanism:**\nThe failure is driven by instability in the polymer melt pressure within the extruder/die assembly, causing oscillations that translate into spatial gauge variations across the web width. Since new sensors are prohibited, we will leverage the existing **melt pressure transducers** to detect the frequency and amplitude of these oscillations. The mitigation uses the existing **line-speed encoder** to modulate the extruder screw speed (and consequently the die gap pressure) in anti-phase with the detected pressure oscillations, effectively acting as a passive-damping controller to stabilize the melt flow before it exits the die.\n\n**Implementation:**\n1.  **Signal Extraction:** Filter the high-frequency noise from the existing melt pressure transducer signal to isolate the specific oscillation frequency causing the gauge variation.\n2.  **Phase-Locked Loop (PLC) Integration:** Configure the existing PLC to create a feedback loop where the extracted pressure oscillation signal is used to generate a corrective actuator command.\n3.  **Speed Modulation:** Instead of adjusting die gap mechanically (which is often too slow for pressure oscillations), the PLC will dynamically modulate the **extruder screw speed** (driven by the same control system that monitors the line-speed encoder) in anti-phase to the pressure oscillation. This acts as a variable restriction at the extruder head, flattening the pressure peaks and troughs.\n4.  **Tuning:** Tune the gain of this speed modulation so that the amplitude of the melt pressure oscillation is reduced to within ±5% of the setpoint, thereby reducing the gauge variation.\n\n**Measures it Relies On:**\n*   **Melt Pressure Transducers:** Used to detect the real-time oscillation magnitude and frequency.\n*   **Line-Speed Encoder:** Used to ensure the corrective screw speed modulation is synchronized with the actual film travel, preventing phase drift between the melt stabilization and the web formation.\n*   **Existing PLC/Drive:** Utilizes the installed controller and extruder motor drive to execute the speed modulation without adding new hardware.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Closed-Loop Die Gap Stabilization via Melt Pressure Oscillation Dampening\n\nMechanism:\nDIRECTION-OF-EFFECT: The driving variable is the oscillating melt pressure; the mechanism is applied in the anti-phase (opposite) direction of the pressure oscillation to produce a net reduction in amplitude. \n\nThe failure is driven by instability in the polymer melt pressure within the extruder/die assembly, causing oscillations that translate into spatial gauge variations across the web width. Since new sensors are prohibited, we will leverage the existing melt pressure transducers to detect the frequency and amplitude of these oscillations. The mitigation uses the existing line-speed encoder to synchronize the extruder screw speed modulation in anti-phase with the detected pressure oscillations, effectively acting as a damping controller to stabilize the melt flow before it exits the die.\n\nImplementation Bill:\n1.  **Signal Extraction:** Filter the high-frequency noise from the existing melt pressure transducer signal to isolate the specific oscillation frequency causing the gauge variation. The input signal is the raw analog output from the existing Melt Pressure Transducer. The derived signal is the oscillation magnitude and frequency, obtained by applying a band-pass filter centered on the dominant oscillation frequency to the raw transducer voltage.\n2.  **Phase-Locked Loop (PLC) Integration:** Configure the existing PLC to create a feedback loop where the extracted pressure oscillation signal is used to generate a corrective actuator command. The input signal is the filtered oscillation signal derived in Step 1.\n3.  **Speed Modulation:** The PLC will dynamically modulate the extruder screw speed in anti-phase to the pressure oscillation. The input signal for synchronization is the pulse train from the existing Line-Speed Encoder, which provides the reference phase and frequency for the corrective command. The output is a torque/speed setpoint deviation applied to the existing Extruder Motor Drive. The formula for the corrective command is: Screw_Speed_Setpoint(t) = Base_Speed + G * A_osc * cos(2*pi*f_osc*t + phi_corr), where G is the tuned gain, A_osc is the amplitude derived from the pressure transducer, f_osc is the frequency derived from the pressure transducer, and phi_corr is the phase shift calculated to be anti-phase relative to the pressure signal.\n4.  **Tuning:** Tune the gain G of this speed modulation so that the amplitude of the melt pressure oscillation is reduced to within ±5% of the setpoint, thereby reducing the gauge variation. The success metric is the reduction in the standard deviation of the Melt Pressure Transducer signal over a rolling window.\n\nMeasures it Relies On:\n*   **Melt Pressure Transducers:** Used to detect the real-time oscillation magnitude and frequency. The specific measurement is the raw pressure value, which is derived into frequency and amplitude via FFT or zero-crossing detection in the PLC.\n*   **Line-Speed Encoder:** Used to ensure the corrective screw speed modulation is synchronized with the actual film travel, preventing phase drift between the melt stabilization and the web formation. The specific measurement is the encoder pulse count and timestamp, used to calculate web linear velocity and phase reference.\n*   **Existing PLC/Drive:** Utilizes the installed controller and extruder motor drive to execute the speed modulation without adding new hardware. No new inputs are required beyond the existing sensor signals listed above.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Signal Extraction:** Filter the high-frequency noise from the existing melt pressure",
+     "2.  **Phase-Locked Loop (PLC) Integration:** Configure the existing PLC to create a feedba",
+     "3.  **Speed Modulation:** The PLC will dynamically modulate the extruder screw speed in an",
+     "4.  **Tuning:** Tune the gain G of this speed modulation so that the amplitude of the melt",
+     "*   **Melt Pressure Transducers:** Used to detect the real-time oscillation magnitude and ",
+     "*   **Line-Speed Encoder:** Used to ensure the corrective screw speed modulation is synchr",
+     "*   **Existing PLC/Drive:** Utilizes the installed controller and extruder motor drive to "
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "Mitigation Proposal: Closed-Loop Die Gap Tuning via Melt Pressure Oscillation Damping\n\nMechanism:\nThe core mechanism is to implement a feedback control loop that uses the existing melt pressure transducer to detect and dampen the die pressure oscillations driving the gauge variation. Since the oscillating pressure causes the polymer melt to expand and contract within the die gap, it creates periodic thickness variations across the web. By actively adjusting the take-up speed (utilizing the existing line-speed drive as the actuator, as die gap actuation may not be present or sufficient) based on the high-frequency components of the melt pressure signal, the system can counteract the volumetric changes in the melt, stabilizing the exit gauge. The line-speed encoder provides the reference frequency for separating pressure oscillations (which may be coupled to drive or pump harmonics) from steady-state pressure, allowing for targeted damping.\n\nDirection-of-Effect Statement:\n*   **Driving Variable:** High-frequency component of the Melt Pressure signal (derived from Melt Pressure Transducer).\n*   **Mechanism Direction:** When Melt Pressure increases (positive deviation from mean), the control law modulates the Take-Up Speed to slightly *decrease* (or compress web density/compensate for expansion) to counteract gauge thinning caused by pressure-induced volume changes. When Melt Pressure decreases (negative deviation), the Take-Up Speed is modulated to slightly *increase* to maintain gauge consistency. The direction of speed modulation is anti-phase to the pressure oscillation to dampen the effective gauge variation.\n\nImplementation:\n1.  **Signal Processing:** \n    *   *Input Source:* Line-Speed Encoder (existing).\n    *   *Derivation:* Derive 'Revolutions Per Second' (RPS) or synchronized timing signal from the raw pulse count of the Line-Speed Encoder.\n    *   *Input Source:* Melt Pressure Transducer (existing).\n    *   *Derivation:* Extract high-frequency oscillation component via a bandpass filter centered on identified harmonic frequencies. The center frequency is derived from the correlation between Melt Pressure peaks and Line-Speed Encoder period (RPS).\n2.  **Control Law:** \n    *   Implement a negative feedback control law that modulates the line-speed setpoint in anti-phase to the detected pressure oscillation amplitude. \n    *   *Logic:* When Melt Pressure (from Melt Pressure Transducer) rises above its moving mean, reduce the instantaneous Take-Up Speed setpoint. When Melt Pressure drops below its moving mean, increase the instantaneous Take-Up Speed setpoint. \n    *   *Input Source:* Temperature Transducer (existing).\n    *   *Derivation:* Calculate viscosity compensation factor. If Temperature (from Temperature Transducer) deviates from baseline, adjust the gain of the pressure-to-speed control law to account for melt viscosity changes, ensuring pressure changes are not misinterpreted as flow dynamics when they are thermal state changes.\n3.  **Integration:** The existing PLC or DCS reads the Melt Pressure, Temperature, and Line-Speed Encoder signals. It computes the control output and adjusts the drive setpoint for the take-up motor.\n\nImplementation Bill:\n1.  **Hardware Costs:** $0.00. No new sensors, actuators, or PLC hardware are added. All components (Melt Pressure Transducer, Temperature Transducer, Line-Speed Encoder, Drive, PLC/DCS) are existing.\n2.  **Software/Engineering Costs:** Estimated 80 hours of PLC/DCS programming and tuning for the bandpass filter, feedback loop, and gain scheduling based on Temperature input.\n3.  **Operational Cost Impact:** \n    *   *Throughput/Availability:* The duty cycle of the speed modulation is continuous during operation. The amplitude of speed modulation is designed to be <0.5% of nominal speed. Impact on nominal line speed is negligible (<0.1% throughput variance). No planned downtime for installation as it is a soft change.\n    *   *Energy:* Modulating take-up speed involves minor variations in motor torque/load. Estimated energy impact is <0.5% of drive energy consumption, effectively unpriced due to insignificance relative to baseline energy costs.\n\nMeasures it Relies On:\n1.  **Causal Linkage:** Melt Pressure oscillations (from Melt Pressure Transducer) are the primary driver of gauge variation. \n2.  **Sufficient Bandwidth of Actuator:** The existing line-speed drive has sufficient bandwidth to respond to the oscillation frequencies without inducing new instabilities.\n3.  **Signal Integrity:** The Melt Pressure Transducer and Line-Speed Encoder have adequate frequency response and signal-to-noise ratio to support the control loop.\n4.  **Process Stability:** Melt viscosity (inferred from Temperature Transducer) remains within a controlled range, allowing pressure-based compensation to be valid.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

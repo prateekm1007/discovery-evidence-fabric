@@ -1,0 +1,151 @@
+{
+ "problem_id": "r125-08-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 55.22,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 7.34,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 1244,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.1,
+     "usage": {
+      "prompt_tokens": 1613,
+      "completion_tokens": 718,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"MITIGATION PROPOSAL\\n\\nMECHANISM\\nThe failure is driven by a premature sw",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a closed-loop \"Purity-First\" adaptive cycle time extension. The root cause of shortening cycles is likely a feedback loop where the controller is prematurely ending the adsorption phase based on a degraded signal or fixed timing that no longer matches the current bed condition, or conversely, the bed is degrading (e.g., moisture accumulation or pressure drop changes) causing the purity to drop, prompting the system to shorten the effective useful portion of the cycle or triggering early blowdowns. However, given the constraint and the symptom of *shortening* cycles leading to *lower* purity, the most direct engineering mitigation is to **override the shortening behavior by forcing the adsorption cycle time to the maximum safe duration derived from the existing sensors, while using the oxygen analyzer as the primary gate for the switch-over, decoupling the cycle time from any implicit time-based shortening logic.**\n\nActually, a more precise interpretation: If cycles are *shortening*, the unit is switching over before the bed is saturated, which typically *increases* purity but *decreases* yield. However, the problem states purity is *slipping* (lowering) AND cycles are shortening. This is a paradox for standard PSA logic unless the \"shortening\" refers to the *effective* adsorption time being compromised by valve leakage or pressure issues, or the control system is misinterpreting a signal. \n\nLet’s re-read: \"Product nitrogen purity has been slipping... and the adsorption cycles have been shortening; feed-air consumption is up.\"\nIf the cycle shortens, you spend more time in the non-productive blow-down/regeneration phases relative to the total time, increasing air consumption per mole of nitrogen. If purity is *also* dropping, it implies that even in the shortened cycle, the bed is not producing pure N2, or the product is being contaminated.\nA common cause is **moisture breakthrough**. As the molecular sieve gets wet, it loses its ability to adsorb oxygen efficiently, requiring a longer time to reach purity. If the system is shortening cycles (perhaps due to a sensor drift or a logic error where the \"ready\" signal is triggered early), it is cutting off the adsorption before the bed can clear the oxygen, leading to low purity and high air usage (more cycles per hour).\n\n**Mitigation:** Use the **Product Oxygen Analyzer** as the sole trigger for cycle switch-over, overriding any time-based shortening. Simultaneously, use the **Feed-Air Pressure Transmitter** to maintain optimal bed pressure, ensuring that the reduced cycle time (if any) is compensated by stable pressure, or more likely, extend the cycle time back to nominal/maximum by ignoring the faulty shortening trigger.\n\n**Implementation:**\n1.  **Reconfigure the PLC/Controller Logic:** Disable the time-based switch-over timer for the adsorption phase. Replace the fixed-time or shortening timer trigger with a **threshold-based trigger** on the **Product Oxygen Analyzer**. The system will now remain in the adsorption phase until the oxygen concentration exceeds a set maximum threshold (e.g., 5 ppm O2 for 99.9% N2, or the specific spec limit), rather than switching on a shortening clock.\n2.  **Compensate for Air Consumption:** Since extending the cycle time will reduce the number of cycles per hour (improving efficiency per cycle but lowering production rate if uncorrected), use the **Feed-Air Pressure Transmitter** to verify that the bed is operating at the design pressure. If the shortening was masking a pressure drop (e.g., clogged filter), the pressure transmitter will confirm if pressure is adequate. If pressure is low, the \"shortening\" might be a response to low flow; however, without new sensors, we assume the pressure is stable. The key is that by letting the oxygen analyzer dictate the switch-over, we stop the premature cut-off that causes low purity.\n3.  **Stabilize Cycle Time:** The **Cycle-Time Counter** is used only for monitoring and logging. The controller no longer *uses* the counter to *force* a shortening; instead, it allows the cycle to lengthen naturally as dictated by the oxygen breakthrough. This stops the \"shortening\" trend. To counter the resulting drop in hourly output (if any), the system will simply run longer cycles, which *reduces* air consumption per unit of nitrogen produced, correcting the \"feed-air consumption is up\" issue.\n\n**Measures it Relies On:**\n*   **Product Oxygen Analyzer:** Provides the real-time feedback on bed saturation. It determines the *true* endpoint of the adsorption phase, preventing premature switch-over (which causes low purity) and ensuring the bed is fully utilized before blow-down (which reduces air waste).\n*   **Feed-Air Pressure Transmitter:** Confirms that the system is operating at the correct pressure, ensuring that the longer cycle time is not being compromised by pressure fluctuations that could mimic purity issues. It validates the operational stability required for the extended cycle to produce pure nitrogen.\n*   **Cycle-Time Counter:** Used for post-hoc validation. After the mitigation, the operator monitors the counter to confirm that cycles have stabilized or extended to their design length, verifying that the shortening trend has been reversed. It also helps in trending the oxygen analyzer’s switch-point to ensure it is not drifting.\n\n**Why this works:**\nThe shortening cycles were likely cutting the adsorption phase too early (perhaps due to a faulty timer or a misinterpreted signal), causing the nitrogen to be switched over before the bed had fully loaded oxygen, resulting in \"slipping\" purity (higher O2 content) and more frequent cycles (higher air consumption). By switching to an analyzer-driven trigger, we ensure the bed is fully loaded (high purity) and the cycle time naturally extends to the required duration for effective adsorption, thereby reducing air consumption per unit of product and stabilizing the cycle time.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (th"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "delivered_bill": "MITIGATION PROPOSAL\n\nMECHANISM\nThe failure is driven by a premature switch-over event that truncates the adsorption phase. The shortening of the adsorption cycle prevents the molecular sieve bed from reaching oxygen breakthrough, resulting in slipping product purity and increased feed-air consumption per unit of nitrogen. The corrective action is to lengthen the adsorption phase by replacing the time-based trigger with a purity-based trigger. This action directly counteracts the driver: by extending the adsorption duration until the product oxygen analyzer indicates oxygen breakthrough, the bed is fully utilized, purity is restored, and the air consumption per mole of nitrogen is reduced.\n\nDIRECTION-OF-EFFECT\nDriving variable: Adsorption phase duration.\nDirection of mechanical effect: The adsorption phase duration is increased from its currently shortened state to a duration determined by the product oxygen analyzer threshold.\nEffect on failure: Increasing the adsorption duration allows the bed to adsorb more oxygen before switch-over, which decreases product oxygen concentration (restoring purity) and decreases feed-air consumption per unit of product nitrogen (improving efficiency).\n\nIMPLEMENTATION\n1. Reconfigure the controller logic to disable the time-based switch-over timer for the adsorption phase.\n2. Implement a threshold-based trigger using the product oxygen analyzer. The system remains in the adsorption phase until the product oxygen concentration reaches the maximum specification limit (e.g., 5 ppm O2).\n3. Use the feed-air pressure transmitter to maintain the bed at the design operating pressure, ensuring that the extended adsorption phase operates under stable pressure conditions.\n4. Use the cycle-time counter solely for monitoring and logging purposes to verify that the adsorption phase duration has stabilized or extended, confirming the reversal of the shortening trend.\n\nIMPLEMENTATION BILL\n1. Control Logic Update: Modify the PLC/Controller routine to disable the fixed-time switch-over timer and enable the product oxygen analyzer threshold trigger.\n2. Sensor Configuration: Calibrate and set the trigger threshold on the existing product oxygen analyzer to the specified purity limit (e.g., 5 ppm O2).\n3. Pressure Control Verification: Confirm that the existing feed-air pressure transmitter is correctly wired to the pressure control loop and verify the setpoint against the design pressure.\n4. Monitoring Setup: Configure the cycle-time counter logging to track adsorption phase duration for post-implementation validation.\n\nINPUTS AND DERIVED SIGNALS\n- Product Oxygen Concentration: Measured directly by the product oxygen analyzer. Used as the primary trigger for cycle switch-over.\n- Feed-Air Pressure: Measured directly by the feed-air pressure transmitter. Used to maintain bed pressure at the design setpoint.\n- Adsorption Phase Duration: Derived from the cycle-time counter. Calculated as the time interval from the start of the adsorption phase to the switch-over event triggered by the product oxygen analyzer. Used for monitoring and validation only; not used for control logic in the corrected system.\n\nWHY THIS WORKS\nThe original failure was caused by a premature switch-over that truncated the adsorption phase. By using the product oxygen analyzer to determine the true endpoint of the adsorption phase, the system ensures the bed is fully utilized before regeneration. This extends the adsorption duration, restores product purity, and reduces feed-air consumption per unit of nitrogen produced. The cycle-time counter is used only to verify that the extension has occurred, without influencing the control logic that drives the correction.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. Control Logic Update: Modify the PLC/Controller routine to disable the fixed-time switc",
+     "2. Sensor Configuration: Calibrate and set the trigger threshold on the existing product o",
+     "3. Pressure Control Verification: Confirm that the existing feed-air pressure transmitter ",
+     "4. Monitoring Setup: Configure the cycle-time counter logging to track adsorption phase du"
+    ],
+    "APPARATUS_ROW": [
+     "1. Control Logic Update: Modify the PLC/Controller routine to disable the fixed-time switch-over timer and ena",
+     "4. Monitoring Setup: Configure the cycle-time counter logging to track adsorption phase duration for post-impl"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 9.17,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 681,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.57,
+     "usage": {
+      "prompt_tokens": 1039,
+      "completion_tokens": 1122,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"## Mitigation Proposal: Closed-Loop Cycle-Time Locking via Oxygen Analyze",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Cycle-Time Extension via Oxygen Analyzer Feedback**\n\n**Mechanism**\nImplement a logic block that dynamically adjusts the adsorption cycle time based on the real-time product oxygen concentration measured by the existing oxygen analyzer. The underlying principle is that the \"shortening of adsorption cycles\" is a root cause symptom (likely due to a faulty timer, controller logic glitch, or premature bleed-off triggered by a misread pressure state) rather than a natural decay of the molecular sieve capacity. By forcing the cycle time to its designed nominal value or extending it slightly within safe limits until the purity recovers, the system allows the adsorbent bed to fully deplete oxygen before switching, thereby restoring product purity and stabilizing feed-air consumption.\n\n**Implementation**\n1.  **Signal Acquisition:** Connect the existing product oxygen analyzer output (4-20 mA or digital) to the PLC/Controller input card. Connect the existing cycle-time counter output to the controller.\n2.  **Logic Development:** Write a control routine that compares the measured oxygen concentration ($O_2_{meas}$) against the purity specification limit ($O_2_{spec}$).\n    *   **Condition A (Normal):** If $O_2_{meas} < O_2_{spec}$ for a set duration (e.g., 5 consecutive checks), lock the cycle time to its nominal design value ($T_{nominal}$). This prevents the controller from arbitrarily shortening the cycle.\n    *   **Condition B (Slipping Purity):** If $O_2_{meas} > O_2_{spec}$, increment the cycle time ($T_{cycle}$) by a small step (e.g., +2%) up to a maximum safe limit ($T_{max}$, typically 105-110% of nominal to avoid valve stress).\n    *   **Condition C (Recovery):** Once $O_2_{meas}$ returns below $O_2_{spec}$ and stays there for a stability period, slowly decay $T_{cycle}$ back to $T_{nominal}$.\n3.  **Interlock:** Use the feed-air pressure transmitter to ensure the logic only adjusts cycle times when the system pressure is stable and within operating range, preventing adjustments during startup or shutdown transients.\n\n**Measures Relied Upon**\n*   **Product Oxygen Analyzer:** Provides the direct feedback variable (purity) for the control loop.\n*   **Cycle-Time Counter:** Serves as the manipulated variable (MV) in the control loop. The mitigation actively overrides or modulates the timer’s output value rather than allowing it to run freely.\n*   **Feed-Air Pressure Transmitter:** Ensures the adjustment is only valid under normal operating pressure conditions, guarding against false positives during pressure fluctuations that might mimic purity issues.\n\n**Outcome**\nThis mitigation stops the uncontrolled shortening of the adsorption phase, ensuring the molecular sieve bed operates for its full intended duration. This restores the nitrogen purity to specification and reduces the frequency of desorption/switching events, which in turn lowers the total feed-air consumption per unit of product nitrogen by improving the efficiency of each cycle. No new sensors are added; only existing instrumentation is re-purposed through controller logic.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "INPUT_UNAVAILABLE: required online signal 'concentration' is not among the permitted measures/signals"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "required online signal 'concentration' is not among the permitted measures/signals"
+    ]
+   },
+   "delivered_bill": "## Mitigation Proposal: Closed-Loop Cycle-Time Locking via Oxygen Analyzer Feedback\n\n### Mechanism\nImplement a logic block that dynamically adjusts or locks the adsorption cycle time based on the real-time product oxygen concentration measured by the existing oxygen analyzer. The underlying principle is that the \"shortening of adsorption cycles\" is a root cause symptom (likely due to a faulty timer, controller logic glitch, or premature bleed-off triggered by a misread pressure state) rather than a natural decay of the molecular sieve capacity. By forcing the cycle time to its designed nominal value or extending it slightly within safe limits until the purity recovers, the system allows the adsorbent bed to fully deplete oxygen before switching, thereby restoring product purity and stabilizing feed-air consumption.\n\n### DIRECTION-OF-EFFECT\nThe driving variable is the **product oxygen concentration** measured by the oxygen analyzer. The direction of effect is as follows: An **increase** in measured oxygen concentration (indicating slipping purity) drives the **extension** (increase) of the adsorption cycle time. Conversely, a **decrease** in measured oxygen concentration (indicating stable/high purity) drives the **locking** or **reduction** of the cycle time to its nominal value. The mechanism relies on the physical principle that extending the adsorption duration allows the molecular sieve to capture more oxygen, thereby lowering the product oxygen concentration and reducing the frequency of desorption events, which lowers total feed-air consumption.\n\n### Implementation\n1.  **Signal Acquisition:** \n    *   **Product Oxygen Concentration ($C_{O2}$):** Derived directly from the **existing product oxygen analyzer** output. This signal represents the molar concentration of oxygen in the product nitrogen stream.\n    *   **Cycle Time Reference ($T_{ref}$):** Derived from the **existing cycle-time counter** or the nominal design value stored in the controller. The cycle-time counter provides the current elapsed time or the setpoint reference.\n    *   **Operating Pressure ($P_{air}$):** Derived directly from the **existing feed-air pressure transmitter**. This signal represents the absolute pressure of the incoming compressed air.\n\n2.  **Logic Development:** Write a control routine that compares the measured oxygen concentration ($C_{O2}$) against the purity specification limit ($C_{O2,spec}$).\n    *   **Condition A (Normal):** If $C_{O2} < C_{O2,spec}$ for a set duration (e.g., 5 consecutive checks), lock the cycle time to its nominal design value ($T_{nominal}$). This prevents the controller from arbitrarily shortening the cycle.\n    *   **Condition B (Slipping Purity):** If $C_{O2} > C_{O2,spec}$, increment the cycle time ($T_{cycle}$) by a small step (e.g., +2%) up to a maximum safe limit ($T_{max}$, typically 105-110% of nominal to avoid valve stress).\n    *   **Condition C (Recovery):** Once $C_{O2}$ returns below $C_{O2,spec}$ and stays there for a stability period, slowly decay $T_{cycle}$ back to $T_{nominal}$.\n\n3.  **Interlock:** Use the feed-air pressure transmitter ($P_{air}$) to ensure the logic only adjusts cycle times when the system pressure is stable and within operating range (e.g., $P_{min} < P_{air} < P_{max}$), preventing adjustments during startup or shutdown transients.\n\n4.  **Implementation Bill:**\n    *   **Hardware:** No new hardware. Reuse existing PLC/Controller I/O channels connected to the oxygen analyzer and pressure transmitter.\n    *   **Software:** Modify the existing PLC ladder logic or function block library to include the new conditional logic blocks for $T_{cycle}$ adjustment.\n    *   **Configuration:** Update the HMI/SCADA screens to display the active cycle time mode (Auto/Lock/Extend) and the current $C_{O2}$ value.\n    *   **Validation:** Simulate logic in the development environment with historical $C_{O2}$ and $P_{air}$ data to verify that $T_{cycle}$ extends when $C_{O2}$ exceeds spec and locks when $C_{O2}$ is within spec.\n\n### Measures Relied Upon\n*   **Product Oxygen Analyzer:** Provides the direct feedback variable ($C_{O2}$) for the control loop. This is a permitted sensor.\n*   **Cycle-Time Counter:** Provides the manipulated variable reference ($T_{ref}$) and allows monitoring of the cycle duration. This is a permitted sensor.\n*   **Feed-Air Pressure Transmitter:** Provides the interlock variable ($P_{air}$) to ensure safe operating conditions. This is a permitted sensor.\n\n### Outcome\nThis mitigation stops the uncontrolled shortening of the adsorption phase, ensuring the molecular sieve bed operates for its full intended duration. This restores the nitrogen purity to specification and reduces the frequency of desorption/switching events, which in turn lowers the total feed-air consumption per unit of product nitrogen by improving the efficiency of each cycle. No new sensors are added; only existing instrumentation is re-purposed through controller logic.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Hardware:** No new hardware. Reuse existing PLC/Controller I/O channels connected to",
+     "*   **Software:** Modify the existing PLC ladder logic or function block library to includ",
+     "*   **Configuration:** Update the HMI/SCADA screens to display the active cycle time mode ",
+     "*   **Validation:** Simulate logic in the development environment with historical $C_{O2}$",
+     "*   **Product Oxygen Analyzer:** Provides the direct feedback variable ($C_{O2}$) for the ",
+     "*   **Cycle-Time Counter:** Provides the manipulated variable reference ($T_{ref}$) and al",
+     "*   **Feed-Air Pressure Transmitter:** Provides the interlock variable ($P_{air}$) to ensu"
+    ],
+    "APPARATUS_ROW": [
+     "*   **Cycle-Time Counter:** Provides the manipulated variable reference ($T_{ref}$) and allows monitoring of t"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "required online signal 'concentration' is not among the permitted measures/signals"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  1
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": false,
+ "delivered_bill": "MITIGATION PROPOSAL\n\nMECHANISM\nThe failure is driven by a premature switch-over event that truncates the adsorption phase. The shortening of the adsorption cycle prevents the molecular sieve bed from reaching oxygen breakthrough, resulting in slipping product purity and increased feed-air consumption per unit of nitrogen. The corrective action is to lengthen the adsorption phase by replacing the time-based trigger with a purity-based trigger. This action directly counteracts the driver: by extending the adsorption duration until the product oxygen analyzer indicates oxygen breakthrough, the bed is fully utilized, purity is restored, and the air consumption per mole of nitrogen is reduced.\n\nDIRECTION-OF-EFFECT\nDriving variable: Adsorption phase duration.\nDirection of mechanical effect: The adsorption phase duration is increased from its currently shortened state to a duration determined by the product oxygen analyzer threshold.\nEffect on failure: Increasing the adsorption duration allows the bed to adsorb more oxygen before switch-over, which decreases product oxygen concentration (restoring purity) and decreases feed-air consumption per unit of product nitrogen (improving efficiency).\n\nIMPLEMENTATION\n1. Reconfigure the controller logic to disable the time-based switch-over timer for the adsorption phase.\n2. Implement a threshold-based trigger using the product oxygen analyzer. The system remains in the adsorption phase until the product oxygen concentration reaches the maximum specification limit (e.g., 5 ppm O2).\n3. Use the feed-air pressure transmitter to maintain the bed at the design operating pressure, ensuring that the extended adsorption phase operates under stable pressure conditions.\n4. Use the cycle-time counter solely for monitoring and logging purposes to verify that the adsorption phase duration has stabilized or extended, confirming the reversal of the shortening trend.\n\nIMPLEMENTATION BILL\n1. Control Logic Update: Modify the PLC/Controller routine to disable the fixed-time switch-over timer and enable the product oxygen analyzer threshold trigger.\n2. Sensor Configuration: Calibrate and set the trigger threshold on the existing product oxygen analyzer to the specified purity limit (e.g., 5 ppm O2).\n3. Pressure Control Verification: Confirm that the existing feed-air pressure transmitter is correctly wired to the pressure control loop and verify the setpoint against the design pressure.\n4. Monitoring Setup: Configure the cycle-time counter logging to track adsorption phase duration for post-implementation validation.\n\nINPUTS AND DERIVED SIGNALS\n- Product Oxygen Concentration: Measured directly by the product oxygen analyzer. Used as the primary trigger for cycle switch-over.\n- Feed-Air Pressure: Measured directly by the feed-air pressure transmitter. Used to maintain bed pressure at the design setpoint.\n- Adsorption Phase Duration: Derived from the cycle-time counter. Calculated as the time interval from the start of the adsorption phase to the switch-over event triggered by the product oxygen analyzer. Used for monitoring and validation only; not used for control logic in the corrected system.\n\nWHY THIS WORKS\nThe original failure was caused by a premature switch-over that truncated the adsorption phase. By using the product oxygen analyzer to determine the true endpoint of the adsorption phase, the system ensures the bed is fully utilized before regeneration. This extends the adsorption duration, restores product purity, and reduces feed-air consumption per unit of nitrogen produced. The cycle-time counter is used only to verify that the extension has occurred, without influencing the control logic that drives the correction.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

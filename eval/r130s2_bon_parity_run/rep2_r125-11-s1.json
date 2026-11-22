@@ -1,0 +1,170 @@
+{
+ "problem_id": "r125-11-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 56.43,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 7.35,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 643,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 7.22,
+     "usage": {
+      "prompt_tokens": 1009,
+      "completion_tokens": 1372,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"## Mitigation Proposal\\n\\nImplement a **Model-Predictive Control (MPC) lo",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal:**\n\nImplement a **Model-Predictive Control (MPC) loop using only the existing melt pressure, temperature, and line-speed signals** to stabilize die pressure and reduce gauge variation.\n\n**Mechanism:**\nThe root cause of the oscillating die pressure and widening gauge variation is likely the interaction between thermal lag in the die and the feedforward delay from melt viscosity changes. By utilizing the existing sensors, we can construct a soft-sensor model that correlates upstream melt temperature and pressure with downstream die pressure fluctuations. The control algorithm will decouple the variables by adjusting the **line speed (via the existing encoder feedback)** as a fast corrective variable to counteract die pressure oscillations, rather than relying solely on slow-acting temperature adjustments. Since film thickness (gauge) is inversely proportional to line speed for a fixed mass flow rate (controlled by screw speed, which is assumed constant or adjusted independently), modulating line speed allows for immediate compensation of pressure-induced flow changes, stabilizing the gauge before the thermal loop can respond.\n\n**Implementation:**\n1.  **Signal Acquisition:** Sample existing melt pressure, melt temperature, and line-speed encoder signals at a rate sufficient to capture the oscillation frequency.\n2.  **Oscillation Damping Logic:** Develop a simple PID or state-space controller that uses **die pressure deviation** (derived from the melt pressure transducer if direct die pressure is unavailable, or inferred from melt pressure trends relative to setpoint) and **line speed** as the primary manipulated variable. \n3.  **Feedforward-Feedback Hybrid:** Use melt temperature changes as a feedforward signal to predict viscosity shifts. If melt temperature drops (indicating higher viscosity), pre-compensate by slightly reducing line speed to prevent pressure spikes. Conversely, if temperature rises, increase line speed.\n4.  **Gain Scheduling:** Adjust the controller gains based on the line speed setpoint, since the time constants of the extrusion process change with speed.\n5.  **Execution:** Command the drive system to adjust line speed in real-time based on the controller output. This directly stabilizes the pressure differential across the die, which in turn narrows the gauge variation across the web, reducing trim scrap.\n\n**Measures Relied Upon:**\n*   **Melt Pressure Transducer:** Provides the real-time feedback on flow resistance and upstream pressure conditions.\n*   **Melt Temperature Transducer:** Provides feedforward information on melt viscosity, allowing anticipation of pressure changes before they fully manifest.\n*   **Line-Speed Encoder:** Provides precise feedback for the speed control loop and enables accurate calculation of linear film thickness (gauge) as mass flow / (width × speed), allowing verification that gauge variation is reduced.\n*   **Existing Drive System:** Capable of accepting rapid speed adjustments without mechanical stress, as the line is running at rated speed with inherent control margins.\n\nThis approach uses no new hardware, leverages the fastest available dynamic element (line speed) to dampen the slow thermal oscillations, and directly addresses the gauge variation by stabilizing the pressure profile that causes non-uniform flow through the die.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "## Mitigation Proposal\n\nImplement a **Model-Predictive Control (MPC) loop using only the existing melt pressure, temperature, and line-speed signals** to stabilize die pressure and reduce gauge variation.\n\n### DIRECTION-OF-EFFECT STATEMENT\n**Driving Variable:** Melt Temperature ($T_m$) and Melt Pressure ($P_m$).\n**Direction of Effect:** \n1. **Temperature ($T_m$):** An *increase* in melt temperature decreases melt viscosity, reducing resistance to flow, thereby *decreasing* die pressure for a constant volumetric flow. Conversely, a *decrease* in temperature increases viscosity, *increasing* die pressure.\n2. **Pressure ($P_m$):** An *increase* in melt pressure indicates increased resistance or higher mass flow rate, which tends to *increase* film gauge (thickness) if line speed is constant. To stabilize gauge, the control action must be such that if $P_m$ rises above setpoint (indicating potential over-extrusion or pressure spike), line speed is *increased* to draw material through faster, preventing gauge buildup and stabilizing the die pressure differential.\n\n### Mechanism\nThe root cause of the oscillating die pressure and widening gauge variation is the interaction between thermal lag in the die and feedforward delay from melt viscosity changes. By utilizing the existing sensors, we construct a soft-sensor model correlating upstream melt temperature and pressure with downstream die pressure fluctuations. The control algorithm adjusts the **line speed** as a fast corrective variable to counteract die pressure oscillations, while maintaining mass flow consistency.\n\n### Signal & Input Derivation (Permitted Sensors Only)\nAll inputs are derived strictly from the permitted existing sensors:\n1.  **Melt Pressure ($P_m$):** Directly sampled from the **Melt Pressure Transducer**.\n    *   *Usage:* Primary feedback signal for pressure deviation. $P_{dev} = P_m(t) - P_{setpoint}$.\n2.  **Melt Temperature ($T_m$):** Directly sampled from the **Melt Temperature Transducer**.\n    *   *Usage:* Feedforward signal for viscosity estimation. $\frac{d T_m}{dt}$ is calculated via numerical differentiation of the temperature signal.\n3.  **Line Speed ($v$):** Directly sampled from the **Line-Speed Encoder**.\n    *   *Usage:* Feedback for closed-loop stability and calculation of gauge proxy.\n4.  **Gauge Variation Proxy ($G_{proxy}$):** Since direct gauge measurement is not permitted, gauge variation is inferred from the ratio of pressure to speed, assuming constant mass flow rate ($\frac{\rho v A}{\\dot{m}} \\propto \\frac{P_m}{v}$). \n    *   *Formula:* $G_{proxy}(t) = \\frac{P_m(t)}{v(t)}$. An increase in this ratio indicates a tendency toward thicker gauge.\n5.  **Viscosity Estimation ($\\eta_{est}$):** Derived from Melt Temperature using a pre-calibrated exponential relationship specific to the material: $\\eta_{est}(t) = A \\cdot e^{B/T_m(t)}$. This serves as the feedforward input for the MPC prediction horizon.\n\n### Implementation Bill\n**BILL-001: Controller Logic & Tuning**\n1.  **Oscillation Damping Logic:** Implement a state-space controller. \n    *   *Input:* $P_{dev}$ (from Melt Pressure Transducer), $T_m$ (from Melt Temperature Transducer), $v$ (from Line-Speed Encoder).\n    *   *Action:* Compute control signal $\\Delta v_{cmd}$.\n    *   *Derivation:* $\\Delta v_{cmd} = K_p P_{dev} + K_i \\int P_{dev} dt + K_f \\eta_{est}(T_m)$. \n    *   *Note:* Gains $K_p, K_i, K_f$ are tuned offline using historical data from the named sensors.\n2.  **Feedforward-Feedback Hybrid:** \n    *   *Input:* $\frac{d T_m}{dt}$ (derived from Melt Temperature Transducer).\n    *   *Action:* Pre-compensate line speed. If $T_m$ drops (viscosity rises), *reduce* the rate of speed increase or slightly *decrease* speed to prevent pressure spike. If $T_m$ rises, *increase* speed to maintain pressure.\n3.  **Gain Scheduling:** \n    *   *Input:* $v_{setpoint}$ (Command value, not a sensor).\n    *   *Action:* Adjust controller gains based on the commanded line speed, as process time constants change with speed.\n4.  **Execution & Safety:** \n    *   *Input:* $v$ (from Line-Speed Encoder) and $\\Delta v_{cmd}$.\n    *   *Action:* Command the drive system to adjust line speed. \n    *   *Constraint:* Limit $\\Delta v_{cmd}$ to ±2% of rated speed to prevent mechanical stress or web breakage.\n    *   *Verification:* Monitor $G_{proxy}$ (derived from Melt Pressure and Line-Speed Encoder) to confirm gauge stabilization.\n\n### Operational Costs & Duty Cycle\n*   **Throughput Impact:** The duty cycle for active speed modulation is estimated at <5% of runtime (only active during pressure oscillation events). Average throughput remains at rated speed ±1%. No permanent speed reduction is required for the base state.\n*   **Energy Impact:** Energy consumption for the extruder drive is proportional to power, $P \\propto v^3$ (cubically) for constant torque loads, or linearly for constant power loads. Since the modulation is around the rated speed with small amplitudes (±2%), the increase in energy is negligible ($\\approx 2 \\times (1+0.02)^3 \\approx 1.06$ relative to baseline if pushed to max positive, but average variance is near zero). Net energy delta is estimated at **<0.5%**.\n*   **Availability:** The control logic resides in the existing PLC/Drive. No new hardware. Risk of failure is limited to software logic errors, mitigated by gain clamping and fallback to open-loop speed. Estimated downtime for commissioning: **4 hours**.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Oscillation Damping Logic:** Implement a state-space controller.",
+     "*   *Input:* $P_{dev}$ (from Melt Pressure Transducer), $T_m$ (from Melt Temperature Trans",
+     "*   *Action:* Compute control signal $\\Delta v_{cmd}$.",
+     "*   *Derivation:* $\\Delta v_{cmd} = K_p P_{dev} + K_i \\int P_{dev} dt + K_f \\eta_{est}(T_m",
+     "*   *Note:* Gains $K_p, K_i, K_f$ are tuned offline using historical data from the named s",
+     "2.  **Feedforward-Feedback Hybrid:**",
+     "*   *Input:* $",
+     "*   *Action:* Pre-compensate line speed. If $T_m$ drops (viscosity rises), *reduce* the ra",
+     "3.  **Gain Scheduling:**",
+     "*   *Input:* $v_{setpoint}$ (Command value, not a sensor).",
+     "*   *Action:* Adjust controller gains based on the commanded line speed, as process time c",
+     "4.  **Execution & Safety:**",
+     "*   *Input:* $v$ (from Line-Speed Encoder) and $\\Delta v_{cmd}$.",
+     "*   *Action:* Command the drive system to adjust line speed.",
+     "*   *Constraint:* Limit $\\Delta v_{cmd}$ to ±2% of rated speed to prevent mechanical stres",
+     "*   *Verification:* Monitor $G_{proxy}$ (derived from Melt Pressure and Line-Speed Encoder",
+     "*   **Throughput Impact:** The duty cycle for active speed modulation is estimated at <5% ",
+     "*   **Energy Impact:** Energy consumption for the extruder drive is proportional to power,",
+     "*   **Availability:** The control logic resides in the existing PLC/Drive. No new hardware"
+    ],
+    "APPARATUS_ROW": [
+     "*   *Verification:* Monitor $G_{proxy}$ (derived from Melt Pressure and Line-Speed Encoder) to confirm gauge s"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: BILL-001 | **BILL-001: Controller Logic & Tuning**"
+    ],
+    "UNPRICED_OPERATIONAL_LOSS": [
+     "UNPRICED_OPERATIONAL_LOSS: duty cycle on throughput: ### Operational Costs & Duty Cycle",
+     "UNPRICED_OPERATIONAL_LOSS: duty cycle on throughput: *   **Throughput Impact:** The duty cycle for active speed modulation is estimated at <5% of runtime (only active during pressure oscillation events). Average t"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.57,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 586,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 6.25,
+     "usage": {
+      "prompt_tokens": 952,
+      "completion_tokens": 1141,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Die Back-Pressure Stabilization via Fe",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Die Back-Pressure Stabilization via Feedforward Gain Scheduling on Melt Pressure**\n\n**Mechanism**\nThe oscillation in die pressure is the primary driver of gauge variation across the web. Because the existing sensors (melt pressure, temperature, and line-speed encoder) provide high-frequency data, we can implement a digital filtering and gain-scheduling algorithm on the existing PLC/DCS. The mechanism involves:\n1.  **Oscillation Damping:** Using the melt pressure transducer signal to calculate a derivative-based damping term (high-pass filter) that is subtracted from the baseline back-pressure setpoint, effectively adding a \"virtual damper\" to the die.\n2.  **Web Tension/Gauge Correlation:** Using the line-speed encoder to normalize the pressure signal. Since gauge thickness is inversely related to local pressure and directly related to speed (residence time), the control law adjusts the die back-pressure target in real-time to counteract the oscillation while compensating for minor speed fluctuations that affect residence time and thus melt temperature/viscosity.\n\n**Implementation**\n1.  **Signal Conditioning:** Implement a Notch Filter tuned to the dominant frequency of the observed die pressure oscillation (identified via spectral analysis of the existing pressure transducer data) to isolate and remove the oscillatory component from the feedback loop.\n2.  **Gain Scheduling Logic:** Configure the existing control system to vary the gain of the back-pressure controller as a function of the line speed (from the encoder) and melt temperature (from transducers).\n    *   *High Speed/Low Temp:* Increase gain for more aggressive pressure correction.\n    *   *Low Speed/High Temp:* Decrease gain to prevent overshoot and instability.\n3.  **Setpoint Adjustment:** Instead of changing the physical die gap (which is often slow or unavailable), the system dynamically adjusts the *back-pressure valve* (or air-cooling damper if pressure is managed via cooling intensity) setpoint based on the real-time deviation of the melt pressure from its stable mean. The goal is to hold the *effective* pressure at the die lips constant, ensuring uniform film thickness across the web.\n\n**Measures Relied Upon**\n*   **Melt Pressure Transducer:** Provides the real-time signal for oscillation detection, notch filter tuning, and back-pressure deviation calculation.\n*   **Melt Temperature Transducers:** Used to normalize the control gain (viscosity compensation) and ensure the process is within the expected thermal window for the scheduled gains.\n*   **Line-Speed Encoder:** Used to normalize the pressure signal for residence time effects and to determine the current operating point for gain scheduling.\n\nThis approach uses only existing hardware to stabilize the pressure oscillation, thereby reducing gauge variation and trim scrap without adding new sensors.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Die Back-Pressure Stabilization via Feedforward Gain Scheduling on Melt Pressure**\n\n**Mechanism**\n\nThe oscillation in die pressure is the primary driver of gauge variation across the web. Because the existing sensors (melt pressure, temperature, and line-speed encoder) provide high-frequency data, we can implement a digital filtering and gain-scheduling algorithm on the existing PLC/DCS. The mechanism involves:\n\n1. **Oscillation Damping:** Using the melt pressure transducer signal to calculate a derivative-based damping term (high-pass filter) that is subtracted from the baseline back-pressure setpoint, effectively adding a \"virtual damper\" to the die.\n2. **Web Tension/Gauge Correlation:** Using the line-speed encoder to normalize the pressure signal. Since gauge thickness is inversely related to local pressure and directly related to speed (residence time), the control law adjusts the die back-pressure target in real-time to counteract the oscillation while compensating for minor speed fluctuations that affect residence time and thus melt temperature/viscosity.\n\n**DIRECTION-OF-EFFECT**\n\nThe driving variable is the deviation of the Melt Pressure signal from its stable mean baseline, denoted as $\\Delta P_{meas}$, derived directly from the Melt Pressure Transducer. The direction of the mechanical effect is that an instantaneous positive deviation in Melt Pressure ($\\Delta P_{meas} > 0$), which correlates with increased film gauge thickness, drives an immediate reduction in the back-pressure valve opening command. Conversely, an instantaneous negative deviation in Melt Pressure ($\\Delta P_{meas} < 0$), which correlates with reduced film gauge thickness, drives an immediate increase in the back-pressure valve opening command. The actuator responds by moving the valve spool to restrict melt flow (lowering pressure) when over-pressure is detected, and to open melt flow (raising pressure) when under-pressure is detected, thereby stabilizing the lip pressure and narrowing the gauge distribution.\n\n**Implementation**\n\n1. **Signal Conditioning:** Implement a Notch Filter tuned to the dominant frequency of the observed die pressure oscillation (identified via spectral analysis of the existing Melt Pressure Transducer data) to isolate and remove the oscillatory component from the feedback loop.\n2. **Gain Scheduling Logic:** Configure the existing control system to vary the gain of the back-pressure controller as a function of the Line Speed (from the Line-Speed Encoder) and Melt Temperature (from the Melt Temperature Transducers).\n    * *High Speed/Low Temp:* Increase gain for more aggressive pressure correction.\n    * *Low Speed/High Temp:* Decrease gain to prevent overshoot and instability.\n3. **Setpoint Adjustment:** Instead of changing the physical die gap (which is often slow or unavailable), the system dynamically adjusts the *back-pressure valve* setpoint based on the real-time deviation of the Melt Pressure from its stable mean. The goal is to hold the *effective* pressure at the die lips constant, ensuring uniform film thickness across the web.\n\n**Measures Relied Upon**\n\n* **Melt Pressure Transducer:** Provides the raw signal for the Melt Pressure measurement. The input $\\Delta P_{meas}$ is derived as the raw Melt Pressure signal minus the stable baseline mean, calculated via a moving average filter within the PLC. This derived signal is used for oscillation detection, notch filter tuning, and back-pressure deviation calculation.\n* **Melt Temperature Transducers:** Provides the raw Melt Temperature measurement. This signal is used to determine the operating point for gain scheduling (High/Low Temp states) to normalize the control gain for viscosity compensation.\n* **Line-Speed Encoder:** Provides the raw Line Speed measurement. The input $V_{line}$ is derived by integrating the encoder pulses over time to determine current operating speed. This derived signal is used to normalize the pressure signal for residence time effects and to determine the operating point for gain scheduling (High/Low Speed states).\n\n**IMPLEMENTATION BILL**\n\n* **Control Logic Deployment:** \n    * Hardware: Existing PLC/DCS CPU and I/O modules.\n    * Action: Firmware upload to the existing controller memory.\n    * Cost Driver: Engineering labor hours only; no capital expenditure for hardware.\n* **Actuation:** \n    * Component: Existing back-pressure valve actuator (electric motor or pneumatic cylinder).\n    * Action: No physical replacement or new sensor installation.\n    * Operational Cost Impact: The bill modulates the valve opening duty cycle at a frequency matching the dominant oscillation (typically low-frequency, < 2 Hz). There is **no operational cost penalty** to throughput, energy, or availability. The valve actuates within its existing continuous operating range without hitting mechanical limits or thermal limits. Energy consumption of the actuator remains nominal (<0.5% of line power) because the modulation is a fine adjustment around a stable setpoint, not a full-range swing. Availability is unaffected because the logic operates in parallel with the existing fail-safe default positions; if the PLC loses signal, the valve reverts to its last known safe position or a hard-wired default, requiring no manual intervention during normal oscillation events.\n\nThis approach uses only existing hardware to stabilize the pressure oscillation, thereby reducing gauge variation and trim scrap without adding new sensors.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "* **Control Logic Deployment:**",
+     "* Hardware: Existing PLC/DCS CPU and I/O modules.",
+     "* Action: Firmware upload to the existing controller memory.",
+     "* Cost Driver: Engineering labor hours only; no capital expenditure for hardware.",
+     "* **Actuation:**",
+     "* Component: Existing back-pressure valve actuator (electric motor or pneumatic cylinder).",
+     "* Action: No physical replacement or new sensor installation.",
+     "* Operational Cost Impact: The bill modulates the valve opening duty cycle at a frequency "
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'Availability is unaffected because the logic operates' shares no allowed-list stem (Use only existing sensors and existing measurements: the melt pressure and tempe...)"
+    ],
+    "APPARATUS_ROW": [
+     "* Action: No physical replacement or new sensor installation."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "## Mitigation Proposal\n\nImplement a **Model-Predictive Control (MPC) loop using only the existing melt pressure, temperature, and line-speed signals** to stabilize die pressure and reduce gauge variation.\n\n### DIRECTION-OF-EFFECT STATEMENT\n**Driving Variable:** Melt Temperature ($T_m$) and Melt Pressure ($P_m$).\n**Direction of Effect:** \n1. **Temperature ($T_m$):** An *increase* in melt temperature decreases melt viscosity, reducing resistance to flow, thereby *decreasing* die pressure for a constant volumetric flow. Conversely, a *decrease* in temperature increases viscosity, *increasing* die pressure.\n2. **Pressure ($P_m$):** An *increase* in melt pressure indicates increased resistance or higher mass flow rate, which tends to *increase* film gauge (thickness) if line speed is constant. To stabilize gauge, the control action must be such that if $P_m$ rises above setpoint (indicating potential over-extrusion or pressure spike), line speed is *increased* to draw material through faster, preventing gauge buildup and stabilizing the die pressure differential.\n\n### Mechanism\nThe root cause of the oscillating die pressure and widening gauge variation is the interaction between thermal lag in the die and feedforward delay from melt viscosity changes. By utilizing the existing sensors, we construct a soft-sensor model correlating upstream melt temperature and pressure with downstream die pressure fluctuations. The control algorithm adjusts the **line speed** as a fast corrective variable to counteract die pressure oscillations, while maintaining mass flow consistency.\n\n### Signal & Input Derivation (Permitted Sensors Only)\nAll inputs are derived strictly from the permitted existing sensors:\n1.  **Melt Pressure ($P_m$):** Directly sampled from the **Melt Pressure Transducer**.\n    *   *Usage:* Primary feedback signal for pressure deviation. $P_{dev} = P_m(t) - P_{setpoint}$.\n2.  **Melt Temperature ($T_m$):** Directly sampled from the **Melt Temperature Transducer**.\n    *   *Usage:* Feedforward signal for viscosity estimation. $\frac{d T_m}{dt}$ is calculated via numerical differentiation of the temperature signal.\n3.  **Line Speed ($v$):** Directly sampled from the **Line-Speed Encoder**.\n    *   *Usage:* Feedback for closed-loop stability and calculation of gauge proxy.\n4.  **Gauge Variation Proxy ($G_{proxy}$):** Since direct gauge measurement is not permitted, gauge variation is inferred from the ratio of pressure to speed, assuming constant mass flow rate ($\frac{\rho v A}{\\dot{m}} \\propto \\frac{P_m}{v}$). \n    *   *Formula:* $G_{proxy}(t) = \\frac{P_m(t)}{v(t)}$. An increase in this ratio indicates a tendency toward thicker gauge.\n5.  **Viscosity Estimation ($\\eta_{est}$):** Derived from Melt Temperature using a pre-calibrated exponential relationship specific to the material: $\\eta_{est}(t) = A \\cdot e^{B/T_m(t)}$. This serves as the feedforward input for the MPC prediction horizon.\n\n### Implementation Bill\n**BILL-001: Controller Logic & Tuning**\n1.  **Oscillation Damping Logic:** Implement a state-space controller. \n    *   *Input:* $P_{dev}$ (from Melt Pressure Transducer), $T_m$ (from Melt Temperature Transducer), $v$ (from Line-Speed Encoder).\n    *   *Action:* Compute control signal $\\Delta v_{cmd}$.\n    *   *Derivation:* $\\Delta v_{cmd} = K_p P_{dev} + K_i \\int P_{dev} dt + K_f \\eta_{est}(T_m)$. \n    *   *Note:* Gains $K_p, K_i, K_f$ are tuned offline using historical data from the named sensors.\n2.  **Feedforward-Feedback Hybrid:** \n    *   *Input:* $\frac{d T_m}{dt}$ (derived from Melt Temperature Transducer).\n    *   *Action:* Pre-compensate line speed. If $T_m$ drops (viscosity rises), *reduce* the rate of speed increase or slightly *decrease* speed to prevent pressure spike. If $T_m$ rises, *increase* speed to maintain pressure.\n3.  **Gain Scheduling:** \n    *   *Input:* $v_{setpoint}$ (Command value, not a sensor).\n    *   *Action:* Adjust controller gains based on the commanded line speed, as process time constants change with speed.\n4.  **Execution & Safety:** \n    *   *Input:* $v$ (from Line-Speed Encoder) and $\\Delta v_{cmd}$.\n    *   *Action:* Command the drive system to adjust line speed. \n    *   *Constraint:* Limit $\\Delta v_{cmd}$ to ±2% of rated speed to prevent mechanical stress or web breakage.\n    *   *Verification:* Monitor $G_{proxy}$ (derived from Melt Pressure and Line-Speed Encoder) to confirm gauge stabilization.\n\n### Operational Costs & Duty Cycle\n*   **Throughput Impact:** The duty cycle for active speed modulation is estimated at <5% of runtime (only active during pressure oscillation events). Average throughput remains at rated speed ±1%. No permanent speed reduction is required for the base state.\n*   **Energy Impact:** Energy consumption for the extruder drive is proportional to power, $P \\propto v^3$ (cubically) for constant torque loads, or linearly for constant power loads. Since the modulation is around the rated speed with small amplitudes (±2%), the increase in energy is negligible ($\\approx 2 \\times (1+0.02)^3 \\approx 1.06$ relative to baseline if pushed to max positive, but average variance is near zero). Net energy delta is estimated at **<0.5%**.\n*   **Availability:** The control logic resides in the existing PLC/Drive. No new hardware. Risk of failure is limited to software logic errors, mitigated by gain clamping and fallback to open-loop speed. Estimated downtime for commissioning: **4 hours**.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

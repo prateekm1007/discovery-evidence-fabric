@@ -1,0 +1,160 @@
+{
+ "problem_id": "r125-04-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 169.46,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.14,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 664,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.33,
+     "usage": {
+      "prompt_tokens": 1034,
+      "completion_tokens": 833,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Closed-Loop Power-Per-Tonnage Optimization with Disc",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Power-Per-Tonnne Optimization with Discharge-Curtailment**\n\n**Mechanism:**\nImplement a soft-limit control strategy that continuously monitors the crusher’s energy efficiency, defined as **Specific Energy (SE)** calculated from the existing motor power meter and discharge-belt scale. When SE exceeds a predefined baseline threshold (indicating coarsened product and increased liner wear/reduction ratio inefficiency), the system automatically **reduces the feed rate** using the feed-rate scale/controller to bring SE back within the target band. Simultaneously, if the coarse fraction continues to report high return rates (inferred from sustained high SE or, if available in the HMI, a ratio of feed-to-discharge mass balance indicating high recirculation), the mitigation triggers a **maintenance hold** by stopping the feed and flagging the liner for inspection/replacement, as operational adjustment alone cannot reverse physical liner wear.\n\n**Implementation:**\n1. **Baseline Calibration:** During the next scheduled liner change, record the average motor power (kW) at a steady-state feed rate and calculate the baseline SE (kWh/t) for the target product size. Set an alarm threshold at, e.g., 15–20% above this baseline.\n2. **Real-Time SE Calculation:** In the existing PLC/SCADA system, continuously compute SE = (Motor Power × Time) / (Discharge Belt Tonnage over that Time).\n3. **Automatic Feed Reduction:** If SE exceeds the threshold for a sustained period (e.g., 5 minutes), the controller linearly decreases the setpoint of the feed-rate conveyor by 5–10% steps until SE returns to the normal band. This reduces the burden on the crusher, allowing the remaining liners to operate at a more favorable reduction ratio (closer to nominal), which typically lowers specific energy even if throughput drops.\n4. **Coarse Fraction Proxy & Escalation:** Since no new particle size sensor is allowed, use the **mass balance gap** (Feed Rate - Discharge Rate) as a proxy for the coarse return stream. If the gap widens significantly *and* SE remains high despite feed reduction, this confirms that the coarse material is not being reduced due to liner wear or cavity geometry issues. The system then triggers a \"Liner Wear/Maintenance\" alarm, pauses the feed, and prompts the operator to inspect the liners.\n\n**Measures It Relies On:**\n*   **Motor Power Meter (kW):** Measures electrical input power to the crusher.\n*   **Discharge Belt Scale (t/h):** Measures the mass flow rate of product leaving the crusher.\n*   **Feed-Rate Scale (t/h):** Measures the mass flow rate of material entering the crusher; used as the control variable to modulate crusher load.\n*   **Existing PLC/SCADA Logic:** To perform real-time division, comparison, and feedback control.\n*   **Operator Action (Implicit):** The system signals when mechanical intervention (liner change) is required, as no sensor can diagnose physical wear without teardown. The mitigation optimizes operation *until* the next planned maintenance window, preventing excessive energy waste and potential equipment stress from oversized particles.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Closed-Loop Power-Per-Tonnage Optimization with Discharge-Curtailment\n\nMechanism:\nImplement a soft-limit control strategy that continuously monitors the crusher’s energy efficiency, defined as Specific Energy (SE) calculated from the existing motor power meter and discharge-belt scale. When SE exceeds a predefined baseline threshold (indicating coarsened product and increased liner wear/reduction ratio inefficiency), the system automatically reduces the feed rate using the feed-rate scale/controller to bring SE back within the target band. Simultaneously, if the coarse fraction continues to report high return rates (inferred from sustained high SE or the ratio of feed-to-discharge mass balance indicating high recirculation), the mitigation triggers a maintenance hold by stopping the feed and flagging the liner for inspection/replacement, as operational adjustment alone cannot reverse physical liner wear.\n\nDIRECTION-OF-EFFECT:\nThe driving variable is the Specific Energy (SE) threshold breach (SE > Threshold). The direction of effect is a reduction in the feed-rate conveyor setpoint. This causes a decrease in crusher burden, which lowers the instantaneous motor power draw relative to the mass throughput, thereby driving SE back below the threshold. Concurrently, the reduction in throughput results in a loss of available production tonnage (throughput cost) to preserve equipment integrity and minimize energy waste per tonne.\n\nImplementation Bill:\n1. Baseline Calibration: During the next scheduled liner change, record the average motor power (kW) at a steady-state feed rate and calculate the baseline SE (kWh/t) for the target product size. Set an alarm threshold at 15–20% above this baseline.\n2. Real-Time SE Calculation: In the existing PLC/SCADA system, continuously compute SE = (Motor Power × Time) / (Discharge Belt Tonnage over that Time)\n3. Automatic Feed Reduction: If SE exceeds the threshold for a sustained period (e.g., 5 minutes), the controller linearly decreases the setpoint of the feed-rate conveyor by 5–10% steps until SE returns to the normal band\n4. Coarse Fraction Proxy & Escalation: Use the mass balance gap (Feed Rate - Discharge Rate) as a proxy for the coarse return stream. If the gap widens significantly AND SE remains high despite feed reduction, trigger a Liner Wear/Maintenance alarm, pause the feed, and prompt the operator to inspect the liners\n\nOperational Cost Accounting (Unpriced Duty Cycle):\n- Throughput Loss: Each 10% reduction in feed-rate setpoint directly reduces total daily tonnage by 10%. The bill must account for this production penalty against the energy savings.\n- Energy Cost: While Specific Energy (kWh/t) may stabilize or improve, total electrical consumption is reduced proportionally to the feed rate reduction. The net operational benefit is calculated as (Energy Savings in kWh) minus (Lost Production Value from Reduced Throughput).\n- Availability Risk: If the maintenance hold is triggered, the availability cost includes the downtime duration multiplied by the lost profit margin per hour of production. This cost is incurred to prevent potential equipment damage from oversized particles and excessive power draw.\n\nMeasures It Relies On:\n- Motor Power (P_m): Sourced directly from the existing crusher motor power meter (kW)\n- Discharge Mass Flow Rate (Q_d): Sourced directly from the existing discharge-belt scale (t/h)\n- Feed Mass Flow Rate (Q_f): Sourced directly from the existing feed-rate scale (t/h)\n- Specific Energy (SE): Derived formula: SE = P_m / Q_d (kW / (t/h) is equivalent to kWh/t)\n- Mass Balance Gap (ΔQ): Derived formula: ΔQ = Q_f - Q_d\n- SE Threshold: Derived from baseline calibration data recorded during the last liner change\n- Time Interval (Δt): Derived from the PLC/SCADA system clock",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. Baseline Calibration: During the next scheduled liner change, record the average motor ",
+     "2. Real-Time SE Calculation: In the existing PLC/SCADA system, continuously compute SE = (",
+     "3. Automatic Feed Reduction: If SE exceeds the threshold for a sustained period (e.g., 5 m",
+     "4. Coarse Fraction Proxy & Escalation: Use the mass balance gap (Feed Rate - Discharge Rat",
+     "- Throughput Loss: Each 10% reduction in feed-rate setpoint directly reduces total daily t",
+     "- Energy Cost: While Specific Energy (kWh/t) may stabilize or improve, total electrical co",
+     "- Availability Risk: If the maintenance hold is triggered, the availability cost includes ",
+     "- Motor Power (P_m): Sourced directly from the existing crusher motor power meter (kW)",
+     "- Discharge Mass Flow Rate (Q_d): Sourced directly from the existing discharge-belt scale ",
+     "- Feed Mass Flow Rate (Q_f): Sourced directly from the existing feed-rate scale (t/h)",
+     "- Specific Energy (SE): Derived formula: SE = P_m / Q_d (kW / (t/h) is equivalent to kWh/t",
+     "- Mass Balance Gap (ΔQ): Derived formula: ΔQ = Q_f - Q_d",
+     "- SE Threshold: Derived from baseline calibration data recorded during the last liner chan",
+     "- Time Interval (Δt): Derived from the PLC/SCADA system clock"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 2,
+     "latency_s": 125.07,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 996,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.87,
+     "usage": {
+      "prompt_tokens": 1332,
+      "completion_tokens": 1205,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Implement Closed-Loop Power Per Tonne (PPT) Optimi",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Implement Closed-Loop Power Per Tonne (PPT) Optimization Using Existing Scales**\n\n**Mechanism:**\nThe symptom of coarsening product, returning coarse fraction, and elevated specific power (kW/t) is indicative of a **tightened closed side (CSS)** or **misaligned liner settings**, causing the crusher to operate in a \"choking\" or excessive compression zone where it crushes material below the optimal size range while failing to break the oversized lumps effectively. Instead of relying on visual inspection or gauges, we will use the existing power meter and flow scales to dynamically calculate **Power Per Tonne (PPT)** and adjust the crusher’s CSS to a target PPT setpoint that correlates with optimal particle size distribution. The goal is to maximize throughput and minimize coarse rejects by finding the PPT value that balances crushing effort with product fineness, leveraging the fact that optimal CSS typically corresponds to a stable, moderate PPT; excessive PPT indicates over-compression (coarse output), while dangerously low PPT indicates under-loading.\n\n**Implementation:**\n1.  **Data Aggregation:** The PLC/SCADA system (already present for motor control) continuously samples:\n    *   Motor Power ($P_{motor}$) from the existing power meter [kW].\n    *   Feed Rate ($\\dot{m}_{feed}$) from the feed-rate scale [t/h].\n    *   Discharge Rate ($\\dot{m}_{discharge}$) from the discharge-belt scale [t/h].\n2.  **PPT Calculation:** Compute instantaneous PPT every 5–10 seconds:\n    $$ PPT = \\frac{P_{motor} \\times 3600}{\\dot{m}_{discharge}} \\quad \\text{[kWh/t]} $$\n    *Note: Using discharge rate as the denominator accounts for actual processed material. Ensure steady-state filtering (e.g., 1-minute moving average) to avoid noise.*\n3.  **Setpoint Definition:** Establish a **Target PPT Range** based on historical data from the “last liner change” when product size was acceptable. For example, if historical PPT during good operation was 0.8–1.0 kWh/t, set the target to 0.9 kWh/t.\n4.  **Control Loop Action:**\n    *   If **$PPT_{avg} > Target$**: The crusher is over-compressing. **Open the CSS** (increase gap) using the hydraulic cylinder position controller (existing actuator). This reduces compression, lowers power draw, and allows coarser but more consistent product, reducing the fraction of oversized rejects returning.\n    *   If **$PPT_{avg} < Target_{min}$**: The crusher is under-loaded or gap is too wide. **Close the CSS** slightly to increase throughput and specific energy, but only down to the lower bound to avoid over-compression.\n    *   If **$\\dot{m}_{discharge} << \\dot{m}_{feed}$**: Indicates choke/blockage. Prioritize opening CSS immediately.\n5.  **Constraint Adherence:** No new sensors are used. Only existing motor power, feed scale, and discharge scale inputs are processed by the existing PLC. The CSS adjustment uses the existing hydraulic position control loop, merely modifying its setpoint based on PPT.\n\n**Measures It Relies On:**\n*   **Correlation Between PPT and CSS/Particle Size:** Empirical data must confirm that at this specific feed material and liner wear state, PPT is a reliable proxy for CSS tightness and resulting product size. If feed material hardness varies significantly, PPT may not be a stable proxy; however, under the constraint, this is the only viable closed-loop signal available.\n*   **Stable Mass Balance:** Assumption that $\\dot{m}_{discharge}$ accurately represents crushed material passing through, and that fines (<5mm) do not bypass scales in a way that distorts PPT. The discharge belt scale is assumed to measure total mass including fines.\n*   **Existing Actuation Authority:** The hydraulic CSS controller must have sufficient authority and response time to adjust the gap based on a slowly varying PPT signal (adjustments should be slow, e.g., max 0.5mm per minute, to avoid oscillations).\n*   **Historical Baseline:** Availability of logged PPT data from the last known-good liner change to calibrate the target range.\n\nThis mitigation directly addresses the “coarsened product” and “high power per tonne” by automatically loosening the CSS when power per tonne is excessive, thereby reducing over-compression, lowering specific energy, and increasing the proportion of correctly-sized product that does not return to the crusher.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Implement Closed-Loop Power Per Tonne (PPT) Optimization Using Existing Scales\n\n**Mechanism:**\nThe symptom of coarsened product, returning coarse fraction, and elevated specific power (kW/t) is indicative of a **tightened closed side (CSS)** or **misaligned liner settings**, causing the crusher to operate in a \"choking\" or excessive compression zone. Instead of relying on visual inspection, we will use the existing power meter and flow scales to dynamically calculate **Power Per Tonne (PPT)** and adjust the crusher’s CSS to a target PPT setpoint that correlates with optimal particle size distribution. The goal is to maximize throughput and minimize coarse rejects by finding the PPT value that balances crushing effort with product fineness, leveraging the fact that optimal CSS typically corresponds to a stable, moderate PPT; excessive PPT indicates over-compression, while dangerously low PPT indicates under-loading.\n\n**Direction-Of-Effect:**\nThe driving variable is the calculated PPT relative to the target setpoint. The mechanical effect direction is: **If PPT > Target, increase CSS gap (open the crusher) to reduce compression pressure and lower specific energy consumption. If PPT < Target_Min, decrease CSS gap (close the crusher) to increase compression pressure and specific energy consumption.** This action directly counters the symptom of \"high power per tonne\" by opening the gap when power draw is excessive, thereby reducing the coarsening effect associated with over-compression and choke conditions.\n\n**Implementation Bill:**\n1. **Hardware/Actuators:**\n   - Utilize existing PLC/SCADA controller for data acquisition and logic execution.\n   - Utilize existing hydraulic CSS actuator and position controller for mechanical adjustment.\n   - **No new sensors or instruments are added.**\n\n2. **Data Aggregation (Permitted Inputs Only):**\n   The system continuously samples only the following permitted measurements:\n   - $P_{motor}$ [kW]: Sourced from the existing **crusher motor power meter**.\n   - $\\\\dot{m}_{feed}$ [t/h]: Sourced from the existing **feed-rate scale**.\n   - $\\\\dot{m}_{discharge}$ [t/h]: Sourced from the existing **discharge-belt scale**.\n\n3. **Logic and Derivation:**\n   - **PPT Calculation:** Compute instantaneous Power Per Tonne every 5–10 seconds using only the permitted inputs:\n     $$ PPT = \\\\frac{P_{motor} \\\\times 3600}{\\\\dot{m}_{discharge}} \\\\quad \\\\text{[kWh/t]} $$\n     *Note: This formula derives PPT exclusively from the motor power meter and the discharge-belt scale. The feed-rate scale is used for context/mass-balance validation but is not part of the PPT formula.*\n   - **Choke Detection:** Derive a mass accumulation indicator using the permitted scales:\n     $$ \\\\Delta M = \\\\dot{m}_{feed} - \\\\dot{m}_{discharge} $$\n     *Note: If $\\\\Delta M > Threshold$, it indicates a choke/blockage state.*\n\n4. **Control Loop Action:**\n   - **Primary Control (PPT):**\n     - If $PPT_{avg} > Target_{Max}$: Command the hydraulic controller to **increase CSS gap** (open direction) until PPT returns to target range.\n     - If $PPT_{avg} < Target_{Min}$: Command the hydraulic controller to **decrease CSS gap** (close direction) until PPT returns to target range.\n   - **Safety Override (Choke):**\n     - If $\\\\Delta M > Threshold$ (derived from feed and discharge scales) persists for $T_{timeout}$: Immediately command **maximum safe CSS opening** to clear blockage, overriding PPT logic.\n\n5. **Setpoint Definition:**\n   - Establish **Target PPT Range** based on historical data from the \"last liner change\" when product size was acceptable. This baseline is derived from logged $P_{motor}$ and $\\\\dot{m}_{discharge}$ values from that period.\n\n**Measures It Relies On:**\n*   **Correlation Between PPT and CSS/Particle Size:** Empirical data must confirm that at this specific feed material and liner wear state, PPT is a reliable proxy for CSS tightness. If feed material hardness varies significantly, PPT may not be a stable proxy; however, under the constraint, this is the only viable closed-loop signal available derived from permitted sensors.\n*   **Stable Mass Balance:** Assumption that $\\\\dot{m}_{discharge}$ accurately represents crushed material passing through, and that fines do not bypass scales in a way that distorts PPT. The discharge belt scale is assumed to measure total mass including fines.\n*   **Existing Actuation Authority:** The hydraulic CSS controller must have sufficient authority and response time to adjust the gap based on a slowly varying PPT signal (adjustments should be slow, e.g., max 0.5mm per minute, to avoid oscillations).\n*   **Historical Baseline:** Availability of logged PPT data from the last known-good liner change to calibrate the target range.\n\nThis mitigation directly addresses the \"coarsened product\" and \"high power per tonne\" by automatically loosening the CSS when power per tonne is excessive, thereby reducing over-compression, lowering specific energy, and increasing the proportion of correctly-sized product that does not return to the crusher.\"",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. **Hardware/Actuators:**",
+     "- Utilize existing PLC/SCADA controller for data acquisition and logic execution.",
+     "- Utilize existing hydraulic CSS actuator and position controller for mechanical adjustmen",
+     "- **No new sensors or instruments are added.**",
+     "2. **Data Aggregation (Permitted Inputs Only):**",
+     "- $P_{motor}$ [kW]: Sourced from the existing **crusher motor power meter**.",
+     "- $\\\\dot{m}_{feed}$ [t/h]: Sourced from the existing **feed-rate scale**.",
+     "- $\\\\dot{m}_{discharge}$ [t/h]: Sourced from the existing **discharge-belt scale**.",
+     "3. **Logic and Derivation:**",
+     "- **PPT Calculation:** Compute instantaneous Power Per Tonne every 5–10 seconds using only",
+     "- **Choke Detection:** Derive a mass accumulation indicator using the permitted scales:",
+     "4. **Control Loop Action:**",
+     "- **Primary Control (PPT):**",
+     "- If $PPT_{avg} > Target_{Max}$: Command the hydraulic controller to **increase CSS gap** ",
+     "- If $PPT_{avg} < Target_{Min}$: Command the hydraulic controller to **decrease CSS gap** ",
+     "- **Safety Override (Choke):**",
+     "- If $\\\\Delta M > Threshold$ (derived from feed and discharge scales) persists for $T_{tim",
+     "5. **Setpoint Definition:**",
+     "- Establish **Target PPT Range** based on historical data from the \"last liner change\" whe",
+     "*   **Correlation Between PPT and CSS/Particle Size:** Empirical data must confirm that at",
+     "*   **Stable Mass Balance:** Assumption that $\\\\dot{m}_{discharge}$ accurately represents ",
+     "*   **Existing Actuation Authority:** The hydraulic CSS controller must have sufficient au",
+     "*   **Historical Baseline:** Availability of logged PPT data from the last known-good line"
+    ],
+    "APPARATUS_ROW": [
+     "- **No new sensors or instruments are added.**"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "Mitigation Proposal: Closed-Loop Power-Per-Tonnage Optimization with Discharge-Curtailment\n\nMechanism:\nImplement a soft-limit control strategy that continuously monitors the crusher’s energy efficiency, defined as Specific Energy (SE) calculated from the existing motor power meter and discharge-belt scale. When SE exceeds a predefined baseline threshold (indicating coarsened product and increased liner wear/reduction ratio inefficiency), the system automatically reduces the feed rate using the feed-rate scale/controller to bring SE back within the target band. Simultaneously, if the coarse fraction continues to report high return rates (inferred from sustained high SE or the ratio of feed-to-discharge mass balance indicating high recirculation), the mitigation triggers a maintenance hold by stopping the feed and flagging the liner for inspection/replacement, as operational adjustment alone cannot reverse physical liner wear.\n\nDIRECTION-OF-EFFECT:\nThe driving variable is the Specific Energy (SE) threshold breach (SE > Threshold). The direction of effect is a reduction in the feed-rate conveyor setpoint. This causes a decrease in crusher burden, which lowers the instantaneous motor power draw relative to the mass throughput, thereby driving SE back below the threshold. Concurrently, the reduction in throughput results in a loss of available production tonnage (throughput cost) to preserve equipment integrity and minimize energy waste per tonne.\n\nImplementation Bill:\n1. Baseline Calibration: During the next scheduled liner change, record the average motor power (kW) at a steady-state feed rate and calculate the baseline SE (kWh/t) for the target product size. Set an alarm threshold at 15–20% above this baseline.\n2. Real-Time SE Calculation: In the existing PLC/SCADA system, continuously compute SE = (Motor Power × Time) / (Discharge Belt Tonnage over that Time)\n3. Automatic Feed Reduction: If SE exceeds the threshold for a sustained period (e.g., 5 minutes), the controller linearly decreases the setpoint of the feed-rate conveyor by 5–10% steps until SE returns to the normal band\n4. Coarse Fraction Proxy & Escalation: Use the mass balance gap (Feed Rate - Discharge Rate) as a proxy for the coarse return stream. If the gap widens significantly AND SE remains high despite feed reduction, trigger a Liner Wear/Maintenance alarm, pause the feed, and prompt the operator to inspect the liners\n\nOperational Cost Accounting (Unpriced Duty Cycle):\n- Throughput Loss: Each 10% reduction in feed-rate setpoint directly reduces total daily tonnage by 10%. The bill must account for this production penalty against the energy savings.\n- Energy Cost: While Specific Energy (kWh/t) may stabilize or improve, total electrical consumption is reduced proportionally to the feed rate reduction. The net operational benefit is calculated as (Energy Savings in kWh) minus (Lost Production Value from Reduced Throughput).\n- Availability Risk: If the maintenance hold is triggered, the availability cost includes the downtime duration multiplied by the lost profit margin per hour of production. This cost is incurred to prevent potential equipment damage from oversized particles and excessive power draw.\n\nMeasures It Relies On:\n- Motor Power (P_m): Sourced directly from the existing crusher motor power meter (kW)\n- Discharge Mass Flow Rate (Q_d): Sourced directly from the existing discharge-belt scale (t/h)\n- Feed Mass Flow Rate (Q_f): Sourced directly from the existing feed-rate scale (t/h)\n- Specific Energy (SE): Derived formula: SE = P_m / Q_d (kW / (t/h) is equivalent to kWh/t)\n- Mass Balance Gap (ΔQ): Derived formula: ΔQ = Q_f - Q_d\n- SE Threshold: Derived from baseline calibration data recorded during the last liner change\n- Time Interval (Δt): Derived from the PLC/SCADA system clock",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

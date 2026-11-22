@@ -4935,7 +4935,7 @@
    "role": "EXECUTOR",
    "session_id": "builder-r130s2",
    "kind": "task",
-   "status": "OPEN",
+   "status": "DONE",
    "base_sha": "6f97f8311",
    "lease_expiry": "2026-11-29T23:59:00Z",
    "claimed_at": "2026-11-22T18:09:10Z",
@@ -4947,7 +4947,9 @@
     "scripts/r130s2_byte_precheck.py",
     "scripts/r130s2_bon_parity_score.py"
    ],
-   "title": "Dir 5 continuation (the R129 verdict): the BoN round-2 48-row PARITY \u2014 the Art. 20 CLASS decision for the bon2-bindselect arm (round 1 WON 0/24 vs 2/48 at builder-r129s1). The arm runs BYTE-IDENTICAL to round 1 (delegation to the committed r129_bon_run legs; the only variable is the independent replication) -> POOLED 48 arm rows (24 round-1 selected rows re-tallied from committed bytes + 24 new) vs the incumbent's 48 committed F31e rows. ADOPT iff pooled strictly < 2, else DELETE (Art. 20). Pins reproduced pre-prereg by the committed zero-LLM precheck (incumbent 2/48 + round-1 arm 0/24 from bytes). Order: prereg + this claim in ONE push (the lock; refs/claims/next rides it), then the run, then the committed scorer + registry update + close."
+   "title": "Dir 5 continuation (the R129 verdict): the BoN round-2 48-row PARITY \u2014 the Art. 20 CLASS decision for the bon2-bindselect arm (round 1 WON 0/24 vs 2/48 at builder-r129s1). The arm runs BYTE-IDENTICAL to round 1 (delegation to the committed r129_bon_run legs; the only variable is the independent replication) -> POOLED 48 arm rows (24 round-1 selected rows re-tallied from committed bytes + 24 new) vs the incumbent's 48 committed F31e rows. ADOPT iff pooled strictly < 2, else DELETE (Art. 20). Pins reproduced pre-prereg by the committed zero-LLM precheck (incumbent 2/48 + round-1 arm 0/24 from bytes). Order: prereg + this claim in ONE push (the lock; refs/claims/next rides it), then the run, then the committed scorer + registry update + close.",
+   "completed_at": "2026-11-22T18:33:01Z",
+   "notes": "Art. 29(b) held: prereg + claim pushed as the lock at 90d546078 BEFORE any run call (refs/claims/next rides the same push); CI re-read from the API: check-run 137303464796 surface completed SUCCESS (quoted, never asserted). THEN the run: 96 legs (48 author + 48 reviewer), 894.0 s wall pool-of-2, 0 typed fails, 0 parse retries, 4 absorbed rate_limited backoffs, per-leg transport_attempts in the records. Gate (preregistered round 2): POOLED arm 48 rows -> 0 delivered-defect rows vs the incumbent's recomputed 2/48 (r125-05-s2/d1 + r125-07-s2/d1, both duty_pricing \u2014 byte-pin reproduced pre-gate, Art. 3) -> ADOPT; registry entry 15 updated in THIS commit with the defect_rows/rows gate dict so the Art. 20 CI recompute bites. Second-construction crosscheck match; descriptive width typed (Art. 14). HONEST BOUNDS: same-24-items parity, two independent replications vs the incumbent's two committed draws; an ablation ADOPT, NOT a capability-score event and NOT a significance claim. Disclosure healed forward: the round-1 scoring producer gap (c-0205's scripts/r129_bon_score.py absent from the tree) is typed in the prereg; THIS round's scorer IS committed (scripts/r130s2_bon_parity_score.py). THE CLOSE PUSH'S OWN CHECK-RUN IS RE-READ AFTER LANDING AND QUOTED IN THE FINAL REPORT PER D2 (a tip cannot quote itself green at commit time). Dir 8: nothing deleted; the retired ceremony stays retired; no new guards/claim kinds. GEPA round 2 stays the twin's lane (untouched, Art. 29(c))."
   }
  ],
  "corrections": [

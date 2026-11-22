@@ -1,0 +1,172 @@
+{
+ "problem_id": "r125-08-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 56.24,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.8,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 870,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.4,
+     "usage": {
+      "prompt_tokens": 1207,
+      "completion_tokens": 1377,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Closed-Loop Cycle Time Optimization via O₂ Purity Fe",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Cycle Time Optimization via O₂ Purity Feedback**\n\n**Mechanism**\nImplement a feedback control loop that dynamically adjusts the adsorption cycle duration using the real-time product oxygen (O₂) concentration measured by the existing analyzer, instead of relying on a fixed, open-loop cycle time. The observed failure modes—shortening cycles and increased feed-air consumption at constant demand—are symptomatic of a control system that is either failing to detect the breakthrough of oxygen or is intentionally running short to compensate for perceived (but unverified) high purity. By closing the loop on the actual O₂ purity, the controller ensures the cycle extends until the target purity threshold is reliably met, preventing premature cut-off that degrades quality, while simultaneously avoiding unnecessary over-cycling that wastes compressed air.\n\n**Implementation**\n1.  **Signal Integration:** Route the signal from the installed **product oxygen analyzer** to the Programmable Logic Controller (PLC) responsible for the PSA cycle timing.\n2.  **Logic Modification:**\n    *   Define a **Target Purity Setpoint** ($P_{set}$) slightly above the minimum specification limit to provide a safety margin.\n    *   Define a **Minimum Cycle Time** ($T_{min}$) based on the theoretical adsorption capacity at the current **feed-air pressure** (from the pressure transmitter) to prevent unstable short-cycling.\n    *   Create a conditional logic state:\n        *   **Condition A (Purity < $P_{set}$):** Force the cycle timer to reset or continue extending the adsorption phase. Do not advance to the regeneration phase.\n        *   **Condition B (Purity $\\ge$ $P_{set}$ AND Cycle Time $\\ge$ $T_{min}$):** Permit the transition to the next phase.\n        *   **Condition C (Cycle Time > $T_{max}$ AND Purity < $P_{set}$):** Trigger an alarm for \"Adsorbent Saturation/Pressure Drop\" rather than continuing to cycle, indicating the pressure transmitter reading may be too low or the bed is fouled.\n3.  **Pressure Compensation:** Use the **feed-air pressure transmitter** signal to normalize the expected O₂ breakthrough curve. If pressure drops, the system anticipates a faster breakthrough and adjusts the internal model for when to expect $P_{set}$ to be achieved, but the *governing* switch remains the O₂ analyzer.\n4.  **Monitoring:** Use the **cycle-time counter** to log the duration of adsorption phases. A persistent increase in average cycle time while O₂ purity stabilizes indicates bed degradation, allowing for predictive maintenance. A persistent decrease in cycle time despite O₂ remaining high may indicate analyzer drift, prompting a verification check.\n\n**Measures It Relies On**\n*   **Product Oxygen Analyzer:** Provides the critical \"quality\" feedback signal. This is the only direct measurement of the failing parameter (purity). By using it as the primary gate for cycle completion, it directly counters the \"slipping below specification\" failure.\n*   **Feed-Air Pressure Transmitter:** Provides the \"input\" condition. Nitrogen production rate is pressure-dependent; this signal allows the logic to scale the *expected* behavior, helping distinguish between a low-pressure issue (which lowers purity and increases air use) and a bed issue.\n*   **Cycle-Time Counter:** Provides the \"process\" health indicator. It allows the system to enforce the $T_{min}$ guard, preventing the \"shortening\" failure mode from becoming unstable, and provides historical data to correlate purity drift with bed aging.\n\n**Why This Works Under the Constraint:**\nNo new sensors are added. The existing O₂ analyzer, which was likely being used only for monitoring or setpoint comparison, is now leveraged as the *active control input* for the cycle timer. This stops the uncontrolled shortening of cycles (which was likely a malfunctioning or misconfigured open-loop timer trying to compensate for something) and ensures that air is not consumed in short, inefficient cycles that produce low-purity gas. It directly addresses both the purity loss and the increased air consumption by aligning cycle length with actual adsorption performance.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Closed-Loop Cycle Time Optimization via O₂ Purity Feedback\n\nMechanism\nImplement a feedback control loop that dynamically adjusts the adsorption cycle duration using the real-time product oxygen (O₂) concentration measured by the existing analyzer, instead of relying on a fixed, open-loop cycle time. The observed failure modes—shortening cycles and increased feed-air consumption at constant demand—are symptomatic of a control system that is either failing to detect the breakthrough of oxygen or is intentionally running short to compensate for perceived (but unverified) high purity. By closing the loop on the actual O₂ purity, the controller ensures the cycle extends until the target purity threshold is reliably met, preventing premature cut-off that degrades quality, while simultaneously avoiding unnecessary over-cycling that wastes compressed air.\n\nDIRECTION-OF-EFFECT\nDriving Variable: Product Oxygen Concentration (O₂) [measured directly by Product Oxygen Analyzer].\nDirection of Effect: Inverse/Stop. As O₂ concentration increases (indicating purity decrease), the control logic prevents the transition to the regeneration phase (stops cycle advancement). The mechanism acts to extend the adsorption time until O₂ decreases back to the target setpoint, thereby stabilizing nitrogen purity and preventing the shortening of effective adsorption cycles that leads to feed-air waste.\n\nImplementation\n1. Signal Integration: Route the signal from the installed product oxygen analyzer to the Programmable Logic Controller (PLC) responsible for the PSA cycle timing.\n2. Logic Modification:\n    * Define a Target Purity Setpoint (P_set) slightly above the minimum specification limit to provide a safety margin.\n    * Define a Minimum Cycle Time (T_min) based on the theoretical adsorption capacity at the current feed-air pressure (from the pressure transmitter) to prevent unstable short-cycling.\n    * Create a conditional logic state:\n        * Condition A (Purity < P_set): Force the cycle timer to reset or continue extending the adsorption phase. Do not advance to the regeneration phase.\n        * Condition B (Purity ≥ P_set AND Cycle Time ≥ T_min): Permit the transition to the next phase.\n        * Condition C (Cycle Time > T_max AND Purity < P_set): Trigger an alarm for \"Adsorbent Saturation/Pressure Drop\" rather than continuing to cycle, indicating the pressure transmitter reading may be too low or the bed is fouled.\n3. Pressure Compensation: Use the feed-air pressure transmitter signal to normalize the expected O₂ breakthrough curve. If pressure drops, the system anticipates a faster breakthrough and adjusts the internal model for when to expect P_set to be achieved, but the governing switch remains the O₂ analyzer.\n4. Monitoring: Use the cycle-time counter to log the duration of adsorption phases. A persistent increase in average cycle time while O₂ purity stabilizes indicates bed degradation, allowing for predictive maintenance. A persistent decrease in cycle time despite O₂ remaining high may indicate analyzer drift, prompting a verification check.\n\nMeasures It Relies On\n* Product Oxygen Analyzer: Provides the critical \"quality\" feedback signal. This is the only direct measurement of the failing parameter (purity). By using it as the primary gate for cycle completion, it directly counters the \"slipping below specification\" failure.\n* Feed-Air Pressure Transmitter: Provides the \"input\" condition. Nitrogen production rate is pressure-dependent; this signal allows the logic to scale the expected behavior, helping distinguish between a low-pressure issue (which lowers purity and increases air use) and a bed issue.\n* Cycle-Time Counter: Provides the \"process\" health indicator. It allows the system to enforce the T_min guard, preventing the \"shortening\" failure mode from becoming unstable, and provides historical data to correlate purity drift with bed aging.\n\nWhy This Works Under the Constraint:\nNo new sensors are added. The existing O₂ analyzer, which was likely being used only for monitoring or setpoint comparison, is now leveraged as the active control input for the cycle timer. This stops the uncontrolled shortening of cycles (which was likely a malfunctioning or misconfigured open-loop timer trying to compensate for something) and ensures that air is not consumed in short, inefficient cycles that produce low-purity gas. It directly addresses both the purity loss and the increased air consumption by aligning cycle length with actual adsorption performance.\n\nIMPLEMENTATION BILL\nTo satisfy the constraint of using only existing sensors and measurements, and to ensure all inputs are explicitly derived from permitted sources, the following logic and signals are required:\n\n1. Input Signals & Derivation:\n   - I1: Product Oxygen Concentration (O₂). Source: Product Oxygen Analyzer. Usage: Direct measurement. Drives the primary control logic (Condition A and B).\n   - I2: Feed-Air Pressure. Source: Feed-Air Pressure Transmitter. Usage: Direct measurement. Used to derive T_min via the formula: T_min = k * (P_ref / P_current), where k is a tuning constant and P_ref is the reference pressure. This ensures the minimum cycle time scales inversely with pressure to maintain adsorption integrity.\n   - I3: Cycle Duration. Source: Cycle-Time Counter. Usage: Direct measurement of elapsed time in the current phase. Used to enforce T_min and T_max limits.\n   - I4: Target Purity Setpoint (P_set). Source: Static parameter. Derived from product specification limits. Not a sensor input, but a logic constant.\n   - I5: Maximum Cycle Time (T_max). Source: Static parameter. Derived from historical maximum observed cycle times plus a safety margin. Used for Condition C alarm.\n\n2. Logic Gates & States:\n   - Gate 1 (Hold State): Activates when O₂ < P_set OR (Cycle Time < T_min). Action: Hold adsorption phase. Prevents regeneration start.\n   - Gate 2 (Release State): Activates when O₂ >= P_set AND Cycle Time >= T_min. Action: Allow transition to regeneration.\n   - Gate 3 (Alarm State): Activates when Cycle Time > T_max AND O₂ < P_set. Action: Trigger alarm, pause cycle. Indicates physical failure (fouling/pressure loss).\n\n3. No New Instrumentation:\n   - All inputs (I1, I2, I3) are from existing hardware.\n   - All derived parameters (T_min, T_max) are calculated within the PLC using existing math blocks or static constants.\n   - No new wiring, sensors, or field devices are added.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. Input Signals & Derivation:",
+     "- I1: Product Oxygen Concentration (O₂). Source: Product Oxygen Analyzer. Usage: Direct me",
+     "- I2: Feed-Air Pressure. Source: Feed-Air Pressure Transmitter. Usage: Direct measurement.",
+     "- I3: Cycle Duration. Source: Cycle-Time Counter. Usage: Direct measurement of elapsed tim",
+     "- I4: Target Purity Setpoint (P_set). Source: Static parameter. Derived from product speci",
+     "- I5: Maximum Cycle Time (T_max). Source: Static parameter. Derived from historical maximu",
+     "2. Logic Gates & States:",
+     "- Gate 1 (Hold State): Activates when O₂ < P_set OR (Cycle Time < T_min). Action: Hold ads",
+     "- Gate 2 (Release State): Activates when O₂ >= P_set AND Cycle Time >= T_min. Action: Allo",
+     "- Gate 3 (Alarm State): Activates when Cycle Time > T_max AND O₂ < P_set. Action: Trigger ",
+     "3. No New Instrumentation:",
+     "- All inputs (I1, I2, I3) are from existing hardware.",
+     "- All derived parameters (T_min, T_max) are calculated within the PLC using existing math ",
+     "- No new wiring, sensors, or field devices are added."
+    ],
+    "APPARATUS_ROW": [
+     "- I1: Product Oxygen Concentration (O₂). Source: Product Oxygen Analyzer. Usage: Direct measurement. Drives th",
+     "- I4: Target Purity Setpoint (P_set). Source: Static parameter. Derived from product specification limits. Not",
+     "- No new wiring, sensors, or field devices are added."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 6.71,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 751,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 8.28,
+     "usage": {
+      "prompt_tokens": 1120,
+      "completion_tokens": 1111,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"### Mitigation Proposal: Closed-Loop Cycle Time Extension via Oxygen Anal",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Cycle Time Extension via Oxygen Analyzer and Pressure-Dependent Logic**\n\n**Mechanism**\nThe root cause of the simultaneous purity drop and cycle shortening is likely premature or erratic valve switching due to controller instability, sensor drift, or upstream pressure fluctuations causing the adsorption bed to saturate faster than the fixed cycle timer accounts for. The mitigation uses the **existing product oxygen analyzer** as the primary feedback variable and the **feed-air pressure transmitter** as a scaling factor to dynamically extend the adsorption cycle time, ensuring the bed reaches sufficient saturation before the purge phase begins. This prevents early blow-down (which reduces purity and wastes feed air in the next cycle’s make-up) and stabilizes the process.\n\n**Implementation**\n1.  **Replace Fixed Timing with Dynamic Logic:** Modify the PLC/control program to no longer use a static cycle time. Instead, the cycle time ($T_{cycle}$) is calculated every cycle based on two existing signals:\n    *   **$O_2$ Level:** Use the average product oxygen concentration from the **oxygen analyzer** over the previous 3–5 cycles. If $O_2 >$ spec threshold (e.g., 2–5 ppm for high-purity N2, or % spec for standard), $T_{cycle}$ is increased.\n    *   **$P_{feed}$ Correction:** Scale the required extension by the **feed-air pressure transmitter** reading. A drop in feed pressure reduces mass flow through the bed, meaning saturation takes longer. The logic applies a multiplier: if $P_{feed}$ drops by 10%, extend $T_{cycle}$ by ~10–15% to compensate for reduced volumetric throughput.\n2.  **Feedback Loop:**\n    *   $T_{cycle}(new) = T_{base} \\times f(O_2_{avg}) \\times g(P_{feed})$\n    *   Where $f(O_2)$ is a gain that increases $T$ when $O_2$ exceeds target (linear or stepwise).\n    *   Where $g(P_{feed})$ is a correction factor inversely proportional to pressure deviation from nominal.\n3.  **Safety Limits:** Implement hard limits in the **cycle-time counter** logic to prevent excessive extension (e.g., $T_{max} = 1.5 \\times T_{base}$) that could cause oxygen breakthrough during the *next* cycle’s purge or violate downstream demand timing.\n\n**Measures It Relies On**\n*   **Product Oxygen Analyzer:** Provides direct feedback on purity outcome. A rising $O_2$ trend indicates the bed is being switched too early (insufficient saturation), justifying cycle extension.\n*   **Feed-Air Pressure Transmitter:** Compensates for variable upstream conditions. Lower pressure reduces adsorption rate; extending time maintains consistent bed saturation despite flow variations. This directly addresses the “feed-air consumption up” issue by ensuring efficient use of each air batch (more adsorption per cycle, fewer wasted cycles).\n*   **Cycle-Time Counter (Existing Hardware):** Used to execute the variable timing. No new hardware is added; only the control logic feeding the counter is altered.\n\n**Expected Outcome**\n*   Purity stabilizes as cycles are long enough to fully saturate the adsorbent before regeneration.\n*   Feed-air consumption drops per unit of nitrogen produced because each cycle yields more high-purity product, reducing the number of cycles needed to meet demand.\n*   The system self-corrects for both pressure fluctuations and minor bed degradation without new sensors.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "REASONING_THRASH_LEAK: Correction:** Scale the required extension by the **feed-air pressure transmitter** reading. A drop in feed pr",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "REASONING_THRASH_LEAK": [
+     "Correction:** Scale the required extension by the **feed-air pressure transmitter** reading. A drop in feed pressure reduces mass fl"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "### Mitigation Proposal: Closed-Loop Cycle Time Extension via Oxygen Analyzer and Pressure-Dependent Logic\n\n**Mechanism**\nThe root cause of the simultaneous purity drop and cycle shortening is likely premature or erratic valve switching due to controller instability, sensor drift, or upstream pressure fluctuations causing the adsorption bed to saturate faster than the fixed cycle timer accounts for. The mitigation uses the **existing product oxygen analyzer** as the primary feedback variable and the **feed-air pressure transmitter** as a scaling factor to dynamically extend the adsorption cycle time, ensuring the bed reaches sufficient saturation before the purge phase begins. This prevents early blow-down (which reduces purity and wastes feed air in the next cycle’s make-up) and stabilizes the process.\n\n**DIRECTION-OF-EFFECT STATEMENT**\n*   **Driving Variable:** The deviation of the measured product oxygen concentration ($O_2$) above the specified purity threshold, and the deviation of the measured feed-air pressure ($P_{feed}$) below the nominal pressure.\n*   **Direction of Mechanism:** An **increase** in the driving variable (i.e., $O_2$ rising above spec or $P_{feed}$ falling below nominal) results in an **increase** in the calculated cycle time ($T_{cycle}$). Conversely, if $O_2$ is below spec or $P_{feed}$ is above nominal, the cycle time is reduced toward the base value, but never below a minimum limit to prevent re-intrusion of residual gas.\n\n**Implementation Bill**\n1.  **Control Logic Update (PLC/HMI):** Modify the existing control program to replace the static timer with a dynamic calculation block.\n2.  **Configuration Parameters:**\n    *   $T_{base}$: Existing nominal cycle time (read from current parameter memory).\n    *   $O_2_{spec}$: Purity threshold (read from current specification parameter).\n    *   $P_{nominal}$: Normal feed pressure setpoint (read from current transmitter scaling parameters).\n    *   $K_p$: Pressure sensitivity gain (calculated or tuned; see Input Rules).\n    *   $K_o$: Oxygen error gain (calculated or tuned; see Input Rules).\n    *   $T_{max}$, $T_{min}$: Hard limits for cycle time (derived from existing mechanical constraints or set as fixed constants in the logic).\n3.  **Safety Interlock Verification:** Verify that the **cycle-time counter** hardware supports variable duration writes and that the maximum value ($T_{max}$) does not exceed the mechanical travel time limits of the valves or the demand buffer capacity.\n\n**Implementation Details**\n1.  **Replace Fixed Timing with Dynamic Logic:** The cycle time ($T_{cycle}$) is calculated every cycle based on two existing signals:\n    *   **$O_2$ Level:** Use the average product oxygen concentration from the **oxygen analyzer** over the previous 3–5 cycles. If $O_2 >$ spec threshold, $T_{cycle}$ is increased.\n    *   **$P_{feed}$ Correction:** Scale the required extension by the **feed-air pressure transmitter** reading. The logic applies a multiplier: if $P_{feed}$ drops below nominal, extend $T_{cycle}$ to compensate for reduced volumetric throughput.\n2.  **Feedback Loop Formula:**\n    *   $T_{cycle}(new) = T_{base} \\times f(O_2_{avg}) \\times g(P_{feed})$\n    *   Where $f(O_2)$ is a gain that increases $T$ when $O_2$ exceeds target.\n    *   Where $g(P_{feed})$ is a correction factor inversely proportional to pressure deviation from nominal.\n3.  **Safety Limits:** Implement hard limits in the **cycle-time counter** logic to prevent excessive extension (e.g., $T_{max} = 1.5 \\times T_{base}$) that could cause oxygen breakthrough during the *next* cycle’s purge or violate downstream demand timing.\n\n**Measures It Relies On (Input Rules)**\n*   **Product Oxygen Analyzer:** Provides direct feedback on purity outcome. A rising $O_2$ trend indicates the bed is being switched too early (insufficient saturation), justifying cycle extension.\n*   **Feed-Air Pressure Transmitter:** Compensates for variable upstream conditions. Lower pressure reduces adsorption rate; extending time maintains consistent bed saturation despite flow variations. This directly addresses the “feed-air consumption up” issue by ensuring efficient use of each air batch (more adsorption per cycle, fewer wasted cycles).\n*   **Cycle-Time Counter (Existing Hardware):** Used to execute the variable timing. No new hardware is added; only the control logic feeding the counter is altered.\n\n**Expected Outcome**\n*   Purity stabilizes as cycles are long enough to fully saturate the adsorbent before regeneration.\n*   Feed-air consumption drops per unit of nitrogen produced because each cycle yields more high-purity product, reducing the number of cycles needed to meet demand.\n*   The system self-corrects for both pressure fluctuations and minor bed degradation without new sensors.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Control Logic Update (PLC/HMI):** Modify the existing control program to replace the",
+     "2.  **Configuration Parameters:**",
+     "*   $T_{base}$: Existing nominal cycle time (read from current parameter memory).",
+     "*   $O_2_{spec}$: Purity threshold (read from current specification parameter).",
+     "*   $P_{nominal}$: Normal feed pressure setpoint (read from current transmitter scaling pa",
+     "*   $K_p$: Pressure sensitivity gain (calculated or tuned; see Input Rules).",
+     "*   $K_o$: Oxygen error gain (calculated or tuned; see Input Rules).",
+     "*   $T_{max}$, $T_{min}$: Hard limits for cycle time (derived from existing mechanical con",
+     "3.  **Safety Interlock Verification:** Verify that the **cycle-time counter** hardware sup",
+     "1.  **Replace Fixed Timing with Dynamic Logic:** The cycle time ($T_{cycle}$) is calculate",
+     "*   **$O_2$ Level:** Use the average product oxygen concentration from the **oxygen analyz",
+     "*   **$P_{feed}$ Correction:** Scale the required extension by the **feed-air pressure tra",
+     "2.  **Feedback Loop Formula:**",
+     "*   $T_{cycle}(new) = T_{base} \\times f(O_2_{avg}) \\times g(P_{feed})$",
+     "*   Where $f(O_2)$ is a gain that increases $T$ when $O_2$ exceeds target.",
+     "*   Where $g(P_{feed})$ is a correction factor inversely proportional to pressure deviatio",
+     "3.  **Safety Limits:** Implement hard limits in the **cycle-time counter** logic to preven",
+     "*   **Product Oxygen Analyzer:** Provides direct feedback on purity outcome. A rising $O_2",
+     "*   **Feed-Air Pressure Transmitter:** Compensates for variable upstream conditions. Lower",
+     "*   **Cycle-Time Counter (Existing Hardware):** Used to execute the variable timing. No ne",
+     "*   Purity stabilizes as cycles are long enough to fully saturate the adsorbent before reg",
+     "*   Feed-air consumption drops per unit of nitrogen produced because each cycle yields mor",
+     "*   The system self-corrects for both pressure fluctuations and minor bed degradation with"
+    ],
+    "REASONING_THRASH_LEAK": [
+     "Correction:** Scale the required extension by the **feed-air pressure transmitter** reading. The logic applies a multiplier: if $P_{"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'a dynamic calculation block' shares no allowed-list stem (Use only existing sensors and existing measurements: the product oxygen analyzer...)",
+     "added measure 'Dynamic Logic' shares no allowed-list stem (Use only existing sensors and existing measurements: the product oxygen analyzer...)"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "Mitigation Proposal: Closed-Loop Cycle Time Optimization via O₂ Purity Feedback\n\nMechanism\nImplement a feedback control loop that dynamically adjusts the adsorption cycle duration using the real-time product oxygen (O₂) concentration measured by the existing analyzer, instead of relying on a fixed, open-loop cycle time. The observed failure modes—shortening cycles and increased feed-air consumption at constant demand—are symptomatic of a control system that is either failing to detect the breakthrough of oxygen or is intentionally running short to compensate for perceived (but unverified) high purity. By closing the loop on the actual O₂ purity, the controller ensures the cycle extends until the target purity threshold is reliably met, preventing premature cut-off that degrades quality, while simultaneously avoiding unnecessary over-cycling that wastes compressed air.\n\nDIRECTION-OF-EFFECT\nDriving Variable: Product Oxygen Concentration (O₂) [measured directly by Product Oxygen Analyzer].\nDirection of Effect: Inverse/Stop. As O₂ concentration increases (indicating purity decrease), the control logic prevents the transition to the regeneration phase (stops cycle advancement). The mechanism acts to extend the adsorption time until O₂ decreases back to the target setpoint, thereby stabilizing nitrogen purity and preventing the shortening of effective adsorption cycles that leads to feed-air waste.\n\nImplementation\n1. Signal Integration: Route the signal from the installed product oxygen analyzer to the Programmable Logic Controller (PLC) responsible for the PSA cycle timing.\n2. Logic Modification:\n    * Define a Target Purity Setpoint (P_set) slightly above the minimum specification limit to provide a safety margin.\n    * Define a Minimum Cycle Time (T_min) based on the theoretical adsorption capacity at the current feed-air pressure (from the pressure transmitter) to prevent unstable short-cycling.\n    * Create a conditional logic state:\n        * Condition A (Purity < P_set): Force the cycle timer to reset or continue extending the adsorption phase. Do not advance to the regeneration phase.\n        * Condition B (Purity ≥ P_set AND Cycle Time ≥ T_min): Permit the transition to the next phase.\n        * Condition C (Cycle Time > T_max AND Purity < P_set): Trigger an alarm for \"Adsorbent Saturation/Pressure Drop\" rather than continuing to cycle, indicating the pressure transmitter reading may be too low or the bed is fouled.\n3. Pressure Compensation: Use the feed-air pressure transmitter signal to normalize the expected O₂ breakthrough curve. If pressure drops, the system anticipates a faster breakthrough and adjusts the internal model for when to expect P_set to be achieved, but the governing switch remains the O₂ analyzer.\n4. Monitoring: Use the cycle-time counter to log the duration of adsorption phases. A persistent increase in average cycle time while O₂ purity stabilizes indicates bed degradation, allowing for predictive maintenance. A persistent decrease in cycle time despite O₂ remaining high may indicate analyzer drift, prompting a verification check.\n\nMeasures It Relies On\n* Product Oxygen Analyzer: Provides the critical \"quality\" feedback signal. This is the only direct measurement of the failing parameter (purity). By using it as the primary gate for cycle completion, it directly counters the \"slipping below specification\" failure.\n* Feed-Air Pressure Transmitter: Provides the \"input\" condition. Nitrogen production rate is pressure-dependent; this signal allows the logic to scale the expected behavior, helping distinguish between a low-pressure issue (which lowers purity and increases air use) and a bed issue.\n* Cycle-Time Counter: Provides the \"process\" health indicator. It allows the system to enforce the T_min guard, preventing the \"shortening\" failure mode from becoming unstable, and provides historical data to correlate purity drift with bed aging.\n\nWhy This Works Under the Constraint:\nNo new sensors are added. The existing O₂ analyzer, which was likely being used only for monitoring or setpoint comparison, is now leveraged as the active control input for the cycle timer. This stops the uncontrolled shortening of cycles (which was likely a malfunctioning or misconfigured open-loop timer trying to compensate for something) and ensures that air is not consumed in short, inefficient cycles that produce low-purity gas. It directly addresses both the purity loss and the increased air consumption by aligning cycle length with actual adsorption performance.\n\nIMPLEMENTATION BILL\nTo satisfy the constraint of using only existing sensors and measurements, and to ensure all inputs are explicitly derived from permitted sources, the following logic and signals are required:\n\n1. Input Signals & Derivation:\n   - I1: Product Oxygen Concentration (O₂). Source: Product Oxygen Analyzer. Usage: Direct measurement. Drives the primary control logic (Condition A and B).\n   - I2: Feed-Air Pressure. Source: Feed-Air Pressure Transmitter. Usage: Direct measurement. Used to derive T_min via the formula: T_min = k * (P_ref / P_current), where k is a tuning constant and P_ref is the reference pressure. This ensures the minimum cycle time scales inversely with pressure to maintain adsorption integrity.\n   - I3: Cycle Duration. Source: Cycle-Time Counter. Usage: Direct measurement of elapsed time in the current phase. Used to enforce T_min and T_max limits.\n   - I4: Target Purity Setpoint (P_set). Source: Static parameter. Derived from product specification limits. Not a sensor input, but a logic constant.\n   - I5: Maximum Cycle Time (T_max). Source: Static parameter. Derived from historical maximum observed cycle times plus a safety margin. Used for Condition C alarm.\n\n2. Logic Gates & States:\n   - Gate 1 (Hold State): Activates when O₂ < P_set OR (Cycle Time < T_min). Action: Hold adsorption phase. Prevents regeneration start.\n   - Gate 2 (Release State): Activates when O₂ >= P_set AND Cycle Time >= T_min. Action: Allow transition to regeneration.\n   - Gate 3 (Alarm State): Activates when Cycle Time > T_max AND O₂ < P_set. Action: Trigger alarm, pause cycle. Indicates physical failure (fouling/pressure loss).\n\n3. No New Instrumentation:\n   - All inputs (I1, I2, I3) are from existing hardware.\n   - All derived parameters (T_min, T_max) are calculated within the PLC using existing math blocks or static constants.\n   - No new wiring, sensors, or field devices are added.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

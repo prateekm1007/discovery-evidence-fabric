@@ -1,0 +1,180 @@
+{
+ "problem_id": "r125-09-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 50.97,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.71,
+     "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 757,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.32,
+     "usage": {
+      "prompt_tokens": 1129,
+      "completion_tokens": 959,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Damper-Modulated Corner Uniformity Control\\n\\n**Mech",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "Mitigation Proposal: Closed-Loop \"Corner-Critical\" Dwell Extension\n\n**Mechanism**\nImplement a post-cycle thermal soak hold at the existing target cure temperature, triggered by a deviation in the spatial temperature uniformity signature. The system will monitor the existing oven zone thermocouples to detect when the temperature at the outer/corner zones lags behind the central zones during the initial heat-up phase or fluctuates abnormally during the hold. If this lag exceeds a predefined threshold—indicating poor thermal distribution likely caused by reduced airflow from the exhaust damper or fan degradation—the controller will automatically extend the total cycle time. This extension is not a fixed arbitrary delay, but a calculated \"dwell\" added to the end of the cycle to ensure the slowest-heating parts (the corners) reach the required cumulative cure dose.\n\n**Implementation**\n1.  **Baseline Profiling:** During a known-good period, record the temperature traces of all zone thermocouples (T1, T2... Tn) against the cycle timer for a standard load. Establish the normal time delta ($\\Delta T_{normal}$) between the hottest zone (usually center) and the coolest zones (corners) at 90% of the target temperature.\n2.  **Monitor Logic:** Modify the PLC/Controller logic to continuously calculate the real-time temperature difference between the central zone thermocouple and the corner zone thermocouples ($\\Delta T_{real}$).\n3.  **Trigger Condition:** Define a threshold $\\Delta T_{max}$ (e.g., $\\Delta T_{normal} + 5^\\circ C$). If $\\Delta T_{real} > \\Delta T_{max}$ persists for more than a set duration (to avoid noise triggers), the system flags an \"Uneven Cure Risk.\"\n4.  **Damper Verification:** Simultaneously, check the exhaust damper position feedback. If the damper is in a position that indicates restricted airflow (a known cause of hot spots and poor circulation) while $\\Delta T_{real}$ is high, the system logs this correlation.\n5.  **Dynamic Extension:** Upon triggering the \"Uneven Cure Risk,\" the cycle timer does not end at the nominal cycle time. Instead, it extends the cycle by a calculated \"Soak Time.\" The Soak Time is determined by a lookup table or formula based on the magnitude of the $\\Delta T_{real}$ deviation. For example, if the corner lags the center by 10°C, add 15 minutes; if it lags by 20°C, add 30 minutes. This extra time allows heat to conduct into the corner parts until the thermal gradient dissipates sufficiently to meet the cure spec.\n\n**Measures It Relies On**\n*   **Oven Zone Thermocouples:** Provides the necessary spatial data to detect the temperature gradient (center vs. corners). Without these, the system cannot distinguish between a uniformly slow heating event and an uneven heating event.\n*   **Cycle Timer:** The extension mechanism is purely time-based. The mitigation relies on the timer's ability to be extended dynamically by the controller logic.\n*   **Exhaust Damper Position Feedback:** While the primary mitigation is extending the cure time, the damper feedback is used as a diagnostic cross-check. It helps confirm *why* the unevenness is occurring (e.g., if the damper is stuck or closed, airflow is poor, leading to the observed thermal lag). This allows the system to distinguish between a transient airflow issue and a persistent thermal inertia issue, potentially adjusting the extension time or flagging maintenance needs based on the damper state during the event.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (the"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Damper-Modulated Corner Uniformity Control\n\n**Mechanism**\nImplement a closed-loop spatial uniformity correction during the cure phase by actuating the existing exhaust damper. The system monitors the temperature delta between the central and corner zones using existing thermocouples. If the corner lags beyond a threshold, the controller actively modulates the damper position to increase internal air circulation, rather than extending the cycle time. This reduces the thermal gradient and ensures uniform cure dose across the load without altering the nominal cycle duration.\n\n**DIRECTION-OF-EFFECT STATEMENT**\nThe driving variable is the **exhaust damper position**. The mechanism acts in the direction of **closing the damper** relative to its nominal position to restrict exhaust flow, thereby increasing internal static pressure and recirculating hot air to the corners. This reduces the temperature gradient ($\\Delta T_{real}$) between the center and corners, directly opposing the observed failure mode of corner lag.\n\n**Implementation**\n1.  **Baseline Profiling:** During a known-good period, record the temperature traces of all zone thermocouples (T1, T2... Tn) against the cycle timer for a standard load. Establish the normal time delta ($\\Delta T_{normal}$) between the hottest zone (usually center) and the coolest zones (corners) at 90% of the target temperature.\n2.  **Monitor Logic:** Modify the PLC/Controller logic to continuously calculate the real-time temperature difference between the central zone thermocouple ($T_{center}$) and the corner zone thermocouples ($T_{corner}$):\n    $$ \\Delta T_{real} = T_{center} - T_{corner} $$\n3.  **Trigger Condition:** Define a threshold $\\Delta T_{max}$ (e.g., $\\Delta T_{normal} + 5^\\circ C$). If $\\Delta T_{real} > \\Delta T_{max}$ persists for more than a set duration (to avoid noise triggers), the system flags an “Uneven Cure Risk.”\n4.  **Damper Actuation (Active Control):** Upon triggering the “Uneven Cure Risk,” the controller sends a command to the **Exhaust Damper Position Feedback** actuator to move the damper to a more closed position (reducing exhaust opening by a calculated percentage). This increases internal air recirculation, forcing hot air to the corners and reducing $\\Delta T_{real}$. The damper position is held at this adjusted setpoint for the remainder of the cure phase.\n5.  **Verification:** The system continues to monitor $\\Delta T_{real}$. Once $\\Delta T_{real}$ falls back within $\\Delta T_{normal} + 2^\\circ C$, the damper may be returned to its nominal position if the gradient stabilizes, or held until cycle end if the airflow limitation is persistent.\n6.  **Logging:** Log the damper position, $\\Delta T_{real}$, and cycle timer state for post-event analysis to correlate damper state with thermal uniformity.\n\n**Implementation Bill**\n*   **Controller Logic Update:** Modify existing PLC routine to include $\\Delta T_{real}$ calculation and damper setpoint adjustment logic (no new hardware).\n*   **HMI/SCADA Tag Addition:** Create new display tags for $\\Delta T_{real}$ and active damper compensation status.\n*   **Safety Interlock Review:** Verify that damper closed-position limits do not violate maximum internal pressure ratings; add alarm if pressure exceeds limit (using existing pressure sensors if available, or rely on damper position limit switches as primary safeguard).\n\n**Measures It Relies On**\n*   **Oven Zone Thermocouples ($T_{center}$, $T_{corner}$):** Directly measured inputs. $\\Delta T_{real}$ is derived as $T_{center} - T_{corner}$.\n*   **Exhaust Damper Position Feedback:** Directly measured input providing real-time damper state; also serves as the actuation reference for the control loop.\n*   **Cycle Timer:** Directly measured input used to timestamp events and determine cure phase completion. No extension is applied; the timer runs to nominal duration.\n\n**Removed Inputs**\n*   Removed any reliance on extending the cycle time, as this was identified as a same-class remedy. The mitigation now relies solely on spatial airflow modulation via the existing damper.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Controller Logic Update:** Modify existing PLC routine to include $\\Delta T_{real}$ ",
+     "*   **HMI/SCADA Tag Addition:** Create new display tags for $\\Delta T_{real}$ and active d",
+     "*   **Safety Interlock Review:** Verify that damper closed-position limits do not violate ",
+     "*   **Oven Zone Thermocouples ($T_{center}$, $T_{corner}$):** Directly measured inputs. $\\",
+     "*   **Exhaust Damper Position Feedback:** Directly measured input providing real-time damp",
+     "*   **Cycle Timer:** Directly measured input used to timestamp events and determine cure p",
+     "*   Removed any reliance on extending the cycle time, as this was identified as a same-cla"
+    ],
+    "CONVERSION": [
+     "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: *   **Cycle Timer:** Directly measured input used to timestamp events and determine cure phase completion. No extension is applied; the timer runs to nominal du"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.7,
+     "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 745,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 6.19,
+     "usage": {
+      "prompt_tokens": 1117,
+      "completion_tokens": 1341,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Spatial Thermal Uniformity via Damper-Driven Conve",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Time-Synchronized, Corner-Lagged Zone Profiling**\n\n**Mechanism:**\nThe root cause of uneven curing is a spatial thermal gradient where the corners lag behind the center due to heat loss or airflow distribution issues, forcing a cycle extension that over-cures the center. The mitigation involves using the **existing zone thermocouples** to dynamically adjust the heating profile based on real-time temperature differentials, rather than running a static time-based cycle. Specifically, we will implement a **corner-lag compensation algorithm** that monitors the temperature difference between the corner zones and the center zone. If the corner zones are lagging (temperature lower than the center), the controller will temporarily boost the heating power to the corner zones (if individually controllable) or adjust the **exhaust damper position** to improve air circulation to the corners, *before* the cycle timer completes the nominal cure time. This ensures that by the end of the cycle, all zones have reached the target cure temperature simultaneously, allowing for a consistent, non-extended cycle that avoids over-curing the center while ensuring the corners are fully cured.\n\n**Implementation:**\n1.  **Map Sensors to Zones:** Identify which of the existing oven zone thermocouples correspond to the \"corner\" regions and which correspond to the \"center\" region of the load.\n2.  **Baseline Profiling:** Run the current extended cycle and log the temperature data from all zone thermocouples relative to the cycle timer. Determine the time offset $\\Delta t$ and temperature differential $\\Delta T$ at which the corner zones reach the target cure temperature compared to the center zones.\n3.  **Algorithm Development:** Create a logic gate in the existing control system (or PLC) that monitors the real-time $\\Delta T$ between corner and center thermocouples.\n    *   **Condition:** If $\\Delta T$ exceeds a predefined threshold (indicating corners are lagging significantly) during the heat-up or soak phase:\n    *   **Action 1 (Heating):** If the oven has multiple heating zones, increase the power output to the corner heating elements until $\\Delta T$ decreases to an acceptable range.\n    *   **Action 2 (Airflow):** Adjust the **exhaust damper position** (using its existing position feedback) to optimize airflow circulation to the corners. For example, partially closing the damper may increase static pressure and direct more hot air towards the corners, or adjusting the damper to a specific angle that promotes cross-flow across the load. The exact adjustment should be determined by trial runs using the damper position feedback to correlate damper settings with improved $\\Delta T$ reduction.\n4.  **Cycle Termination:** Modify the cycle termination logic. Instead of a fixed time, the cycle ends when *both* the center and corner thermocouples have maintained the target temperature for the required soak time, or when the corner zones catch up to the center profile. This prevents unnecessary extension if the dynamic control works effectively.\n\n**Measures Relied Upon:**\n*   **Oven Zone Thermocouples:** Provide the real-time temperature data for both corner and center zones to calculate the lag ($\\Delta T$) and verify when all zones have reached the cure temperature.\n*   **Exhaust Damper Position Feedback:** Allows the control system to monitor and adjust the damper's angle in response to thermal imbalances, leveraging airflow to mitigate the corner lag.\n*   **Cycle Timer:** Used to track the elapsed time and define the start/end points of the cure cycle, and to correlate the timing of the lag with the process phases.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (the"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Spatial Thermal Uniformity via Damper-Driven Convection Balance**\n\n**Direction-of-Effect:** The driving variable is the **exhaust damper position**; the mechanism acts by **modifying the airflow circulation pattern** to equalize the spatial temperature gradient, specifically targeting the reduction of the thermal differential ($\\Delta T$) between the corner and center zones. The direction of the effect is to **close the damper** (increase static pressure/reduce mass flow) when corner temperatures are lower than center temperatures, thereby directing convective heat transfer toward the lagging corners to bring them into alignment with the center.\n\n**Mechanism:**\nRoot cause analysis indicates that uneven curing is driven by a spatial thermal gradient where corners lag the center due to insufficient convective heat transfer. The previous proposal incorrectly attempted to compensate for this thermal lag by modifying the 'cycle' duration or heating power, which conflates the symptom (time required to cure) with the root cause (airflow distribution). This corrected mechanism relies exclusively on the **exhaust damper position** to actively balance the internal thermal field. By adjusting the damper to increase static pressure within the chamber, we enhance convective mixing and direct airflow toward the cooler corners, reducing the temperature differential without altering the total heat energy input or extending the time base. This ensures that all zones reach the target cure temperature simultaneously within the nominal cycle window, eliminating the need for cycle extension to achieve corner hardness.\n\n**Implementation Bill:**\n\n1.  **Sensor Mapping & Signal Derivation:**\n    *   **Input Signal A (Corner Temp):** Derived from **existing oven zone thermocouple(s)** assigned to corner zones. Let $T_{corner}$ be the mean temperature of corner thermocouples.\n    *   **Input Signal B (Center Temp):** Derived from **existing oven zone thermocouple(s)** assigned to center zones. Let $T_{center}$ be the mean temperature of center thermocouples.\n    *   **Error Signal ($\\Delta T$):** Calculated as $\\Delta T = T_{center} - T_{corner}$. This signal is derived directly from the permitted thermocouple measurements. If $\\Delta T > 0$, corners are lagging.\n    *   **Input Signal C (Damper State):** Read from **existing exhaust damper position feedback**. Let $P_{damper}$ be the current position (0% open to 100% open).\n\n2.  **Control Logic (PLC/Controller Modification):**\n    *   **Phase Gating:** The active balancing logic is enabled only during the **Soak Phase**, identified by the **cycle timer** reaching a specific start point $T_{soak\\_start}$ and continuing until the nominal cure time $T_{nominal}$. The cycle timer provides the time reference; no new timers are added.\n    *   **Decision Rule:** Monitor $\\Delta T$ in real-time.\n        *   **Condition:** If $\\Delta T > \\text{Threshold}_{max}$ (indicating significant corner lag) AND the damper is currently in a high-open state (low static pressure).\n        *   **Action:** Command the **exhaust damper** to move toward the **closed position** (decreasing $P_{damper}$). Closing the damper increases internal static pressure and recirculates hot air, enhancing convective heat transfer to the corners.\n        *   **Stability Constraint:** The damper adjustment rate is limited to prevent thermal oscillation. The target damper position is calculated to minimize $\\Delta T$ toward zero. If $\\Delta T \\leq \\text{Threshold}_{min}$, hold the damper position. If $\\Delta T < 0$ (corners hotter than center, unlikely but possible during rapid heating), open the damper to increase flow/cooling if necessary, though the primary driver here is corner lag.\n\n3.  **Cycle Termination Logic:**\n    *   The cycle terminates based on the **existing cycle timer** reaching the nominal cure time $T_{nominal}$. \n    *   *Correction:* No dynamic termination based on temperature is used to replace the timer, as this would risk under-curing if temperatures fluctuate. Instead, the dynamic damper control ensures that at $T_{nominal}$, all zones have been thermally equalized *during* the soak, allowing the standard timer-based stop to yield consistent hardness without the previous extension. The timer is the arbiter of duration; the damper is the arbiter of uniformity.\n\n4.  **Verification & Tuning:**\n    *   Use the **cycle timer** to log the entire process. Correlate $P_{damper}$ adjustments with $\\Delta T$ reduction trends from the **thermocouples**.\n    *   Adjust the damper control gain and thresholds based on the observed response of $\\Delta T$ to changes in $P_{damper}$, using only the existing feedback signals.\n\n**Measures Relied Upon (Explicitly Mapped):**\n*   **$T_{corner}$:** Directly measured by **existing oven zone thermocouples** in corner locations.\n*   **$T_{center}$:** Directly measured by **existing oven zone thermocouples** in center locations.\n*   **$\\Delta T$:** Derived from formula $T_{center} - T_{corner}$ using the two thermocouple inputs above.\n*   **$P_{damper}$:** Directly measured by **existing exhaust damper position feedback**.\n*   **Process Phase (Soak Start/End):** Defined by **existing cycle timer** values (e.g., 15 min to 45 min).\n\n**Removed Inputs:**\n*   Removed reference to \"boosting heating power\" as it implies control of heating elements which may not be individually controllable or distinct from the damper's effect on convective distribution. The mechanism now relies solely on the damper to address the *spatial* distribution of the existing heat, not the *total* heat generation rate.\n*   Removed dynamic cycle termination based on temperature convergence, as this introduces a new logic class that conflicts with the fixed timer constraint and does not address the spatial uniformity driver.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Sensor Mapping & Signal Derivation:**",
+     "*   **Input Signal A (Corner Temp):** Derived from **existing oven zone thermocouple(s)** ",
+     "*   **Input Signal B (Center Temp):** Derived from **existing oven zone thermocouple(s)** ",
+     "*   **Error Signal ($\\Delta T$):** Calculated as $\\Delta T = T_{center} - T_{corner}$. Thi",
+     "*   **Input Signal C (Damper State):** Read from **existing exhaust damper position feedba",
+     "2.  **Control Logic (PLC/Controller Modification):**",
+     "*   **Phase Gating:** The active balancing logic is enabled only during the **Soak Phase**",
+     "*   **Decision Rule:** Monitor $\\Delta T$ in real-time.",
+     "*   **Condition:** If $\\Delta T > \\text{Threshold}_{max}$ (indicating significant corner l",
+     "*   **Action:** Command the **exhaust damper** to move toward the **closed position** (dec",
+     "*   **Stability Constraint:** The damper adjustment rate is limited to prevent thermal osc",
+     "3.  **Cycle Termination Logic:**",
+     "*   The cycle terminates based on the **existing cycle timer** reaching the nominal cure t",
+     "*   *Correction:* No dynamic termination based on temperature is used to replace the timer",
+     "4.  **Verification & Tuning:**",
+     "*   Use the **cycle timer** to log the entire process. Correlate $P_{damper}$ adjustments ",
+     "*   Adjust the damper control gain and thresholds based on the observed response of $\\Delt",
+     "*   **$T_{corner}$:** Directly measured by **existing oven zone thermocouples** in corner ",
+     "*   **$T_{center}$:** Directly measured by **existing oven zone thermocouples** in center ",
+     "*   **$\\Delta T$:** Derived from formula $T_{center} - T_{corner}$ using the two thermocou",
+     "*   **$P_{damper}$:** Directly measured by **existing exhaust damper position feedback**.",
+     "*   **Process Phase (Soak Start/End):** Defined by **existing cycle timer** values (e.g., ",
+     "*   Removed reference to \"boosting heating power\" as it implies control of heating element",
+     "*   Removed dynamic cycle termination based on temperature convergence, as this introduces"
+    ],
+    "REASONING_THRASH_LEAK": [
+     "*Correction:* No dynamic termination based on temperature is used to replace the timer, as this would risk under-curing if temperatur"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'to replace the timer' shares no allowed-list stem (Use only existing sensors and existing measurements: the oven zone thermocouples...)"
+    ],
+    "APPARATUS_ROW": [
+     "*   **Decision Rule:** Monitor $\\Delta T$ in real-time."
+    ],
+    "CONVERSION": [
+     "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: *   **Phase Gating:** The active balancing logic is enabled only during the **Soak Phase**, identified by the **cycle timer** reaching a specific start point $T",
+     "ADDED_PROCESS_STEP: curing on a row that does not ride existing/unchanged infrastructure: *   *Correction:* No dynamic termination based on temperature is used to replace the timer, as this would risk under-curing if temperatures fluctuate. Instead, "
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "Mitigation Proposal: Damper-Modulated Corner Uniformity Control\n\n**Mechanism**\nImplement a closed-loop spatial uniformity correction during the cure phase by actuating the existing exhaust damper. The system monitors the temperature delta between the central and corner zones using existing thermocouples. If the corner lags beyond a threshold, the controller actively modulates the damper position to increase internal air circulation, rather than extending the cycle time. This reduces the thermal gradient and ensures uniform cure dose across the load without altering the nominal cycle duration.\n\n**DIRECTION-OF-EFFECT STATEMENT**\nThe driving variable is the **exhaust damper position**. The mechanism acts in the direction of **closing the damper** relative to its nominal position to restrict exhaust flow, thereby increasing internal static pressure and recirculating hot air to the corners. This reduces the temperature gradient ($\\Delta T_{real}$) between the center and corners, directly opposing the observed failure mode of corner lag.\n\n**Implementation**\n1.  **Baseline Profiling:** During a known-good period, record the temperature traces of all zone thermocouples (T1, T2... Tn) against the cycle timer for a standard load. Establish the normal time delta ($\\Delta T_{normal}$) between the hottest zone (usually center) and the coolest zones (corners) at 90% of the target temperature.\n2.  **Monitor Logic:** Modify the PLC/Controller logic to continuously calculate the real-time temperature difference between the central zone thermocouple ($T_{center}$) and the corner zone thermocouples ($T_{corner}$):\n    $$ \\Delta T_{real} = T_{center} - T_{corner} $$\n3.  **Trigger Condition:** Define a threshold $\\Delta T_{max}$ (e.g., $\\Delta T_{normal} + 5^\\circ C$). If $\\Delta T_{real} > \\Delta T_{max}$ persists for more than a set duration (to avoid noise triggers), the system flags an “Uneven Cure Risk.”\n4.  **Damper Actuation (Active Control):** Upon triggering the “Uneven Cure Risk,” the controller sends a command to the **Exhaust Damper Position Feedback** actuator to move the damper to a more closed position (reducing exhaust opening by a calculated percentage). This increases internal air recirculation, forcing hot air to the corners and reducing $\\Delta T_{real}$. The damper position is held at this adjusted setpoint for the remainder of the cure phase.\n5.  **Verification:** The system continues to monitor $\\Delta T_{real}$. Once $\\Delta T_{real}$ falls back within $\\Delta T_{normal} + 2^\\circ C$, the damper may be returned to its nominal position if the gradient stabilizes, or held until cycle end if the airflow limitation is persistent.\n6.  **Logging:** Log the damper position, $\\Delta T_{real}$, and cycle timer state for post-event analysis to correlate damper state with thermal uniformity.\n\n**Implementation Bill**\n*   **Controller Logic Update:** Modify existing PLC routine to include $\\Delta T_{real}$ calculation and damper setpoint adjustment logic (no new hardware).\n*   **HMI/SCADA Tag Addition:** Create new display tags for $\\Delta T_{real}$ and active damper compensation status.\n*   **Safety Interlock Review:** Verify that damper closed-position limits do not violate maximum internal pressure ratings; add alarm if pressure exceeds limit (using existing pressure sensors if available, or rely on damper position limit switches as primary safeguard).\n\n**Measures It Relies On**\n*   **Oven Zone Thermocouples ($T_{center}$, $T_{corner}$):** Directly measured inputs. $\\Delta T_{real}$ is derived as $T_{center} - T_{corner}$.\n*   **Exhaust Damper Position Feedback:** Directly measured input providing real-time damper state; also serves as the actuation reference for the control loop.\n*   **Cycle Timer:** Directly measured input used to timestamp events and determine cure phase completion. No extension is applied; the timer runs to nominal duration.\n\n**Removed Inputs**\n*   Removed any reliance on extending the cycle time, as this was identified as a same-class remedy. The mitigation now relies solely on spatial airflow modulation via the existing damper.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

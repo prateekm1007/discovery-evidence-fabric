@@ -1,0 +1,155 @@
+{
+ "problem_id": "r125-03-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 50.82,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.79,
+     "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 742,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 6.1,
+     "usage": {
+      "prompt_tokens": 1081,
+      "completion_tokens": 1293,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Automated Batch Correction Based on Real-Time Mixe",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Automated Batch Correction Based on Real-Time Mixer Load and Ambient Temperature Deviations**\n\n**Mechanism:**\nImplement a feedback-controlled correction loop within the plant’s existing control system that adjusts the water-to-binder ratio and total batch mass in real-time for each upcoming batch. The loop uses two existing measurable deviations to infer changes in aggregate moisture and workability requirements:\n1.  **Mixer Motor Current:** Higher-than-baseline average current during the mixing cycle at a fixed timepoint indicates increased resistance, implying the mix is too stiff (low workability) or aggregates are denser/drier than standard.\n2.  **Ambient Temperature:** Deviations from the seasonal baseline temperature affect cement hydration and evaporation; colder air increases water demand for workability, while hotter air may require adjustments to avoid premature setting or excessive evaporation losses.\n\nThe system will automatically reduce water addition when motor current indicates excessive stiffness (dry aggregates) or increase it when current is low (overly wet aggregates), scaled by the temperature deviation from the reference standard.\n\n**Implementation:**\n1.  **Baseline Establishment:** Using historical batch scale records, mixer motor current data, and air thermometer readings from prior stable periods, define:\n    -   Reference motor current profile `I_ref(t)` for each batch type.\n    -   Reference water addition `W_ref`.\n    -   Reference temperature band `T_ref` for the season.\n2.  **Real-Time Monitoring:** For each batch:\n    -   Record the mixer motor current `I(t)` at a fixed post-mixing timepoint (e.g., 30 seconds after initial mix).\n    -   Read the current plant air temperature `T_now`.\n3.  **Correction Calculation:**\n    -   Compute Current Deviation: `ΔI = I(t) - I_ref(t)`.\n    -   Compute Temperature Deviation: `ΔT = T_now - T_ref`.\n    -   Apply a linear correction model derived from historical data:\n      -   Water Adjustment `ΔW = k1 * (-ΔI) + k2 * (-ΔT)`\n        *(Note: Positive ΔI means stiffer mix → less water needed, hence negative k1. Positive ΔT means hotter → more water needed to maintain workability, hence negative k2 if T_ref is higher than actual, but generally hotter requires more water. The signs must be calibrated with historical data.)*\n    -   New Water Target `W_new = W_ref + ΔW`.\n4.  **Automatic Adjustment:** The batch scale and water dosing system are commanded to deliver `W_new` instead of `W_ref`. Aggregate weights remain unchanged per existing delivery records, but the correction compensates for unmeasured moisture variability in the aggregates.\n\n**Measures It Relies On:**\n-   **Mixer Motor Current Meter:** Provides a proxy for mix consistency and aggregate moisture state; deviations from baseline indicate drying or wetting of aggregates.\n-   **Plant Air Thermometer:** Provides ambient temperature, which correlates with required water adjustments for workability and hydration rate.\n-   **Batch Scale Records:** Provide the historical baseline for reference water amounts and correlate aggregate deliveries with outcomes, enabling calibration of the correction model `k1` and `k2`.\n-   **Existing Control System:** Must be capable of accepting a dynamically adjusted water target before each batch cycle.\n\nThis mitigation stabilizes concrete consistency by automatically compensating for the primary drivers of drift (aggregate moisture and temperature effects) using only existing sensors, without adding new instrumentation.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Automated Batch Correction Based on Real-Time Mixer Load and Ambient Temperature Deviations**\n\n**Mechanism:**\nImplement a feedback-controlled correction loop within the plant’s existing control system that adjusts the water-to-binder ratio in real-time for each upcoming batch. The loop uses two existing measurable deviations to infer changes in aggregate moisture and workability requirements:\n1. **Mixer Motor Current:** Higher-than-baseline average current during the mixing cycle at a fixed timepoint indicates increased resistance, implying the mix is too stiff (low workability) or aggregates are denser/drier than standard.\n2. **Ambient Temperature:** Deviations from the seasonal baseline temperature affect cement hydration and evaporation; colder air increases water demand for workability, while hotter air may require adjustments to avoid premature setting or excessive evaporation losses.\n\nThe system will automatically reduce water addition when motor current indicates excessive stiffness (dry aggregates) or increase it when current is low (overly wet aggregates), scaled by the temperature deviation from the reference standard.\n\n**Direction-of-Effect Statement:**\n- **Mixer Motor Current ($I$):** An increase in $I$ relative to baseline $I_{ref}$ indicates a stiffer mix (lower workability) due to drier aggregates. To maintain target consistency, the water addition must be **increased**. Therefore, the driving variable $I$ has a **positive** effect on the required water adjustment $\frac{dW}{dI} > 0$.\n- **Ambient Temperature ($T$):** An increase in $T$ relative to baseline $T_{ref}$ increases evaporation losses and hydration rates, requiring **more** water to maintain workability. Therefore, the driving variable $T$ has a **positive** effect on the required water adjustment $\frac{dW}{dT} > 0$.\n\n**Implementation Bill:**\n1. **Software Modification:** Update the plant’s existing PLC ladder logic to accept a dynamic water target variable $W_{new}$ instead of the static setpoint $W_{ref}$. No hardware changes are required.\n2. **Calibration Phase:** Run the plant in open-loop mode for two shifts to collect current data pairs $(I_{measured}, T_{measured})$ and manually verified concrete consistency results. Use batch scale records to confirm total batch mass consistency.\n3. **Coefficient Determination:** Regress historical batch scale water records against measured $I$ and $T$ deviations to determine coefficients $k_1$ and $k_2$ such that $\\Delta W = k_1(\\Delta I) + k_2(\\Delta T)$, ensuring $k_1 > 0$ and $k_2 > 0$.\n4. **Deployment:** Enable the closed-loop correction. The system calculates $W_{new}$ before each batch cycle and commands the water dosing valve accordingly.\n\n**Implementation Logic:**\n1. **Baseline Establishment:** Using historical batch scale records, mixer motor current data, and air thermometer readings from prior stable periods, define:\n    -   Reference motor current profile `I_ref(t)` for each batch type.\n    -   Reference water addition `W_ref`.\n    -   Reference temperature band `T_ref` for the season.\n2. **Real-Time Monitoring:** For each batch:\n    -   Record the mixer motor current `I(t)` at a fixed post-mixing timepoint (e.g., 30 seconds after initial mix).\n    -   Read the current plant air temperature `T_now`.\n3. **Correction Calculation:**\n    -   Compute Current Deviation: `ΔI = I(t) - I_ref(t)`.\n    -   Compute Temperature Deviation: `ΔT = T_now - T_ref`.\n    -   Apply a linear correction model derived from historical data:\n        -   Water Adjustment `ΔW = k1 * (ΔI) + k2 * (ΔT)`.\n        -   *(Note: Based on the Direction-of-Effect statement, k1 and k2 are positive constants. Higher current implies stiffer mix, requiring more water. Higher temperature implies more evaporation, requiring more water.)*\n    -   New Water Target `W_new = W_ref + ΔW`.\n    -   Apply safety bounds: `W_min <= W_new <= W_max` to prevent hydraulic overload or cement starvation.\n4. **Automatic Adjustment:** The batch scale and water dosing system are commanded to deliver `W_new` instead of `W_ref`. Aggregate weights remain unchanged per existing delivery records, but the correction compensates for unmeasured moisture variability in the aggregates.\n\n**Input Sensitivity and Derivation Source:\n- **Mixer Motor Current ($I$):** Taken directly from the **Mixer Motor Current Meter**. This is a permitted existing sensor. $I(t)$ is the raw measurement at the fixed timepoint $t_{mix}$.\n- **Ambient Temperature ($T$):** Taken directly from the **Plant Air Thermometer**. This is a permitted existing sensor. $T_{now}$ is the raw measurement at the time of batching.\n- **Reference Values ($I_{ref}, T_{ref}, W_{ref}$):** Derived from **Batch Scale Records** and historical logs of the above two sensors. $W_{ref}$ is the nominal water mass recorded in stable historical batches. $I_{ref}$ and $T_{ref}$ are statistical baselines computed from the same stable period. No new instrumentation is introduced.\n- **Coefficients ($k_1, k_2$):** Derived from regression analysis of **Batch Scale Records** (actual water used) against historical **Mixer Motor Current Meter** and **Plant Air Thermometer** readings. These are static constants stored in the PLC.\n- **Water Dosing Command:** The target $W_{new}$ is calculated by the PLC and sent to the existing water dosing valve controller. The actual delivered water mass is verified by the **Batch Scale Records** (water scale component, part of the existing batch scale system).",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. **Software Modification:** Update the plant’s existing PLC ladder logic to accept a dyn",
+     "2. **Calibration Phase:** Run the plant in open-loop mode for two shifts to collect curren",
+     "3. **Coefficient Determination:** Regress historical batch scale water records against mea",
+     "4. **Deployment:** Enable the closed-loop correction. The system calculates $W_{new}$ befo",
+     "1. **Baseline Establishment:** Using historical batch scale records, mixer motor current d",
+     "-   Reference motor current profile `I_ref(t)` for each batch type.",
+     "-   Reference water addition `W_ref`.",
+     "-   Reference temperature band `T_ref` for the season.",
+     "2. **Real-Time Monitoring:** For each batch:",
+     "-   Record the mixer motor current `I(t)` at a fixed post-mixing timepoint (e.g., 30 secon",
+     "-   Read the current plant air temperature `T_now`.",
+     "3. **Correction Calculation:**",
+     "-   Compute Current Deviation: `ΔI = I(t) - I_ref(t)`.",
+     "-   Compute Temperature Deviation: `ΔT = T_now - T_ref`.",
+     "-   Apply a linear correction model derived from historical data:",
+     "-   Water Adjustment `ΔW = k1 * (ΔI) + k2 * (ΔT)`.",
+     "-   *(Note: Based on the Direction-of-Effect statement, k1 and k2 are positive constants. ",
+     "-   New Water Target `W_new = W_ref + ΔW`.",
+     "-   Apply safety bounds: `W_min <= W_new <= W_max` to prevent hydraulic overload or cement",
+     "4. **Automatic Adjustment:** The batch scale and water dosing system are commanded to deli",
+     "- **Mixer Motor Current ($I$):** Taken directly from the **Mixer Motor Current Meter**. Th",
+     "- **Ambient Temperature ($T$):** Taken directly from the **Plant Air Thermometer**. This i",
+     "- **Reference Values ($I_{ref}, T_{ref}, W_{ref}$):** Derived from **Batch Scale Records**",
+     "- **Coefficients ($k_1, k_2$):** Derived from regression analysis of **Batch Scale Records",
+     "- **Water Dosing Command:** The target $W_{new}$ is calculated by the PLC and sent to the "
+    ],
+    "APPARATUS_ROW": [
+     "2. **Real-Time Monitoring:** For each batch:",
+     "- **Reference Values ($I_{ref}, T_{ref}, W_{ref}$):** Derived from **Batch Scale Records** and historical logs"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.21,
+     "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 637,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.68,
+     "usage": {
+      "prompt_tokens": 976,
+      "completion_tokens": 1214,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Moisture Compensation Using Existing M",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Moisture Compensation Using Existing Mixer Current and Temperature Data**\n\n**Mechanism:**\nThe drifting consistency and increasing water addition are caused by unaccounted moisture variability in aggregates, which the plant scale does not capture (as it measures total mass, not solid content). Instead of adding new moisture sensors, this mitigation leverages the **mixer motor current** as a real-time proxy for concrete viscosity/slump. Higher moisture leads to thinner concrete, which reduces internal friction and lowers motor current. By correlating the existing mixer current profile with the ambient air temperature (a driver of aggregate moisture evaporation and variability) and the batch scale records, we establish a dynamic correction factor for water addition.\n\n**Implementation:**\n1.  **Baseline Calibration (Offline):** During a period of stable conditions (e.g., dry aggregates, low temperature), record the average mixer motor current for a target slump/consistency at the standard water dose. Map the ambient air temperature to the expected moisture loss/gain in aggregates over a typical shift.\n2.  **Real-Time Feedback Loop (Online):**\n    *   For each batch, after aggregates are charged, the system records the **ambient air temperature** from the plant thermometer.\n    *   As the mixing cycle begins, the system monitors the **mixer motor current** during the first 30–60 seconds of mixing.\n    *   Compare the observed current signature to the expected baseline for the current temperature.\n        *   *If current is lower than expected:* The mix is too thin (aggregates were wetter than assumed, or temperature caused higher initial water retention). **Reduce** the water addition for the final batch charge by a calculated delta.\n        *   *If current is higher than expected:* The mix is too stiff (aggregates were drier). **Increase** the water addition.\n    *   The water meter (existing) is adjusted automatically by this calculated delta before the water is added to the batch.\n3.  **Shift Trending:** Log the correction deltas along with the **batch scale records** (to confirm aggregate tonnage is constant) and air temperature. If the required water corrections trend upward over multiple shifts despite constant scale readings, it indicates a systematic change in aggregate moisture baseline, prompting a manual review of aggregate storage conditions.\n\n**Measures Relied On (Existing Only):**\n*   **Mixer Motor Current Meter:** Provides real-time feedback on mixture consistency (viscosity) without needing a slump test. Irregular current profiles directly signal inconsistent mix density.\n*   **Plant Air Thermometer:** Allows for environmental correction; temperature influences aggregate moisture state and evaporation rates, helping predict baseline moisture trends.\n*   **Batch Scale Records:** Confirms that aggregate mass is constant across deliveries, isolating moisture variability as the primary cause of consistency drift (since mass is unchanged, but water content within the aggregate changes).\n\nThis approach uses existing signals to infer the hidden variable (aggregate moisture) through the observable effects on mixer load and environmental conditions, ensuring consistent concrete consistency without new hardware.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Moisture Compensation Using Existing Mixer Current and Temperature Data**\n\n**DIRECTION-OF-EFFECT STATEMENT:**\n*   **Driving Variable:** Aggregate moisture content.\n*   **Mechanism:** An increase in aggregate moisture content reduces the internal friction of the concrete mix, which decreases the mechanical load on the mixer.\n*   **Direction:** Higher aggregate moisture leads to a **decrease** in mixer motor current. Conversely, lower aggregate moisture leads to an **increase** in mixer motor current.\n*   **Correction Direction:** If the observed mixer current is lower than the temperature-adjusted baseline, the system must **decrease** the water addition to compensate for the excess moisture in the aggregates. If the observed mixer current is higher than the baseline, the system must **increase** the water addition.\n\n**Measures Relied On (Permitted Sensors and Derivations):**\n*   **Input 1: Mixer Motor Current (I_m)**\n    *   *Source:* Existing Mixer Motor Current Meter.\n    *   *Usage:* Direct measurement of motor load during the first 30–60 seconds of mixing.\n*   **Input 2: Ambient Air Temperature (T_amb)**\n    *   *Source:* Existing Plant Air Thermometer.\n    *   *Usage:* Direct measurement of environmental temperature.\n*   **Input 3: Baseline Current Function (C_base(T_amb))**\n    *   *Source:* Derived from offline calibration data.\n    *   *Derivation Formula:* A pre-computed lookup table or linear regression function mapping `T_amb` to the expected average mixer current (`I_expected`) for a target slump under dry aggregate conditions. This is derived by recording `I_m` at various `T_amb` values during known stable (dry) periods and fitting a curve.\n*   **Input 4: Aggregate Mass (M_agg)**\n    *   *Source:* Existing Batch Scale Records.\n    *   *Usage:* Verification that aggregate tonnage is constant.\n*   **Input 5: Water Adjustment Delta (ΔW)**\n    *   *Source:* Derived logic output.\n    *   *Derivation Formula:* `ΔW = k * (I_expected(T_amb) - I_m_observed)`. Where `k` is a calibration constant determined during the baseline phase. This delta is applied to the standard water dose.\n\n**Implementation:**\n\n1.  **Baseline Calibration (Offline):**\n    *   During periods of stable, dry aggregate conditions, record the average mixer motor current (`I_m`) at various ambient temperatures (`T_amb`).\n    *   Establish the function `C_base(T_amb)` which predicts the expected mixer current for a target consistency when aggregates are dry.\n    *   Determine the proportionality constant `k` that relates the difference between expected and observed current to the required water adjustment delta.\n\n2.  **Real-Time Feedback Loop (Online):**\n    *   For each batch, record the **Ambient Air Temperature (T_amb)** from the plant thermometer.\n    *   Calculate the expected baseline current: `I_expected = C_base(T_amb)`.\n    *   Charge aggregates and verify **Aggregate Mass (M_agg)** from the batch scale records.\n    *   As the mixing cycle begins, monitor the **Mixer Motor Current (I_m_observed)** during the first 30–60 seconds.\n    *   Calculate the required water adjustment: `ΔW = k * (I_expected - I_m_observed)`.\n        *   *Logic Check:* If `I_m_observed < I_expected`, then `ΔW` is positive relative to the reduction logic (i.e., the mix is too wet/thin). The system calculates a **reduction** in water addition.\n        *   *Logic Check:* If `I_m_observed > I_expected`, then `ΔW` is negative relative to the reduction logic (i.e., the mix is too stiff). The system calculates an **increase** in water addition.\n    *   Adjust the water meter setpoint by the calculated delta before the water is added to the batch.\n\n3.  **Shift Trending:**\n    *   Log the calculated `ΔW` values, `T_amb`, and `M_agg` for each batch.\n    *   If the trend of `ΔW` indicates a systematic shift in the required water baseline over multiple shifts despite constant `M_agg`, flag for manual review of aggregate storage moisture conditions.\n\n**Implementation Bill:**\n*   **Software/Logic Update:** Configure the batch plant controller to implement the `C_base(T_amb)` lookup and the `ΔW` calculation logic. Estimated effort: 2 engineering days.\n*   **Calibration Session:** Perform offline calibration to generate `C_base(T_amb)` and determine constant `k`. Estimated effort: 4 hours on-site.\n*   **Operator Training:** Brief operators on the new automatic water adjustment logic and the trending report interpretation. Estimated effort: 1 hour.\n*   **Hardware:** None. Utilizes existing Mixer Motor Current Meter, Plant Air Thermometer, and Batch Scale Records.\n\n**Measures Relied On (Existing Only):**\n*   **Mixer Motor Current Meter:** Provides real-time feedback on mixture viscosity via load. Irregular or shifted current profiles signal moisture variability.\n*   **Plant Air Thermometer:** Provides environmental context to normalize the expected motor current baseline.\n*   **Batch Scale Records:** Confirms that aggregate mass is constant, isolating moisture as the variable causing consistency drift.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Software/Logic Update:** Configure the batch plant controller to implement the `C_ba",
+     "*   **Calibration Session:** Perform offline calibration to generate `C_base(T_amb)` and d",
+     "*   **Operator Training:** Brief operators on the new automatic water adjustment logic and",
+     "*   **Hardware:** None. Utilizes existing Mixer Motor Current Meter, Plant Air Thermometer",
+     "*   **Mixer Motor Current Meter:** Provides real-time feedback on mixture viscosity via lo",
+     "*   **Plant Air Thermometer:** Provides environmental context to normalize the expected mo",
+     "*   **Batch Scale Records:** Confirms that aggregate mass is constant, isolating moisture "
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal: Automated Batch Correction Based on Real-Time Mixer Load and Ambient Temperature Deviations**\n\n**Mechanism:**\nImplement a feedback-controlled correction loop within the plant’s existing control system that adjusts the water-to-binder ratio in real-time for each upcoming batch. The loop uses two existing measurable deviations to infer changes in aggregate moisture and workability requirements:\n1. **Mixer Motor Current:** Higher-than-baseline average current during the mixing cycle at a fixed timepoint indicates increased resistance, implying the mix is too stiff (low workability) or aggregates are denser/drier than standard.\n2. **Ambient Temperature:** Deviations from the seasonal baseline temperature affect cement hydration and evaporation; colder air increases water demand for workability, while hotter air may require adjustments to avoid premature setting or excessive evaporation losses.\n\nThe system will automatically reduce water addition when motor current indicates excessive stiffness (dry aggregates) or increase it when current is low (overly wet aggregates), scaled by the temperature deviation from the reference standard.\n\n**Direction-of-Effect Statement:**\n- **Mixer Motor Current ($I$):** An increase in $I$ relative to baseline $I_{ref}$ indicates a stiffer mix (lower workability) due to drier aggregates. To maintain target consistency, the water addition must be **increased**. Therefore, the driving variable $I$ has a **positive** effect on the required water adjustment $\frac{dW}{dI} > 0$.\n- **Ambient Temperature ($T$):** An increase in $T$ relative to baseline $T_{ref}$ increases evaporation losses and hydration rates, requiring **more** water to maintain workability. Therefore, the driving variable $T$ has a **positive** effect on the required water adjustment $\frac{dW}{dT} > 0$.\n\n**Implementation Bill:**\n1. **Software Modification:** Update the plant’s existing PLC ladder logic to accept a dynamic water target variable $W_{new}$ instead of the static setpoint $W_{ref}$. No hardware changes are required.\n2. **Calibration Phase:** Run the plant in open-loop mode for two shifts to collect current data pairs $(I_{measured}, T_{measured})$ and manually verified concrete consistency results. Use batch scale records to confirm total batch mass consistency.\n3. **Coefficient Determination:** Regress historical batch scale water records against measured $I$ and $T$ deviations to determine coefficients $k_1$ and $k_2$ such that $\\Delta W = k_1(\\Delta I) + k_2(\\Delta T)$, ensuring $k_1 > 0$ and $k_2 > 0$.\n4. **Deployment:** Enable the closed-loop correction. The system calculates $W_{new}$ before each batch cycle and commands the water dosing valve accordingly.\n\n**Implementation Logic:**\n1. **Baseline Establishment:** Using historical batch scale records, mixer motor current data, and air thermometer readings from prior stable periods, define:\n    -   Reference motor current profile `I_ref(t)` for each batch type.\n    -   Reference water addition `W_ref`.\n    -   Reference temperature band `T_ref` for the season.\n2. **Real-Time Monitoring:** For each batch:\n    -   Record the mixer motor current `I(t)` at a fixed post-mixing timepoint (e.g., 30 seconds after initial mix).\n    -   Read the current plant air temperature `T_now`.\n3. **Correction Calculation:**\n    -   Compute Current Deviation: `ΔI = I(t) - I_ref(t)`.\n    -   Compute Temperature Deviation: `ΔT = T_now - T_ref`.\n    -   Apply a linear correction model derived from historical data:\n        -   Water Adjustment `ΔW = k1 * (ΔI) + k2 * (ΔT)`.\n        -   *(Note: Based on the Direction-of-Effect statement, k1 and k2 are positive constants. Higher current implies stiffer mix, requiring more water. Higher temperature implies more evaporation, requiring more water.)*\n    -   New Water Target `W_new = W_ref + ΔW`.\n    -   Apply safety bounds: `W_min <= W_new <= W_max` to prevent hydraulic overload or cement starvation.\n4. **Automatic Adjustment:** The batch scale and water dosing system are commanded to deliver `W_new` instead of `W_ref`. Aggregate weights remain unchanged per existing delivery records, but the correction compensates for unmeasured moisture variability in the aggregates.\n\n**Input Sensitivity and Derivation Source:\n- **Mixer Motor Current ($I$):** Taken directly from the **Mixer Motor Current Meter**. This is a permitted existing sensor. $I(t)$ is the raw measurement at the fixed timepoint $t_{mix}$.\n- **Ambient Temperature ($T$):** Taken directly from the **Plant Air Thermometer**. This is a permitted existing sensor. $T_{now}$ is the raw measurement at the time of batching.\n- **Reference Values ($I_{ref}, T_{ref}, W_{ref}$):** Derived from **Batch Scale Records** and historical logs of the above two sensors. $W_{ref}$ is the nominal water mass recorded in stable historical batches. $I_{ref}$ and $T_{ref}$ are statistical baselines computed from the same stable period. No new instrumentation is introduced.\n- **Coefficients ($k_1, k_2$):** Derived from regression analysis of **Batch Scale Records** (actual water used) against historical **Mixer Motor Current Meter** and **Plant Air Thermometer** readings. These are static constants stored in the PLC.\n- **Water Dosing Command:** The target $W_{new}$ is calculated by the PLC and sent to the existing water dosing valve controller. The actual delivered water mass is verified by the **Batch Scale Records** (water scale component, part of the existing batch scale system).",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}
