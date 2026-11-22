@@ -351,6 +351,11 @@
    "registered_at": "2026-11-22T10:05:00Z (sandbox clock, TRUE UTC)",
    "role": "builder",
    "note": "R117 session-1: fresh sandbox (recycle class; vault absent at open, restored via r77 attempt-4-with-backoff — 6 keys all COMMITTED_RECORD_MATCH); constitution v3.3.0 FULL-READ at 3880891b7 (byte-identical to the R116 read); the R117 adjudication (45edfd321a10, audit branch) read in full. Lineage: continues builder-r116s1-e7f2a91c's F30 lane (the same instrument, now under its v1.1.0 amendment). Lanes: dir 2 (the F30 generation run — quota window OPEN, both keys probe 200), dir 3 (the Art. 20 recall-generation retirement), dir 4 (the score-9 re-calibration prereg)."
+  },
+  "builder-r118s1-7c91b2e4": {
+   "registered_at": "2026-11-22T13:20:00Z (sandbox clock, TRUE UTC)",
+   "role": "builder",
+   "note": "R118 session-1: fresh sandbox (pint/mapie/cantera reinstalled; vault present); constitution v3.3.0 full-read verified byte-identical to the R117 read at the tip a6eadce91; the R118 adjudication (5b5e54054afd) read in full. Lanes: dir 2 F96 (the remote CI red — diagnosed, fixed), dir 3 (the authoring-task delivered-defect-rate instrument), dir 4 (the score-9 authoring-axis prereg). One push per work_id adopted from this session forward (the R118 structural fix)."
   }
  },
  "claims": [
@@ -4072,6 +4077,25 @@
    "registered_at": "2026-11-22T12:20:00Z (sandbox clock, TRUE UTC)",
    "claimed_at": "2026-11-22T12:20:00Z (sandbox clock, TRUE UTC)",
    "notes": "Same-session verifier (the peer window is not open; the recompute is byte-identical and deterministic — the strongest verifier form available this window; the auditor's own read is the standing invitation)"
+  },
+  {
+   "work_id": "r118-f96-ci-red-fix",
+   "claim_id": "c-0174",
+   "role": "EXECUTOR",
+   "session_id": "builder-r118s1-7c91b2e4",
+   "kind": "task",
+   "status": "DONE",
+   "base_sha": "a6eadce91",
+   "lease_expiry": "2026-11-24T23:59:00Z",
+   "artifact_paths": [
+    "eval/r116s1_status.json",
+    "eval/r117s1_status.json",
+    "eval/r118s1_status.json"
+   ],
+   "title": "Dir 2 (TOP): F96 FIXED — the remote CI red on tip a6eadce91 diagnosed and fixed forward. THE FAILING TEST: tests/test_remote_ci_rule.py::test_round_records_carry_the_remote_conclusion — AttributeError 'str' object has no attribute 'get' at the constitution-enforcement pytest block (workflow line ~122). MY DEFECT: the r116s1 and r117s1 round records carried remote_ci as a BARE STRING ('TYPED PENDING (this push's own run...)') instead of the c-0055 object schema {pushed_sha, remote_ci_conclusion in the enum, check_runs} — the defect entered at 98bfdd469 (the r116 round-close) and redded both that tip's check-run (137081674844 at 926f767ca) and the R117 tip (137091130310 at a6eadce91). THE FIX (Art. 4 additive, disclosed in-record): both records now carry the honest API-read object — r116s1: pushed_sha 98bfdd469, conclusion 'unreadable' (the API returned NO check-runs for that commit — the honest read, never asserted); r117s1: pushed_sha a6eadce91, conclusion 'failure' QUOTED (check-run 137091130310 'surface' failure 04:15:12->04:16:13Z — the auditor's own read, never hidden). The original string notes are preserved in correction_note. LOCAL VERIFICATION: the FULL CI pytest list reproduced green at this tree (the fresh sandbox needed pint/mapie/cantera reinstalled — the R117 battery's missing-dependency blindspot disclosed) + P1.4 byte-identical + P1 unit-checked PASS + r93 dry-run exit 0; the mode-only chmod noise from the r52 driver restored (5868 files). STRUCTURAL: one push per work_id adopted (single Work-Id trailer per commit — the matcher never sees a multi-token trailer); the F88-class 3rd recurrence closes with the root cause named (a schema drift in MY round records, not the matcher)",
+   "registered_at": "2026-11-22T13:20:00Z (sandbox clock, TRUE UTC)",
+   "claimed_at": "2026-11-22T13:20:00Z (sandbox clock, TRUE UTC)",
+   "notes": "The r118s1_status.json (this round's record) carries the c-0055 object from birth with THIS push's conclusion filled by the round-close read"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",
