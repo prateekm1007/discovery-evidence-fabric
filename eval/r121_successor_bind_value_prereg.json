@@ -1,0 +1,30 @@
+{
+ "record": "R121_SUCCESSOR_BIND_VALUE_PREREG/1.0.0 (PRE-REGISTRATION — committed BEFORE any successor-run byte)",
+ "claim": "c-0180 (work id r121-successor-bind-value-prereg)",
+ "session": "builder-r121s1-3e8a41d7",
+ "at": "2026-11-23T04:30:00Z (sandbox clock, TRUE UTC)",
+ "authority": "the R121 adjudication (74a18913a3e3): 'Test the successor shape (the live bind-value proof): delivered-defect-rate of (bare authors + binds check + bare reviewer fixes) vs bare-only on the seeded battery. Accept: rate < bare, paired CI excludes 0, damage <= 0.25 -> bind-check value PROVEN; else typed negative + bind-retirement question.' + 'Score-9 axis enactment against the successor (auditor): delivered-defect-rate gate <=0.25 AND CI excludes 0 below bare AND damage <=0.25. Accept: enacted before any run.'",
+ "the_instrument": {
+  "name": "SUCCESSOR-SHAPE DELIVERED-DEFECT-RATE (F31b)",
+  "the_arms": {
+   "bare_only": "THE COMMITTED F31a BARE BILLS, BYTE-IDENTICAL (eval/r118_authoring_run/bare_*.txt — zero new generation calls; the R118 run's own arm, re-used as the baseline exactly as measured: delivered-defect-rate 10/24 = 0.417 under the amendment-1 detectors)",
+   "successor": "the R121 successor shape end-to-end on the SAME 24 items: (1) the bare authored bill (the SAME committed bytes — zero new authoring calls); (2) the bind CHECK layer over the authored bill (the stripped machine's own scans, zero LLM except the direction check, which is part of the frozen check layer); (3) the findings SURFACED verbatim to a BARE REVIEWER — one agnes-3.0-flash call per item: the original problem + the authored bill + the surfaced findings, directed to fix the findings and return the corrected bill; the reviewer's output is the DELIVERED bill"
+  },
+  "reviewer_directive": "FIX-DIRECTIVE (the F30 working-reviewer shape): 'You are reviewing an engineering proposal. The automated check layer surfaced the findings listed below against the original problem. Fix the proposal so the findings no longer apply, changing as little else as possible. Return the complete corrected proposal.'",
+  "n_items": "24 (the F31a set, unchanged)",
+  "scoring": {
+   "delivered_defect_rate_PRIMARY": "per arm, the fraction of the 24 DELIVERED bills carrying >=1 defect class under the AMENDMENT-1 DETECTORS (the machine's own bind scans over (prob, delivered_bill) — the same detectors as the F31a result; UNSTATED-only formatting demands excluded; DETECTOR_ERROR counts as defective, fail-closed)",
+   "paired_bootstrap": "per-item defect indicator, bare_only minus successor, percentile bootstrap 10k, seed 121",
+   "damage_gate": "among items whose bare bill was CLEAN, the fraction where the successor's DELIVERED bill carries a class the bare bill lacked (the reviewer introducing a defect) — must be <= 0.25",
+   "gates": "BIND-CHECK VALUE PROVEN iff successor rate < bare rate AND the paired CI excludes 0 (lower bound > 0) AND damage <= 0.25; else TYPED_NEGATIVE + the bind-retirement question with the per-class table"
+  },
+  "quota_budget": "24 reviewer calls ONLY (the check layer re-runs deterministic over committed bytes; the direction-check LLM legs ride the frozen check layer, ~24 calls worst case) — ~24-48 calls total on the 2-key rotation; if the quota probe fails, the claim stays OPEN typed INFRA_QUOTA_WALL",
+  "leakage_controls": "the sealed key never enters any prompt; the reviewer sees the problem + the bill + the findings ONLY; the detectors are the amendment-1 committed logic; zero judge calls",
+  "wall_tolerance": "byte-skip resume per item (one reviewer call per item, ever); typed 429 backoff through the 2-key rotation"
+ },
+ "the_score9_axis_enactment_proposal": {
+  "per_the_adjudication": "the axis is enacted AGAINST THE SUCCESSOR SHAPE (the autonomous-repair config already failed): score-9 binds to the successor's delivered-defect-rate gate — successor delivered-defect-rate <= 0.25 AND the paired CI excludes 0 below bare-only AND the damage gate <= 0.25, all three; Art. 9 LABELLED ASSUMPTIONS with the per-class sensitivity path; the AUDITOR enacts (this file proposes; the adjudication adopts)",
+  "ordering_guarantee": "this prereg + the axis proposal commit BEFORE any successor-run byte (the reviewer calls have not started; the claim registers in the same push)"
+ },
+ "invalidates": "NOTHING (the F30 + F31a negatives stand as measured); this is the adjudicated successor test. No new guards (the detectors + the check layer are the committed frozen bytes)"
+}
