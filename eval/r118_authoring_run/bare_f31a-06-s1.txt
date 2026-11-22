@@ -1,0 +1,16 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implement a **High-Concentration Caustic CIP Cycle** that maximizes the alkalinity to the physical limit of the system’s gasket ratings, thereby shifting the cleaning burden from the less effective "losing bite" caustic step to a rigorous acid pre-treatment or a boosted caustic main wash that effectively emulsifies the protein and emulsion components trapped by the scale, while relying on frequent acid descals to remove the mineral crust. The core mechanism is exploiting the maximum allowable chemical potential (2.5 wt% NaOH at 75 °C) to ensure that between the inevitable acid descaling events, the caustic wash is aggressive enough to prevent fouling buildup that leads to blistering.
+
+**Implementation:**
+1.  **Set Caustic Concentration to 2.5 wt%:** Program the CIP controller to dispense caustic at the maximum concentration allowed by the gasket rating (2.5 wt% NaOH). Do not lower it to "save" on gasket life beyond this threshold; instead, monitor gasket condition more frequently.
+2.  **Maintain Temperature at 75 °C:** Ensure the heating system brings the caustic solution to exactly 75 °C, as the gaskets are rated for this specific temperature at the maximum concentration. Higher temperatures or concentrations risk gasket failure; lower temperatures reduce the "bite" which is the current failure point.
+3.  **Increase Caustic Contact Time:** Extend the dwell time of the caustic wash by 10–15 minutes to compensate for the scale resistance. The scale blisters cause poor heat transfer and shelter fouling; longer exposure at high alkalinity helps penetrate the sheltered areas.
+4.  **Mandatory Acid Descal Interval:** While the caustic concentration is raised, strictly adhere to the acid descaling schedule. Do not allow caustic cycles to accumulate on a heavily scaled surface. Use the 2.5 wt% caustic only for routine clean-in-place after production, reserving acid descals for when blisters are detected or at a fixed time interval (e.g., every 4th CIP cycle).
+5.  **Gasket Monitoring Protocol:** Implement a visual inspection and pressure test protocol for gaskets after every 50 CIP cycles at the new maximum settings. Replace gaskets proactively before they fail, as the system is now operating at the edge of their chemical compatibility.
+
+**Measures Relied Upon:**
+*   **Gasket Rating Compliance:** Relies on the stated constraint that gaskets are rated for 2.5 wt% NaOH at 75 °C. This mitigation pushes the system to the limit of this rating to regain cleaning efficacy.
+*   **Chemical Synergy:** Relies on the fact that high-concentration caustic is superior at removing organic fouling (proteins/fats) that typically accumulates in the shadowed areas of scale blisters. By maximizing caustic strength, we prevent the organic layer from forming, which in turn slows the progression of scale adhesion.
+*   **Operational Discipline:** Relies on the operator/controller adhering to the maximum concentration without exceeding it (to avoid gasket damage) and performing the necessary acid descals at set intervals to remove the mineral component that caustic cannot dissolve. The "losing bite" is addressed by restoring the caustic to its maximum effective concentration within material limits.

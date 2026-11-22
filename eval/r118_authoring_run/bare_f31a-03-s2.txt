@@ -1,0 +1,17 @@
+Mitigation: Implement a Temperature-Compensated Float Voltage Control System with an Upper Ambient Threshold Alarm
+
+**Mechanism:**
+The mitigation relies on the Arrhenius relationship for electrolyte dry-out, where the rate of gas generation and loss is exponentially proportional to temperature ($Rate \propto e^{-E_a/RT}$). By dynamically adjusting the float voltage to maintain a lower internal battery temperature at higher ambient conditions, we reduce the thermal energy available for water dissociation into hydrogen and oxygen gas. Simultaneously, we prevent the "dry-out acceleration" loop where lower electrolyte volume leads to reduced thermal mass and higher local temperatures, further accelerating dry-out. The system actively caps the peak thermal stress within the allowable 18–26°C room range by ensuring the batteries do not exceed their optimal internal operating temperature window, thereby extending the time between equalizations.
+
+**Implementation:**
+1.  **Sensors:** Install RTDs (Resistance Temperature Detectors) inside each battery case (or one per string if space-constrained, but internal is preferred for accuracy) to monitor internal battery temperature. Also, use a calibrated air temperature sensor in the battery room for ambient monitoring.
+2.  **Controller Logic:** Configure the battery management system (BMS) or rectifier control loop to apply a temperature compensation coefficient to the float voltage. The standard compensation is typically -3.0 mV/cell/°C (for VRLA). The controller calculates the required float voltage adjustment based on the deviation of the internal battery temperature from a reference (e.g., 25°C).
+3.  **Ambient Setpoint Optimization:** Within the 18–26°C constraint, set the HVAC setpoint to **22°C**. This value is selected because:
+    *   It is below the 26°C upper limit, ensuring the Arrhenius factor ($e^{-E_a/RT}$) is minimized for the worst-case scenario.
+    *   It provides a thermal buffer so that when batteries heat up under load or charge, the internal temperature does not exceed 25–26°C even if the room air is at 22°C.
+4.  **Alarm and Interlock:** Configure a hard alarm if any internal battery temperature exceeds 45°C (or the manufacturer’s specified maximum operating temperature) or if the room ambient exceeds 26°C. The alarm triggers an HVAC boost mode to force the room temperature back toward 22°C. Additionally, log capacity fade trends between equalizations to validate the mitigation’s effectiveness.
+
+**Measures It Relies On:**
+*   **Arrhenius Law Validation:** Confirms that a 5°C reduction in average battery temperature (from ~27°C to 22°C ambient plus internal delta) reduces the dry-out rate by approximately 30–40% (calculated via $k_2/k_1 = e^{(E_a/R)(1/T_1 - 1/T_2)}$ with $E_a=80$ kJ/mol), directly slowing capacity fade.
+*   **Thermal Mass Principle:** Higher electrolyte volume (prevented dry-out) maintains higher thermal mass, slowing temperature rise during charge cycles and reducing peak gas generation rates.
+*   **Voltage-Temperature Inverse Relationship:** Ensures that as temperature rises, the applied float voltage decreases, preventing overcharge and excessive gassing, which is the primary driver of water loss in VRLA cells.

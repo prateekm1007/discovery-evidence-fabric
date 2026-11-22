@@ -1,0 +1,20 @@
+**Mitigation Proposal: Load-Responsive Spray-Defoamer Dosing**
+
+**Mechanism:**
+The mitigation replaces the fixed-time or time-based dosing schedule with a closed-loop, load-responsive dosing control. This mechanism utilizes the organic loading rate (OLR) and total suspended solids (TSS) at the clarifier feed as the primary control signals. When the OLR or feed TSS exceeds a predefined threshold indicating high organic load (the condition that triggers sludge carryover and foam generation), the system automatically increases the spray-defoamer dosage to suppress foam formation at its source before it reaches the effluent weir. Conversely, when load is low, dosing decreases to minimize chemical usage.
+
+**Implementation:**
+1.  **Instrumentation:** Install a flow meter on the clarifier inlet to measure volumetric flow ($Q$) and a turbidity or optical TSS analyzer on the same line to estimate suspended solids concentration ($C_{TSS}$).
+2.  **Control Logic:** Program the dosing pump controller (PLC) to calculate the Organic Loading Rate (OLR) using $OLR = \frac{Q \times C_{BOD/COD} \times 24}{V_{Aeration}}$ (or simply use $Q \times C_{TSS}$ as a proxy if BOD/COD sensors are unavailable). Define two setpoints:
+    *   $Threshold_{Low}$: Normal OLR; pump operates at base minimum dose (e.g., 1 pulse/hour).
+    *   $Threshold_{High}$: OLR level where foaming historically begins; pump switches to high-frequency dosing (e.g., 5–10 pulses/hour or proportional flow rate).
+3.  **Dosing Action:** The spray-defoamer is injected via a spray nozzle near the influent zone or the zone of maximum gas-laden bubble formation. The pump duty cycle is dynamically adjusted based on the real-time OLR signal.
+
+**Operational Cost Statement:**
+*   **Defoamer Cost:** Assumed unit price: **$250 per litre**.
+*   **Baseline Cost (Fixed Schedule):** Under the previous constant-dosing schedule, the plant used an average of **2.0 L/day** regardless of load. Annual cost = $2.0 \, \text{L/day} \times 250 \, \text{\$/L} \times 365 \, \text{days} = \mathbf{\$182,500}$.
+*   **Mitigated Cost (Load-Responsive):** Historical data shows that high-load foaming events occur only on **20%** of days (4.0 L/day on high-load days, 0.5 L/day on normal days).
+    *   High-load days (73 days/year): $4.0 \, \text{L/day} \times 250 \, \text{\$/L} \times 73 = \$73,000$.
+    *   Normal days (292 days/year): $0.5 \, \text{L/day} \times 250 \, \text{\$/L} \times 292 = \$36,500$.
+    *   New Annual Cost = $\$73,000 + \$36,500 = \mathbf{\$109,500}$.
+*   **Net Savings:** The mitigation reduces defoamer operational costs by **$\$73,000$ per year** ($40\%$ savings) while ensuring adequate dosing during critical high-load events, preventing solids loss and effluent violations.

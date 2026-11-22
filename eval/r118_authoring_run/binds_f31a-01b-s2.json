@@ -1,0 +1,134 @@
+{
+ "problem_id": "f31a-01b-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Adaptive Cleaning Interval via Outlet Temperature Gradient Monitoring**\n\n**Mechanism:**\nUtilize the existing brine outlet thermocouple and flow meter to calculate the instantaneous heat duty ($Q$) and monitor its trend over time under stable operating conditions. Since inlet temperature and flow rate are held constant by the upstream refrigeration/processing process, a rise in the outlet temperature directly indicates a drop in the overall heat transfer coefficient ($U$) due to the growing thermal resistance of tube-side fouling deposits. The mitigation mechanism is a **variable-interval preventive maintenance strategy** that dynamically adjusts the next cleaning date based on the rate of outlet temperature increase, rather than a fixed calendar schedule.\n\n**Implementation:**\n1.  **Baseline Establishment:** Record the outlet temperature ($T_{out,clean}$) when the exchanger is newly cleaned and operating at a specific, constant design flow rate ($\\dot{m}_{base}$) and constant inlet temperature ($T_{in}$).\n2.  **Continuous Monitoring Logic:** Using the existing flow meter ($\\dot{m}$) and inlet/outlet thermocouples ($T_{in}, T_{out}$), calculate the heat duty:\n    $$Q = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{in})$$\n    Assuming constant $T_{in}$ and $\\dot{m}$, monitor $T_{out}$ directly.\n3.  **Trend Analysis Algorithm:** Implement a simple control logic (PLC or historian alarm) that calculates the daily average rate of change of $T_{out}$ ($\\frac{dT_{out}}{dt}$).\n4.  **Dynamic Scheduling:**\n    *   If $\\frac{dT_{out}}{dt}$ is near zero (early life after cleaning), extend the cleaning interval.\n    *   If $\\frac{dT_{out}}{dt}$ exceeds a predefined threshold (indicating rapid fouling accumulation), trigger an early cleaning alarm.\n    *   Set a hard limit: If $T_{out}$ reaches $T_{out,max}$ (corresponding to the minimum acceptable process heat transfer), immediately schedule an emergency cleaning regardless of time elapsed.\n\n**Measures it Relies On:**\n*   **Existing Sensors:** Brine inlet thermocouple, brine outlet thermocouple, and brine flow meter.\n*   **Process Assumptions:** The brine inlet temperature ($T_{in}$) and mass flow rate ($\\dot{m}$) are controlled and held relatively constant by the upstream system, making the outlet temperature ($T_{out}$) a direct, unambiguous indicator of the degrading heat transfer performance.\n*   **Thermal Principle:** The inverse relationship between $T_{out}$ and the overall heat transfer coefficient $U$ in a counter-current or co-current exchanger with fixed thermal loads and fluid properties.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\nThe question asks for an intervention to mitigate tube-side fouling deposits reducing heat transfer. The proposal is a **duty-cycle change** to the existing brine circulation pump: implementing a high-shear \"clean-in-place\" (CIP) pulse by increasing the pump speed above the normal operating point for short, scheduled intervals, utilizing the existing Variable Frequency Drive (VFD) and flow meter.\n*   **Standard Practice:** Periodic chemical shutdown cleaning or continuous low-velocity operation leading to gradual fouling accumulation.\n*   **Mitigation (Departure):** Instead of removing the fluid for chemical treatment, the system utilizes the **kinetic energy of the bulk brine** to mechanically shear off low-adhesion fouling layers. The departure is the **operating point schedule**: modulating the existing VFD to create transient high-velocity regimes that exceed the critical shear stress for fouling removal, rather than maintaining a constant low-shear steady state.\n*   **Adjacent-Technique Clearance:** Standard practice uses high-velocity scrubbing only during dedicated shutdown CIP with cleaning agents. This mechanism applies hydrodynamic shearing via **plain brine circulation at elevated velocity** on a frequent, open-loop scheduled basis during normal operation, avoiding chemical dosing and shutdown time.\n*   **Mechanism:** Fouling removal rate ($R_{foul}$) scales with wall shear stress ($\\tau_w$). By driving the flow through the VFD to a velocity $v_{pulse}$ such that $\\tau_w \\propto \\rho v_{pulse}^2$ exceeds the fouling detachment threshold, the deposit thickness is reduced, maintaining higher heat transfer coefficient $U$ between full cleanings.\n\nPHYSICS CHECK\n**Driving Variable:** Fouling accumulation rate vs. removal rate. The failure driver is the net deposition when shear stress is below the critical detachment stress $\\tau_{crit}$.\n**Governing Relation:** $\\tau_w \\approx \\frac{1}{2} C_f \\rho v^2$. For turbulent flow in a tube, $C_f$ is roughly constant. To detach foulant, $\\tau_w > \\tau_{crit}$.\n**DIRECTION-OF-EFFECT:** driving variable = **wall shear stress**; the mechanism moves it **up** by **a factor of $(v_{pulse}/v_{nom})^2$** during the pulse; this **reduces** the **net fouling integral** by actively removing deposited material, keeping the thermal resistance $R_f$ below the threshold that causes outlet temperature creep.\n**Magnitude Verification:** Nominal brine velocity in a shell-and-tube tube side is typically $0.5$–$1.0$ m/s. Fouling detachment often requires shear stresses in the range of $50$–$100$ Pa. If nominal shear is ~$10$ Pa, a velocity increase to $2.5$ m/s ($2.5^2 = 6.25$ times) yields $\\tau_w \\approx 62$ Pa, entering the removal regime. This is well within the operational range of standard brine pumps.\n**INPUT-AVAILABILITY:** The mechanism requires only the existing **VFD** (to modulate speed) and the **flow meter** (to confirm the pulse magnitude). No new sensors are added; the setpoint is a time-based schedule (open-loop) or optionally limited by existing flow feedback. All required signals are explicitly permitted.\n\nIMPLEMENTATION BILL\n1.  **MECHANISM CLASS:** Velocity-Modulated Hydrodynamic Scouring (Duty-Cycle Change).\n2.  **VFD Setpoint Program:** (c) Configuration change to the **existing Variable Frequency Drive** currently controlling the brine pump. The PLC or drive interface is programmed with a time-based schedule: e.g., operate at $120\\%$ of nominal flow for $15$ minutes every $6$ hours.\n3.  **Flow Verification Setpoint:** (a) Parameterization of the **existing flow meter**. The control logic uses the flow meter signal to verify that the pulse achieves the target velocity ratio (e.g., $2.0 \\times$ nominal). No new hardware; uses the existing transmitter.\n4.  **Pump Operational Envelope Check:** (b) Verification against the **pump curve** (standard manufacturer documentation for the installed pump). Ensure the $120\\%$ speed point does not exceed the NPSH margin or motor thermal limit. This is a standard engineering check, not a procurement.\n5.  **Safety Interlock Logic:** (c) Configuration of the **existing PLC** to abort the pulse if the brine temperature exceeds a high-temperature alarm (protecting the compressor/evaporator), using the existing outlet thermocouple.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Hardware Burden:** **Zero**. No new sensors, valves, or actuators. The mechanism rides entirely on the existing VFD, flow meter, and PLC.\n*   **Operational Loss:** **Net Positive**.\n    *   *Cost:* Increased pump energy during the $15$-minute pulse every $6$ hours. Energy is proportional to $v^3$. If $v$ is $1.2 \\times$, power is $1.728 \\times$. Over a 6-hour cycle, the extra energy is $15/360 \\times 0.728 \\approx 3\\%$ of the continuous energy cost.\n    *   *Benefit:* Reduced frequency of chemical cleaning shutdowns (which carry high labor/chemical costs) and maintained heat transfer efficiency (reducing compressor load on the refrigeration circuit).\n    *   *Parity Conclusion:* The operational loss is negligible (<5% pump energy) compared to the cost of missed production during manual/chemical cleaning. The burden is **lower** than the standard practice of periodic shutdown cleaning because it extends the clean interval.\n\nEXECUTABLE TEST\n*   **Protocol:**\n    1.  Establish baseline: Record brine outlet temperature ($T_{out}$) and flow ($F$) over a 48-hour period at nominal speed. Observe the creep rate of $T_{out}$.\n    2.  Intervention: Enable the VFD pulse program ($120\\%$ speed for $15$ min every $6$ hours) for a 7-day period.\n    3.  Measurement: Log $T_{out}$ and $F$ continuously using the existing data logger/PLC historian (no new hardware).\n*   **Pass/Fail Thresholds:**\n    *   **Effectiveness:** The rate of increase of $T_{out}$ over the 7-day period must be **statistically lower** (slope of $T_{out}$ vs. time) than the baseline rate.\n    *   **Kill Criterion:** If $T_{out}$ continues to creep at the baseline rate, or if the pump trips on high temperature/flow deviation alarms, the mechanism is ineffective.\n    *   **Safety:** Pump motor temperature and pressure drop must remain within 110% of rated limits during pulses.\n\nCONSTRAINT-BIND / RISK\n*   **Permitted Set Adherence:** The constraint states \"Use only existing sensors... No new instrumentation.\" This solution uses **zero** new instrumentation. It uses the existing flow meter for verification and the existing VFD for execution. It fits within the permitted set of \"existing measurements\" and \"existing equipment.\"\n*   **Deployed Part Clause:** No modification to the tubes, shell, or end caps. The mechanism acts on the fluid dynamics outside the immediate fouling interface (the pump/pipe velocity).\n*   **Risk:** High velocity pulses may increase erosion-corrosion if the brine is highly corrosive or if there is pre-existing severe pitting. *Mitigation:* Monitor existing outlet temperature for sudden drops (indicating tube leak/failure) as a standard alarm. The pulse frequency should be adjusted if erosion signs appear.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 2596,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 6024,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Control Logic Modification**",
+     "*   **Component:** Existing PLC/Controller (Stated Infrastructure)",
+     "*   **Action:** Reprogram existing timer blocks to trigger a \"High-Speed Flush\" mode. No n",
+     "2.  **Pump Speed Setpoint Override**",
+     "*   **Component:** Existing Brine Pump VFD/Drive (Stated Infrastructure)",
+     "*   **Action:** Configure the VFD to switch from \"Normal Duty\" frequency (e.g., 50 Hz) to ",
+     "3.  **Valve Position Command**",
+     "*   **Component:** Existing Control Valves on Suction/Discharge (Stated Infrastructure)",
+     "*   **Action:** Command valves to 100% open during flush cycle to minimize pressure drop a",
+     "4.  **Sensor Signal Validation (Safety Limit)**",
+     "*   **Component:** Existing Brine Inlet/Outlet Thermocouples & Flow Meter (Stated Infrastr",
+     "*   **Action:** Logic interlock: If Outlet Temp ($T_{out}$) < Inlet Temp ($T_{in}$) + $\\De",
+     "*   **Installation Burden:** Zero. No hardware installation. Reprogramming existing PLC/VF",
+     "*   **Operational Loss Pricing:**",
+     "*   **Energy Loss:** Pump power $P \\propto v^3$. At $v_{flush} = 2.5 v_{norm}$, power $\\ap",
+     "*   **Duty Cycle:** Assume 15-minute flush every 4 hours. Total daily flush time = 0.25 ho",
+     "*   **Daily Energy Penalty:** $0.25 h \\times (15.6 - 1) \\times P_{norm} \\approx 3.65 P_{no",
+     "*   **Net Benefit:** This energy cost is negligible compared to the cost of cleaning downt",
+     "*   **Parity Conclusion:** Same-or-lower burden than standard practice. Standard practice "
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 10592,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **MECHANISM CLASS:** Thermal Cyclic Fatigue via Setpoint Modulation.",
+     "1.  **PLC Program Modification (Setpoint Ramp Logic)**",
+     "*   **Component:** Existing PLC/Controller (Stated Infrastructure).",
+     "*   **Action:** Modify the temperature control routine to impose a square-wave modulation ",
+     "*   **Where it attaches:** The existing control logic for the brine temperature loop.",
+     "2.  **Outlet Temperature Alarm Threshold Adjustment**",
+     "*   **Component:** Existing HMI/Alarm Settings (Stated Infrastructure).",
+     "*   **Action:** Increase the \"Cleaning Required\" alarm threshold by $2^\\circ C$ to accommo",
+     "3.  **Verification Protocol (Standard Practice Operation)**",
+     "*   **Component:** Existing Thermocouples (Stated Infrastructure).",
+     "*   **Action:** No new sensors. The standard practice's own monitoring (inlet/outlet temps",
+     "*   **Standard Practice Bill:**",
+     "*   Hardware: Existing Thermocouples, Flow Meter, PLC, Control Valves.",
+     "*   Operation: Steady state control.",
+     "*   Cleaning: Periodic shutdown, chemical cleaning, or ball cleaning.",
+     "*   Burden: High labor cost for cleaning; downtime.",
+     "*   **Proposed Mitigation Bill:**",
+     "*   Hardware: **None added.** Uses existing PLC, existing Thermocouples, existing Valves.",
+     "*   Operation: **Procedure Change.** Modulation of setpoint.",
+     "*   Cleaning: **Extended Interval.** Cleaning frequency reduced due to slower effective fo",
+     "*   Burden: **Zero** new hardware installation. **Zero** new calibration. **Lower** long-t",
+     "*   **Row-by-Row Comparison:**",
+     "*   Row 1 (PLC Logic): Standard practice uses PLC for steady state. Proposed uses same PLC",
+     "*   Row 2 (Alarm Threshold): Standard practice uses HMI. Proposed uses same HMI. **Same cl",
+     "*   Row 3 (Monitoring): Standard practice uses existing TCs. Proposed uses existing TCs. *",
+     "*   **Operational Loss Pricing:**",
+     "*   **Energy Cost:** During the \"Warm\" phase ($+10^\\circ C$), the heat exchanger duty is r",
+     "*   *Correction on Physics:* If you run the inlet warmer, the brine absorbs less heat from",
+     "*   **Conclusion:** Operational Energy Cost is **Negative** (Savings).",
+     "*   **Throughput:** None.",
+     "*   **Availability:** None.",
+     "*   **Net Burden:** **Same-or-Lower.** The only \"cost\" is the potential for increased vibr"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "derived feature input 'cyclic stress rather than chemical reaction or high-velocity' is not derivable from the permitted signals"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 7103,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1.  **MECHANISM CLASS:** Velocity-Modulated Hydrodynamic Scouring (Duty-Cycle Change).",
+     "*   **Hardware Burden:** **Zero**. No new sensors, valves, or actuators. The mechanism rid",
+     "*   **Operational Loss:** **Net Positive**.",
+     "*   *Cost:* Increased pump energy during the $15$-minute pulse every $6$ hours. Energy is ",
+     "*   *Benefit:* Reduced frequency of chemical cleaning shutdowns (which carry high labor/ch",
+     "*   *Parity Conclusion:* The operational loss is negligible (<5% pump energy) compared to "
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **MECHANISM CLASS:** Velocity-Modulated Hydrodynamic Scouring (Duty-Cycle Change).",
+    "*   **Hardware Burden:** **Zero**. No new sensors, valves, or actuators. The mechanism rid",
+    "*   **Operational Loss:** **Net Positive**.",
+    "*   *Cost:* Increased pump energy during the $15$-minute pulse every $6$ hours. Energy is ",
+    "*   *Benefit:* Reduced frequency of chemical cleaning shutdowns (which carry high labor/ch",
+    "*   *Parity Conclusion:* The operational loss is negligible (<5% pump energy) compared to "
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ]
+  }
+ }
+}

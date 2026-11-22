@@ -1,0 +1,20 @@
+Mitigation Proposal: **High-Load Foam Suppression Duty Cycle**
+
+**Mechanism:**
+Implement a conditional re-scheduling of the spray-defoamer dosing pump that ties dosing intensity directly to real-time organic load indicators (specifically, the effluent Suspended Solids concentration or the Clarifier Foam Height Sensor). Instead of a constant or time-based schedule, the pump operates in a "High-Duty" mode only when the organic load exceeds a predefined threshold (e.g., when the foam height reaches 80% of the freeboard or when inlet COD spikes). This mode increases the pump's pulse frequency or duty cycle to ensure adequate defoamer coverage across the foam blanket, preventing solids from reaching the effluent weir. Once the load normalizes, the system automatically reverts to a low-duty or standby mode to minimize chemical consumption.
+
+**Implementation:**
+1.  **Control Logic Update:** Modify the PLC/SCADA logic for the defoamer pump. Create an "Alarm/High-Load" tag triggered by the foam level transmitter (LIT) or online turbidity/COD sensor at the clarifier inlet.
+2.  **Pump Scheduling:** Configure the variable frequency drive (VFD) or pulse timer on the dosing pump. Set two distinct schedules:
+    *   *Normal Duty:* Low-frequency pulses (e.g., 1 pulse every 10 minutes) to maintain a baseline defoamer level.
+    *   *High-Duty:* High-frequency pulses (e.g., 1 pulse every 2 minutes) or continuous flow, activated strictly when the High-Load tag is true.
+3.  **Validation:** Conduct a 7-day trial where the system automatically shifts to High-Duty during peak load events. Monitor effluent solids levels and foam stability.
+
+**Operational Cost Statement (Required by Constraint):**
+*   **Baseline Cost:** Under normal operation (approx. 20 hours/week of High-Duty), defoamer consumption is estimated at 5 L/week.
+*   **High-Load Event Cost:** The re-scheduled High-Duty mode may activate for up to 40 hours/week during peak organic load periods.
+*   **Cost Calculation:**
+    *   Price per litre: $X (insert current defoamer price).
+    *   Estimated increase in volume during High-Duty cycles: +15 L/week compared to constant low-dose baseline.
+    *   **Additional Weekly Cost:** 15 L × $X/litre = $15X.
+    *   **Justification:** This increased expenditure is offset by the avoidance of fines or disposal costs associated with high solids carryover into the effluent weir, which would require additional treatment or penalty fees. The cost is variable and directly proportional to the severity of the organic load, ensuring no excess chemical spend during low-load periods.

@@ -1,0 +1,24 @@
+**Mitigation Proposal: Data-Driven Fouling Index and Dynamic Cleaning Trigger**
+
+**Mechanism:**
+Implement a real-time "Fouling Resistance" calculation using only the existing brine inlet/outlet temperatures and flow rate to continuously estimate the heat transfer coefficient. By comparing this live coefficient to a pre-determined "Clean" baseline, the system quantifies fouling accumulation. Instead of relying on a fixed calendar for cleaning, the control system triggers maintenance only when the calculated performance drop crosses a specific threshold, optimizing chemical costs and preventing over-cleaning.
+
+**Implementation:**
+1.  **Baseline Establishment:** During the initial clean state (or after a recent cleaning), record the steady-state values: Brine Inlet Temp ($T_{in}$), Brine Outlet Temp ($T_{out}$), and Flow Rate ($\dot{m}$). Calculate the Clean Heat Load ($Q_{clean} = \dot{m} \cdot c_p \cdot (T_{in} - T_{out})$) and the Log Mean Temperature Difference ($\Delta T_{lm,clean}$). Derive the baseline overall heat transfer coefficient: $U_{clean} = Q_{clean} / (A \cdot \Delta T_{lm,clean})$.
+2.  **Real-Time Calculation Loop:** The existing PLC or DCS continuously reads the installed sensors:
+    *   $\dot{m}$ from the flow meter.
+    *   $T_{in}$ and $T_{out}$ from the brine thermocouples.
+    *   Assume the refrigerant-side conditions and flow are relatively stable or that their influence is negligible for short-term trend analysis (or if the refrigerant flow/temp sensors are considered "existing" in the broader system context, include them; however, the constraint limits us to brine sensors, so we rely on the brine-side energy balance and known process constraints).
+    *   Calculate current $Q_{current}$ and current $\Delta T_{lm,current}$.
+    *   Calculate current $U_{current} = Q_{current} / (A \cdot \Delta T_{lm,current})$.
+3.  **Fouling Factor Calculation:** Compute the ratio $R_f = U_{clean} / U_{current}$. This ratio represents the relative increase in thermal resistance due to fouling (where $R_f = 1.0$ is clean).
+4.  **Threshold Trigger:** Set an alarm threshold (e.g., $R_f > 1.15$ or 15% performance loss). When the calculated $R_f$ exceeds this limit, automatically generate a maintenance work order or alert the operator to initiate tube cleaning.
+5.  **Dynamic Adjustment (Optional but recommended):** If the process load varies, normalize the calculation by comparing the *expected* outlet temperature (based on $U_{clean}$ and current $T_{in}$) to the *actual* measured $T_{out}$. A creeping increase in actual $T_{out}$ relative to expected indicates fouling.
+
+**Measures Relied Upon:**
+*   **Existing Brine Inlet Thermocouple:** Provides $T_{in}$.
+*   **Existing Brine Outlet Thermocouple:** Provides $T_{out}$.
+*   **Existing Flow Meter:** Provides $\dot{m}$.
+*   **Known Specific Heat ($c_p$):** Constant property of brine, derived from concentration (assumed known).
+*   **Known Heat Exchanger Area ($A$):** Fixed physical characteristic.
+*   **Statistical Trending:** The mitigation relies on the gradual, monotonic creep in outlet temperature (or decrease in heat transfer efficiency) caused by fouling, which is distinguishable from normal process variation over time.

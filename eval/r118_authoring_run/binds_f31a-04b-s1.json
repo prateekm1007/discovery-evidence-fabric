@@ -1,0 +1,111 @@
+{
+ "problem_id": "f31a-04b-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Dosing Control via Feedforward Compensation and Stroke Rate Modulation**\n\n**Mechanism:**\nImplement a closed-loop control system that modulates the caustic dosing-pump stroke rate based on real-time measurements of inlet water flow rate and total alkalinity (measured at a stable, non-drifting location upstream of the membrane housing, or via periodic offline lab titration), *not* pH. The system uses a PID (Proportional-Integral-Derivative) controller where the error signal is derived from the difference between the *predicted* required caustic dose (calculated from flow and alkalinity) and the *actual* accumulated dose delivered by the pump’s stroke counter. This prevents overshoot by dynamically adjusting stroke rate to maintain a constant *mass flow rate* of caustic relative to water flow, rather than targeting a pH setpoint.\n\n**Implementation:**\n1.  **Sensor Integration:** Install high-accuracy flow meters on the inlet line and alkalinity sensors (or use pre-existing water quality data feeds for total alkalinity). These sensors must be independent of the drifting pH probe.\n2.  **Stroke Rate Modulation:** Replace the fixed stroke rate with a variable-rate actuator on the dosing pump. The stroke rate is no longer set to a constant value but is continuously adjusted by the controller.\n3.  **Controller Logic:** \n    - Calculate the *target caustic flow rate* (L/min) using: `Target Flow = k * (Water Flow Rate) * (Alkalinity)`, where `k` is a calibrated gain factor derived from stoichiometric neutralization requirements to keep pH ≤ 10.5.\n    - Measure the *actual caustic flow rate* via the pump’s stroke counter (strokes/second × stroke volume).\n    - Compute error: `Error = Target Flow - Actual Flow`.\n    - Adjust stroke rate using PID logic on this error to minimize deviation in *flow matching*, not pH.\n4.  **Safety Limits:** Hard-code maximum and minimum stroke rates in the PLC. If the error persists beyond a threshold time or if flow/alkalinity readings exceed predefined bounds, the system defaults to a conservative, low stroke rate and triggers an alarm for manual review.\n\n**Measures it Relies On:**\n*   **Accurate Flow Metering:** Real-time, high-precision measurement of inlet water flow to scale caustic dosing proportionally.\n*   **Alkalinity Data:** Reliable input of total alkalinity (via online sensor or scheduled lab analysis) to account for variability in water chemistry that affects how much caustic is needed to maintain target pH.\n*   **Stable Stroke Counter:** The dosing pump must have a reliable encoder or stroke counter to accurately report delivered volume, enabling closed-loop flow matching.\n*   **Calibrated Gain Factor (k):** A well-characterized relationship between water flow, alkalinity, and the exact caustic flow rate required to keep pH at or below 10.5, validated through offline testing.\n*   **Decoupling from pH Probe:** The control loop explicitly excludes the pH probe as an input, relying instead on physical property measurements (flow, alkalinity) that are more stable and less prone to drift.\n\nThis mitigation directly addresses the overshoot by ensuring caustic delivery is tightly coupled to the actual water and alkalinity inputs, preventing excessive dosing that would raise pH above 10.5 and cause carbonate precipitation.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is to retune the caustic dosing pump setpoint to a lower stroke rate, specifically reducing the duty cycle to limit the total moles of hydroxide introduced per unit of process water, thereby capping the peak alkalinity and preventing the pH excursion above 10.5 that drives carbonate precipitation. Standard practice typically tunes the setpoint to target an end-of-cycle pH, often allowing transient overshoots. My mitigation departs by capping the maximum stroke count (or duty cycle) to a value that mathematically cannot push the bulk pH above 10.5, regardless of probe drift. The closest adjacent technique is flow-proportional dosing; this is different because it does not rely on flow measurement or pH feedback, but strictly on a fixed, conservative upper-bound stroke limit. The mechanism attacks the driving physics by reducing the total base charge delivered per hour, directly lowering the carbonate saturation index.\n\nPHYSICS CHECK\nThe driving variable is the pH of the inlet stream, which must remain below 10.5 to prevent $\\text{CaCO}_3$ precipitation. The governing relation is the carbonate saturation index $SI = \\log_{10}\\left(\\frac{[Ca^{2+}][CO_3^{2-}]}{K_{sp}}\\right)$, where $[CO_3^{2-}]$ is a function of pH and total inorganic carbon $C_T$. As pH approaches 10.5, the fraction of carbonate species ($\\alpha_{CO_3}$) increases sharply, raising $[CO_3^{2-}]$ and thus $SI$. The mechanism moves the driving variable (pH) DOWN by limiting the moles of $\\text{OH}^-$ added per unit volume. By capping the dosing pump stroke rate (or total strokes per hour) to a value corresponding to the stoichiometric neutralization of the acid demand to exactly pH 10.5, the maximum possible pH is bounded. Magnitude verification: If the standard overshoot results in pH 11.0, reducing the dose to the 10.5 limit reduces the $\\Delta\\text{pH}$ by 0.5 units. Since $[H^+]$ drops by a factor of 3.16 for every 0.5 pH unit increase, moving down 0.5 pH units from 11.0 to 10.5 increases $[H^+]$ by a factor of 3.16 relative to the failure state, directly suppressing the carbonate ion activity and keeping $SI < 0$ (unsaturated).\n\nDIRECTION-OF-EFFECT: driving variable = pH; the mechanism moves it DOWN by capping the hydroxide molar input; this REDUCES the carbonate saturation index.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Parameter Adjustment\n\n*   (c) **Retune Dosing Pump Setpoint**: Modify the controller configuration for the caustic dosing pump. Change the \"Stroke Rate\" setpoint (or \"Strokes Per Hour\" limit) from the standard value (which allows overshoot) to a calculated maximum value that caps the alkalinity addition at the equivalent of pH 10.5. No hardware changes are made to the pump or controller; only the parameter file is updated.\n*   (c) **Update Operational Procedure**: Amend the CIP/maintenance logbook to record the new stroke-rate limit as the operational maximum. Operators are instructed to never override the limit, even if probe readings indicate low pH.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Standard Practice Bill**: Includes the dosing pump, controller, and routine maintenance. The burden involves tuning the setpoint to target pH, which often requires iterative adjustments and risks overshoot.\n*   **Proposed Bill**: Adds no hardware. The only burden is the engineering time to calculate the new stroke limit (one-time) and the procedural change to enforce it.\n*   **Comparison**: The proposed burden is LOWER than standard practice. Standard practice requires continuous tuning and risks failure. The proposed method is a static limit that does not require ongoing calibration adjustments against a drifting probe.\n*   **Operational Loss**: The operational loss is a potential slight under-dosing if the acid demand varies significantly, which may result in a lower inlet pH (e.g., 10.2 instead of 10.5). This is within the acceptable operating envelope for the MF membrane (pH 10.5 is the upper limit, not a target). There is no throughput loss; the treatment remains effective. Energy cost is unchanged or slightly lower due to reduced caustic usage.\n\nEXECUTABLE TEST\n1.  **Protocol**: Calculate the theoretical maximum stroke rate $S_{max}$ that will raise the process water pH to exactly 10.5 based on the current acid demand (measured via titration or historical data, not the drifting probe). Set the dosing pump controller's stroke rate limit to $S_{max} \\times 0.95$ (5% safety margin).\n2.  **Instruments**: Use a calibrated handheld pH meter (independent of the plant's fixed probe) to measure the actual inlet pH at the membrane inlet.\n3.  **Duration**: Run the system at normal flow for 24 hours with the new setpoint.\n4.  **Pass/Fail Thresholds**: The handheld pH meter must read $\\le 10.5$ at all times during the 24-hour test. If the pH ever exceeds 10.5, the mechanism fails. Additionally, monitor the caustic consumption; it should drop by the percentage corresponding to the reduction in stroke rate.\n5.  **Kill Criterion**: If the pH exceeds 10.5, the setpoint is too high; reduce the stroke rate limit further until the pH remains at or below 10.5. If the pH is consistently well below 10.5 (e.g., < 9.5) and affects downstream processes, the setpoint may be gently increased, but never above the calculated $S_{max} \\times 0.95$ without re-verifying with the handheld meter.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 3340,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'input' in: if the error persists beyond a threshold time or if flow/alkalinity readings exceed predefined bounds, the sys",
+     "excluded stem 'inputs' in: if the error persists beyond a threshold time or if flow/alkalinity readings exceed predefined bounds, the sys"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5503,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Action**: Modify the dosing pump controller parameters to set a new maximum stroke r",
+     "*   **Detail**: Access the pump HMI or PLC. Adjust the \"Max Stroke Rate\" or \"Max Frequency",
+     "2.  **Action**: Update the Standard Operating Procedure (SOP) for \"Caustic Dosing Adjustme",
+     "*   **Detail**: Operators must take a spot-check pH reading with a calibrated benchtop met",
+     "3.  **Action**: Integrate a \"High Dose Alarm\" tag in the existing DCS/SCADA system that tr",
+     "*   **Detail**: This is a configuration change in the existing alarm system, not a new sen",
+     "*   **Hardware Cost**: $0. No new parts, sensors, or meters required.",
+     "*   **Installation/Commissioning**: < 1 hour for parameter change and alarm configuration.",
+     "*   **Operational Loss**: **Zero** throughput loss. The MF system continues to operate. Th",
+     "*   **Maintenance**: No change to maintenance intervals.",
+     "*   **Conclusion**: Lower burden than standard practice (which assumes automated control i"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'input' in: no new control inputs from the ph probe are used.\n*   **exclusions**: no modification to the membrane or devic",
+     "excluded stem 'inputs' in: no new control inputs from the ph probe are used.\n*   **exclusions**: no modification to the membrane or devic",
+     "excluded stem 'used' in: no new control inputs from the ph probe are used.\n*   **exclusions**: no modification to the membrane or devic"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 7494,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Hardware**: The standard practice uses the pump and controller. This adds two standard",
+     "- **Installation**: The limit switch and stop plate are bolted onto the existing pump moun",
+     "- **Commissioning**: The stop plate is adjusted to the correct stroke length. This is a on",
+     "- **Maintenance**: The stop plate position is re-verified during CIP, which is already par",
+     "- **Operational Loss**: The mechanism imposes no operational loss on the primary output (t",
+     "- **Conclusion**: The burden is lower than the standard practice of relying solely on cont"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'input' in: inlet ph is monitored but must not be used as a control input\"",
+     "excluded stem 'input' in: this mitigation uses the stroke rate as the control variable and does not use the ph probe as a control input",
+     "excluded stem 'input' in: the limit switch is a mechanical actuation, not a ph-based control.\n- **exclusions**: no new control inputs fr",
+     "excluded stem 'inputs' in: the limit switch is a mechanical actuation, not a ph-based control.\n- **exclusions**: no new control inputs fr"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 5401,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Standard Practice Bill**: Includes the dosing pump, controller, and routine maintena",
+     "*   **Proposed Bill**: Adds no hardware. The only burden is the engineering time to calcul",
+     "*   **Comparison**: The proposed burden is LOWER than standard practice. Standard practice",
+     "*   **Operational Loss**: The operational loss is a potential slight under-dosing if the a"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'input' in: since $[h^+]$ drops by a factor of 3.16 for every 0.5 ph unit increase, moving down 0.5 ph units from 11.0 to "
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Standard Practice Bill**: Includes the dosing pump, controller, and routine maintena",
+    "*   **Proposed Bill**: Adds no hardware. The only burden is the engineering time to calcul",
+    "*   **Comparison**: The proposed burden is LOWER than standard practice. Standard practice",
+    "*   **Operational Loss**: The operational loss is a potential slight under-dosing if the a"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'input' in: since $[h^+]$ drops by a factor of 3.16 for every 0.5 ph unit increase, moving down 0.5 ph units from 11.0 to "
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ }
+}

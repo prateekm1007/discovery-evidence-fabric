@@ -1,0 +1,152 @@
+{
+ "problem_id": "f31a-03-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Optimize Thermal Setpoint to the Cold End of the Permitted Range**\n\n**Mechanism**\nLeverage the Arrhenius relationship governing electrolyte dry-out (water loss via off-gassing and evaporation) to minimize the reaction rate constant. Since the activation energy ($E_a$) for the dry-out leg is approximately 80 kJ/mol, the rate of capacity fade is exponentially sensitive to ambient temperature. By strictly enforcing the lowest permissible setpoint (18°C) rather than allowing the system to drift toward the upper limit (26°C), the chemical driving force for gas generation and electrolyte stratification is significantly reduced. This preserves the acid concentration within the plates longer, thereby stabilizing the charge acceptance and minimizing the delta in capacity between equalization events.\n\n**Implementation**\n1.  **HVAC Recalibration**: Reconfigure the Battery Management System (BMS) or the room HVAC controller to target 18°C with a tight control band (e.g., 18±1°C). Disable any \"energy-saving\" modes that allow the ambient temperature to rise above 22°C, even slightly.\n2.  **Ventilation Verification**: Ensure that the thermal mass of the battery string is not creating localized hotspots that exceed the room average. If the room is held at 18°C but the battery cases reach 24°C due to poor airflow, install forced-air circulation (low-speed fans) to keep the case temperature within 2°C of the ambient setpoint, ensuring the Arrhenius benefit is realized at the plate level.\n3.  **Monitoring**: Log the maximum case temperature (not just room air) to verify that the 18°C setpoint translates to a consistent thermal environment for the VRLA cells.\n\n**Measures it Relies On**\n*   **Arrhenius Kinetics**: The model assumes that reducing the temperature from 26°C (299 K) to 18°C (291 K) reduces the dry-out rate constant ($k$) by a factor of approximately $e^{\\frac{E_a}{R}(\\frac{1}{291} - \\frac{1}{299})} \\approx e^{\\frac{80000}{8.314}(0.000092)} \\approx 1.088$. Wait, let's re-calculate carefully.\n    *   $k_2/k_1 = e^{\\frac{E_a}{R}(\\frac{1}{T_1} - \\frac{1}{T_2})}$\n    *   $T_1 = 291$ K (18°C), $T_2 = 299$ K (26°C)\n    *   $\\frac{E_a}{R} = \\frac{80000}{8.314} \\approx 9622$ K\n    *   $(\\frac{1}{291} - \\frac{1}{299}) = (\\frac{299 - 291}{291 \\times 299}) = \\frac{8}{87009} \\approx 9.194 \\times 10^{-5}$\n    *   Exponent $= 9622 \\times 9.194 \\times 10^{-5} \\approx 0.884$\n    *   Ratio $e^{0.884} \\approx 2.42$\n    *   *Correction*: This calculation shows that the rate at 26°C is ~2.42 times faster than at 18°C. Therefore, holding at 18°C reduces the absolute dry-out rate by ~59% compared to holding at 26°C.\n*   **VRLA Valve Functionality**: The mitigation assumes the VRLA valves are functioning correctly to recombine gases; if the valves are clogged, the pressure buildup will be worse, but the *rate* of generation is still lowered by the cooler temperature.\n*   **No Heat Source Shift**: It assumes no other major heat sources in the room are uncontrolled; if the batteries themselves generate significant heat, the ambient 18°C may not keep the internal cell temperature low enough, necessitating the airflow implementation step.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\n**Question-Answered Sentence:** The proposed intervention is a **Temperature-Triggered Float-Voltage Modulation** of the existing battery management system (BMS) or DC charger, which lowers the DC output voltage (and consequently the electrolyte partial pressure) during periods of sustained high ambient temperature to prevent the Arrhenius-accelerated dry-out, returning to standard settings when temperature normalizes.\n\n**Standard Practice vs. Mitigation:**\n*   **Standard Practice:** Maintains a constant float voltage (typically 13.5–13.8 V per 12V module, or ~2.275–2.30 V/cell) and relies on the room HVAC to maintain a constant temperature (25°C) year-round.\n*   **Mitigation Departure:** Instead of fighting the temperature rise with increased HVAC load (energy penalty) or accepting the dry-out risk, this mitigation accepts the temperature rise but dynamically reduces the chemical driving force (oxygen partial pressure) by lowering the float voltage. This is a control-logic change, not a hardware addition.\n*   **Adjacent-Technique Clearance:** The closest existing practice is \"Temperature Compensation\" used in automotive and telecom batteries, which adjusts voltage based on ambient temperature. However, standard compensation is typically a static lookup table (e.g., -50mV per 12V module per °C) applied broadly. The novelty here is the **conditional logic**: the voltage reduction is gated specifically by a \"sustained high ambient\" state (>26°C for >4h) to prevent the capacity fade associated with under-charging during transient peaks, attacking the *sustained* nature of the failure driver.\n\n**Mechanism:** The driving physics is the electrolyte decomposition rate ($r_{dec}$), which is a function of both the overpotential ($\\eta$) and temperature ($T$). By lowering the terminal voltage ($V_{term}$), the overpotential $\\eta = V_{term} - E_{eq}(T)$ is reduced. Since $r_{dec} \\propto \\exp(-E_a/RT)$ is already high at elevated $T$, reducing $\\eta$ via a lower setpoint exponentially reduces the decomposition rate, preserving electrolyte volume.\n\nPHYSICS CHECK\n**Governing Relation:** The rate of gas generation (dry-out) is proportional to the decomposition current, $I_{dec} \\approx I_{corr} \\exp(nF\\eta/RT)$. The open-circuit voltage $E_{eq}$ decreases with temperature (typically ~ -2 to -4 mV/°C per cell for VRLA). To maintain constant electrolyte pressure (and thus constant $I_{dec}$), one would need to *lower* the voltage. Standard practice holds voltage constant, meaning that as $T$ rises, $\\eta$ effectively increases relative to the *local* equilibrium, or simply the thermal activation term $\\exp(-E_a/RT)$ increases the base rate.\n**Magnitude Verification:**\n*   At 25°C, assume $E_{eq} \\approx 2.27$ V (theoretical) and $V_{float} = 2.30$ V. $\\eta \\approx 0.03$ V.\n*   At 35°C (sustained high ambient), $E_{eq}$ drops by ~$10 \\times (-3$ mV/°C$) \\approx -0.03$ V. New $E_{eq} \\approx 2.24$ V.\n*   If $V_{float}$ is held at 2.30 V, the effective overpotential driving decomposition *against the thermal baseline* is worse because the thermal activation factor $k(T)$ increases. For $E_a = 80$ kJ/mol, the reaction rate increases by a factor of $\\exp(\\frac{E_a}{R} (\\frac{1}{298} - \\frac{1}{308})) \\approx 3.6$ times between 25°C and 35°C.\n*   By lowering $V_{float}$ to 2.25 V at 35°C, the overpotential $\\eta$ shrinks significantly. The reduction in $I_{dec}$ counteracts the thermal increase in rate constant.\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Electrolyte Decomposition Rate ($R_{dec}$).\n*   **Mechanism Action:** Lowers DC Float Voltage ($V_{DC}$).\n*   **Effect on Driver:** Moving $V_{DC}$ down reduces the electrochemical overpotential, which **reduces** $R_{dec}$.\n*   **Validity:** The mechanism moves the variable in the opposite direction of the failure driver (high T + constant V = high decay; high T + lower V = mitigated decay).\n\n**INPUT-AVAILABILITY CLAUSE:**\n*   **Signal 1: Ambient Temperature.** Source: Existing room temperature sensor (stated as \"battery room setpoints may be adjusted,\" implying HVAC controls exist and sense T).\n*   **Signal 2: Charger State.** Source: Existing DC charger/BMS digital communication (RS485/Modbus) or analog signal.\n*   **Permissibility:** Both signals are standard parts of the \"existing infrastructure\" implied by the constraint allowing setpoint adjustments. No new hardware is required.\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS:** Control Logic Parameterization\n\n| Row | Item / Component | Tag | Description & Placement |\n| :--- | :--- | :--- | :--- |\n| 1 | **HVAC Thermostat / BMS Controller** | **(a)** | **Existing Equipment:** The temperature sensor and controller loop already present in the battery room infrastructure. |\n| 2 | **Charger Voltage Setpoint Parameter** | **(c)** | **Parameter Change:** Modify the float voltage setpoint in the existing DC charger or Battery Management System (BMS). Change from fixed 13.6V (example) to a temperature-dependent curve or a stepped logic (e.g., <26°C: 13.6V; >26°C: 13.4V). |\n| 3 | **Configuration Logic Update** | **(c)** | **Procedure Change:** Program the existing controller to trigger the voltage derating only when ambient T > 26°C persists for > 2 hours (to avoid transients), preventing the \"capacity fade\" seen in standard aggressive compensation during short peaks. |\n\n**Constraint-Exclusion Check:**\n*   The constraint allows \"battery room setpoints... adjusted within 18-26 C\". This implies the *HVAC* setpoint is the lever, OR the *environment* is defined by that range. However, the intervention here uses the *electrical* setpoint. Is this permitted?\n*   *Correction/Refinement:* The constraint states \"The battery room setpoints may be adjusted within 18-26 C.\" This usually refers to the HVAC setpoint. If the problem strictly limits *only* HVAC setpoints, I must adjust the *HVAC* to hold T lower, not the voltage.\n*   *Re-Reading Constraint:* \"The battery room setpoints may be adjusted within 18-26 C.\" This defines the *operating envelope* of the room temperature. It does *not* explicitly forbid voltage changes, but it highlights that the room can only be held in that band.\n*   *Alternative Interpretation:* If \"battery room setpoints\" refers to HVAC, and the question asks for a mitigation for \"high ambient temperature\" *within* that system, perhaps the standard practice is *failing* to hold the temperature, or the HVAC is set to 26°C (the max) to save energy, causing dry-out.\n*   *Pivot:* Let's look at the **DEPLOYED PART CLAUSE**. The battery itself cannot be modified. The HVAC is surrounding infrastructure.\n*   *Best Fit:* The most robust \"no-new-hardware\" intervention that respects the \"setpoint\" constraint language is **HVAC Setpoint Optimization via Hysteresis**.\n    *   Standard practice: HVAC setpoint 25°C, hysteresis 2°C (cycles 23-25°C).\n    *   Problem: At sustained high ambient, the HVAC fights the heat load, but thermal stratification or sensor location causes the battery rack to sit at >26°C even if the sensor reads 25°C, OR the HVAC is set to 26°C to save energy, causing the battery to run hot.\n    *   *Revised Mechanism:* **Lowering the HVAC Setpoint from 26°C to 20°C** and **increasing the fan speed duty cycle** (if variable speed, otherwise reducing hysteresis) to ensure the battery *rack* temperature (the actual failure driver) is reduced, not just the room sensor.\n    *   *Wait, the constraint says \"setpoints may be adjusted within 18-26 C\".*\n    *   *Standard Practice:* Likely set at 25°C or 26°C.\n    *   *Intervention:* **Reset the HVAC Setpoint to 20°C (the lower bound of the allowed range)** and **reduce the Temperature Hysteresis Band** to minimize the duration time the room spends at the upper limit.\n    *   *Why this is novel?* Standard practice often sets the setpoint to \"comfort\" (24-25°C) and uses wide hysteresis to save compressor energy. By moving to the *minimum allowed setpoint* (20°C) and *tightening hysteresis*, we maximize the negative delta-T for the Arrhenius term.\n    *   *Is this a \"Monitoring\" or \"Intervention\"?* It is a control parameter change.\n\nLet's stick to the **Voltage Compensation** approach if allowed, or **HVAC Optimization** if the constraint is exclusive.\n*   *Constraint Text Analysis:* \"The battery room setpoints may be adjusted within 18-26 C.\"\n*   *Interpretation A:* You are *only* allowed to change the HVAC setpoint. (Exhaustive list).\n*   *Interpretation B:* The room *operates* in this range. (Boundary condition).\n*   *Given \"Allowed-Measures Enumeration\" rule:* \"setpoints\" is a parameter/procedure measure. \"Without X\" is not present. I will assume **Interpretation B** (Boundary) because restricting a VRLA operator to *only* HVAC setpoints while ignoring the charger (which has a temp comp feature) is an unusual constraint. However, to be safe under the \"Permitted-Set Clause\", I will frame the mitigation as a **Parameter Change to the Existing HVAC Controller** which is explicitly mentioned in the constraint (\"setpoints... adjusted\").\n\n**REVISED MECHANISM (HVAC Parameterization):**\n**Question-Answered Sentence:** The intervention is a **Reduction of the HVAC Setpoint to the Minimum Allowed Limit (18°C) and a Reduction of the Temperature Hysteresis Band**, ensuring the battery rack operates at the lower end of the allowed temperature window to minimize the Arrhenius aging integral.\n\n**Standard Practice vs. Mitigation:**\n*   **Standard Practice:** HVAC setpoint at 25°C (mid-range) with a 2-3°C hysteresis band to conserve compressor energy. This allows the battery rack to drift to 26°C+ for significant durations (\"sustained high ambient\"), accelerating dry-out.\n*   **Mitigation:** Move the setpoint to 18°C (minimum allowed) and tighten the hysteresis (e.g., 0.5°C). This forces the thermal mass of the room to stabilize at a much lower baseline, reducing the time-averaged temperature at the battery rack.\n*   **Novelty:** Standard practice optimizes for *energy* (wide hysteresis, mid-setpoint). This mitigation optimizes for *battery life* (low setpoint, tight hysteresis) using the *same* existing equipment.\n\n**PHYSICS CHECK:**\n*   **Governing Relation:** $Damage = \\int_{0}^{t} k(T(t)) dt$, where $k(T) = A \\exp(-E_a/RT)$.\n*   **Magnitude Verification:**\n    *   Standard: T_avg ≈ 24°C.\n    *   Mitigated: T_avg ≈ 19°C (due to 18°C setpoint + tight hysteresis).\n    *   Rate Ratio: $\\frac{k(24^\\circ C)}{k(19^\\circ C)} = \\exp(\\frac{80000}{8.314} (\\frac{1}{292} - \\frac{1}{297})) \\approx \\exp(9622 \\times 5.8 \\times 10^{-5}) \\approx \\exp(0.56) \\approx 1.75$.\n    *   The dry-out rate is reduced by ~43% (1 - 1/1.75).\n*   **DIRECTION-OF-EFFECT:**\n    *   **Driving Variable:** Time-Averaged Battery Temperature ($T_{avg}$).\n    *   **Mechanism Action:** Lowers HVAC Setpoint and Hysteresis.\n    *   **Effect:** **Reduces** $T_{avg}$.\n    *   **Validity:** Reducing $T_{avg}$ lowers the Arrhenius term, reducing the failure driver.\n\n**INPUT-AVAILABILITY CLAUSE:**\n*   **Signal:** Room Temperature.\n*   **Source:** Existing HVAC temperature sensor (stated infrastructure).\n*   **Permissibility:** Within \"battery room setpoints\" constraint.\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS:** Control Parameter Optimization\n\n| Row | Item / Component | Tag | Description & Placement |\n| :--- | :--- | :--- | :--- |\n| 1 | **HVAC Controller Setpoint Register** | **(a)** | **Existing Equipment:** The digital or analog input on the building HVAC controller that defines the target room temperature. |\n| 2 | **Setpoint Value Change** | **(c)** | **Parameter Change:** Adjust the target temperature from 25°C (standard) to **18°C** (minimum allowed by constraint). |\n",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 3183,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "REASONING_THRASH_LEAK": [
+     "Wait, let's re-calculate carefully."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 6609,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- *Where:* Existing building HVAC controller for the battery room.",
+     "- *Parameter:* Temperature setpoint = 18.0 °C (within the permitted 18–26 °C constraint).",
+     "- *Where:* Existing VRLA charger/BMS configuration menu.",
+     "- *Parameter:* Set float voltage to (Manufacturer Nominal) - 0.10 V per 12V cell (i.e., ~1",
+     "- *Where:* Installed equipment.",
+     "- *Action:* No modification. Used as-is.",
+     "- *Where:* Building infrastructure.",
+     "- *Action:* No modification. Operates at the new setpoint.",
+     "- **Installation:** Zero new hardware. Both the HVAC setpoint and BMS voltage are paramete",
+     "- **Commissioning:** None required beyond verifying the new setpoints.",
+     "- **Operation:** The HVAC system runs at a colder setpoint (18��C vs. typical 26°C). This ",
+     "- *Operational Loss Pricing:* Cooling from 26°C to 18°C requires removing ~8 K of sensible",
+     "- **Maintenance:** Equalization intervals may be extended. Standard practice performs equa",
+     "- **Parity Conclusion:** Same-or-lower burden class. No new procurement. Only parameter ch"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 6329,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Item:** HVAC Temperature Setpoint Adjustment.",
+     "*   **Description:** Access the existing building HVAC controller for the battery room. Ch",
+     "*   **Operating Parameter:** Setpoint = $18.0^\\circ\\text{C}$; Deadband = default (e.g., $\\",
+     "*   **Justification:** This draws solely from the permitted constraint \"battery room setpo",
+     "*   **Hardware:** The standard practice uses the existing HVAC controller. The interventio",
+     "*   **Installation:** Standard practice involves initial setup. Intervention involves a si",
+     "*   **Operation:** The HVAC system operates with a lower setpoint. This may increase cooli",
+     "*   **Operational Loss Pricing:**",
+     "*   **Loss:** Increased electricity consumption for cooling.",
+     "*   **Magnitude:** Order-of-magnitude bound is < 1% increase in total facility energy cost",
+     "*   **Availability:** Zero operational loss in battery availability; availability increase",
+     "*   **Conclusion:** Same-or-lower burden class. The mechanism relies entirely on a paramet"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 11701,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   The constraint allows \"battery room setpoints... adjusted within 18-26 C\". This implie",
+     "*   *Correction/Refinement:* The constraint states \"The battery room setpoints may be adju",
+     "*   *Re-Reading Constraint:* \"The battery room setpoints may be adjusted within 18-26 C.\" ",
+     "*   *Alternative Interpretation:* If \"battery room setpoints\" refers to HVAC, and the ques",
+     "*   *Pivot:* Let's look at the **DEPLOYED PART CLAUSE**. The battery itself cannot be modi",
+     "*   *Best Fit:* The most robust \"no-new-hardware\" intervention that respects the \"setpoint",
+     "*   Standard practice: HVAC setpoint 25°C, hysteresis 2°C (cycles 23-25°C).",
+     "*   Problem: At sustained high ambient, the HVAC fights the heat load, but thermal stratif",
+     "*   *Revised Mechanism:* **Lowering the HVAC Setpoint from 26°C to 20°C** and **increasing",
+     "*   *Wait, the constraint says \"setpoints may be adjusted within 18-26 C\".*",
+     "*   *Standard Practice:* Likely set at 25°C or 26°C.",
+     "*   *Intervention:* **Reset the HVAC Setpoint to 20°C (the lower bound of the allowed rang",
+     "*   *Why this is novel?* Standard practice often sets the setpoint to \"comfort\" (24-25°C) ",
+     "*   *Is this a \"Monitoring\" or \"Intervention\"?* It is a control parameter change.",
+     "*   *Constraint Text Analysis:* \"The battery room setpoints may be adjusted within 18-26 C",
+     "*   *Interpretation A:* You are *only* allowed to change the HVAC setpoint. (Exhaustive li",
+     "*   *Interpretation B:* The room *operates* in this range. (Boundary condition).",
+     "*   *Given \"Allowed-Measures Enumeration\" rule:* \"setpoints\" is a parameter/procedure meas",
+     "*   **Standard Practice:** HVAC setpoint at 25°C (mid-range) with a 2-3°C hysteresis band ",
+     "*   **Mitigation:** Move the setpoint to 18°C (minimum allowed) and tighten the hysteresis",
+     "*   **Novelty:** Standard practice optimizes for *energy* (wide hysteresis, mid-setpoint).",
+     "*   **Governing Relation:** $Damage = \\int_{0}^{t} k(T(t)) dt$, where $k(T) = A \\exp(-E_a/",
+     "*   **Magnitude Verification:**",
+     "*   Standard: T_avg ≈ 24°C.",
+     "*   Mitigated: T_avg ≈ 19°C (due to 18°C setpoint + tight hysteresis).",
+     "*   Rate Ratio: $\\frac{k(24^\\circ C)}{k(19^\\circ C)} = \\exp(\\frac{80000}{8.314} (\\frac{1}{",
+     "*   The dry-out rate is reduced by ~43% (1 - 1/1.75).",
+     "*   **DIRECTION-OF-EFFECT:**",
+     "*   **Driving Variable:** Time-Averaged Battery Temperature ($T_{avg}$).",
+     "*   **Mechanism Action:** Lowers HVAC Setpoint and Hysteresis.",
+     "*   **Effect:** **Reduces** $T_{avg}$.",
+     "*   **Validity:** Reducing $T_{avg}$ lowers the Arrhenius term, reducing the failure drive",
+     "*   **Signal:** Room Temperature.",
+     "*   **Source:** Existing HVAC temperature sensor (stated infrastructure).",
+     "*   **Permissibility:** Within \"battery room setpoints\" constraint."
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   The constraint allows \"battery room setpoints... adjusted within 18-26 C\". This implie",
+    "*   *Correction/Refinement:* The constraint states \"The battery room setpoints may be adju",
+    "*   *Re-Reading Constraint:* \"The battery room setpoints may be adjusted within 18-26 C.\" ",
+    "*   *Alternative Interpretation:* If \"battery room setpoints\" refers to HVAC, and the ques",
+    "*   *Pivot:* Let's look at the **DEPLOYED PART CLAUSE**. The battery itself cannot be modi",
+    "*   *Best Fit:* The most robust \"no-new-hardware\" intervention that respects the \"setpoint",
+    "*   Standard practice: HVAC setpoint 25°C, hysteresis 2°C (cycles 23-25°C).",
+    "*   Problem: At sustained high ambient, the HVAC fights the heat load, but thermal stratif",
+    "*   *Revised Mechanism:* **Lowering the HVAC Setpoint from 26°C to 20°C** and **increasing",
+    "*   *Wait, the constraint says \"setpoints may be adjusted within 18-26 C\".*",
+    "*   *Standard Practice:* Likely set at 25°C or 26°C.",
+    "*   *Intervention:* **Reset the HVAC Setpoint to 20°C (the lower bound of the allowed rang",
+    "*   *Why this is novel?* Standard practice often sets the setpoint to \"comfort\" (24-25°C) ",
+    "*   *Is this a \"Monitoring\" or \"Intervention\"?* It is a control parameter change.",
+    "*   *Constraint Text Analysis:* \"The battery room setpoints may be adjusted within 18-26 C",
+    "*   *Interpretation A:* You are *only* allowed to change the HVAC setpoint. (Exhaustive li",
+    "*   *Interpretation B:* The room *operates* in this range. (Boundary condition).",
+    "*   *Given \"Allowed-Measures Enumeration\" rule:* \"setpoints\" is a parameter/procedure meas",
+    "*   **Standard Practice:** HVAC setpoint at 25°C (mid-range) with a 2-3°C hysteresis band ",
+    "*   **Mitigation:** Move the setpoint to 18°C (minimum allowed) and tighten the hysteresis",
+    "*   **Novelty:** Standard practice optimizes for *energy* (wide hysteresis, mid-setpoint).",
+    "*   **Governing Relation:** $Damage = \\int_{0}^{t} k(T(t)) dt$, where $k(T) = A \\exp(-E_a/",
+    "*   **Magnitude Verification:**",
+    "*   Standard: T_avg ≈ 24°C.",
+    "*   Mitigated: T_avg ≈ 19°C (due to 18°C setpoint + tight hysteresis).",
+    "*   Rate Ratio: $\\frac{k(24^\\circ C)}{k(19^\\circ C)} = \\exp(\\frac{80000}{8.314} (\\frac{1}{",
+    "*   The dry-out rate is reduced by ~43% (1 - 1/1.75).",
+    "*   **DIRECTION-OF-EFFECT:**",
+    "*   **Driving Variable:** Time-Averaged Battery Temperature ($T_{avg}$).",
+    "*   **Mechanism Action:** Lowers HVAC Setpoint and Hysteresis.",
+    "*   **Effect:** **Reduces** $T_{avg}$.",
+    "*   **Validity:** Reducing $T_{avg}$ lowers the Arrhenius term, reducing the failure drive",
+    "*   **Signal:** Room Temperature.",
+    "*   **Source:** Existing HVAC temperature sensor (stated infrastructure).",
+    "*   **Permissibility:** Within \"battery room setpoints\" constraint."
+   ]
+  }
+ }
+}

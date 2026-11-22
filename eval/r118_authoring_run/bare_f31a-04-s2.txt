@@ -1,0 +1,25 @@
+**Mitigation Proposal: Implement an Open-Loop Time-Based Dosing Cycle with Conservative Setpoint Retuning**
+
+**1. Mechanism**
+The mitigation replaces the current feedback-driven dosing (or overly aggressive feedforward) with a strictly open-loop, time-bounded dosing cycle. By retuning the *dosing-pump stroke rate* (the only permitted control variable) to a conservative value and limiting the duration of dosing via a timer, the system ensures that caustic is only introduced when the estimated pH is safely below the 10.5 threshold, thereby preventing the chemical overshoot that causes carbonate precipitation. The mechanism relies on process knowledge (inflow rate, initial pH, stoichiometry) rather than real-time pH feedback, which is prohibited due to probe drift.
+
+**2. Implementation**
+*   **Step 1: Characterize the Process.** Calculate the required moles of caustic needed to raise the MF inlet stream from its baseline pH (e.g., pH 7.5) to a target "safe" pH (e.g., pH 9.8, well below the 10.5 limit). Determine the volume and concentration of caustic required per batch or per hour of permeate/reject flow.
+*   **Step 2: Retune the Stroke Rate.** Set the **dosing-pump stroke rate** to a value that delivers the calculated dose *gradually* over a fixed time window. For example, if the pump delivers 1 L/min at 100% stroke rate, and a 500 mL dose is required every 2 hours, the stroke rate should be adjusted so that 500 mL is delivered over 30 minutes (i.e., ~3.3% of full stroke rate, assuming 1 L/min at 100%). This lowers the instantaneous alkalinity addition rate, reducing peak pH spikes.
+*   **Step 3: Implement a Time-Based Dosing Logic.** 
+    *   Create a timer that triggers the dosing pump only during the first 15 minutes of a 2-hour cycle.
+    *   The pump runs at the newly retuned, low stroke rate during this window.
+    *   The pump remains off for the remaining 105 minutes of the cycle.
+    *   This ensures that by the end of the dosing period, the cumulative alkalinity added is sufficient to maintain buffering capacity but not enough to exceed pH 10.5 under any reasonable flow variation.
+*   **Step 4: Validate via Offline pH Measurements.** Since inlet pH cannot be used for control, validate the new setpoint by taking manual grab samples at the end of the dosing cycle (t=15 min) and at the end of the cycle (t=120 min). Adjust the stroke rate *down* if the end-of-cycle pH is >10.2, and *up* if buffering is insufficient, but never above the calculated stoichiometric limit for pH 10.5.
+
+**3. Measures It Relies On**
+*   **Process Stability:** Assumes that the influent flow rate and baseline pH are relatively constant or have known bounds. Significant fluctuations in flow will require a larger safety margin in the retuned stroke rate.
+*   **Stoichiometric Accuracy:** Relies on accurate calculation of the alkalinity demand of the MF permeate/reject stream. A 20% safety margin is applied to the calculated dose to account for estimation errors.
+*   **Pump Linearity:** Assumes that the dosing pump’s stroke rate is linearly proportional to the volumetric delivery rate over the operating range.
+*   **Temporal Mixing:** Assumes that the MF vessel is well-mixed such that localized high-pH zones do not form; the low stroke rate ensures gentle injection, minimizing local concentration gradients that could cause spot precipitation.
+
+**Why This Works Under the Constraint:**
+*   **Only permitted control variable used:** The stroke rate is the sole variable adjusted; no pH probe signal is used in the control loop.
+*   **Prevents Overshoot:** By capping the *total* dose per cycle and spreading it over a longer time (low stroke rate), the maximum achievable pH is mathematically bounded below 10.5. Even if flow decreases, the fixed dose cannot raise the pH above the calculated maximum for that dose volume, provided the baseline pH is known.
+*   **Prevents Scale:** Keeping pH < 10.5 prevents the solubility product of calcium carbonate from being exceeded, thus preventing scale precipitation on membranes between CIPs.

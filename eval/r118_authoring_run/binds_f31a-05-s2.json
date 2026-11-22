@@ -1,0 +1,117 @@
+{
+ "problem_id": "f31a-05-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Controlled Manual Grease Injection via Metered Porting**\n\n**Mechanism:**\nReplace the current practice of high-volume \"filling\" the bearing with a **metered, low-volume injection protocol** using a dedicated manual grease gun equipped with a precise stroke counter or a regulated pressure gauge. The goal is to achieve *purge displacement* (cleaning out old grease and contaminants) without *washover* (excessive internal pressure that squeezes grease out, thins the film, and abrades the race). By limiting the total volume injected per interval to the calculated minimum required to maintain film thickness, you prevent the hydraulic pressure spike that causes spalling.\n\n**Implementation:**\n1.  **Port Modification/Verification:** Ensure the grease nipple on the screen deck bearing is clean and unobstructed. Install a dedicated, high-quality manual grease gun with a fine-bore hose and a clean injector tip that does not damage the seal.\n2.  **Volume Calibration:** Determine the bearing’s grease capacity (typically 30–50% of free space). Calculate the **minimum effective volume** needed to purge one cycle of old grease (usually 2–4 strokes of a standard 15ml gun, or precisely measured via a marked syringe adapter on the gun).\n3.  **Protocol Execution:**\n    *   Operate the bearing at normal speed.\n    *   Inject the calculated minimum volume (e.g., 3 strokes) in a controlled, steady manner.\n    *   **Stop immediately** once the old grease is visibly purged at the seals. Do *not* continue until resistance increases or grease extrudes from both seals, which indicates over-pressurization.\n    *   Log the exact number of strokes used for each interval to maintain consistency.\n4.  **Seal Maintenance:** During each greasing session, inspect and clean the external seal faces to prevent external contaminants from being drawn in by the slight vacuum effect during purge.\n\n**Measures It Relies On:**\n*   **Precise Volume Control:** Using a stroke-counted manual gun or a calibrated syringe adapter to limit input volume, preventing the hydraulic over-pressurization that causes washover.\n*   **Operator Discipline:** Strict adherence to \"purge-and-stop\" rather than \"fill-and-dump,\" ensuring grease is not forced past the seals or into the race space at destructive pressures.\n*   **Seal Integrity:** Maintaining clean and undamaged seals so that the limited grease volume stays within the bearing rather than being lost to leakage or contamination ingress.\n*   **Frequent, Small Intervals:** Instead of large, infrequent greasing sessions, use shorter intervals with smaller volumes to keep the grease fresh without excessive mechanical disruption.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\n**Question answered:** A procedural change to the manual greasing schedule and application technique is proposed to prevent bearing washover and outer-race spalling.\n**Standard Practice:** Standard practice involves periodic manual grease application using a fixed volume per interval, often resulting in excess grease that generates heat (churning loss) and pressure that forces grease out the seal, thinning the film and exposing the race.\n**Departure:** The mitigation is a **duty-cycle reduction** of grease quantity and an **operating-point shift** of application timing, implemented purely through procedural changes to the manual route. It reduces the *heat generation from churning* and the *hydrodynamic pressure spike* that drives washover, thereby preserving the grease film thickness and reducing contact stress on the outer race.\n**Adjacent-Technique Clearance:** Closest existing practice is \"grease dosing optimization\" in automatic lubricators. This differs because it achieves the same physics (lowering churning loss and seal pressure) through **manual procedure constraints** (counting strokes, timing against load cycles) rather than hardware replacement, respecting the \"no automatic lubricators\" constraint.\n**Mechanism:** The driving failure mechanism is **excessive internal shear heating and pressure** caused by over-greasing, which exceeds the seal's dynamic retention limit. By strictly limiting grease volume to the minimum required for film replenishment and timing the application to low-load windows, the net pressure gradient across the seal is reduced, and the churning loss is minimized, keeping the bearing temperature within the grease’s base-oil stability limits.\n\nPHYSICS CHECK\n**Governing Relation:**\nBearing temperature rise $\\Delta T$ due to churning is proportional to grease volume $V_g$ and rotational speed $n$:\n$$ \\Delta T \\propto \\eta_{eff} \\cdot n \\cdot V_g $$\nwhere $\\eta_{eff}$ is the effective viscosity of the grease. Washover occurs when the pressure $P_{seal}$ generated by thermal expansion and churning exceeds the seal's dynamic limit $P_{limit}$.\n\n**Magnitude Verification:**\nStandard practice often applies 10-15 grease gun strokes (approx. 20-30g grease). A typical light-duty bearing requires 2-4 strokes (approx. 4-6g) for replenishment.\nReducing $V_g$ by factor $k=0.25$ (from 30g to 7.5g) reduces churning heat generation by 75%.\nSeal pressure $P_{seal}$ is roughly linear with internal temperature rise and static volume.\n$P_{seal, new} \\approx P_{seal, old} \\times (1 - 0.75 \\cdot \\alpha_{th})$.\nAssuming a significant thermal component, reducing volume by 75% drops the peak seal pressure below the dynamic washover threshold $P_{limit}$, preventing film thinning and spall initiation.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving variable:** Internal bearing temperature / Seal dynamic pressure.\n*   **Mechanism moves it:** Down by ~75% (by reducing grease volume $V_g$ in the churning equation).\n*   **Result:** This reduces the failure driver (washover-induced film thinning and contact stress on the outer race).\n\n**INPUT-AVAILABILITY:**\n*   **Required Input:** Bearing load state (to time application to low-load windows).\n*   **Permitted Source:** Existing operator observation of machine cycle (screen deck load varies with feed rate/operation). No new sensors required; uses existing process knowledge.\n\nIMPLEMENTATION BILL\n*   **MECHANISM CLASS:** Procedural Scheduling and Volume Constraint.\n*   **Row 1:** Revise standard operating procedure (SOP) to limit manual grease application to **2-3 strokes** per bearing instead of 10-15. **(c)**\n    *   *Where:* Manual grease gun and bearing fitting point.\n    *   *Parameter:* Stroke count limit = 3 max.\n*   **Row 2:** Schedule greasing during **minimum load phases** of the screen deck cycle (e.g., during material discharge or idle periods where deck vibration/load is lowest). **(c)**\n    *   *Where:* Maintenance schedule calendar aligned with production schedule.\n    *   *Parameter:* Application window = Low-load cycle segment.\n*   **Row 3:** Implement a \"blow-off\" step immediately after greasing: wipe excess grease from the seal face and surrounding area using a clean rag to prevent external contamination ingress and visible over-greasing indicators. **(a)**\n    *   *Where:* Cleaning station near the screen deck.\n    *   *Parameter:* Wipe time = 10 seconds per bearing.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installation/Commissioning:** None. No hardware installed. SOP update only.\n*   **Operation:** Standard manual greasing time is reduced from ~2 mins (10+ strokes) to ~0.5 mins (3 strokes + wipe). **Zero operational loss** (actually saves maintenance time).\n*   **Maintenance:** No new parts to track.\n*   **Cost Class:** Lower than standard practice (less grease consumed, less labor time per event).\n*   **Conclusion:** Same-or-lower burden class. The mechanism is purely procedural, utilizing existing manual infrastructure.\n\nEXECUTABLE TEST\n**Protocol:**\n1.  Select two identical screen decks, one with standard practice (Deck A) and one with the new intervention (Deck B).\n2.  Instrument both with standard IR thermometers (already in plant stock) to measure bearing housing temperatures at steady state and after grease application.\n3.  Apply grease to Deck B using the 3-stroke limit and low-load timing. Apply standard volume to Deck A.\n4.  Monitor for 8 weeks. Inspect seals and housing for grease leakage (washover evidence).\n5.  Disassemble bearings at 8 weeks or at first sign of failure.\n\n**Pass/Fail Thresholds:**\n*   **Success:** Deck B shows no grease leakage at seals. Bearing temperature rise post-grease is $\\le$ 5% above ambient baseline. No spalling on outer race.\n*   **Failure (Kill Criterion):** Deck B shows visible grease washover at seals within 2 weeks, OR bearing temperature spike > 15°C above Deck A baseline immediately post-grease, OR spalling detected on outer race.\n\n**Duration:** 8 weeks (typical spall initiation window stated as \"within weeks\").\n\nCONSTRAINT BIND / RISK\n*   **Constraint Adherence:** \"Only the existing manual greasing route may be used.\" -> **Met** (manual gun, manual schedule).\n*   **Exclusion:** \"NO automatic lubricators.\" -> **Met** (none added).\n*   **Exclusion:** \"NO grease-spec change.\" -> **Met** (same OEM pack used, just less volume).\n*   **Risk:** If the bearing is severely depleted, 3 strokes may be insufficient to restore film. Mitigation: Include a check in SOP that if bearing temperature is high prior to greasing, increase to 5 strokes. This keeps the mechanism within the permitted manual/procedural class.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 2684,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "derived feature input 'Metered Porting' is not derivable from the permitted signals"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 8853,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Installation:** Zero. No new parts. (Parity: Same or Lower).",
+     "*   **Commissioning:** Operator training on the new 2-step dosing schedule (1 pump, wait, ",
+     "*   **Operation:** **Operational Loss Pricing:**",
+     "*   **Throughput:** **Zero loss.** The schedule operates *during* production time. There i",
+     "*   **Energy:** **Zero loss.** In fact, slightly *lower* energy due to reduced churning/fr",
+     "*   **Availability:** **Zero loss.** No new maintenance windows.",
+     "*   **Material Cost:** **Zero net change.** Total grease per cycle = 3 pumps. Standard pra",
+     "*   **Maintenance:** Same frequency, different volume distribution.",
+     "*   **Conclusion:** The burden is **same-or-lower** than standard practice. It removes the"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "derived feature input 'thermal decay models of the grease' is not derivable from the permitted signals"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 8416,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **MECHANISM CLASS:** Procedural Scheduling and Load-Bearing Sequence.",
+     "*   The bearing, outer race, inner race, and screen deck are **NOT modified**. No machinin",
+     "*   The grease gun is existing infrastructure.",
+     "*   The procedure is a parameter change to the *schedule* and *quantity* of the existing m",
+     "*   **Installation:** 0 hardware. (Parity: Same).",
+     "*   **Commissioning:** 0. Update procedure cards in the binder. (Parity: Lower than standa",
+     "*   **Operation:** Operator spends 2 minutes longer per shift? No, they spend less time ov",
+     "*   **Cost:** $0.",
+     "*   **Operational Loss:** **Zero**. The machine runs the same hours. The greasing is done ",
+     "*   **Conclusion:** Burden is **LOWER** than standard practice (which requires frequent, t"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 6668,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **MECHANISM CLASS:** Procedural Scheduling and Volume Constraint.",
+     "*   *Where:* Manual grease gun and bearing fitting point.",
+     "*   *Parameter:* Stroke count limit = 3 max.",
+     "*   *Where:* Maintenance schedule calendar aligned with production schedule.",
+     "*   *Parameter:* Application window = Low-load cycle segment.",
+     "*   *Where:* Cleaning station near the screen deck.",
+     "*   *Parameter:* Wipe time = 10 seconds per bearing.",
+     "*   **Installation/Commissioning:** None. No hardware installed. SOP update only.",
+     "*   **Operation:** Standard manual greasing time is reduced from ~2 mins (10+ strokes) to ",
+     "*   **Maintenance:** No new parts to track.",
+     "*   **Cost Class:** Lower than standard practice (less grease consumed, less labor time pe",
+     "*   **Conclusion:** Same-or-lower burden class. The mechanism is purely procedural, utiliz"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** Procedural Scheduling and Volume Constraint.",
+    "*   *Where:* Manual grease gun and bearing fitting point.",
+    "*   *Parameter:* Stroke count limit = 3 max.",
+    "*   *Where:* Maintenance schedule calendar aligned with production schedule.",
+    "*   *Parameter:* Application window = Low-load cycle segment.",
+    "*   *Where:* Cleaning station near the screen deck.",
+    "*   *Parameter:* Wipe time = 10 seconds per bearing.",
+    "*   **Installation/Commissioning:** None. No hardware installed. SOP update only.",
+    "*   **Operation:** Standard manual greasing time is reduced from ~2 mins (10+ strokes) to ",
+    "*   **Maintenance:** No new parts to track.",
+    "*   **Cost Class:** Lower than standard practice (less grease consumed, less labor time pe",
+    "*   **Conclusion:** Same-or-lower burden class. The mechanism is purely procedural, utiliz"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ }
+}
