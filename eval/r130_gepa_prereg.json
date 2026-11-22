@@ -1,0 +1,26 @@
+{
+ "record": "R130_GEPA_PREREG/1.0.0",
+ "claim": "c-0207",
+ "base": "195302632",
+ "typed_at": "2026-11-22T20:05:00Z (sandbox clock, TRUE UTC) — BEFORE any run call",
+ "design_source": "eval/r129_phaseB_design.json (the committed R129 design: the residual defect source is the REVIEWER stage — both bon3 losses selected bind-clean candidates that the reviewer rewrite broke)",
+ "arm": "gepa-reviewer (directive compile, Art. 20 round 1 of 2)",
+ "incumbent": "the committed r129 ss reviewer chain (IMPROVED_DIRECTIVE frozen bytes), baseline RECOMPUTED from committed delivered bills",
+ "isolation": {
+  "author_bills": "FROZEN to eval/r129_phase_ab/ss_<pid>.json delivered_bill bytes on the compile slice; the author is NEVER invoked",
+  "variable": "ONLY the reviewer directive text",
+  "frozen": [
+   "model pin agnes-3.0-flash",
+   "FIX_SCHEMA response_format",
+   "detector bytes (r121_successor_score + m77 scan_duty_cycle_pricing)",
+   "authoring prompt (r125_f31e_run)",
+   "transport backoff policy"
+  ],
+  "slice": "compile = items 1-12 in eval/r125_f31e_set/items.jsonl order; validation = the full 24"
+ },
+ "compile_procedure": [
+  "K=6 candidates: the incumbent directive + 5 mutations. Each mutation = the incumbent directive with ONE typed amendment drawn from the error examples: (m1) an explicit duty-cycle/PWM-pricing derivation rule (every duty-cycle or PWM figure must carry its derivation from the permitted measurements with the formula, or cite the datasheet parameter it comes from); (m2) a no-introduction clause (the fix must NOT introduce any new numeric claim, parameter or operating point not present in the ORIGINAL bill); (m3) the input-rule tightened with an explicit sensor-source checklist; (m4) m1+m2 combined; (m5) a minimal-diff clause (change ONLY the sentences the findings touch, keep every other sentence byte-identical where possible)"
+ ],
+ "fitness": "(a) introduced defects: delivered defects on the 12 frozen bills under the UNCHANGED canonical detector, FEWER is better; (b) heal rate: surfaced findings actually healed (the post-review scan on the same items), must not regress the incumbent's; (c) length ratio ~1.0 (a directive that shrinks bills to dodge the detector fails the length gate)",
+ "selection_rule": "Pareto front on (a,b,c); if >1 non-dominated, pick the fewest introduced defects, then highest heal rate. Deterministic, typed BEFORE the run (no post-hoc metric choice)."
+}
