@@ -272,19 +272,26 @@ def resolve_vault_key(name: str) -> Optional[str]:
 
 def _post_chat(base_url: str, api_key: str, messages: List[dict],
                model: str, max_tokens: int, timeout_s: float,
-               user_agent: str, route_name: str) -> Dict[str, Any]:
+               user_agent: str, route_name: str,
+               response_format: Optional[dict] = None) -> Dict[str, Any]:
     """One OpenAI-compatible chat completion. Typed refusals on every
     failure class; the response dict carries {content, model,
-    finish_reason, usage, raw}."""
+    finish_reason, usage, raw}. response_format is an OPTIONAL
+    transport pass-through (the r127 Phase-A structured-output
+    contract); None keeps the body byte-identical to the pre-r127
+    instrument."""
     if not api_key:
         raise RouteRefused("missing_key", route_name,
                            f"no vault key for {route_name}")
-    body = json.dumps({
+    body_dict = {
         "model": model,
         "messages": messages,
         "max_tokens": max_tokens,
         "temperature": 0.0,
-    }).encode("utf-8")
+    }
+    if response_format is not None:
+        body_dict["response_format"] = response_format
+    body = json.dumps(body_dict).encode("utf-8")
     req = urllib.request.Request(
         base_url.rstrip("/") + "/chat/completions", data=body,
         headers={"Authorization": f"Bearer {api_key}",
@@ -336,16 +343,19 @@ def xkiro_chat(messages: List[dict], model: str,
 
 def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
                visible_target: int = 64, timeout_s: float = 120.0,
-               api_key: Optional[str] = None) -> Dict[str, Any]:
+               api_key: Optional[str] = None,
+               response_format: Optional[dict] = None) -> Dict[str, Any]:
     """One agnes completion with the measured reasoning headroom
     (c-0078: the flash tier budgets reasoning tokens FIRST — a call
-    sized to the visible target alone returns empty visible text)."""
+    sized to the visible target alone returns empty visible text).
+    response_format passes through unchanged (r127 Phase-A)."""
     key = api_key if api_key is not None else \
         resolve_vault_key("AGNES_API_KEY")
     return _post_chat("https://apihub.agnes-ai.com/v1", key or "",
                       messages, model,
                       visible_target + REASONING_HEADROOM, timeout_s,
-                      "agnes-route-adapter/1.0", "agnes")
+                      "agnes-route-adapter/1.0", "agnes",
+                      response_format=response_format)
 
 
 def registered_route() -> Dict[str, Any]:
