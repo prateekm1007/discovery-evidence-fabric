@@ -6,10 +6,59 @@
   {
    "leg": "author",
    "attempts": 1,
-   "typed_fail": "RouteRefused: [rate_limited] agnes: HTTP 429: {\"error\":{\"code\":\"\",\"message\":\"You’ve reached the API rate limit for free users. Upgrade to a Token Plan to "
+   "latency_s": 7.72,
+   "usage": {
+    "prompt_tokens": 255,
+    "completion_tokens": 679,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 3.82,
+   "usage": {
+    "prompt_tokens": 1051,
+    "completion_tokens": 1108,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal\\n\\nMechanism:\\nImplement a closed-loop thermal duty-c",
+   "schema_parsed_first_try": true
   }
  ],
  "parse_retries": 0,
- "wall_clock_s": 0.07,
- "status": "TYPED_CALL_FAIL"
+ "authored_bill": "Mitigation Proposal\n\nMechanism:\nImplement a closed-loop thermal duty-cycle governor using the existing hour-run counter and manifold thermometer. This mechanism introduces a mandatory, automatic cool-down \"pump-off\" pause when the manifold temperature exceeds a defined limit, thereby preventing heat accumulation that causes viscosity drop and internal leakage, which leads to pressure fall-off.\n\nImplementation:\n1.  **Parameterization:** Use the PLC/Controller (which already logs the hour-run counter) to define two thresholds:\n    *   `T_Cutoff`: A specific manifold temperature (e.g., 75°C, determined via offline testing with existing sensors) above which the fluid viscosity is too low to maintain peak pressure.\n    *   `T_Cool`: A lower target temperature (e.g., 55°C) indicating the system is cool enough to resume operation.\n2.  **Logic Execution:**\n    *   **State Monitor:** Continuously read the manifold thermometer.\n    *   **Trigger Condition:** When `Manifold Temp >= T_Cutoff`, the controller immediately sends a signal to de-energize the pump solenoid (shut off the pump). The motor ammeter will drop to zero, confirming the pump is off.\n    *   **Cool-Down Hold:** While the pump is off, allow passive cooling. The controller monitors the manifold thermometer. It will **not** re-enable the pump unless `Manifold Temp <= T_Cool`.\n    *   **Counter Reset:** The hour-run counter continues to tick (or is noted) during the cool-down period if the machine is considered \"available but idle,\" or the logic can tag this time as \"forced maintenance/downtime\" in the OEE logs, but the key action is the *thermal interlock*.\n    *   **Resume Operation:** Once `Manifold Temp <= T_Cool`, the next press cycle request is accepted, and the pump is re-energized.\n\nMeasures Relied Upon:\n*   **Manifold Thermometer:** Provides the real-time feedback signal for the temperature limit and cool-down status.\n*   **Pump Motor Ammeter:** Used to verify the pump is actually de-energized (current ~0A) during the cool-down phase, ensuring the interlock is effective and preventing false starts.\n*   **Hour-Run Counter:** Used to log the duration of the thermal pauses for maintenance trend analysis (to see if the required cool-down time is increasing, indicating a deeper issue like a clogged cooler or degraded seals) and to track total operational vs. thermal-downtime hours.\n*   **Existing Control Logic:** The interlock is implemented in the existing PLC/relay logic without adding new physical sensors, only changing the program logic to respond to the available temperature and current signals.\n\n**Why this works:**\nThe pressure fall-off at the end of the stroke in a hot system is typically due to oil viscosity dropping significantly, which increases internal leakage past the pump vanes and seals. By forcing a thermal break before the viscosity drops below the critical threshold, the pump maintains adequate sealing and pressure delivery. The use of the ammeter ensures the pump is truly off, and the hour-counter provides data to adjust the `T_Cutoff` if necessary. No new hardware is installed.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "Mitigation Proposal\n\nMechanism:\nImplement a closed-loop thermal duty-cycle governor using the existing hour-run counter and manifold thermometer. This mechanism introduces a mandatory, automatic cool-down \"pump-off\" pause when the manifold temperature exceeds a defined limit, thereby preventing heat accumulation that causes viscosity drop and internal leakage, which leads to pressure fall-off.\n\nDIRECTION-OF-EFFECT:\nThe driving variable is Manifold Temperature ($T_m$). An increase in $T_m$ above $T_{Cutoff}$ causes a decrease in hydraulic pump duty cycle (availability), which results in a decrease in $T_m$ over time due to passive cooling. Conversely, a decrease in $T_m$ below $T_{Cool}$ causes an increase in hydraulic pump duty cycle, resulting in an increase in $T_m$ due to heat generation. This negative feedback loop stabilizes $T_m$ within the range $[T_{Cool}, T_{Cutoff}]$.\n\nImplementation:\n1.  **Parameterization:** Use the PLC/Controller to define two thresholds:\n    *   `T_Cutoff`: A specific manifold temperature (e.g., 75°C) above which the fluid viscosity is too low to maintain peak pressure.\n    *   `T_Cool`: A lower target temperature (e.g., 55°C) indicating the system is cool enough to resume operation.\n2.  **Logic Execution:**\n    *   **State Monitor:** Continuously read the manifold thermometer.\n    *   **Trigger Condition:** When `Manifold Temp >= T_Cutoff`, the controller immediately sends a signal to de-energize the pump solenoid (shut off the pump).\n    *   **Cool-Down Hold:** While the pump is off, allow passive cooling. The controller monitors the manifold thermometer. It will **not** re-enable the pump unless `Manifold Temp <= T_Cool`.\n    *   **Resume Operation:** Once `Manifold Temp <= T_Cool`, the next press cycle request is accepted, and the pump is re-energized.\n3.  **IMIMPLEMENTATION BILL:**\n    *   **Sensors/Inputs:** Manifold Thermometer ($T_m$); Pump Motor Ammeter ($I_p$); Hour-Run Counter ($H_{run}$).\n    *   **Control Logic:** PLC program update to implement interlock based on $T_m$.\n    *   **Operational Cost Pricing:**\n        *   **Throughput/Availability Impact:** The duty cycle $D$ is modulated such that $D = \\frac{T_{on}}{T_{on} + T_{off}}$. During the cool-down period ($T_{off}$), throughput is zero. The bill prices this as a loss in Opportunity Cost ($OC$). $OC = \\Delta H_{thermal} \\times R_{press}$, where $\\Delta H_{thermal}$ is the total hours logged by the Hour-Run Counter tagged as thermal-downtime and $R_{press}$ is the revenue per press hour. This cost is traded against the reduced Cost of Downtime ($CD$) due to failure prevention ($CD_{failure} > OC$ for typical cycles).\n        *   **Energy Impact:** Energy consumption drops to near-zero (standby losses only) during $T_{off}$. The bill notes that while energy cost is saved, the thermal mass of the system is utilized for passive cooling, avoiding the need for active external cooling energy expenditure.\n\nMeasures Relied Upon:\n*   **Manifold Thermometer:** Provides the real-time feedback signal ($T_m$) for the temperature limit and cool-down status. This is the primary input for the trigger condition ($T_m >= T_{Cutoff}$) and the resume condition ($T_m <= T_{Cool}$).\n*   **Pump Motor Ammeter:** Used to verify the pump is actually de-energized ($I_p \\approx 0A$) during the cool-down phase. The value $I_{off}$ is derived from the existing ammeter reading; if $I_p > I_{threshold}$ (e.g., 10% of rated current) while the logic dictates off, a fault is flagged. This ensures the interlock is effective.\n*   **Hour-Run Counter:** Used to log the duration of the thermal pauses. The duration $\\Delta H_{thermal}$ is derived from the difference in counter values between the start of the thermal event ($H_{start}$) and the end ($H_{end}$), i.e., $\\Delta H_{thermal} = H_{end} - H_{start}$. This is used for maintenance trend analysis and pricing the operational availability cost.\n\n**Why this works:**\nThe pressure fall-off at the end of the stroke in a hot system is typically due to oil viscosity dropping significantly, which increases internal leakage past the pump vanes and seals. By forcing a thermal break before the viscosity drops below the critical threshold, the pump maintains adequate sealing and pressure delivery. The use of the ammeter ensures the pump is truly off, and the hour-counter provides data to adjust the `T_Cutoff` if necessary and to quantify the availability cost. No new hardware is installed.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Sensors/Inputs:** Manifold Thermometer ($T_m$); Pump Motor Ammeter ($I_p$); Hour-Run",
+   "*   **Control Logic:** PLC program update to implement interlock based on $T_m$.",
+   "*   **Operational Cost Pricing:**",
+   "*   **Throughput/Availability Impact:** The duty cycle $D$ is modulated such that $D = \\fr",
+   "*   **Energy Impact:** Energy consumption drops to near-zero (standby losses only) during ",
+   "*   **Manifold Thermometer:** Provides the real-time feedback signal ($T_m$) for the tempe",
+   "*   **Pump Motor Ammeter:** Used to verify the pump is actually de-energized ($I_p \\approx",
+   "*   **Hour-Run Counter:** Used to log the duration of the thermal pauses. The duration $\\D"
+  ]
+ },
+ "wall_clock_s": 19.56,
+ "status": "DELIVERED_REVIEWED"
 }

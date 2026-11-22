@@ -6,10 +6,70 @@
   {
    "leg": "author",
    "attempts": 1,
-   "typed_fail": "RouteRefused: [rate_limited] agnes: HTTP 429: {\"error\":{\"code\":\"\",\"message\":\"You’ve reached the API rate limit for free users. Upgrade to a Token Plan to "
+   "latency_s": 8.3,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 693,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.99,
+   "usage": {
+    "prompt_tokens": 1029,
+    "completion_tokens": 1184,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal**\\n\\n**Mechanism**\\nImplement a closed-loop \\\"Speci",
+   "schema_parsed_first_try": true
   }
  ],
  "parse_retries": 0,
- "wall_clock_s": 0.07,
- "status": "TYPED_CALL_FAIL"
+ "authored_bill": "**Mitigation Proposal**\n\n**Mechanism**\nImplement a closed-loop \"Specific Power\" (kW/t) control strategy that dynamically adjusts the crusher’s discharge opening (gap) based on real-time energy consumption per unit mass. Since the problem is coarsening product and high specific power, the liner is likely worn, increasing the chamber volume and allowing larger particles to exit or causing inefficient crushing. By monitoring the ratio of motor power to total throughput (feed + discharge), the system can detect when the specific power rises (indicating inefficiency or coarse product) and automatically reduces the discharge gap to force a finer break, thereby lowering the specific power back to target levels.\n\n**Implementation**\n1.  **Calculate Real-Time Specific Power ($SP$):**\n    *   Continuously sample the crusher motor power meter ($P_{motor}$, in kW) and the discharge-belt scale mass flow rate ($\\dot{m}_{out}$, in t/h).\n    *   Compute $SP = P_{motor} / \\dot{m}_{out}$ (kW/t). Note: While feed rate is available, discharge mass is the most direct indicator of current production efficiency for specific power calculations. Alternatively, use average throughput if instantaneous discharge variability is high, but $\\dot{m}_{out}$ is preferred for direct response to product size changes.\n2.  **Define Control Limits:**\n    *   Establish a target Specific Power range ($SP_{min}$ to $SP_{max}$) based on historical data from the last liner change when performance was optimal. A rising $SP$ above this range indicates coarsening or liner wear.\n3.  **Automatic Gap Adjustment Logic:**\n    *   If $SP > SP_{threshold}$ (high specific power, coarse product), the controller issues a command to the crusher’s gap control system (which exists as standard equipment) to *reduce* the discharge gap (narrow the opening). This increases the crushing intensity, reducing product coarseness and lowering specific power.\n    *   If $SP < SP_{min}$ (over-crushing, excessive power per tonne is low but energy input may be inefficient or throughput too high for optimal size), the controller may *increase* the gap slightly to improve throughput efficiency, though the primary focus here is correcting coarsening.\n    *   Use the feed-rate scale only for validation or to modulate the control aggressiveness (e.g., slower adjustments during high feed rates to avoid instability).\n\n**Measures It Relies On**\n*   **Crusher Motor Power Meter:** Provides real-time $P_{motor}$ to calculate specific power.\n*   **Discharge-Belt Scale:** Provides real-time $\\dot{m}_{out}$, enabling the calculation of $SP$ and detecting throughput changes.\n*   **Feed-Rate Scale:** Used for contextual monitoring and to ensure control actions are proportionate to feed conditions (e.g., preventing gap closure if feed is too high, which could cause overload).\n*   **Existing Gap Control System:** The cone crusher must have an existing electro-hydraulic or mechanical gap adjustment actuator and position feedback sensor (standard on all modern cone crushers) to execute the automated narrowing of the discharge opening. No new sensors are added; only the control logic is changed to use the existing power and mass flow data to drive the gap controller.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism**\nImplement a closed-loop \"Specific Power\" (kW/t) control strategy that dynamically adjusts the crusher’s discharge opening (gap) based on real-time energy consumption per unit mass. Since the problem is coarsening product and high specific power, the liner is likely worn, increasing the chamber volume and allowing larger particles to exit or causing inefficient crushing. By monitoring the ratio of motor power to throughput, the system can detect when the specific power rises and automatically adjust the discharge gap.\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** The calculated Specific Power ($SP$).\n*   **Direction of Effect:** A rising $SP$ (indicating coarsening product and liner wear/inefficiency) triggers a command to **decrease** (narrow) the discharge gap. This forces a finer break, reducing the size of escaping particles. The reduction in discharge particle size increases resistance to crushing, which stabilizes the motor load and lowers the specific energy required per tonne back toward the target baseline. Conversely, if $SP$ drops below the target range (indicating over-crushing or excessive gap), the gap is **increased** to restore optimal throughput efficiency.\n\n**Implementation**\n1.  **Calculate Real-Time Specific Power ($SP$):**\n    *   Continuously sample the crusher motor power meter ($P_{motor}$, in kW).\n    *   Determine the throughput mass flow rate. To derive a stable $SP$ value suitable for control logic, calculate the average throughput ($\\dot{m}_{avg}$) as the arithmetic mean of the feed-rate scale mass flow rate ($\\dot{m}_{feed}$) and the discharge-belt scale mass flow rate ($\\dot{m}_{out}$): $\\dot{m}_{avg} = (\\dot{m}_{feed} + \\dot{m}_{out}) / 2$.\n    *   Compute $SP = P_{motor} / \\dot{m}_{avg}$ (kW/t). Using the average accounts for inventory build-up within the crusher chamber, providing a more stable indicator of current efficiency than instantaneous discharge alone.\n2.  **Define Control Limits:**\n    *   Establish a target Specific Power range ($SP_{min}$ to $SP_{max}$) based on historical data from the last liner change when performance was optimal.\n3.  **Automatic Gap Adjustment Logic:**\n    *   If $SP > SP_{max}$ (high specific power, indicating coarse product/inefficiency), the controller issues a command to the crusher’s existing gap control system to **reduce** the discharge gap. This increases crushing intensity, reducing product coarseness and lowering specific power.\n    *   If $SP < SP_{min}$ (low specific power, indicating potential over-crushing or inefficient energy use due to wide gap), the controller may **increase** the gap slightly to improve throughput efficiency.\n    *   **Safety/Validation Logic:** Use the feed-rate scale ($\\dot{m}_{feed}$) as a conditional input. If $\\dot{m}_{feed}$ exceeds a predefined overload threshold, the controller suspends any gap-closing actions (reductions) to prevent motor overload, allowing only gap-opening actions or holding the current setpoint until feed rate stabilizes.\n\n**IMPLEMENTATION BILL**\n*   **Sensor 1:** Existing Crusher Motor Power Meter. \n    *   *Signal:* Real-time electrical power consumption ($P_{motor}$ in kW).\n    *   *Use:* Numerator in Specific Power calculation.\n*   **Sensor 2:** Existing Feed-Rate Scale.\n    *   *Signal:* Real-time mass flow rate of incoming material ($\\dot{m}_{feed}$ in t/h).\n    *   *Use:* Term 1 in average throughput calculation ($\\dot{m}_{avg}$) and conditional safety check for overload.\n*   **Sensor 3:** Existing Discharge-Belt Scale.\n    *   *Signal:* Real-time mass flow rate of crushed product ($\\dot{m}_{out}$ in t/h).\n    *   *Use:* Term 2 in average throughput calculation ($\\dot{m}_{avg}$).\n*   **Actuator 1:** Existing Electro-Hydraulic or Mechanical Gap Adjustment Actuator.\n    *   *Signal:* Command voltage/current from the new logic module.\n    *   *Use:* Executes the physical narrowing or widening of the discharge opening.\n*   **Feedback 1:** Existing Gap Position Sensor.\n    *   *Signal:* Real-time gap position (mm).\n    *   *Use:* Closed-loop verification that the gap has moved to the commanded setpoint; prevents actuator hunting.\n\n**Measures It Relies On**\n*   **Crusher Motor Power Meter:** Provides $P_{motor}$.\n*   **Feed-Rate Scale:** Provides $\\dot{m}_{feed}$.\n*   **Discharge-Belt Scale:** Provides $\\dot{m}_{out}$.\n*   **Derivation:** $\\dot{m}_{avg} = (\\dot{m}_{feed} + \\dot{m}_{out}) / 2$; $SP = P_{motor} / \\dot{m}_{avg}$.\n*   **Existing Gap Control System:** Relies on the standard actuator and position feedback sensor already installed on the cone crusher to execute and verify gap movements. No new instrumentation is added; the logic leverages existing signals to drive the existing actuator.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Sensor 1:** Existing Crusher Motor Power Meter.",
+   "*   *Signal:* Real-time electrical power consumption ($P_{motor}$ in kW).",
+   "*   *Use:* Numerator in Specific Power calculation.",
+   "*   **Sensor 2:** Existing Feed-Rate Scale.",
+   "*   *Signal:* Real-time mass flow rate of incoming material ($\\dot{m}_{feed}$ in t/h).",
+   "*   *Use:* Term 1 in average throughput calculation ($\\dot{m}_{avg}$) and conditional safe",
+   "*   **Sensor 3:** Existing Discharge-Belt Scale.",
+   "*   *Signal:* Real-time mass flow rate of crushed product ($\\dot{m}_{out}$ in t/h).",
+   "*   *Use:* Term 2 in average throughput calculation ($\\dot{m}_{avg}$).",
+   "*   **Actuator 1:** Existing Electro-Hydraulic or Mechanical Gap Adjustment Actuator.",
+   "*   *Signal:* Command voltage/current from the new logic module.",
+   "*   *Use:* Executes the physical narrowing or widening of the discharge opening.",
+   "*   **Feedback 1:** Existing Gap Position Sensor.",
+   "*   *Signal:* Real-time gap position (mm).",
+   "*   *Use:* Closed-loop verification that the gap has moved to the commanded setpoint; prev",
+   "*   **Crusher Motor Power Meter:** Provides $P_{motor}$.",
+   "*   **Feed-Rate Scale:** Provides $\\dot{m}_{feed}$.",
+   "*   **Discharge-Belt Scale:** Provides $\\dot{m}_{out}$.",
+   "*   **Derivation:** $\\dot{m}_{avg} = (\\dot{m}_{feed} + \\dot{m}_{out}) / 2$; $SP = P_{motor",
+   "*   **Existing Gap Control System:** Relies on the standard actuator and position feedback"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 22.31,
+ "status": "DELIVERED_REVIEWED"
 }

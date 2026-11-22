@@ -6,10 +6,62 @@
   {
    "leg": "author",
    "attempts": 1,
-   "typed_fail": "RouteRefused: [rate_limited] agnes: HTTP 429: {\"error\":{\"code\":\"\",\"message\":\"You’ve reached the API rate limit for free users. Upgrade to a Token Plan to "
+   "latency_s": 8.24,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 723,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 7.16,
+   "usage": {
+    "prompt_tokens": 1086,
+    "completion_tokens": 1454,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal**\\n\\n**Direction-of-Effect Statement:**\\n*   **Driv",
+   "schema_parsed_first_try": true
   }
  ],
  "parse_retries": 0,
- "wall_clock_s": 0.08,
- "status": "TYPED_CALL_FAIL"
+ "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a **Pressure-Loss-Driven Regeneration Logic** that replaces the current time-based regeneration schedule with a pressure drop threshold trigger, coupled with a **Service Flow-Modulated Salt Dose Rate**. This addresses the premature breakthrough (by optimizing regeneration timing) and rising salt consumption (by preventing unnecessary regenerations and optimizing salt usage per cycle).\n\n**Implementation:**\n1.  **Regeneration Trigger:** Configure the controller to monitor the differential pressure (ΔP) across the resin bed using the existing **inlet pressure transmitter** and an inferred outlet pressure (or total system pressure differential if a reference point is available; if only one absolute pressure transmitter is present at the inlet, use its trend relative to a baseline service flow). When ΔP exceeds a predefined threshold (indicating resin fouling or bed settling that accelerates breakthrough), initiate regeneration immediately. This prevents \"cooking\" the resin at the end of its cycle where hardness breakthrough occurs.\n2.  **Adaptive Salt Dosing:** During the regeneration phase, adjust the salt brine flow rate (via the existing **regeneration flow meter**) based on the preceding service flow history. Use the **service flow meter** data from the previous cycle to calculate the actual ion exchange load. Increase brine flow duration or concentration if the service flow was high (indicating higher resin loading), and decrease it if flow was low. This stops \"over-softening\" (wasting salt) when the resin is not fully loaded.\n3.  **Baseline Recalibration:** Use the existing **inlet pressure transmitter** trend at a standardized low-flow test interval to recalibrate the fouling threshold, distinguishing between mechanical fouling (which may require backwash, not salt) and ion exchange exhaustion (which requires regeneration). If pressure remains stable but breakthrough occurs, it indicates resin exhaustion; if pressure spikes, it indicates fouling. Only apply salt regeneration when the pressure trend is stable/low but the cycle time is reaching the *original* maximum limit, or when a specific breakthrough proxy (e.g., flow vs. time curve deviation) is inferred from the service flow meter's consistency against a reference curve.\n\n**Measures Relied On:**\n*   **Inlet Pressure Transmitter:** Used to detect mechanical fouling vs. ion exchange exhaustion and to establish a stable hydraulic baseline for resin integrity. A rising pressure at constant flow indicates bed compaction/fouling, which can cause premature breakthrough not fully remedied by salt alone; this differentiates the cause of the failure.\n*   **Service Flow Meter:** Provides the quantitative load on the resin. By logging cumulative service volume per cycle, the system can determine when the resin is actually exhausted vs. when it is merely old. High service flow with early breakthrough indicates the resin capacity is being exceeded, requiring *more* salt; low service flow with early breakthrough indicates the resin is degraded or the brine efficiency is poor, requiring *less* salt but better contact time.\n*   **Regeneration Flow Meter:** Ensures precise control of brine quantity and flow rate. It prevents over-feeding of salt (which increases cost) by verifying that the brine delivery matches the calculated requirement based on the service flow load, rather than a fixed, conservative volume.\n\nThis approach leverages the existing flow and pressure data to shift from a fixed-time, fixed-salt protocol to a demand-based, condition-triggered protocol, directly targeting the symptoms of rising salt use and early breakthrough without new hardware.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal**\n\n**Direction-of-Effect Statement:**\n*   **Driving Variable:** The ratio of cumulative service volume (derived from Service Flow Meter) to the baseline resin exchange capacity (derived from inlet pressure trend stability), denoted as Load Factor (LF).\n*   **Mechanism Action:** The controller increases the Regeneration Flow Meter setpoint (brine flow rate and duration) linearly with LF when LF > 1.0, and triggers regeneration immediately when LF >= 1.0 or when Inlet Pressure exceeds Threshold (P_thresh).\n*   **Direction:** An increase in service load (higher flow or shorter time between regenerations) increases salt consumption rate (regeneration flow) to prevent breakthrough. An increase in inlet pressure indicates fouling, which triggers a backwash instead of salt regeneration, thereby *decreasing* salt usage by avoiding unnecessary chemical cycles.\n\n**Mechanism:**\nImplement a **Load-Factor-Driven Regeneration Logic** that replaces the current time-based regeneration schedule with a dual-trigger system: (1) Ion-Exchange Load Trigger and (2) Fouling Prevention Trigger. This addresses premature breakthrough by matching salt dose to actual resin loading (removing conservative over-dosing) and reduces unnecessary salt use by distinguishing between chemical exhaustion and mechanical fouling.\n\n**Implementation:**\n1.  **Regeneration Trigger (Load-Based):** Configure the controller to calculate the **Load Factor (LF)** for each cycle. LF is defined as the Ratio of Actual Service Volume ($V_{act}$) to Baseline Service Volume ($V_{base}$). $V_{act}$ is the integral of the **Service Flow Meter** reading over the cycle duration. $V_{base}$ is a static constant representing the resin’s nominal exchange capacity under standard conditions. If $LF \\ge 1.0$, initiate regeneration. This ensures regeneration occurs only when the resin is chemically exhausted, preventing early breakthrough due to conservative time-based limits.\n2.  **Fouling Interlock (Pressure-Based):** Monitor the **Inlet Pressure Transmitter** continuously. Establish a baseline pressure $P_{base}$ at the current Service Flow using the pressure transmitter's trend during steady-state operation. Calculate $\\Delta P = P_{inlet} - P_{base}$. If $\\Delta P$ exceeds a threshold $P_{thresh}$ (indicating bed compaction or fouling), initiate a backwash cycle (hydraulic flush) *instead* of a salt regeneration. Salt regeneration is only executed if the load trigger is met *and* the pressure condition is not met. This prevents wasting salt on fouled resin.\n3.  **Adaptive Salt Dosing (Load-Modulated):** During the regeneration phase, adjust the brine delivery duration and flow rate using the **Regeneration Flow Meter**. The target brine volume ($V_{brine}$) is calculated as: $V_{brine} = k_{salt} \\times LF$, where $k_{salt}$ is a calibrated conversion factor (grams of salt per unit exchange capacity). The **Regeneration Flow Meter** controls the flow rate to ensure $V_{brine}$ is delivered within the standard contact time window. Higher LF (higher previous service load) increases brine volume; lower LF decreases it. This eliminates the \"over-softening\" waste seen in fixed-volume protocols.\n4.  **Baseline Recalibration:** At the start of each regeneration, use the **Service Flow Meter** to verify that the flow stabilizes to a known reference level for 60 seconds to establish the current hydraulic baseline for $P_{base}$ via the **Inlet Pressure Transmitter**. This ensures the pressure threshold remains accurate despite minor system variations.\n\n**Implementation Bill:**\n\n| Component | Action | Operational Cost Impact |\n| :--- | :--- | :--- |\n| **Controller Logic** | Update PLC/SCADA ladder logic to replace time-based timer with Load Factor calculation ($V_{act}/V_{base}$) and Pressure Interlock. | **Low.** No hardware cost. Development time only. |\n| **Service Flow Meter** | Read integral of flow rate over cycle duration to derive $V_{act}$. | **Zero.** Existing sensor; no additional energy or throughput cost. |\n| **Inlet Pressure Transmitter** | Read real-time pressure to derive $\\Delta P$ against dynamic $P_{base}$. | **Zero.** Existing sensor; no additional energy or throughput cost. |\n| **Regeneration Flow Meter** | Modulate brine pump VFD or valve opening to match calculated $V_{brine}$. | **Neutral to Positive.** Variable brine volume may reduce total salt cost. Pump energy varies with flow rate but is negligible compared to chemical savings. Availability impact: None, as regeneration duration is dynamically optimized rather than fixed, potentially shortening downtime per cycle. |\n| **Backwash Logic** | Insert backwash step if $\\Delta P > P_{thresh}$. | **Low.** Uses existing service water. Reduces salt waste by ~15-25% in fouled scenarios (estimated operational saving). |\n\n**Measures Relied On (Derivation Logic):**\n*   **$V_{act}$ (Actual Service Volume):** Derived from **Service Flow Meter** by integrating flow rate ($Q_{service}$) over the cycle time ($t_{cycle}$): $V_{act} = \\int_{0}^{t_{cycle}} Q_{service} \\, dt$.\n*   **$P_{base}$ (Baseline Pressure):** Derived from **Inlet Pressure Transmitter** reading at a stabilized standard service flow condition. If absolute pressure is not available as a reference, $P_{base}$ is the rolling average of the inlet pressure transmitter output during the last 10 minutes of stable service flow.\n*   **$\\Delta P$ (Differential Pressure Proxy):** Derived as $P_{inlet} - P_{base}$. This approximates the bed pressure drop trend without a dedicated outlet transmitter, relying on the fact that at constant flow, a stable bed has stable inlet pressure. A rising inlet pressure at constant flow indicates increased bed resistance (fouling).\n*   **$V_{brine}$ (Required Brine Volume):** Derived from $V_{act}$ and calibration constant $k_{salt}$: $V_{brine} = k_{salt} \\times V_{act}$. The **Regeneration Flow Meter** measures the actual delivered volume to verify this target is met.\n*   **Load Factor (LF):** Derived ratio $V_{act} / V_{base}$. Used as the primary trigger for regeneration timing.\n\nThis approach leverages existing flow and pressure data to shift from a fixed-time, fixed-salt protocol to a demand-based, condition-triggered protocol, directly targeting the symptoms of rising salt use and early breakthrough without new hardware.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **$V_{act}$ (Actual Service Volume):** Derived from **Service Flow Meter** by integrat",
+   "*   **$P_{base}$ (Baseline Pressure):** Derived from **Inlet Pressure Transmitter** readin",
+   "*   **$\\Delta P$ (Differential Pressure Proxy):** Derived as $P_{inlet} - P_{base}$. This ",
+   "*   **$V_{brine}$ (Required Brine Volume):** Derived from $V_{act}$ and calibration consta",
+   "*   **Load Factor (LF):** Derived ratio $V_{act} / V_{base}$. Used as the primary trigger "
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 's the primary trigger' shares no allowed-list stem (Use only existing sensors and existing measurements: the service and regeneratio...)"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 23.42,
+ "status": "DELIVERED_REVIEWED"
 }

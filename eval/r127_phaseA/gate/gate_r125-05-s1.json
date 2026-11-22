@@ -6,10 +6,57 @@
   {
    "leg": "author",
    "attempts": 1,
-   "typed_fail": "RouteRefused: [rate_limited] agnes: HTTP 429: {\"error\":{\"code\":\"\",\"message\":\"You’ve reached the API rate limit for free users. Upgrade to a Token Plan to "
+   "latency_s": 3.64,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 634,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 6.42,
+   "usage": {
+    "prompt_tokens": 972,
+    "completion_tokens": 1273,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Fineness Control via Differential Pres",
+   "schema_parsed_first_try": true
   }
  ],
  "parse_retries": 0,
- "wall_clock_s": 0.08,
- "status": "TYPED_CALL_FAIL"
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Fineness Control via Differential Pressure and Throughput Ratio**\n\n**Mechanism**\nThe mitigation implements a virtual sensor algorithm that uses the existing mill differential pressure ($\\Delta P$) and mill-feed rate ($F$) to estimate the current particle fineness (Blaine specific surface area). The flattened pressure signature indicates a loss of grinding resistance due to an excessively coarse particle population inside the mill. By monitoring the ratio of $\\Delta P$ to $F$, the control system can detect when the specific pressure (grinding intensity per unit mass) drops below a calibrated threshold, indicating that the material is passing through without sufficient comminution. The system then automatically reduces the mill-feed rate to restore the required residence time and grinding intensity, thereby recovering the specific surface area without requiring new instrumentation.\n\n**Implementation**\n1.  **Baseline Calibration:** Establish a lookup table or linear model correlating the ratio $R = \\Delta P / F$ to target specific surface areas for various material mixes, using historical data from existing sensors.\n2.  **Real-Time Monitoring:** The control system continuously calculates $R$. It also monitors the bucket-elevator ammeter ($I_{BE}$) as a secondary cross-check; if $R$ indicates coarseness but $I_{BE}$ shows high load (suggesting a blockage or overload rather than fineness loss), the alarm logic prioritizes safety over feed reduction.\n3.  **Automatic Feed Trimming:** If $R$ falls below the target setpoint $R_{target}$ (indicating flatter pressure than expected for the current feed rate, hence coarser grind), the controller issues a step-down command to the mill-feed rate meter. The feed is reduced in small increments (e.g., 2-5%) to allow the mill internal pressure to rebuild.\n4.  **Hysteresis and Stabilization:** To prevent oscillation, the control loop includes a hold period. Feed rate only increases again when $R$ has been maintained above $R_{target}$ for a defined duration (e.g., 10-15 minutes), ensuring the specific surface area is stable.\n\n**Measures It Relies On**\n*   **Mill Differential Pressure Transmitter:** Provides the primary signal for grinding intensity. A flattened signature directly correlates with lower $\\Delta P$ for a given feed rate, which is the core detection mechanism for the fineness drift.\n*   **Mill-Feed Rate Meter:** Provides the normalization factor ($F$). Without dividing $\\Delta P$ by $F$, it would be impossible to distinguish between a flattened pressure signature caused by coarseness and one caused by a lower total throughput. This ratio isolates the *specific* grinding energy.\n*   **Bucket-Elevator Ammeter:** Serves as a validation metric. It confirms that the material is actually moving through the system (preventing false positives from blocked feeders which might also lower $\\Delta P$). It ensures that any change in $\\Delta P$ is due to particle dynamics and not mechanical blockages.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Fineness Control via Differential Pressure and Throughput Ratio**\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** The mill-feed rate ($F$) is the primary driving variable manipulated by the control loop. \n*   **Mechanism Direction:** The system detects a drop in the specific grinding intensity ratio $R = \\Delta P / F$. A decrease in $R$ indicates that for a given feed rate, the differential pressure $\\Delta P$ is lower than expected, which physically corresponds to a coarser particle population (reduced inter-particle friction and grinding resistance).\n*   **Control Action Direction:** Upon detecting $R < R_{target}$, the controller executes a **decrease** in the mill-feed rate ($F$). This reduction in $F$ increases the residence time and material density in the grinding zone, thereby increasing the differential pressure ($\\Delta P$) more than the feed rate decreases, effectively restoring the ratio $R$ to the target setpoint and recovering the target specific surface area (fineness).\n\n**Mechanism**\nThe mitigation implements a virtual sensor algorithm that uses the existing mill differential pressure ($\\Delta P$) and mill-feed rate ($F$) to estimate the current particle fineness. The flattened pressure signature indicates a loss of grinding resistance due to an excessively coarse particle population inside the mill. By monitoring the ratio of $\\Delta P$ to $F$, the control system can detect when the specific pressure (grinding intensity per unit mass) drops below a calibrated threshold, indicating that the material is passing through without sufficient comminution. The system then automatically reduces the mill-feed rate to restore the required residence time and grinding intensity, thereby recovering the specific surface area without requiring new instrumentation.\n\n**Implementation**\n1.  **Baseline Calibration:** Establish a lookup table or linear model correlating the ratio $R = \\Delta P / F$ to target specific surface areas for various material mixes, using historical data from existing sensors.\n2.  **Real-Time Monitoring:** The control system continuously calculates $R$. It also monitors the bucket-elevator ammeter ($I_{BE}$) as a secondary cross-check; if $R$ indicates coarseness but $I_{BE}$ shows high load (suggesting a blockage or overload rather than fineness loss), the alarm logic prioritizes safety over feed reduction.\n3.  **Automatic Feed Trimming:** If $R$ falls below the target setpoint $R_{target}$ (indicating flatter pressure than expected for the current feed rate, hence coarser grind), the controller issues a step-down command to the mill-feed rate actuator. The feed is reduced in small increments (e.g., 2-5%) to allow the mill internal pressure to rebuild.\n4.  **Hysteresis and Stabilization:** To prevent oscillation, the control loop includes a hold period. Feed rate only increases again when $R$ has been maintained above $R_{target}$ for a defined duration (e.g., 10-15 minutes), ensuring the specific surface area is stable.\n\n**Input Signal Derivation and Permitted Sensors**\n*   **$\\Delta P$ (Mill Differential Pressure):** Derived directly from the **mill differential pressure transmitter** (Permitted Sensor).\n*   **$F$ (Mill Feed Rate):** Derived directly from the **mill-feed rate meter** (Permitted Sensor). *Correction Note: The original proposal listed 'mill-feed rate meter' as a signal source, but a meter measures $F$. The control action (feed trimming) requires a setpoint signal for the feed actuator. Since the constraint allows 'existing sensors and measurements', the 'mill-feed rate meter' provides the measured value $F_{measured}$. The control system compares $F_{measured}$ against a setpoint $F_{sp}$ to determine the trim amount. The proposal's step 3 mentions 'command to the mill-feed rate meter', which is physically inaccurate; meters do not accept commands. The corrected logic is: The controller calculates a new setpoint $F_{sp}$ and sends this to the existing variable speed drive or gate controller associated with the mill feed. The 'mill-feed rate meter' continues to provide the feedback signal $F_{measured}$ for the loop.*\n*   **$I_{BE}$ (Bucket-Elevator Current):** Derived directly from the **bucket-elevator ammeter** (Permitted Sensor).\n*   **$R$ (Grinding Intensity Ratio):** Derived from the formula $R = \\Delta P / F$, where $\\Delta P$ is from the mill differential pressure transmitter and $F$ is from the mill-feed rate meter.\n\n**Implementation Bill**\n1.  **Software/Logic Update:** Configure the DCS/PLC program to calculate the ratio $R = \\Delta P / F$.\n2.  **Setpoint Definition:** Define $R_{target}$ based on historical calibration data for the specific cement mix.\n3.  **Control Loop Configuration:** Implement the feed rate control loop with the following parameters:\n    *   Input: $R_{measured}$ and $I_{BE}$.\n    *   Logic: If $R_{measured} < R_{target}$ AND $I_{BE} < I_{BE,limit}$, calculate $\\Delta F = -k \\cdot (R_{target} - R_{measured})$ and update $F_{sp} = F_{sp,previous} + \\Delta F$ (with $\\Delta F < 0$ for feed reduction).\n    *   Safety Interlock: If $I_{BE} > I_{BE,alarm}$, disable automatic feed reduction and trigger maintenance alarm.\n4.  **Hysteresis Timer:** Implement a 10-15 minute timer that must elapse with $R_{measured} > R_{target}$ before allowing $F_{sp}$ to increase back toward nominal throughput.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Software/Logic Update:** Configure the DCS/PLC program to calculate the ratio $R = \\",
+   "2.  **Setpoint Definition:** Define $R_{target}$ based on historical calibration data for ",
+   "3.  **Control Loop Configuration:** Implement the feed rate control loop with the followin",
+   "*   Input: $R_{measured}$ and $I_{BE}$.",
+   "*   Logic: If $R_{measured} < R_{target}$ AND $I_{BE} < I_{BE,limit}$, calculate $\\Delta F",
+   "*   Safety Interlock: If $I_{BE} > I_{BE,alarm}$, disable automatic feed reduction and tri",
+   "4.  **Hysteresis Timer:** Implement a 10-15 minute timer that must elapse with $R_{measure"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 18.08,
+ "status": "DELIVERED_REVIEWED"
 }

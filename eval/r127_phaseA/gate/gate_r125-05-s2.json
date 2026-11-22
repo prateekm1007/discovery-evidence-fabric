@@ -6,10 +6,74 @@
   {
    "leg": "author",
    "attempts": 1,
-   "typed_fail": "RouteRefused: [rate_limited] agnes: HTTP 429: {\"error\":{\"code\":\"\",\"message\":\"You’ve reached the API rate limit for free users. Upgrade to a Token Plan to "
+   "latency_s": 7.35,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 578,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 2.76,
+   "usage": {
+    "prompt_tokens": 916,
+    "completion_tokens": 924,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n\"corrected_proposal\": \"Mitigation Proposal: Closed-Loop Mill Load Regulation via Differential Pres",
+   "schema_parsed_first_try": true
   }
  ],
  "parse_retries": 0,
- "wall_clock_s": 0.09,
- "status": "TYPED_CALL_FAIL"
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Mill Load Regulation via Differential Pressure Optimization**\n\n**Mechanism**\nThe flattening of the mill internal pressure signature (differential pressure, $\\Delta P$) indicates that the internal load of the grinding media and cement powder has decreased, resulting in reduced interparticle collision energy and inefficient size reduction. By artificially increasing the feed rate to restore the internal void fraction and bulk density to the historical \"peak\" $\\Delta P$ setpoint, the grinding intensity is increased. This allows the operator to increase mill throughput (restoring production capacity) while simultaneously improving fineness (raising specific surface area), effectively counteracting the \"flattened\" pressure trend.\n\n**Implementation**\n1.  **Establish Baseline:** Map the current relationship between **Mill-Feed Rate Meter** (signal $F$) and **Mill Differential Pressure Transmitter** (signal $\\Delta P$). Identify the historical $\\Delta P$ value ($\\Delta P_{target}$) associated with optimal specific surface and stable throughput during the peak performance phase of the campaign.\n2.  **Active Load Management:** Increase the **Mill-Feed Rate Meter** setpoint in incremental steps. Do not rely on fixed feed rates; instead, use the **Mill Differential Pressure Transmitter** as the process variable for control.\n3.  **Constraint Check:** Monitor the **Bucket-Elevator Ammeter** current ($I_{BE}$). The bucket elevator acts as a secondary indicator of downstream flow stability and load. If $I_{BE}$ remains within its nominal operating band while $\\Delta P$ rises toward $\\Delta P_{target}$, the system is safely absorbing the increased load.\n4.  **Feedback Loop:** Continue increasing feed rate until the **Mill Differential Pressure Transmitter** reading reaches $\\Delta P_{target}$. At this point, the internal packing density is restored, which increases the grinding efficiency.\n5.  **Throughput Restoration:** With $\\Delta P$ stabilized at the target, the mill is operating at higher load. Gradually release the throughput trim to restore nominal production rates, monitoring that $\\Delta P$ does not dip below a \"critical low\" threshold, which would indicate over-filling or loss of grinding efficiency.\n\n**Measures Relied Upon**\n*   **Mill Differential Pressure Transmitter:** Used as the primary control variable to detect the \"flattened\" signature (low load) and guide feed adjustment to restore optimal internal density.\n*   **Mill-Feed Rate Meter:** Used as the manipulated variable to actively increase the load on the mill and boost throughput.\n*   **Bucket-Elevator Ammeter:** Used as a safety and confirmation measure to ensure that the downstream transport system can handle the increased material flow without overload, verifying that the increased feed rate is sustainable across the entire circuit.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "Mitigation Proposal: Closed-Loop Mill Load Regulation via Differential Pressure Optimization\n\nMechanism\nThe flattening of the mill internal pressure signature (differential pressure, ΔP) indicates that the internal load of the grinding media and cement powder has decreased, resulting in reduced interparticle collision energy and inefficient size reduction. By artificially increasing the feed rate to restore the internal void fraction and bulk density to the historical \"peak\" ΔP setpoint, the grinding intensity is increased. This allows the operator to increase mill throughput (restoring production capacity) while simultaneously improving fineness (raising specific surface area), effectively counteracting the \"flattened\" pressure trend.\n\nImplementation Bill\n1.  Establish Baseline:\n    -   Input Signal: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct measurement from the existing transmitter.\n    -   Input Signal: Mill-Feed Rate Meter reading (F). Derivation: Direct measurement from the existing rate meter.\n    -   Action: Map the current relationship between F and ΔP. Identify the historical ΔP value (ΔP_target) associated with optimal specific surface and stable throughput during the peak performance phase of the campaign.\n    -   Constraint Check: Verify that ΔP_target is within the safe operating range for the mill based on historical records.\n\n2.  Active Load Management:\n    -   Manipulated Variable: Mill-Feed Rate Meter setpoint (F_set). Derivation: Adjusted from the current F reading.\n    -   Process Variable: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct measurement from the existing transmitter.\n    -   Action: Increase the F_set in incremental steps. Do not rely on fixed feed rates; instead, use ΔP as the process variable for control.\n\n3.  Constraint Check:\n    -   Input Signal: Bucket-Elevator Ammeter current (I_BE). Derivation: Direct measurement from the existing ammeter.\n    -   Action: Monitor I_BE. The bucket elevator acts as a secondary indicator of downstream flow stability and load. If I_BE remains within its nominal operating band while ΔP rises toward ΔP_target, the system is safely absorbing the increased load. If I_BE exceeds the upper limit of its nominal band, halt feed increase.\n\n4.  Feedback Loop:\n    -   Input Signal: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct measurement from the existing transmitter.\n    -   Target Value: ΔP_target. Derivation: Identified in Step 1.\n    -   Action: Continue increasing feed rate (F_set) until the ΔP reading reaches ΔP_target. At this point, the internal packing density is restored, which increases the grinding efficiency.\n\n5.  Throughput Restoration:\n    -   Input Signal: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct measurement from the existing transmitter.\n    -   Target Value: ΔP_target. Derivation: Identified in Step 1.\n    -   Action: With ΔP stabilized at the target, the mill is operating at higher load. Gradually release the throughput trim to restore nominal production rates, monitoring that ΔP does not dip below a \"critical low\" threshold (derived from the lower limit of the stable operating band identified in Step 1), which would indicate over-filling or loss of grinding efficiency.\n\nDirection-Of-Effect Statement\nDriving Variable: Mill-Feed Rate (F).\nDirection of Effect: Increasing the Mill-Feed Rate (F) causes an increase in Mill Differential Pressure (ΔP). This increase in ΔP corresponds to an increase in internal mill load and grinding intensity, which leads to an improvement in Specific Surface Area (fineness) and allows for the restoration of Mill Throughput.\n\nMeasures Relied Upon\n*   Mill Differential Pressure Transmitter: Signal ΔP. Used as the primary control variable to detect the \"flattened\" signature (low load) and guide feed adjustment to restore optimal internal density.\n*   Mill-Feed Rate Meter: Signal F. Used as the manipulated variable to actively increase the load on the mill and boost throughput.\n*   Bucket-Elevator Ammeter: Signal I_BE. Used as a safety and confirmation measure to ensure that the downstream transport system can handle the increased material flow without overload, verifying that the increased feed rate is sustainable across the entire circuit.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  Establish Baseline:",
+   "-   Input Signal: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct ",
+   "-   Input Signal: Mill-Feed Rate Meter reading (F). Derivation: Direct measurement from th",
+   "-   Action: Map the current relationship between F and ΔP. Identify the historical ΔP valu",
+   "-   Constraint Check: Verify that ΔP_target is within the safe operating range for the mil",
+   "2.  Active Load Management:",
+   "-   Manipulated Variable: Mill-Feed Rate Meter setpoint (F_set). Derivation: Adjusted from",
+   "-   Process Variable: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Dir",
+   "-   Action: Increase the F_set in incremental steps. Do not rely on fixed feed rates; inst",
+   "3.  Constraint Check:",
+   "-   Input Signal: Bucket-Elevator Ammeter current (I_BE). Derivation: Direct measurement f",
+   "-   Action: Monitor I_BE. The bucket elevator acts as a secondary indicator of downstream ",
+   "4.  Feedback Loop:",
+   "-   Input Signal: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct ",
+   "-   Target Value: ΔP_target. Derivation: Identified in Step 1.",
+   "-   Action: Continue increasing feed rate (F_set) until the ΔP reading reaches ΔP_target. ",
+   "5.  Throughput Restoration:",
+   "-   Input Signal: Mill Differential Pressure Transmitter reading (ΔP). Derivation: Direct ",
+   "-   Target Value: ΔP_target. Derivation: Identified in Step 1.",
+   "-   Action: With ΔP stabilized at the target, the mill is operating at higher load. Gradua"
+  ],
+  "APPARATUS_ROW": [
+   "-   Action: Monitor I_BE. The bucket elevator acts as a secondary indicator of downstream flow stability and l",
+   "-   Action: With ΔP stabilized at the target, the mill is operating at higher load. Gradually release the thro"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 18.13,
+ "status": "DELIVERED_REVIEWED"
 }
