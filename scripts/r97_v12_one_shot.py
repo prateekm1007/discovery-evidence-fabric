@@ -90,8 +90,6 @@ import r80_chemistry_equilibrium as r80chem  # noqa: E402  (the c-0107
 from discovery_fabric.engine import route_adapter  # noqa: E402
 from discovery_fabric.engine import engine_route  # noqa: E402
 from discovery_fabric.engine import tool_grounded_critic as tgc  # noqa: E402
-from discovery_fabric.engine.aide_tree_search import (  # noqa: E402
-    AideTreeSearch)
 
 OUT = REPO / "eval" / "holdout_v12_generation"
 GW_LOG = REPO / "ENGINE_RUNS" / "zai_gateway_calls.jsonl"
@@ -215,207 +213,120 @@ def load_v12_problems() -> tuple:
     return prereg, doc, probs, seal
 
 
-# ---------------------------------------------------------------------------
-# [c-0109] the tool-grounded correction point (TOOLS FIRST): runs on
-# every candidate BEFORE the frozen battery scores it.
-# ---------------------------------------------------------------------------
-def grounded_correct(final: str) -> tuple:
-    """The composed c-0109 correction: (1) the bill tagger — the
-    machine's own base_scan contract; (2) the computed-chemistry
-    corrector — the c-0107 engine's COMPUTED verdict drives the typed
-    direction-word rewrite. Returns (corrected_answer, record)."""
-    corrected, rec = tgc.tag_bill(final)
-    chem = r80chem.scan_computed_equilibrium_direction(corrected)
-    corrected, crec = tgc.correct_inverted_chemistry(corrected, chem)
-    rec.update(crec)
-    rec["chem_verdict"] = (chem or {}).get("computed_verdict")
-    return corrected, rec
-
-
 def machine_generate_v79(prob: dict, gw_key: str,
                          used_templates: Counter | None = None):
-    """The V7.9 challenger loop: the frozen V7.7 body byte-mirrored
-    with the two controller insertions ([c-0109] post-generation
-    correction + [c-0110] the tree-search controller). Every scan,
-    critic, contract, directive and transport byte is the frozen
-    module's own (imported, never re-declared). Delivery is the AIDE
-    semantics: the BEST LIVE NODE's candidate (the controller's own
-    close()/trajectory() selection, CI-tested), typed in the record."""
+    """The R121 successor shape (Art. 20 code-level retirement,
+    adjudication 74a18913a3e3): the autonomous repair loop, the AIDE
+    tree-search ceremony, and the tool-grounded rewrite point are
+    RETIRED from the live machine. What remains is the measured
+    working shape:
+
+        ONE bare authoring call -> the frozen bind CHECK layer
+        (every scan, byte-identical) -> the findings SURFACED in
+        final_meta (residual_findings + findings_disclosed) for a
+        bare reviewer to fix. NO autonomous repair, NO re-authoring,
+        NO tree search, NO candidate population.
+
+    The signature and the (final, attempts, final_meta) contract are
+    unchanged so instrument code that calls the machine stays honest;
+    attempts carries exactly ONE entry (the authored draft + its full
+    finding surface). The F31a evidence: the check layer is a proven
+    defect detector; the repair loop was net-zero (heals 4, breaks 4,
+    damage 0.286 > 0.25)."""
     qt = (prob.get("question_type") or "").lower()
     q = json.dumps(prob, ensure_ascii=False)
     contract = m77.contract_for_v72(qt)
-    attempts: list = []
-    node_answers: dict = {}
-    final, gen_meta = m77._retry_call(m77._gen_fb, q, contract, gw_key)
+    final, gen_meta = m77._retry_call(m77._gen_fb, q, contract,
+                                      gw_key)
     lat = gen_meta["latency_s"]
-    tries = 1
-    final_meta: dict = {}
-    rep = 0
-    # [c-0110] the per-row tree-search controller (budget = the frozen
-    # constant, MATCHED — it redirects the incumbent's own slots)
-    ctrl = AideTreeSearch(budget=m77.REPAIR_BUDGET, population=True,
-                          seed_key=prob.get("problem_id") or q)
-    while True:
-        # [c-0109] TOOLS FIRST: mechanically correct BEFORE scoring —
-        # the frozen battery judges the corrected bytes
-        final, crec = grounded_correct(final)
-        dc = None  # the typed direction-check verdict (interventions)
-        cr = m77._retry_call(m77.critic, final, prob)
-        tg = m77.gate_question_type(final, prob)
-        vio: dict = {}
-        vio.update(m77.base_scan(final))
-        vio.update(m77.scan_deliverable_class(final))
-        vio.update(m77.scan_stated_formula_direction(final))
-        vio.update(m77.scan_constraint_fit(prob, final))
-        if not qt.startswith("predictor"):
-            vio.update(m77.scan_catalog(prob, final))
-            sb = m77.scan_standard_bill(final, qt)
-            if sb:
-                vio.update(sb)
-            ol = m77.scan_operational_loss(final, qt)
-            if ol:
-                vio.update(ol)
-            cv = m77.scan_conversion(final, qt, prob)
-            if cv:
-                vio.update(cv)
-            vio.update(m77.scan_allowed_measures_class(prob, final))
-            vio.update(m77.scan_physics_direction(prob, final))
-            vio.update(m77.direction_lexicon_check(prob, final))
-            vio.update(m77.scan_input_availability(prob, final))
-            vio.update(m77.scan_duty_cycle_pricing(final))
-            vio.update(m77.scan_mechanism_template(final,
-                                                   used_templates))
-            dc = m77.direction_check_llm(prob, final, gw_key)
-            if dc["direction"] == "INVERTED":
-                vio["PHYSICS_DIRECTION_INVERTED"] = [
-                    f"the sign/integral check reads the mechanism "
-                    f"INVERTED: {dc.get('reason', '')[:160]}"]
-            elif dc["direction"] == "UNCLEAR":
-                vio["DIRECTION_UNPROVEN"] = [
-                    "the sign/integral check cannot judge the "
-                    "direction from the bill — state the governing "
-                    "relation and the sign the mechanism imposes"]
-            elif dc["direction"] == "DIRECTION_CHECK_UNAVAILABLE":
-                vio["DIRECTION_CHECK_UNAVAILABLE"] = [
-                    f"typed fail-open: {dc.get('reason', '')[:120]} "
-                    "(the authoritative read stays the auditor's)"]
-        else:
-            from r19_a1w_v4_contract import predictor_violations
-            pv = predictor_violations(final)
-            if pv:
-                vio.update({"PREDICTOR_VIOLATION": list(pv)})
-            vio.update(m77.scan_input_availability(prob, final))
-        findings = [f"{k}: {'; '.join(map(str, v))[:110]}"
-                    for k, v in vio.items() if v]
-        verdict_eff, f75_note = m77.effective_critic_verdict(
-            cr["verdict"], vio)
-        problems: list = []
-        if cr["verdict"] != "CLEAN":
-            problems += [c.get("anchor") for c in cr["checks"]
-                         if c.get("verdict") != "CLEAN"]
-        if tg["verdict"] == "MISMATCH":
-            problems.append(tg["reason"])
-        problems += findings
-        if not (final or "").strip():
-            problems.append("EMPTY_ANSWER_TRANSPORT")
-        # [c-0110 insertion 1/2 on the RECORD side] the node's finding
-        # surface enters the tree BEFORE any exit decision
-        stage = "draft" if rep == 0 else f"repair_{rep}"
-        if rep == 0:
-            node_id = ctrl.record_draft(
-                scan=vio, critic_verdict=verdict_eff,
-                type_gate_verdict=tg.get("verdict"))
-        else:
-            node_id = ctrl.record_node(
-                slot=slot["slot"], parent_id=slot["parent_id"],
-                angle=slot.get("angle"), scan=vio,
-                critic_verdict=verdict_eff,
-                type_gate_verdict=tg.get("verdict"))
-        node_answers[node_id] = final
-        node = ctrl.trajectory()["nodes"][-1]
-        att = {"stage": stage,
-               "chars": len(final), "latency_s": round(lat, 1),
-               "transport_tries": tries,
-               "route": gen_meta.get("route"),
-               "route_model": gen_meta.get("model"),
-               "fallback_reason": gen_meta.get("fallback_reason"),
-               "critic_verdict": verdict_eff, "type_gate": tg,
-               **(f75_note or {}),
-               "scan": {k: list(v) for k, v in vio.items()},
-               "direction_check": (dc if not qt.startswith("predictor")
-                                   else None),
-               "sha256_16": _sha16(final),
-               # [c-0109] additive correction fields (typed, additive —
-               # the incumbent's fields are byte-identical)
-               "corrections": {k: crec[k] for k in
-                               ("corrected", "normalized",
-                                "left_flagged", "chemistry_rewrites")
-                               if k in crec},
-               # [c-0110] additive tree fields
-               "node_id": node_id,
-               "parent_id": node["parent_id"],
-               "angle": node["angle"],
-               "node_metric": node["metric"],
-               "pruned": node.get("pruned_reason"),
-               "signature": {"digest": node["signature"],
-                             "keys": sorted(vio.keys()),
-                             "critic": verdict_eff,
-                             "type_gate": tg.get("verdict")},
-               }
-        if rep:
-            att["findings_disclosed"] = [p for p in problems if p]
-        attempts.append(att)
-        # the frozen loop's exits (byte-identical conditions)
-        if not [p for p in problems if p]:
-            final_meta = {"critic_verdict": verdict_eff,
-                          "type_gate": tg, "repairs": rep,
-                          "direction_check": dc,
-                          **(f75_note or {}),
-                          "residual_findings": {},
-                          "stop_reason": "CONVERGED_ZERO_FINDINGS"}
-            break
-        if rep == m77.REPAIR_BUDGET:
-            final_meta = {"critic_verdict": verdict_eff,
-                          "type_gate": tg, "repairs": rep,
-                          "direction_check": dc,
-                          **(f75_note or {}),
-                          "residual_findings":
-                              {k: list(v) for k, v in vio.items()},
-                          "stop_reason": "BUDGET_EXHAUSTED"}
-            break
-        # [c-0110 insertion 2/2 on the PROMPT side] the tree-search
-        # controller directs the NEXT repair slot: best-first parent
-        # + a distinct structural angle (budget-matched — None when
-        # the frozen budget is used)
-        slot = ctrl.next_slot()
-        if slot is None:
-            final_meta = {"critic_verdict": verdict_eff,
-                          "type_gate": tg, "repairs": rep,
-                          "direction_check": dc,
-                          **(f75_note or {}),
-                          "residual_findings":
-                              {k: list(v) for k, v in vio.items()},
-                          "stop_reason": "BUDGET_EXHAUSTED"}
-            break
-        directive = m77.V77_REPAIR_DIRECTIVE.format(
-            findings="; ".join(p for p in problems if p))
-        if slot.get("angle"):
-            directive = directive + "\n\n" + slot["angle"]
-        final, gen_meta = m77._retry_call(
-            m77._gen_fb, q + "\n\n" + directive, contract, gw_key)
-        lat = gen_meta["latency_s"]
-        tries += 1
-        rep += 1
-    # the AIDE delivery: the BEST LIVE NODE's candidate (the
-    # controller's own selection, CI-tested — never the driver's)
-    ctrl.close()
-    traj = ctrl.trajectory()
-    delivered = node_answers.get(traj["final_node_id"], final)
-    final_meta["trajectory"] = traj
-    final_meta["delivered_node_id"] = traj["final_node_id"]
-    final_meta["delivery_rule"] = ("aide_best_live_node (the "
-                                   "controller's close() selection)")
-    return delivered, attempts, final_meta
+    dc = None
+    cr = m77._retry_call(m77.critic, final, prob)
+    tg = m77.gate_question_type(final, prob)
+    vio: dict = {}
+    vio.update(m77.base_scan(final))
+    vio.update(m77.scan_deliverable_class(final))
+    vio.update(m77.scan_stated_formula_direction(final))
+    vio.update(m77.scan_constraint_fit(prob, final))
+    if not qt.startswith("predictor"):
+        vio.update(m77.scan_catalog(prob, final))
+        sb = m77.scan_standard_bill(final, qt)
+        if sb:
+            vio.update(sb)
+        ol = m77.scan_operational_loss(final, qt)
+        if ol:
+            vio.update(ol)
+        cv = m77.scan_conversion(final, qt, prob)
+        if cv:
+            vio.update(cv)
+        vio.update(m77.scan_allowed_measures_class(prob, final))
+        vio.update(m77.scan_physics_direction(prob, final))
+        vio.update(m77.direction_lexicon_check(prob, final))
+        vio.update(m77.scan_input_availability(prob, final))
+        vio.update(m77.scan_duty_cycle_pricing(final))
+        vio.update(m77.scan_mechanism_template(final,
+                                               used_templates))
+        dc = m77.direction_check_llm(prob, final, gw_key)
+        if dc["direction"] == "INVERTED":
+            vio["PHYSICS_DIRECTION_INVERTED"] = [
+                f"the sign/integral check reads the mechanism "
+                f"INVERTED: {dc.get('reason', '')[:160]}"]
+        elif dc["direction"] == "UNCLEAR":
+            vio["DIRECTION_UNPROVEN"] = [
+                "the sign/integral check cannot judge the "
+                "direction from the bill — state the governing "
+                "relation and the sign the mechanism imposes"]
+        elif dc["direction"] == "DIRECTION_CHECK_UNAVAILABLE":
+            vio["DIRECTION_CHECK_UNAVAILABLE"] = [
+                f"typed fail-open: {dc.get('reason', '')[:120]} "
+                "(the authoritative read stays the auditor's)"]
+    else:
+        from r19_a1w_v4_contract import predictor_violations
+        pv = predictor_violations(final)
+        if pv:
+            vio.update({"PREDICTOR_VIOLATION": list(pv)})
+        vio.update(m77.scan_input_availability(prob, final))
+    findings = [f"{k}: {'; '.join(map(str, v))[:110]}"
+                for k, v in vio.items() if v]
+    verdict_eff, f75_note = m77.effective_critic_verdict(
+        cr["verdict"], vio)
+    problems: list = []
+    if cr["verdict"] != "CLEAN":
+        problems += [c.get("anchor") for c in cr["checks"]
+                     if c.get("verdict") != "CLEAN"]
+    if tg["verdict"] == "MISMATCH":
+        problems.append(tg["reason"])
+    problems += findings
+    if not (final or "").strip():
+        problems.append("EMPTY_ANSWER_TRANSPORT")
+    residual = {k: list(v) for k, v in vio.items() if v}
+    att = {"stage": "draft",
+           "chars": len(final), "latency_s": round(lat, 1),
+           "transport_tries": 1,
+           "route": gen_meta.get("route"),
+           "route_model": gen_meta.get("model"),
+           "fallback_reason": gen_meta.get("fallback_reason"),
+           "critic_verdict": verdict_eff, "type_gate": tg,
+           **(f75_note or {}),
+           "scan": {k: list(v) for k, v in vio.items()},
+           "direction_check": (dc if not qt.startswith("predictor")
+                               else None),
+           "sha256_16": _sha16(final),
+           "findings_disclosed": [p for p in problems if p],
+           }
+    attempts = [att]
+    final_meta = {"critic_verdict": verdict_eff,
+                  "type_gate": tg, "repairs": 0,
+                  "direction_check": dc,
+                  **(f75_note or {}),
+                  "residual_findings": residual,
+                  "stop_reason": ("SURFACED_ZERO_FINDINGS"
+                                  if not residual
+                                  else "FINDINGS_SURFACED_FOR_REVIEWER"),
+                  "machine_shape": ("R121 successor: bare author + "
+                                    "bind check + findings surfaced "
+                                    "(autonomous repair + AIDE "
+                                    "ceremony retired, Art. 20)")}
+    return final, attempts, final_meta
 
 
 # ---------------------------------------------------------------------------
@@ -736,16 +647,14 @@ def attest() -> int:
 # dry-run — zero LLM (Art. 22: fixtures prove mechanics)
 # ---------------------------------------------------------------------------
 def dry_run() -> int:
-    # (1) the two controller modules are CI-green (their own batteries)
-    #     — here the DRIVER-level wiring is proven with STUBBED
-    #     TRANSPORT ONLY: the fake generator returns a COMMITTED
-    #     incumbent answer (constant text), the critic and EVERY scan
-    #     stay REAL (the frozen finding surface is deterministic and
-    #     non-empty), and the loop proves: the c-0109 corrector runs
-    #     BEFORE scoring (the scans see the corrected bytes — the
-    #     BILL_UNTAGGED residual shrinks on the constant answer), the
-    #     tree-search controller directs distinct angles, the AIDE
-    #     delivery picks the best live node, and budget stays matched.
+    # The R121 successor wiring, proven with STUBBED TRANSPORT ONLY
+    # (zero LLM, Art. 22): the fake generator returns a COMMITTED
+    # incumbent answer (constant text), the critic and EVERY scan
+    # stay REAL (the frozen finding surface is deterministic), and
+    # the machine proves: ONE authoring call, the full bind CHECK
+    # layer runs, the findings are SURFACED in final_meta, and NO
+    # autonomous repair ever fires (repairs == 0, one attempt,
+    # stop_reason in the successor vocabulary).
     _, _, probs, seal = v10m.load_v10_problems()
     assert seal["verified"] and len(probs) == 30
     first_pid = sorted(probs, key=lambda p: p["problem_id"])[0]
@@ -754,17 +663,10 @@ def dry_run() -> int:
          / f"{first_pid['problem_id']}.json").read_text(
              encoding="utf-8"))
     fixed_answer = inc_row["a1_answer"]
-    inc_untagged = len((inc_row.get("final_meta") or {})
-                       .get("residual_findings", {})
-                       .get("BILL_UNTAGGED", []))
     calls: list = []
 
     def _fake_gen(prompt, contract, key):
-        calls.append("ANGLE" if "ANGLE RESTRUCTURE" in prompt
-                     or "ANGLE MINIMAL EDIT" in prompt
-                     or "ANGLE MECHANISM FIRST" in prompt
-                     or "ANGLE PARITY COMPRESS" in prompt
-                     else "PLAIN")
+        calls.append("GEN")
         return (fixed_answer, {"latency_s": 0.0, "route": "stub",
                                "model": "stub",
                                "fallback_reason": None})
@@ -779,47 +681,38 @@ def dry_run() -> int:
         m77._retry_call = lambda f, *a, **k: f(*a, **k)
         final, attempts, meta = machine_generate_v79(
             first_pid, "stub-key", used_templates=Counter())
-        # budget matched: the incumbent's own cap, zero added calls
-        assert meta["repairs"] == m77.REPAIR_BUDGET, meta["repairs"]
-        assert len(attempts) == m77.REPAIR_BUDGET + 1
-        # the controller directed the repair slots (angles present)
-        assert calls[0] == "PLAIN" and all(
-            c == "ANGLE" for c in calls[1:]), calls
-        # [c-0109] the corrector ran BEFORE scoring: the committed
-        # incumbent's BILL_UNTAGGED residual shrinks (or zeroes) on
-        # the corrected bytes — the scans judge what the tools fixed
-        last_untagged = len(attempts[-1]["scan"].get(
-            "BILL_UNTAGGED", []))
-        assert last_untagged < inc_untagged or inc_untagged == 0, (
-            f"corrector ran but the residual did not shrink: "
-            f"{inc_untagged} -> {last_untagged}")
-        assert all("corrections" in a for a in attempts)
-        # [c-0110] the tree record: distinct candidates >= 2 (the
-        # constant answer + distinct angles = distinct (sig, angle)
-        # pairs), best-first delivery typed
-        traj = meta["trajectory"]
-        assert traj["budget_respected"] and traj["closed"]
-        assert traj["distinct_candidate_count"] >= 2, traj[
-            "distinct_candidate_count"]
-        assert meta["delivered_node_id"] == traj["final_node_id"]
-        print(f"[dry-run] wiring proven: budget matched "
-              f"(repairs={meta['repairs']} == frozen "
-              f"REPAIR_BUDGET={m77.REPAIR_BUDGET}); angles directed "
-              f"(draft PLAIN -> repairs ANGLE); [c-0109] corrector "
-              f"ran before scoring (BILL_UNTAGGED {inc_untagged} -> "
-              f"{last_untagged} on the corrected bytes); [c-0110] "
-              f"distinct_candidates="
-              f"{traj['distinct_candidate_count']}, delivered "
-              f"{meta['delivered_node_id']} = best live node; real "
-              f"frozen scans on a committed incumbent answer; zero "
-              f"LLM, zero gateway", flush=True)
+        # the successor contract: exactly ONE authoring call
+        assert len(calls) == 1, calls
+        # NO autonomous repair: one attempt, zero repairs
+        assert meta["repairs"] == 0, meta["repairs"]
+        assert len(attempts) == 1, len(attempts)
+        assert meta["stop_reason"] in (
+            "SURFACED_ZERO_FINDINGS",
+            "FINDINGS_SURFACED_FOR_REVIEWER"), meta["stop_reason"]
+        # the full bind CHECK layer ran on the authored bytes (the
+        # frozen scans are real; a committed incumbent answer has a
+        # deterministic non-empty or empty surface — both lawful)
+        assert "machine_shape" in meta
+        assert "scan" in attempts[0]
+        # findings surfaced for the reviewer: residual_findings is
+        # the same surface the scan recorded
+        assert (sorted(meta["residual_findings"].keys())
+                == sorted(k for k, v in attempts[0]["scan"].items()
+                          if v))
+        print(f"[dry-run] successor wiring proven: 1 authoring call, "
+              f"repairs=0 (no autonomous repair), stop_reason="
+              f"{meta['stop_reason']}, findings surfaced "
+              f"{sorted(meta['residual_findings'].keys())[:6]}; "
+              f"real frozen scans on a committed incumbent answer; "
+              f"zero LLM, zero gateway", flush=True)
     finally:
         (m77._gen_fb, m77.direction_check_llm,
          m77._retry_call) = orig
     print(f"[dry-run] corpus OK (30 burned v10 problems, seal "
-          f"{seal['recomputed'][:16]}... verified); the v12 machine "
-          f"is wired (five binds byte-identical + two controllers)",
-          flush=True)
+          f"{seal['recomputed'][:16]}... verified); the R121 "
+          f"successor machine is wired (bare author + the five "
+          f"binds' full check layer + findings surfaced; autonomous "
+          f"repair + AIDE ceremony retired, Art. 20)", flush=True)
     return 0
 
 
