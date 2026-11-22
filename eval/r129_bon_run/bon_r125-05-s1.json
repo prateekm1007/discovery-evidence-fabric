@@ -1,0 +1,159 @@
+{
+ "problem_id": "r125-05-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 170.64,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 5.12,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 814,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 5.4,
+     "usage": {
+      "prompt_tokens": 1152,
+      "completion_tokens": 1204,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n\"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Throughput Control via Pressure-Amplitud",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Throughput Control via Pressure-Amplitude-Flow Correlation**\n\n**Mechanism:**\nThe flattened mill differential pressure (ΔP) signature indicates a breakdown in the internal material charge profile, specifically a reduction in the dynamic pressure drop caused by the lifting and discharging of the circulating load. In finish mills, ΔP is not just a static measure of resistance but a dynamic signal correlated with the mill's power consumption and internal air velocity, which in turn determines the fineness of the product. A falling specific surface area implies the residence time of the material in the mill has become insufficient relative to the throughput, or the charge has become too coarse/heavy. By correlating the *instantaneous* ΔP signal with the feed rate, we can identify that the mill is operating at a point where the energy input per ton of cement is no longer sufficient to achieve the target fineness. The mitigation involves actively adjusting the feed rate to restore the ΔP-to-feed-rate ratio to a target setpoint that corresponds to the required specific surface area, effectively using ΔP as a proxy for particle size and fineness.\n\n**Implementation:**\n1.  **Baseline Correlation:** Using historical data from the existing sensors (ΔP transmitter, bucket-elevator ammeter, and feed rate meter), establish a transfer function or lookup table that maps the ratio of **Mill ΔP** to **Feed Rate** against the known **Bucket-Elevator Amperage** (which correlates with the total circulating load and thus the material charge weight). \n2.  **Setpoint Definition:** Define a target \"Pressure-Per-Ton\" ratio ($ \\Delta P_{target} / \\dot{m}_{feed} $) that historically correlates with the desired specific surface area (e.g., Blaine fineness). This ratio must be adjusted for the bucket-elevator amperage to normalize for changes in circulating load; high amperage with low ΔP indicates a loss of fines in the classification loop or excessive coarse recirculation.\n3.  **Control Action:** Implement a simple feedback loop (manual or automated PLC routine) that adjusts the **Feed Rate Meter** setpoint. If the current ΔP/Feed Rate ratio falls below the target (indicating insufficient pressure for the given feed rate, hence coarser product), **increase** the feed rate restriction (i.e., reduce feed rate) until the ratio recovers. If the ratio is too high (excessive pressure, risk of overload and excessive fineness with wasted energy), allow feed rate to increase.\n4.  **Safety Limit:** Use the **Bucket-Elevator Ammeter** as a hard limit. If amperage exceeds the safe operating range (indicating over-loading of the circulating loop or elevator), immediately increase feed rate to clear the mill, overriding the fineness target to protect the equipment.\n\n**Measures Relied On:**\n*   **Mill Differential Pressure Transmitter:** Used as the primary process variable representing the internal \"fineness index\" or energy intensity per unit mass. A drop in ΔP at constant feed rate signals that the material is not being agitated/classified efficiently (flattened signature).\n*   **Feed Rate Meter:** The manipulated variable. Adjusting feed rate directly changes the residence time and the pressure profile of the material column.\n*   **Bucket-Elevator Ammeter:** Used as a supervisory constraint and normalizing factor. It provides a real-time proxy for the mass flow of circulating load and the total charge in the mill. Changes in amperage without proportional changes in ΔP or feed rate indicate a shift in material density or fineness distribution, allowing the operator/system to distinguish between \"low fineness due to high throughput\" and \"low fineness due to coarse circulating load.\"\n\nThis approach restores the pressure signature by ensuring the mill operates at a pressure-feed ratio consistent with the target fineness, using only the existing instrumentation to close the loop on product quality.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Throughput Control via Pressure-Amplitude-Flow Correlation**\n\n**Mechanism:**\nThe flattened mill differential pressure (ΔP) signature indicates a breakdown in the internal material charge profile, specifically a reduction in the dynamic pressure drop caused by the lifting and discharging of the circulating load. In finish mills, ΔP is not just a static measure of resistance but a dynamic signal correlated with the mill's power consumption and internal air velocity, which in turn determines the fineness of the product. A falling specific surface area implies the residence time of the material in the mill has become insufficient relative to the throughput, or the charge has become too coarse/heavy. By correlating the *instantaneous* ΔP signal with the feed rate, we can identify that the mill is operating at a point where the energy input per ton of cement is no longer sufficient to achieve the target fineness. The mitigation involves actively adjusting the feed rate to restore the ΔP-to-feed-rate ratio to a target setpoint that corresponds to the required specific surface area, effectively using ΔP as a proxy for particle size and fineness.\n\n**Direction of Effect:**\n*   **Driving Variable:** The controlled Feed Rate ($\\dot{m}_{feed}$).\n*   **Directional Mechanism:** Increasing the Feed Rate ($\\dot{m}_{feed}$) *decreases* the dynamic Differential Pressure ($\\Delta P$) by reducing the internal air velocity and decreasing the resistance to flow. Conversely, decreasing the Feed Rate ($\\dot{m}_{feed}$) *increases* the Differential Pressure ($\\Delta P$).\n*   **Quality Impact:** Because $\\Delta P$ is a proxy for internal agitation/fineness, *decreasing* the Feed Rate (thereby *increasing* $\\Delta P$) improves specific surface area (finer cement). *Increasing* the Feed Rate (thereby *decreasing* $\\Delta P$) reduces specific surface area (coarser cement).\n\n**Input Measurement Derivations:**\n*   **Process Variable (PV):** $R_{ratio} = \\frac{\\Delta P_{mill}}{\\dot{m}_{feed}}$. Derived directly from the existing **Mill Differential Pressure Transmitter** ($\\Delta P_{mill}$) and the existing **Mill-Feed Rate Meter** ($\\dot{m}_{feed}$).\n*   **Normalization Factor:** $I_{norm} = \\frac{\\Delta P_{mill}}{\\dot{m}_{feed} \\cdot I_{bkt}}$. Derived from the existing **Mill Differential Pressure Transmitter** ($\\Delta P_{mill}$), **Mill-Feed Rate Meter** ($\\dot{m}_{feed}$), and the existing **Bucket-Elevator Ammeter** ($I_{bkt}$). This normalizes the pressure-per-ton ratio for the total circulating load mass indicated by the bucket elevator current.\n*   **Safety Limit:** $I_{bkt}$. Taken directly from the existing **Bucket-Elevator Ammeter**.\n*   **Manifold Variable:** $\\dot{m}_{feed}^{cmd}$. This is a command signal sent to the existing **Mill-Feed Rate Meter** actuator. It is calculated by the controller based on the error between the current $R_{ratio}$ (or $I_{norm}$) and the target setpoint.\n\nNo new inputs are introduced. All measurements are derived strictly from the permitted sensor list: Mill differential pressure transmitter, bucket-elevator ammeter, and mill-feed rate meter.\n\n**Implementation Bill:**\n1.  **Controller Logic (PLC/DCS Tag):** Create a new calculated tag `FINES_RATIO` defined as `(Tag_Mill_DeltaP / Tag_FeedRate_Measured)`.\n2.  **Normalization Tag:** Create a calculated tag `NORMALIZED_FINES` defined as `FINES_RATIO / Tag_BktElev_Current`.\n3.  **PID/On-Off Loop:** Configure a control loop (e.g., PID or On-Off) with:\n    *   **PV:** `NORMALIZED_FINES`\n    *   **SP:** `SP_NORMALIZED_FINES` (Historically determined setpoint for target specific surface area)\n    *   **Output:** `Tag_FeedRate_Setpoint`\n4.  **Safety Interlock:** Create a high-limit alarm/interlock on `Tag_BktElev_Current`. If `Tag_BktElev_Current > Limit_High`, force `Tag_FeedRate_Setpoint` to its maximum permitted value (bypassing the fineness loop) to clear the mill charge.\n5.  **HMI Update:** Add a new faceplate page displaying `FINES_RATIO`, `NORMALIZED_FINES`, and `Tag_BktElev_Current` to allow operator monitoring of the correlation.\n\n**Measures Relied On:**\n*   **Mill Differential Pressure Transmitter:** Source for $\\Delta P_{mill}$. Used as the primary process variable representing the internal \"fineness index\" or energy intensity per unit mass.\n*   **Feed Rate Meter:** Source for $\\dot{m}_{feed}$ (measured) and receiver for $\\dot{m}_{feed}^{cmd}$ (setpoint). The manipulated variable.\n*   **Bucket-Elevator Ammeter:** Source for $I_{bkt}$. Used as a supervisory constraint and normalizing factor for the circulating load.\n\nThis approach restores the pressure signature by ensuring the mill operates at a pressure-feed ratio consistent with the target fineness, using only the existing instrumentation to close the loop on product quality.\"",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Controller Logic (PLC/DCS Tag):** Create a new calculated tag `FINES_RATIO` defined ",
+     "2.  **Normalization Tag:** Create a calculated tag `NORMALIZED_FINES` defined as `FINES_RA",
+     "3.  **PID/On-Off Loop:** Configure a control loop (e.g., PID or On-Off) with:",
+     "*   **PV:** `NORMALIZED_FINES`",
+     "*   **SP:** `SP_NORMALIZED_FINES` (Historically determined setpoint for target specific su",
+     "*   **Output:** `Tag_FeedRate_Setpoint`",
+     "4.  **Safety Interlock:** Create a high-limit alarm/interlock on `Tag_BktElev_Current`. If",
+     "5.  **HMI Update:** Add a new faceplate page displaying `FINES_RATIO`, `NORMALIZED_FINES`,",
+     "*   **Mill Differential Pressure Transmitter:** Source for $\\Delta P_{mill}$. Used as the ",
+     "*   **Feed Rate Meter:** Source for $\\dot{m}_{feed}$ (measured) and receiver for $\\dot{m}_",
+     "*   **Bucket-Elevator Ammeter:** Source for $I_{bkt}$. Used as a supervisory constraint an"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 's a supervisory constraint and normalizing factor' shares no allowed-list stem (Use only existing sensors and existing measurements: the mill differential press...)"
+    ],
+    "APPARATUS_ROW": [
+     "5.  **HMI Update:** Add a new faceplate page displaying `FINES_RATIO`, `NORMALIZED_FINES`, and `Tag_BktElev_Cu"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.25,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 622,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 2,
+     "latency_s": 124.81,
+     "usage": {
+      "prompt_tokens": 960,
+      "completion_tokens": 1011,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Feed Rate Modulation via Differential ",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Feed Rate Modulation via Differential Pressure Feedback**\n\n**Mechanism**\nThe flattened differential pressure (ΔP) signature indicates that the average particle size in the mill grinding zone has increased, reducing the resistance to airflow and lowering the fine powder content (specific surface). To raise the specific surface back to target, the residence time of material in the mill must be increased. Since throughput has already been trimmed, the effective lever is to dynamically modulate the **mill-feed rate** inversely with the **mill differential pressure**. By lowering the feed rate further when ΔP drops, we increase the load per unit mass of grinding media, thereby enhancing impact and attrition rates, which raises the fineness (specific surface) of the product.\n\n**Implementation**\n1.  **Define Control Variable:** Use the existing **mill differential pressure transmitter** as the primary process variable (PV). Establish a target ΔP setpoint corresponding to the historical baseline associated with the desired specific surface target.\n2.  **Controller Logic:** Implement a PI (Proportional-Integral) control loop within the existing DCS/PLC.\n    *   **Input PV:** Mill ΔP.\n    *   **Manipulated Variable (MV):** **Mill-feed rate meter** command (via VFD on the feed conveyor or variable-speed feeder).\n    *   **Logic:** If ΔP falls below the setpoint, the controller issues a command to *decrease* the feed rate. If ΔP rises above the setpoint, the controller allows the feed rate to *increase* (within safe limits).\n3.  **Constraint Guardrails:**\n    *   **Upper Limit:** Cap the feed rate at the maximum mechanical limit of the feed system.\n    *   **Lower Limit:** Set a minimum feed rate to avoid starved milling conditions that could damage media or cause abnormal pressure spikes.\n    *   **Safety Interlock:** Use the existing **bucket-elevator ammeter** as a secondary monitoring signal. If the elevator current exceeds its rated threshold (indicating overload or blockage), immediately trip the feed rate controller to a manual hold or safe stop mode, overriding the PI loop to prevent mechanical damage.\n\n**Measures Relied Upon**\n*   **Primary Measurement:** Mill differential pressure (inverse correlation with particle size/residence time).\n*   **Actuation Signal:** Mill-feed rate (direct control of material loading).\n*   **Safety/Constraint Measurement:** Bucket-elevator ammeter (current draw, used exclusively for limit supervision and interlocking, not for fine tuning).\n\n**Expected Outcome**\nThe system will automatically slow the feed rate whenever the internal pressure signature flattens (indicating coarser material), thereby increasing the energy input per ton of cement and raising the specific surface back to target. Throughput will stabilize at a slightly lower level than initial trim, but at the correct fineness quality. No new sensors are required; the existing DCS tags are simply reconfigured into a feedback loop.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Feed Rate Modulation via Differential Pressure Feedback**\n\n**Implementation Bill**\n1. **Control Loop Configuration:** Configure PI controller (e.g., PID tag `MILL_PI_01`) in existing DCS.\n   - **Process Variable (PV):** `MILL_DP_TX` (Mill Differential Pressure Transmitter).\n   - **Manipulated Variable (MV):** `FEED_RATE_CMD` (Command to Mill-Feed Rate Meter/VFD).\n   - **Setpoint:** Historical baseline ΔP associated with target specific surface.\n   - **Action:** Reverse acting (if PV < Setpoint, MV decreases).\n2. **Limit Supervision:** Configure high-limit alarm and trip on `BUCKET_ELEV_AMM` (Bucket-Elevator Ammeter).\n   - **Threshold:** Rated current limit + 10% margin.\n   - **Action on Trip:** Disable `MILL_PI_01`, hold `FEED_RATE_CMD` at safe minimum or zero, alarm operator.\n3. **No New Hardware:** All tags and actuators use existing instruments: Mill ΔP Transmitter, Bucket-Elevator Ammeter, Mill-Feed Rate Meter.\n\n**Mechanism**\n\n**Direction-of-Effect Statement:**\n*   **Driving Variable:** Mill differential pressure (ΔP).\n*   **Direction of Effect on Mechanism:** An increase in ΔP indicates an increase in aerodynamic resistance due to higher particle loading and coarser average particle size, which correlates with a *decrease* in specific surface. A decrease in ΔP indicates a *decrease* in particle loading/resistance, correlating with an *increase* in specific surface (finer product).\n*   **Control Action:** To *raise* specific surface when it has fallen (implied by flattened/lower ΔP signature), the feed rate must be *decreased*. This increases the load per unit mass of grinding media, enhancing impact and attrition.\n*   **Mechanism Flow:** ΔP ↓ → Controller commands Feed Rate ↓ → Residence Time ↑ / Energy per ton ↑ → Specific Surface ↑ → ΔP ↑ (toward setpoint).\n\n**Implementation**\n1.  **Define Control Variable:** Use the existing **mill differential pressure transmitter** as the primary process variable (PV). Establish a target ΔP setpoint corresponding to the historical baseline associated with the desired specific surface target.\n2.  **Controller Logic:** Implement a PI (Proportional-Integral) control loop within the existing DCS/PLC.\n    *   **Input PV:** Mill ΔP (from `MILL_DP_TX`).\n    *   **Manipulated Variable (MV):** **Mill-feed rate meter** command (`FEED_RATE_CMD`) (via VFD on the feed conveyor or variable-speed feeder).\n    *   **Logic:** If ΔP falls below the setpoint, the controller issues a command to *decrease* the feed rate. If ΔP rises above the setpoint, the controller allows the feed rate to *increase* (within safe limits).\n3.  **Constraint Guardrails:**\n    *   **Upper Limit:** Cap the feed rate at the maximum mechanical limit of the feed system.\n    *   **Lower Limit:** Set a minimum feed rate to avoid starved milling conditions that could damage media or cause abnormal pressure spikes.\n    *   **Safety Interlock:** Use the existing **bucket-elevator ammeter** (`BUCKET_ELEV_AMM`) as a secondary monitoring signal. If the elevator current exceeds its rated threshold, immediately trip the feed rate controller to a manual hold or safe stop mode, overriding the PI loop to prevent mechanical damage.\n\n**Measures Relied Upon**\n*   **Primary Measurement:** Mill differential pressure (ΔP) — derived directly from the **Mill Differential Pressure Transmitter** (`MILL_DP_TX`).\n*   **Actuation Signal:** Mill-feed rate command — derived from the **Mill-Feed Rate Meter** controller output (`FEED_RATE_CMD`) via VFD scaling.\n*   **Safety/Constraint Measurement:** Bucket-elevator current — derived directly from the **Bucket-Elevator Ammeter** (`BUCKET_ELEV_AMM`).\n\n**Expected Outcome**\nThe system will automatically slow the feed rate whenever the internal pressure signature flattens or drops (indicating coarser material/lower specific surface), thereby increasing the energy input per ton of cement and raising the specific surface back to target. Throughput will stabilize at a slightly lower level than initial trim, but at the correct fineness quality. No new sensors are required; the existing DCS tags are simply reconfigured into a feedback loop.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. **Control Loop Configuration:** Configure PI controller (e.g., PID tag `MILL_PI_01`) in",
+     "- **Process Variable (PV):** `MILL_DP_TX` (Mill Differential Pressure Transmitter).",
+     "- **Manipulated Variable (MV):** `FEED_RATE_CMD` (Command to Mill-Feed Rate Meter/VFD).",
+     "- **Setpoint:** Historical baseline ΔP associated with target specific surface.",
+     "- **Action:** Reverse acting (if PV < Setpoint, MV decreases).",
+     "2. **Limit Supervision:** Configure high-limit alarm and trip on `BUCKET_ELEV_AMM` (Bucket",
+     "- **Threshold:** Rated current limit + 10% margin.",
+     "- **Action on Trip:** Disable `MILL_PI_01`, hold `FEED_RATE_CMD` at safe minimum or zero, ",
+     "3. **No New Hardware:** All tags and actuators use existing instruments: Mill ΔP Transmitt",
+     "*   **Driving Variable:** Mill differential pressure (ΔP).",
+     "*   **Direction of Effect on Mechanism:** An increase in ΔP indicates an increase in aerod",
+     "*   **Control Action:** To *raise* specific surface when it has fallen (implied by flatten",
+     "*   **Mechanism Flow:** ΔP ↓ → Controller commands Feed Rate ↓ → Residence Time ↑ / Energy",
+     "1.  **Define Control Variable:** Use the existing **mill differential pressure transmitter",
+     "2.  **Controller Logic:** Implement a PI (Proportional-Integral) control loop within the e",
+     "*   **Input PV:** Mill ΔP (from `MILL_DP_TX`).",
+     "*   **Manipulated Variable (MV):** **Mill-feed rate meter** command (`FEED_RATE_CMD`) (via",
+     "*   **Logic:** If ΔP falls below the setpoint, the controller issues a command to *decreas",
+     "3.  **Constraint Guardrails:**",
+     "*   **Upper Limit:** Cap the feed rate at the maximum mechanical limit of the feed system.",
+     "*   **Lower Limit:** Set a minimum feed rate to avoid starved milling conditions that coul",
+     "*   **Safety Interlock:** Use the existing **bucket-elevator ammeter** (`BUCKET_ELEV_AMM`)",
+     "*   **Primary Measurement:** Mill differential pressure (ΔP) — derived directly from the *",
+     "*   **Actuation Signal:** Mill-feed rate command — derived from the **Mill-Feed Rate Meter",
+     "*   **Safety/Constraint Measurement:** Bucket-elevator current — derived directly from the"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Throughput Control via Pressure-Amplitude-Flow Correlation**\n\n**Mechanism:**\nThe flattened mill differential pressure (ΔP) signature indicates a breakdown in the internal material charge profile, specifically a reduction in the dynamic pressure drop caused by the lifting and discharging of the circulating load. In finish mills, ΔP is not just a static measure of resistance but a dynamic signal correlated with the mill's power consumption and internal air velocity, which in turn determines the fineness of the product. A falling specific surface area implies the residence time of the material in the mill has become insufficient relative to the throughput, or the charge has become too coarse/heavy. By correlating the *instantaneous* ΔP signal with the feed rate, we can identify that the mill is operating at a point where the energy input per ton of cement is no longer sufficient to achieve the target fineness. The mitigation involves actively adjusting the feed rate to restore the ΔP-to-feed-rate ratio to a target setpoint that corresponds to the required specific surface area, effectively using ΔP as a proxy for particle size and fineness.\n\n**Direction of Effect:**\n*   **Driving Variable:** The controlled Feed Rate ($\\dot{m}_{feed}$).\n*   **Directional Mechanism:** Increasing the Feed Rate ($\\dot{m}_{feed}$) *decreases* the dynamic Differential Pressure ($\\Delta P$) by reducing the internal air velocity and decreasing the resistance to flow. Conversely, decreasing the Feed Rate ($\\dot{m}_{feed}$) *increases* the Differential Pressure ($\\Delta P$).\n*   **Quality Impact:** Because $\\Delta P$ is a proxy for internal agitation/fineness, *decreasing* the Feed Rate (thereby *increasing* $\\Delta P$) improves specific surface area (finer cement). *Increasing* the Feed Rate (thereby *decreasing* $\\Delta P$) reduces specific surface area (coarser cement).\n\n**Input Measurement Derivations:**\n*   **Process Variable (PV):** $R_{ratio} = \\frac{\\Delta P_{mill}}{\\dot{m}_{feed}}$. Derived directly from the existing **Mill Differential Pressure Transmitter** ($\\Delta P_{mill}$) and the existing **Mill-Feed Rate Meter** ($\\dot{m}_{feed}$).\n*   **Normalization Factor:** $I_{norm} = \\frac{\\Delta P_{mill}}{\\dot{m}_{feed} \\cdot I_{bkt}}$. Derived from the existing **Mill Differential Pressure Transmitter** ($\\Delta P_{mill}$), **Mill-Feed Rate Meter** ($\\dot{m}_{feed}$), and the existing **Bucket-Elevator Ammeter** ($I_{bkt}$). This normalizes the pressure-per-ton ratio for the total circulating load mass indicated by the bucket elevator current.\n*   **Safety Limit:** $I_{bkt}$. Taken directly from the existing **Bucket-Elevator Ammeter**.\n*   **Manifold Variable:** $\\dot{m}_{feed}^{cmd}$. This is a command signal sent to the existing **Mill-Feed Rate Meter** actuator. It is calculated by the controller based on the error between the current $R_{ratio}$ (or $I_{norm}$) and the target setpoint.\n\nNo new inputs are introduced. All measurements are derived strictly from the permitted sensor list: Mill differential pressure transmitter, bucket-elevator ammeter, and mill-feed rate meter.\n\n**Implementation Bill:**\n1.  **Controller Logic (PLC/DCS Tag):** Create a new calculated tag `FINES_RATIO` defined as `(Tag_Mill_DeltaP / Tag_FeedRate_Measured)`.\n2.  **Normalization Tag:** Create a calculated tag `NORMALIZED_FINES` defined as `FINES_RATIO / Tag_BktElev_Current`.\n3.  **PID/On-Off Loop:** Configure a control loop (e.g., PID or On-Off) with:\n    *   **PV:** `NORMALIZED_FINES`\n    *   **SP:** `SP_NORMALIZED_FINES` (Historically determined setpoint for target specific surface area)\n    *   **Output:** `Tag_FeedRate_Setpoint`\n4.  **Safety Interlock:** Create a high-limit alarm/interlock on `Tag_BktElev_Current`. If `Tag_BktElev_Current > Limit_High`, force `Tag_FeedRate_Setpoint` to its maximum permitted value (bypassing the fineness loop) to clear the mill charge.\n5.  **HMI Update:** Add a new faceplate page displaying `FINES_RATIO`, `NORMALIZED_FINES`, and `Tag_BktElev_Current` to allow operator monitoring of the correlation.\n\n**Measures Relied On:**\n*   **Mill Differential Pressure Transmitter:** Source for $\\Delta P_{mill}$. Used as the primary process variable representing the internal \"fineness index\" or energy intensity per unit mass.\n*   **Feed Rate Meter:** Source for $\\dot{m}_{feed}$ (measured) and receiver for $\\dot{m}_{feed}^{cmd}$ (setpoint). The manipulated variable.\n*   **Bucket-Elevator Ammeter:** Source for $I_{bkt}$. Used as a supervisory constraint and normalizing factor for the circulating load.\n\nThis approach restores the pressure signature by ensuring the mill operates at a pressure-feed ratio consistent with the target fineness, using only the existing instrumentation to close the loop on product quality.\"",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED"
+}

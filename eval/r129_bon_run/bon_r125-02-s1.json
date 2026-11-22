@@ -1,0 +1,158 @@
+{
+ "problem_id": "r125-02-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 292.72,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.94,
+     "usage": {
+      "prompt_tokens": 249,
+      "completion_tokens": 730,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 2,
+     "latency_s": 123.32,
+     "usage": {
+      "prompt_tokens": 1064,
+      "completion_tokens": 753,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n\"corrected_proposal\": \"**Mitigation Proposal**\\n\\n**Mechanism:** Implement a closed-loop **Variabl",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:** Implement a closed-loop **Variable Tension Control (VTC)** algorithm that modulates the draw speed based on real-time friction/viscous resistance proxies, thereby preventing the progressive tension buildup in the finish block that causes wire breaks.\n\n**Implementation:**\n1.  **Signal Acquisition:** Continuously sample the existing **per-block motor ammeters** (specifically focusing on the finish block and the preceding intermediate blocks) and the **line-speed encoder**.\n2.  **Resistance Proxy Calculation:** In the control PLC, compute a \"friction index\" for each block by normalizing the motor current ($I$) against the line speed ($v$) from the encoder:\n    $$ R_{block} = \\frac{I_{motor} - I_{no\\_load}}{v} $$\n    *(Note: $I_{no\\_load}$ is the static baseline current at zero speed or low constant speed, which can be established from historical logs or a baseline calibration pass. If static data is unavailable, use a relative delta approach: monitor the trend of $I$ at constant $v$.)*\n3.  **Feedback Loop:**\n    *   **Setpoint:** Define a target \"Nominal Resistance Index\" ($R_{target}$) for the finish block based on historical data of when the wire was breaking least.\n    *   **Control Logic:** If the real-time $R_{finish\\_block}$ exceeds $R_{target}$ by a set threshold (e.g., +5%), the controller issues a **speed reduction command** to the line-speed encoder reference (reducing $v$).\n    *   **Reasoning:** Reducing line speed in a wire drawing machine generally reduces the dynamic tension peak and allows the material more time to respond to deformation without adiabatic heating and stress concentration. More importantly, in many draw configurations, if the *upstream* blocks are running too fast relative to the finish block, the finish block acts as the braking point, causing high tension. By modulating the overall line speed *down* when the finish block's relative effort (current/speed ratio) climbs, we relieve the tension peak at the finish block where breaks occur.\n    *   **Break Counter Integration:** Use the existing **break counter** as a long-term validation metric. If the break frequency drops after VTC activation, the parameter tuning is correct. If breaks increase, the threshold or gain of the VTC loop must be adjusted.\n\n**Measures it Relies On:**\n*   **Motor Ammeters:** Provide the primary feedback signal for resistance/tension estimation. The climb in current per pass indicates increasing friction or tension load.\n*   **Line-Speed Encoder:** Provides the denominator for the resistance proxy and serves as the actuator input (reference speed) for the control loop.\n*   **Break Counter:** Serves as the outcome metric to validate mitigation effectiveness and trigger operator intervention if the automatic control fails.\n*   **Existing Baseline:** Relies on the assumption that a \"healthy\" current-to-speed relationship exists in the system's historical data (or can be established manually) against which the deviation (climbing current) is measured.\n\n**Why this works under the constraint:**\n*   No new sensors are added.\n*   It directly addresses the \"climbing motor current\" and \"multiplied breaks\" by actively suppressing the condition (high relative resistance at finish block) that leads to breaks, using the available speed control and current feedback.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism:** Implement a closed-loop **Variable Tension Control (VTC)** algorithm that modulates the line speed to suppress progressive tension buildup in the finish block, preventing wire breaks.\n\n**Direction-of-Effect:** The driving variable is the real-time calculated **Finish Block Friction Index** ($R_{finish}$). The direction of the mechanical effect is **reduction of line speed** ($v$) when $R_{finish}$ exceeds the target threshold. This reduces dynamic tension peaks at the finish block, thereby lowering the probability of wire fracture.\n\n**Implementation Bill:**\n1.  **Signal Acquisition:**\n    *   **Input:** Per-block motor ammeter reading for the finish block ($I_{finish}$).\n    *   **Input:** Line-speed encoder reading ($v$).\n    *   **Input:** Break counter cumulative count ($C_{break}$).\n    *   **Derivation:** Establish baseline no-load current ($I_{no\\_load}$) from historical logs at $v=0$ or low constant $v$ prior to activation. If unavailable, derive $I_{no\\_load}$ as the minimum observed $I_{finish}$ during the most recent stable operating period.\n2.  **Resistance Proxy Calculation:**\n    *   Compute Finish Block Friction Index: $R_{finish} = \\frac{I_{finish} - I_{no\\_load}}{v}$\n    *   Compute Target Threshold: $R_{target} = 1.05 \\times R_{healthy}$, where $R_{healthy}$ is the average $R_{finish}$ from historical logs associated with the lowest break frequency.\n3.  **Feedback Loop Logic:**\n    *   **Condition:** If $R_{finish} > R_{target}$:\n    *   **Action:** Issue a **speed reduction command** to the line-speed encoder reference, decreasing $v$ by 1% per control cycle.\n    *   **Condition:** If $R_{finish} < R_{target} \\times 0.95$ and $C_{break}$ has not increased in the last 1 hour:\n    *   **Action:** Issue a **speed increase command** to restore nominal $v$, increasing $v$ by 0.5% per control cycle up to nominal limit.\n    *   **Break Counter Integration:** Use $C_{break}$ as a long-term validation metric. If $C_{break}$ increases over a 24-hour window despite VTC activation, trigger operator alarm for manual intervention.\n\n**Measures it Relies On:**\n*   **Per-block Motor Ammeter (Finish Block):** Primary feedback signal for tension estimation. Value used directly as $I_{finish}$.\n*   **Line-Speed Encoder:** Primary feedback signal for speed. Value used directly as $v$; also the actuator reference for the control loop.\n*   **Break Counter:** Outcome metric for validation. Value used directly as $C_{break}$.\n*   **Historical Logs (Derived):** Source for $I_{no\\_load}$ and $R_{healthy}$ baselines. No new sensors required; relies on existing data records.\n\n**Why this works under the constraint:**\n*   No new sensors are added.\n*   It directly addresses the climbing motor current and multiplied breaks by actively suppressing high relative resistance at the finish block using available speed control and current feedback, with explicit direction of effect defined.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Signal Acquisition:**",
+     "*   **Input:** Per-block motor ammeter reading for the finish block ($I_{finish}$).",
+     "*   **Input:** Line-speed encoder reading ($v$).",
+     "*   **Input:** Break counter cumulative count ($C_{break}$).",
+     "*   **Derivation:** Establish baseline no-load current ($I_{no\\_load}$) from historical lo",
+     "2.  **Resistance Proxy Calculation:**",
+     "*   Compute Finish Block Friction Index: $R_{finish} = \\frac{I_{finish} - I_{no\\_load}}{v}",
+     "*   Compute Target Threshold: $R_{target} = 1.05 \\times R_{healthy}$, where $R_{healthy}$ ",
+     "3.  **Feedback Loop Logic:**",
+     "*   **Condition:** If $R_{finish} > R_{target}$:",
+     "*   **Action:** Issue a **speed reduction command** to the line-speed encoder reference, d",
+     "*   **Condition:** If $R_{finish} < R_{target} \\times 0.95$ and $C_{break}$ has not increa",
+     "*   **Action:** Issue a **speed increase command** to restore nominal $v$, increasing $v$ ",
+     "*   **Break Counter Integration:** Use $C_{break}$ as a long-term validation metric. If $C",
+     "*   **Per-block Motor Ammeter (Finish Block):** Primary feedback signal for tension estima",
+     "*   **Line-Speed Encoder:** Primary feedback signal for speed. Value used directly as $v$;",
+     "*   **Break Counter:** Outcome metric for validation. Value used directly as $C_{break}$.",
+     "*   **Historical Logs (Derived):** Source for $I_{no\\_load}$ and $R_{healthy}$ baselines. ",
+     "*   No new sensors are added.",
+     "*   It directly addresses the climbing motor current and multiplied breaks by actively sup"
+    ],
+    "APPARATUS_ROW": [
+     "*   No new sensors are added."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 8.59,
+     "usage": {
+      "prompt_tokens": 249,
+      "completion_tokens": 860,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 2,
+     "latency_s": 124.82,
+     "usage": {
+      "prompt_tokens": 1194,
+      "completion_tokens": 1292,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Tension Regulation via Speed-Current I",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Tension Regulation via Speed-Current Integration**\n\n**Mechanism**\nImplement a derived \"Virtual Tension\" control law using only existing sensors to dynamically adjust line speed and counteract the climbing motor current in the finish block. The core insight is that motor current ($I_m$) is a direct proxy for mechanical tension ($T$) in a DC motor drive, governed by $T \\propto I_m$. By using the per-block ammeters as tension sensors and the line-speed encoder for velocity, you can create a feedback loop that detects the excessive tension (high current) and reduces the draw speed to relieve stress on the wire, thereby preventing breaks while maintaining the correct gauge (since gauge is primarily determined by the die reduction ratio and material flow, which remains stable if the process is slowed, not if speed is blindly increased).\n\n**Implementation**\n1.  **Signal Acquisition:**\n    *   Read the real-time motor current ($I_m$) from the **finish block’s ammeter** (existing sensor).\n    *   Read the line velocity ($v$) from the **line-speed encoder** (existing sensor).\n    *   Monitor the **break counter** to detect immediate failures.\n\n2.  **Control Logic (PLC/Drive PID Loop):**\n    *   Define a **Current Threshold ($I_{set}$)** slightly above the historical baseline normal operating current for the finish block. This threshold represents the maximum allowable tension before break risk becomes high.\n    *   Create a **Tension Error Signal ($E_t$):**\n        $$E_t = I_{set} - I_{measured}$$\n    *   Use a **PI (Proportional-Integral) controller** where the error $E_t$ drives an adjustment to the **line-speed reference**.\n        *   If $I_{measured} > I_{set}$ (Current too high / Tension too high), the controller **reduces** the speed setpoint.\n        *   If $I_{measured} < I_{set}$ (Current low / Tension low), the controller **increases** the speed setpoint (within safe limits).\n    *   **Rate Limiting:** Apply a slew rate limit to speed changes to prevent jerky movements that could cause inertial breaks.\n\n3.  **Safety Interlock (Break Counter Integration):**\n    *   If the **break counter** increments, immediately halt the line and reset the speed controller to a safe startup speed. This prevents the controller from trying to \"correct\" speed against a broken wire.\n\n**Measures Relied On**\n*   **Per-block motor ammeters:** Used as indirect tension sensors. In wire drawing, motor current is linearly proportional to the load torque, which is directly caused by wire tension against the die friction and material deformation resistance. This allows tension monitoring without new force sensors.\n*   **Line-speed encoder:** Provides the velocity feedback necessary for the PI controller and ensures that speed adjustments are precise and synchronized with the actual line movement. It also allows for speed-based normalization of current (if needed, e.g., compensating for varying speed-dependent friction).\n*   **Break counter:** Serves as a hard fault detection mechanism to safely stop the process when the mitigation fails or when a break occurs, preventing damage to the machine and waste of material.\n\n**Why This Mitigates the Failure**\n*   **Climbing Current/Breaks:** The climbing current indicates increasing tension, likely due to factors like wire heating (reducing strength), die wear (increasing friction), or material variability. The PI loop automatically slows the line when tension rises, reducing the force on the wire and preventing breaks.\n*   **Gauge Maintained:** Slowing the line does not change the mechanical reduction ratio at the die. The gauge is a function of the die diameter and material displacement, not the speed (within reasonable limits). By controlling tension (via speed) instead of forcing speed, the process adapts to changing wire/material conditions, keeping tension in a safe band and thus preventing breaks, while the gauge remains to print.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Tension Regulation via Speed-Current Integration**\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** Per-block motor ammeter reading ($I_{measured}$) from the finish block.\n*   **Direction of Effect:** An increase in $I_{measured}$ above the setpoint ($I_{set}$) indicates excessive mechanical tension. The control system responds by **decreasing** the line-speed reference. A decrease in line speed reduces the relative velocity at the die and the associated inertial/frictional forces, thereby **decreasing** the tension on the wire and preventing breaks. Conversely, if $I_{measured}$ drops below $I_{set}$, the system increases the speed to maintain production rate without excessive tension, keeping the wire within the safe tension band.\n\n**Mechanism**\nImplement a derived \"Virtual Tension\" control law using only existing sensors to dynamically adjust line speed and counteract the climbing motor current in the finish block. The core insight is that motor current ($I_m$) is a direct proxy for mechanical tension ($T$) in a DC motor drive, governed by $T \\propto I_m$. By using the per-block ammeters as tension sensors and the line-speed encoder for velocity feedback, the system creates a feedback loop that detects excessive tension (high current) and reduces the draw speed to relieve stress on the wire. This prevents breaks while maintaining the correct gauge, as gauge is determined by the die reduction ratio and material displacement, which remain stable when the process is slowed rather than when speed is blindly increased.\n\n**Implementation**\n1.  **Signal Acquisition & Input Mapping:**\n    *   **Tension Input:** Read the real-time motor current ($I_{measured}$) from the **finish block’s ammeter** (permitted existing sensor). This serves as the primary control input.\n    *   **Velocity Feedback:** Read the line velocity ($v$) from the **line-speed encoder** (permitted existing sensor). This is used for rate-limiting calculations and ensuring synchronized speed adjustments.\n    *   **Fault Detection:** Monitor the **break counter** (permitted existing sensor) to detect immediate wire failures.\n    *   **Setpoint Definition:** Define a **Current Threshold ($I_{set}$)** slightly above the historical baseline normal operating current for the finish block. This threshold represents the maximum allowable tension before break risk becomes high.\n\n2.  **Control Logic (PLC/Drive PID Loop):**\n    *   Create a **Tension Error Signal ($E_t$):**\n        $$E_t = I_{set} - I_{measured}$$\n    *   Use a **PI (Proportional-Integral) controller** where the error $E_t$ drives an adjustment to the **line-speed reference**.\n        *   If $I_{measured} > I_{set}$ (Error negative / Tension too high), the controller **reduces** the speed setpoint.\n        *   If $I_{measured} < I_{set}$ (Error positive / Tension low), the controller **increases** the speed setpoint (within safe limits).\n    *   **Rate Limiting:** Apply a slew rate limit to speed changes derived from the velocity feedback ($v$) to prevent jerky movements that could cause inertial breaks.\n\n3.  **Safety Interlock (Break Counter Integration):**\n    *   If the **break counter** increments, immediately halt the line and reset the speed controller to a safe startup speed. This prevents the controller from attempting to \"correct\" speed against a broken wire.\n\n**IMPLEMENTATION BILL**\n*   **Hardware:** None. Utilize existing PLC/Drive firmware capacity.\n*   **Software/Firmware:** Update the PLC logic to include a new PI control block. \n    *   Input 1: Finish Block Ammeter (4-20mA or digital equivalent).\n    *   Input 2: Line-Speed Encoder (frequency or digital output).\n    *   Input 3: Break Counter (latching relay or digital input).\n    *   Output: Speed Reference Command to Drive (analog or digital bus).\n*   **Configuration:** \n    *   Define $I_{set}$ in the PLC parameter table.\n    *   Tune PI gain ($K_p, K_i$) and slew rate limits.\n    *   Map the Break Counter signal to a Stop command and Reset command.\n\n**Measures Relied On**\n*   **Per-block motor ammeters:** Source of $I_{measured}$. Used as indirect tension sensors. In wire drawing, motor current is linearly proportional to the load torque, which is directly caused by wire tension against the die friction and material deformation resistance. This allows tension monitoring without new force sensors.\n*   **Line-speed encoder:** Source of $v$. Provides the velocity feedback necessary for the PI controller's rate-limiting logic and ensures that speed adjustments are precise and synchronized with the actual line movement.\n*   **Break counter:** Source of fault status. Serves as a hard fault detection mechanism to safely stop the process when the mitigation fails or when a break occurs, preventing damage to the machine and waste of material.\n\n**Why This Mitigates the Failure**\n*   **Climbing Current/Breaks:** The climbing current indicates increasing tension, likely due to factors like wire heating (reducing strength), die wear (increasing friction), or material variability. The PI loop automatically slows the line when tension rises (current increases), reducing the force on the wire and preventing breaks.\n*   **Gauge Maintained:** Slowing the line does not change the mechanical reduction ratio at the die. The gauge is a function of the die diameter and material displacement, not the speed (within reasonable limits). By controlling tension (via speed) instead of forcing speed, the process adapts to changing wire/material conditions, keeping tension in a safe band and thus preventing breaks, while the gauge remains to print.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Hardware:** None. Utilize existing PLC/Drive firmware capacity.",
+     "*   **Software/Firmware:** Update the PLC logic to include a new PI control block.",
+     "*   Input 1: Finish Block Ammeter (4-20mA or digital equivalent).",
+     "*   Input 2: Line-Speed Encoder (frequency or digital output).",
+     "*   Input 3: Break Counter (latching relay or digital input).",
+     "*   Output: Speed Reference Command to Drive (analog or digital bus).",
+     "*   **Configuration:**",
+     "*   Define $I_{set}$ in the PLC parameter table.",
+     "*   Tune PI gain ($K_p, K_i$) and slew rate limits.",
+     "*   Map the Break Counter signal to a Stop command and Reset command.",
+     "*   **Per-block motor ammeters:** Source of $I_{measured}$. Used as indirect tension senso",
+     "*   **Line-speed encoder:** Source of $v$. Provides the velocity feedback necessary for th",
+     "*   **Break counter:** Source of fault status. Serves as a hard fault detection mechanism ",
+     "*   **Climbing Current/Breaks:** The climbing current indicates increasing tension, likely",
+     "*   **Gauge Maintained:** Slowing the line does not change the mechanical reduction ratio "
+    ],
+    "APPARATUS_ROW": [
+     "*   **Per-block motor ammeters:** Source of $I_{measured}$. Used as indirect tension sensors. In wire drawing,"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism:** Implement a closed-loop **Variable Tension Control (VTC)** algorithm that modulates the line speed to suppress progressive tension buildup in the finish block, preventing wire breaks.\n\n**Direction-of-Effect:** The driving variable is the real-time calculated **Finish Block Friction Index** ($R_{finish}$). The direction of the mechanical effect is **reduction of line speed** ($v$) when $R_{finish}$ exceeds the target threshold. This reduces dynamic tension peaks at the finish block, thereby lowering the probability of wire fracture.\n\n**Implementation Bill:**\n1.  **Signal Acquisition:**\n    *   **Input:** Per-block motor ammeter reading for the finish block ($I_{finish}$).\n    *   **Input:** Line-speed encoder reading ($v$).\n    *   **Input:** Break counter cumulative count ($C_{break}$).\n    *   **Derivation:** Establish baseline no-load current ($I_{no\\_load}$) from historical logs at $v=0$ or low constant $v$ prior to activation. If unavailable, derive $I_{no\\_load}$ as the minimum observed $I_{finish}$ during the most recent stable operating period.\n2.  **Resistance Proxy Calculation:**\n    *   Compute Finish Block Friction Index: $R_{finish} = \\frac{I_{finish} - I_{no\\_load}}{v}$\n    *   Compute Target Threshold: $R_{target} = 1.05 \\times R_{healthy}$, where $R_{healthy}$ is the average $R_{finish}$ from historical logs associated with the lowest break frequency.\n3.  **Feedback Loop Logic:**\n    *   **Condition:** If $R_{finish} > R_{target}$:\n    *   **Action:** Issue a **speed reduction command** to the line-speed encoder reference, decreasing $v$ by 1% per control cycle.\n    *   **Condition:** If $R_{finish} < R_{target} \\times 0.95$ and $C_{break}$ has not increased in the last 1 hour:\n    *   **Action:** Issue a **speed increase command** to restore nominal $v$, increasing $v$ by 0.5% per control cycle up to nominal limit.\n    *   **Break Counter Integration:** Use $C_{break}$ as a long-term validation metric. If $C_{break}$ increases over a 24-hour window despite VTC activation, trigger operator alarm for manual intervention.\n\n**Measures it Relies On:**\n*   **Per-block Motor Ammeter (Finish Block):** Primary feedback signal for tension estimation. Value used directly as $I_{finish}$.\n*   **Line-Speed Encoder:** Primary feedback signal for speed. Value used directly as $v$; also the actuator reference for the control loop.\n*   **Break Counter:** Outcome metric for validation. Value used directly as $C_{break}$.\n*   **Historical Logs (Derived):** Source for $I_{no\\_load}$ and $R_{healthy}$ baselines. No new sensors required; relies on existing data records.\n\n**Why this works under the constraint:**\n*   No new sensors are added.\n*   It directly addresses the climbing motor current and multiplied breaks by actively suppressing high relative resistance at the finish block using available speed control and current feedback, with explicit direction of effect defined.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED"
+}

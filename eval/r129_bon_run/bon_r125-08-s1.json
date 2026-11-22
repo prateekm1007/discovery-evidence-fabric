@@ -1,0 +1,161 @@
+{
+ "problem_id": "r125-08-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 57.39,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 7.51,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 1406,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 8.46,
+     "usage": {
+      "prompt_tokens": 1775,
+      "completion_tokens": 984,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Pressure-Scheduled Adsorption with Purity-Gated Pu",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Feed-Pressure-Corrected Cycle Time Control**\n\n**Mechanism**\nImplement a closed-loop control strategy that dynamically adjusts the adsorption cycle duration based on the real-time reading of the existing feed-air pressure transmitter. The core principle is that adsorption capacity is proportional to the partial pressure of the adsorbate (oxygen/methane) and the total feed pressure. As feed pressure drops, the residence time of air in the bed required to fully saturate the adsorbent increases, or alternatively, the breakthrough point occurs later in absolute terms but earlier relative to a fixed timer if flow is low. However, in PSA, a more robust correlation is that for a fixed volume of adsorbent, the *breakthrough time* (cycle time) is inversely proportional to the feed flow rate. Since feed flow rate is directly proportional to feed pressure (for a fixed valve opening and upstream supply), the controller must extend the cycle time as feed pressure drops to maintain consistent purge and adsorption depth. The observed \"shortening\" of cycles is likely a fault in the current control logic (e.g., a fixed timer that doesn't account for pressure variation, or a faulty purge valve causing premature breakthrough). The mitigation forces the cycle time to be a function of measured pressure.\n\n**Implementation**\n1.  **Baseline Calibration:** Establish a linear relationship between the current \"Nominal\" Cycle Time ($T_{nom}$) and the \"Nominal\" Feed Pressure ($P_{nom}$) at the current known good operating point. Calculate the flow coefficient $K = T_{nom} / P_{nom}$.\n2.  **Real-Time Calculation:** Use the existing **cycle-time counter** to track elapsed time in each adsorption phase. Use the **feed-air pressure transmitter** to continuously read the current feed pressure ($P_{current}$).\n3.  **Dynamic Setpoint Adjustment:** Modify the PLC/Controller logic so that the target cycle time for each adsorption phase ($T_{target}$) is calculated in real-time as:\n    $$T_{target} = K \\times P_{current}$$\n    *Note: If the system was previously using a fixed timer $T_{fix}$, and $P_{current}$ is lower than nominal, $T_{target}$ will be shorter? No, physically, if flow is lower, the bed takes longer to break through. Therefore, $T_{target}$ must be **increased** when pressure is low. The correct physical relationship for constant flow capacity is $Flow \\propto Pressure$. $Time \\propto Volume/Flow$. So $Time \\propto Volume/Pressure$. Thus, $T_{target} = \\frac{C}{P_{current}}$.*\n    \n    *Correction to Mechanism:* The cycle time must be **inversely** proportional to feed pressure. If feed pressure drops, the volumetric flow drops, the gas spends more time in the bed, and breakthrough is delayed. If the controller keeps the time fixed, it over-adsorbs and wastes energy, or if the control strategy was \"time-based\" assuming constant flow, a drop in pressure means less mass transfer per second, but the total mass transferred by a fixed time is lower. Actually, in standard PSA, if flow decreases, breakthrough time *increases*. If the current failure is \"cycles shortening,\" it suggests the controller is actively reducing the cycle time. Why? Perhaps it is chasing the **product oxygen analyzer** reading. If purity is slipping, a bad heuristic might be shortening the cycle to avoid the tail of the breakthrough curve. But shortening the cycle reduces the volume of product per cycle.\n    \n    Let’s re-evaluate based on the failure: \"Purity slipping\" + \"Cycles shortening\" + \"Feed-air up.\" This implies the system is trying to compensate for low purity by rushing the cycle (shortening time) to get more cycles? No, shortening time reduces product output. The \"Feed-air consumption up\" suggests the valves are opening faster or the purge is aggressive.\n    \n    The most robust mitigation using existing sensors is to **decouple the cycle time from the oxygen analyzer’s reactive control** and instead tie it strictly to the **feed pressure**, while using the **oxygen analyzer** only for alarm/validation. The shortening of cycles is likely a control instability where the loop is over-correcting.\n\n    *Revised Implementation Logic:*\n    1.  **Disable reactive cycle-shortening:** Ensure the control system does *not* shorten the adsorption time in response to a transient drop in the oxygen analyzer signal.\n    2.  **Pressure-Based Scheduling:** Set the adsorption time $T_{ads}$ to be inversely proportional to the measured feed pressure $P_{feed}$: $T_{ads} = \\frac{A}{P_{feed}}$, where $A$ is a constant determined at the rated pressure. This ensures that as feed pressure (and thus flow) varies, the mass of gas processed per cycle remains constant, preventing premature breakthrough (which causes purity slippage) or excessive cycle times (which reduce production rate).\n    3.  **Purity Validation:** Use the **product oxygen analyzer** to monitor purity. If purity remains below spec after 3-5 cycles under the new pressure-corrected timing, trigger an alarm for adsorbent degradation or valve leakage (manual maintenance), as these are the only remaining root causes not fixable by cycle timing.\n\n**Measures It Relies On**\n1.  **Feed-Air Pressure Transmitter:** Provides the real-time input $P_{feed}$ to calculate the dynamic cycle duration. This addresses the root cause of variable flow rates due to upstream supply fluctuations.\n2.  **Cycle-Time Counter:** Implements the calculated variable duration $T_{ads}$, replacing the fixed timer. This prevents the \"shortening\" fault mode if it was caused by a miscalibrated fixed timer or a reactive control loop.\n3.  **Product Oxygen Analyzer:** Used strictly as a feedback signal for **validation and alarming**, not for real-time cycle shortening. This prevents the control system from entering a unstable loop where it shortens cycles in an attempt to improve purity, which actually reduces the contact time and further degrades purity, creating the observed \"slipping\" and \"shortening\" symptoms.\n\n**Summary of Action:**\nChange the control logic to set adsorption cycle time as $T \\propto 1/P_{feed}$. Stop using the oxygen analyzer to shorten cycles. Monitor purity with the oxygen analyzer; if it remains low, schedule maintenance for the bed or valves. This stabilizes the process, ensures consistent adsorption depth, and reduces unnecessary feed-air consumption by eliminating aggressive, reactive valve switching.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycles' are the same action class (th"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Pressure-Scheduled Adsorption with Purity-Gated Purge**\n\n**Mechanism**\nImplement a decoupled control strategy that separates adsorption timing from purity-based reactive shortening. The core principle is that adsorbent breakthrough is governed by the total mass of air processed, not just time. Since volumetric flow rate through the fixed bed is driven by the upstream feed-air pressure, a drop in pressure reduces the gas mass-transfer rate. To maintain a consistent adsorption depth (preventing premature oxygen breakthrough into the product), the adsorption phase duration must be extended when pressure drops. Conversely, the observed “shortening” of cycles is attributed to a faulty heuristic where the controller reacts to transient oxygen analyzer spikes by truncating the cycle to purge earlier, which paradoxically reduces contact time and further degrades purity. The mitigation decouples the adsorption timer from the oxygen analyzer, driving it solely via pressure, while using the oxygen analyzer strictly to gate the purge phase and validate purity.\n\n**DIRECTION-OF-EFFECT**\n*Driving Variable:* Feed-Air Pressure ($P_{feed}$).\n*Direction of Effect:* As Feed-Air Pressure **decreases**, the volumetric gas flow through the bed decreases, slowing the adsorption front. Therefore, the required Adsorption Cycle Time ($T_{ads}$) must **increase** to process the same total mass of air. As Feed-Air Pressure **increases**, $T_{ads}$ must **decrease**. This inverse relationship ($T_{ads} \times P_{feed} = Constant$) ensures constant mass throughput per adsorption cycle, preventing early breakthrough that causes purity slippage.\n\n**IMPLEMENTATION BILL**\n1. **Disable Reactive Shortening:** Modify the PLC logic to remove the oxygen analyzer signal from the input calculation for the adsorption phase timer. The adsorption timer shall no longer be adjusted in response to $O_2$ spikes.\n2. **Pressure-Based Scheduling:** Implement the formula $T_{ads} = K / P_{current}$ for the adsorption phase, where $K$ is a calibrated constant derived from nominal operating conditions ($K = T_{nom} \\times P_{nom}$).\n3. **Purity-Gated Purge:** Retain the oxygen analyzer as a threshold trigger for the *purge* phase only. Initiate the purge when the product $O_2$ exceeds the specification limit (e.g., 0.5% vol). If $O_2$ remains below spec at the end of the pressure-scheduled $T_{ads}$, hold the state (or extend minimally) but do not shorten. If $O_2$ exceeds spec at the end of $T_{ads}$, trigger an immediate alarm and force a maintenance hold, indicating adsorbent degradation or valve leakage.\n4. **Calibration Step:** At commissioning, record $T_{nom}$ at $P_{nom}$. Calculate $K$. Verify that at low pressure tests, the cycle extends proportionally.\n\n**Inputs and Measurement Traceability**\n1. **$P_{current}$ (Feed Pressure):** Derived directly from the **Feed-Air Pressure Transmitter** (Permitted Sensor 1). Used as the denominator in the $T_{ads}$ calculation.\n2. **$T_{elapsed}$ (Cycle Time):** Derived directly from the **Cycle-Time Counter** (Permitted Sensor 2). Used to compare against $T_{ads}$ and manage phase transitions.\n3. **$O_2_{product}$ (Purity):** Derived directly from the **Product Oxygen Analyzer** (Permitted Sensor 3). Used *only* for the logic gate that initiates the purge phase and for alarming/maintenance validation. It is explicitly excluded from the calculation of $T_{ads}$.\n4. **$K$ (Flow Coefficient):** Derived from permitted measurements at the nominal operating point: $K = T_{nom} \\times P_{nom}$, where $T_{nom}$ is read from the Cycle-Time Counter and $P_{nom}$ is read from the Feed-Air Pressure Transmitter at steady-state.\n\n**Summary of Action**\nDrive the adsorption cycle time inversely proportional to feed-air pressure ($T_{ads} = K/P_{feed}$) using the pressure transmitter and cycle-time counter. Decouple the oxygen analyzer from the cycle-time logic to prevent unstable reactive shortening. Use the oxygen analyzer solely to validate purity and trigger the purge phase. This stabilizes the adsorption depth, eliminates the feedback loop causing cycle shortening, and reduces unnecessary feed-air consumption by preventing aggressive, reactive valve switching.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. **Disable Reactive Shortening:** Modify the PLC logic to remove the oxygen analyzer sig",
+     "2. **Pressure-Based Scheduling:** Implement the formula $T_{ads} = K / P_{current}$ for th",
+     "3. **Purity-Gated Purge:** Retain the oxygen analyzer as a threshold trigger for the *purg",
+     "4. **Calibration Step:** At commissioning, record $T_{nom}$ at $P_{nom}$. Calculate $K$. V",
+     "1. **$P_{current}$ (Feed Pressure):** Derived directly from the **Feed-Air Pressure Transm",
+     "2. **$T_{elapsed}$ (Cycle Time):** Derived directly from the **Cycle-Time Counter** (Permi",
+     "3. **$O_2_{product}$ (Purity):** Derived directly from the **Product Oxygen Analyzer** (Pe",
+     "4. **$K$ (Flow Coefficient):** Derived from permitted measurements at the nominal operatin"
+    ],
+    "APPARATUS_ROW": [
+     "1. **Disable Reactive Shortening:** Modify the PLC logic to remove the oxygen analyzer signal from the input c",
+     "3. **$O_2_{product}$ (Purity):** Derived directly from the **Product Oxygen Analyzer** (Permitted Sensor 3). U"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycles' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 6.12,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 795,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.25,
+     "usage": {
+      "prompt_tokens": 1164,
+      "completion_tokens": 784,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Pressure Modulation**\\n\\n**Mechanism:*",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Pressure Modulation**\n\n**Mechanism:**\nThe degradation in purity and increased feed-air consumption at constant demand indicate that the current fixed pressure setpoint is no longer optimal for the current bed condition (likely due to bed aging, contamination, or ambient pressure shifts). The mitigation is to dynamically modulate the feed-air pressure using the existing Oxygen Analyzer to maintain the target product purity, rather than operating at a static, likely excessive, pressure. By lowering the operating pressure to the minimum effective level for the required purity, the specific feed-air consumption will decrease (improving energy efficiency) and the bed will operate at a more stable adsorption/desorption equilibrium, potentially stabilizing or extending the effective cycle time by reducing pressure-drop-induced flow fluctuations that trigger early cycle termination.\n\n**Implementation:**\n1.  **Control Law:** Implement a Proportional-Integral (PI) control loop in the existing PLC/Controller.\n    *   **Process Variable (PV):** Product Oxygen Concentration (from existing Oxygen Analyzer).\n    *   **Setpoint (SP):** Upper limit of product Oxygen spec (e.g., 2% or 4%, depending on spec, targeting just under the limit for efficiency).\n    *   **Manipulated Variable (MV):** Feed-Air Pressure Setpoint (sent to the existing Pressure Transmitter’s associated control valve/regulator).\n2.  **Logic:**\n    *   If PV > SP (Oxygen is too high/purity too low), the controller increases the MV (raises feed pressure) to improve separation.\n    *   If PV < SP (Oxygen is low/purity high), the controller decreases the MV (lowers feed pressure) to reduce air consumption.\n3.  **Constraints & Safety Limits:**\n    *   **Pressure Limits:** Hard-code minimum and maximum pressure limits in the controller based on equipment ratings (from the Pressure Transmitter range).\n    *   **Cycle Time Interaction:** The existing Cycle-Time Counter is used for *monitoring* only. The controller does not modulate cycle time. However, by stabilizing the pressure/purity relationship, the \"shortening\" of cycles (often caused by pressure oscillations triggering premature valve sequencing) should stabilize. If the controller detects that even at maximum allowed pressure the Oxygen level cannot be brought below SP, it triggers a maintenance alarm (using the existing Oxygen Analyzer reading), indicating the bed requires regeneration or replacement.\n    *   **Anti-Windup:** Ensure the PI controller has anti-windup logic to prevent the pressure setpoint from saturating incorrectly when the Oxygen Analyzer has transient noise.\n\n**Measures Relied On:**\n*   **Product Oxygen Analyzer:** Provides the real-time purity feedback signal (Process Variable).\n*   **Feed-Air Pressure Transmitter:** Provides the measurement of the actual pressure for the control loop feedback (though the controller manipulates the valve, the transmitter ensures the system knows the actual state; in many PSA systems, the transmitter is used for safety monitoring, but here it confirms the pressure is within operational bounds and provides data for tuning the pressure-purity correlation).\n*   **Cycle-Time Counter:** Used to verify that the cycles are operating within expected durations after the pressure modulation is applied. If cycles remain abnormally short despite stable pressure and purity, it indicates a valve sequencing fault, which is a separate issue. However, in this specific failure mode, the counter serves as a sanity check that the dynamic pressure modulation is not causing unstable oscillations in the cycle logic.\n\n**Outcome:**\nThis approach uses only existing sensors to actively optimize the operating pressure, directly addressing the increased feed-air consumption by preventing over-pressurization, and stabilizing purity by tightly controlling the key performance parameter (Oxygen content) via the primary process variable (Pressure), thereby mitigating the observed purity slip and cycle instability.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (th"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Pressure Modulation**\n\n**Mechanism:**\nThe degradation in nitrogen purity and increased feed-air consumption at constant demand indicate that the current fixed operating pressure is no longer optimal for the current bed condition (likely due to bed aging, contamination, or ambient pressure shifts). The mitigation is to dynamically modulate the feed-air pressure using the existing Oxygen Analyzer to maintain the target product purity. By adjusting the operating pressure to the minimum effective level required for the target purity, the specific feed-air consumption will decrease (improving energy efficiency). This stabilizes the adsorption equilibrium, which indirectly supports stable valve sequencing logic, preventing the pressure-drop-induced flow fluctuations that currently trigger early cycle termination.\n\n**DIRECTION-OF-EFFECT:**\nDriving Variable: Feed-air pressure setpoint.\nDirection of Effect: Increasing the feed-air pressure setpoint increases the partial pressure of oxygen in the product gas, thereby increasing the measured product oxygen concentration (PV) and reducing the product nitrogen purity. Decreasing the feed-air pressure setpoint decreases the product oxygen concentration, improving nitrogen purity, but may increase specific air consumption if not optimized.\n\n**Implementation Bill:**\n1.  **Control Law:** Implement a Proportional-Integral (PI) control loop in the existing PLC/Controller.\n    *   **Process Variable (PV):** Product Oxygen Concentration. Source: Existing Product Oxygen Analyzer.\n    *   **Setpoint (SP):** Upper limit of product Oxygen spec (e.g., 2% or 4%, targeting just under the limit for efficiency). Source: Static configuration parameter.\n    *   **Manipulated Variable (MV):** Feed-Air Pressure Setpoint. Source: Controller output sent to the existing Pressure Transmitter’s associated control valve/regulator.\n    *   **Feedback Verification:** Actual Feed-Air Pressure. Source: Existing Feed-Air Pressure Transmitter. Used to validate MV execution and check bounds.\n2.  **Logic:**\n    *   If PV > SP (Oxygen is too high/purity too low), the controller increases the MV (raises feed pressure setpoint) to improve separation.\n    *   If PV < SP (Oxygen is low/purity high), the controller decreases the MV (lowers feed pressure setpoint) to reduce air consumption.\n    *   Note: The controller does *not* manipulate the cycle time directly. Cycle time adjustments are a secondary response to stable pressure/purity equilibrium.\n3.  **Constraints & Safety Limits:**\n    *   **Pressure Limits:** Hard-code minimum and maximum pressure limits in the controller based on equipment ratings. Source: Equipment datasheet/Engineering constants.\n    *   **Monitoring:** The existing Cycle-Time Counter is used for *monitoring* only. It is not a manipulated variable. If cycles remain abnormally short despite stable pressure and purity, it indicates a valve sequencing fault, which is a separate issue. The counter serves as a sanity check that dynamic pressure modulation is not causing unstable oscillations in the cycle logic.\n    *   **Maintenance Alarm:** If the controller detects that even at maximum allowed pressure the Oxygen level (PV) cannot be brought below SP, it triggers a maintenance alarm. Source: Oxygen Analyzer reading vs. SP logic.\n    *   **Anti-Windup:** Ensure the PI controller has anti-windup logic to prevent the pressure setpoint from saturating incorrectly when the Oxygen Analyzer has transient noise.\n\n**Outcome:**\nThis approach uses only existing sensors to actively optimize the operating pressure, directly addressing the increased feed-air consumption by preventing over-pressurization, and stabilizing purity by tightly controlling the key performance parameter (Oxygen content) via the primary process variable (Pressure).",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Control Law:** Implement a Proportional-Integral (PI) control loop in the existing P",
+     "*   **Process Variable (PV):** Product Oxygen Concentration. Source: Existing Product Oxyg",
+     "*   **Setpoint (SP):** Upper limit of product Oxygen spec (e.g., 2% or 4%, targeting just ",
+     "*   **Manipulated Variable (MV):** Feed-Air Pressure Setpoint. Source: Controller output s",
+     "*   **Feedback Verification:** Actual Feed-Air Pressure. Source: Existing Feed-Air Pressur",
+     "2.  **Logic:**",
+     "*   If PV > SP (Oxygen is too high/purity too low), the controller increases the MV (raise",
+     "*   If PV < SP (Oxygen is low/purity high), the controller decreases the MV (lowers feed p",
+     "*   Note: The controller does *not* manipulate the cycle time directly. Cycle time adjustm",
+     "3.  **Constraints & Safety Limits:**",
+     "*   **Pressure Limits:** Hard-code minimum and maximum pressure limits in the controller b",
+     "*   **Monitoring:** The existing Cycle-Time Counter is used for *monitoring* only. It is n",
+     "*   **Maintenance Alarm:** If the controller detects that even at maximum allowed pressure",
+     "*   **Anti-Windup:** Ensure the PI controller has anti-windup logic to prevent the pressur"
+    ],
+    "APPARATUS_ROW": [
+     "*   **Maintenance Alarm:** If the controller detects that even at maximum allowed pressure the Oxygen level (P",
+     "*   **Anti-Windup:** Ensure the PI controller has anti-windup logic to prevent the pressure setpoint from satu"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  1,
+  0
+ ],
+ "selected_candidate": "c2",
+ "selection_tie": false,
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Pressure Modulation**\n\n**Mechanism:**\nThe degradation in nitrogen purity and increased feed-air consumption at constant demand indicate that the current fixed operating pressure is no longer optimal for the current bed condition (likely due to bed aging, contamination, or ambient pressure shifts). The mitigation is to dynamically modulate the feed-air pressure using the existing Oxygen Analyzer to maintain the target product purity. By adjusting the operating pressure to the minimum effective level required for the target purity, the specific feed-air consumption will decrease (improving energy efficiency). This stabilizes the adsorption equilibrium, which indirectly supports stable valve sequencing logic, preventing the pressure-drop-induced flow fluctuations that currently trigger early cycle termination.\n\n**DIRECTION-OF-EFFECT:**\nDriving Variable: Feed-air pressure setpoint.\nDirection of Effect: Increasing the feed-air pressure setpoint increases the partial pressure of oxygen in the product gas, thereby increasing the measured product oxygen concentration (PV) and reducing the product nitrogen purity. Decreasing the feed-air pressure setpoint decreases the product oxygen concentration, improving nitrogen purity, but may increase specific air consumption if not optimized.\n\n**Implementation Bill:**\n1.  **Control Law:** Implement a Proportional-Integral (PI) control loop in the existing PLC/Controller.\n    *   **Process Variable (PV):** Product Oxygen Concentration. Source: Existing Product Oxygen Analyzer.\n    *   **Setpoint (SP):** Upper limit of product Oxygen spec (e.g., 2% or 4%, targeting just under the limit for efficiency). Source: Static configuration parameter.\n    *   **Manipulated Variable (MV):** Feed-Air Pressure Setpoint. Source: Controller output sent to the existing Pressure Transmitter’s associated control valve/regulator.\n    *   **Feedback Verification:** Actual Feed-Air Pressure. Source: Existing Feed-Air Pressure Transmitter. Used to validate MV execution and check bounds.\n2.  **Logic:**\n    *   If PV > SP (Oxygen is too high/purity too low), the controller increases the MV (raises feed pressure setpoint) to improve separation.\n    *   If PV < SP (Oxygen is low/purity high), the controller decreases the MV (lowers feed pressure setpoint) to reduce air consumption.\n    *   Note: The controller does *not* manipulate the cycle time directly. Cycle time adjustments are a secondary response to stable pressure/purity equilibrium.\n3.  **Constraints & Safety Limits:**\n    *   **Pressure Limits:** Hard-code minimum and maximum pressure limits in the controller based on equipment ratings. Source: Equipment datasheet/Engineering constants.\n    *   **Monitoring:** The existing Cycle-Time Counter is used for *monitoring* only. It is not a manipulated variable. If cycles remain abnormally short despite stable pressure and purity, it indicates a valve sequencing fault, which is a separate issue. The counter serves as a sanity check that dynamic pressure modulation is not causing unstable oscillations in the cycle logic.\n    *   **Maintenance Alarm:** If the controller detects that even at maximum allowed pressure the Oxygen level (PV) cannot be brought below SP, it triggers a maintenance alarm. Source: Oxygen Analyzer reading vs. SP logic.\n    *   **Anti-Windup:** Ensure the PI controller has anti-windup logic to prevent the pressure setpoint from saturating incorrectly when the Oxygen Analyzer has transient noise.\n\n**Outcome:**\nThis approach uses only existing sensors to actively optimize the operating pressure, directly addressing the increased feed-air consumption by preventing over-pressurization, and stabilizing purity by tightly controlling the key performance parameter (Oxygen content) via the primary process variable (Pressure).",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED"
+}
