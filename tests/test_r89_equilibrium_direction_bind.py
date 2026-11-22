@@ -135,13 +135,18 @@ def test_r71_recompute_table_still_matches():
 # ---- 4. zero frozen files moved (the freeze discipline) -------------
 def test_frozen_machine_untouched():
     """The fifth bind rides the scan module (the R77 precedent): the
-    frozen V7.7 machine bytes are UNTOUCHED — the 15/15 baseline's
-    r40_machine_v77.py sha16 stays ff43c6056d7e4163 and the machine
-    call site still imports the merged scan."""
+    frozen V7.7 machine bytes are UNTOUCHED except the R124 F97
+    re-freeze (claim c-0186, adjudication e8bbb5134a1e — the
+    auditor-ordered detector-side distinction in
+    scan_input_availability ONLY): the r40_machine_v77.py sha16
+    stays at the re-frozen pin and the machine call site still
+    imports the merged scan. The pin moved once before (R64s4
+    conscious re-freeze) with the changed-file map disclosed in
+    eval/r64_v9_preflight.json re_freeze_note."""
     import hashlib
     p = REPO / "scripts/r40_machine_v77.py"
     sha16 = hashlib.sha256(p.read_bytes()).hexdigest()[:16]
-    assert sha16 == "ff43c6056d7e4163", sha16
+    assert sha16 == "b95afc9006223bcd", sha16  # R124 F97 re-freeze (c-0186): scan_input_availability only; the formula-direction surface below unchanged
     src = p.read_text(encoding="utf-8")
     assert "from r70_stated_formula_scan import scan_stated_formula_direction" in src
     assert "vio.update(scan_stated_formula_direction(final))" in src

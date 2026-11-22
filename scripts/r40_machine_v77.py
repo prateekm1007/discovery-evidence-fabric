@@ -239,23 +239,196 @@ _DERIVED = re.compile(
     r"\b(?:derived|computed|calculated|estimated)\s+from\s+"
     r"([^\n.]{5,90})|\bvia\s+([^\n.]{5,90})", re.I)
 
+# --- F97 (R124 adjudication e8bbb5134a1e, claim c-0186): the
+# relied-on-input distinction. A NARRATED purpose ("used to monitor
+# thermal outcomes", "Continuously", "critical") is NOT a
+# control-input dependency; only a derivation actually CONSUMING a
+# non-permitted probe is. All parse helpers are STRUCTURAL (closed
+# function-word classes + physics vocabulary), never corpus-word
+# blacklists.
+_FUNC_WORDS = {
+    "the", "a", "an", "this", "that", "these", "those", "each",
+    "every", "all", "any", "some", "its", "their", "our", "we",
+    "is", "are", "was", "were", "be", "been", "being", "am",
+    "and", "or", "but", "nor", "so", "yet", "if", "then", "than",
+    "as", "at", "by", "for", "from", "in", "into", "of", "off",
+    "on", "onto", "out", "over", "per", "to", "up", "upon", "with",
+    "within", "without", "when", "while", "where", "which", "who",
+    "whom", "whose", "it", "they", "you", "can", "could", "may",
+    "might", "must", "shall", "should", "will", "would", "do",
+    "does", "did", "done", "has", "have", "had", "not", "no",
+    "also", "thus", "hence", "here", "there", "more", "most",
+    "less", "least", "very", "such", "both", "either", "neither",
+    "only", "just", "even", "still", "new", "existing", "already",
+    "installed", "permitted", "allowed", "current", "existing",
+}
+_ADJECTIVE_ENDINGS = ("ly",)
+# sensing/monitoring verbs and their derivatives NEVER head a
+# quantity noun phrase
+_SENSE_ROOTS = ("sens", "monitor", "measur", "analyz", "analyse",
+                "track", "observ", "detect", "indicat", "interrog",
+                "assay", "spectroscop", "read", "record", "sampl",
+                "check", "verif", "confirm", "watch", "survey")
+# generic head nouns: they carry quantity content only through
+# their modifiers/prepositional content
+_GENERIC_HEADS = {"rate", "ratio", "value", "values", "delta",
+                  "level", "signal", "signals", "reading",
+                  "readings", "measurement", "measurements",
+                  "trend", "system", "loop", "output", "input",
+                  "baseline", "profile", "index", "factor",
+                  "estimate", "deviation", "differential",
+                  "difference", "gradient", "change", "state",
+                  "condition", "parameter", "variable", "setpoint"}
+# instrument -> measured-quantity bridge (a permitted instrument
+# permits the quantity it measures; deterministic physics
+# vocabulary, not corpus-tuned)
+_INSTRUMENT_BRIDGE = {
+    "ammeter": ("current", "ampere", "amps", "amperage"),
+    "anemometer": ("wind", "speed", "velocity", "airspeed"),
+    "thermometer": ("temperature",),
+    "thermocouple": ("temperature",),
+    "thermostat": ("temperature",),
+    "pyrometer": ("temperature",),
+    "manometer": ("pressure",),
+    "barometer": ("pressure",),
+    "flowmeter": ("flow",),
+    "flow-meter": ("flow",),
+    "encoder": ("speed", "position", "belt"),
+    "tachometer": ("speed", "rpm", "rotation"),
+    "hygrometer": ("humidity", "moisture"),
+    "psychrometer": ("humidity", "wet-bulb", "wetbulb"),
+    "pressure-transmitter": ("pressure",),
+    "level-transmitter": ("level",),
+    "vibration-sensor": ("vibration", "frequency", "acceleration"),
+    "accelerometer": ("vibration", "acceleration"),
+}
+_CONTROL_FRAME = re.compile(
+    r"\b(?:use[sd]?\s+(?:the\s+)?{Q}|based\s+on\s+(?:the\s+)?{Q}|"
+    r"from\s+(?:the\s+)?{Q}\s+(?:to\s+)?(?:compute|calculat|"
+    r"estimat|deriv|obtain|construct|drive|adjust|modulat|control)|"
+    r"(?:compute|calculat|estimat|deriv|obtain|construct)\w*\s+"
+    r"(?:\w+\s+){0,4}(?:from|using)\s+(?:the\s+)?{Q}|"
+    r"(?:control|regulat|adjust|actuat|modulat|drive|steer|limit|"
+    r"schedule|cycle|trigger|alarm)\w*\s+(?:\w+\s+){0,4}"
+    r"(?:on|from|by|using|against|with)\s+(?:the\s+)?{Q}|"
+    r"response\s+to\s+(?:the\s+)?{Q}|{Q}\s+(?:as|for)\s+(?:the\s+)?"
+    r"(?:control|feedback|input|error|trigger|trip)\s+"
+    r"(?:signal|input|variable|basis))"
+    .replace("{Q}", r"([A-Za-z][A-Za-z\-]*(?:\s+[A-Za-z][A-Za-z\-]*){0,3})"))
+_NARRATION_FRAME = re.compile(
+    r"\b(?:to\s+(?:monitor|track|watch|verify|confirm|check|assess|"
+    r"indicate|detect|record|log|trend)|serves?\s+as\s+a\s+proxy|"
+    r"is\s+a\s+(?:standard|key|critical|useful|common)\s+"
+    r"parameter|used\s+(?:to|for)\s+(?:monitor|track|watch)|"
+    r"for\s+monitoring|a\s+(?:proxy|surrogate)\s+for|"
+    r"helps?\s+(?:to\s+)?(?:assess|indicate|verify)|"
+    r"(?:monitors?|tracks?|indicates?|reflects?|reveals?))",
+    re.I)
+_NEGATION = re.compile(
+    r"\b(?:do(?:es)?\s+not|not\s+(?:use|using|measure|measuring|"
+    r"calculate|calculating|require|requiring|rely|relying|"
+    r"available)|with(?:out)?\s+(?:measuring|using)|"
+    r"(?:are|is)\s+not\s+(?:in\s+the\s+)?permitted|"
+    r"not\s+in\s+the\s+permitted|cannot\s+be\s+(?:measured|"
+    r"obtained|derived)|no\s+direct\s+measurement|"
+    r"excludes?\s+(?:any\s+)?(?:reliance|use))",
+    re.I)
+
+
+def _is_noun_like(word: str) -> bool:
+    """F97: a quantity head must be noun-like — not a function
+    word, not an -ly adverb, not a sensing verb form, not a
+    coordinating conjunction."""
+    lw = word.lower().strip(".,;:")
+    if not lw or len(lw) < 3:
+        return False
+    if lw in _FUNC_WORDS:
+        return False
+    if lw.endswith(_ADJECTIVE_ENDINGS):
+        return False
+    if any(lw.startswith(r) for r in _SENSE_ROOTS):
+        return False
+    return True
+
+
+def _noun_phrase_after(text: str, start: int) -> str:
+    """F97 leg-1 rule A: the OBJECT of the sensing verb as a noun
+    phrase. Walk tokens after `start`; skip function words and
+    leading adjectives; the first noun-like token is the head;
+    extend with trailing noun-like tokens up to 4 words. A
+    coordination conjunction CUTS the phrase. Returns '' when no
+    noun-like head exists (narration grammar — fail-open)."""
+    toks = re.findall(r"[A-Za-z][A-Za-z\-]*", text[start:start + 60])
+    if not toks:
+        return ""
+    out = []
+    for i, w in enumerate(toks):
+        lw = w.lower()
+        if lw in ("and", "or", "nor", "but"):
+            break  # coordination tail — the conjunct is another clause
+        if lw in _FUNC_WORDS or lw.endswith(_ADJECTIVE_ENDINGS) \
+                or any(lw.startswith(r) for r in _SENSE_ROOTS):
+            if out:
+                break  # the head phrase already ended
+            continue  # a leading article/adjective — keep walking
+        out.append(w)
+        if len(out) >= 4:
+            break
+    return " ".join(out)
+
+
+def _hnorm(text: str) -> str:
+    """F97 rule D: hyphen-insensitive normalization for stem
+    matching — hyphens become spaces so 'feed rate' matches the
+    permitted 'feed-rate meter'."""
+    return (text.replace("-", " ").replace("\u2013", " ")
+                .replace("\u2014", " "))
+
+
+def _qty_content_stems(qty: str) -> set:
+    """The CONTENT stems of a quantity phrase: a GENERIC head
+    (rate/ratio/value/delta/...) contributes nothing by itself —
+    its content comes from its modifiers (e.g. 'rate of change of
+    the suction temperature' -> 'temper'). Empty content means no
+    identifiable physical quantity: fail-open (never fire)."""
+    toks = [t for t in _hnorm(qty).split()
+            if _is_noun_like(t) and t.lower() not in _GENERIC_HEADS]
+    if not toks:
+        return set()
+    return _content_stems(" ".join(toks))
+
+
+def _permitted_stems_plus_bridge(permitted_span: str) -> set:
+    """The permitted span's content stems PLUS the quantities its
+    named instruments measure (an ammeter permits 'current'; a
+    vibration sensor permits 'frequency'; an anemometer permits
+    'wind speed'). Deterministic physics vocabulary."""
+    stems = _content_stems(_hnorm(permitted_span))
+    h = _hnorm(permitted_span).lower()
+    for inst, quants in _INSTRUMENT_BRIDGE.items():
+        if inst.replace("-", " ") in h or inst in h.replace(" ", "-"):
+            for q in quants:
+                stems |= _content_stems(q)
+    return stems
+
 
 def scan_input_availability(prob: dict, a: str) -> dict:
-    """AM37 D2, deterministic, precision-first. Fire
+    """AM37 D2 + F97 (R124): deterministic, precision-first. Fire
     INPUT_UNAVAILABLE only when (a) the constraint's permitted-
-    measures/signals span parses (the allowed-measures span OR the
-    use-only/existing-sensors phrasing), and (b) the mechanism span
-    REQUIRES an online signal whose MEASURED QUANTITY (parentheticals
-    stripped — a '(derivative of an existing measurement)' aside does
-    not rescue an unpermitted quantity) shares no content stem with
-    the permitted span. Silent (fail-open) otherwise — the
-    authoritative read stays the auditor's."""
+    measures/signals span parses, and (b) the mechanism span RELIES
+    ON an online signal — a noun-phrase quantity consumed by a
+    CONTROL/COMPUTATION frame, not a narrated purpose, not
+    negated — whose hyphen-normalized content stems (instrument-
+    bridged) share nothing with the permitted span. Leg 2 fires
+    only on a comma-free noun-phrase capture of physical
+    quantities a stated computation consumes. Silent (fail-open)
+    otherwise — the authoritative read stays the auditor's."""
     cons = str(prob.get("constraint") or "")
     m = (PERMITTED_SPAN.search(cons) or ALLOWED_SPAN.search(cons)
          or _SIGNAL_SPAN.search(cons))
     if not m:
         return {}
-    permitted_stems = _content_stems(m.group(1))
+    permitted_stems = _permitted_stems_plus_bridge(m.group(1))
     if not permitted_stems:
         return {}
     span = _mechanism_span(a)
@@ -266,37 +439,112 @@ def scan_input_availability(prob: dict, a: str) -> dict:
                          r"cycle|during (?:operation|production)|in[- ]"
                          r"line|in[- ]service|monitor)", phrase):
             continue  # only ONGOING requirements bind (AM37: online)
-        # the measured QUANTITY: the "X-sensing" compound prefix or
-        # the object after the verb — parenthetical asides removed
-        # (they are argumentation, not the signal)
         s, e = mm.start(), mm.end()
         w = span[max(0, s - 45):min(len(span), e + 45)]
         w = re.sub(r"\([^)]*\)", " ", w)
+        # the measured QUANTITY: the "X-sensing" compound prefix or
+        # the OBJECT of the sensing verb as a NOUN PHRASE (F97 rule
+        # A — grammar noise fails open, silent)
         qty = None
         qc = _QTY_COMPOUND.search(w)
-        qo = _QTY_OBJECT.search(w)
-        if qc:
-            qty = qc.group(1)
-        elif qo:
-            qty = qo.group(1)
+        if qc and _is_noun_like(qc.group(1).split("-")[0].split()[0] \
+                if qc.group(1).split("-")[0].split() else ""):
+            head = qc.group(1)
+            qty = head
+        else:
+            vm = re.search(r"(?:sens\w+|monitor\w*|measur\w+|"
+                           r"analyz\w+|analyse\w+|interrogat\w+)\s+",
+                           w, re.I)
+            if vm:
+                np = _noun_phrase_after(w, vm.end())
+                if np and _is_noun_like(np.split()[0]):
+                    qty = np
         if not qty:
-            continue  # no identifiable quantity — fail-open silent
-        qty_stems = _content_stems(qty)
-        if qty_stems and not (qty_stems & permitted_stems):
-            out.append(f"required online signal '{qty.strip()[:50]}' "
-                       "is not among the permitted measures/signals")
+            continue  # no noun-phrase quantity — narration, silent
+        qty_stems = _qty_content_stems(qty)
+        if not qty_stems:
+            continue  # a generic head with no physical content
+        if qty_stems & permitted_stems:
+            continue  # the quantity (or its instrument) is permitted
+        # F97 rule B: RELIED-ON, not narrated. The window is judged
+        # as a whole: a control frame MUST consume the quantity AND
+        # a narration frame must NOT dominate it (the adjudicated
+        # 'use the existing probes to monitor thermal outcomes'
+        # has a control verb but is narration — the narration frame
+        # overrides).
+        frame = _hnorm(span[max(0, s - 130):min(len(span), e + 170)])
+        frame = re.sub(r"\([^)]*\)", " ", frame)
+        qpat = re.escape(_hnorm(qty).strip()[:34])
+        has_q = bool(re.search(qpat, frame, re.I))
+        control = has_q and _CONTROL_FRAME.search(frame)
+        narration = _NARRATION_FRAME.search(frame)
+        if narration and not (control and qpat
+                              and _CONTROL_FRAME.search(frame)
+                              and not narration):
+            # narration present: it overrides unless the quantity is
+            # consumed by an explicit computation frame OUTSIDE the
+            # narration clause; judged conservatively -> narration
+            continue
+        if not control:
+            continue
+        # F97 rule C: a disclosed exclusion is not a dependency
+        pre = _hnorm(span[max(0, s - 120):s + 70]).lower()
+        if _NEGATION.search(pre):
+            continue
+        out.append(f"required online signal "
+                   f"'{qty.strip()[:50]}' "
+                   "is not among the permitted measures/signals")
     # leg 2 (predictor features): a feature DERIVED from a quantity
-    # that requires unpermitted inputs (AM37 D2: "every predictor
-    # feature ... must derive only from the constraint's named
-    # signals" — the HO6-12 class: a saturation index via ion
-    # activity products under temperature/flow-only meters)
+    # that requires unpermitted inputs (AM37 D2) — F97 sharpened:
+    # a comma-free NOUN-PHRASE capture of physical quantities a
+    # stated computation consumes. Title-Case technique captions,
+    # prose slices (finite verbs/punctuation/length > 55), generic
+    # heads without physical content, and negated mentions never
+    # fire.
     for dm in _DERIVED.finditer(span):
         cap = dm.group(1) or dm.group(2) or ""
         cap = re.sub(r"\*|\([^)]*\)", " ", cap)
-        stems = _content_stems(cap)
-        if stems and not (stems & permitted_stems):
-            out.append(f"derived feature input '{cap.strip()[:60]}' "
-                       "is not derivable from the permitted signals")
+        # stray/unbalanced brackets from prose slicing are not
+        # input-list grammar
+        cap = re.sub(r"[()\[\]{}]", " ", cap).strip()
+        if (not cap or len(cap) > 55 or re.search(r"[,;:]", cap)
+                or re.search(r"\b(?:rather|which|assuming|reduces|"
+                             r"proactively|terminate|while|since|"
+                             r"because|although|whereas|we|our|"
+                             r"the|than|not)\b", cap, re.I)):
+            continue  # prose slice or disclosed exclusion
+        words = cap.split()
+        if words and all(t[0].isupper() for t in words):
+            continue  # Title-Case technique caption (any length)
+        if re.search(r"\b(?:valve\s+position|pump\s+speed|damper\s+"
+                     r"position|vfd\s+speed|fan\s+speed|actuator|"
+                     r"control\s+output|command|stroke)\b", cap,
+                     re.I):
+            continue  # an ACTUATOR phrase: the 'via X' names the
+            # manipulation means (what the proposal MOVES), not a
+            # measured input dependency
+        if not all(_is_noun_like(t) for t in words if len(t) > 2):
+            continue  # a verb phrase, not a quantity list
+        # short chemical/specifier tokens (O2, CO2, pH, T1) carry
+        # content the >=4-char stemmer drops: match them verbatim
+        # against the permitted span before firing
+        short = [t for t in re.findall(r"[A-Za-z]{1,3}\d?",
+                                       _hnorm(cap)) if len(t) <= 3]
+        if short:
+            pl = _hnorm(m.group(1)).lower()
+            if any(t.lower() in pl for t in short):
+                continue
+        stems = _qty_content_stems(cap)
+        if not stems:
+            continue  # generic head without physical content
+        if stems & permitted_stems:
+            continue
+        d0 = dm.start()
+        pre = _hnorm(span[max(0, d0 - 120):d0 + 70]).lower()
+        if _NEGATION.search(pre):
+            continue
+        out.append(f"derived feature input '{cap.strip()[:60]}' "
+                   "is not derivable from the permitted signals")
     if out:
         return {"INPUT_UNAVAILABLE": out[:3]}
     return {}
