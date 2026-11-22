@@ -1,0 +1,93 @@
+{
+ "lane": "replication",
+ "problem_id": "r123-01-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor-v2 (bare author [committed bytes] + F97-fixed check + improved-directive reviewer)",
+ "improved_directive_len": 567,
+ "authored_bill": "**Mitigation Proposal: Implement a Predictive Moisture Estimator Using Dry-Bulb/Dry-Bulb Temperature Differential and Feed Rate**\n\n**Mechanism:**\nReplace the reactive \"moisture loop\" (which likely waits for direct moisture measurement or long thermal lag) with a **feedforward predictive control** strategy based on a real-time \"Dryer Efficiency Index.\" This index is derived from existing signals to estimate the *rate of moisture removal* versus the *rate of moisture input*. By predicting the exit product moisture before it physically manifests at the sensor, the controller can adjust the dryer inlet temperature or residence time (via speed) proactively.\n\n**Implementation:**\n1.  **Calculate Wetting Factor (WF):**\n    *   Compute the **Inlet Wet-Bulb Temperature ($T_{wb,in}$)** and **Inlet Dry-Bulb Temperature ($T_{db,in}$)**.\n    *   Compute the **Outlet Dry-Bulb Temperature ($T_{db,out}$)** and **Outlet Wet-Bulb Temperature ($T_{wb,out}$)**.\n    *   Calculate the **Effective Heat Availability** as the difference between the inlet air's potential cooling capacity and the actual exit conditions. A key proxy for air-side moisture absorption capacity is the **Psychrometric Moisture Potential**:\n        $$ \\Delta \\Psi = (T_{db,in} - T_{wb,in}) - (T_{db,out} - T_{wb,out}) $$\n        *Note: As the dryer becomes less efficient or overload occurs, the temperature difference between dry and wet bulb at the outlet will converge (lower $\\Delta T$), indicating the air is saturated and losing drying capacity.*\n    *   Combine this with the **Feed Rate ($F$)** from the meter to create a normalized **Load Density**:\n        $$ \\text{Load} = \\frac{F}{\\Delta \\Psi_{in}} $$\n        Where $\\Delta \\Psi_{in} = T_{db,in} - T_{wb,in}$ is the maximum available drying power of the incoming air.\n\n2.  **Create a Reference Curve:**\n    *   Map historical data of $\\text{Load}$ against known \"Good\" product moisture levels to establish a target threshold: $\\text{Load}_{max}$.\n    *   If $\\text{Load} > \\text{Load}_{max}$, the dryer is thermodynamically overloaded relative to its current capacity.\n\n3.  **Control Logic (PID/FF):**\n    *   **Primary Control:** Use the **Feed Rate ($F$)** as the setpoint reference. Instead of controlling based on exit temperature (which is lagging and climbing), control the **Inlet Dry-Bulb Temperature ($T_{db,in}$)** to maintain the calculated $\\Delta \\Psi$ at a target level that keeps $\\text{Load}$ within the stable range.\n    *   **Secondary Safety:** If $T_{db,out}$ exceeds a safe upper limit *while* the moisture estimate is high, this confirms inefficiency. The controller should then **reduce feed rate** (if process allows) or **increase inlet temperature** (if heating capacity allows) to restore the drying potential gap ($\\Delta \\Psi$).\n    *   **Anti-Windup:** Since the old loop reacted late, use the **Inlet Wet-Bulb vs. Dry-Bulb** spread as a leading indicator. If the inlet spread narrows unexpectedly (indicating humid air supply), preemptively lower the feed rate before exit moisture rises.\n\n**Measures Relied On:**\n1.  **Inlet Dry-Bulb & Wet-Bulb Probes:** Used to calculate the initial psychrometric properties of the drying medium (air), specifically the latent heat capacity ($\\Delta T_{in} = T_{db,in} - T_{wb,in}$). This is the \"fuel\" for drying.\n2.  **Outlet Dry-Bulb & Wet-Bulb Probes:** Used to detect the \"saturation point\" of the exhaust. A rising $T_{db,out}$ coupled with a shrinking $\\Delta T_{out}$ (dry-wet difference) signals that the air has reached its moisture holding capacity, meaning the product will retain more moisture. This provides the *early* warning that the exit temperature climb is a symptom of overload, not just a temperature control issue.\n3.  **Feed-Rate Meter:** Provides the numerator for the Load calculation. By normalizing heat input by mass flow, the system can distinguish between \"more material\" (requiring more heat or slower speed) and \"less effective heat\" (requiring higher temperature or drier air).\n\n**Why this fixes the problem:**\nThe original failure is \"late reaction\" because the controller waits for the product to actually become too wet. The new mitigation uses the **thermodynamic state of the air** (via wet/dry bulb differentials) as a real-time proxy for drying *capacity*. Since air saturation occurs before product moisture exits, this method provides a leading indicator. The climbing exit temperature at constant feed rate is diagnosed as a system trying to compensate for reduced drying efficiency; the new logic addresses the root cause (capacity vs. load mismatch) rather than just symptomatically raising temperature.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Corrected Proposal: Predictive Moisture Control via Psychrometric Capacity Index**\n\n**1. Implementation Bill**\n*   **Control Strategy:** Switch the moisture management from reactive exit-temperature control to feedforward capacity-based control.\n*   **Calculated Variables:**\n    *   Inlet Drying Potential ($DP_{in}$): Derived from inlet dry-bulb and wet-bulb temperatures.\n    *   System Load Index ($LI$): Ratio of feed mass flow to inlet drying potential.\n    *   Saturation Alert: Derived from the convergence of outlet dry-bulb and wet-bulb temperatures.\n*   **Setpoints & Limits:**\n    *   $LI_{max}$: The maximum permissible System Load Index, determined from historical data correlating \"Good\" product moisture with specific $DP_{in}$ and Feed Rate values.\n    *   $T_{db,out, max}$: Existing safety limit for outlet dry-bulb temperature.\n*   **Actuators:**\n    *   Primary: Inlet air heating system (adjusting $T_{db,in}$).\n    *   Secondary: Feed rate meter control (adjusting $F$) or dryer speed (residence time).\n*   **Logic Flow:**\n    1.  Calculate $DP_{in}$ and $LI$.\n    2.  Compare $LI$ against $LI_{max}$.\n    3.  If $LI > LI_{max}$, increase $T_{db,in}$ to raise $DP_{in}$ (and thus lower $LI$) or decrease $F$ to lower $LI$.\n    4.  Monitor Outlet Saturation: If $(T_{db,out} - T_{wb,out})$ falls below a critical threshold $\\Delta T_{crit}$, trigger an immediate \"Overload\" state, forcing a reduction in $F$ to prevent product moisture creeps, regardless of current $T_{db,out}$.\n\n**2. Direction of Effect**\n*   **Driving Variable:** The System Load Index ($LI = F / DP_{in}$).\n*   **Mechanism Direction:** An increase in $LI$ (due to increased feed rate $F$ or decreased drying potential $DP_{in}$) drives the product moisture content **upward** and the exit temperature **upward** as the system attempts to compensate for insufficient air capacity. Conversely, maintaining $LI \\le LI_{max}$ drives the product moisture **downward** or stable within spec, while allowing exit temperatures to stabilize at a lower, more efficient level.\n*   **Leading Indicator Direction:** A narrowing of the outlet temperature differential $(T_{db,out} - T_{wb,out})$ signals a move toward air saturation, which drives the effective drying rate **downward**, leading to an eventual rise in exit product moisture if feed rate is not reduced.\n\n**3. Mechanism & Logic Details**\n\n**A. Input Signals & Derivations (Permitted Sensors Only)**\nThe proposal relies exclusively on the following existing measurements and derived variables. No new instrumentation is used.\n\n1.  **$F$ (Feed Rate):**\n    *   *Source:* Existing Feed-Rate Meter.\n    *   *Usage:* Numerator for Load calculation.\n\n2.  **$T_{db,in}$ (Inlet Dry-Bulb Temperature):**\n    *   *Source:* Existing Inlet Dry-Bulb Probe.\n    *   *Usage:* Input for Drying Potential calculation and primary control actuator reference.\n\n3.  **$T_{wb,in}$ (Inlet Wet-Bulb Temperature):**\n    *   *Source:* Existing Inlet Wet-Bulb Probe.\n    *   *Usage:* Input for Drying Potential calculation.\n\n4.  **$T_{db,out}$ (Outlet Dry-Bulb Temperature):**\n    *   *Source:* Existing Outlet Dry-Bulb Probe.\n    *   *Usage:* Safety limit check and diagnostic variable.\n\n5.  **$T_{wb,out}$ (Outlet Wet-Bulb Temperature):**\n    *   *Source:* Existing Outlet Wet-Bulb Probe.\n    *   *Usage:* Calculation of Outlet Saturation Differential.\n\n6.  **Derived Variable: Inlet Drying Potential ($DP_{in}$):**\n    *   *Formula:* $DP_{in} = T_{db,in} - T_{wb,in}$\n    *   *Physical Meaning:* The temperature spread represents the psychrometric capacity of the incoming air to absorb moisture. A larger spread indicates lower relative humidity and higher latent heat absorption capacity.\n\n7.  **Derived Variable: System Load Index ($LI$):**\n    *   *Formula:* $LI = F / DP_{in}$\n    *   *Physical Meaning:* A normalized index of how much moisture load the feed places on the available air capacity.\n\n8.  **Derived Variable: Outlet Saturation Differential ($\\Delta T_{out}$):**\n    *   *Formula:* $\\Delta T_{out} = T_{db,out} - T_{wb,out}$\n    *   *Physical Meaning:* As the air becomes saturated with moisture from the product, its wet-bulb temperature rises toward the dry-bulb temperature. A small $\\Delta T_{out}$ indicates high relative humidity in the exhaust, meaning the air has exhausted its capacity to absorb more moisture, signaling that product moisture will rise unless conditions change.\n\n**B. Control Logic**\n\n1.  **Baseline Calculation:**\n    *   Continuously compute $DP_{in}$ and $\\Delta T_{out}$.\n    *   Compute $LI = F / DP_{in}$.\n\n2.  **Preventive Control (Feedforward):**\n    *   **Condition:** $LI > LI_{max}$ (where $LI_{max}$ is established from historical \"Good\" moisture data).\n    *   **Action:** The controller acts on the root cause of the overload.\n        *   *Option 1 (Primary):* Increase $T_{db,in}$ (via heating element) to increase $DP_{in}$, thereby reducing $LI$ back into the stable zone. This prevents the exit temperature from climbing as a reactive measure.\n        *   *Option 2 (Secondary):* If heating capacity is at limit, decrease $F$ (feed rate) to reduce the numerator of $LI$.\n\n3.  **Reactive Safety Interlock (Correcting the \"Late\" Reaction):**\n    *   **Condition:** $\\Delta T_{out} < \\Delta T_{crit}$ (The outlet air is nearly saturated).\n    *   **Action:** Immediately reduce $F$ (feed rate).\n    *   **Rationale:** This interlock uses the outlet psychrometric state as a *direct* proxy for air exhaustion, bypassing the lag of product moisture sensors. If the air cannot accept more water vapor (low $\\Delta T_{out}$), adding more product feed will inevitably cause product moisture to creep up. This action takes precedence over temperature setpoints to prevent spec violations.\n\n4.  **Inlet Anomaly Check:**\n    *   **Condition:** $DP_{in}$ falls below a minimum threshold ($DP_{in, min}$) despite $T_{db,in}$ being at setpoint.\n    *   **Action:** Alert operator to check ambient humidity supply or ventilation. The system will automatically reduce $F$ to maintain $LI \\le LI_{max}$ because the \"fuel\" for drying is diminished.\n\n**4. Why This Fixes the Problem**\n\n*   **Eliminates Late Reaction:** The original loop reacted to product moisture or exit temperature, which are lagging variables. The corrected proposal reacts to $LI$ and $\\Delta T_{out}$. Since air saturation ($\\Delta T_{out}$ narrowing) and load mismatch ($LI$ rising) occur *before* the product reaches the exit sensor, the control action is predictive rather than reactive.\n*   **Stabilizes Exit Temperature:** The problem notes exit temperature climbs at constant feed rate. This is a symptom of the system trying to force dryness through temperature when air capacity is insufficient. By explicitly controlling $DP_{in}$ (via $T_{db,in}$) to match the load ($F$), the system restores the thermodynamic balance without the need for excessive temperature.\n*   **Uses Only Permitted Sensors:** All inputs are derived from the four existing temperature probes and the one existing feed meter. No new hardware is introduced. The \"Psychrometric Moisture Potential\" from the original proposal is simplified and clarified into $DP_{in}$ and $\\Delta T_{out}$, which are directly computable from the stated sensor data.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Control Strategy:** Switch the moisture management from reactive exit-temperature co",
+   "*   **Calculated Variables:**",
+   "*   Inlet Drying Potential ($DP_{in}$): Derived from inlet dry-bulb and wet-bulb temperatu",
+   "*   System Load Index ($LI$): Ratio of feed mass flow to inlet drying potential.",
+   "*   Saturation Alert: Derived from the convergence of outlet dry-bulb and wet-bulb tempera",
+   "*   **Setpoints & Limits:**",
+   "*   $LI_{max}$: The maximum permissible System Load Index, determined from historical data",
+   "*   $T_{db,out, max}$: Existing safety limit for outlet dry-bulb temperature.",
+   "*   **Actuators:**",
+   "*   Primary: Inlet air heating system (adjusting $T_{db,in}$).",
+   "*   Secondary: Feed rate meter control (adjusting $F$) or dryer speed (residence time).",
+   "*   **Logic Flow:**",
+   "1.  Calculate $DP_{in}$ and $LI$.",
+   "2.  Compare $LI$ against $LI_{max}$.",
+   "3.  If $LI > LI_{max}$, increase $T_{db,in}$ to raise $DP_{in}$ (and thus lower $LI$) or d",
+   "4.  Monitor Outlet Saturation: If $(T_{db,out} - T_{wb,out})$ falls below a critical thres",
+   "*   **Driving Variable:** The System Load Index ($LI = F / DP_{in}$).",
+   "*   **Mechanism Direction:** An increase in $LI$ (due to increased feed rate $F$ or decrea",
+   "*   **Leading Indicator Direction:** A narrowing of the outlet temperature differential $(",
+   "1.  **$F$ (Feed Rate):**",
+   "*   *Source:* Existing Feed-Rate Meter.",
+   "*   *Usage:* Numerator for Load calculation.",
+   "2.  **$T_{db,in}$ (Inlet Dry-Bulb Temperature):**",
+   "*   *Source:* Existing Inlet Dry-Bulb Probe.",
+   "*   *Usage:* Input for Drying Potential calculation and primary control actuator reference",
+   "3.  **$T_{wb,in}$ (Inlet Wet-Bulb Temperature):**",
+   "*   *Source:* Existing Inlet Wet-Bulb Probe.",
+   "*   *Usage:* Input for Drying Potential calculation.",
+   "4.  **$T_{db,out}$ (Outlet Dry-Bulb Temperature):**",
+   "*   *Source:* Existing Outlet Dry-Bulb Probe.",
+   "*   *Usage:* Safety limit check and diagnostic variable.",
+   "5.  **$T_{wb,out}$ (Outlet Wet-Bulb Temperature):**",
+   "*   *Source:* Existing Outlet Wet-Bulb Probe.",
+   "*   *Usage:* Calculation of Outlet Saturation Differential.",
+   "6.  **Derived Variable: Inlet Drying Potential ($DP_{in}$):**",
+   "*   *Formula:* $DP_{in} = T_{db,in} - T_{wb,in}$",
+   "*   *Physical Meaning:* The temperature spread represents the psychrometric capacity of th",
+   "7.  **Derived Variable: System Load Index ($LI$):**",
+   "*   *Formula:* $LI = F / DP_{in}$",
+   "*   *Physical Meaning:* A normalized index of how much moisture load the feed places on th",
+   "8.  **Derived Variable: Outlet Saturation Differential ($\\Delta T_{out}$):**",
+   "*   *Formula:* $\\Delta T_{out} = T_{db,out} - T_{wb,out}$",
+   "*   *Physical Meaning:* As the air becomes saturated with moisture from the product, its w",
+   "1.  **Baseline Calculation:**",
+   "*   Continuously compute $DP_{in}$ and $\\Delta T_{out}$.",
+   "*   Compute $LI = F / DP_{in}$.",
+   "2.  **Preventive Control (Feedforward):**",
+   "*   **Condition:** $LI > LI_{max}$ (where $LI_{max}$ is established from historical \"Good\"",
+   "*   **Action:** The controller acts on the root cause of the overload.",
+   "*   *Option 1 (Primary):* Increase $T_{db,in}$ (via heating element) to increase $DP_{in}$",
+   "*   *Option 2 (Secondary):* If heating capacity is at limit, decrease $F$ (feed rate) to r",
+   "3.  **Reactive Safety Interlock (Correcting the \"Late\" Reaction):**",
+   "*   **Condition:** $\\Delta T_{out} < \\Delta T_{crit}$ (The outlet air is nearly saturated)",
+   "*   **Action:** Immediately reduce $F$ (feed rate).",
+   "*   **Rationale:** This interlock uses the outlet psychrometric state as a *direct* proxy ",
+   "4.  **Inlet Anomaly Check:**",
+   "*   **Condition:** $DP_{in}$ falls below a minimum threshold ($DP_{in, min}$) despite $T_{",
+   "*   **Action:** Alert operator to check ambient humidity supply or ventilation. The system",
+   "*   **Eliminates Late Reaction:** The original loop reacted to product moisture or exit te",
+   "*   **Stabilizes Exit Temperature:** The problem notes exit temperature climbs at constant",
+   "*   **Uses Only Permitted Sensors:** All inputs are derived from the four existing tempera"
+  ],
+  "APPARATUS_ROW": [
+   "4.  Monitor Outlet Saturation: If $(T_{db,out} - T_{wb,out})$ falls below a critical threshold $\\Delta T_{crit",
+   "*   **Rationale:** This interlock uses the outlet psychrometric state as a *direct* proxy for air exhaustion, "
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ }
+}
