@@ -37,8 +37,7 @@ sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
 from r45_machine_v81 import (  # noqa: E402
-    machine_generate_v81, counted_template, MACHINE_DESCRIPTOR,
-    V81_REPAIR_DIRECTIVE)
+    machine_generate_v81, counted_template, MACHINE_DESCRIPTOR)
 from r43_machine_v8 import V77_REQUEST_MODEL, start_gateway  # noqa: E402
 
 AUDIT_TIP = "af6b5b311"

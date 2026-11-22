@@ -8,7 +8,9 @@ AGPL-licensed code (e.g. new-api) and unlicensed material (e.g. AutoTRIZ
 casebase.json, Gitee CWRU-1) are NOT copied verbatim; the TRIZ methodology
 (39 parameters, 40 principles, contradiction matrix, 76 standard solutions)
 is public-domain factual knowledge and is encoded in our own files
-(scripts/triz_principles.py).
+(discovery_fabric/engine/triz_principles.py — the engine plan layer;
+the scripts/ shim was deleted R120 with the retired delivery-machine
+ceremony, claim c-0178 re-scoped).
 
 ## Python dependencies (pip; used by the computed-physics layer and eval tooling)
 
@@ -188,8 +190,10 @@ is public-domain factual knowledge and is encoded in our own files
   verified present) — TF-IDF novelty-gate pattern (D3, planned).
 - triz-engine (MIT; `data/triz-matrix.json` 39x39 +
   `triz-knowledge-base.json` verified present) — candidate principle
-  mapping for D2 typed population; our own self-encoded families in
-  scripts/triz_principles.py remain the primary, the matrix JSON is
+  mapping for the D2 typed population (the ENGINE plan layer,
+  discovery_fabric/engine/triz_principles.py — the scripts/ shim was
+  deleted R120 with the retired delivery-machine ceremony); our own
+  self-encoded families remain the primary, the matrix JSON is
   the cross-check (attribution carried here).
 - llnl/open-ai-co-scientist (MIT) — Elo-tournament / proximity-dedup
   pattern (D8, planned; NOT jataware/open-coscientist, which is
@@ -284,7 +288,9 @@ this repository; no unlicensed repo code is copied.
 - jataware/open-coscientist — MIT + Commons Clause: not copied; the clean-MIT
   llnl/open-ai-co-scientist is the tournament-pattern source instead.
 - AutoTRIZ-DETC24 casebase.json — no license (textbook cases): not copied;
-  TRIZ encoded from public-domain methodology in scripts/triz_principles.py.
+  TRIZ encoded from public-domain methodology in
+  discovery_fabric/engine/triz_principles.py (the scripts/ shim
+  deleted R120 with the retired delivery-machine ceremony).
 - Gitee CWRU-1 and other unlicensed CN PHM repos — public data used, own loaders.
 
 ## triz-engine data (MIT)
