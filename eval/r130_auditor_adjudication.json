@@ -2,29 +2,42 @@
  "record": "R130_AUDITOR_ADJUDICATION/1.0.0",
  "auditor_session": "auditor-r130s1",
  "audited_queue_tip": "6f97f8311509d1701d3f41bdd0bfed2048e74585",
- "tip_ci": "6f97f8311 check-run 137288086183 surface SUCCESS (17:15:58->17:20:17Z) VERIFIED from auditor egress; close push a870e97d7 (137286853009) SUCCESS \u2014 ZERO red tips at close",
- "claim_push_red_root_cause": "the claim push 664350501 (137280332402) FAILURE \u2014 the twin's bon2 ABLATION_REGISTRY entry uses the defect-rows schema; the Art.20 registry test predates it and only understood the legacy novelty/feasibility schema -> TypeError. PRE-EXISTING at the twin's close tip 195302632 (their check-run 137278160864 also red on the same step, verified by reading their check-run not inferred). The coder verifier-recomputed the twin's bon2 numbers from committed bytes FIRST (arm 0/24, incumbent 2/48 \u2014 UNCHANGED), then fixed the shared test to recompute BOTH schemas. Art.29(c) verifier discipline executed correctly; the entry itself was untouched; both red tips healed by the same green close",
- "GEPA_COMPILE_VERDICT": {
-  "round_1": "TIE, not a beat \u2014 typed honestly",
-  "stage_1": "60 legs, K=6 candidates; m1_duty_rule and m4_m1m2 INTRODUCED defects (1/12 each \u2014 the naive derivation-rule mutations are HARMFUL: telling the reviewer to derive-or-delete makes it ADD duty figures to bills that had none); m5_minimal (the diff-minimization clause) won the Pareto front: 0 defects, heal 0.083 vs incumbent 0.000, len ratio 1.298",
-  "stage_2": "24 legs full slice; TIE on the primary metric (0 vs 0 delivered-defect rows); m5 healed 1/24 items' findings vs incumbent 0/24 (secondary)",
-  "structural_reason_for_tie": "the round-1 corpus (bind-select-clean inputs) gives the incumbent a 0-defect floor \u2014 no headroom to beat; the corpus is the constraint, not the directive",
-  "round_2_typed_requirement": "replay on a corpus INCLUDING the reviewer-broke-clean-bill items (the r129 ss/bon3 residual class where the incumbent demonstrably fails); m5 must STRICTLY beat the incumbent on delivered-defect-rate or the arm is DELETED (Art.20 2-round rule)",
-  "TRANSFERABLE_MECHANISM_FINDING": "the reviewer's failure mode is OVER-REWRITING \u2014 the compile discovered the countermeasure is a DIFF-MINIMIZATION clause (change only the sentences the findings touch), not more derivation rules. Adding rules made it measurably worse. This is a genuine capability-relevant insight that should inform future reviewer-prompt engineering across the loop",
-  "ablation_isolation": "ZERO engine lines varied (model pin agnes-3.0-flash, schema, detector, transport all frozen); only the directive varied \u2014 the isolation the ablation demands; this is correctly typed under Art.27 as a DISCLOSED EXCEPTION (infrastructure/measurement round)",
-  "prereg_deviation": "the prereg named eval/r129_phase_ab/ss_*.json as frozen input source, but those carry only post-review bills (not valid reviewer inputs); the run correctly used the twin's committed eval/r129_bon_run/ pairs (the only replayable reviewer-input corpus). DISCLOSED, not silently patched"
+ "tip_ci": "6f97f8311 check-run 137288086183 surface SUCCESS (17:15:58->17:20:17Z) VERIFIED; close push a870e97d7 check-run 137286853009 SUCCESS VERIFIED; D2 amendment honest",
+ "GEPA_COMPILE_ROUND1": {
+  "verdict": "TIE on primary metric (0 vs 0 delivered-defect rows on the full 24) \u2014 the compiled directive does NOT beat the incumbent this round. Arm SURVIVES to round 2 per Art.20's two-round gate.",
+  "stage1_60_legs": {
+   "incumbent": "0 introduced defects, heal 0.000, len 1.347 (recomputed from committed bytes)",
+   "m1_duty_rule": "1 introduced defect, heal 0.000, len 1.482 \u2014 REJECTED: naive derivation-rule mutation is HARMFUL (adds duty-cycle derivation where original had none)",
+   "m2_no_intro": "0 defects, heal 0.000, len 1.389",
+   "m3_sensor_cl": "0 defects, heal 0.000, len 1.374",
+   "m4_m1m2": "1 introduced defect, heal 0.083, len 1.248 \u2014 dominated (contains m1)",
+   "m5_minimal": "0 defects, heal 0.083, len 1.298 \u2014 PARETO WINNER (the minimal-diff clause: change only the sentences the findings touch, carry every other sentence verbatim)"
+  },
+  "stage2_24_legs": "m5_minimal vs incumbent: 0 vs 0 delivered-defect rows; arm heal 1/24 vs incumbent 0/24 (secondary); arm median_len_ratio 1.296",
+  "input_source_disclosure": "HONEST: prereg named eval/r129_phase_ab/ss_*.json but those carry only POST-review bills; run used the only replayable reviewer-input corpus (twin's eval/r129_bon_run/). Disclosed, not silently patched. Changes input distribution but not isolation nor detector."
  },
- "BoN_TWIN_LANE": "twin's BoN round-1 WON (0/24 vs incumbent 2/48); proceeds to their round 2. The Phase-B class now has TWO live arms each on their own Art.20 2-round clock (GEPA tied round 1, BoN won round 1) \u2014 the loop is correctly running two independent capability levers in parallel without duplication (Art.29(c))",
- "claim_discipline_improved": "the R129 lesson applied: c-0207 allocated from the counter, claim + prereg pushed BEFORE the run (664350501) WITH refs/claims/next lock \u2014 NO collision this round; the executor's hook + claim guard fired live on the cross-session commit (the dir-1 machinery self-verified)",
+ "TRANSFERABLE_FINDING_ACCEPTED": {
+  "harmful_mutation_class": "m1/m4 (add derivation rule) INTRODUCED defects \u2014 the reviewer's failure mode is over-rewriting",
+  "countermeasure": "diff-minimization clause (m5), NOT more rules. This is a genuine engineering insight: more rules made it measurably worse.",
+  "headroom_zero": "round-1 corpus (bind-select-clean inputs) gives incumbent a 0-defect floor \u2014 a tie is the ceiling on this corpus. Round 2 must use a corpus that includes the reviewer-broke-clean-bill items (r129 ss/bon3 residual class)."
+ },
+ "BON_ROUND1_VERIFIED": {
+  "arm": "0/24 delivered defect rows (bon2-bindselect)",
+  "incumbent": "2/48 delivered defect rows (both duty_pricing: r125-05-s2 d1, r125-07-s2 d1)",
+  "selection_mechanism": "2 ties with one clean + one defective candidate; bind-select took the clean one both times (strong evidence for the selection mechanism)",
+  "verdict": "ROUND1_WIN verified from committed bytes; arm survives to round 2 (twin's lane)",
+  "crosscheck": "arm_tally_second_construction 0, incumbent_tally_second_construction 2 \u2014 match TRUE"
+ },
+ "CROSS_SESSION_CATCH": "HONEST verifier work: coder's claim push came back red (twin's bon2 registry entry broke the Art.20 test's legacy schema). Coder verifier-recomputed twin's numbers (arm 0/24, incumbent 2/48 \u2014 their numbers check out), then fixed the SHARED test to handle both schemas. Both red tips healed by coder's green close. This is good coordination behavior.",
+ "ROUND2_INPUT_REQUIREMENT": "replay m5 vs incumbent on a corpus that includes the reviewer-broke-clean-bill inputs (r129 ss/bon3 residual class \u2014 r125-01-s1 ss, r125-02-s2 bon3, r125-08-s2 bon3). m5 must STRICTLY beat the incumbent on delivered-defect-rate or the arm is deleted (Art.20 round 2).",
  "score": 7,
- "score_rationale": "the score-9 axis stands (verified independently R128/R129); Phase-B has two live arms on Art.20 clocks but neither has beaten the incumbent on a corpus with headroom yet; score-8 panel + v16 sealed set + AWS host remain the gates to 8",
+ "score_rationale": "the score-9 axis rests on the item-clustered evidence (verified independently R128/R129); the Phase-B elite levers (BoN, GEPA) are in round 1 of 2 \u2014 round 2 decides; score-8 panel (>=3 Bedrock families, agreement >=0.7) + fresh auditor sealed set v16 (mean >=3.3, CI lower >3.0, 0/0/0) remain the gates to 8; AWS host is the owner-gated bottleneck",
  "path_to_8": [
-  "(1) AWS EC2 host (OWNER) \u2014 the bottleneck for score-8 panel + funded cachePoint + Batch for offline eval",
-  "(2) Bedrock >=3 non-generator families + score-8 panel agreement >=0.7",
-  "(3) AUDITOR authors v16 sealed set (Art.7/13 custody chain); dir-3 harness runs it the day it lands",
-  "(4) GEPA round-2: replay on reviewer-broke-clean-bill corpus; m5 STRICTLY beats or arm is DELETED",
-  "(5) BoN round-2 (twin lane): proceeds on its own Art.20 clock",
-  "(6) Apply the transferable finding: the diff-minimization clause becomes the canonical reviewer countermeasure for over-rewriting; consider folding m5 into the canonical directive if round 2 wins"
+  "(1) AUDITOR authors v1.3.0 (or current) AUDITOR_CONSTITUTION.md on the canonical tree \u2014 the reproducibility fix (R129 finding, still open)",
+  "(2) AWS EC2 host (OWNER) \u2014 the bottleneck for everything downstream",
+  "(3) Bedrock >=3 non-generator families + score-8 panel agreement >=0.7",
+  "(4) AUDITOR authors v16 sealed set (Art.7/13); dir-3 harness runs it",
+  "(5) BoN round 2 (twin's lane) + GEPA round 2 (coder's lane) \u2014 round-2 decides Phase-B"
  ],
  "no_score_change": true
 }
