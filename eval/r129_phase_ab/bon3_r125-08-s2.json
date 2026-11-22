@@ -1,0 +1,107 @@
+{
+ "problem_id": "r125-08-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 4.26,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 757,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.54,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 751,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.44,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 786,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 124.27,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1023,
+    "completion_tokens": 907,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycles' are the same action class (th"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycles' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Implement a Purity-Driven Feed-Pressure Stabilization and Bed Regeneration Pause**\n\n**Physics-Direction-of-Effect Statement:**\nThe primary failure driver is the loss of feed-air pressure stability, which reduces the partial pressure gradient of oxygen into the adsorbent bed. The mechanism of mitigation is to **increase** the effective feed-air pressure at the bed inlet during the adsorption phase by pausing downstream demand, which **increases** the mass transfer rate of oxygen to the bed, thereby **restoring** product purity. The driving variable is the feed-air pressure ($P_{feed}$), the direction of the mechanical intervention is to stabilize/increase $P_{feed}$ relative to demand, and the resulting effect is the restoration of $P_{O2}$ below the specification limit.\n\n**Mechanism:**\nThe observed symptoms (purity drop, shortening cycles, increased air consumption) indicate that the adsorption process is failing to achieve equilibrium because the available pressure differential is insufficient for the aged bed. The mechanism does not rely on extending cycle time (which exacerbates pressure drops), but rather on **stabilizing the feed-air pressure**. By using the product oxygen analyzer to detect purity loss, the system triggers a temporary reduction in nitrogen product flow (or a pause in cycle advancement if demand allows) to prevent the feed-air pressure from dropping below the minimum threshold required for effective adsorption. This ensures the bed reaches the necessary adsorption equilibrium despite aging, without extending the cycle time which would further degrade pressure.\n\n**Implementation Bill (IMPLEMENTATION BILL):**\n1.  **Pressure Guard Logic:** Configure the controller using the **Feed-Air Pressure Transmitter** to define a minimum operating pressure ($P_{min}$). \n2.  **Purity-Triggered Hold:** Use the **Product Oxygen Analyzer** signal ($P_{O2,meas}$). If $P_{O2,meas} > P_{target}$, initiate a 'Hold' state where the **Cycle-Time Counter** is paused or the next cycle's adsorption phase is delayed, while simultaneously reducing the product output valve position (derived from demand vs. pressure, or simply pausing cycles if demand is low) to raise $P_{feed}$. \n3.  **Recovery and Resume:** Once $P_{feed}$ (from **Feed-Air Pressure Transmitter**) stabilizes above $P_{min}$ for a defined dwell time, and $P_{O2,meas}$ (from **Product Oxygen Analyzer**) drops back below $P_{target}$, resume normal cycling using the **Cycle-Time Counter** at its original nominal setting.\n4.  **No Cycle Extension:** The adsorption time $T_{ads}$ is **not** extended. The mitigation is purely pressure-stabilization to ensure the existing $T_{ads}$ is sufficient.\n\n**Derivation of Inputs:**\n*   **$P_{O2,meas}$:** Directly read from the **Product Oxygen Analyzer**.\n*   **$P_{feed}$:** Directly read from the **Feed-Air Pressure Transmitter**.\n*   **$T_{ads}$:** Directly read/set via the **Cycle-Time Counter**.\n*   **$P_{min}$:** Defined as a static constant based on engineering limits, or derived as a fixed offset from the nominal $P_{feed}$ observed at baseline.\n*   **$P_{target}$:** Defined as a static constant slightly above the specification limit, or derived from the baseline **Product Oxygen Analyzer** reading.\n\n**Measures It Relies On:**\n*   **Product Oxygen Analyzer:** Provides the feedback signal ($P_{O2,meas}$) to trigger the hold state when purity slips.\n*   **Feed-Air Pressure Transmitter:** Provides the real-time pressure signal ($P_{feed}$) to confirm when the pressure has recovered sufficiently to resume cycling, preventing operation in a low-pressure regime that degrades purity.\n*   **Cycle-Time Counter:** Used to monitor the current cycle state and to implement the 'Hold' or 'Pause' action without altering the fundamental $T_{ads}$ duration, thereby avoiding the shortening/extension artifacts. It serves as the timing reference for the recovery dwell time.\"",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Pressure Guard Logic:** Configure the controller using the **Feed-Air Pressure Trans",
+   "2.  **Purity-Triggered Hold:** Use the **Product Oxygen Analyzer** signal ($P_{O2,meas}$).",
+   "3.  **Recovery and Resume:** Once $P_{feed}$ (from **Feed-Air Pressure Transmitter**) stab",
+   "4.  **No Cycle Extension:** The adsorption time $T_{ads}$ is **not** extended. The mitigat",
+   "*   **$P_{O2,meas}$:** Directly read from the **Product Oxygen Analyzer**.",
+   "*   **$P_{feed}$:** Directly read from the **Feed-Air Pressure Transmitter**.",
+   "*   **$T_{ads}$:** Directly read/set via the **Cycle-Time Counter**.",
+   "*   **$P_{min}$:** Defined as a static constant based on engineering limits, or derived as",
+   "*   **$P_{target}$:** Defined as a static constant slightly above the specification limit,",
+   "*   **Product Oxygen Analyzer:** Provides the feedback signal ($P_{O2,meas}$) to trigger t",
+   "*   **Feed-Air Pressure Transmitter:** Provides the real-time pressure signal ($P_{feed}$)",
+   "*   **Cycle-Time Counter:** Used to monitor the current cycle state and to implement the '"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Cycle-Time Counter:** Used to monitor the current cycle state and to implement the 'Hold' or 'Pause' act"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycles' and the stated failure driver 'cycles' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "wall_clock_s": 139.6,
+ "status": "DELIVERED",
+ "delivered_defects": [
+  "duty_pricing"
+ ]
+}

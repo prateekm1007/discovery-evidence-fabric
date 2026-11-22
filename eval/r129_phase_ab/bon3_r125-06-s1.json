@@ -1,0 +1,90 @@
+{
+ "problem_id": "r125-06-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 125.37,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 260,
+    "completion_tokens": 1100,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 9.32,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 260,
+    "completion_tokens": 977,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.27,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 260,
+    "completion_tokens": 855,
+    "cached_tokens": 256,
+    "cache_hit_rate": 0.9846153846153847
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.94,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1441,
+    "completion_tokens": 1535,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "### Mitigation Proposal: Closed-Loop Temperature Reduction via Dross Accumulation Index\n\n**Mechanism**\nThe accelerated thickening of the ash layer (dross) is caused by excessive zinc vaporization, which is driven by holding the kettle temperature too high. Zinc vapor condenses on cooler surfaces, oxidizes in air, and forms dross. By lowering the bath temperature, the vapor pressure of zinc drops exponentially (according to the Clausius-Clapeyron relation), significantly reducing vapor loss, dross formation, and subsequent zinc consumption. This mitigation implements a **closed-loop temperature reduction** strategy that dynamically calculates a \"Dross Accumulation Index\" from existing data to adjust the kettle setpoint lower when consumption rates spike, rather than maintaining a static, potentially excessive, temperature.\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** The calculated Dross Accumulation Index (DAI), which is derived from the ratio of actual zinc consumption to theoretical minimum consumption ($F_{excess}$) scaled by the square of the relative kettle temperature.\n*   **Direction of Effect:** An increase in DAI indicates excessive thermal stress and zinc loss. The control logic applies a **negative** adjustment to the kettle temperature setpoint ($\nabla T_{adj}$ is subtracted). Conversely, a decrease in DAI below the threshold applies a **positive** adjustment to the setpoint. Thus, the system acts to **lower** the temperature when the index is high, directly reducing the driving force (temperature) for vaporization.\n\n**Implementation**\n1.  **Calculate Real-Time Zinc Consumption Rate:**\n    *   Use the **production counter** to determine the mass of galvanized sheet produced per hour ($M_{sheet}$).\n    *   Assume a baseline target coating mass per unit area ($\\lambda_{target}$, in $g/m^2$). The theoretical minimum zinc consumption per hour is $Z_{min} = M_{sheet} \\times \\lambda_{target}$.\n    *   *Correction Note:* The original proposal relied on \"inventory tracking\" for $Z_{actual}$. This is **not** a permitted sensor or existing automated measurement stream derivable from the listed sensors. We must replace this input. Since we cannot measure total bath mass change directly without a level sensor, we will use the **Sheet-Entry Pyrometer** and **Kettle Thermocouples** to infer thermal efficiency, but primarily we will use the production counter and a fixed design value for $\\lambda_{target}$ to calculate $Z_{min}$. To create a dynamic index without a direct consumption sensor, we will define the DAI based on the **Kettle Zone Thermocouples** temperature relative to a baseline, as temperature is the direct driver of vaporization. We assume that if the temperature is held above the baseline for a duration correlated with high production (via counter), the potential for dross formation is high. However, to strictly adhere to the \"permitted sensors\" rule, we will derive the signal solely from temperature and throughput.\n    *   **Revised Calculation Strategy:** Since we cannot measure $Z_{actual}$ directly from the permitted sensors, we will use the **Kettle Zone Thermocouples** to determine if the bath is running hotter than the optimal baseline for the given throughput. High temperature relative to baseline is the primary indicator of excessive vaporization potential.\n\n2.  **Define Dross Accumulation Index (DAI):**\n    *   The DAI is a proxy for the thermal drive towards dross formation.\n    *   $DAI = \\left( \\frac{T_{kettle}}{T_{baseline}} \\right)^2 \\times \\left( \\frac{P_{current}}{P_{reference}} \\right)$\n    *   Where:\n        *   $T_{kettle}$ is the average temperature from the **kettle zone thermocouples**.\n        *   $T_{baseline}$ is the historical optimal temperature (e.g., 450\u00b0C).\n        *   $P_{current}$ is the real-time production rate derived from the **production counter** (sheets/hour).\n        *   $P_{reference}$ is the historical average production rate (stored constant).\n    *   This formulation uses only permitted inputs. The squared temperature term approximates vapor pressure increase; the production term accounts for the duration of exposure.\n\n3.  **Dynamic Setpoint Adjustment Logic:**\n    *   Define a control window: If $DAI > 1.1$ (indicating high thermal stress and risk), initiate a temperature reduction.\n    *   New Target Setpoint = $Current\\_Setpoint - \\Delta T_{adj}$\n    *   $\\Delta T_{adj} = k \\times (DAI - 1.1)$, where $k$ is a tuning constant.\n    *   **Constraint Check:** Ensure the new setpoint does not drop below the minimum required temperature. The **sheet-entry pyrometer** measures the temperature of the sheet as it enters. If the pyrometer indicates the sheet is entering too cold (risk of poor zinc adhesion), the control loop holds the temperature at the minimum limit.\n    *   If $DAI < 0.95$, slowly increase the setpoint towards $T_{baseline}$.\n\n4.  **Integration with Existing Systems:**\n    *   This logic is implemented in the PLC/SCADA system using the real-time data from:\n        *   **Kettle zone thermocouples** ($T_{kettle}$)\n        *   **Production counter** ($P_{current}$)\n        *   **Sheet-entry pyrometer** (Safety limit check for minimum entry temperature)\n    *   The system automatically adjusts the heater output to maintain the new, dynamically calculated setpoint.\n\n5.  **IMPLEMENTATION BILL**\n    *   **Software Modification:** Update PLC logic to calculate DAI using inputs from Kettle Thermocouples and Production Counter. Add a conditional branch to adjust the heater setpoint based on DAI value.\n    *   **Safety Logic:** Integrate Sheet-Entry Pyrometer signal to clamp the minimum setpoint. If $T_{pyro} < T_{min\\_entry}$, disable setpoint reduction.\n    *   **Configuration:** Set $T_{baseline} = 450^\\circ C$. Set $P_{reference}$ to the 30-day moving average of production counter output. Tune constant $k$ via simulation.\n    *   **Monitoring:** Log DAI value and resulting setpoint adjustments to SCADA for post-incident analysis.\n\n**Measures Relied Upon**\n*   **Kettle Zone Thermocouples:** Provide $T_{kettle}$ for the DAI calculation.\n*   **Production Counter:** Provide $P_{current}$ for the DAI calculation.\n*   **Sheet-Entry Pyrometer:** Provides the temperature check for the lower-bound safety constraint. (Note: The original proposal did not use this for DAI calculation, only for safety limits, which is valid. The original $Z_{actual}$ input was removed as it could not be derived from permitted sensors.\"\n}\n",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Software Modification:** Update PLC logic to calculate DAI using inputs from Kettle ",
+   "*   **Safety Logic:** Integrate Sheet-Entry Pyrometer signal to clamp the minimum setpoint",
+   "*   **Configuration:** Set $T_{baseline} = 450^\\circ C$. Set $P_{reference}$ to the 30-day",
+   "*   **Monitoring:** Log DAI value and resulting setpoint adjustments to SCADA for post-inc",
+   "*   **Kettle Zone Thermocouples:** Provide $T_{kettle}$ for the DAI calculation.",
+   "*   **Production Counter:** Provide $P_{current}$ for the DAI calculation.",
+   "*   **Sheet-Entry Pyrometer:** Provides the temperature check for the lower-bound safety c"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Monitoring:** Log DAI value and resulting setpoint adjustments to SCADA for post-incident analysis."
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 147.92,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

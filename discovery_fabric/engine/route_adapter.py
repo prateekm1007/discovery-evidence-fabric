@@ -341,6 +341,38 @@ def xkiro_chat(messages: List[dict], model: str,
                       BROWSER_UA, "xkiro")
 
 
+# R129 owner direction (2-key rotation): when both agnes keys sit in
+# the vault, the two keys rotate ROUND-ROBIN per call — a 5/min cap on
+# one key becomes ~10/min of sustained transport, and a single
+# exhausted key no longer stalls a run (the R127 '8 backoffs' class).
+# Deterministic (a process-local counter, not wall-clock) so a re-run
+# of the same sequence allocates the same keys; no credential value
+# ever crosses this boundary (digests only in any record).
+_AGNES_ROTATION: List[str] = []
+_AGNES_ROTATION_I = 0
+
+
+def _agnes_key(api_key: Optional[str]) -> str:
+    """Pick the agnes key: explicit > rotation. Builds the rotation
+    list once from the vault (keys that exist), then advances the
+    counter per call. An empty list degrades to the pre-R129
+    single-key behavior (key may be '' — the typed missing_key
+    refusal downstream, unchanged)."""
+    global _AGNES_ROTATION_I
+    if api_key is not None:
+        return api_key
+    if not _AGNES_ROTATION:
+        for name in ("AGNES_API_KEY", "AGNES_API_KEY_2"):
+            k = resolve_vault_key(name)
+            if k:
+                _AGNES_ROTATION.append(k)
+        if not _AGNES_ROTATION:
+            return ""
+    k = _AGNES_ROTATION[_AGNES_ROTATION_I % len(_AGNES_ROTATION)]
+    _AGNES_ROTATION_I += 1
+    return k
+
+
 def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
                visible_target: int = 64, timeout_s: float = 120.0,
                api_key: Optional[str] = None,
@@ -348,10 +380,10 @@ def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
     """One agnes completion with the measured reasoning headroom
     (c-0078: the flash tier budgets reasoning tokens FIRST — a call
     sized to the visible target alone returns empty visible text).
-    response_format passes through unchanged (r127 Phase-A)."""
-    key = api_key if api_key is not None else \
-        resolve_vault_key("AGNES_API_KEY")
-    return _post_chat("https://apihub.agnes-ai.com/v1", key or "",
+    response_format passes through unchanged (r127 Phase-A).
+    R129: the key is chosen by the 2-key rotation when both vault
+    slots exist (owner direction 2; digests-only in records)."""
+    return _post_chat("https://apihub.agnes-ai.com/v1", _agnes_key(api_key),
                       messages, model,
                       visible_target + REASONING_HEADROOM, timeout_s,
                       "agnes-route-adapter/1.0", "agnes",
@@ -361,7 +393,8 @@ def agnes_chat(messages: List[dict], model: str = "agnes-2.5-flash",
 def bedrock_converse(messages: List[dict], model_id: str,
                      region: str = "us-east-1",
                      max_tokens: int = 4000, timeout_s: float = 300.0,
-                     api_key: Optional[str] = None) -> Dict[str, Any]:
+                     api_key: Optional[str] = None,
+                     cache_prefix_turns: int = 0) -> Dict[str, Any]:
     """One Amazon Bedrock Converse call over plain HTTPS — the r128
     dir-4 owner direction. NO AWS SDK and NO EC2 host: an API key
     works as a plain bearer token (AWS_BEARER_TOKEN_BEDROCK) on
@@ -369,7 +402,15 @@ def bedrock_converse(messages: List[dict], model_id: str,
     Additive transport: the agnes path is byte-unchanged. Typed
     refusals on every failure class (F67: degenerate inputs refuse,
     never crash); the response dict carries {content, model, usage}
-    with usage = the Converse inputTokens/outputTokens bytes."""
+    with usage = the Converse inputTokens/outputTokens bytes.
+    R129 Phase A (owner direction 2): cache_prefix_turns > 0 puts a
+    bedrock cachePoint BREAKPOINT after the first N user turns — the
+    frozen bind/reviewer prefix (directive, problem, few-shots) is
+    served from the prompt cache (up to ~85% latency / ~90% input
+    cost off exactly this pattern), the variable content rides after
+    the cachePoint, and the 5-min TTL resets on each hit. The
+    returned usage carries the cacheRead/cacheWrite token counts so
+    the hit-rate is recomputable from the committed record."""
     key = api_key if api_key is not None else \
         resolve_vault_key("AWS_BEARER_TOKEN_BEDROCK")
     if not key:
@@ -382,17 +423,37 @@ def bedrock_converse(messages: List[dict], model_id: str,
         raise RouteRefused("degenerate_input", "bedrock",
                            "messages must be non-empty {role, content} "
                            "dicts (typed refusal, F67)")
-    if not model_id or "/" not in model_id:
+    # Bedrock id shapes: foundation models 'anthropic.claude-3-haiku-
+    # 20240307-v1:0', inference profiles 'us.anthropic.claude-3-5-sonnet-
+    # 20240620-v1:0', marketplace 'deepseek-ai/deepseek-r1' — a dot or
+    # slash plus a ':version' suffix (marketplace ids may omit it).
+    # The guard rejects free-text junk ('claude', 'x') typed, F67.
+    if not model_id or not isinstance(model_id, str) or not (
+            ("." in model_id or "/" in model_id)
+            and (":" in model_id or "/" in model_id)):
         raise RouteRefused("degenerate_input", "bedrock",
                            f"model_id '{model_id}' must be an inference-"
-                           "profile or foundation-model id (typed refusal)")
+                           "profile, foundation-model or marketplace id "
+                           "(typed refusal)")
+    if cache_prefix_turns < 0 or cache_prefix_turns >= len(messages):
+        raise RouteRefused("degenerate_input", "bedrock",
+                           f"cache_prefix_turns={cache_prefix_turns} must "
+                           "be 0 (no cachePoint) or index a real turn "
+                           "0..len(messages)-1 (the breakpoint goes AFTER "
+                           "that turn; the variable content must ride "
+                           "after the cached prefix)")
     # Converse message shape: role/content map from the OpenAI dicts
     # (user/assistant pass through); system text is NOT carried in
     # messages — the caller folds any system line into the first user
     # turn, as the F31e composition already does (directive then problem).
+    conv_msgs = [{"role": m["role"], "content": [{"text": m["content"]}]}
+                 for m in messages]
+    if cache_prefix_turns:
+        # breakpoint AFTER turn cache_prefix_turns-1 (the frozen prefix)
+        conv_msgs[cache_prefix_turns - 1]["content"].append(
+            {"cachePoint": {"type": "default"}})
     body = json.dumps({
-        "messages": [{"role": m["role"], "content": [{"text": m["content"]}]}
-                     for m in messages],
+        "messages": conv_msgs,
         "inferenceConfig": {"maxTokens": max_tokens, "temperature": 0.0},
     }).encode("utf-8")
     url = (f"https://bedrock-runtime.{region}.amazonaws.com"

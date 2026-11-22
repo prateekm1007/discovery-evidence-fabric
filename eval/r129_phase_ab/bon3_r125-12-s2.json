@@ -1,0 +1,91 @@
+{
+ "problem_id": "r125-12-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 1,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 12.55,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 816,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 6.7,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 1147,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 5.46,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 1009,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 8.66,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1510,
+    "completion_tokens": 2370,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Flow-Ratio-Guided Regeneration Scheduling and Brine Concentration Verification**\n\n**Direction-of-Effect Statement:**\n*   **Driving Variable:** The `Depletion Index` (derived from Service Flow) and `Brine Contact Validation` (derived from Regeneration Flow and Inlet Pressure).\n*   **Direction of Effect:** An **increase** in the `Depletion Index` (indicating higher service load) drives an **increase** in the `Target Brine Volume`, which subsequently drives an **increase** in salt consumption per cycle to ensure full resin recovery. Conversely, a **decrease** in `Depletion Index` drives a **decrease** in `Target Brine Volume`, reducing salt usage. The `Inlet Pressure` and `Regeneration Flow` signals act as a **validity gate**: if the pressure drop is outside the baseline 85-115% window, the brine flow is deemed ineffective regardless of volume, driving a **maintenance alert** rather than a scheduling adjustment. This mechanism directly counters the observed failure mode by preventing over-regeneration (salt waste) when load is low and ensuring sufficient regeneration strength when load is high, thereby stabilizing breakthrough timing.\n\n**Mechanism:**\nThe observed increase in salt usage coupled with earlier hardness breakthrough suggests that the resin bed is either being over-regenerated relative to the actual ion exchange load, or that the brine solution is not reaching optimal saturation due to improper brine circulation timing or flow rates during the regeneration phase. By leveraging existing flow meters and pressure transmitters, we can decouple the *time-based* regeneration cycle from the *load-based* demand. The mitigation implements a \"Flow-Ratio Index\" (FRI) to dynamically adjust regeneration duration and verify brine effectiveness without adding sensors.\n\n1.  **Calculate Daily Ion Load Proxy:** Use the Service Flow Meter to record cumulative service flow since the last regeneration.\n2.  **Determine Brine Efficiency Factor:** Compare the Regeneration Flow Meter reading (brine throughput) against the expected theoretical minimum flow required for the resin volume to ensure adequate contact time.\n3.  **Dynamic Brine Duration Adjustment:** Instead of a fixed-time brine cycle, terminate the brine phase when a calculated \"Target Brine Volume\" is achieved, inferred from the ratio of Service Flow to Resin Capacity (assumed constant initially) and the observed Regeneration Flow rate. If service flow has been low, the regeneration time is shortened; if service flow has been high, it is extended. This prevents wasting salt when the bed isn't as depleted, or ensures full recovery when it is.\n4.  **Inlet Pressure Validation for Brine Flow:** Use the Inlet Pressure Transmitter to monitor pressure drop across the resin bed during the brine phase. A stable, expected pressure drop confirms that the brine is flowing through the bed and not channeling or bypassing. A significant deviation indicates a plumbing or valve issue causing poor brine distribution, which explains early breakthrough despite high salt use.\n\n**Implementation:**\n1.  **Baseline Establishment:** Record the current fixed regeneration parameters (brine time, service time, salt dose). Log three consecutive cycles of Service Flow, Regeneration Flow, and Inlet Pressure (during brine) to establish normal operating ranges.\n2.  **Logic Modification (Control System or Manual Protocol):**\n    *   **Service Phase:** Track cumulative Service Flow. Calculate a \"Depletion Index\" = (Current Service Flow) / (Design Service Flow for 100% exhaustion).\n    *   **Regeneration Phase:**\n        *   Initiate brine circulation. Monitor Regeneration Flow Meter.\n        *   Simultaneously monitor Inlet Pressure Transmitter. Verify pressure drop is within 85-115% of the baseline brine-phase pressure drop.\n        *   **Adaptive Termination:** Set a target Brine Volume (in liters) instead of a fixed time. The target volume is calculated as: `Base Brine Volume * (Depletion Index from previous cycle)`. This ensures you only use as much salt/brine as needed for the actual load, not a maximum worst-case scenario.\n    *   **Breakthrough Check (Manual/Visual Aid):** Since we cannot add conductivity sensors, use the *Inlet Pressure Transmitter* trend. Early breakthrough often correlates with increased pressure drop if fines accumulate, or stable pressure if just exhaustion. However, the key is to *prevent* the next early breakthrough by ensuring the regeneration was sufficient. If breakthrough still occurs early after adjusting brine volume based on flow, the issue is likely brine concentration or temperature, not volume.\n3.  **Concentration Sanity Check (Existing Means):** Verify brine tank level (visual/manual) and ensure the brine well is not flooded. Use the Regeneration Flow Meter to ensure the brine pump is delivering at its rated flow. If the brine pump is running but flow is low, salt may not be dissolving properly due to tank aeration or temperature, leading to weak brine. The \"increased salt use\" might be an operator response to perceived weakness. The mitigation requires verifying that *effective* brine strength is achieved by confirming that the Regeneration Flow rate meets the minimum specified GPM/ft\u00b3 of resin, even if the timer was previously cut short.\n\n**Input Derivation & Source Mapping (Permitted Sensors Only):**\n*   **Input: Current Service Flow**\n    *   *Source:* Service Flow Meter (Permitted).\n    *   *Derivation:* Direct integration of the service flow meter signal over the duration since the last regeneration.\n*   **Input: Design Service Flow for 100% Exhaustion**\n    *   *Source:* Existing Engineering Documentation/Resin Manufacturer Data (Permitted as existing knowledge, not new sensor).\n    *   *Derivation:* Constant value derived from the resin volume and known hardness capacity limits. Not a real-time signal.\n*   **Input: Depletion Index**\n    *   *Source:* Derived.\n    *   *Derivation Formula:* `Depletion Index = (Cumulative Service Flow) / (Design Service Flow for 100% Exhaustion)`.\n*   **Input: Base Brine Volume**\n    *   *Source:* Existing Configuration Parameter (Permitted).\n    *   *Derivation:* The nominal brine volume used in the standard fixed-time cycle, calculated from `Regeneration Flow Rate * Fixed Time`.\n*   **Input: Target Brine Volume**\n    *   *Source:* Derived.\n    *   *Derivation Formula:* `Target Brine Volume = Base Brine Volume * Depletion Index`.\n*   **Input: Regeneration Flow Rate**\n    *   *Source:* Regeneration Flow Meter (Permitted).\n    *   *Derivation:* Direct reading of the regeneration flow meter during the brine phase.\n*   **Input: Brine Phase Pressure Drop**\n    *   *Source:* Inlet Pressure Transmitter (Permitted).\n    *   *Derivation:* `Pressure Drop = Inlet Pressure (during brine) - Outlet Pressure (assumed atmospheric or fixed backpressure)`. *Note: Since only Inlet Pressure is listed as a sensor, and Outlet is typically open to atmosphere or a fixed header, the absolute Inlet Pressure trend is used as a proxy for flow resistance/pressure drop relative to baseline.*\n*   **Input: Baseline Brine-Phase Pressure**\n    *   *Source:* Existing Baseline Data (From Step 1).\n    *   *Derivation:* Statistical mean of Inlet Pressure readings during the brine phase from the three initial logging cycles.\n*   **Input: Pressure Validation Status**\n    *   *Source:* Derived Logic.\n    *   *Derivation Formula:* `Valid = (Current Inlet Pressure > 0.85 * Baseline) AND (Current Inlet Pressure < 1.15 * Baseline)`.\n\n**IMPLEMENTATION BILL:**\n\n| Item / Activity | Quantity / Frequency | Unit Cost (Est.) | Total Cost | Operational Impact (Duty Cycle & Availability) |\n| :--- | :--- | :--- | :--- | :--- |\n| **Control Logic Update** | 1 software/firmware update | $1,500 | $1,500 | **None.** Logic updates are offline or performed during planned maintenance windows. No impact on service throughput. |\n| **Baseline Data Collection** | 3 cycles (approx. 3-9 days) | $0 (Labor only) | $0 | **None.** Uses existing sensors. No interruption to service flow. |\n| **Operator Training** | 1 session per shift lead | $200/hr * 4 hrs | $800 | **None.** Administrative time. No impact on water treatment availability. |\n| **Salt Cost Adjustment** | Variable per cycle | N/A | **Savings** | **Throughput Impact:** None. The duty cycle of the *softening* service remains 100% available. The *regeneration* duty cycle duration varies dynamically. **Energy Impact:** Pump run-time for brine circulation may decrease by 10-30% in low-load periods, reducing energy consumption. **Availability Impact:** Regeneration time may extend during high-load periods. This extension is bounded by the `Depletion Index` and must be accounted for in the scheduling algorithm to ensure the vessel is available for service within the demand window. If the vessel is unavailable for the required regeneration time, throughput is reduced. The bill assumes the current demand profile allows for the variable regeneration duration. |\n| **Maintenance Alerting** | Continuous monitoring | $0 | $0 | **None.** Alert generation does not impact duty cycle. |\n\n**Expected Outcome:**\nBy matching brine volume to actual service load (via Service Flow) and verifying brine delivery integrity (via Regeneration Flow and Inlet Pressure), the system will stop wasting salt on over-regeneration cycles. It will also identify if early breakthrough is due to poor brine distribution (pressure drop anomaly) rather than insufficient salt dose, allowing for targeted mechanical fixes (e.g., cleaning brine lines) instead of just adding more salt. This should stabilize regeneration frequency and reduce per-cycle salt consumption to a level appropriate for the actual water hardness load.\n\n**Measures Relied Upon:**\n*   **Service Flow Meter:** To calculate the actual resin load (depletion) between cycles, replacing fixed-time assumptions.\n*   **Regeneration Flow Meter:** To ensure brine contact time/volume is sufficient for the specific load calculated from the service meter, and to diagnose brine distribution issues (low flow = clogged brine line/pump; high flow = insufficient contact time).\n*   **Inlet Pressure Transmitter:** To validate bed integrity and brine distribution. A significant drop in pressure during the brine phase indicates channeling or valve bypass, which causes breakthrough. A stable, expected pressure drop confirms the brine is penetrating the resin evenly, ensuring that the salt used is actually effective.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Service Flow Meter:** To calculate the actual resin load (depletion) between cycles,",
+   "*   **Regeneration Flow Meter:** To ensure brine contact time/volume is sufficient for the",
+   "*   **Inlet Pressure Transmitter:** To validate bed integrity and brine distribution. A si"
+  ],
+  "UNPRICED_OPERATIONAL_LOSS": [
+   "UNPRICED_OPERATIONAL_LOSS: duty cycle on throughput: | Item / Activity | Quantity / Frequency | Unit Cost (Est.) | Total Cost | Operational Impact (Duty Cycle & Availability) |",
+   "UNPRICED_OPERATIONAL_LOSS: duty cycle on throughput: | **Salt Cost Adjustment** | Variable per cycle | N/A | **Savings** | **Throughput Impact:** None. The duty cycle of the *softening* service remains 100% availa"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 36.37,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

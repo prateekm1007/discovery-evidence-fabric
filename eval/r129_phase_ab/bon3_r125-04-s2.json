@@ -1,0 +1,88 @@
+{
+ "problem_id": "r125-04-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 8.89,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 923,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 8.19,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 1289,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 9.58,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 781,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.24,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1117,
+    "completion_tokens": 926,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a **Dynamic Discharge Set-Closure via Specific Power Monitoring**. The core mechanism relies on the inverse relationship between crusher closing speed (discharge opening) and product fineness. As liners wear and product coarsens, the crusher operates less efficiently, drawing higher power per tonne of throughput. By interpreting the rising specific power demand as a proxy for \"excessive discharge opening\" or \"inefficient crushing chamber configuration,\" we can systematically close the crusher's discharge opening (via the hydraulic overload protection system or set-point adjustment, which is standard equipment control, not new instrumentation) to increase the residence time and breakage force, thereby reducing product coarseness and returning the power efficiency to baseline levels.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Specific Power ($P_{spec}$).\n*   **Direction of Mechanical Adjustment:** Decreasing the discharge opening (increasing the closing speed).\n*   **Resulting Physical Effect:** Increasing the crushing intensity and reducing the mean particle size of the discharge product, which lowers the specific power draw per tonne toward the baseline benchmark.\n\n**Implementation:**\n1.  **Baseline Establishment:** Use the existing motor power meter and the discharge-belt scale to calculate the current **Specific Power (kW/h)** for the crusher over a stable operating period. Establish a target Specific Power benchmark based on the \"last liner change\" historical data (assumed available in historian/PLC records) or determine an optimal efficiency threshold.\n2.  **Closed-Loop Adjustment Protocol:**\n    *   Continuously monitor the real-time Specific Power ($P_{spec}$).\n    *   If $P_{spec}$ exceeds the target benchmark by a defined margin, initiate a controlled **closure sequence**.\n    *   Adjust the crusher\u2019s discharge setting to a smaller opening in discrete, small increments.\n    *   After each increment, allow a stabilization period for material inventory to adjust.\n    *   Re-measure $P_{spec}$. If $P_{spec}$ decreases toward the benchmark and remains stable, continue with small closures until the target efficiency is met or the crusher reaches its minimum safe discharge setting.\n    *   If $P_{spec}$ rises significantly or oscillates, revert to the previous stable setting to prevent choke feed or overload conditions.\n3.  **Verification:** Successful mitigation is confirmed when the Specific Power drops back to its optimal range, correlating with reduced product coarseness.\n\n**Implementation Bill:**\n1.  **Software/PLC Logic Update:** Configure the existing PLC logic to calculate $P_{spec}$ and generate set-point adjustment commands for the discharge opening based on the deviation from the baseline benchmark.\n2.  **Actuator Verification:** Verify the functionality and range of the existing hydraulic discharge opening adjustment actuator to ensure it can execute the discrete closure increments.\n3.  **Benchmark Calibration:** Retrieve historical specific power data from the last liner change to set the target threshold in the control system.\n4.  **Safety Interlock Check:** Confirm that the existing overload protection and minimum opening limits are active to prevent equipment damage during the closure sequence.\n\n**Measures Relied On (Existing Sensors Only):**\n*   **Motor Power Meter:** Provides instantaneous motor power draw, denoted as $P_{motor}$.\n*   **Discharge-Belt Scale:** Provides instantaneous mass flow rate of the discharged product, denoted as $\\dot{m}_{discharge}$.\n*   **Derived Variable - Specific Power ($P_{spec}$):** Calculated in real-time using the formula $P_{spec} = P_{motor} / \\dot{m}_{discharge}$ (units: kW/t/h or kW/(t/h)).\n*   **Excluded Input:** The Feed-Rate Scale is not used in the control loop logic for this specific power calculation, as the discharge scale directly represents the actual throughput of the crushed product for which the power is being consumed. Using the discharge scale ensures the specific power metric reflects the actual work done on the material currently being processed and discharged, avoiding inventory mismatch errors that may occur if feed rate and discharge rate differ temporarily during inventory changes. Therefore, the proposal relies only on $P_{motor}$ and $\\dot{m}_{discharge}$ to derive the driving variable $P_{spec}$.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Software/PLC Logic Update:** Configure the existing PLC logic to calculate $P_{spec}",
+   "2.  **Actuator Verification:** Verify the functionality and range of the existing hydrauli",
+   "3.  **Benchmark Calibration:** Retrieve historical specific power data from the last liner",
+   "4.  **Safety Interlock Check:** Confirm that the existing overload protection and minimum ",
+   "*   **Motor Power Meter:** Provides instantaneous motor power draw, denoted as $P_{motor}$",
+   "*   **Discharge-Belt Scale:** Provides instantaneous mass flow rate of the discharged prod",
+   "*   **Derived Variable - Specific Power ($P_{spec}$):** Calculated in real-time using the ",
+   "*   **Excluded Input:** The Feed-Rate Scale is not used in the control loop logic for this"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'in the control loop logic' shares no allowed-list stem (Use only existing sensors and existing measurements: the crusher motor power met...)"
+  ]
+ },
+ "wall_clock_s": 26.83,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

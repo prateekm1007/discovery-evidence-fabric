@@ -1,0 +1,88 @@
+{
+ "problem_id": "r125-01-s1",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.32,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 892,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 12.54,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1237,
+    "completion_tokens": 1330,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop \"Melt Temperature Compensation\" via Cycle-Time Logger and Check-Weigher Feedback**\n\n**Mechanism:**\n\nThe observed drift in part weight (too heavy) combined with increased screw recovery time at constant barrel setpoints indicates that the effective melt viscosity is increasing, likely due to material degradation, moisture uptake, or thermal lag. This increased viscosity resists flow, forcing the machine to inject for a longer duration or at a higher pressure to achieve the target shot volume, resulting in over-filling (heavy parts) and longer screw recovery times. The proposal implements a control loop that uses the check-weigher\u2019s mass deviation and the cycle-time logger\u2019s injection/recovery timing to infer this change in melt consistency. It then dynamically adjusts the **barrel zone thermocouple setpoints** (specifically the final zones) to lower the melt viscosity back toward the nominal range, thereby normalizing the part weight and recovery time.\n\n**IMPLEMENTATION BILL**\n\n1.  **Input Definitions & Source Mapping:**\n    *   **$\\Delta m$ (Mass Deviation):** Measured directly by the existing **Check-Weigher**. Formula: $\\Delta m = m_{measured} - m_{target}$, where $m_{measured}$ is the per-cycle check-weigher output and $m_{target}$ is the configured target weight in the PLC.\n    *   **$t_{rec}$ (Screw Recovery Time):** Measured directly by the **Cycle-Time Logger**. This is the time interval from the end of the injection phase to the completion of the next shot positioning.\n    *   **$t_{inj}$ (Injection Time):** Measured directly by the **Cycle-Time Logger**. This is the time interval from the start to the end of the injection phase.\n    *   **$T_{actual}$ (Actual Barrel Temperature):** Measured directly by the **Barrel Zone Thermocouples**.\n    *   **$SP_{nominal}$ (Nominal Setpoint):** Pre-existing value stored in the **PLC/HMI**.\n    *   **Derived State Variable:** \"Melt Consistency Index\" ($I_{consist}$). Derived from the permitted measurements as a normalized ratio: $I_{consist} = \\frac{t_{rec}}{t_{rec\\_baseline}}$. A value $>1.05$ indicates increased resistance/viscosity.\n\n2.  **DIRECTION-OF-EFFECT STATEMENT:**\n    *   **Driving Variable:** $I_{consist}$ (derived from $t_{rec}$), correlated with $\\Delta m$.\n    *   **Direction of Mechanical Effect:** When $\\Delta m$ is positive (part is heavy) AND $I_{consist} > 1.05$ (recovery time is long), the physical mechanism is increased melt viscosity resisting injection flow. To counteract this, the thermal energy input must be **increased** to reduce viscosity. Therefore, the control action is to **INCREASE** the temperature setpoints of the final two barrel zones ($SP_{zone\\_n}$ and $SP_{zone\\_n-1}$).\n    *   **Rationale:** Increasing temperature lowers polymer melt viscosity. Lower viscosity allows the screw to inject the required volume faster (reducing $t_{inj}$) and recover more quickly (reducing $t_{rec}$), which also prevents the over-filling that causes $\\Delta m$ to drift positive.\n\n3.  **Control Logic (PLC/HMI):**\n    *   **Baseline:** Establish a moving average of $t_{rec}$ and $\\Delta m$ over the last 100 cycles as the current \"state.\"\n    *   **Adjustment Rule:** Dynamically modify the setpoint of the last two barrel zone thermocouples by a calculated delta ($\\delta T$).\n        *   **Condition:** If $\\Delta m > +$ tolerance AND $I_{consist} > 1.05$:\n            *   **Action:** Apply a **positive** $\\delta T$ (increase setpoint) to the final zones. Magnitude: Step-wise increase of 2\u20135\u00b0C per evaluation window.\n        *   **Guardrail:** If the calculated $SP_{adjusted}$ exceeds $SP_{nominal} + 15\u00b0C$ or falls below $SP_{nominal} - 15\u00b0C$, clamp the setpoint at the limit and trigger an alarm for manual material inspection.\n\n4.  **Verification Loop:**\n    *   After each 50-cycle window, re-evaluate $\\Delta m$ and $t_{rec}$.\n    *   If $\\Delta m$ returns within control limits AND $I_{consist} \\leq 1.05$, hold the new adjusted setpoints.\n    *   If $\\Delta m$ remains positive and $I_{consist} > 1.05$, apply the next positive $\\delta T$ step.\n    *   If $\\Delta m$ becomes negative (part light) OR $I_{consist} < 0.95$ (recovery too fast, indicating potential under-melting or low viscosity), reverse the direction: apply a **negative** $\\delta T$ step to cool the melt, provided it remains within the \u00b115\u00b0C guardrail.\n    *   If the response is oscillatory (sign of $\\Delta m$ flips between windows) or guardrails are hit, halt auto-adjust and alarm.\n\n**Measures it Relies On:**\n*   **Barrel Zone Thermocouples:** To confirm the actual temperature is tracking the adjusted setpoints.\n*   **Cycle-Time Logger:** To quantify \"screw recovery time\" ($t_{rec}$) and \"injection time\" ($t_{inj}$) as proxies for melt consistency.\n*   **Check-Weigher:** To provide real-time, per-cycle feedback on part mass deviation ($\\Delta m$).\n*   **Existing PLC/HMI:** To execute the control loop and apply setpoint adjustments to the thermocouple controllers.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Input Definitions & Source Mapping:**",
+   "*   **$\\Delta m$ (Mass Deviation):** Measured directly by the existing **Check-Weigher**. ",
+   "*   **$t_{rec}$ (Screw Recovery Time):** Measured directly by the **Cycle-Time Logger**. T",
+   "*   **$t_{inj}$ (Injection Time):** Measured directly by the **Cycle-Time Logger**. This i",
+   "*   **$T_{actual}$ (Actual Barrel Temperature):** Measured directly by the **Barrel Zone T",
+   "*   **$SP_{nominal}$ (Nominal Setpoint):** Pre-existing value stored in the **PLC/HMI**.",
+   "*   **Derived State Variable:** \"Melt Consistency Index\" ($I_{consist}$). Derived from the",
+   "2.  **DIRECTION-OF-EFFECT STATEMENT:**",
+   "*   **Driving Variable:** $I_{consist}$ (derived from $t_{rec}$), correlated with $\\Delta ",
+   "*   **Direction of Mechanical Effect:** When $\\Delta m$ is positive (part is heavy) AND $I",
+   "*   **Rationale:** Increasing temperature lowers polymer melt viscosity. Lower viscosity a",
+   "3.  **Control Logic (PLC/HMI):**",
+   "*   **Baseline:** Establish a moving average of $t_{rec}$ and $\\Delta m$ over the last 100",
+   "*   **Adjustment Rule:** Dynamically modify the setpoint of the last two barrel zone therm",
+   "*   **Condition:** If $\\Delta m > +$ tolerance AND $I_{consist} > 1.05$:",
+   "*   **Action:** Apply a **positive** $\\delta T$ (increase setpoint) to the final zones. Ma",
+   "*   **Guardrail:** If the calculated $SP_{adjusted}$ exceeds $SP_{nominal} + 15\u00b0C$ or fall",
+   "4.  **Verification Loop:**",
+   "*   After each 50-cycle window, re-evaluate $\\Delta m$ and $t_{rec}$.",
+   "*   If $\\Delta m$ returns within control limits AND $I_{consist} \\leq 1.05$, hold the new ",
+   "*   If $\\Delta m$ remains positive and $I_{consist} > 1.05$, apply the next positive $\\del",
+   "*   If $\\Delta m$ becomes negative (part light) OR $I_{consist} < 0.95$ (recovery too fast",
+   "*   If the response is oscillatory (sign of $\\Delta m$ flips between windows) or guardrail",
+   "*   **Barrel Zone Thermocouples:** To confirm the actual temperature is tracking the adjus",
+   "*   **Cycle-Time Logger:** To quantify \"screw recovery time\" ($t_{rec}$) and \"injection ti",
+   "*   **Check-Weigher:** To provide real-time, per-cycle feedback on part mass deviation ($\\",
+   "*   **Existing PLC/HMI:** To execute the control loop and apply setpoint adjustments to th"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "wall_clock_s": 17.87,
+ "status": "DELIVERED",
+ "delivered_defects": [
+  "duty_pricing"
+ ]
+}

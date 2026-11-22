@@ -1,0 +1,109 @@
+{
+ "problem_id": "r125-05-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 9.05,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 896,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 4.97,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 768,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 8.54,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 775,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 125.75,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1106,
+    "completion_tokens": 1052,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Recycle Ratio Optimization via Closed-Loop Feedback**\n\n**Direction-of-Effect Statement:**\n*   **Driving Variable:** Mill Feed Rate ($F_{feed}$)\n*   **Mechanism Direction:** An **increase** in the mill feed rate **increases** the total material load inside the grinding zone, which **increases** the internal particle concentration and **increases** the resistance to airflow, thereby **increasing** the mill differential pressure ($\\Delta P$). Conversely, a decrease in feed rate decreases the load and flattens the differential pressure.\n*   **Target Outcome:** To restore the specific surface area, the specific surface of the material must be increased. Since specific surface is inversely related to particle size, we must increase grinding intensity. The flattened pressure signature indicates low grinding intensity/load. Therefore, the control action must be to **increase** the mill differential pressure to the target value. This is achieved by **increasing** the mill feed rate (provided the system is not choked), thereby raising the internal load and restoring the necessary differential pressure for fine grinding.\n\n**Mechanism:**\nThe flattened internal pressure signature and low specific surface area indicate a \"coarse\" mill operation, likely caused by a low internal recirculation load or insufficient grinding intensity due to the recent throughput trim. The most effective lever using only existing instruments is to manipulate the **mill differential pressure** in conjunction with the **feed rate** to restore the optimal grinding intensity.\n\n**Implementation Bill:**\n1.  **Baseline Reset:** Re-establish the target differential pressure ($\\Delta P_{target}$) for the desired specific surface area (fineness) based on historical data from when the target was met.\n2.  **Feedback Loop Activation:** Implement a control logic (manual or automated) that uses the **mill differential pressure** as the primary feedback variable to drive the **mill feed rate**.\n3.  **Action Protocol:**\n    *   **Step A (Restore Pressure):** Since the pressure has flattened, the immediate action is to **increase** the mill feed rate setpoint incrementally. Monitor the differential pressure transmitter. Continue increasing feed rate until $\\Delta P$ reaches $\\Delta P_{target}$.\n    *   **Step B (Fine-Tune Fineness):** Once $\\Delta P$ is at target, verify that the specific surface target is met. If not, hold $\\Delta P$ constant and allow the classifier (if independent, though not measured here) or system dynamics to equilibrate.\n    *   **Step C (Stability Check):** Monitor the **bucket-elevator ammeter**. Use the current reading as a proxy for total discharge mass flow.\n        *   If $\\Delta P$ is at target but the elevator ammeter indicates significantly low flow compared to nominal, check for internal blockage or excessive recirculation; slightly reduce feed rate to clear the system.\n        *   If the elevator ammeter indicates high flow, ensure the mill is not being starved of fresh feed; ensure feed rate matches the calculated balance.\n\n**Inputs and Derivations:**\n*   **Mill Differential Pressure Transmitter:**\n    *   **Signal Used:** $\\Delta P_{measured}$\n    *   **Source:** Existing mill differential pressure transmitter.\n    *   **Derivation:** Direct measurement.\n*   **Mill Feed Rate Meter:**\n    *   **Signal Used:** $F_{feed}$ (Actuator setpoint)\n    *   **Source:** Existing mill-feed rate meter (as the measurement of the current feed). The actuation is done via the feed control mechanism (implied to exist for the meter to be adjustable or monitored).\n*   **Bucket-Elevator Ammeter:**\n    *   **Signal Used:** $I_{elevator}$\n    *   **Source:** Existing bucket-elevator ammeter.\n    *   **Derivation:** The mass flow rate of product leaving the system ($\\dot{m}_{out}$) is derived from the ammeter current using the linear relationship calibrated for the specific elevator motor: $\\dot{m}_{out} = k \\cdot I_{elevator} + b$, where $k$ and $b$ are constants determined from historical data correlating amperage with verified throughput. This derived value serves as the sanity check for material balance. If $\\dot{m}_{out}$ is unavailable or the linear model is invalid, the ammeter reading is used qualitatively to determine if the load is within the nominal current range.\n*   **Specific Surface Area:**\n    *   **Status:** This is the *target* outcome, not a direct input signal. It is *inferred* from the control of $\\Delta P_{measured}$. The proposal relies on the physical correlation that $\\Delta P_{measured}$ at the target value corresponds to the target specific surface. No new sensor for specific surface is added.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Baseline Reset:** Re-establish the target differential pressure ($\\Delta P_{target}$",
+   "2.  **Feedback Loop Activation:** Implement a control logic (manual or automated) that use",
+   "3.  **Action Protocol:**",
+   "*   **Step A (Restore Pressure):** Since the pressure has flattened, the immediate action ",
+   "*   **Step B (Fine-Tune Fineness):** Once $\\Delta P$ is at target, verify that the specifi",
+   "*   **Step C (Stability Check):** Monitor the **bucket-elevator ammeter**. Use the current",
+   "*   If $\\Delta P$ is at target but the elevator ammeter indicates significantly low flow c",
+   "*   If the elevator ammeter indicates high flow, ensure the mill is not being starved of f",
+   "*   **Mill Differential Pressure Transmitter:**",
+   "*   **Signal Used:** $\\Delta P_{measured}$",
+   "*   **Source:** Existing mill differential pressure transmitter.",
+   "*   **Derivation:** Direct measurement.",
+   "*   **Mill Feed Rate Meter:**",
+   "*   **Signal Used:** $F_{feed}$ (Actuator setpoint)",
+   "*   **Source:** Existing mill-feed rate meter (as the measurement of the current feed). Th",
+   "*   **Bucket-Elevator Ammeter:**",
+   "*   **Signal Used:** $I_{elevator}$",
+   "*   **Source:** Existing bucket-elevator ammeter.",
+   "*   **Derivation:** The mass flow rate of product leaving the system ($\\dot{m}_{out}$) is ",
+   "*   **Specific Surface Area:**",
+   "*   **Status:** This is the *target* outcome, not a direct input signal. It is *inferred* "
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'current reading as a proxy' shares no allowed-list stem (Use only existing sensors and existing measurements: the mill differential press...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Step A (Restore Pressure):** Since the pressure has flattened, the immediate action is to **increase** t",
+   "*   **Step C (Stability Check):** Monitor the **bucket-elevator ammeter**. Use the current reading as a proxy ",
+   "*   **Status:** This is the *target* outcome, not a direct input signal. It is *inferred* from the control of "
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 147.7,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

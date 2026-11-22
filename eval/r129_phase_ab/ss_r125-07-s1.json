@@ -1,0 +1,77 @@
+{
+ "problem_id": "r125-07-s1",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 1,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.54,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 255,
+    "completion_tokens": 804,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 6.43,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1175,
+    "completion_tokens": 1451,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Thermal-Compensated Pressure Setpoint and Duty Cycle Throttling**\n\n**Mechanism:**\nThe pressure drop at the end of the stroke correlates with rising fluid temperature and increased internal leakage. As the hydraulic oil heats up, its viscosity decreases, which reduces resistance to flow but simultaneously increases internal leakage across the pump\u2019s internal clearances and valve spools due to reduced lubrication film thickness and increased clearances from thermal expansion. This leakage causes pressure to fall under load, particularly as the load increases toward the end of the stroke. Simultaneously, higher temperatures reduce the oil\u2019s volumetric efficiency, causing the pump to deliver less flow for a given motor speed, exacerbating the pressure drop. By using the existing reservoir and manifold thermometers to monitor temperature in real-time, the control system can dynamically adjust the pump\u2019s operating parameters or introduce pauses to manage thermal load, rather than relying on fixed pressure setpoints that become inadequate at high temperatures.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Reservoir Temperature (\u00b0C) and Manifold Temperature (\u00b0C).\n*   **Direction of Mechanism:** An **increase** in reservoir and manifold temperatures leads to a **decrease** in oil viscosity and a **decrease** in volumetric efficiency, resulting in an **increase** in internal leakage and a **decrease** in achievable end-of-stroke pressure.\n*   **Correction Action:** An **increase** in temperature above the defined threshold triggers a **decrease** in pump motor duty cycle (insertion of pauses) and a **decrease** in target stroke speed/flow rate to reduce shear heating and allow thermal recovery.\n\n**Implementation:**\n1.  **Temperature Monitoring:**\n    *   *Input Source:* **Reservoir Thermometer** (Existing) and **Manifold Thermometer** (Existing).\n    *   *Action:* Continuously read these sensors. Define a \"Thermal Threshold\" (e.g., 70\u00b0C for the reservoir) and a \"High-Temp Band\" (e.g., 65\u201380\u00b0C).\n2.  **Dynamic Pressure/Flow Adjustment:**\n    *   *Input Source:* **Manifold Thermometer** and **Reservoir Thermometer** (Existing).\n    *   *Action:* When manifold/reservoir temperature is below the High-Temp Band, operate at the standard pressure setpoint.\n    *   *Input Source:* **Pump Motor Ammeter** (Existing).\n    *   *Action:* When temperature enters the High-Temp Band, the controller reduces the target pump motor speed. The ammeter provides the feedback signal for load; the controller uses the ammeter reading to verify that the load has not dropped below a minimum safe threshold before allowing full speed reduction. If the ammeter indicates high current (high load) *and* temperature is high, the system interprets this as increased leakage/friction; it further throttles the stroke speed or inserts a dwell time at the end of the stroke to allow pressure recovery without exceeding temperature limits.\n3.  **Duty Cycle Management (Heat Budgeting):**\n    *   *Input Source:* **Hour-Run Counter** (Existing) and **Reservoir Thermometer** (Existing).\n    *   *Action:* Use the hour-run counter to track cumulative run time. Implement a \"Cool-Down Pause\": After a defined run-time (e.g., 30 minutes), automatically pause the unit for 2\u20135 minutes. This pause is triggered when the reservoir temperature exceeds a safe operating limit and is maintained until the temperature drops below a \"recovery threshold\" (e.g., 60\u00b0C).\n4.  **Ammeter Correlation for Fault Detection:**\n    *   *Input Source:* **Pump Motor Ammeter** (Existing) and **Manifold Thermometer** (Existing).\n    *   *Action:* Correlate current draw with temperature. Normally, current is highest at the start of a stroke (breakaway load). If current remains high *during* the retraction or low-load phases while the manifold temperature is high, it indicates excessive internal leakage or pump wear exacerbated by heat. This signature triggers an early maintenance alert or further throttles operation.\n\n**IMPLEMENTATION BILL:**\n*   **Operational Cost:**\n    *   **Throughput Impact:** Introduction of 2\u20135 minute cool-down pauses every ~30 minutes of run time reduces theoretical throughput by approximately 7\u201317%. This must be scheduled during non-critical production windows or accounted for in job quoting.\n    *   **Energy Cost:** No additional energy cost for the mitigation logic itself (uses existing controller I/O). However, prolonged dwell times may increase energy consumption for maintaining system pressure if the pump is kept running, or save energy if the pump is cycled off. Assume net neutral to slight increase due to potential pump cycling inefficiencies.\n    *   **Availability Cost:** The system will be unavailable for hydraulic pressing during the 2\u20135 minute pause windows. Availability reduction is calculated as $\\frac{\\text{Pause Duration}}{\\text{Cycle Time} + \\text{Pause Duration}}$. For a 30-minute duty cycle with a 5-minute pause, availability is ~86%.\n*   **Resource Cost:**\n    *   **Labor:** No new sensors required. Programming/configuration of the PLC/controller is required to implement the new logic. Estimated cost: 4\u20138 engineering hours ($200\u2013$400) for configuration and validation.\n    *   **Materials:** None. All hardware (thermometers, ammeter, hour-run counter, controller) already exists.\n*   **Risk/Maintenance Cost:**\n    *   **Fault Alert:** The ammeter/temperature correlation feature adds a diagnostic capability that may increase maintenance frequency. Estimated cost: $0 direct, but potential indirect cost of downtime if alerts are not acted upon promptly.\n\n**Measures Relied Upon (Explicit Mapping):**\n*   **Reservoir Thermometer:** Existing sensor. Used as the primary trigger for mandatory cool-down pauses and the \"Thermal Threshold\" check. No derivation needed; direct reading.\n*   **Manifold Thermometer:** Existing sensor. Used to check \"High-Temp Band\" entry/exit and for fault correlation. No derivation needed; direct reading.\n*   **Pump Motor Ammeter:** Existing sensor. Used as the feedback signal for load verification during speed reduction and for the fault detection signature (high current at low expected load phases). No derivation needed; direct reading.\n*   **Hour-Run Counter:** Existing sensor. Used to trigger the time-based component of the \"Cool-Down Pause\" logic (e.g., after 30 minutes of accumulated run time). No derivation needed; direct reading of totalized hours.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Operational Cost:**",
+   "*   **Throughput Impact:** Introduction of 2\u20135 minute cool-down pauses every ~30 minutes o",
+   "*   **Energy Cost:** No additional energy cost for the mitigation logic itself (uses exist",
+   "*   **Availability Cost:** The system will be unavailable for hydraulic pressing during th",
+   "*   **Resource Cost:**",
+   "*   **Labor:** No new sensors required. Programming/configuration of the PLC/controller is",
+   "*   **Materials:** None. All hardware (thermometers, ammeter, hour-run counter, controller",
+   "*   **Risk/Maintenance Cost:**",
+   "*   **Fault Alert:** The ammeter/temperature correlation feature adds a diagnostic capabil",
+   "*   **Reservoir Thermometer:** Existing sensor. Used as the primary trigger for mandatory ",
+   "*   **Manifold Thermometer:** Existing sensor. Used to check \"High-Temp Band\" entry/exit a",
+   "*   **Pump Motor Ammeter:** Existing sensor. Used as the feedback signal for load verifica",
+   "*   **Hour-Run Counter:** Existing sensor. Used to trigger the time-based component of the"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 's the primary trigger' shares no allowed-list stem (Use only existing sensors and existing measurements: the reservoir and manifold ...)",
+   "added measure 's the feedback signal' shares no allowed-list stem (Use only existing sensors and existing measurements: the reservoir and manifold ...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Labor:** No new sensors required. Programming/configuration of the PLC/controller is required to impleme"
+  ]
+ },
+ "wall_clock_s": 11.98,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

@@ -1,0 +1,108 @@
+{
+ "problem_id": "r125-03-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 5.98,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 697,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 4.5,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 736,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 3.89,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 745,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.6,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1179,
+    "completion_tokens": 1109,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Correlative Water-Content Index (CWCI) Closed-Loop Adjustment**\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** The **Mixer Motor Current** (specifically the peak current during the initial mixing phase).\n*   **Direction of Mechanism:** An **increase** in unaccounted aggregate moisture leads to a **decrease** in Mixer Motor Current (due to reduced viscosity/torque required for mixing). Conversely, a **decrease** in moisture (drier aggregate) leads to an **increase** in Mixer Motor Current.\n*   **Control Action:** If the Actual Mixer Motor Current is **higher** than the Expected value, the system infers the mix is too dry, and the subsequent **Water Addition Rate** must be **increased**. If the Actual Mixer Motor Current is **lower** than the Expected value, the system infers the mix is too wet (due to high aggregate moisture), and the subsequent **Water Addition Rate** must be **decreased**.\n\n**Mechanism:**\nEstablish a quantitative correlation between the **Mixer Motor Current Signature** and the **Effective Water Content** of the batch. The core mechanism uses the divergence between expected and actual mixer current (normalized for temperature and mass) as a real-time proxy for unaccounted moisture variance. This drives adjustments to the water addition rate for subsequent batches to keep the current profile within a target band, correcting shift-to-shift drift.\n\n**Implementation Bill:**\n1.  **Data Logging Module:** Configure existing data historian or PLC tag file to log timestamps, Batch Scale Mass, Air Temperature, and Mixer Motor Current peak values.\n2.  **Baseline Regression Model:** Develop a static lookup table or linear regression formula mapping `(Aggregate Mass, Air Temperature)` to `Expected Peak Current` using historical 'good' batch data.\n3.  **Deviation Calculator:** Create a calculation script or ladder logic block to compute `Current Deviation Index (CDI)` in real-time for each batch.\n4.  **Water Setpoint Adjustment Procedure:** Define operational protocol (manual or automated setpoint shift) for adjusting the next batch\u2019s water target based on the CDI value from the previous batch.\n5.  **Shift-End Calibration Routine:** Implement a check at shift change to apply cumulative CDI offset to the baseline model for the new shift.\n\n**Implementation Details:**\n1.  **Baseline Establishment (Offline):** \n    *   *Input X:* Nominal Aggregate Mass + Ambient Temperature.\n    *   *Output Y:* Target Mixer Motor Current Envelope (Peak Current).\n    *   Construct a regression model $E[I_{peak}] = f(M_{agg}, T_{air})$.\n\n2.  **Real-Time Monitoring:**\n    *   For each batch, calculate **Expected Peak Current** using the baseline model with current inputs.\n    *   Record **Actual Peak Current** from the mixer meter.\n    *   Calculate **Current Deviation Index (CDI):** \n        $$ CDI = \\frac{I_{actual} - I_{expected}}{I_{expected}} $$\n\n3.  **Feedback Adjustment:**\n    *   **Intra-Shift:** Apply a gain factor $K$ to adjust the water setpoint for the *next* batch:\n        $$ \\Delta W_{water} = K \\times CDI $$\n        *   If $CDI > 0$ (Current High -> Mix Dry): Increase water.\n        *   If $CDI < 0$ (Current Low -> Mix Wet): Decrease water.\n    *   **Shift-to-Shift:** Accumulate average CDI over the shift and apply a persistent offset to the baseline model $f(M_{agg}, T_{air})$ to account for long-term drift in aggregate drying characteristics or sensor bias.\n\n**Permitted Sensor/Measurement Mapping:**\n*   **Nominal Aggregate Mass ($M_{agg}$):** Derived directly from **Batch Scale Records**. This is the permitted sensor for mass.\n*   **Ambient Temperature ($T_{air}$):** Derived directly from the **Plant Air Thermometer**. This is the permitted sensor for temperature.\n*   **Actual Mixer Motor Current ($I_{actual}$):** Derived directly from the **Mixer Motor Current Meter**. This is the permitted sensor for electrical load.\n*   **Expected Mixer Motor Current ($I_{expected}$):** Derived from the formula $f(M_{agg}, T_{air})$ using the offline baseline model. This is a calculated value, not a new sensor.\n*   **Current Deviation Index (CDI):** Derived from the formula $\\frac{I_{actual} - I_{expected}}{I_{expected}}$. This is a calculated logic signal.\n*   **Water Addition Rate Adjustment ($\\Delta W_{water}$):** Derived from the formula $K \\times CDI$. This is a control setpoint adjustment.\n\n**Removed Inputs:**\n*   No direct measurement of aggregate moisture content (no moisture sensor permitted).\n*   No direct measurement of concrete slump (no slump meter permitted).\n*   No new instrumentation added; all logic relies strictly on the three permitted existing measurements.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Data Logging Module:** Configure existing data historian or PLC tag file to log time",
+   "2.  **Baseline Regression Model:** Develop a static lookup table or linear regression form",
+   "3.  **Deviation Calculator:** Create a calculation script or ladder logic block to compute",
+   "4.  **Water Setpoint Adjustment Procedure:** Define operational protocol (manual or automa",
+   "5.  **Shift-End Calibration Routine:** Implement a check at shift change to apply cumulati",
+   "1.  **Baseline Establishment (Offline):**",
+   "*   *Input X:* Nominal Aggregate Mass + Ambient Temperature.",
+   "*   *Output Y:* Target Mixer Motor Current Envelope (Peak Current).",
+   "*   Construct a regression model $E[I_{peak}] = f(M_{agg}, T_{air})$.",
+   "2.  **Real-Time Monitoring:**",
+   "*   For each batch, calculate **Expected Peak Current** using the baseline model with curr",
+   "*   Record **Actual Peak Current** from the mixer meter.",
+   "*   Calculate **Current Deviation Index (CDI):**",
+   "3.  **Feedback Adjustment:**",
+   "*   **Intra-Shift:** Apply a gain factor $K$ to adjust the water setpoint for the *next* b",
+   "*   If $CDI > 0$ (Current High -> Mix Dry): Increase water.",
+   "*   If $CDI < 0$ (Current Low -> Mix Wet): Decrease water.",
+   "*   **Shift-to-Shift:** Accumulate average CDI over the shift and apply a persistent offse",
+   "*   **Nominal Aggregate Mass ($M_{agg}$):** Derived directly from **Batch Scale Records**.",
+   "*   **Ambient Temperature ($T_{air}$):** Derived directly from the **Plant Air Thermometer",
+   "*   **Actual Mixer Motor Current ($I_{actual}$):** Derived directly from the **Mixer Motor",
+   "*   **Expected Mixer Motor Current ($I_{expected}$):** Derived from the formula $f(M_{agg}",
+   "*   **Current Deviation Index (CDI):** Derived from the formula $\\frac{I_{actual} - I_{exp",
+   "*   **Water Addition Rate Adjustment ($\\Delta W_{water}$):** Derived from the formula $K \\",
+   "*   No direct measurement of aggregate moisture content (no moisture sensor permitted).",
+   "*   No direct measurement of concrete slump (no slump meter permitted).",
+   "*   No new instrumentation added; all logic relies strictly on the three permitted existin"
+  ],
+  "APPARATUS_ROW": [
+   "2.  **Real-Time Monitoring:**",
+   "*   No direct measurement of aggregate moisture content (no moisture sensor permitted)."
+  ]
+ },
+ "wall_clock_s": 23.08,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

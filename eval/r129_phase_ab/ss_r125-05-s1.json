@@ -1,0 +1,54 @@
+{
+ "problem_id": "r125-05-s1",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 3.43,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 662,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 121.57,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1000,
+    "completion_tokens": 267,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Mill Differential Pressure Control for Particle Size**\n\n**Mechanism:**\nUtilize the existing Mill Differential Pressure (DP) Transmitter as the primary feedback signal to infer the average particle size and air permeability of the cement bed. A flattened pressure signature indicates an over-coarsened product (low surface area). The control strategy establishes a \"Pressure-Throughput Envelope\" where the mill DP is maintained at a specific target setpoint, which is dynamically adjusted based on the Mill Feed Rate. If the measured DP falls below the calculated target for the current feed rate, it signifies that the grind is too coarse (low resistance to airflow), triggering a corrective action to increase fineness.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the **Mill Differential Pressure ($P_{DP}$)**. The mechanism operates under the direction that **higher $P_{DP}$ corresponds to higher Specific Surface Area (finer grind)**, while **lower $P_{DP}$ corresponds to lower Specific Surface Area (coarser grind)**. The control loop acts to increase $P_{DP}$ when it falls below the target (indicating coarse material) by increasing residence time/burden, thereby increasing particle fineness.",
+ "post_review_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ]
+ },
+ "wall_clock_s": 126.01,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

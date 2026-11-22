@@ -1,0 +1,102 @@
+{
+ "problem_id": "r125-08-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.54,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 751,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.44,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 786,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 9.65,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 958,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.1,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1295,
+    "completion_tokens": 1352,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Cycle Time Extension via Oxygen Analyzer Feedback**\n\n**Direction of Effect**\n*   **Driving Variable:** Product Oxygen Concentration (measured by O2 Analyzer).\n*   **Mechanism:** The oxygen concentration in the product stream increases as the adsorbent bed approaches exhaustion. An increase in measured oxygen concentration is the direct indicator that the bed can no longer maintain the required purity.\n*   **Direction of Effect:** As the O2 concentration rises toward the predefined limit, the control logic extends the adsorption cycle duration until the limit is reached. This prevents premature cycle termination (shortening) and ensures maximum nitrogen extraction per cycle, thereby reducing total cycle frequency and feed-air consumption for a fixed nitrogen demand.\n\n**Implementation Bill**\n| Step | Action | Permitted Input/Measurement Source | Logic/Formula |\n| :--- | :--- | :--- | :--- |\n| 1 | Configure Primary Trigger | Product Oxygen Analyzer | Read signal `O2_meas`. No derivation needed. |\n| 2 | Define Limit Threshold | Product Oxygen Analyzer & Spec | Set `O2_limit` = 95-98% of max allowable O2 in spec. This is a static parameter derived from the specification, not a dynamic measurement. |\n| 3 | Define Safety Cap | Cycle-Time Counter | Read signal `T_now`. Set `T_max` = 150% of nominal cycle time. `T_max` is a static parameter. |\n| 4 | Execute Logic | Product Oxygen Analyzer & Cycle-Time Counter | Switch valves when (`O2_meas` >= `O2_limit`) OR (`T_now` >= `T_max`). |\n| 5 | Filter Signal | Product Oxygen Analyzer | Apply existing moving average filter to `O2_meas` to produce `O2_filt` to prevent noise-induced switching. |\n| 6 | Pressure Optimization | Feed-Air Pressure Transmitter | Read signal `P_air`. Lower regulator setpoint if `P_air` > minimum required bed pressure. Minimum required pressure is a static process parameter. |\n\n**Mechanism**\nThe primary failure mode described\u2014shortening adsorption cycles coupled with rising feed-air consumption and slipping purity\u2014indicates that the control logic is currently terminating cycles based on a fixed, conservative timer rather than actual bed readiness. This suggests the PSA units are running in a \"time-based\" or \"failsafe\" mode where the cycle timer has been inadvertently reduced (or the controller is reacting poorly to pressure fluctuations by cutting cycles short to protect the bed, thereby forcing higher air throughput to meet demand).\n\nThe mitigation relies on shifting from time-based cycle termination to **oxygen-concentration-based cycle termination**. Since the product oxygen analyzer is already installed, it is used as the primary feedback signal to determine when the adsorption bed has truly exhausted its nitrogen production capacity and must switch valves. By extending the adsorption phase until the oxygen breakthrough reaches a defined limit (just below the purity spec), we maximize nitrogen yield per cycle. This reduces the total number of cycles required to meet demand, which directly addresses the \"feed-air consumption is up at the same demand\" issue by improving volumetric efficiency and stopping the erratic, short-cycle operation that causes air waste.\n\n**Implementation**\n1.  **Reconfigure Control Logic (No Hardware Changes):**\n    *   Access the existing PLC or controller configuration for the PSA unit.\n    *   Locate the valve-switching logic (typically the \"Adsorption Complete\" trigger).\n    *   Change the trigger condition from `[Cycle Timer >= T_set]` to `[O2_Analyzer >= O2_limit] OR [Cycle Timer >= T_max]`.\n        *   `O2_limit` is set to 95\u201398% of the maximum allowable oxygen in the product spec (e.g., if spec is <0.5% O2, set limit at 0.45% O2). This is derived from the product specification.\n        *   `T_max` is set to a generous upper bound (e.g., 150% of the nominal cycle time) to serve as a safety cap in case the analyzer fails or drifts high. This is derived from historical nominal cycle data.\n    *   Ensure the oxygen analyzer signal is averaged or filtered (using existing calculation blocks in the controller) to prevent rapid valve switching due to momentary sensor noise.\n\n2.  **Adjust Feed-Air Pressure Setpoint:**\n    *   Use the existing feed-air pressure transmitter to monitor operating pressure.\n    *   If pressure remains higher than the minimum required for optimal adsorption (a static process parameter), manually or programmatically lower the compressor/pressure regulator setpoint. This ensures the bed operates at the most efficient pressure, reducing energy consumption.\n\n3.  **Validate and Calibrate:**\n    *   Run the system in this new mode for 24\u201348 hours.\n    *   Use the cycle-time counter to log the new cycle durations. They should stabilize at a longer, consistent duration compared to the previous erratic shortening.\n    *   Confirm that product oxygen remains within specification (monitored by the analyzer) and that total air consumption decreases.\n\n**Measures it Relies On**\n*   **Product Oxygen Analyzer:** Provides real-time feedback on bed exhaustion, enabling accurate cycle termination. This is the core sensor replacing the unreliable timer. Input: `O2_meas`.\n*   **Feed-Air Pressure Transmitter:** Used to monitor operating pressure and optimize the regulator setpoint. Input: `P_air`.\n*   **Cycle-Time Counter:** Used as a safety limit (`T_max`) to prevent infinite adsorption in case of sensor failure, and for logging the new stable cycle duration. Input: `T_now`.\n\n**Why This Works**\nBy stopping the \"shortening\" of cycles, we allow the bed to fully utilize its adsorption capacity. This increases nitrogen per cycle, reducing the total number of cycles needed to meet demand. Fewer cycles = less air compressed and consumed per unit of nitrogen produced. The oxygen analyzer ensures purity is not compromised by waiting too long, while the pressure transmitter ensures we aren't wasting energy with excessive pressure. No new hardware is required; only the control logic is reconfigured to use the existing, underutilized analyzer signal as the primary switching trigger.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Reconfigure Control Logic (No Hardware Changes):**",
+   "*   Access the existing PLC or controller configuration for the PSA unit.",
+   "*   Locate the valve-switching logic (typically the \"Adsorption Complete\" trigger).",
+   "*   Change the trigger condition from `[Cycle Timer >= T_set]` to `[O2_Analyzer >= O2_limi",
+   "*   `O2_limit` is set to 95\u201398% of the maximum allowable oxygen in the product spec (e.g.,",
+   "*   `T_max` is set to a generous upper bound (e.g., 150% of the nominal cycle time) to ser",
+   "*   Ensure the oxygen analyzer signal is averaged or filtered (using existing calculation ",
+   "2.  **Adjust Feed-Air Pressure Setpoint:**",
+   "*   Use the existing feed-air pressure transmitter to monitor operating pressure.",
+   "*   If pressure remains higher than the minimum required for optimal adsorption (a static ",
+   "3.  **Validate and Calibrate:**",
+   "*   Run the system in this new mode for 24\u201348 hours.",
+   "*   Use the cycle-time counter to log the new cycle durations. They should stabilize at a ",
+   "*   Confirm that product oxygen remains within specification (monitored by the analyzer) a",
+   "*   **Product Oxygen Analyzer:** Provides real-time feedback on bed exhaustion, enabling a",
+   "*   **Feed-Air Pressure Transmitter:** Used to monitor operating pressure and optimize the",
+   "*   **Cycle-Time Counter:** Used as a safety limit (`T_max`) to prevent infinite adsorptio"
+  ],
+  "APPARATUS_ROW": [
+   "*   Confirm that product oxygen remains within specification (monitored by the analyzer) and that total air co",
+   "*   **Feed-Air Pressure Transmitter:** Used to monitor operating pressure and optimize the regulator setpoint.",
+   "*   **Cycle-Time Counter:** Used as a safety limit (`T_max`) to prevent infinite adsorption in case of sensor "
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 27.92,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

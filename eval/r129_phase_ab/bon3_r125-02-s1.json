@@ -1,0 +1,95 @@
+{
+ "problem_id": "r125-02-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 4.87,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 911,
+    "cached_tokens": 256,
+    "cache_hit_rate": 0.9552238805970149
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 4.2,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 249,
+    "completion_tokens": 786,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 3.46,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 249,
+    "completion_tokens": 632,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 124.23,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1120,
+    "completion_tokens": 1193,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Implement \"Current-Ratio-Based Tension Modulation\" Using Existing Block Ammeters**\n\n**Mechanism:**\nThe increasing motor current in the finish block while the gauge remains within spec indicates that the dies are wearing (increasing friction), causing higher resistance. However, the breaks are occurring upstream. To mitigate this without adding new sensors, we will exploit the correlation between **motor ammeter readings (current)** and **wire tension/resistance** across the line.\n\nThe mitigation works by using the **line-speed encoder** to normalize the motor current of the finish block against the wire speed, creating a \"specific load\" metric. This metric is then used to actively throttle the **line-speed setpoint** to dynamically reduce the tension on the upstream, fragile sections when the finish block\u2019s specific load exceeds a safe threshold.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** The normalized specific load metric, defined as $I_{norm} = I_{finish} / v$. A rise in this variable indicates increased mechanical resistance (die wear/friction) per unit of speed.\n*   **Direction of Effect:** An increase in $I_{norm}$ above the baseline triggers a **reduction** in the line speed setpoint. This reduction in speed lowers the dynamic tension in the wire, thereby **reducing** the load on the upstream blocks and decreasing the probability of wire breaks.\n\n**Implementation Bill:**\n1.  **Controller Logic Update:** Modify the existing PLC program to implement the calculation of $I_{norm}$ using the available sensor signals.\n2.  **Baseline Capture Routine:** Add a routine to capture $I_{norm, base}$ during a verified \"known-good\" production run.\n3.  **Threshold Guard:** Implement a soft-limit check where if $I_{norm} > 1.15 \\times I_{norm, base}$, the speed setpoint is reduced by 10%.\n4.  **Fail-Safe Logic:** Integrate the break counter signal into the startup logic. Upon a break, force the system to restart at 50% of the maximum speed limit and prohibit speed increases unless $I_{norm}$ remains below the threshold.\n5.  **HMI Alerts:** Configure existing HMI screens to display the real-time value of $I_{norm}$ and the active speed limit status.\n\n**Implementation:**\n1.  **Signal Processing:** The existing **per-block motor ammeters** (specifically focusing on the finish block and the immediately preceding block) feed into the PLC/Controller. The **line-speed encoder** provides a real-time speed signal ($v$).\n2.  **Calculation:** The controller calculates the normalized current $I_{norm}$ for the finish block: $I_{norm} = I_{finish} / v$. This accounts for the fact that current should scale roughly linearly with speed for a healthy system. A rising $I_{norm}$ indicates increasing die friction or tension issues.\n3.  **Control Logic:**\n    *   Define a baseline $I_{norm, base}$ (captured during a known-good run).\n    *   Define a threshold $T_{thresh}$ (e.g., $1.15 \\times I_{norm, base}$).\n    *   **Action:** If $I_{norm} > T_{thresh}$, the controller automatically reduces the setpoint for the **line-speed reference** by a fixed percentage (e.g., 10-15%) or proportionally to the excess current.\n    *   **Break Counter Integration:** The **break counter** is used to trigger a hard reset of the speed reduction. If a break is detected, the line stops. Upon restart, the speed setpoint is initialized at 50% of the maximum speed and allowed to ramp up only if $I_{norm}$ remains within acceptable limits. If a break occurs again during ramp-up, the system locks at a lower speed baseline.\n\n**Measures It Relies On:**\n*   **$I_{finish}$ (Finish Block Motor Current):** Sourced directly from the **per-block motor ammeters** installed on the finish block motor. This is a permitted existing sensor signal.\n*   **$v$ (Line Speed):** Sourced directly from the **line-speed encoder**. This is a permitted existing measurement signal.\n*   **$I_{norm}$ (Specific Load):** Derived from the permitted measurements using the formula: $I_{norm} = I_{finish} / v$.\n*   **$I_{norm, base}$ (Baseline Specific Load):** Derived from the **per-block motor ammeters** and **line-speed encoder** during a calibration run. This is a derived parameter from permitted measurements.\n*   **$T_{thresh}$ (Threshold):** Derived from $I_{norm, base}$ using the formula: $T_{thresh} = 1.15 \\times I_{norm, base}$.\n*   **Break Event Status:** Sourced directly from the **break counter**. This is a permitted existing measurement signal.\n\n**Why This Works:**\nBy slowing down the line when the finish block\u2019s specific load rises, you reduce the tensile force required to pull the wire through the worn dies. This lowers the tension on the upstream blocks (where breaks are multiplying), preventing further failures, while still producing wire to gauge (since gauge is determined by die geometry, not speed, though speed affects surface finish and straightness, which is a secondary trade-off). No new hardware is needed; only logic changes in the existing controller using existing sensor signals.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Controller Logic Update:** Modify the existing PLC program to implement the calculat",
+   "2.  **Baseline Capture Routine:** Add a routine to capture $I_{norm, base}$ during a verif",
+   "3.  **Threshold Guard:** Implement a soft-limit check where if $I_{norm} > 1.15 \\times I_{",
+   "4.  **Fail-Safe Logic:** Integrate the break counter signal into the startup logic. Upon a",
+   "5.  **HMI Alerts:** Configure existing HMI screens to display the real-time value of $I_{n",
+   "1.  **Signal Processing:** The existing **per-block motor ammeters** (specifically focusin",
+   "2.  **Calculation:** The controller calculates the normalized current $I_{norm}$ for the f",
+   "3.  **Control Logic:**",
+   "*   Define a baseline $I_{norm, base}$ (captured during a known-good run).",
+   "*   Define a threshold $T_{thresh}$ (e.g., $1.15 \\times I_{norm, base}$).",
+   "*   **Action:** If $I_{norm} > T_{thresh}$, the controller automatically reduces the setpo",
+   "*   **Break Counter Integration:** The **break counter** is used to trigger a hard reset o",
+   "*   **$I_{finish}$ (Finish Block Motor Current):** Sourced directly from the **per-block m",
+   "*   **$v$ (Line Speed):** Sourced directly from the **line-speed encoder**. This is a perm",
+   "*   **$I_{norm}$ (Specific Load):** Derived from the permitted measurements using the form",
+   "*   **$I_{norm, base}$ (Baseline Specific Load):** Derived from the **per-block motor amme",
+   "*   **$T_{thresh}$ (Threshold):** Derived from $I_{norm, base}$ using the formula: $T_{thr",
+   "*   **Break Event Status:** Sourced directly from the **break counter**. This is a permitt"
+  ]
+ },
+ "wall_clock_s": 141.68,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

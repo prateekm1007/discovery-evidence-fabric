@@ -1,0 +1,94 @@
+{
+ "problem_id": "r125-09-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 6.69,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 1058,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 4.26,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 732,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.84,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 795,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 3.3,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1154,
+    "completion_tokens": 1014,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (the"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Adaptive Zone-Temp & Exhaust Damper Compensation**\n\n**Mechanism:**\nImplement a closed-loop compensation strategy that dynamically adjusts the **Exhaust Damper Position** and individual **Oven Zone Thermocouple Setpoints** to counteract the known thermal lag at the corners. The mechanism relies on the fact that corner lag is often caused by reduced air circulation (boundary layer effects or fan decay) and heat loss through the door/frame. By modulating the exhaust damper, we control the overall oven pressure and airflow velocity; by differentially adjusting zone temperatures, we pre-compensate the heat input to the zones closest to the corners.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Exhaust Damper Position (derived from sensor feedback).\n*   **Direction of Effect:** Closing the damper increases internal static pressure and recirculation velocity, directing more heat to the corners (increasing corner temperature relative to center). Opening the damper decreases pressure and velocity, reducing heat loss and over-correction.\n*   **Driving Variable:** Zone Heating Setpoint Offset (\u0394T).\n*   **Direction of Effect:** Increasing the setpoint for corner-adjacent zones increases local heat flux, directly raising the temperature in those specific zones to match the center.\n\n**Implementation:**\n1.  **Establish a Baseline Map:** Using the existing **Cycle Timer** as the primary time-reference, log the current relationship between timer elapsed time and the readings from all **Oven Zone Thermocouples**. Identify the specific zones associated with the \"corner\" regions (typically the outermost or top/bottom zones depending on oven geometry) versus the \"center\" zones.\n2.  **Define Compensation Logic:** Create a lookup table or simple algorithm in the existing control system that calculates a **Delta-T (\u0394T)** offset for the corner-adjacent zones relative to the center zones. This offset is a function of the **Cycle Timer** state (i.e., how far into the cure cycle we are). For example, if corner zones run 10\u00b0C cooler than center zones at the 60-minute mark of the cycle, the controller adds a +10\u00b0C offset to the setpoint of the heating elements serving those corner zones.\n3.  **Modulate Airflow via Exhaust Damper:** Simultaneously, adjust the **Exhaust Damper Position** based on the difference between the average temperature of the corner zones and the center zones.\n    *   *If Corner Temps < Center Temps:* **Close the exhaust damper slightly.** This increases internal static pressure, reduces heat loss through the damper opening, and can increase recirculation velocity, pushing more hot air into the corners.\n    *   *If Corner Temps > Center Temps (over-compensating):* **Open the exhaust damper slightly.** This reduces overall oven temperature and lowers air velocity, preventing the corners from overheating while the center cools.\n4.  **Real-Time Execution:** During each batch cycle, the controller continuously compares the real-time readings of the **Zone Thermocouples**. It calculates the instantaneous temperature gradient between the \"corner\" zones and \"center\" zones. It then applies the pre-defined \u0394T compensation to the heating setpoints and makes fine adjustments to the **Exhaust Damper Position** to minimize this gradient. The **Cycle Timer** ensures that these compensations are applied only during the active curing phase.\n\n**IMPLEMENTATION BILL:**\n*   **Control Logic Modification:** Update the existing PLC/Controller program to implement the \u0394T lookup table based on Timer and Zone TC inputs.\n*   **Damper Control Loop:** Configure the existing damper actuator controller to accept a new setpoint derived from the temperature differential signal.\n*   **No Hardware Changes:** No new sensors, wiring, or actuators are required. All actions use existing installed hardware.\n\n**Measures it Relies On (Derivation from Permitted Sensors):**\n*   **Corner/Center Temperature Difference:** Derived from **Oven Zone Thermocouples**. Formula: `T_diff = Average(T_corner_zones) - Average(T_center_zones)`. This signal drives the Damper Position adjustment and the dynamic \u0394T offset calculation.\n*   **Time Reference:** Taken directly from the **Cycle Timer**. Used to index the baseline compensation profile and gate the compensation logic to the curing phase.\n*   **Damper Position:** Taken directly from the **Exhaust Damper Position Feedback** sensor. Used to close the loop on airflow adjustments and verify that the actuator is responding to the calculated setpoints.\n*   **Local Zone Temperatures:** Taken directly from individual **Oven Zone Thermocouples**. Used to calculate specific zone offsets if local granularity is required, or to validate that the global \u0394T is sufficient.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Control Logic Modification:** Update the existing PLC/Controller program to implemen",
+   "*   **Damper Control Loop:** Configure the existing damper actuator controller to accept a",
+   "*   **No Hardware Changes:** No new sensors, wiring, or actuators are required. All action",
+   "*   **Corner/Center Temperature Difference:** Derived from **Oven Zone Thermocouples**. Fo",
+   "*   **Time Reference:** Taken directly from the **Cycle Timer**. Used to index the baselin",
+   "*   **Damper Position:** Taken directly from the **Exhaust Damper Position Feedback** sens",
+   "*   **Local Zone Temperatures:** Taken directly from individual **Oven Zone Thermocouples*"
+  ],
+  "CONVERSION": [
+   "ADDED_PROCESS_STEP: curing on a row that does not ride existing/unchanged infrastructure: *   **Time Reference:** Taken directly from the **Cycle Timer**. Used to index the baseline compensation profile and gate the compensation logic to the curing p"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ]
+ },
+ "wall_clock_s": 140.46,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

@@ -1,0 +1,89 @@
+{
+ "problem_id": "r125-02-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 5.59,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 840,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 8.99,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 1511,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 5.44,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 249,
+    "completion_tokens": 658,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 128.97,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1217,
+    "completion_tokens": 984,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "MITIGATION PROPOSAL: Implement a \"Current-Speed Correlation Anomaly\" Soft Slowdown gate on the finish block using existing ammeters and speed encoder.\n\n**DIRECTION-OF-EFFECT**\nDriving Variable: Normalized Electrical Load ($R = I_{\\text{current}} / v_{\\text{speed}}$). \nDirection of Effect: An upward deviation in $R$ above the dynamic threshold $T_{\\text{high}}$ signifies an increase in real mechanical drawing force (or friction/die resistance) per unit of speed. The mitigation direction is to **reduce** line speed ($v_{\\text{speed}}$) by 50% upon sustained anomaly. This action decreases the rate of work done by the drive, lowering the instantaneous power input and thermal load into the wire-die interface, thereby reducing the probability of catastrophic fracture caused by stress/heat accumulation, while the lower speed allows the operator to safely inspect or clear the block at the next scheduled stop.\n\n**Mechanism**\nThe climbing motor current at constant line speed indicates increasing drawing force, a precursor to fracture. The drawn gauge remains in print because the die opening is not yet fully worn, but friction or die condition has deteriorated. By normalizing instantaneous motor current against line speed, we isolate the mechanical load component from the kinematic component. If the normalized current exceeds a dynamic threshold derived from historical baseline data (collected when breaks were low), the system triggers a protective \"Soft Slowdown.\"\n\n**Implementation**\n1.  **Baseline Calculation**: Use historical ammeter and encoder logs to establish a baseline \"Expected Current per Unit Speed\" curve for the finish block during normal operation. The break counter data is used only to validate that the baseline period corresponds to low-break intervals.\n2.  **Real-Time Normalization**: Implement a PLC function block that calculates $R = I_{\\text{current}} / v_{\\text{speed}}$ in real-time.\n3.  **Threshold Trigger**: Set a threshold $T_{\\text{high}}$ at the 95th percentile of the historical $R$ distribution.\n4.  **Protective Action**: When $R > T_{\\text{high}}$ is sustained for 500ms:\n    *   Command the drive to reduce line speed to 50% of the current setpoint (Soft Slowdown).\n    *   Set a \"Wear Indicator\" flag. This flag is a derived software state, not a new sensor, which prompts maintenance to inspect the finish block die at the next opportunity.\n    *   Do not stop the line immediately to avoid inertial snap-breaks; the slowdown reduces kinetic energy and thermal input, mitigating the fracture risk associated with high drawing forces.\n\n**Input Signal Provenance**\n*   **$I_{\\text{current}}$**: Sourced directly from the existing **per-block motor ammeter** (Finish Block).\n*   **$v_{\\text{speed}}$**: Sourced directly from the existing **line-speed encoder**.\n*   **$R$ (Ratio)**: Derived from permitted measurements via the formula $I_{\\text{current}} / v_{\\text{speed}}$.\n*   **$T_{\\text{high}}$ (Threshold)**: Derived from the statistical distribution (95th percentile) of the historical $R$ dataset, which was recorded using the permitted **per-block motor ammeter** and **line-speed encoder**.\n*   **Wear Indicator**: Derived software boolean state; true when $R > T_{\\text{high}}$ persists for 500ms. It relies solely on the derived signal $R$ and the derived threshold $T_{\\text{high}}$.\n*   **Baseline Validation**: The break counter is used only to filter historical time windows for baseline calculation; it does not provide a direct input to the real-time control logic.\n\n**IMPLEMENTATION BILL**\n1.  **Logic Update**: Modify the finish block drive controller to calculate the ratio $I_{\\text{current}} / v_{\\text{speed}}$.\n2.  **Threshold Programming**: Configure the controller with the historical 95th percentile value of the ratio as $T_{\\text{high}}$.\n3.  **Action Programming**: Program the 50% speed reduction setpoint and the 500ms debounce timer.\n4.  **HMI/Maintenance Link**: Map the \"Wear Indicator\" flag to the operator interface to alert maintenance of the high-friction anomaly.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Logic Update**: Modify the finish block drive controller to calculate the ratio $I_{",
+   "2.  **Threshold Programming**: Configure the controller with the historical 95th percentil",
+   "3.  **Action Programming**: Program the 50% speed reduction setpoint and the 500ms debounc",
+   "4.  **HMI/Maintenance Link**: Map the \"Wear Indicator\" flag to the operator interface to a"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "wall_clock_s": 146.47,
+ "status": "DELIVERED",
+ "delivered_defects": [
+  "duty_pricing"
+ ]
+}

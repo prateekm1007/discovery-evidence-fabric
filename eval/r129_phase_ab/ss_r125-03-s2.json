@@ -1,0 +1,67 @@
+{
+ "problem_id": "r125-03-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 7.02,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 942,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.08,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1281,
+    "completion_tokens": 1393,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Water Demand Index (WDI) Control Loop Using Mixer Current**\n\n**Direction-of-Effect Statement:**\n*   **Driving Variable:** Aggregate moisture content (varies shift to shift due to weather/storage) and Ambient Temperature (from Plant Air Thermometer).\n*   **Direction of Mechanical Effect:** An increase in aggregate moisture decreases the required water-to-cement ratio for a target slump, which reduces the mixture viscosity. A reduction in mixture viscosity decreases the torque required by the mixer, thereby **decreasing** the mixer motor current. Conversely, a decrease in aggregate moisture (drier aggregate) increases the required water addition, or if water is held constant, increases mixture viscosity, thereby **increasing** the mixer motor current. The control loop detects the current deviation (High Current = Too Dry/Viscous; Low Current = Too Wet/Fluid) and adjusts the next batch's water dose to return the current to the baseline expected value.\n\n**Mechanism:**\nThe irregular mixer current profile indicates that the concrete batch is becoming too dry (viscous) or too wet (fluid), requiring the motor to work harder or easier than nominal for a given volume. The growth in added water suggests the operator or automated system is compensating for perceived dryness, likely due to changing aggregate moisture. Instead of blindly adding water, we will use the **mixer motor current** as a real-time proxy for mixture viscosity/consistency to dynamically adjust the water dose *before* the batch is fully mixed, using the existing batch scale records to establish the baseline.\n\n**Implementation:**\n1.  **Baseline Characterization (Offline Analysis):**\n    *   Retrieve historical batch scale records (mass of cement, mass of aggregates, mass of water added) for a \"good\" reference period where consistency was stable.\n    *   For each batch, record the **steady-state mixer motor current** ($I_{steady}$) during the mixing phase (e.g., at $t=45s$ after start).\n    *   Create a regression model: $Expected\\_I_{steady} = f(mass\\_cement, mass\\_aggregates, water\\_added\\_ref, T_{air})$. This defines the \"normal\" current signature for a standard consistency, accounting for thermal effects on evaporation/moisture loss indicated by the air thermometer.\n\n2.  **Real-Time Adjustment (Online Control):**\n    *   During each new batch, the batch scale records the incoming aggregate mass and cement mass. The plant air thermometer records ambient temperature ($T_{air}$).\n    *   Calculate the expected baseline current for this specific batch composition and ambient condition: $I_{expected} = f(mass\\_cement, mass\\_aggregates, water\\_ref, T_{air})$.\n    *   Initially, start the water addition at the reference amount ($water\\_ref$) derived from scale records.\n    *   **Crucial Step:** As soon as mixing begins and the motor current stabilizes (after the first 30\u201360 seconds), measure the **actual mixer motor current** ($I_{measured}$).\n    *   **Adjustment Rule:**\n        *   Calculate Deviation: $\\Delta I = I_{measured} - I_{expected}$.\n        *   If $\\Delta I > 0$ (Motor working harder -> batch too dry/viscous): The aggregate is likely drier than the reference state. The system will flag for increased water in the next batch.\n        *   If $\\Delta I < 0$ (Motor working easier -> batch too wet/fluid): The aggregate is likely wetter than the reference state. The system will flag for reduced water in the next batch.\n\n3.  **Feedback for Water Dose:**\n    *   Use the deviation $\\Delta I$ to calculate a correction factor for the *next* batch's water dose.\n    *   Formula: $Water_{next} = Water_{ref} + k \\times (I_{expected} - I_{measured})$.\n    *   Where $k$ is a gain factor derived from historical data linking current deviations to required water changes. This creates a closed-loop correction using only existing meters.\n\n4.  **IMPLEMENTATION BILL:**\n    *   **Labor (Engineering):** 4 hours for regression model derivation using historical batch scale and current meter data.\n    *   **Labor (IT/Controls):** 2 hours to configure the logic for calculating $I_{expected}$ and updating $Water_{next}$ setpoint in the existing Batch Control System (BCS).\n    *   **Materials:** $0. No new sensors, cables, or displays are required.\n    *   **Testing:** 1 shift (approx. 8 batches) to validate the gain factor $k$ against observed slump results.\n\n**Measures Relied On (Input Derivation):**\n*   **$mass\\_cement$:** Directly read from existing **Batch Scale Records** (cement hopper scale).\n*   **$mass\\_aggregates$:** Directly read from existing **Batch Scale Records** (aggregate silo scales/batch scale).\n*   **$water\\_ref$:** Derived from historical **Batch Scale Records** (water meter integration or batch scale differential) for the target slump.\n*   **$T_{air}$:** Directly read from existing **Plant Air Thermometer**.\n*   **$I_{measured}$:** Directly read from existing **Mixer Motor Current Meter** (steady-state value at $t=45s$).\n*   **$I_{expected}$:** Derived via the regression model $f(mass\\_cement, mass\\_aggregates, water\\_ref, T_{air})$ using only the permitted inputs above.\n*   **$Water_{next}$:** Calculated using the formula $Water_{next} = Water_{ref} + k \\times (I_{expected} - I_{measured})$.\n\n**Why This Works:**\nThe drift in consistency and irregular current indicate a decoupling between the assumed aggregate moisture and the actual mix rheology. By using motor current as a real-time consistency indicator, the plant can detect *actual* mix behavior instead of relying on estimated moisture content. The feedback loop adjusts water addition based on observed mechanical resistance, ensuring consistent slump without over-hydrating the mix, thus stabilizing shift-to-shift variability.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Labor (Engineering):** 4 hours for regression model derivation using historical batc",
+   "*   **Labor (IT/Controls):** 2 hours to configure the logic for calculating $I_{expected}$",
+   "*   **Materials:** $0. No new sensors, cables, or displays are required.",
+   "*   **Testing:** 1 shift (approx. 8 batches) to validate the gain factor $k$ against obser",
+   "*   **$mass\\_cement$:** Directly read from existing **Batch Scale Records** (cement hopper",
+   "*   **$mass\\_aggregates$:** Directly read from existing **Batch Scale Records** (aggregate",
+   "*   **$water\\_ref$:** Derived from historical **Batch Scale Records** (water meter integra",
+   "*   **$T_{air}$:** Directly read from existing **Plant Air Thermometer**.",
+   "*   **$I_{measured}$:** Directly read from existing **Mixer Motor Current Meter** (steady-",
+   "*   **$I_{expected}$:** Derived via the regression model $f(mass\\_cement, mass\\_aggregates",
+   "*   **$Water_{next}$:** Calculated using the formula $Water_{next} = Water_{ref} + k \\time"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 13.11,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

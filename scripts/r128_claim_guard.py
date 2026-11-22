@@ -25,6 +25,14 @@ def show(path, ref=":"):
     return r.stdout if r.returncode == 0 else None
 
 
+def _parses(text):
+    try:
+        json.loads(text)
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def main():
     staged = subprocess.run(
         ["git", "diff", "--cached", "--name-only"],
@@ -34,15 +42,22 @@ def main():
     if not reg_staged and not cnt_staged:
         return 0  # nothing this guard governs
 
-    old_cnt = (show(CNT, "HEAD:") or "").strip() or "c-0000"
+    # the base state: HEAD's registry/counter, falling back to the
+    # REMOTE tip when HEAD is unreadable (the repair path — a commit
+    # whose own base is broken is amended against the authoritative
+    # remote state; Art. 7: canonical state has one authority)
+    old_raw = show(REG, "HEAD:")
+    if old_raw is None or not _parses(old_raw):
+        old_raw = show(REG, "origin/queue/dev12_r7:")
+    old_cnt = (show(CNT, "HEAD:") or show(
+        CNT, "origin/queue/dev12_r7:") or "").strip() or "c-0000"
     new_cnt = (show(CNT) or "").strip() if cnt_staged else old_cnt
     old_ids = set()
-    old_raw = show(REG, "HEAD:")
     if old_raw:
         try:
             old_ids = {c["claim_id"] for c in json.loads(old_raw)["claims"]}
         except Exception as e:  # noqa: BLE001
-            print(f"claim guard: HEAD registry unreadable ({e}) — "
+            print(f"claim guard: base registry unreadable ({e}) — "
                   "refusing (fix the base first)", file=sys.stderr)
             return 1
     new_raw = show(REG) if reg_staged else old_raw

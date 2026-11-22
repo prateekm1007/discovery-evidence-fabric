@@ -1,0 +1,90 @@
+{
+ "problem_id": "r125-04-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 8.19,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 1289,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 9.58,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 781,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 3.12,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 546,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 6.08,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1625,
+    "completion_tokens": 1364,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "Mitigation Proposal: Closed-Loop Power-Based Setpoint Adjustment and Feed Rate Modulation\n\n**Mechanism:**\nThe mitigation employs a feedback control loop that uses the **specific power** (power per unit mass throughput) as a proxy for crushing intensity and product consistency. The mechanism operates on the principle that for a cone crusher, maintaining stable crushing intensity requires holding specific power at a defined reference level. When liner wear or gap adjustments alter the crusher's geometry, the specific power drifts. To counteract this, the controller modulates the **Feed Rate** to maintain the specific power at a target value, thereby stabilizing the energy input per tonne and preventing the 'coarsening' spiral caused by unstable load conditions.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** The error signal derived from the deviation of current Specific Power ($SP$) from the Reference Specific Power ($SP_{set}$). Specifically, $e = SP_{set} - SP$.\n*   **Direction of Effect:**\n    1.  If $SP > SP_{set}$ (Specific Power is high, indicating excessive load or inefficiency per ton), the error $e$ is negative. The controller **decreases** the feed rate setpoint. This reduces the mass flow through the chamber, lowering the instantaneous power draw relative to the mass throughput, bringing $SP$ back down to $SP_{set}$.\n    2.  If $SP < SP_{set}$ (Specific Power is low, indicating under-utilization or starved condition), the error $e$ is positive. The controller **increases** the feed rate setpoint. This increases the mass flow, raising the load on the crusher, and bringing $SP$ back up to $SP_{set}$.\n*   **Result:** The system acts to maintain constant Specific Power by inversely modulating feed mass flow in response to power/mass ratio deviations.\n\n**Implementation:**\n1.  **Calculate Specific Power ($SP$):** Using the existing sensors, calculate $SP = P_{motor} / (F_{discharge})$, where $P_{motor}$ is the instantaneous motor power from the power meter, and $F_{discharge}$ is the mass flow rate from the discharge-belt scale. Feed-rate scale data $F_{feed}$ is used for mass balance validation: $F_{feed} \\approx F_{discharge} + \\Delta W_{stock}$, ensuring steady state before control action.\n2.  **Define Setpoint:** Establish $SP_{set}$ as the average specific power recorded during the 7 days following the last liner change.\n3.  **Control Loop:** Implement a PI controller that adjusts the **Feed Rate Setpoint** sent to the feed conveyor drive based on the direction-of-effect stated above.\n    *   **Stabilization Logic:** The automated mitigation focuses on maintaining $SP = SP_{set}$. If the operator manually tightens the gap to address coarsening, $SP$ will naturally rise. The controller detects $SP > SP_{set}$ and automatically **reduces** the feed rate to compensate, preventing motor overload and ensuring the crusher operates at its efficient power point for that new gap setting.\n    *   **Coarsening Mitigation:** If product coarsens due to excessive gap, the operator tightens the gap. The controller prevents the resulting power spike from destabilizing the process by reducing throughput. This ensures that for any given gap setting, the crusher operates at a consistent, optimized power level.\n\n**Measures it Relies On:**\nAll inputs, measurements, and logic signals in this corrected proposal are derived exclusively from the permitted sensors:\n1.  **$P_{motor}$ (Motor Power):** Derived directly from the **existing crusher motor power meter**.\n2.  **$F_{discharge}$ (Discharge Mass Flow):** Derived directly from the **existing discharge-belt scale**. (Formula: Mass flow rate calculated via belt speed and load cell integration, standard to the scale system).\n3.  **$F_{feed}$ (Feed Mass Flow):** Derived directly from the **existing feed-rate scale**. Used strictly for the mass balance validation term $\\Delta W_{stock} \\approx F_{feed} - F_{discharge}$.\n4.  **$SP$ (Specific Power):** Derived from the formula $SP = P_{motor} / F_{discharge}$ using the two measurements listed above.\n5.  **$SP_{set}$ (Reference Specific Power):** Derived from historical data of $SP$ during the baseline period, stored in the control system memory. It is a constant parameter, not a real-time measurement, but its value is established from the permitted measurements over time.\n6.  **Feed Rate Setpoint (Actuation Signal):** The output of the controller is sent to the existing feed conveyor drive. The feedback on the conveyor speed is assumed to be managed by the existing local conveyor control loop referenced in the problem context ('existing feed-rate scale feedback loop'). The proposal relies on the **existing feed-rate scale** to confirm the actuation is achieved.\n\n*No new instrumentation is added.*\n\n**IMPLEMENTATION BILL:**\n1.  **Software/Logic Configuration:** Update the existing DCS/PLC control logic to include the Specific Power calculation module and PI controller loop.\n    *   Inputs: $P_{motor}$ (tag: `CRUSHER_POWER`), $F_{discharge}$ (tag: `DISCHARGE_FLOW`).\n    *   Calculation: `SP_CURRENT = CRUSHER_POWER / DISCHARGE_FLOW`.\n    *   Error: `ERR = SP_SET - SP_CURRENT`.\n    *   Output: PI Controller adjusting `FEED_SETPOINT`.\n2.  **Parameter Setup:**\n    *   Define $SP_{set}$ based on historical baseline data from the last liner change.\n    *   Tune PI gains for stability using the existing mass flow dynamics.\n3.  **Safety Interlocks:** Verify that existing motor overload trips remain active. Ensure the feed rate reduction limit does not starve the crusher below minimum operational thresholds (defined by existing interlocks).\n4.  **Operator Interface:** Add HMI alarm for 'SP Deviation' to notify operators when manual gap adjustments are required due to coarse product, indicating that the automatic feed modulation has compensated for the power change but the product size requires mechanical intervention.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Software/Logic Configuration:** Update the existing DCS/PLC control logic to include",
+   "*   Inputs: $P_{motor}$ (tag: `CRUSHER_POWER`), $F_{discharge}$ (tag: `DISCHARGE_FLOW`).",
+   "*   Calculation: `SP_CURRENT = CRUSHER_POWER / DISCHARGE_FLOW`.",
+   "*   Error: `ERR = SP_SET - SP_CURRENT`.",
+   "*   Output: PI Controller adjusting `FEED_SETPOINT`.",
+   "2.  **Parameter Setup:**",
+   "*   Define $SP_{set}$ based on historical baseline data from the last liner change.",
+   "*   Tune PI gains for stability using the existing mass flow dynamics.",
+   "3.  **Safety Interlocks:** Verify that existing motor overload trips remain active. Ensure",
+   "4.  **Operator Interface:** Add HMI alarm for 'SP Deviation' to notify operators when manu"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'HMI alarm' shares no allowed-list stem (Use only existing sensors and existing measurements: the crusher motor power met...)"
+  ]
+ },
+ "wall_clock_s": 144.78,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

@@ -1,0 +1,61 @@
+{
+ "problem_id": "r125-04-s1",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 12.88,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 1712,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.16,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 2085,
+    "completion_tokens": 818,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "REASONING_THRASH_LEAK: Wait, if the product is coarsening, simply throttling feed might not fix the \"coarse fraction keeps returning\"",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "Wait, if the product is coarsening, simply throttling feed might not fix the \"coarse fraction keeps returning\" part. The coar"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "MITIGATION PROPOSAL: CLOSED-LOOP SPECIFIC ENERGY REGULATION VIA FEED RATE MODULATION\n\nMECHANISM:\nThe observed failure modes\u2014coarsened product, high coarse recycle, and elevated specific energy\u2014are indicative of the crusher operating inefficiently due to liner wear, which has effectively increased the Closed Size of Crush (CSS). This causes material packing, increasing the specific power draw per tonne. The mitigation is to implement a feedback control loop that modulates the feed rate to maintain the specific energy at a known optimal baseline, preventing packing and overload. By reducing the feed rate when specific energy rises, the load on the chamber decreases, allowing the material to pass through more efficiently at the current, degraded CSS. This does not reverse the physical wear but stabilizes the process to prevent mechanical damage and excessive energy consumption, ensuring the most efficient operation possible under the current hardware constraints.\n\nINPUT/MEASUREMENT SOURCING:\n1. Specific Energy (SE): Derived from two permitted sensors.\n   - Numerator (Power): Raw kW signal from the existing crusher motor power meter.\n   - Denominator (Throughput): Mass flow rate (t/h) from the existing discharge-belt scale.\n   - Formula: SE = (Motor Power in kW) / (Discharge Belt Scale Mass Flow in t/h). A time-weighted moving average (e.g., 5-minute window) is applied to the resulting SE value to filter transient noise.\n2. Feed Rate Setpoint: The control output is a speed command to the existing feeder actuator. The actual delivered feed rate is verified using the mass flow rate signal from the existing feed-rate scale to close the inner loop.\n3. Target Specific Energy (SE_target): Derived from historical data of the same motor power meter and discharge-belt scale taken at the last liner change, stored as a constant baseline.\n\nDIRECTION-OF-EFFECT:\n*   Driving Variable: Specific Energy (SE).\n*   Effect Direction: When SE increases above the target threshold, the control logic drives the feed rate downward. This reduction in feed mass flow decreases the material load in the crushing chamber, which in turn reduces the motor power draw and lowers the SE back towards the target. Conversely, if SE is below the target with available capacity, the feed rate is increased to maximize throughput.\n\nIMPLEMENTATION:\n1.  **Signal Processing:** Continuously calculate SE using the motor power meter and discharge-belt scale signals.\n2.  **Control Law:** Implement a Proportional-Integral (PI) controller.\n    *   Error = SE_target - SE_current.\n    *   If SE_current > SE_target: Controller output commands a decrease in feeder speed (reducing feed rate).\n    *   If SE_current < SE_target: Controller output commands an increase in feeder speed, limited by the maximum mechanical feed capacity.\n3.  **Feedback Verification:** Use the feed-rate scale to confirm the actual mass flow matches the commanded speed, adjusting for any belt stretch or loading inconsistencies.\n4.  **Safety Limits:** Hard-limit the feed rate to the crusher\u2019s maximum rated input and ensure a minimum flow to prevent starvation of the screen downstream.\n\nIMPLEMENTATION BILL:\n1.  **Software/Logic Module:** Develop and deploy a SE calculation and PI control routine in the existing DCS/PLC. (Cost: Internal Engineering Hours)\n2.  **Configuration:** Set SE_target constant based on baseline data. (Cost: Internal Engineering Hours)\n3.  **Hardware:** No new sensors or actuators required. Utilize existing motor power meter, discharge-belt scale, feed-rate scale, and feeder variable speed drive. (Cost: $0)\n4.  **Validation:** Perform a test run at reduced setpoints to verify the feed-rate scale response and stability of the SE loop. (Cost: Internal Operations Hours)",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Software/Logic Module:** Develop and deploy a SE calculation and PI control routine ",
+   "2.  **Configuration:** Set SE_target constant based on baseline data. (Cost: Internal Engi",
+   "3.  **Hardware:** No new sensors or actuators required. Utilize existing motor power meter",
+   "4.  **Validation:** Perform a test run at reduced setpoints to verify the feed-rate scale "
+  ]
+ },
+ "wall_clock_s": 19.06,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

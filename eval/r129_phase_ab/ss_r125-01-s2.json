@@ -1,0 +1,94 @@
+{
+ "problem_id": "r125-01-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 6.92,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 1231,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 12.38,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1610,
+    "completion_tokens": 1219,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "REASONING_THRASH_LEAK: Wait, the constraint says \"Part weight... has drifted... and screw recovery time has grown.\" This suggests a p",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "Wait, the constraint says \"Part weight... has drifted... and screw recovery time has grown.\" This suggests a process drift. T"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "### Mitigation Proposal: Closed-Loop Shot Volume Adjustment via Check-Weigher Feedback\n\n**Direction-of-Effect Statement**\n*   **Driving Variable:** Part mass deviation ($E_m$) measured by the check-weigher.\n*   **Direction of Effect:** A positive mass deviation (part heavier than target) triggers a **negative** adjustment to the injection displacement volume ($\\Delta V_{inj}$). Conversely, a negative mass deviation (part lighter than target) triggers a **positive** adjustment to the injection displacement volume.\n*   **Mechanism:** Since part mass $m \\approx \\rho V$ (where $\\rho$ is melt density and $V$ is injected volume), and process drift causes density/viscosity changes that decouple mass from fixed volume, directly modulating $V_{inj}$ inversely to the mass error maintains constant part mass regardless of thermal or material drift.\n\n**Mechanism**\nThe observed increase in part weight and elongated screw recovery time, despite constant barrel setpoints, indicates a drift in melt properties (temperature/density/viscosity). To stop the scrap trend immediately without adding new instrumentation, we implement a closed-loop feedback control on the injection displacement (shot size). The **check-weigher** provides the direct mass error signal. The controller adjusts the **injection displacement** for the subsequent cycle to compensate for the drift. The **cycle-time logger** is used to trend these adjustments and detect when the compensation exceeds safe limits, signaling a need for root-cause thermal maintenance. The **barrel zone thermocouples** are used purely for post-event correlation to identify specific zones responsible for the drift, but they do not drive the real-time correction.\n\n**Implementation Bill**\n1.  **PLC Logic Integration:** Map the digital/analog signal from the existing **check-weigher** to an input channel in the machine controller\u2019s PLC.\n2.  **PI Controller Implementation:** Code a Proportional-Integral (PI) loop that calculates the mass error: $E_m(t) = W_{measured}(t) - W_{target}$. Here, $W_{measured}$ is derived directly from the **check-weigher** output.\n3.  **Shot Volume Actuation:** Apply the PI output $K_p E_m + K_i \\int E_m dt$ as a delta-value to the baseline injection displacement $V_{inj}$ for the next cycle. The new setpoint is $V_{new} = V_{base} + \\Delta V_{inj}$.\n4.  **Rate Limiting:** Clamp the magnitude of $\\Delta V_{inj}$ to a maximum of 0.1% of $V_{base}$ per cycle to prevent instability and protect the screw recovery process.\n5.  **Trending & Alarm:** Log the value of $\\Delta V_{inj}$ into the **cycle-time logger**. Configure an alarm threshold on the logger: if $|\\Delta V_{inj}|$ exceeds a predefined limit for $N$ consecutive cycles, trigger a maintenance flag. This uses the **cycle-time logger** not for control, but for monitoring the effectiveness of the mitigation.\n6.  **Diagnostic Correlation:** During maintenance windows, export the **barrel zone thermocouple** readings from the existing data acquisition system. Correlate the timestamped thermocouple values with the logged **check-weigher** errors to identify which heater zones are drifting. This step uses only existing **thermocouple** data for offline analysis, not real-time control.\n\n**Measures it Relies On**\n*   **Input 1: Part Mass ($W_{measured}$)**\n    *   *Source:* Existing **check-weigher**.\n    *   *Usage:* Primary feedback variable for the PI controller.\n    *   *Derivation:* Direct analog/digital readout. No derivation needed.\n*   **Input 2: Target Weight ($W_{target}$)**\n    *   *Source:* Existing **check-weigher** configuration parameters.\n    *   *Usage:* Setpoint for the mass error calculation.\n    *   *Derivation:* User-defined constant stored in the check-weigher or PLC.\n*   **Input 3: Mass Error ($E_m$)**\n    *   *Source:* Derived.\n    *   *Usage:* Drives the PI controller.\n    *   *Formula:* $E_m = W_{measured} - W_{target}$.\n*   **Input 4: Injection Displacement Adjustment ($\\Delta V_{inj}$)**\n    *   *Source:* Derived.\n    *   *Usage:* Actuator command to the hydraulic/pneumatic injection unit.\n    *   *Formula:* $\\Delta V_{inj} = K_p E_m + K_i \\int E_m dt$, subject to rate limit $|\\Delta V_{inj}| \\le 0.001 \\cdot V_{base}$.\n*   **Input 5: Trending Data**\n    *   *Source:* Existing **cycle-time logger**.\n    *   *Usage:* Monitor $\\Delta V_{inj}$ over time for alarm generation.\n    *   *Derivation:* Historical buffer of the $\\Delta V_{inj}$ variable logged by the PLC.\n*   **Input 6: Thermal Correlation Data**\n    *   *Source:* Existing **barrel zone thermocouples**.\n    *   *Usage:* Offline diagnostic only. Not part of the real-time control loop.\n    *   *Derivation:* Direct readout of thermocouple voltage signals converted to temperature by the existing PLC I/O modules.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **PLC Logic Integration:** Map the digital/analog signal from the existing **check-wei",
+   "2.  **PI Controller Implementation:** Code a Proportional-Integral (PI) loop that calculat",
+   "3.  **Shot Volume Actuation:** Apply the PI output $K_p E_m + K_i \\int E_m dt$ as a delta-",
+   "4.  **Rate Limiting:** Clamp the magnitude of $\\Delta V_{inj}$ to a maximum of 0.1% of $V_",
+   "5.  **Trending & Alarm:** Log the value of $\\Delta V_{inj}$ into the **cycle-time logger**",
+   "6.  **Diagnostic Correlation:** During maintenance windows, export the **barrel zone therm",
+   "*   **Input 1: Part Mass ($W_{measured}$)**",
+   "*   *Source:* Existing **check-weigher**.",
+   "*   *Usage:* Primary feedback variable for the PI controller.",
+   "*   *Derivation:* Direct analog/digital readout. No derivation needed.",
+   "*   **Input 2: Target Weight ($W_{target}$)**",
+   "*   *Source:* Existing **check-weigher** configuration parameters.",
+   "*   *Usage:* Setpoint for the mass error calculation.",
+   "*   *Derivation:* User-defined constant stored in the check-weigher or PLC.",
+   "*   **Input 3: Mass Error ($E_m$)**",
+   "*   *Source:* Derived.",
+   "*   *Usage:* Drives the PI controller.",
+   "*   *Formula:* $E_m = W_{measured} - W_{target}$.",
+   "*   **Input 4: Injection Displacement Adjustment ($\\Delta V_{inj}$)**",
+   "*   *Source:* Derived.",
+   "*   *Usage:* Actuator command to the hydraulic/pneumatic injection unit.",
+   "*   *Formula:* $\\Delta V_{inj} = K_p E_m + K_i \\int E_m dt$, subject to rate limit $|\\Delt",
+   "*   **Input 5: Trending Data**",
+   "*   *Source:* Existing **cycle-time logger**.",
+   "*   *Usage:* Monitor $\\Delta V_{inj}$ over time for alarm generation.",
+   "*   *Derivation:* Historical buffer of the $\\Delta V_{inj}$ variable logged by the PLC.",
+   "*   **Input 6: Thermal Correlation Data**",
+   "*   *Source:* Existing **barrel zone thermocouples**.",
+   "*   *Usage:* Offline diagnostic only. Not part of the real-time control loop.",
+   "*   *Derivation:* Direct readout of thermocouple voltage signals converted to temperature "
+  ],
+  "APPARATUS_ROW": [
+   "5.  **Trending & Alarm:** Log the value of $\\Delta V_{inj}$ into the **cycle-time logger**. Configure an alarm",
+   "*   *Usage:* Monitor $\\Delta V_{inj}$ over time for alarm generation."
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 20.31,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

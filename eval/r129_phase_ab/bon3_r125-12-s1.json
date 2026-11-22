@@ -1,0 +1,84 @@
+{
+ "problem_id": "r125-12-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.8,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 754,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 129.84,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 1173,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.65,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 621,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 20.61,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1074,
+    "completion_tokens": 1005,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Brine Strength Stabilization via Pressure-Flow Compensation**\n\n**Mechanism**\nThe observed increase in salt usage and premature hardness breakthrough, while maintaining service flow, suggests that the regeneration brine concentration is drifting downward or the brine flow rate is inconsistent. Instead of relying on a fixed salt-dissolution timer, we will dynamically adjust the brine fill cycle to maintain a consistent brine delivery rate and confirm system integrity via pressure signatures.\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** Cumulative Service Flow (resin exhaustion level).\n*   **Direction of Mechanical Effect:** An **increase** in cumulative service flow (greater exhaustion) drives an **increase** in Brine Fill Time. This increases the total volume of brine delivered to the resin bed, which is intended to restore ion-exchange capacity.\n*   **Secondary Driving Variable:** Inlet Pressure Drop during Brine Fill.\n*   **Direction of Mechanical Effect:** An **increase** in Inlet Pressure (indicating restricted flow or valve issue) drives a **flag/alarm** state (no automatic increase in flow, as flow is not directly adjustable via pressure alone in this fixed-geometry pipeline; it signals mechanical maintenance need).\n\n**Implementation**\n1.  **Calculate Target Brine Volume/Time:** Use the existing **Service Flow Meter** to record the cumulative service flow since the last regeneration ($Q_{service}$). Determine the required brine fill time ($T_{fill}$) using the formula:\n    $$T_{fill} = k \\cdot \\int_{0}^{t} Q_{service}(t) dt$$\n    Where $k$ is a calibration constant derived from historical baseline data linking flow exhaustion to required regeneration time. This scales brine quantity to actual demand.\n\n2.  **Adjust Brine Fill Logic:** Modify the controller\u2019s regeneration sequence.\n    *   **Primary Control:** The controller opens the brine fill valve for the calculated duration $T_{fill}$.\n    *   **Health Check:** Monitor the **Inlet Pressure Transmitter** ($P_{inlet}$) during the fill phase. Establish a baseline pressure signature $P_{baseline}$ for a known good, unblocked brine line. \n        *   *Logic:* If $P_{inlet} > P_{baseline} + \\Delta P_{tolerance}$, the brine line is restricted or the valve is not opening fully. Flag for mechanical inspection. This confirms that the brine delivery rate is consistent with expected hydraulic resistance.\n\n3.  **Closed-Loop Adjustment:**\n    *   After each regeneration cycle, calculate the new $Q_{service}$ accumulated.\n    *   Compare the previous regeneration's breakthrough performance (if recorded in controller logs as time-to-next-regen) against target.\n    *   *Note:* The proposal relies on the assumption that consistent $T_{fill}$ scaled by $Q_{service}$ maintains efficiency. The pressure transmitter ensures the physical delivery is not impeded. No new sensors are used.\n\n**INPUT SIGNAL SOURCING (Permitted Sensors Only)**\n*   **Cumulative Service Flow ($\\int Q_{service}$):** Comes directly from the **Service Flow Meter**.\n*   **Inlet Pressure ($P_{inlet}$):** Comes directly from the **Inlet Pressure Transmitter**.\n*   **Brine Fill Time ($T_{fill}$):** Derived from the **Service Flow Meter** integral via the formula $T_{fill} = k \\cdot \\int Q_{service}$. $k$ is a parameter from existing baseline data, not a real-time sensor input.\n*   **Pressure Deviation ($\\Delta P$):** Derived from the **Inlet Pressure Transmitter** reading minus the stored **Inlet Pressure Transmitter** baseline value.\n\n**IMPLEMENTATION BILL**\n1.  **Controller Logic Update:** Rewrite the regeneration timing block in the PLC/Controller to integrate service flow totalization instead of using a fixed timer. (Labor: 4 hours)\n2.  **Baseline Calibration:** Collect 5-10 regeneration cycles' data to establish the correlation factor $k$ between service flow and optimal brine fill time. Verify inlet pressure baseline against known-good hardware. (Labor: 2 hours)\n3.  **Safety Interlocks:** Configure high-pressure alarm on the **Inlet Pressure Transmitter** to abort brine fill if pressure exceeds safe limits, preventing tank overflow or valve damage. (Labor: 1 hour)\n4.  **Documentation:** Update the Operation & Maintenance manual to reflect the new adaptive regeneration logic and the meaning of the new pressure-based health flags. (Labor: 1 hour)",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Controller Logic Update:** Rewrite the regeneration timing block in the PLC/Controll",
+   "2.  **Baseline Calibration:** Collect 5-10 regeneration cycles' data to establish the corr",
+   "3.  **Safety Interlocks:** Configure high-pressure alarm on the **Inlet Pressure Transmitt",
+   "4.  **Documentation:** Update the Operation & Maintenance manual to reflect the new adapti"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 162.75,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

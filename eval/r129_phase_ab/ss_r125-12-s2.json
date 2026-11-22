@@ -1,0 +1,65 @@
+{
+ "problem_id": "r125-12-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 1,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 5.44,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 682,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.17,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1045,
+    "completion_tokens": 955,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Implement a Flow-Dependent Regeneration Scheduling Protocol**\n\n**Mechanism:**\nThe root cause of increased salt consumption and early hardness breakthrough is a mismatch between the fixed regeneration cycle and actual water demand. When service flow spikes, the resin bed depletes faster than the scheduled regeneration allows, causing early breakthrough. The mitigation shifts from a static schedule to a dynamic one using existing sensors to trigger regeneration based on accumulated volume and verify process conditions, ensuring regeneration occurs only when necessary and that cycles are effective.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the accumulated service water volume ($V_{cum}$). An increase in $V_{cum}$ beyond the resin capacity threshold drives the system into the regeneration state. The mechanism acts to reset the ion-exchange capacity, which restores hardness removal efficiency. Consequently, this increases service hardness rejection and decreases premature salt consumption caused by ineffective short-cycled regenerations.\n\n**Implementation:**\n1.  **Flow-Integrated Trigger Logic:**\n    *   **Input Derivation:** The trigger variable is $V_{cum}$, derived by integrating the real-time output of the **Service Flow Meter** over the service cycle ($V_{cum} = \\int Q_{service} dt$).\n    *   **Logic:** Replace the fixed time-based trigger with a volume threshold trigger. The threshold is set to the resin bed\u2019s certified capacity. Since incoming water hardness is not directly measured by a permitted sensor, the threshold is adjusted conservatively based on historical seasonal data stored in the controller memory to ensure the resin is not overloaded before regeneration.\n    *   **Action:** When $V_{cum}$ exceeds the threshold, initiate the regeneration sequence.\n\n2.  **Pressure-Verified Regeneration:**\n    *   **Input Derivation:** The driving variable is the system pressure ($P_{in}$), measured directly by the **Inlet Pressure Transmitter**.\n    *   **Logic:** Before initiating regeneration, verify $P_{in}$ is above the minimum required pressure for adequate brine circulation. Low pressure can cause stratification and incomplete resin washing, leading to ineffective regeneration and higher salt use in subsequent cycles.\n    *   **Action:** If $P_{in}$ is low, delay regeneration and alarm. If $P_{in}$ is adequate, proceed to the next step.\n\n3.  **Flow-Verified Regeneration Duration:**\n    *   **Input Derivation:** The driving variable is the brine flow rate ($Q_{regen}$), measured directly by the **Regeneration Flow Meter**.\n    *   **Logic:** Monitor $Q_{regen}$ during the rinse and brine exchange phases. Verify that $Q_{regen}$ meets the minimum required flow for effective ion exchange. The duration of the regeneration cycle is not fixed by time but by the accumulated brine volume passing through the resin bed ($V_{regen} = \\int Q_{regen} dt$), ensuring sufficient contact time.\n    *   **Action:** If $Q_{regen}$ is too low, extend the regeneration time to achieve the required cumulative brine volume. This prevents \"short-cycled\" regenerations that waste salt without restoring full capacity.\n\n**IMPLEMENTATION BILL:**\n*   **Labor:** 0.0 hours (Configuration only; no new hardware installation).\n*   **Materials:** $0.00 (No new components required; uses existing sensors and controller logic).\n*   **Operational Cost Impact:**\n    *   **Salt Consumption:** Expected to decrease by approximately 10-15% by eliminating unnecessary regenerations triggered by low-flow periods and ensuring effective cycles that restore full resin capacity.\n    *   **Energy/Throughput:** No significant change in energy for service flow. Regeneration energy remains consistent as pump duty is unchanged, but frequency is optimized. Service availability is maintained as regeneration triggers are based on actual saturation, preventing unexpected early breakthrough.\n\n**Measures It Relies On:**\n*   **Service Flow Meter:** Provides real-time and cumulative service flow data. Used to derive $V_{cum}$ for the regeneration trigger.\n*   **Inlet Pressure Transmitter:** Provides real-time pressure data. Used to verify system integrity before regeneration to prevent incomplete brine exchange due to low pressure.\n*   **Regeneration Flow Meter:** Provides real-time brine flow data. Used to derive $V_{regen}$ and verify that the brine flow rate is sufficient for effective ion exchange during the regeneration cycle.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Labor:** 0.0 hours (Configuration only; no new hardware installation).",
+   "*   **Materials:** $0.00 (No new components required; uses existing sensors and controller",
+   "*   **Operational Cost Impact:**",
+   "*   **Salt Consumption:** Expected to decrease by approximately 10-15% by eliminating unne",
+   "*   **Energy/Throughput:** No significant change in energy for service flow. Regeneration ",
+   "*   **Service Flow Meter:** Provides real-time and cumulative service flow data. Used to d",
+   "*   **Inlet Pressure Transmitter:** Provides real-time pressure data. Used to verify syste",
+   "*   **Regeneration Flow Meter:** Provides real-time brine flow data. Used to derive $V_{re"
+  ]
+ },
+ "wall_clock_s": 10.62,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

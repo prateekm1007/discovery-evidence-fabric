@@ -1,0 +1,36 @@
+{
+ "record": "R129S1_STATUS/1.0.0",
+ "session": "builder-r121s1-3e8a41d7",
+ "at": "2026-11-22T19:10:00Z (sandbox clock, TRUE UTC)",
+ "responds_to": "the owner's R129 direction set (8 directions; the deep-research workflow tiers). Preflight: EPISTEMIC_CONSTITUTION.md v3.3.0 FULL-READ at f404f2466 (221 lines, 29 articles + 4 amendments + Art. 28 addendum; byte-identical to the prior full read — 0-line diff since 63e692733); vault verified env-only (HF 33bc7af22c62, AGNES d0c666a3842f + 5c4dffd28fe4, GH_PAT; no AWS_BEARER_TOKEN_BEDROCK — the owner checklist row stays OPEN)",
+ "executed": {
+  "phase_A": "ALL FOUR acceptance criteria MET on the 24-item slice (eval/r129_phase_ab/summary.json + per-problem records): median 16.3 s / worst 132.3 s (budgets <=2 / <=5 min), 24/24 delivered, 0 parse retries (reviewer 24/24 first-try), 6 transport backoffs absorbed AND counted in-record (transport_attempts live — the R128 field's first data), delivered-defect rate 0.0417 (1/24) UNCHANGED vs the r127 treated arm (2/48). Parallelism = the bounded pool (POOL=3) over INDEPENDENT problems only; the author->check->review chain stays sequential per problem (the Anthropic rule adapted: fan out only independent work). Engine changes (route_adapter/2.2.0): 2-key agnes rotation (deterministic alternation over both vault keys), Bedrock cachePoint support (cache_prefix_turns; cacheRead/Write counts in usage — hit-rate reportable the day the owner's key lands), Bedrock model-id guard fixed to real id shapes (the r128 guard over-rejected 'anthropic.claude-3-haiku-20240307-v1:0'-class ids — caught by unit check, fixed). Batch API: typed NOT-WIRED — the agnes route exposes no batch endpoint and Bedrock is key-gated; revisited when the key lands (offline eval only, never the interactive path)",
+  "phase_B": "Art. 20 ablation round 1 of 2 RUN AND TYPED (eval/r129_ablation_bon3.json): best-of-3 + bind-select LOSES round 1 — 2/24 (0.0833) vs single-shot 1/24 (0.0417) at 2.1x calls and ~9x median latency. MECHANISM FINDING (typed): the bind-select WORKED (both losses selected bind-clean candidates) but the REVIEWER REWRITE broke clean bills in both cases (duty_pricing introduced post-fix) — the residual defect source is the reviewer stage. Phase B re-aims: the GEPA-on-reviewer compile enters at R130 with its own 2-round clock (design committed: eval/r129_phaseB_design.json); retrieval-grounded authoring typed PENDING a corpus; bon3 is DELETED at round 2 unless it strictly beats ss",
+  "phase_C": "typed OWNER-GATED (budget cap + the score-8 panel; no Elo tournament runs without the panel)",
+  "score8_panel": "transport precondition advanced (both new transports + rotation in the engine) but still key-gated: no AWS_BEARER_TOKEN_BEDROCK — the owner's checklist row stays OPEN; the HF path remains funded and live (re-probed this round, usage bytes re-recorded)",
+  "v16_sealed_set": "auditor-gated, unauthored (unchanged)"
+ },
+ "dir_7_compliance": "this round: ONE push, claim c-0206 (REALLOCATED from a stale-counter c-0205 draft — the twin session's c-0205 claim-before-work pushed first; the push is the lock, Art. 29; overlap disclosed: both sessions ran Phase-B best-of-n ablations this round — mine n=3, theirs n=2 prereg — independent draws, cross-referenced), trailers present",
+ "remote_ci": {
+  "pushed_sha": "f404f2466",
+  "remote_ci_conclusion": "success",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success",
+    "id": 137254465931
+   }
+  ],
+  "read_at": "2026-11-22T18:55:00Z (sandbox clock, TRUE UTC)",
+  "note": "the pre-push tip's green quoted; THIS push's own run re-read and quoted at close"
+ },
+ "art27_capability_budget": {
+  "engine_line_share_measured": 1,
+  "engine_diff": "discovery_fabric/engine/route_adapter.py (~71 changed engine lines): the 2-key agnes rotation + the Bedrock cachePoint support + the model-id guard fix — route_adapter/2.2.0",
+  "share_exception_reason": "DISCLOSED EXCEPTION (infrastructure + measurement round BY OWNER DIRECTION — the R129 directions 2/3): the changed-line mass is the 48 per-problem MEASUREMENT RECORDS of the primary metric (the Phase-A speed acceptance + the Art. 20 Phase-B ablation the owner's acceptance criteria demand) — the capability-measurement path, not diagnostics; the engine behavior DID change this round (rotation, cachePoint) and is measured on the primary metric; scripts/r129_phase_ab.py is the measurement instrument whose measured path runs through the engine chain (gate.call_with_transport_backoff -> route_adapter.agnes_chat — declared)",
+  "primary_metric_delta": "delivered-defect rate 0.0417 (1/24) on the parallel single-shot arm — UNCHANGED vs the r127 treated arm (2/48); speed: median 16.3 s / worst 132.3 s per problem under the bounded pool (the <=2 / <=5 min budgets MET); Phase-B ablation round 1 typed: bon3 0.0833 (2/24) LOSES to ss — the reviewer stage is the residual defect source (typed mechanism finding)",
+  "deletions": "none (the retired ceremony stays retired — dir 8); bon3 enters its Art. 20 round-2 delete clock (deleted at R130 unless it strictly beats ss)"
+ },
+ "no_score_claims": true,
+ "claim_id": "c-0206"
+}
