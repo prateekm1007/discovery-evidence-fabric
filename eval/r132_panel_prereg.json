@@ -51,5 +51,12 @@
   "judge models (4, named above)",
   "hf_router_chat transport"
  ],
- "power_note": "auditor Art. 14: n=10 pairs is the P4-spec'd calibration slice (the spec itself says '10-item slice'); the qualification is per-judge on 10 labels (power typed honestly as the spec's own n); the production panel gate (>=50% viable) will pre-register its own n"
+ "power_note": "auditor Art. 14: n=10 pairs is the P4-spec'd calibration slice (the spec itself says '10-item slice'); the qualification is per-judge on 10 labels (power typed honestly as the spec's own n); the production panel gate (>=50% viable) will pre-register its own n",
+ "amendment_1": {
+  "at": "2026-11-23 (sandbox clock) — BEFORE any gate tally, after 11 legs",
+  "the_defect": "the prereg's blind_swap text said _rubric_prompt randomizes A/B by its own sha-parity — WRONG ON THE BYTES: _rubric_prompt places its (a_text, b_text) arguments verbatim; the swap is the CALLER's job (the r9 blind_order convention, sha256(pid::pair) parity). The first 11 legs ran FIXED-ORDER (a1 always A).",
+  "the_correction": "the driver now implements the committed r9 convention (deterministic per-pair swap by sha256(pid::pair) parity, order recorded per leg) PLUS a full MIRROR pass (every judge x pair also sees the opposite order) — position-swap is now real, both orders recorded with a_is. The recompute unswaps from each record's own a_is; a judge's per-pair vote = the majority of its two order-passes (split = tie).",
+  "the_11_legs": "archived at eval/r132_panel_pass1_fixedorder/ and EXCLUDED from every tally (disclosed, not silently patched); they were judgment calls under a defective protocol, kept for the record only",
+  "gate_unchanged": "the preregistered thresholds are unchanged (acc>=0.8, answered>=0.9, agreement>=0.7, kappa>=0.6, AUC>=0.8); only the blindness mechanism is corrected"
+ }
 }
