@@ -26,7 +26,9 @@ if "builder-r129s1" not in d.get("sessions", {}):
                 "dirs 2/3 (AWS host, score-8 panel) owner-gated — "
                 "typed, unattempted beyond the vault AWS-key check; "
                 "dir 4 (v16 sealed set) auditor-authored — untouched.",
-        "registered_at": NOW}
+        "registered_at": NOW,
+        "role": "builder"}  # the registry schema requires a session
+    # role (test_registry_schema_valid; the CI red 137267892171 class)
 base = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=REPO,
                       capture_output=True, text=True).stdout.strip()
 # the committed counter file is the allocation authority (r128 dir-1)
@@ -43,6 +45,9 @@ claim = {
     "status": "OPEN",
     "base_sha": base,
     "lease_expiry": "2026-11-29T23:59:00Z",
+    # the registry validator (test_registry_schema_valid) requires
+    # claimed_at on every claim (the CI red 137267892171 class)
+    "claimed_at": NOW,
     "artifact_paths": [
         "eval/r129_bon_prereg.json",
         "eval/r129_bon_run/",
