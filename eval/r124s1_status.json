@@ -30,11 +30,19 @@
   "deletions": "none"
  },
  "remote_ci": {
-  "pushed_sha": "PENDING (this record commits with the execution push)",
-  "remote_ci_conclusion": "PENDING",
-  "check_runs": [],
-  "read_at": null,
-  "note": "the execution push's own check-run is read at close and quoted in the round-close commit (the c-0055 discipline); the prereg push e7cb4308f carried check-run 137153306625 success (quoted in the prereg commit)"
+  "pushed_sha": "e7cb4308f",
+  "remote_ci_conclusion": "success",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success",
+    "id": 137153306625,
+    "url_suffix": "check-runs/137153306625"
+   }
+  ],
+  "read_at": "2026-11-23T13:55:00Z (sandbox clock, TRUE UTC)",
+  "note": "the quoted green is the PREREG push (e7cb4308f, the c-0186 instrument freeze). THIS record travels with the execution push 3f6c7976b, whose own check-run 137155819641 read FAILURE (the record's PENDING placeholder reds the remote-ci rule — the F96 class, fixed forward here); the execution push's re-read after this fix is quoted at round-close"
  },
- "no_score_claims": "NO score change claimed; the score-9 axis enactment question (the gates now met on both draws under the fixed detector) is the auditor's; this session types the measurements"
+ "no_score_claims": "NO score change claimed; the score-9 axis enactment question (the gates now met on both draws under the fixed detector) is the auditor's; this session types the measurements",
+ "ci_red_green_chain": "3f6c7976b (137155819641 failure: the round record's remote_ci.pushed_sha carried a PENDING placeholder — the remote-ci rule demands a real pushed sha + conclusion; ALSO the sandbox-local core.hooksPath was unset, reding test_guard_activation locally but not in CI) -> this fix-forward re-quotes the prereg green and the round-close quotes the fixed push's own green"
 }
