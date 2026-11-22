@@ -1,0 +1,92 @@
+{
+ "record": "R132_PANEL_CALIBRATION/1.0.1 (amendment 1 protocol)",
+ "claim": "c-0211",
+ "at": "2026-11-23 (sandbox clock)",
+ "method": "independent recompute from raw per-leg records only (auditor Art. 13); every leg carries its own order + a_is, the tally unswaps from the record; per judge x pair the vote = majority of the two order-passes (det + mirror), a split = tie",
+ "judges": {
+  "meta-llama": {
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_r5_prefer": 0.4,
+   "hits": 4,
+   "n_cmp": 10,
+   "qualified": false
+  },
+  "qwen": {
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_r5_prefer": 0.5,
+   "hits": 5,
+   "n_cmp": 10,
+   "qualified": false
+  },
+  "deepseek": {
+   "legs": 20,
+   "valid": 19,
+   "answered_rate": 0.95,
+   "acc_vs_r5_prefer": 0.7,
+   "hits": 7,
+   "n_cmp": 10,
+   "qualified": false
+  },
+  "cohere": {
+   "legs": 20,
+   "valid": 14,
+   "answered_rate": 0.7,
+   "acc_vs_r5_prefer": 0.222,
+   "hits": 2,
+   "n_cmp": 9,
+   "qualified": false
+  }
+ },
+ "qualified_panel": [],
+ "panel_agreement_vs_auditor": 0.0,
+ "panel_agreement_n": 0,
+ "pairwise_kappa_prefer": [],
+ "kappa_mean": 0.0,
+ "gold_auc": {
+  "per_specimen": {},
+  "auc_good_gt_bad": null,
+  "n_good": 0,
+  "n_bad": 0
+ },
+ "gate": {
+  "n_qualified": 0,
+  "agreement_ge_0.7": null,
+  "kappa_ge_0.6": null,
+  "auc_ge_0.8": false
+ },
+ "generator_family_excluded": "agnes (z-ai gateway)",
+ "per_pair": {},
+ "disclosure": "pass-1 (11 legs, fixed order) is archived at eval/r132_panel_pass1_fixedorder/ and EXCLUDED from every tally — it was run before the protocol defect was caught; the prereg amendment 1 discloses the correction",
+ "diagnosis": {
+  "gate_outcome": "HONEST NEGATIVE — 0/4 judges R-CAL qualified; the panel-calibration gate is NOT_MET this window",
+  "why_not_met": {
+   "accuracy": "best judge deepseek acc 0.7 (7/10) vs the >=0.8 bar; the paired order-majority vote rule (split = tie) costs accuracy: the auditor's labels carry NO ties (7 a1 / 3 baseline) while the order-majority produced 6 ties across the panel — every tie against a decisive auditor label is a miss",
+   "position_bias": "llama (A-votes 15:5) and cohere (13:1) show strong FIRST-POSITION bias; when their two order-passes disagree, the majority rule types tie. Per-order accuracy is HIGHER than paired accuracy (llama 8/10 on the mirror order, deepseek 8/10 both) — the judges are individually closer to the auditor than the paired-vote arithmetic shows",
+   "answered_rate": "cohere 0.70 (persistent router 429s on its free tier across 3 paced retry passes; 6 legs never served) — below the 0.9 bar independently of accuracy"
+  },
+  "what_agrees": "the panel substantially agrees with the auditor AND each other on the decisive pairs (eval-new02-slipring: ALL judges baseline, auditor baseline; bench-p09-packaging: all a1, auditor a1); the misses concentrate in the order-sensitive middle pairs, not in the decisive ones",
+  "comparison_to_prior_art": "the loop's own history typed this class before: the f28 lineage ('the paid shelf cannot serve the rubric judge' — kimi-k3 degenerate, typhoon format-incomplete, deepseek 429-isolated) and the R3 6/6 JUDGE_EMPTY_OUTPUT — small open models on a strict 10-item exact-match bar remain hard; the P4 spec's R-CAL bar (acc>=0.8 incl. ties) is a REAL filter, not a formality",
+  "next_lever_typed": "(a) the judge prompt's tie policy — the auditor was never offered 'TIE' as a lazy out; the per-axis suffix's 'TIE' acceptance may inflate ties (6 across the panel); (b) larger models on the same families (Qwen3-235B, Llama-4 class) if the router serves them; (c) the mirror-order-only accuracy (0.7-0.8 range) suggests a swap-robust scoring rule (e.g. a vote = one order drawn by the r9 parity, the mirror pass used as a consistency CHECK not a vote-splitter) would type higher — but ANY such change is a NEW prereg, not a re-tally of these bytes",
+  "no_gate_claims": "no agreement/kappa/AUC numbers are claimed from an unqualified panel (the gate record carries the computed-by-construction zeros as N/A — an unqualified panel has no panel-level tallies by definition)"
+ },
+ "run_census": {
+  "legs_total": 80,
+  "valid": 67,
+  "transport_failed_429": 10,
+  "parse_failed": 3,
+  "passes": "initial (2s pace) + sweep (45s) + final (90s) — the 429 class cleared only partially for cohere; all other judges fully served",
+  "archived_pass1": "eval/r132_panel_pass1_fixedorder/ (11 fixed-order legs, excluded from every tally, disclosed in prereg amendment 1)"
+ },
+ "next_lever_probe_typed": {
+  "at": "after the tally (diagnostic probes, NOT part of the gate corpus — new legs require a new prereg)",
+  "Qwen/Qwen3-235B-A22B-Instruct-2507": "OK READY — callable+funded; the larger-qwen lever EXISTS for the next window",
+  "meta-llama/Llama-4-Maverick-17B-128E-Instruct": "429 at probe time (rate-limited, same class as cohere's failures — retryable in a paced window)",
+  "openai/gpt-oss-120b": "429 at probe time",
+  "microsoft/Phi-4-reasoning-plus": "429 at probe time",
+  "mistralai/Mistral-Small-24B-Instruct-2501": "HTTP 400 (request rejected for this model — typed, not a funding signal)"
+ }
+}
