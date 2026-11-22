@@ -1,0 +1,30 @@
+**Mitigation Proposal: Load-Compensated Zone Biasing via Timer-Damper Interlock**
+
+**Mechanism:**
+The core issue is thermal stratification, where the center zones overheat while corner zones remain sub-cooled, forcing a longer global cycle time that degrades the center parts. This mitigation leverages the correlation between exhaust damper position and internal airflow distribution. By actively modulating the exhaust damper position *during* the cycle (rather than just at the end), we can alter the convective heat transfer coefficients across the oven load. Specifically, we will introduce a controlled, periodic "air-pulsing" or "damper-sweeping" strategy that encourages cross-flow through the corner regions, improving heat transfer to the lagging parts without requiring a longer static hold time.
+
+**Implementation:**
+1.  **Baseline Calibration (Using Existing Sensors):**
+    *   Use the **cycle timer** to log the current extended cycle duration $T_{ext}$.
+    *   Use the **oven zone thermocouples** to map the temperature gradients. Identify the specific corner zones ($Z_{corner}$) that exhibit the lowest $d(T)/dt$ (slowest heating rate) and the center zones ($Z_{center}$) that hit target temperature earliest.
+    *   Manually operate the **exhaust damper** (via its position feedback) while monitoring the zone thermocouples. Record the damper positions ($P_{damper}$) that minimize the temperature difference $\Delta T_{corner-center} = T_{center} - T_{corner}$ without causing any zone to exceed its maximum setpoint. This defines an "Optimal Damper Profile" $P_{opt}(t)$.
+
+2.  **Control Logic Modification (Using Existing Timer & Damper Feedback):**
+    *   Modify the oven's control sequence (via the PLC or manual protocol if PLC is not accessible, but typically this is hardwired logic) to execute the $P_{opt}(t)$ profile during the heating and soak phases.
+    *   **Step A:** During the first 20% of the heating phase (tracked by **cycle timer**), hold the damper at a position that maximizes exhaust flow through the center (cooling the center slightly) while drawing air through the corners. This is verified by checking that $Z_{center}$ thermocouples rise more slowly relative to $Z_{corner}$.
+    *   **Step B:** For the next 50% of the heating/soak phase, sweep the damper position slowly between the "Center-Cooling" position and the "Corner-Heating" position. Use the **damper position feedback** to ensure smooth transitions. The **zone thermocouples** are monitored to ensure no zone drops below the minimum cure temperature.
+    *   **Step C:** In the final 30% of the cycle, lock the damper at the position that maintains the highest uniformity across all thermocouples, allowing the system to stabilize at the target hardness temperature.
+
+3.  **Cycle Time Optimization:**
+    *   Because the corners now heat faster due to improved convective flow, the limiting factor for the cycle is no longer the corner lag but rather the center's peak temperature or the uniformity floor.
+    *   Monitor the **cycle timer** against the **zone thermocouples**. When all zones (including corners) reach the target temperature range simultaneously, shorten the total cycle time from $T_{ext}$ to a new $T_{opt}$, where $T_{opt} < T_{ext}$. This is achieved by observing that the standard deviation of temperatures across all zones drops below a threshold (e.g., ±5°C) earlier in the cycle.
+
+**Measures Relied Upon:**
+1.  **Exhaust Damper Position Feedback:** Used as the actuator signal to control airflow distribution. The position is directly read to ensure the damper is at the commanded $P_{opt}(t)$ values.
+2.  **Oven Zone Thermocouples:** Used as the sensing feedback. They provide the real-time temperature data for each zone, allowing the operator/control system to verify that the corner zones are heating at an accelerated rate relative to the center, and that no zone is overheating or under-heating. The differential signal between corner and center thermocouples serves as the primary metric for "evenness."
+3.  **Cycle Timer:** Used to segment the heating profile into phases (Step A, B, C) and to determine when the process is complete. It replaces the need for a new "uniformity sensor" by providing the time-axis for the damper modulation strategy. The timer also confirms the reduction in total cycle time.
+
+**Why This Works Under Constraints:**
+*   **No New Instrumentation:** It uses only the existing thermocouples (for feedback), damper position feedback (for actuator control), and timer (for sequencing).
+*   **Addresses Root Cause:** It directly combats the uneven heat transfer (convection) causing the corner lag, rather than just tolerating it with a longer cycle.
+*   **Result:** The cycle time is reduced back toward standard levels, and hardness uniformity is improved because the temperature differential between corners and center is actively minimized during the critical heating phase.

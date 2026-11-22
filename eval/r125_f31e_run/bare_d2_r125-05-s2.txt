@@ -1,0 +1,18 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implement a closed-loop control strategy that modulates the mill feed rate based on the real-time ratio of the mill differential pressure to the bucket-elevator current, effectively restoring the internal material residence time and grinding efficiency without reducing throughput below the necessary minimum for specific surface target. The "flattened" pressure signature indicates that the internal air velocity and particle load have decoupled, likely due to excessive feed rate relative to grinding capacity or blockage in the circulation loop. By using the pressure-to-current ratio as a proxy for internal grinding intensity, the controller can dynamically adjust the feed to maintain a setpoint that correlates with the target specific surface.
+
+**Implementation:**
+1.  **Signal Derivation:** Compute a normalized grinding intensity index (GII) defined as:
+    $$ GII = \frac{P_{diff}}{I_{bucket}} $$
+    where $P_{diff}$ is the mill differential pressure transmitter reading and $I_{bucket}$ is the bucket-elevator ammeter reading. This ratio normalizes the pressure (which is affected by air flow and particle load) against the material return rate, helping to distinguish between pure airflow effects and actual material grinding load.
+2.  **Setpoint Calibration:** Using historical campaign data where specific surface (Blaine) met target, determine the target setpoint $GII_{target}$ that corresponds to the required specific surface. If direct historical correlation is weak, use the current flattened signature as a baseline and incrementally adjust the feed rate to raise $GII$ until process observations (if available via periodic lab tests) or the trend in $P_{diff}$ alone stabilize at a level associated with higher grinding intensity.
+3.  **Control Loop:** Configure the existing mill-feed rate meter's controller to adjust the feed rate ($F$) to maintain $GII$ at $GII_{target}$. Use a PI controller where the error is $GII_{target} - GII_{current}$. If $GII$ drops (indicating reduced grinding load or excess feed), the controller decreases feed rate to increase internal residence time and grinding intensity. If $GII$ rises too high (indicating risk of overloading or blockage), the controller increases feed rate slightly.
+4.  **Safety Limits:** Hard-code limits on $F$ based on the mill's maximum capacity and minimum required feed to prevent starvation of the grinding zone. Also, ensure $P_{diff}$ does not exceed the mill's safe operating pressure limit.
+
+**Measures it Relies On:**
+*   **Mill Differential Pressure ($P_{diff}$):** Used as a primary indicator of internal material load and air resistance, which correlates with grinding intensity when normalized.
+*   **Bucket-Elevator Ammeter ($I_{bucket}$):** Used to estimate the return material flow rate, which is critical for normalizing the pressure signal to account for air flow variations caused by material circulation.
+*   **Mill-Feed Rate Meter ($F$):** The manipulated variable to adjust input material rate, thereby controlling residence time and grinding intensity.
+*   **No New Instrumentation:** The solution exclusively uses the three pre-installed sensors.

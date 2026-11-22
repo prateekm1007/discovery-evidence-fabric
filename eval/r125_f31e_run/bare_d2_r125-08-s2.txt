@@ -1,0 +1,19 @@
+**Mitigation Proposal: Closed-Loop Cycle Time Extension Based on Oxygen Analyzer Feedback**
+
+**Mechanism:**
+The root cause of the observed symptoms (purity slip, shortened cycles, and increased feed-air consumption) is likely that the fixed, short cycle time is no longer sufficient for the adsorbent bed to achieve the required breakthrough point due to aging, pressure drop, or temperature effects. By dynamically extending the adsorption hold time, the system can reach the purity specification before switching, thereby stabilizing purity and preventing premature switching that causes unnecessary feed-air churn. Since the failure is defined by purity slip, the most direct available control is to use the product oxygen analyzer as a feedback signal to modulate the cycle time.
+
+**Implementation:**
+1.  **Signal Mapping:** Configure the PLC/controller logic to continuously read the output from the existing **product oxygen analyzer**.
+2.  **Control Algorithm:** Implement a simple feedback loop (e.g., PI control or a step-wise ladder logic) where the target is the minimum allowable oxygen concentration (maximum nitrogen purity).
+    *   If the oxygen analyzer reads above the threshold (purity is slipping), the logic increases the next adsorption cycle time by a fixed increment (e.g., +0.5 seconds).
+    *   If the oxygen analyzer reads well below the threshold (with a margin for safety), the logic may slightly decrease the cycle time or hold it steady to optimize energy, but never decrease it below a minimum safety limit.
+    *   The primary action in the current failure state is to **allow the cycle time to drift longer** until the oxygen analyzer reports the target purity.
+3.  **Constraint Verification:** The logic uses only the **oxygen analyzer** (for feedback), the **cycle-time counter** (for execution), and implicitly the **feed-air pressure transmitter** to ensure the system pressure is stable enough to permit the extension (if pressure is low, the algorithm pauses cycle extension to prevent starvation, though the primary mitigation is the time adjustment). No new sensors are added.
+
+**Measures it Relies On:**
+*   **Product Oxygen Analyzer:** Provides the real-time purity error signal that dictates whether the cycle is too short. This is the critical input for the closed-loop correction.
+*   **Cycle-Time Counter:** The actuator. The controller writes a new, longer time value to this counter, physically extending the adsorption phase.
+*   **Feed-Air Pressure Transmitter:** Used as a safety interlock. It ensures that the extended cycle time is only applied when feed-air pressure is sufficient to maintain flow through the bed; if pressure is low, the system may prioritize pressure restoration over purity extension to avoid damaging the bed, but the primary mitigation leverages the pressure stability to justify the longer hold.
+
+This approach directly addresses the "shortening adsorption cycles" by allowing them to lengthen as needed to restore purity, which will inherently reduce the frequency of switching and the associated "up" in feed-air consumption caused by rapid cycling and purge inefficiencies.

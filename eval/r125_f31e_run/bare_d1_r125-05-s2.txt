@@ -1,0 +1,16 @@
+**Mitigation Proposal: Dynamic Feed Rate Modulation via Pressure-Signature Feedback**
+
+**Mechanism:**
+The flattened mill internal pressure signature indicates that the cement particles inside the grinding chamber are not achieving sufficient turbulence and collision energy, leading to coarser particles and a drop in specific surface area (Blaine fineness). By using the existing **mill differential pressure transmitter** as a real-time proxy for particle fineness (higher differential pressure generally correlates with finer particle size due to increased air resistance through the packed bed), we can dynamically adjust the **mill-feed rate meter** setpoints to maintain the pressure signature at a target baseline. This compensates for changes in material grindability and mill loading, restoring the desired fineness without adding new sensors.
+
+**Implementation:**
+1.  **Baseline Calibration:** Establish a target differential pressure ($\Delta P_{target}$) corresponding to the desired specific surface area based on historical data where throughput and fineness were optimal.
+2.  **Feedback Loop:** Configure the existing control system to monitor the **mill differential pressure transmitter**. 
+    *   If $\Delta P < \Delta P_{target}$ (indicating potential coarse grinding/flattening of pressure signature), **decrease** the mill feed rate via the **mill-feed rate meter** control. Reducing the load increases the energy per unit mass, raising the internal pressure and fineness.
+    *   If $\Delta P > \Delta P_{target}$ (indicating over-finishing or risk of overload), **increase** the mill feed rate via the **mill-feed rate meter** control. This restores throughput while keeping the pressure signature stable.
+3.  **Throughput Stabilization:** Use the **bucket-elevator ammeter** as a secondary guardrail. Ensure that any increase in feed rate does not exceed the motor’s safe operating limit (current draw) to prevent mechanical overload. The system prioritizes maintaining $\Delta P$ within bounds while maximizing feed rate up to the ammeter’s threshold.
+
+**Measures Relied Upon:**
+*   **Mill differential pressure transmitter:** Serves as the primary feedback variable for particle fineness/grinding intensity.
+*   **Mill-feed rate meter:** Serves as the primary control actuator (adjusting input load to modulate internal energy intensity).
+*   **Bucket-elevator ammeter:** Serves as the safety limit/secondary constraint to prevent mechanical overload during feed rate adjustments.

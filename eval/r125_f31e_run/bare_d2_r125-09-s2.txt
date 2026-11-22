@@ -1,0 +1,21 @@
+**Mitigation Proposal: Closed-Loop Exhaust Damper Control via Corner-to-Center Temperature Gradient**
+
+**Mechanism:**
+The uneven curing is caused by excessive heat loss at the corners, likely due to turbulent air flow or negative pressure zones created by the static position of the exhaust damper. The mitigation involves dynamically modulating the existing exhaust damper position during the heating and soak phases of the cycle to reduce air velocity at the corners and improve thermal uniformity. By minimizing the temperature differential (gradient) between the corner zones and the center zone, the system ensures that corner parts heat uniformly with the center, eliminating the need to extend the cycle time solely to compensate for lagging corners.
+
+**Implementation:**
+1.  **Signal Selection:** Utilize the existing **oven zone thermocouples**. Assign specific TCs to represent "Corner" zones (e.g., TC-C1, TC-C4) and "Center" zones (e.g., TC-C2, TC-C3). Use the existing **exhaust damper position feedback** sensor to know the current damper state.
+2.  **Control Algorithm:** Implement a proportional control loop on the existing PLC/Controller using only these signals:
+    *   Calculate the instantaneous Temperature Gradient ($\Delta T$): $\Delta T = T_{center\_avg} - T_{corner\_avg}$.
+    *   Define a Target Gradient Band (e.g., $\Delta T < 5^\circ C$).
+    *   **Logic:**
+        *   If $\Delta T > 5^\circ C$ (Corners are colder than center): The controller commands the **exhaust damper to close partially** (reduce opening) to decrease air velocity and heat loss at the corners, allowing them to catch up.
+        *   If $\Delta T < 0^\circ C$ or is within the target band: Hold damper at the baseline setpoint (calibrated during a commissioning run to ensure adequate exhaust without over-cooling corners).
+        *   If $\Delta T$ remains negative for an extended period (Corners hotter than center, risk of hot spots): Open the damper slightly to increase air flow and cool the corners.
+3.  **Cycle Integration:** The **cycle timer** triggers the start of this active damping phase during the "Soak" period, just before or as the set temperature is reached. The damper remains modulated until the end of the soak period, then locks at a neutral position for the cool-down phase to prevent thermal shock.
+
+**Measures Relied On:**
+*   **Thermocouple Readings:** Continuous temperature data from the existing corner and center zone TCs to calculate the real-time gradient.
+*   **Exhaust Damper Position Feedback:** Continuous confirmation of the damper's actual physical position to prevent actuator hunting or over-travel, enabling precise closed-loop correction.
+*   **Cycle Timer:** Synchronization of the active control window with the standard curing phase to ensure mitigation occurs only when thermal uniformity is critical for resin/cure chemistry.
+*   **Constraint Adherence:** No new sensors are added; only the existing TCs, damper feedback, and timer are repurposed for a dynamic control logic instead of their previous open-loop/static setpoint usage.

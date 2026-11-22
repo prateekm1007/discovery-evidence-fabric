@@ -1,0 +1,25 @@
+**Mitigation Proposal: Zone-Profiled Cycle Extension with Exhaust Damper Modulation**
+
+**Mechanism:**
+The uneven cure (corner lag) indicates that the corners are cooler than the center, likely due to hot air bypassing the corners or insufficient convective mixing. Instead of uniformly extending the entire cycle time for all parts (which risks over-curing the center), we implement a **spatially-aware compensation strategy**. By exploiting the *existing* exhaust damper position feedback and *existing* zone thermocouples, we can actively manipulate the internal airflow and pressure distribution to force hotter air into the colder corner zones. This reduces the temperature differential between center and corners, allowing the standard cycle time to hold the hardness spec without extension, or allowing a shorter total cycle time with a targeted boost for corners.
+
+**Implementation:**
+1.  **Diagnostic Phase (using existing sensors):**
+    *   Correlate the **zone thermocouple** readings (specifically identifying the corners vs. center zones) with the **exhaust damper position feedback** over several cycles.
+    *   Determine the baseline relationship: As the damper closes (reducing exhaust), does the corner temperature rise relative to the center? Or does opening the damper slightly increase airflow velocity, improving mixing but potentially lowering the mean temperature?
+    *   Identify the "lag" signature: Quantify the ΔT between the coldest corner thermocouple and the hottest center thermocouple at the point where the center part reaches spec temperature.
+
+2.  **Control Logic Modification (using existing components):**
+    *   Modify the oven’s control loop (or supervisory layer) to use the **maximum difference** between the corner zone thermocouples and the center zone thermocouple as a secondary setpoint variable, in addition to the absolute temperature setpoint.
+    *   Introduce a **damper modulation rule**: If the corner thermocouples lag behind the center thermocouples by more than a defined threshold (e.g., >5°C), the controller commands the **exhaust damper** to modulate its position dynamically during the soak phase.
+        *   *Scenario A (If corners are cold due to low airflow):* Close the damper slightly to increase internal static pressure and force recirculation fans (existing) to push more air through the corners. Alternatively, if the damper controls a recirculation fan inlet, open it to increase bulk flow velocity for better mixing.
+        *   *Scenario B (If corners are cold due to excessive exhaust of hot air):* Close the damper more aggressively to trap heat within the oven cavity, raising the overall temperature and reducing the relative lag of the corners, while compensating for the center with a slight reduction in heater output (if controllable) or by accepting a minor center temperature rise (verified via center thermocouple).
+    *   Use the **cycle timer** to trigger this modulation only during the critical "soak" phase of the cure cycle, not during ramp-up or cool-down.
+
+**Measures it Relies On:**
+1.  **Zone Thermocouples (Existing):** Provide real-time spatial temperature data to detect the corner-center differential. The "corner lag" is directly measurable as a persistent negative deviation of corner T vs. center T.
+2.  **Exhaust Damper Position Feedback (Existing):** Provides a closed-loop means to actuate the physical mechanism that alters airflow and heat retention. The feedback signal allows the controller to verify that the commanded damper movement is occurring, ensuring the mitigation is actually being applied.
+3.  **Cycle Timer (Existing):** Defines the temporal window for the intervention. The mitigation is applied only during the phase where cure chemistry is most sensitive to uniformity (typically the soak/hold phase), preventing unnecessary damper cycling during ramps which could induce thermal shock.
+
+**Outcome:**
+By actively modulating the exhaust damper based on the real-time temperature differential measured by existing zone thermocouples, the control system forces improved thermal uniformity. The corners receive enhanced heat transfer (via increased pressure/mixing or reduced heat loss), reducing the lag. This allows the cycle to maintain hardness spec without needing to extend the total cycle time, or it enables a shorter cycle time because the *limiting factor* (corner cure) is addressed proactively rather than passively by adding time. No new sensors are added; the existing damper feedback and thermocouple network are repurposed for a more advanced, spatially-resolved control strategy.

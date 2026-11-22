@@ -1,0 +1,30 @@
+**Mitigation Proposal: Closed-Loop Cycle Time Optimization using Product Oxygen Analyzer and Feed-Air Pressure Transmitter**
+
+**Mechanism:**
+The primary failure mode is the adsorption cycles shortening, which reduces the time available for oxygen (O₂) to be fully removed from the product stream, leading to purity drop. Simultaneously, the increased feed-air consumption at constant demand suggests inefficient separation due to the shortened cycles or potential pressure variations affecting the mass transfer zone. The proposed mitigation is a **real-time cycle time extension algorithm** that dynamically adjusts the adsorption and desorption times based on two existing signals:
+1.  **Product Oxygen Analyzer (Purity Proxy):** Used to detect the onset of O₂ breakthrough (i.e., when purity starts to slip).
+2.  **Feed-Air Pressure Transmitter:** Used to normalize the required cycle time based on actual inlet pressure, since shorter cycles at higher pressures may yield insufficient separation efficiency, and vice versa.
+
+The core logic is to *extend* the adsorption cycle time just enough to compensate for the observed purity dip and pressure variations, thereby restoring the mass transfer balance without new hardware.
+
+**Implementation:**
+1.  **Baseline Acquisition:** Use the existing **Cycle-Time Counter** to record the current nominal adsorption and desorption times. Establish a "purity-safe" threshold value from the **Product Oxygen Analyzer** (e.g., 99.9% N₂ or <0.5% O₂, depending on spec).
+2.  **Pressure Normalization Factor:** Calculate a pressure ratio \( R_p = \frac{P_{actual}}{P_{nominal}} \) using the **Feed-Air Pressure Transmitter** and the known nominal operating pressure. Since mass transfer velocity is inversely related to pressure for a fixed mass of air, a drop in pressure may require *longer* cycles to achieve the same adsorption depth, or vice versa if the system is over-pressurized causing channeling (though typically, higher pressure increases flow rate, reducing residence time per molecule, so we adjust for that). *Note: For PSA, higher pressure generally allows shorter cycles for same purity, but if pressure drops, cycles must be lengthened to maintain adsorption capacity. Conversely, if pressure is high and cycles are too short, O₂ may not be fully stripped. The algorithm will map \( P_{actual} \) to a recommended cycle time delta \( \Delta t_{pressure} \).*
+3.  **Purity-Feedback Adjustment:** Monitor the **Product Oxygen Analyzer**. If the O₂ content exceeds the lower purity limit (i.e., N₂ purity < spec), trigger an **incremental increase** in the adsorption cycle time. The increase magnitude is proportional to the deviation from the purity spec. 
+4.  **Combined Adjustment Rule:** The new cycle time \( T_{new} \) is calculated as:
+    \[
+    T_{new} = T_{current} + \Delta t_{pressure} + \Delta t_{purity}
+    \]
+    Where:
+    *   \( \Delta t_{pressure} \) is a lookup or linear function of \( (P_{nominal} - P_{actual}) \). If \( P_{actual} < P_{nominal} \), \( \Delta t_{pressure} > 0 \) (extend cycle to compensate for lower driving force/higher volumetric flow at same mass flow). If \( P_{actual} > P_{nominal} \), \( \Delta t_{pressure} \) may be slightly negative or zero, but safety bias keeps it non-negative unless purity is already high.
+    *   \( \Delta t_{purity} \) is a positive value activated only when the O₂ analyzer reads above the threshold. It uses a simple integral-like accumulation: \( \Delta t_{purity} = K \cdot \int (O_{2,max} - O_{2,measured}) dt \), clamped to a maximum safe extension to avoid desorption interference.
+
+5.  **Execution:** Update the **Cycle-Time Counter** setpoints via the existing PLC/Control System (which already reads these sensors and controls the valves). No new sensors are added; only the control logic is modified to use the existing data streams.
+
+**Measures it Relies On:**
+*   **Product Oxygen Analyzer:** Provides direct, real-time feedback on the key output (purity). It serves as the error signal for the purity-based cycle extension.
+*   **Feed-Air Pressure Transmitter:** Provides input condition normalization. It allows the system to distinguish between purity loss due to adsorbent exhaustion (requiring cycle extension) vs. loss due to pressure variation (requiring pressure-corrected cycle timing).
+*   **Cycle-Time Counter:** Serves as the actuator variable. The existing counter is modified from a fixed-time mode to a variable-time mode, accepting the calculated \( T_{new} \) from the control logic.
+
+**Why this works:**
+The problem states cycles are *shortening* (likely due to manual tuning or a failing timer logic) and purity is *slipping*. By forcing the cycle time to *lengthen* in response to O₂ breakthrough and pressure deviations, we increase the adsorption time, allowing the zeolite to capture more O₂ before breakthrough. This directly counteracts the "shortening cycles" failure mode. The pressure term ensures that if the feed pressure is lower than normal (common in aging systems), the system automatically compensates by extending the cycle to maintain the same volumetric throughput per adsorption period, preventing premature O₂ leak. Since no new instruments are added, the solution is purely software/logic-based, leveraging the existing sensor suite.

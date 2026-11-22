@@ -1,0 +1,16 @@
+Mitigation: Implement a "Thermal Load Limiting" control strategy using the existing pump motor ammeter and reservoir thermometers.
+
+**Mechanism:**
+The pressure drop at the end of the stroke combined with high temperatures indicates that the hydraulic fluid has degraded in viscosity or the system is suffering from excessive internal leakage due to thermal expansion, causing the pump to work inefficiently (high current draw) and lose pressure. By correlating the pump motor ammeter (a proxy for system load/power demand) with the reservoir temperature, we can detect when the system is approaching a thermal threshold where pressure loss becomes critical. The mitigation involves automatically reducing the duty cycle or stroke speed before the temperature limit is breached, preventing the pressure drop from affecting part quality and preventing catastrophic overheating.
+
+**Implementation:**
+1.  **Set Thermal Threshold:** Define a maximum allowable reservoir temperature (e.g., 70°C) based on oil specifications.
+2.  **Establish Load-Temperature Correlation:** Use the hour-run counter to track total operating time and the pump motor ammeter to log peak/current load during strokes. Create a lookup table or simple algorithm that determines the "safe" maximum stroke speed or duty cycle limit as a function of the current reservoir temperature.
+    *   *Example Logic:* If Reservoir Temp < 60°C, run at 100% speed. If Reservoir Temp 60–70°C, run at 80% speed. If Reservoir Temp > 70°C, run at 50% speed or insert mandatory cooling pauses (monitored by hour-run counter and temperature stabilization).
+3.  **Control Action:** Modify the existing press cycle controller (which already reads these sensors) to automatically scale down the hydraulic pump speed (via VFD or variable speed pump control, if available, or by extending stroke duration/reducing cycles per hour) when the reservoir thermometer reads high. This reduces the heat generation rate (lower ammeter draw per unit time) and allows the system to cool more effectively during the extended dwell time, maintaining pressure stability.
+
+**Measures It Relies On:**
+*   **Reservoir Thermometer:** Primary input for temperature-based gating.
+*   **Pump Motor Ammeter:** Used to verify that reducing speed/duty cycle actually reduces load/current, ensuring the control loop is responding to the actual thermal source.
+*   **Hour-Run Counter:** Used to track total accumulated stress and ensure that the "cooling pauses" or reduced duty cycles are accounted for in the maintenance schedule, preventing over-accumulation of hours at low efficiency.
+*   **Existing Sensors:** No new sensors; leverages the installed thermometers, ammeter, and hour counter to create a closed-loop thermal management protocol.

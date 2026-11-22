@@ -1,0 +1,19 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implement a "Thermal-Load Shedding" logic routine in the existing control system that uses the reservoir thermometer and pump motor ammeter to modulate the cycle time and limit peak pressure demands, preventing thermal runaway and maintaining sufficient pressure headroom for the end of the stroke.
+
+**Implementation:**
+1.  **Baseline Establishment:** Use the hour-run counter to log total operating hours. Periodically (e.g., every 500 hours), record the baseline steady-state oil temperature and baseline motor current (amps) during a standard, non-critical test cycle at room temperature.
+2.  **Real-Time Monitoring:** Continuously monitor the reservoir thermometer and the pump motor ammeter during production cycles.
+3.  **Adaptive Cycle Control:**
+    *   Define a threshold temperature $T_{max}$ (e.g., 55°C / 131°F, adjusted based on the specific oil's thermal limits) and a corresponding maximum allowable motor current $I_{max}$ (derived from the baseline, accounting for increased viscosity at lower temps, but more importantly, recognizing that high current at high temp indicates high friction/losses).
+    *   If the reservoir temperature exceeds $T_{max}$, the controller automatically extends the dwell/cool-down time between strokes. This increases the thermal mass exposure to the ambient environment and allows the oil to dissipate heat before the next high-load phase.
+    *   Simultaneously, if the motor current trends upward relative to the baseline *while* temperature is high, the controller reduces the maximum pressure setpoint by a calculated margin. This is safe because the pressure "fall-off" at the end of the stroke is often due to thermal expansion of trapped air or oil cavitation; lowering the peak demand slightly ensures the pump can maintain pressure throughout the stroke without overworking the motor, which generates even more heat.
+4.  **Feedback Loop:** The hour-run counter is used to trigger periodic "re-calibration" checks, ensuring that if the system has been running hot for many hours, the baseline for current/temperature drift is updated to prevent false alarms while still enforcing thermal limits.
+
+**Measures Relied Upon:**
+*   **Reservoir Thermometer:** Directly measures the bulk oil temperature, which is the primary driver of viscosity loss, internal leakage, and thermal expansion that causes pressure fall-off.
+*   **Pump Motor Ammeter:** Serves as a proxy for hydraulic power demand and mechanical friction. A rising current at high temperature indicates the system is working harder due to inefficiencies or is at the edge of its thermal capacity, signaling a need to reduce load (pressure) or increase rest time.
+*   **Hour-Run Counter:** Provides the context for thermal mass accumulation over time, allowing the system to distinguish between a single hot cycle and a chronic thermal overload that requires permanent adjustment of operating parameters or operator intervention (e.g., scheduling a longer cool-down period).
+*   **Existing Pressure Setpoint Control (Implied):** The system already has a way to adjust pressure settings; the mitigation reuses this function but triggers it adaptively based on thermal/current data rather than fixed settings.

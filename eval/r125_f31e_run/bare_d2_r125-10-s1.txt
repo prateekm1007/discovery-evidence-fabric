@@ -1,0 +1,19 @@
+**Mitigation Proposal: Adaptive Drive Load Limiting and Feed Rate Modulation**
+
+**Mechanism:**
+Implement a closed-loop control logic that uses the main drive power meter to dynamically modulate the feed conveyor speed in real-time. The system detects the approach of "tougher feed" by observing an upward trend in drive power before a stall occurs. Instead of allowing the drive to hit its hard torque limit and stall (which causes the screen undersize to grow due to inadequate shearing and the discharge to drop), the controller proactively reduces the feed rate to maintain the shredder operating point within the safe power envelope, thereby restoring consistent throughput and particle size distribution.
+
+**Implementation:**
+1.  **Define Operational Envelope:** Using historical data from the existing drive power meter, establish a "Maximum Safe Power Threshold" ($P_{max}$) slightly below the stall point. Also, define a "Target Power Band" ($P_{target}$) where the shredder operates most efficiently.
+2.  **Controller Logic (PLC/HMI):**
+    *   Continuously read the main drive power ($P_{actual}$) and the feed conveyor scale weight/velocity ($F_{feed}$).
+    *   Calculate the specific power consumption ($S = P_{actual} / F_{feed}$) to account for material density variations.
+    *   **Condition:** If $P_{actual} > P_{max}$ OR $S > S_{limit}$ (indicating tough material), trigger a **Feed Slowdown**.
+    *   **Action:** Reduce the feed conveyor speed by a stepwise percentage (e.g., 5-10%) to lower the load on the shredder. This allows the shredder to maintain rotation speed (preventing stall) and ensures material spends longer in the shear zone (reducing screen undersize issues caused by incomplete shredding).
+    *   **Recovery:** If $P_{actual}$ drops back to $P_{target}$ for a set dwell time, gradually increase feed speed back to normal.
+3.  **Discharge Monitoring:** Use the discharge conveyor scale to verify that total mass flow is recovering. If discharge mass remains low despite stable power, hold the reduced feed rate to allow the system to clear the bottleneck.
+
+**Measures it Relies On:**
+*   **Main Drive Power Meter:** Provides the real-time load signal used to detect approaching stall conditions and trigger the feedback loop.
+*   **Feed Conveyor Scale/Velocity Sensor:** Provides the mass flow rate for normalizing power data and serves as the actuator variable (speed) for the control loop.
+*   **Discharge Conveyor Scale:** Acts as a secondary validation measure to confirm that throughput (mass output) is stabilizing and preventing the "lighter than rated" condition.

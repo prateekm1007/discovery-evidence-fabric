@@ -1,0 +1,19 @@
+**Mitigation Proposal: Closed-Loop Tension Regulation via Motor Current Feedback**
+
+**Mechanism:**
+The climbing motor current in the finish block, despite the final gauge being correct, indicates that the drawing die or roll assembly in that block is experiencing increased friction or misalignment. This excess mechanical load translates to higher amperage. Simultaneously, the multiplication of breaks suggests that the tension profile is no longer optimal; the wire is likely being subjected to excessive peak stresses at the draw points, or the tension is fluctuating wildly due to the operator manually "fighting" the high current. The mitigation involves using the existing **per-block motor ammeters** as a real-time tension proxy to automatically modulate the **line-speed encoder** setpoint, thereby reducing the mechanical load on the finish block and smoothing the tension profile across the line to prevent breaks.
+
+**Implementation:**
+1.  **Establish Baseline Correlation:** Use historical data from the **motor ammeters** (specifically the finish block) and the **line-speed encoder** to identify the "Nominal Current" ($I_{nom}$) at the current standard production speed ($V_{std}$).
+2.  **Create Inverse Gain Control Law:** Implement a control logic (either via the PLC or the line-speed controller’s manual override trim) that links the finish block motor current to the line speed. Define a deviation threshold $\Delta I_{crit}$ (e.g., 5% above $I_{nom}$).
+3.  **Dynamic Speed Dampening:**
+    *   **Condition:** If the finish block ammeter reading exceeds $I_{nom} + \Delta I_{crit}$, automatically reduce the target line speed (via the **line-speed encoder** setpoint) by a calculated percentage (e.g., 2-5%).
+    *   **Logic Rationale:** Reducing speed lowers the inertial forces and dynamic tension peaks in the wire, allowing the operator to verify if the high current is due to a transient jam or a persistent mechanical issue. It also prevents the wire from being pulled through the faulty/high-friction zone with excessive force, which is the primary driver of breaks.
+4.  **Break Counter Integration for Safety:** Use the existing **break counter** to validate the mitigation. If the break rate decreases while the speed is modulated, the system is working. If breaks continue at the new lower speed, the system should trigger a "High Fault" alarm, prompting a manual stop for physical inspection of the finish block, as the control loop has done its best to mitigate the symptom.
+
+**Measures It Relies On:**
+*   **Per-block Motor Ammeters:** Serves as the primary input sensor for mechanical load/tension estimation. The specific use of the *finish block* ammeter is critical because the problem states its current is climbing, identifying it as the bottleneck.
+*   **Line-Speed Encoder:** Serves as the actuation variable. By adjusting the speed setpoint, we directly influence the tension in the wire. Lower speed reduces the dynamic tension component ($T \propto v^2$ or similar depending on mass/geometry), directly addressing the "wire breaks" issue.
+*   **Break Counter:** Provides a feedback validation signal to ensure the mitigation is actually reducing failures, not just lowering current. It acts as the ultimate success metric for the control loop's effectiveness.
+
+This approach uses *only* the allowed sensors to create a closed-loop system that trades production speed (temporarily) for process stability and reduced breakage, while protecting the equipment from damage due to excessive current.

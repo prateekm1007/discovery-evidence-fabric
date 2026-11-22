@@ -1,0 +1,14 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Utilize the **Mill Differential Pressure (ΔP) Transmitter** as the primary feedback signal for fineness control, replacing or supplementing the current throughput trim strategy. The flattened pressure signature indicates that the mill is operating in a low-internal-load regime where the air flow is not fully restricted by the cement bed, resulting in short residence time and poor grinding (low specific surface). By establishing a strict **pressure setpoint** corresponding to the target fineness and enforcing it through dynamic control of the mill feed, the internal material bed level can be raised to the optimal zone, increasing the grinding intensity and restoring the target specific surface without permanently reducing throughput.
+
+**Implementation:**
+1.  **Map the Pressure-Fineness Correlation:** Use historical campaign data to correlate the Mill Differential Pressure values with lab-tested Specific Surface (Blaine). Identify the specific ΔP value that historically coincides with the target fineness. Since the pressure signature has "flattened," the current operating ΔP is likely below this target value.
+2.  **Adjust Feed Rate Setpoint via Mill-Feed Rate Meter:** Use the existing **Mill-Feed Rate Meter** to actively reduce the feed rate until the **Mill Differential Pressure** rises to the identified target setpoint. Do not use the **Bucket-Elevator Ammeter** for this adjustment; instead, use it only as a secondary alarm for motor overload.
+3.  **Closed-Loop Pressure Control:** Configure the control system to hold the Mill ΔP at the new, higher setpoint. If the pressure drops below the setpoint (indicating reduced fineness), automatically decrease the feed rate (via the feed rate meter actuator). If the pressure exceeds the setpoint (risking blockage), slightly increase the feed rate. This ensures the mill operates at its maximum efficient internal load for the target fineness, rather than arbitrarily trimming throughput.
+
+**Measures it Relies On:**
+*   **Mill Differential Pressure Transmitter:** Serves as the direct proxy for internal material level and grinding intensity. A higher, stable ΔP indicates a fuller mill, which correlates with longer residence time and finer grind.
+*   **Mill-Feed Rate Meter:** Provides the actuation variable to adjust the mill load, allowing the operator/controller to manipulate the ΔP.
+*   **Existing Knowledge of ΔP-to-Fineness Correlation:** Leverages the established physical relationship between internal pressure and specific surface in cement mills, eliminating the need for new online fineness analyzers.

@@ -1,0 +1,87 @@
+{
+ "draw": "d2",
+ "problem_id": "r125-02-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [F31e draw] + canonical F97-fixed check + improved-directive reviewer)",
+ "improved_directive_len": 567,
+ "authored_bill": "### Mitigation Proposal\n\n**Mechanism:**\nImplement a **\"Dynamic Current-Slope Speed Cap\"** logic layer using the existing PLC. This mechanism uses the rate of change of the finish block's motor current (amperage) to dynamically lower the setpoint of the line-speed encoder, effectively throttling the drawing speed specifically during the finish block operation to prevent excessive strain that leads to wire breaks.\n\n**Implementation:**\n1.  **Signal Conditioning (Existing Sensors):**\n    *   Acquire the raw signal from the **finish block's motor ammeter** (0–20 mA or 4–20 mA).\n    *   Acquire the current speed signal from the **line-speed encoder**.\n    *   Acquire the pulse train from the **break counter** (or its derived status flag) to detect immediate stoppages.\n\n2.  **Control Logic (PLC Program):**\n    *   **Calculate Current Slope ($dI/dt$):** In a fixed scan cycle (e.g., 100ms), compute the difference between the current ammeter reading and the previous scan's reading. Normalize this by the scan time to get the rate of change in amperes per second (A/s).\n    *   **Define Thresholds:** Establish a \"Safe Slope Threshold\" (e.g., >2 A/s indicates rapid load increase due to wire hardening or friction).\n    *   **Speed Limiting Algorithm:**\n        *   Initialize a `Speed_Multiplier` at 1.0 (100% of original setpoint).\n        *   **IF** `dI/dt` > `Safe Slope Threshold` **AND** `Current Ammeter Reading` > `Base Operating Current` (to avoid false triggers at low load):\n            *   Decrement `Speed_Multiplier` by a fixed step (e.g., 0.95).\n            *   The new line-speed setpoint = `Original Speed Setpoint` * `Speed_Multiplier`.\n            *   Send this new setpoint to the line-speed drive (encoder feedback loop remains active for closed-loop control).\n        *   **ELSE IF** `dI/dt` < `Recovery Slope Threshold` **AND** `Current Ammeter Reading` < `Safe Current Limit`:\n            *   Increment `Speed_Multiplier` by a smaller step (e.g., 0.02) to gradually restore speed.\n            *   *Constraint:* Do not exceed 1.0.\n    *   **Break Counter Reset/Recovery:**\n        *   When the **break counter** registers a new event (count increment), the PLC must immediately drive `Speed_Multiplier` to a \"Restart Low\" value (e.g., 0.5) and hold the line-speed setpoint at this low value for a defined \"Re-thread Delay\" (e.g., 10 seconds). This allows the wire to pass through the finish block at a reduced speed before the normal slope-based control resumes, reducing the chance of immediate re-breakage due to residual friction or hardening.\n\n3.  **HMI/Alarming:**\n    *   Display the current `Speed_Multiplier` value on the operator screen.\n    *   Set a high-priority alarm if `Speed_Multiplier` drops below 0.7 for more than 30 seconds, indicating persistent excessive load on the finish block (suggesting die wear or contamination, even if gauge is in spec).\n\n**Measures It Relies On (Existing Only):**\n*   **Per-block motor ammeters:** Provides the real-time load signal (current) essential for detecting the *rate* of load increase before it exceeds absolute limits.\n*   **Line-speed encoder:** Used as the feedback element for the closed-loop speed control; the proposed logic modifies the *setpoint* sent to this loop, not the feedback itself.\n*   **Break counter:** Provides the trigger for the \"Re-thread Low Speed\" recovery sequence, ensuring the mitigation actively responds to the reported failure mode (wire breaks).\n\n**Why This Mitigates the Failure:**\n*   The climbing motor current indicates increasing resistance (likely due to work hardening, die friction, or minor misalignment not yet affecting final gauge).\n*   By reducing speed when the *rate* of current increase is high, the system reduces the tensile stress on the wire (stress is proportional to speed in drawing) and reduces thermal input (less friction heat per unit length), thereby preventing the over-stress that causes breaks.\n*   Since the final gauge is still in spec, the reduction in speed does not compromise product quality, only throughput. This is acceptable as a safety mitigation for breakage.\n*   No new sensors are added; the logic uses only the already-installed ammeters, encoder, and break counter.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "### Mitigation Proposal\n\n**Mechanism:**\nImplement a **\"Dynamic Current-Slope Speed Cap\"** logic layer using the existing PLC. This mechanism uses the rate of change of the finish block's motor current (amperage) to dynamically lower the setpoint of the line-speed encoder, effectively throttling the drawing speed specifically during the finish block operation to prevent excessive strain that leads to wire breaks.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** The calculated current slope ($dI/dt$) of the finish block's motor ammeter signal.\n*   **Direction of Mechanical Effect:** An increase in the positive slope of the motor current ($dI/dt > 0$) triggers a **decrease** in the line-speed setpoint. Conversely, a sustained negative slope or low absolute current triggers an **increase** in the line-speed setpoint (restoration). The direct mechanical effect of the control action is to reduce drawing tension and thermal load on the wire, thereby inhibiting the failure mode (breakage).\n\n**Implementation:**\n\n1.  **Implementation Bill (PLC Logic & Parameters):**\n    *   **Input Registers:**\n        *   `I_Finish_Current`: Raw ammeter value from Finish Block Motor Ammeter (Permitted Sensor: Per-block motor ammeters).\n        *   `Speed_Setpoint_Base`: Original speed setpoint (Static Parameter: Derived from standard operating procedure; not a new sensor).\n        *   `Break_Count`: Last known count from Break Counter (Permitted Sensor: Break counter).\n        *   `Current_Break_Status`: Boolean flag derived from `Break_Count` changes (Permitted Derivation: Logic comparison of `Break_Count` vs `Prev_Break_Count`).\n    *   **Calculated Variables:**\n        *   `Prev_I_Finish_Current`: Value of `I_Finish_Current` from previous PLC scan.\n        *   `dI_dt`: `(I_Finish_Current - Prev_I_Finish_Current) / (Scan_Time_Seconds)` (Derivation: Finite difference formula using permitted ammeter measurement).\n        *   `Speed_Multiplier`: Floating point value initialized to 1.0. Range [0.5, 1.0].\n        *   `Speed_Setpoint_Actual`: `Speed_Setpoint_Base * Speed_Multiplier`.\n    *   **Parameters/Constants (Tunables):**\n        *   `Safe_Slope_Threshold`: 2.0 A/s (Initial guess, tunable).\n        *   `Recovery_Slope_Threshold`: -0.5 A/s (Initial guess, tunable).\n        *   `Base_Operating_Current`: 15.0 A (Normal operating baseline, derived from historical data of permitted ammeter).\n        *   `Safe_Current_Limit`: 25.0 A (Maximum safe absolute current, derived from motor rating/permitted ammeter max).\n        *   `Restart_Low_Multiplier`: 0.5.\n        *   `Re_Threading_Delay_Sec`: 10.0.\n        *   `Alarm_Persistence_Time`: 30.0 sec.\n\n2.  **Control Logic (PLC Program Steps):**\n    *   **Step 1: Signal Acquisition & Derivation**\n        *   Read `I_Finish_Current` from the **finish block's motor ammeter**.\n        *   Read `Break_Count` from the **break counter**.\n        *   Compute `dI_dt` using the formula: `dI_dt = (I_Finish_Current - Prev_I_Finish_Current) / Scan_Time`.\n        *   Update `Prev_I_Finish_Current` = `I_Finish_Current` for next cycle.\n    *   **Step 2: Break Event Handling (Priority)**\n        *   **IF** `Break_Count > Prev_Break_Count` (New break detected via permitted **break counter**):\n            *   Set `Speed_Multiplier` = `Restart_Low_Multiplier` (0.5).\n            *   Start timer `T_ReThread`.\n            *   Hold logic for `Re_Threading_Delay_Sec` (10s).\n            *   **WHILE** `T_ReThread` active: Force `Speed_Setpoint_Actual` = `Speed_Setpoint_Base * 0.5`.\n    *   **Step 3: Dynamic Slope Logic (Active only if NOT in Step 2 Hold)**\n        *   **IF** `dI_dt > Safe_Slope_Threshold` **AND** `I_Finish_Current > Base_Operating_Current`:\n            *   `Speed_Multiplier` = `Speed_Multiplier` - 0.05.\n            *   *Constraint:* Floor `Speed_Multiplier` at `Restart_Low_Multiplier` (0.5).\n        *   **ELSE IF** `dI_dt < Recovery_Slope_Threshold` **AND** `I_Finish_Current < Safe_Current_Limit`:\n            *   `Speed_Multiplier` = `Speed_Multiplier` + 0.02.\n            *   *Constraint:* Cap `Speed_Multiplier` at 1.0.\n        *   **ELSE**:\n            *   `Speed_Multiplier` remains unchanged.\n    *   **Step 4: Output Generation**\n        *   Calculate `Speed_Setpoint_Actual` = `Speed_Setpoint_Base` * `Speed_Multiplier`.\n        *   Write `Speed_Setpoint_Actual` to the **line-speed encoder** drive setpoint register. (The encoder acts as the feedback element for the closed-loop speed control; the proposed logic modifies the *setpoint* sent to this loop, not the feedback itself).\n    *   **Step 5: Alarming**\n        *   **IF** `Speed_Multiplier < 0.7` **AND** time `Speed_Multiplier` has been < 0.7 > `Alarm_Persistence_Time` (30s):\n            *   Trigger High-Priority Alarm \"Finish Block Excessive Load (Suspected Die Wear/Contamination)\".\n\n3.  **HMI/Alarming:**\n    *   Display the current `Speed_Multiplier` value on the operator screen.\n    *   Display the calculated `dI_dt` value.\n    *   Set a high-priority alarm if `Speed_Multiplier` drops below 0.7 for more than 30 seconds, indicating persistent excessive load on the finish block.\n\n**Measures It Relies On (Existing Only):**\n*   **Per-block motor ammeters:** Provides the real-time load signal (current). The input `I_Finish_Current` is read directly from this sensor. The derived input `dI_dt` is calculated via the finite difference formula using consecutive samples of this sensor.\n*   **Line-speed encoder:** Used as the feedback element for the closed-loop speed control; the proposed logic modifies the *setpoint* sent to this loop. No direct measurement is read from the encoder for the logic calculation, only its control interface is utilized.\n*   **Break counter:** Provides the trigger for the \"Re-thread Low Speed\" recovery sequence. The input `Break_Count` is read directly from this sensor. The derived input `Current_Break_Status` is derived by comparing the current count to the previous count.\n\n**Why This Mitigates the Failure:**\n*   The climbing motor current indicates increasing resistance (likely due to work hardening, die friction, or minor misalignment not yet affecting final gauge).\n*   By reducing speed when the *rate* of current increase is high, the system reduces the tensile stress on the wire (stress is proportional to speed in drawing) and reduces thermal input (less friction heat per unit length), thereby preventing the over-stress that causes breaks.\n*   Since the final gauge is still in spec, the reduction in speed does not compromise product quality, only throughput. This is acceptable as a safety mitigation for breakage.\n*   No new sensors are added; the logic uses only the already-installed ammeters, encoder, and break counter.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Input Registers:**",
+   "*   `I_Finish_Current`: Raw ammeter value from Finish Block Motor Ammeter (Permitted Senso",
+   "*   `Speed_Setpoint_Base`: Original speed setpoint (Static Parameter: Derived from standar",
+   "*   `Break_Count`: Last known count from Break Counter (Permitted Sensor: Break counter).",
+   "*   `Current_Break_Status`: Boolean flag derived from `Break_Count` changes (Permitted Der",
+   "*   **Calculated Variables:**",
+   "*   `Prev_I_Finish_Current`: Value of `I_Finish_Current` from previous PLC scan.",
+   "*   `dI_dt`: `(I_Finish_Current - Prev_I_Finish_Current) / (Scan_Time_Seconds)` (Derivatio",
+   "*   `Speed_Multiplier`: Floating point value initialized to 1.0. Range [0.5, 1.0].",
+   "*   `Speed_Setpoint_Actual`: `Speed_Setpoint_Base * Speed_Multiplier`.",
+   "*   **Parameters/Constants (Tunables):**",
+   "*   `Safe_Slope_Threshold`: 2.0 A/s (Initial guess, tunable).",
+   "*   `Recovery_Slope_Threshold`: -0.5 A/s (Initial guess, tunable).",
+   "*   `Base_Operating_Current`: 15.0 A (Normal operating baseline, derived from historical d",
+   "*   `Safe_Current_Limit`: 25.0 A (Maximum safe absolute current, derived from motor rating",
+   "*   `Restart_Low_Multiplier`: 0.5.",
+   "*   `Re_Threading_Delay_Sec`: 10.0.",
+   "*   `Alarm_Persistence_Time`: 30.0 sec.",
+   "2.  **Control Logic (PLC Program Steps):**",
+   "*   **Step 1: Signal Acquisition & Derivation**",
+   "*   Read `I_Finish_Current` from the **finish block's motor ammeter**.",
+   "*   Read `Break_Count` from the **break counter**.",
+   "*   Compute `dI_dt` using the formula: `dI_dt = (I_Finish_Current - Prev_I_Finish_Current)",
+   "*   Update `Prev_I_Finish_Current` = `I_Finish_Current` for next cycle.",
+   "*   **Step 2: Break Event Handling (Priority)**",
+   "*   **IF** `Break_Count > Prev_Break_Count` (New break detected via permitted **break coun",
+   "*   Set `Speed_Multiplier` = `Restart_Low_Multiplier` (0.5).",
+   "*   Start timer `T_ReThread`.",
+   "*   Hold logic for `Re_Threading_Delay_Sec` (10s).",
+   "*   **WHILE** `T_ReThread` active: Force `Speed_Setpoint_Actual` = `Speed_Setpoint_Base * ",
+   "*   **Step 3: Dynamic Slope Logic (Active only if NOT in Step 2 Hold)**",
+   "*   **IF** `dI_dt > Safe_Slope_Threshold` **AND** `I_Finish_Current > Base_Operating_Curre",
+   "*   `Speed_Multiplier` = `Speed_Multiplier` - 0.05.",
+   "*   *Constraint:* Floor `Speed_Multiplier` at `Restart_Low_Multiplier` (0.5).",
+   "*   **ELSE IF** `dI_dt < Recovery_Slope_Threshold` **AND** `I_Finish_Current < Safe_Curren",
+   "*   `Speed_Multiplier` = `Speed_Multiplier` + 0.02.",
+   "*   *Constraint:* Cap `Speed_Multiplier` at 1.0.",
+   "*   **ELSE**:",
+   "*   `Speed_Multiplier` remains unchanged.",
+   "*   **Step 4: Output Generation**",
+   "*   Calculate `Speed_Setpoint_Actual` = `Speed_Setpoint_Base` * `Speed_Multiplier`.",
+   "*   Write `Speed_Setpoint_Actual` to the **line-speed encoder** drive setpoint register. (",
+   "*   **Step 5: Alarming**",
+   "*   **IF** `Speed_Multiplier < 0.7` **AND** time `Speed_Multiplier` has been < 0.7 > `Alar",
+   "*   Trigger High-Priority Alarm \"Finish Block Excessive Load (Suspected Die Wear/Contamina",
+   "3.  **HMI/Alarming:**",
+   "*   Display the current `Speed_Multiplier` value on the operator screen.",
+   "*   Display the calculated `dI_dt` value.",
+   "*   Set a high-priority alarm if `Speed_Multiplier` drops below 0.7 for more than 30 secon",
+   "*   **Per-block motor ammeters:** Provides the real-time load signal (current). The input ",
+   "*   **Line-speed encoder:** Used as the feedback element for the closed-loop speed control",
+   "*   **Break counter:** Provides the trigger for the \"Re-thread Low Speed\" recovery sequenc",
+   "*   The climbing motor current indicates increasing resistance (likely due to work hardeni",
+   "*   By reducing speed when the *rate* of current increase is high, the system reduces the ",
+   "*   Since the final gauge is still in spec, the reduction in speed does not compromise pro",
+   "*   No new sensors are added; the logic uses only the already-installed ammeters, encoder,"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 's the feedback element' shares no allowed-list stem (Use only existing sensors and existing measurements: the per-block motor ammeter...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Per-block motor ammeters:** Provides the real-time load signal (current). The input `I_Finish_Current` i"
+  ]
+ }
+}

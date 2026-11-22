@@ -1,0 +1,21 @@
+**Mitigation Proposal: Closed-Loop Choke Feed Regulation via Specific Power Index**
+
+**Mechanism**
+Implement a control strategy that actively regulates the Crusher Closed Side Setting (CSS) and feed rate to maintain a target "Specific Power" ($P_{sp}$). The core principle is that as liners wear and the crushing cavity volume increases, the crusher naturally operates at a larger CSS if the feed rate is constant, leading to coarser product and increased specific power (work input per tonne). By using the existing motor power meter and discharge scale to calculate $P_{sp}$ in real-time, the system detects the transition into an inefficient, coarse-crushing regime. The mitigation is not a new hardware fix, but a procedural control logic that reduces feed rate to increase crusher pressure (choke) and closes the CSS to restore the original crush point, using only available actuators and sensors.
+
+**Implementation**
+1.  **Calculate Specific Power Index ($P_{sp}$):** Use the existing motor power meter (reading in kW) and the discharge-belt scale (reading in t/h) to compute $P_{sp} = \frac{P_{motor}}{Q_{discharge}}$.
+2.  **Establish Baseline:** Retrieve the $P_{sp}$ value recorded at the time of the "last liner change" from the historian/DCS, representing the efficient, fine-crushing operating point.
+3.  **Deviation Detection:** Continuously compare the live $P_{sp}$ against the baseline. A sustained increase in $P_{sp}$ (typically >5-10%) indicates the coarse fraction is building up and the crusher is operating away from its optimal choke point due to liner wear.
+4.  **Actuation (Manual or Automated Protocol):**
+    *   **Step A (Increase Choke):** The operator (or automated PLC logic) reduces the feed rate using the feed-rate scale setpoint. Reducing feed allows the crusher to "choke" sooner, increasing the compression of the material in the cavity, which forces the CSS effectively smaller relative to the worn liners.
+    *   **Step B (Adjust CSS):** If the CSS is mechanically adjustable (standard on most cone crushers), slowly close the CSS to compensate for liner wear. This is verified by observing the $P_{sp}$ trend. The goal is to bring $P_{sp}$ back to the baseline value.
+    *   **Step C (Stability Check):** Monitor the discharge-belt scale for flow stability and the motor power for spikes. Ensure the crusher remains in a stable "choke" condition (high power, low vibration) without overloading the motor.
+
+**Measures It Relies On**
+*   **Motor Power Meter:** Provides the numerator for $P_{sp}$ and serves as a real-time indicator of crusher load. A rise in power at constant production rate signals increased energy per ton, characteristic of coarse crushing.
+*   **Discharge-Belt Scale:** Provides the denominator for $P_{sp}$ (production rate) and allows for real-time feed-rate setpoint adjustments. It confirms the actual throughput against which power consumption is normalized.
+*   **Feed-Rate Scale:** Acts as the primary actuator for Step A. By reducing the feed rate, the operator increases the "crushing intensity" (work per unit volume) in the cavity, forcing the crusher to break larger particles more aggressively and effectively mimicking a smaller CSS. This measure relies on the physical principle that a cone crusher must be choked (operated at constant volume pressure) to produce consistent size; reducing feed when liners are worn helps re-establish this choke point without new sensors.
+*   **Existing CSS Actuator (Implicit):** While no *new* instrumentation is added, the existing mechanical CSS adjustment mechanism (gears/hydraulics) is utilized. The "measure" here is the operator's verification of CSS position against the target, guided by the $P_{sp}$ feedback loop.
+
+This mitigation uses only existing instrumentation to detect inefficiency (via $P_{sp}$) and correct it (via feed rate reduction and CSS adjustment), directly addressing the coarsened product and excess power draw without adding new sensors.
