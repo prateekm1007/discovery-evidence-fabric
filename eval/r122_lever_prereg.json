@@ -1,0 +1,28 @@
+{
+ "record": "R122_LEVER_PREREG/1.0.0 (PRE-REGISTRATION — committed BEFORE any lever-run byte)",
+ "claim": "c-0185 (work id r122-residual-class-lever)",
+ "session": "builder-r121s1-3e8a41d7",
+ "at": "2026-11-23T09:10:00Z (sandbox clock, TRUE UTC)",
+ "authority": "the R122 direction 3: 'improve the bind findings' clarity / the bare reviewer's fix prompts for physics_direction, input_availability, duty_pricing (the binds detect them; the reviewer left them). Accept: residual defect rate drops on a re-test, damage stays <= 0.25.'",
+ "the_root_cause_being_targeted": "the F31c fresh-run residual (typed in eval/r123_fresh_confirmation_run/scoring.json): INPUT_UNAVAILABLE carried over in 7/8 residual items — the reviewer addresses the flagged input but leaves or introduces a DERIVED-FEATURE input (e.g. 'Wet-Bulb Deviation Logic') not derivable from the permitted signals, without stating the derivation. The finding text says WHAT is not derivable but not HOW to satisfy it.",
+ "the_lever": {
+  "what_changes": "the REVIEWER PROMPT ONLY. The r121 FIX_DIRECTIVE bytes + an appended input-availability HOW-TO-SATISFY clause:",
+  "improved_directive_bytes": "You are reviewing an engineering proposal. The automated check layer surfaced the findings listed below against the original problem. Fix the proposal so the findings no longer apply, changing as little else as possible. Return the complete corrected proposal. INPUT RULE: for every input, measurement, or logic signal your corrected proposal relies on, state explicitly which permitted sensor or measurement it comes from, or how it is derived from the permitted measurements with the formula; remove any input that cannot be derived from the permitted measurements.",
+  "what_does_not_change": "the bind CHECK layer (byte-identical, imported from scripts/r121_successor_run.py), the amendment-1 detectors (byte-identical, imported from scripts/r121_successor_score.py), the authoring directive, the model (agnes-3.0-flash)",
+  "why_prompt_only": "the adjudication's lever is findings-clarity/reviewer-fix-prompt; the binds stay frozen so the detector definition never moves (no tuning of the measuring instrument)"
+ },
+ "the_retest": {
+  "retest_set": "the 9 F31c items whose successor delivery was still defective under the amendment-1 detectors (8 input_availability + 1 physics_direction) — ids VERIFIED against eval/r123_fresh_confirmation_run/scoring.json per_item: r123-01-s2, r123-02-s2, r123-03-s1, r123-03-s2, r123-04-s2, r123-06-s1, r123-07-s1, r123-07-s2, r123-08-s1 (r123-03-s1 is the reviewer-introduced case; r123-02-s2 is the physics_direction residual — the clause is input-specific; typed honestly: it rides along, no claim it is fixed)",
+  "the_pass": "a SECOND reviewer call with the improved directive over the F31c DELIVERED bill (not the original bare bill — the lever tests whether the reviewer, told how, can satisfy the still-standing findings): problem + F31c delivered bill + the STILL-STANDING findings (the F31c post-review scan) + the improved directive; the output is the new DELIVERED bill; the same check layer re-scans it",
+  "guard_set": "the 15 F31c items whose successor delivery was CLEAN (VERIFIED against the record: r123-01-s1, r123-02-s1, r123-04-s1, r123-05-s1, r123-05-s2, r123-06-s2, r123-08-s2, r123-09-s1, r123-09-s2, r123-10-s1, r123-10-s2, r123-11-s1, r123-11-s2, r123-12-s1, r123-12-s2): the SAME second-pass improved-directive call over their clean delivered bills — the lever must not break clean bills",
+  "n_calls": "9 + 15 = 24 worst case, byte-skip resume, one call per item ever; INFRA_QUOTA_WALL typed if closed"
+ },
+ "the_acceptance": {
+  "primary": "among the 9 re-test items, the count of defective bills (the amendment-1 detectors) STRICTLY DROPS below the F31c re-test baseline (9/9 defective as delivered by the F31c run)",
+  "damage_shapes": "(a) among the 15 guard items, at most 3 become defective (the <= 0.25 damage shape, 3/15 = 0.2); (b) no item clean for a class at F31c gains that class from the lever pass (counted per class, the guard set)",
+  "branch": "both met -> the lever WORKS (the input-availability residual is actionable by prompt clarity alone; the successor shape's absolute-gate path is concrete); either failed -> TYPED_NEGATIVE (the reviewer cannot satisfy the input bind even when told how — the finding + per-item table go to the auditor)",
+  "typed_note": "no score-9 claim: the fresh-set gate remains the auditor's question; this lever is evidence for the keep-the-absolute-gate option"
+ },
+ "ordering_guarantee": "this prereg + the frozen improved-directive bytes commit BEFORE any lever-run byte (zero calls made; the claim registers in the same push)",
+ "invalidates": "NOTHING (the F31c typed negative stands; this is the adjudicated lever test)"
+}
