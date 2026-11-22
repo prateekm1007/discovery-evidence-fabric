@@ -1,0 +1,135 @@
+{
+ "problem_id": "f30-01-h",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a **procedure modification** (schedule-based flushing or cleaning) to mitigate fouling-induced heat transfer degradation. The draft’s novelty fails because it relies on an untagged software logic update and violates the physical direction constraint: backflushing uses thermal energy (heat) as the active agent, which is the same driving variable causing the thermal load, creating a circular dependency. The valid departure is a **passive hydraulic shear-removal schedule** triggered by existing flow data, avoiding new instrumentation and reversing the thermal logic to purely mechanical/kinetic logic.\n\nPHYSICS CHECK\nGoverning relation: Fouling resistance $R_f$ increases over time $t$ via $R_f = k t^n$, reducing overall heat transfer coefficient $U$. The failure driver is the accumulation of solids/ice crystals in the brine.\n*   **DIRECTION-OF-EFFECT:** driving variable = *Fouling Accumulation Rate ($\\dot{M}_f$)*; the mechanism moves it **down** by **increasing local shear stress ($\\tau_w$)** via periodic high-velocity backflow; this **reduces** the *net mass deposition integral* $\\int (\\dot{M}_{deposit} - \\dot{M}_{erode}) dt$ over the duty cycle.\n*   **Sign Check:** The draft’s “heat” trigger moves the system toward higher thermal delta, which increases brine solubility/viscosity changes that may *accelerate* certain fouling types or mask the onset. The corrective mechanism must rely on **kinetic energy** (flow shear), not thermal energy, to remove deposits. The sign of shear stress is positive for erosion; the sign of accumulation is negative for removal. Net effect is lower $R_f$.\n*   **Magnitude:** Typical brine velocity $v \\approx 1-2$ m/s. Backflush at $3-4$ m/s increases shear $\\tau_w \\propto \\rho v^2$ by a factor of $3-6\\times$, sufficient to dislodge loose particulates without eroding tube walls.\n\nIMPLEMENTATION BILL\n*   **MECHANISM CLASS:** Kinetic Shear Removal (Passive/Schedule) (c)\n*   **Row 1:** **Backflush Valve Logic (Existing Actuation):** Utilize the *existing* control valves on the brine loop for reverse flow. (Tag: EXISTING EQUIPMENT). Rationale: No new valves installed; uses existing bypass/return lines. (a)\n*   **Row 2:** **Flow Rate Trigger (Existing Meter):** Set a fixed-time interval trigger (e.g., every 48 hours) OR a flow-velocity threshold alert using the *existing* flow meter. (Tag: EXISTING SENSOR). Rationale: Avoids the \"software update\" defect by using a pre-programmed timer or fixed HMI alarm limit already present in the DCS/PLC. No new logic software development is billed; it is a parameter change on the existing controller. (c)\n*   **Row 3:** **Valve Actuation Signal:** Command the existing brine pump to run at high speed (VFD setpoint increase) for 15 minutes during the backflush interval. (Tag: EXISTING CONTROL). Rationale: Uses the *existing* VFD capability. No new instrumentation. (c)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Zero new hardware. Same class as standard practice (which also uses existing valves/pumps). (a)\n*   **Operability:** Low burden. Automated schedule. (c)\n*   **Maintenance:** None. (a)\n*   **Operational Cost (Unpriced Loss Resolution):** **Energy Cost:** Backflushing at high speed for 15 min/day increases pump energy by ~5-10% of total pumping cost. **Heat Loss:** Reversing flow may cause transient cold-shock to the shell side, but this is negligible for brine systems. **Net Trade:** The 10% energy increase is offset by preventing a 20-30% loss in heat exchanger efficiency between cleanings, which would otherwise require a full mechanical cleaning (high cost/downtime). The trade nets positive. (c)\n*   **Cost Class:** SAME as standard schedule-based flushing, DIFFERENT mechanism (kinetic vs. thermal-triggered). (c)\nEXECUTABLE TEST\n*   **Protocol:** Run the backflush schedule for 30 days.\n*   **Instruments:** Existing brine inlet/outlet thermocouples and flow meter only.\n*   **Pass/Fail:** Calculate Approach Temperature ($\\Delta T_{approach} = T_{out} - T_{in}$) normalized by flow rate. If the normalized approach temperature drift exceeds 5% from the baseline \"Clean\" value within 7 days of the schedule start, the mechanism fails.\n*   **Kill Criterion:** If the backflush does not cause a measurable *decrease* in fouling resistance (inferred from stable/improving $\\Delta T_{approach}$ vs. trend), the schedule is ineffective.\n*   **Validation:** Compare against the \"inlet-referenced baseline\" stated in the problem. No new sensors needed.\n\nCONSTRAINT BIND\n*   **Primary Indicator:** The problem states \"outlet temperature creeps up.\" This is the primary stated indicator. The solution monitors the *trend* of this existing temperature data, not a new derived sensor.\n*   **Permitted Set:** The constraint allows \"only existing sensors and existing measurements.\" The bill uses ONLY existing thermocouples, flow meter, and existing valve/pump actuation. No new instrumentation.\n*   **Typed Defects Resolved:**\n    *   **BILL_UNTAGGED:** Every row is tagged (EXISTING EQUIPMENT/SENSOR/CONTROL).\n    *   **DRIVER_AS_REMEDY:** The draft used \"heat\" (outlet temp rise) as the *trigger* for a *heat-based* remedy. The revision uses *time/flow* (kinetic) as the trigger for a *kinetic* remedy. The mechanism no longer relies on the failure driver (thermal creep) to initiate the remedy.\n    *   **ALLOWED_ROW_OUTSIDE:** \"No new sensor\" is a constraint, not a measure. The bill does not list it as a measure; it is a compliance check.\n    *   **DEPLOYED-PART CLAUSE:** No modification to tube, shell, or head. Only control of existing external valves/pumps.\n    *   **INPUT-AVAILABILITY:** All inputs (flow, temp) are stated as existing.\n\nRISK\n*   **Fouling Type:** If the fouling is crystalline (ice) or hard scale, 15-min backflush may be insufficient. However, for general brine fouling (bio/particulate), this is standard practice. The test protocol will falsify if ineffective.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Fouling deposits accumulate on tube walls, increasing thermal resistance and reducing heat transfer coefficients. | ingredient: The proposed backflushing and thermal shock cycles apply mechanical shear and thermal disruption to remove or prevent deposit adhesion, thereby reducing fouling resistance. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Fouling deposits accumulate on tube walls, increasing thermal resistance and reducing heat transfer coefficients.",
+   "ingredient_action": "The proposed backflushing and thermal shock cycles apply mechanical shear and thermal disruption to remove or prevent deposit adhesion, thereby reducing fouling resistance.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Constraint Violation (Baseline):** The draft relies on an \"inlet-referenced baseline",
+    "2.  **Typed Plan Mismatch:** The draft uses T/Flow for a mechanical backflush. The typed p"
+   ],
+   "APPARATUS_ROW": [
+    "*   **Typed Plan Conflict:** The typed plan requested `chemistry` (pH/Cond). These sensors are **not stated** "
+   ],
+   "INPUT_UNAVAILABLE": [
+    "required online signal 'continuous' is not among the permitted measures/signals",
+    "derived feature input 'chemical stabilization   OR by thermally cycling' is not derivable from the permitted signals"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "882537f1ee340611",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      8,
+      0,
+      0
+     ],
+     "signature": "c7b09d697f0db112",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "9aec84f85848f341",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "936935a01ee805fe",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "41c914ad826dd96a",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    }
+   ],
+   "live_frontier": [
+    "n2",
+    "n1"
+   ],
+   "final_node_id": "n2",
+   "final_metric": [
+    2,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n2",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

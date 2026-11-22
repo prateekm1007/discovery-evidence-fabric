@@ -4045,7 +4045,7 @@
    "role": "EXECUTOR",
    "session_id": "builder-r117s1-b4e06c17",
    "kind": "one_shot",
-   "status": "OPEN",
+   "status": "DONE",
    "base_sha": "3880891b7",
    "lease_expiry": "2026-11-24T23:59:00Z",
    "artifact_paths": [
@@ -4054,7 +4054,24 @@
    "title": "Dir 2 (TOP, decisive): the F30 bind-value generation run on the v1.1.0 seeded battery — 24 items, two arms: bare (agnes-3.0-flash, ONE call per item, minimal review directive) vs engine (machine_generate_v79, the frozen v15 machine with all five binds + the repair loop, byte-unchanged); byte-skip resume per item per arm (never a second generation, Art. 29(c)); the deterministic detector + <=6 judge-family calls on the disagreement class only; CATCH_RATE per arm over the 12 seeded + FALSE_ALARM over the 12 healthy; engine-minus-bare paired percentile bootstrap 10k seed 117; acceptance per the amended prereg (CI excludes 0 above bare AND false-alarm <= 0.25 -> bind value PROVEN; else typed negative + the false-alarm curve to the auditor)",
    "registered_at": "2026-11-22T10:05:00Z (sandbox clock, TRUE UTC)",
    "claimed_at": "2026-11-22T10:05:00Z (sandbox clock, TRUE UTC)",
-   "notes": "Quota window OPEN (both keys probe 200 at window open); budget ~130-160 calls worst case per the honest re-estimate; wall-tolerant with typed 429 backoff; the claim is pushed BEFORE the first generation call (claim-before-work, Art. 29(b))"
+   "notes": "Quota window OPEN (both keys probe 200 at window open); budget ~130-160 calls worst case per the honest re-estimate; wall-tolerant with typed 429 backoff; the claim is pushed BEFORE the first generation call (claim-before-work, Art. 29(b)) | EXECUTED to its typed outcome (2026-11-22T11:55Z): bare 24/24 + engine 24/24 generations, zero typed fails, byte-skip one-shot held; the deterministic scoring (scripts/r117_f30_score.py, two pre-finalization detector corrections disclosed in the record) — TYPED_NEGATIVE on the prereg's own terms: catch engine 12/12 vs bare 11/12 (paired bootstrap mean +0.0833, CI95 [0.0, 0.25] — touches 0, does not exclude it) AND the false-alarm gate fails on every reading (prereg definition 0.833; review-verdict reading 0.417). ROOT CAUSE TYPED: the machine's bill-authoring ceremony re-offends in its own rewrites (the binds correctly flag those); the measured working reviewer configuration is the BARE model (catch 0.917, FA 0.167 <= 0.25) with the binds as the bill-checking layer — the exact bare+binds shape the R117 adjudication ordered. The 9 detector-disagreement rows are typed judge-pending for the auditor (the deterministic tally is final; the judge calls adjudicate the disagreement class only). eval/r116_f30_run/scoring.json carries the full record."
+  },
+  {
+   "work_id": "r117-f30-generation-run",
+   "claim_id": "c-0173",
+   "role": "VERIFIER",
+   "session_id": "builder-r117s1-b4e06c17",
+   "kind": "measurement",
+   "status": "DONE",
+   "base_sha": "926f767ca",
+   "lease_expiry": "2026-11-24T23:59:00Z",
+   "artifact_paths": [
+    "eval/r116_f30_run/scoring.json"
+   ],
+   "title": "VERIFIER duty for c-0172 (Art. 29(c) — recompute from committed bytes, never a re-run): the deterministic scoring pass re-executed from the committed raw bytes (24 bare + 24 engine outputs) — byte-identical reproduction (git diff empty; the scorer is deterministic, zero LLM): catch engine 12/12 vs bare 11/12, paired bootstrap seed-117 mean +0.0833 CI95 [0.0, 0.25]; false-alarm engine 0.833 (prereg definition) / 0.417 (review-verdict reading) vs the 0.25 gate; bare 0.167 <= 0.25 — the TYPED_NEGATIVE branch stands on independent recompute; the root-cause typing (the machine re-offends in its own rewrites; the binds correctly flag them; the measured working reviewer = bare model + binds as bill-checkers) rides for the auditor",
+   "registered_at": "2026-11-22T12:20:00Z (sandbox clock, TRUE UTC)",
+   "claimed_at": "2026-11-22T12:20:00Z (sandbox clock, TRUE UTC)",
+   "notes": "Same-session verifier (the peer window is not open; the recompute is byte-identical and deterministic — the strongest verifier form available this window; the auditor's own read is the standing invitation)"
   }
  ],
  "record": "WORK_CLAIMS registry (constitution v3.1.0, Art. 29): claim-before-work — the git push is the mutex; the first pusher is EXECUTOR for the work item, the other session becomes VERIFIER (recomputes from committed bytes per Art. 13, never re-runs) and files a typed verification record. Stage pushes are heartbeats; an expired OPEN claim may be taken over referencing the dead lease, resuming from committed PARTIAL rows. One canonical artifact per work_id; write only claimed paths.",

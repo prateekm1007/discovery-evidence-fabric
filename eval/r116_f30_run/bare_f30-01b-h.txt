@@ -1,0 +1,15 @@
+**Verdict:** The draft proposal is **compliant** and does not violate any constraints, rely on unavailable resources, invert physical directions, or misprice the duty cycle.
+
+**Reasoning:**
+
+1.  **Constraint Compliance (No new instrumentation):** The draft explicitly states it uses "the existing thermocouples and flow meter only." It triggers the maintenance action based on the *measured* outlet-temperature rise relative to an inlet-referenced baseline. This calculation requires only the two thermocouples (inlet and outlet) and potentially the flow meter (to normalize for load or verify flow), all of which are permitted by the constraint. No new sensors or external systems are introduced.
+
+2.  **Availability of Resources:** The proposal relies on "backflushing," which is a standard mechanical maintenance procedure for shell-and-tube exchangers that can be performed using existing piping and pumps (assuming standard backflush connections exist, which is typical in such designs). It does not require new hardware, software licenses, or external data streams.
+
+3.  **Physical Direction (No Inversion):**
+    *   **Fouling Effect:** Fouling deposits increase thermal resistance, causing the outlet temperature to rise for a given inlet temperature and flow rate (assuming cooling is the primary function, or generally that heat transfer efficiency drops). The proposal correctly identifies that a "rise" in outlet temperature is the indicator of degraded performance.
+    *   **Mitigation Direction:** Backflushing reverses flow direction to dislodge deposits, which is the correct physical direction for cleaning tube-side fouling. The trigger logic (temperature rise $\rightarrow$ clean) aligns with the physical cause-and-effect of fouling accumulation. There is no inversion of physical principles (e.g., it does not suggest cleaning when temperature drops, which would indicate *better* performance).
+
+4.  **Duty Cycle/Pricing:** The term "duty cycle" in this context likely refers to the frequency or scheduling of the maintenance action. The proposal suggests a "weekly on a schedule triggered by..." This implies a conditional frequency: it checks weekly, but only performs the backflush if the temperature rise threshold is exceeded. This is a reasonable and standard predictive/preventive maintenance strategy. It does not "misprice" the duty cycle because it is not claiming a fixed continuous operation that might be inefficient; rather, it aligns the costly/high-impact action (backflushing) with the detected condition (fouling). The "pricing" (cost/effort) is appropriately gated by the sensor data, avoiding unnecessary backflushes when the tubes are clean.
+
+**Conclusion:** The draft is a valid, constraint-compliant mitigation proposal. It uses allowed sensors, correctly interprets the physical symptom of fouling (outlet temp rise), and applies the correct remedial action (backflush) in a logically triggered manner.

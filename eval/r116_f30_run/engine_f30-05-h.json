@@ -1,0 +1,131 @@
+{
+ "problem_id": "f30-05-h",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE via schedule compression: shortening the manual greasing interval to maintain grease film thickness. The draft's departure is a failure of mechanism: shortening the interval from 4 weeks to 1 week moves the driving variable (grease film thickness) UPWARD, but the failure physics is dominated by the *rate of washover*, not the *average film thickness*. If the washover velocity exceeds the re-injection volume per cycle, the film thins regardless of schedule frequency; thus, schedule compression alone does not address the primary driver (washover rate) and may increase operational burden without proportional benefit. The genuine mechanism departure is recognizing that the draft inverts the duty-cycle pricing: it assumes more frequent greasing = more grease, but in a high-washover environment, the grease is washed out faster than it is replenished, so the net effect on film thickness is neutral or negative, while the operational cost increases.\n\nPHYSICS CHECK\nGoverning relation: Grease Film Thickness ($h$) dynamics are governed by $\\frac{dh}{dt} = R_{in} - R_{wash}$, where $R_{in}$ is the injection rate per unit time and $R_{wash}$ is the washover rate.\nDIRECTION-OF-EFFECT: driving variable = $R_{wash}$ (washover rate); the draft mechanism moves $R_{in}$ UP by 4x (4x frequency), but does not alter $R_{wash}$; this does NOT reduce the failure driver if $R_{wash} \\gg R_{in,original} \\times 4$. The mechanism is INVERTED in effect: it increases labor/operational cost without guaranteeing an increase in net film thickness if the washover rate is high. The correct direction would require reducing $R_{wash}$ (e.g., by modifying the seal or screen deck) or increasing $R_{in}$ beyond 4x (impossible under constraint), but since the device is not modifiable, the draft's mechanism is out of class because it does not lower the damage integral over the duty cycle.\nMAGNITUDE VERIFICATION: Assume original interval 4 weeks, volume $V$. New interval 1 week, volume $V$. $R_{in,new} = 4 R_{in,old}$. If $R_{wash} > 4 R_{in,old}$, then $h$ continues to decrease, and the failure occurs within weeks as stated. The draft assumes $R_{wash}$ is constant and $R_{in}$ is the limiting factor, but the problem states \"thin the grease film and spalls the outer race within weeks,\" implying $R_{wash}$ is high. The draft's physics is flawed because it does not account for the washover rate exceeding the increased injection rate.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Schedule Compression\n(a) Manual greasing interval change: 4 weeks to 1 week. ALREADY-RECORDED: Existing manual greasing route card. DERIVED: Constraint \"Only the existing manual greasing route may be used.\"\n(b) Purge procedure: Per existing route card. ALREADY-RECORDED: Existing route card. DERIVED: Constraint \"ONLY... procedure... ONLY.\"\n(c) Operational Cost Line: Unpriced in draft. RESOLUTION: State that shortening the interval from 4 weeks to 1 week increases labor hours by 300% (4 visits/year to 12 visits/year). Assume 0.5 hours per visit, 52 weeks/year. Original: 2 visits/year (if 4 weeks is 14 days, ~3 visits/year; let's use 4 weeks = 1 month, 3 visits/year). New: 12 visits/year. Delta = 9 visits/year * 0.5 hours = 4.5 hours/year. Cost class: Labor only. No throughput/energy/availability loss, but increased maintenance man-hours.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Same (no new hardware).\nOperability: Increased (4x visits).\nMaintenance: Increased (purge procedure same, but more frequent).\nCost: Labor cost increases by ~300%.\nConclusion: The draft is SAME burden class (labor) but HIGHER operational cost without guaranteed physical benefit. The verdict is that the draft is INADEQUATE because it does not address the primary driver (washover rate) and misprices the duty cycle by assuming schedule compression suffices when the washover rate may dominate.\nEXECUTABLE TEST\nFalsification test: Monitor grease film thickness (if measurable via existing instrumentation, or infer from spall rate). Protocol: Implement 1-week interval for 2 weeks. Pass/fail: If spall rate on outer race does not decrease compared to 4-week interval, or if film thickness remains below critical threshold, the mechanism is falsified. Duration: 2 weeks (one cycle of new schedule). Kill criterion: No improvement in film thickness or spall rate. Validated against ALREADY-RECORDED data: Compare spall rate from existing inspection records vs. new schedule. However, since the draft does not address $R_{wash}$, the test will likely fail if washover is high.\n\nVERDICT AND REASONING\nThe draft proposal violates the DIRECTION-OF-EFFECT clause: it moves the driving variable (injection rate) UP but does not lower the failure driver (washover rate) if washover is high. It misprices the duty cycle by not including the operational labor cost in the bill. It does not invert any physical direction in terms of the mechanism itself (more grease = thicker film), but it inverts the effectiveness by ignoring the washover dominance. The draft is IN CLASS for permitted measures (procedure only) but OUT OF CLASS for mechanism effectiveness. The revision must acknowledge that schedule compression is insufficient if washover rate > 4x original injection rate, and the operational cost must be priced. Since the constraint permits ONLY procedure/interval changes and the device is not modifiable, the draft is the best permissible measure, but it is physically flawed. The verdict is: DRAFT VIOLATES COST-PRICING (unpriced duty cycle) and MECHANISM-EFFECTIVENESS (does not lower failure integral if washover dominates). The resolution is to keep the draft as the only permitted measure, but explicitly state the risk that if washover rate exceeds 4x injection rate, the mechanism will fail, and the operational cost is a 300% increase in labor.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The established physical driver is the depletion and washing of the grease lubricant by water ingress, which thins the lubricant film and leads to outer race spalling due to lubricant starvation. | ingredient: The proposed remedy imposes a higher frequency of grease replenishment, which physically increases the local grease volume and maintains film thickness, thereby adding a negative term (or reducing the magnitude) to the lubricant depletion integral over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The established physical driver is the depletion and washing of the grease lubricant by water ingress, which thins the lubricant film and leads to outer race spalling due to lubricant starvation.",
+   "ingredient_action": "The proposed remedy imposes a higher frequency of grease replenishment, which physically increases the local grease volume and maintains film thickness, thereby adding a negative term (or reducing the magnitude) to the lubricant depletion integral over the duty cycle.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. BILL_UNTAGGED: The draft did not tag procurement/labor/cost. Corrected bill above.",
+    "2. REASONING_THRASH_LEAK: Removed all internal monologue.",
+    "3. INPUT_UNAVAILABLE: The draft referenced \"purge\" as if it were a monitored state. Correc",
+    "- Rough Cost Class: Low. Manual labor only.",
+    "- Parity: Same burden class as standard practice, just higher frequency."
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "586f0183cd775302",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "0a72a79848e50b5f",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "ee392c971c60030d",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      3,
+      1,
+      0
+     ],
+     "signature": "cac275652320b117",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n1",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "b691fbc2a06d6aac",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n1",
+    "n3"
+   ],
+   "final_node_id": "n1",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n1",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

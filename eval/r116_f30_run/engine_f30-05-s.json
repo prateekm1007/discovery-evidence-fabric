@@ -1,0 +1,127 @@
+{
+ "problem_id": "f30-05-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a **SCHEDULED INTERVENTION** (manual grease replenishment) to maintain film thickness. The draft violates the constraint by proposing an **AUTOMATIC DEVICE**.\nDeparture: The mechanism is **INTERVAL MODULATION** of the existing manual route, not hardware addition.\nFailure-Physics Connection: Wear is driven by insufficient elastohydrodynamic (EHL) film thickness during the dry-friction regime. Increasing grease quantity per event is ineffective due to overflow/hardening; the failure driver is *time-to-film-depletion*, not *instantaneous volume*.\n\nPHYSICS CHECK\nGoverning relation: Film thickness $h$ decays exponentially with time $t$ after replenishment: $h(t) = h_0 e^{-t/\\tau}$, where $\\tau$ is the retention constant.\nFailure occurs when $h(t) < h_{crit}$ (metal-to-metal contact threshold).\n**DIRECTION-OF-EFFECT:** Driving variable = **Time-interval between grease events ($T$)**. The mechanism moves it **DOWN** by shortening the interval. This **reduces** the peak temperature and shear stress accumulation, keeping $h(T)$ above $h_{crit}$, thereby **lowering** the fatigue damage integral.\n**INPUT-AVAILABILITY:** No new online signals are required. The control input is the **calendar/cycle count**, a permitted parameter in the \"procedure/interval\" class. No sensors, no automatic lubricators.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: INTERVAL COMPRESSION ON EXISTING MANUAL ROUTE\n\n| Row | Item | Spec | Tag | Rationale |\n| :--- | :--- | :--- | :--- | :--- |\n| 1 | Revised Maintenance Procedure | **DERIVED** from stated physics: Shorten interval from OEM $T_{oem}$ to $T_{new} = T_{oem} / 2$. | (a) Schedule | Reduces $t$ in $h(t)$ to keep film above critical threshold. |\n| 2 | Grease Quantity Control | **DERIVED** from stated constraint: Use fixed **small** quantity per event (e.g., 10% of OEM pack), NOT continuous dispensing. | (b) Procedure | Prevents overflow/hardening which destroys the film. |\n| 3 | Manual Grease Port Access | **ALREADY-RECORDED** as \"existing manual greasing route\". | (c) Existing | No hardware change; uses stated port. |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Zero hardware installation. Parity with standard. (a)\n*   **Operability:** Increased labor frequency (2x). **OPERATIONAL COST:** +100% manual greasing labor hours. **Order-of-magnitude:** Negligible (<$500/year) vs. catastrophic bearing replacement cost. **Why it nets positive:** Prevents weeks-of-spalling failure mode. (c)\n*   **Maintenance:** No new parts to maintain. (a)\n*   **Constraint Compliance:**\n    *   \"Only existing manual route\": **MET** (uses manual port). (a)\n    *   \"NO automatic lubricators\": **MET** (procedural change only). (c)\n    *   \"NO grease-spec change (OEM pack fixed)\": **MET** (uses same grease, different volume/frequency). (c)\nEXECUTABLE TEST\nProtocol:\n1.  Baseline: Run with OEM interval $T_{oem}$ for 1 week. Measure outer race temperature $\\Delta T_1$ (if thermometer available) or inspect grease color for oxidation.\n2.  Test: Switch to $T_{new} = T_{oem}/2$ with reduced volume per shot for 4 weeks.\n3.  Pass/Fail:\n    *   **Pass:** No spalling observed on visual inspection; grease remains at port without overflow.\n    *   **Kill Criterion:** If grease is expelled under pressure (indicating over-grease) or temperature rises despite interval change, the mechanism is inverted (likely seal failure, not film depletion).\n\nCONSTRAINT BIND\n*   **Primary Indicator:** **Grease Film Integrity** (stated failure: \"thins the grease film\").\n*   **Secondary Indicator:** Spalling rate.\n*   **Constraint Adherence:** The draft proposal is **REJECTED** because it violates \"NO automatic lubricators.\" The revised proposal adheres strictly to the \"manual greasing route\" by modifying the **procedure** (interval and quantity), which is permitted under the \"procedure\" clause of the constraint.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The established physical driver is the degradation of the elastohydrodynamic lubricant film thickness due to retention loss over time, leading to boundary friction, metal-to-metal contact, and thermal/mechanical fatigue spalling. | ingredient: The ingredient (increased frequency of manual greasing events with reduced volume) imposes a higher maintenance rate that shortens the time interval between lubricant replenishments, thereby keeping the film thickness above the critical threshold and reducing the integral of boun | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The established physical driver is the degradation of the elastohydrodynamic lubricant film thickness due to retention loss over time, leading to boundary friction, metal-to-metal contact, and thermal/mechanical fatigue spalling.",
+   "ingredient_action": "The ingredient (increased frequency of manual greasing events with reduced volume) imposes a higher maintenance rate that shortens the time interval between lubricant replenishments, thereby keeping the film thickness above the critical threshold and reducing the integral of boun",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Constraint Compliance:**"
+   ],
+   "ALLOWED_ROW_OUTSIDE": [
+    "added measure 'same grease' shares no allowed-list stem (Only the existing manual greasing route may be used. NO automatic lubricators an...)"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "b34abfbe37335395",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      9,
+      1,
+      0
+     ],
+     "signature": "729d4d8f517557b8",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "259ccb6bc4b8e759",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "a8fbae346409128c",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "dd53f91c16825fcb",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n1"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    2,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

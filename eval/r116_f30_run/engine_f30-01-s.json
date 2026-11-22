@@ -1,0 +1,142 @@
+{
+ "problem_id": "f30-01-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "## VERDICT: VIOLATION\n\nThe draft proposal violates the stated constraint: \"Use only existing sensors and existing measurements... No new instrumentation may be added.\" The proposal explicitly requires installing an \"online deposit-thickness sensor,\" which is new instrumentation.\n\n## REASONS\n\n1.  **Constraint Violation (Input Unavailable/Prohibited):** The mechanism relies on a signal (deposit thickness) that is not among the permitted signals (brine inlet/outlet thermocouples, flow meter). The constraint explicitly forbids adding new instrumentation.\n2.  **Physics Check (Directional Mismatch):** The proposed \"remedy\" is a backflush. While backflushing reduces fouling, the *trigger* is based on a new sensor. The failure driver is heat transfer degradation due to fouling resistance. The permitted inputs (T_in, T_out, Flow) allow for the calculation of the overall heat transfer coefficient (U) or a fouling resistance estimate (R_f), which correlates with fouling. A thickness sensor is unnecessary and prohibited.\n3.  **Bill Untagged/Driver as Remedy:** The draft does not specify how the backflush is implemented using existing hardware. Backflushing typically requires reverse flow, which may not be possible with existing pumps/valves without modification. However, the primary defect is the sensor.\n\n## REVISED APPROACH (Compliant with Constraint)\n\nSince we cannot add sensors, we must use the **existing** temperature and flow data to infer fouling.\n\n**Mechanism:** Infer fouling resistance (R_f) from the drop in the Overall Heat Transfer Coefficient (U). Trigger maintenance (backflush or mechanical cleaning) when U drops below a threshold derived from clean-in-place (CIP) performance or nameplate efficiency.\n\n**Why this works:**\n*   **Input Streams:** $T_{in}$, $T_{out}$ (brine), Flow rate ($Q$). These are explicitly allowed.\n*   **Calculation:**\n    1.  Calculate Heat Duty $Q_{heat} = m \\cdot C_p \\cdot (T_{in} - T_{out})$.\n    2.  Calculate Log Mean Temperature Difference ($\\Delta T_{lm}$) using brine temps and the known/shell-side medium temp (assumed measurable or stated in logs; if not, use a relative U tracking method comparing current $U$ to a reference $U_{ref}$ derived from the last clean state if recorded, or use a threshold on the rate of change of $T_{out}$ for a given $T_{in}$ and Flow).\n    *   *Correction based on strict constraint:* We only have brine $T_{in}$, $T_{out}$, and Flow. We do NOT have shell-side temps in the permitted list. However, we can track the **approach temperature** or the **temperature rise** for a fixed flow rate. As fouling increases, for a given shell-side condition (which may drift but is slower), the brine outlet temperature $T_{out}$ will creep up (less cooling) or the required flow to maintain $T_{out}$ will increase.\n    *   *Most robust inference with ONLY $T_{in}, T_{out}, Q$:* Monitor the ratio of Temperature Difference to Heat Exchanger Performance. A simpler, valid leading indicator is the **drift of $T_{out}$** for a constant $T_{in}$ and $Q$. As tubes foul, heat transfer worsens, and for a constant duty/flow, $T_{out}$ increases.\n    *   *Threshold:* Define a \"Clean Baseline\" $T_{out,ref}$ from historical data (if available) or use a **Rate-of-Change** alarm: If $d(T_{out})/dt > \\text{Threshold}$, trigger cleaning. This relies only on existing thermocouples.\n\n**Revised Bill:**\n*   **Mechanism Class:** Algorithmic Inference of Fouling via Existing Thermocouples and Flow Meter.\n*   **Action:** Trigger backflush/cleaning when $T_{out}$ exceeds a dynamic threshold based on $T_{in}$ and Flow, OR when the rate of increase of $T_{out}$ exceeds a setpoint.\n*   **Inputs:** $T_{in}$, $T_{out}$, Flow (All Permitted).\n*   **No New Hardware:** Uses existing PLC/SCADA logic.\n\n**Constraint Compliance:**\n*   No new sensors.\n*   Uses only existing $T_{in}, T_{out}$, Flow.\n*   Physical direction correct: Fouling $\\uparrow$ $\\rightarrow$ Heat Transfer $\\downarrow$ $\\rightarrow$ $T_{out} \\uparrow$ (for cooling brine). Detecting $T_{out} \\uparrow$ is the correct leading indicator.\n\n**Failure Physics Connection:** Fouling deposits act as a thermal insulator. Their accumulation reduces the overall heat transfer coefficient. The outlet temperature $T_{out}$ is a direct, measurable proxy for this degradation when inlet temperature and flow are accounted for.\n\n**Burden Ledger:**\n*   **Standard Practice:** Manual periodic cleaning (cost: labor, downtime).\n*   **Revised Proposal:** Algorithmic trigger on existing data (cost: negligible, uses existing control system resources).\n*   **Parity:** Lower burden than manual schedule (only cleans when needed), same burden class as automatic control.\n\n**Executable Test:**\n*   **Protocol:** Simulate fouling by comparing current $T_{out}$ to a reference curve or baseline for the same $T_{in}$ and Flow.\n*   **Pass/Fail:** If $T_{out}$ drifts above the baseline by > 0.5°C (Assumption: sensitivity limit) or rate of drift > 0.1°C/hour, trigger alert.\n*   **Kill Criterion:** If false positives occur frequently, adjust threshold.\n\n**Note on \"Driver as Remedy\":** The draft's backflush is a valid mechanical remedy, but the *trigger* was invalid. The revised approach keeps the mechanical remedy (if backflush is feasible with existing valves) but changes the trigger to permitted data. If backflush is not feasible with existing valves, the remedy is \"Scheduling of Chemical Clean/PIB\" triggered by the algorithm. The constraint says \"No new instrumentation,\" not \"No new procedures.\"\n\n**Final Verdict:** The draft is **REJECTED** due to adding new instrumentation (thickness sensor). The revised approach uses **ONLY** the permitted existing sensors ($T_{in}, T_{out}$, Flow) to infer fouling and trigger maintenance.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Accumulation of fouling deposits on tube surfaces increases thermal resistance, which physically decreases the overall heat transfer coefficient ($U$) and raises outlet temperature. | ingredient: The monitoring system calculates the real-time $U$ to detect its downward drift caused by fouling resistance, providing an early warning signal that opposes the loss of heat transfer performance by triggering mitigation before the efficiency collapse becomes critical. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Accumulation of fouling deposits on tube surfaces increases thermal resistance, which physically decreases the overall heat transfer coefficient ($U$) and raises outlet temperature.",
+   "ingredient_action": "The monitoring system calculates the real-time $U$ to detect its downward drift caused by fouling resistance, providing an early warning signal that opposes the loss of heat transfer performance by triggering mitigation before the efficiency collapse becomes critical.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **No New Instrumentation:** The \"sensor\" is a software calculation. No physical deposi",
+    "*   **Installability:** Zero. Uses existing controller I/O or SCADA database tags.",
+    "*   **Operability:** Requires 4 analog inputs (2 temps, 1 flow, 1 process side temp/flow) ",
+    "*   **Rough Cost Class:** $0 hardware. ~$500 software configuration.",
+    "5.  **Validation:** The test validates the *inference engine*, not a physical sensor. It c",
+    "*   **BILL_SECTION_MISSING:** Resolved by adding the structured IMPLEMENTATION BILL above.",
+    "*   **PHYSICS_DIRECTION_UNSTATED:** Resolved by including the explicit DIRECTION-OF-EFFECT",
+    "*   **DIRECTION-CORRECTNESS CLAUSE:** Adhered. Mechanism detects the drop in $U$ (the fail"
+   ],
+   "APPARATUS_ROW": [
+    "*   **No New Instrumentation:** The \"sensor\" is a software calculation. No physical deposit-thickness sensor i",
+    "*   **Parity Verdict:** SAME burden class (lower cost) compared to standard practice of installing an expensiv"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "required online signal 'thickness' is not among the permitted measures/signals",
+    "derived feature input 'the difference between clean $U_0$ and current $U$' is not derivable from the permitted signals"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "638140df0a42c759",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      6,
+      0,
+      0
+     ],
+     "signature": "ebd45b0e5ca5134e",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "5e4eb4ea4265a25b",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "5099397cb2f3c30a",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "fc6baa836278e065",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n2",
+    "n3"
+   ],
+   "final_node_id": "n2",
+   "final_metric": [
+    3,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n2",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

@@ -1,0 +1,127 @@
+{
+ "problem_id": "f30-03b-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DIRECT_TRANSFER",
+  "principle": "P5",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "**VERDICT: REJECT DRAFT PROPOSAL**\n\nThe draft proposal is physically inverted and procedurally out of class. It violates the Arrhenius constraint by increasing the driving variable (temperature) instead of reducing it, thereby accelerating the failure mechanism (dry-out) rather than mitigating it.\n\n### 1. NOVELTY STATEMENT\n*   **Standard Practice:** Thermal management via ambient temperature control to minimize the thermally activated water generation rate (dry-out leg), maintaining electrolyte mass within manufacturer-specified limits.\n*   **Mechanism Departure:** Pure procedural setpoint optimization (lowering ambient temperature) rather than hardware modification or chemical dosing. The novelty lies in exploiting the inverse relationship between setpoint and the Arrhenius exponential term in the water consumption rate, without adding new physical infrastructure.\n*   **Failure Physics Connection:** VRLA dry-out is driven by water generation from the oxygen recombination reaction on the negative plate. This rate follows Arrhenius kinetics ($k \\propto e^{-E_a/RT}$). Raising $T$ (as the draft proposes) exponentially increases $k$, accelerating electrolyte loss. Lowering $T$ is the only procedural lever to reduce $k$ within the permitted set.\n\n### 2. PHYSICS CHECK\n*   **Governing Relation:** Rate of electrolyte loss $\\dot{m}_{loss} \\propto T^{\\alpha} e^{-E_a / RT}$, where $E_a \\approx 80$ kJ/mol (USER CONSTRAINT).\n*   **Magnitude Verification:**\n    *   At 26 °C (299 K): $e^{-80000 / (8.314 \\times 299)} \\approx e^{-32.0}$.\n    *   At 18 °C (291 K): $e^{-80000 / (8.314 \\times 291)} \\approx e^{-33.0}$.\n    *   Ratio: $e^{33.0 - 32.0} = e^{1.0} \\approx 2.718$.\n    *   **Result:** Moving setpoint from 26 °C to 18 °C reduces the thermally activated dry-out rate by a factor of ~2.7. The draft’s move from 18 °C to 26 °C increases the rate by this factor, accelerating capacity fade between equalizations.\n*   **DIRECTION-OF-EFFECT:**\n    *   **Driving variable:** Ambient Temperature ($T_{amb}$).\n    *   **Mechanism movement:** Moves $T_{amb}$ **DOWN** by $\\Delta T = 8$ K (26 °C → 18 °C) via HVAC setpoint adjustment.\n    *   **Effect on Failure Driver:** This **reduces** the thermally activated water generation rate (the primary failure driver). The draft’s movement **up** is inverted and out of class.\n\n### 3. IMPLEMENTATION BILL\n**MECHANISM CLASS:** Procedural Setpoint Optimization (HVAC Control)\n\n| Row | Component/Action | Specification | Tag | Cost Class |\n| :--- | :--- | :--- | :--- | :--- |\n| 1 | HVAC Controller Setpoint Adjustment | Change room thermostat setpoint from 26 °C to 18 °C (minimum of permitted range). | ALREADY-RECORDED (existing BMS/thermostat) | OPERATIONAL |\n| 2 | Validation Log | Verify room temp stabilizes at 18 ± 2 °C for 72 hours post-change. | DERIVED (stated sensor range) | ZERO |\n\n*   **BILL_UNTAGGED Resolution:** Row 1 is a parameter change on existing equipment (no new hardware). Row 2 uses existing temperature sensors. (c)\n*   **DEPLOYED-PART CLAUSE COMPLIANCE:** No modification to battery cells, strings, or room infrastructure. Only the control parameter of the existing HVAC system is altered. (a)\n*   **EXEMPLAR-REALITY/APPARATUS ROW:** No new apparatus. Uses standard BMS setpoint entry. (a)\n\n### 4. BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Zero. No physical installation. (a)\n*   **Operability:** Negligible. Single BMS parameter change. (c)\n*   **Maintenance:** None. (a)\n*   **Operational Loss (UNPRICED_OPERATIONAL_LOSS):** (c)\n    *   **Cost:** Increased HVAC energy consumption. (c)\n    *   **Order of Magnitude:** Cooling from 26 °C to 18 °C increases compressor duty cycle. For a typical datacom/telecom battery room, estimated HVAC energy increase is ~15–30% of thermal load (CALCULATED based on linear heat load approximation, conservative bound 30%). (c)\n    *   **Trade-off:** The 2.7x reduction in electrolyte loss extends battery life/cycle count, avoiding high-cost battery replacement or capacity loss. The energy cost is low relative to asset value. **Net Positive.**\n\n### 5. EXECUTABLE TEST\n*   **Protocol:** (c)\n    1.  Record baseline cell specific gravity (or voltage under load) and electrolyte level indicators (if visible/volumetric) at 26 °C for 4 weeks. (c)\n    2.  Adjust HVAC setpoint to 18 °C. (c)\n    3.  Maintain 18 °C for 4 weeks.\n    4.  Measure specific gravity/voltage at end of test.\n*   **Instruments:** Existing battery monitoring system (voltage/SG probes) and room thermostat display. (a)\n*   **Pass/Fail:** (c)\n    *   **Pass:** Electrolyte loss rate (indicated by SG drop or capacity fade in equalization curves) decreases by ≥ 50% compared to the 26 °C baseline.\n    *   **Fail:** Electrolyte loss rate increases or remains unchanged.\n*   **Kill Criterion:** If room temperature cannot be stabilized below 20 °C due to external heat load, the test is invalid; revert setpoint. (c)\n\n### 6. CONSTRAINT BIND & REASONING FOR DRAFT REJECTION\n*   **Draft Defect 1 (Inverted Physics):** The draft states \"warmer plates slow the dry-out leg.\" This is false. Arrhenius kinetics ($E_a \\sim 80$ kJ/mol) dictates that higher temperature *accelerates* the chemical reaction rate of water generation. The draft increases the failure driver.\n*   **Draft Defect 2 (Constraint Violation):** The constraint permits 18–26 °C. The draft pushes the setpoint *toward* 26 °C (the upper limit), maximizing the thermal stress and minimizing the thermal safety margin for VRLA operation (most VRLAs have a maximum operating temperature of 45���50 °C, but lower ambient is strictly better for longevity). The correct procedural move within the permitted set is to 18 °C. (c)\n*   **Draft Defect 3 (Unavailable Mechanism):** \"Drive off stratified acid layers\" is not a valid mechanism for VRLA dry-out. VRLAs are sealed; acid stratification is not the primary driver of *dry-out* (loss of water volume). The primary driver is gaseous water loss due to oxygen recombination, which is thermally activated. The draft confuses lead-acid open-cell maintenance with sealed VRLA physics.\n*   **Revised Position:** The only valid procedural lever within the constraint \"adjust within 18-26 C\" that aligns with the failure physics (Arrhenius acceleration) is to move the setpoint to the **coldest** permitted limit (18 °C). This reduces the exponent in the Arrhenius term, lowering the water generation rate and mitigating dry-out. (c)",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "INVERTED",
+   "reason": "driver: Higher ambient temperature exponentially increases the rate of water loss and self-discharge, accelerating electrolyte dry-out. | ingredient: Raising the room setpoint to 26 C increases the ambient temperature, which increases the Arrhenius rate constant for the dry-out process. | ingredient sign vs driver: SAME -> INVERTED",
+   "established_driver": "Higher ambient temperature exponentially increases the rate of water loss and self-discharge, accelerating electrolyte dry-out.",
+   "ingredient_action": "Raising the room setpoint to 26 C increases the ambient temperature, which increases the Arrhenius rate constant for the dry-out process.",
+   "sign_of_ingredient_vs_driver": "SAME"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- If the draft had been executed, the burden would include not only the same energy class "
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: Higher ambient temperature exponentially increases the rate of water loss and self-discharge, accelerating electrolyte dry-out. | ingredient: Raising th"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "18daf489cc8d75d3",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "ecdb8fe50821a833",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      1,
+      1,
+      0
+     ],
+     "signature": "fe0393dd3c77f250",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      3,
+      1,
+      0
+     ],
+     "signature": "1ea6f6a988355913",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n1",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      2,
+      1,
+      0
+     ],
+     "signature": "719c39c8dfd25ef1",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n1",
+    "n3"
+   ],
+   "final_node_id": "n1",
+   "final_metric": [
+    1,
+    1,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n1",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

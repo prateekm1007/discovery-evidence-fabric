@@ -1,0 +1,137 @@
+{
+ "problem_id": "f30-06b-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice for caustic CIP scale mitigation delivers a procedural outcome: maintaining a low-concentration caustic wash within material compatibility limits to prevent gasket degradation. The draft proposal's mechanism departure is a concentration spike; however, this mechanism is physically inverted and mechanically invalid under the constraint. The failure physics connection is that the constraint strictly limits NaOH to 2.5 wt% to protect gaskets, whereas the draft proposes 12 mol/L (approx. 48 wt%), which immediately exceeds the material rating and accelerates gasket swelling/failure rather than mitigating scale.\n\nPHYSICS CHECK\nGoverning relation: Material compatibility limit.\nStated Constraint: Gaskets rated for up to 2.5 wt% NaOH at 75 C.\nDraft Proposal: 12 mol/L NaOH.\nCalculation: Molar mass NaOH = 40 g/mol. Density approx 1.33 g/mL at 12 M.\nConcentration = (12 mol/L * 40 g/mol) / 1330 g/L ≈ 0.36 or 36 wt%.\n36 wt% > 2.5 wt%.\nDIRECTION-OF-EFFECT: driving variable = NaOH concentration; the mechanism moves it UP by ~14.4x the limit; this RAISES the gasket degradation rate (failure driver). The mechanism is INVERTED.\nMagnitude verification: 36 wt% exceeds the 2.5 wt% limit by a factor of 14.4. The gaskets are not rated for this concentration. The draft is out of class.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Caustic Concentration Limit Adherence (Procedure)\n\n(a) CIP Tank Dosing Protocol:\n- Action: Maintain NaOH concentration at 2.5 wt% (approx. 0.625 mol/L) at 75 C. (c)\n- Input: ALREADY-RECORDED: CIP tank recipe log (stated system standard). (a)\n- Reference: DERIVED: Stated constraint limit (2.5 wt%). (c)\n- Tag: (a) [PROCUREMENT: NONE - Procedure change only]\n\n(b) Caustic Wash Duration:\n- Action: Extend caustic wash duration by 50% relative to standard baseline to compensate for concentration limit. (c)\n- Input: ALREADY-RECORDED: CIP cycle timer logs. (a)\n- Reference: DERIVED: Kinetic scaling compensation (time ∝ 1/concentration for similar mass transfer). (c)\n- Tag: (b) [PROCUREMENT: NONE - Software/Schedule adjustment]\n\n(c) Gasket Monitoring:\n- Action: Standard visual inspection of gaskets per existing maintenance schedule.\n- Input: ALREADY-RECORDED: Maintenance records. (a)\n- Reference: DERIVED: Standard practice. (c)\n- Tag: (c) [PROCUREMENT: NONE - Existing procedure]\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: SAME (no hardware change).\nOperability: HIGHER COST (time) - 50% extension of CIP cycle. Operational loss: 50% of CIP cycle time (e.g., if 1h cycle, 0.5h added). This is the trade for staying within the 2.5 wt% limit.\nMaintenance: SAME.\nRough Cost Class: SAME (chemical cost similar, time cost increased).\nConclusion: SAME burden class, DIFFERENT mechanism (duration extension vs. concentration spike).\nEXECUTABLE TEST\nProtocol: Run CIP cycle with NaOH at 2.5 wt% for extended duration (standard + 50%).\nInstruments: Conductivity probe in CIP tank (stated signal).\nPass/Fail: Conductivity at end of cycle matches target for 2.5 wt% solution; no gasket deformation observed at next inspection.\nDuration: One full CIP cycle (approx. 1.5 hours).\nKill Criterion: If conductivity does not stabilize at target, or if gasket show swelling > 2% (assumed standard limit), the duration extension is insufficient and the mechanism fails.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: Gasket compatibility limit (2.5 wt% NaOH).\nReason: The problem explicitly states the gaskets are rated for up to 2.5 wt% NaOH. The draft violates this hard constraint. The revised mechanism adheres to this limit by capping concentration and compensating with time, which is a permitted procedural axis (\"CIP caustic concentration may be raised\" implies up to the limit, but the limit is hard).\n\nTYPED FINDINGS RESOLUTION\nBILL_UNTAGGED: All bill rows tagged (a), (b), (c) with procurement status.\nAPPARATUS_ROW: No new instrumentation. Conductivity probe is part of standard CIP control (stated signal \"conductivity\" in typed_plan signals_used).\nNAMED_VARIANT: No brands. \"NaOH\" and \"CIP tank\" are generic.\nSTANDARD_BILL: Parity maintained.\nDEV_NEED: None.\nUNPRICED_OPERATIONAL_LOSS: Stated in Burden Ledger (50% CIP cycle extension).\nDEPLOYED-PART CLAUSE: No modification to pasteurizer plates or gaskets.\nPERMITTED-SET CLAUSE: Constraint permits raising concentration, but hard limit is 2.5 wt%. The mechanism uses the permitted axis (concentration/duration) within the limit.\nDIRECTION-OF-EFFECT: Corrected. Mechanism moves concentration DOWN to limit, not UP.\nEXEMPLAR-REALITY: No commercial exemplars needed.\nPREMISE-VALIDITY: CIP tank and gaskets are stated.\nCERTIFIED-SYSTEM-AS-SOLD: No new hardware.\nDIRECTION-CORRECTNESS: Sign is correct (limiting concentration reduces gasket stress).\nINPUT-AVAILABILITY: Conductivity and time are standard CIP inputs.\nCOST-PRICING: Operational loss quantified.\nMECHANISM-DIVERSITY: Mechanism class is \"Caustic Concentration Limit Adherence\".",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "DIRECTION_CHECK_UNAVAILABLE",
+   "reason": "no verdict JSON in the reply"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Operability**: Minor. Requires updating the controller recipe and timer settings.",
+    "*   **Rough Cost Class**: Same. Chemical cost may decrease slightly due to lower concentra",
+    "*   *Parity Note*: The draft’s high concentration is physically impossible (inverts direct",
+    "1.  Run CIP with 2.5 wt% NaOH at 75°C for the extended duration.",
+    "2.  Measure gasket compression/leakage after 5 cycles.",
+    "3.  Measure residual scale weight on test coupons before/after.",
+    "*   **Gasket**: No permanent set or leakage beyond standard tolerance.",
+    "*   **Scale**: Removal > 90% of baseline."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_CHECK_UNAVAILABLE": [
+    "typed fail-open: no verdict JSON in the reply (the authoritative read stays the auditor's)"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "2922fe8bfc1dc10d",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "fea07cf4c5730221",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "ab6deb6c7a5f3021",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "c07e83a0453ab9bc",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "7ddabdf3fa73fddf",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    }
+   ],
+   "live_frontier": [
+    "n2",
+    "n1"
+   ],
+   "final_node_id": "n2",
+   "final_metric": [
+    2,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n2",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

@@ -1,0 +1,19 @@
+**Verdict: Pass**
+
+**Reasoning:**
+
+1.  **Constraint Compliance:** The proposal explicitly states it will use only the "existing thermocouples and flow meter." It does not propose new sensors, new control loops, or external data sources. The trigger for the backflush is derived from data already available on the instrumented device (outlet temperature rise relative to a baseline). This strictly adheres to the constraint "No new instrumentation may be added."
+
+2.  **Physical Direction:** The failure is "tube-side fouling deposits." The proposed mitigation is "backflush the tube side." Backflushing is a standard, physically correct mechanism for removing fouling deposits from the inside of tubes. It does not invert any physical direction (e.g., it does not suggest blowing the shell side to clean the tube side, nor does it suggest flushing in the same direction as normal flow to "polish" the fouling, which is ineffective). The action aligns with the physics of dislodging particulate or bio-fouling from tube walls.
+
+3.  **Duty Cycle Pricing:** The proposal uses a "weekly on a schedule triggered by... outlet-temperature rise." This is a reasonable heuristic for monitoring fouling. Fouling is a gradual process, not a rapid cycle. A weekly check is a plausible duty cycle for a maintenance inspection/flush that is only activated when a degradation threshold (temperature rise) is met. It does not "misprice" the duty cycle in the sense that it doesn't assume a frequency that is physically impossible (e.g., every second) or economically nonsensical for this type of thermal management. The logic is sound: monitor performance metrics (delta-T) to determine when intervention (backflush) is required.
+
+4.  **Reliance on Unavailable Items:** The proposal relies on:
+    *   Thermocouples (available per problem statement).
+    *   Flow meter (available per problem statement).
+    *   "Inlet-referenced baseline" (a calculated value or logged historical value, not new hardware).
+    *   "Backflush" capability (implied as an existing or easily implementable mechanical procedure using the existing system; even if not currently automated, the *sensing and trigger logic* relies only on existing instruments. The constraint is on *instrumentation*, not necessarily on the actuator if backflushing is a known maintenance procedure, but even if a valve is required, the prompt focuses on the sensing/trigger aspect. However, strictly speaking, if no backflush plumbing exists, one could argue it's unavailable. But in engineering contexts, "backflush" often refers to the *action* which may require existing valves to be operated in reverse, or a dedicated clean loop. Given the constraint is specifically about *sensors/measurements*, and the proposal correctly limits its *data* sources to existing sensors, it does not violate the specific constraint provided. The constraint says "Use only existing sensors... No new instrumentation may be added." It does not forbid using existing mechanical infrastructure for backflushing.)
+
+    Therefore, the proposal does not rely on any *new* instrumentation or unavailable measurement data.
+
+**Conclusion:** The draft is technically sound and compliant with the given constraints.
