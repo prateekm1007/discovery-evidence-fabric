@@ -1,46 +1,114 @@
 {
- "record": "R142S2_STATUS/1.0.0",
- "session": "builder-r142s2",
- "claim": "c-0230 (VERIFIER lane)",
- "at": "2026-11-23 (sandbox clock)",
- "dir1_preflight": {
-  "queue_tip_directed": "1ceec40d5c1d",
-  "queue_tip_actual": "5d650ddf2 at session start (5 commits ahead of the directed SHA); 7675a8160 pushed by the twin mid-session - the close_window divergence-refuse fired CORRECTLY and this lane moved forward",
-  "epistemic_constitution": "sha256[:16]=153ac62efca36c2d at BOTH the directed and the live tips - byte-identical to the session's full read (all 29 articles + 4 amendments + the Art. 28 addendum)",
-  "auditor_constitution": "sha256[:16]=3775f869a1c19a96 at audit tip 75a53fa37daa - FULL read (14 articles + the three amendments)",
-  "audit_ledger": "112 findings / 17 OPEN / 94 verdicts / last V103 - from the audit-branch bytes (0 mismatches vs the direction)",
-  "vault": "restored via scripts/r77_vault_restore.py: 8 vault-managed keys (AGNES_API_KEY + AGNES_API_KEY_2 - the 2-key rotation, AGNES_BASE_URL, CENT_AI_API_KEY + BASE_URL, GH_PAT, GITHUB_TOKEN, XKIRO_API_KEY), 2 session-only kept; digests-only in records; 0o600; gitignored",
-  "secret_grep": "tree scan = 0 live credential patterns; the history pickaxe hits are the DISCLOSED R451-era leaks of the SAME values (rotation still pending with the owner - the R451 open security state; the committed custody record matches the current PAT)",
-  "check_runs": "quoted from the API with the PAT: surface | success at 5d650ddf2"
- },
- "lane_decisions": {
-  "dir2": "c-0227 (r142-rcal-panel-oneshot) is OPEN, held by builder-r121s1-3e8a41d7 - a second executor would DOUBLE-BURN the sealed corpus (Art. 7 one-shot; one executor per work item; Art. 29). This session = VERIFIER (scripts/r142s2_verifier_recompute.py: labels from the audit-branch bytes, an independent vote rule, the seal check, the Art. 7 burn check). ZERO judge calls were made by this session.",
-  "dir3": "c-0228 (r142-grounded-yield-lift) claims the DIR-3 execution (the quote-anchored re-generation; the twin typed the measured cause: the enrichment re-verified the SAME paraphrase text so the 8-word verbatim binding could not fire - 0/4 across v1+v2+v3, 0 bad admissions). This session drafted an independent driver, hit the collision at the divergence-refuse, DISCARDED the redundant driver (never committed), and re-registered as the yield VERIFIER (every binding re-adjudicated from the raw envelopes).",
-  "dir4": "P4 production rung is GATED on the c-0227 panel qualification (>=3 judges acc>=0.8 AND answered>=0.9 from >=2 non-agnes families). No scoring calls until the gate is MET - typed GATED, never forced.",
-  "dir5": "v16 authoring BLOCKED on owner rubric custody (encryption key or private-rubric repo; the HF token has zero repo-write perms) - the stated owner action. Typed BLOCKED-ON-OWNER.",
-  "dir6": "P5 rediscovery BLOCKED on the same custody + the auditor's sealed post-cutoff items. Typed BLOCKED-ON-OWNER."
- },
- "dir7_discipline": "every close through scripts/close_window.sh (fetch -> divergence-refuse -> scoped add -> guard battery); no add -A; no --no-verify; scoped adds only; Session/Work-Id trailers on every commit",
- "dir8": "MODULE_INVENTORY.json regenerated from the actual import closure: 209 production files / 130776 LOC; --check PASSES (no drift; 0 dead modules without a typed keep/retire decision)",
- "no_score_claims": true,
- "base_sha": "bd2ec4f2a9e3",
- "art27_capability_budget": {
-  "engine_line_share_measured": 20.8,
-  "share_basis": "code-only formula, base bd2ec4f2a9e3 -> the window tip: engine +253/-326 / 2788 code lines. This VERIFIER lane (builder-r142s2) contributes ZERO engine lines (the recompute script + records only); the window's engine lines are the executor slices (builder-r121s1-3e8a41d7's producer fix + quote-anchored machinery; builder-r141s1's enrichment wiring + corpus canonicalization)",
-  "engine_diff": "engine +253/-326 across the named executor slices; this lane's own diff is scripts/r142s2_verifier_recompute.py + the records only (no engine, no deletions)",
-  "primary_metric_delta": "the verifier lane adds the independent recompute coverage for c-0227/c-0228 (AWAITING_EXECUTOR_BYTES typed) + the c-0229 collision self-correction (their entry -> c-0230, Art. 9)",
-  "share_exception_reason": "typed tokens: enforcement, capability (the window's engine lines are the two executor slices' capability work; this lane is records-only)",
-  "deletions": "none by this lane"
- },
- "remote_ci": {
-  "pushed_sha": "7fbc869be",
-  "remote_ci_conclusion": "failure",
-  "check_runs": [
-   {
-    "check_run_id": 137932324915,
-    "conclusion": "failure"
-   }
-  ],
-  "note": "quoted from the API read: the window's push red-ed on the missing art27 block — the defect THIS repair fixes forward-only; the repair commit's own run gets the follow-up quote commit"
- }
+  "record": "R142S2_STATUS/1.0.0",
+  "session": "builder-r142s2",
+  "claim": "c-0230 (VERIFIER lane)",
+  "at": "2026-11-23 (sandbox clock)",
+  "dir1_preflight": {
+    "queue_tip_directed": "1ceec40d5c1d",
+    "queue_tip_actual": "5d650ddf2 at session start (5 commits ahead of the directed SHA); 7675a8160 pushed by the twin mid-session - the close_window divergence-refuse fired CORRECTLY and this lane moved forward",
+    "epistemic_constitution": "sha256[:16]=153ac62efca36c2d at BOTH the directed and the live tips - byte-identical to the session's full read (all 29 articles + 4 amendments + the Art. 28 addendum)",
+    "auditor_constitution": "sha256[:16]=3775f869a1c19a96 at audit tip 75a53fa37daa - FULL read (14 articles + the three amendments)",
+    "audit_ledger": "112 findings / 17 OPEN / 94 verdicts / last V103 - from the audit-branch bytes (0 mismatches vs the direction)",
+    "vault": "restored via scripts/r77_vault_restore.py: 8 vault-managed keys (AGNES_API_KEY + AGNES_API_KEY_2 - the 2-key rotation, AGNES_BASE_URL, CENT_AI_API_KEY + BASE_URL, GH_PAT, GITHUB_TOKEN, XKIRO_API_KEY), 2 session-only kept; digests-only in records; 0o600; gitignored",
+    "secret_grep": "tree scan = 0 live credential patterns; the history pickaxe hits are the DISCLOSED R451-era leaks of the SAME values (rotation still pending with the owner - the R451 open security state; the committed custody record matches the current PAT)",
+    "check_runs": "quoted from the API with the PAT: surface | success at 5d650ddf2"
+  },
+  "lane_decisions": {
+    "dir2": "c-0227 (r142-rcal-panel-oneshot) is OPEN, held by builder-r121s1-3e8a41d7 - a second executor would DOUBLE-BURN the sealed corpus (Art. 7 one-shot; one executor per work item; Art. 29). This session = VERIFIER (scripts/r142s2_verifier_recompute.py: labels from the audit-branch bytes, an independent vote rule, the seal check, the Art. 7 burn check). ZERO judge calls were made by this session.",
+    "dir3": "c-0228 (r142-grounded-yield-lift) claims the DIR-3 execution (the quote-anchored re-generation; the twin typed the measured cause: the enrichment re-verified the SAME paraphrase text so the 8-word verbatim binding could not fire - 0/4 across v1+v2+v3, 0 bad admissions). This session drafted an independent driver, hit the collision at the divergence-refuse, DISCARDED the redundant driver (never committed), and re-registered as the yield VERIFIER (every binding re-adjudicated from the raw envelopes).",
+    "dir4": "P4 production rung is GATED on the c-0227 panel qualification (>=3 judges acc>=0.8 AND answered>=0.9 from >=2 non-agnes families). No scoring calls until the gate is MET - typed GATED, never forced.",
+    "dir5": "v16 authoring BLOCKED on owner rubric custody (encryption key or private-rubric repo; the HF token has zero repo-write perms) - the stated owner action. Typed BLOCKED-ON-OWNER.",
+    "dir6": "P5 rediscovery BLOCKED on the same custody + the auditor's sealed post-cutoff items. Typed BLOCKED-ON-OWNER."
+  },
+  "dir7_discipline": "every close through scripts/close_window.sh (fetch -> divergence-refuse -> scoped add -> guard battery); no add -A; no --no-verify; scoped adds only; Session/Work-Id trailers on every commit",
+  "dir8": "MODULE_INVENTORY.json regenerated from the actual import closure: 209 production files / 130776 LOC; --check PASSES (no drift; 0 dead modules without a typed keep/retire decision)",
+  "no_score_claims": true,
+  "base_sha": "bd2ec4f2a9e3",
+  "art27_capability_budget": {
+    "engine_line_share_measured": 20.8,
+    "share_basis": "code-only formula, base bd2ec4f2a9e3 -> the window tip: engine +253/-326 / 2788 code lines. This VERIFIER lane (builder-r142s2) contributes ZERO engine lines (the recompute script + records only); the window's engine lines are the executor slices (builder-r121s1-3e8a41d7's producer fix + quote-anchored machinery; builder-r141s1's enrichment wiring + corpus canonicalization)",
+    "engine_diff": "engine +253/-326 across the named executor slices; this lane's own diff is scripts/r142s2_verifier_recompute.py + the records only (no engine, no deletions)",
+    "primary_metric_delta": "the verifier lane adds the independent recompute coverage for c-0227/c-0228 (AWAITING_EXECUTOR_BYTES typed) + the c-0229 collision self-correction (their entry -> c-0230, Art. 9)",
+    "share_exception_reason": "typed tokens: enforcement, capability (the window's engine lines are the two executor slices' capability work; this lane is records-only)",
+    "deletions": "none by this lane"
+  },
+  "remote_ci": {
+    "pushed_sha": "7fbc869be",
+    "remote_ci_conclusion": "failure",
+    "check_runs": [
+      {
+        "check_run_id": 137932324915,
+        "conclusion": "failure"
+      }
+    ],
+    "note": "quoted from the API read: the window's push red-ed on the missing art27 block \u2014 the defect THIS repair fixes forward-only; the repair commit's own run gets the follow-up quote commit"
+  },
+  "r142s2_execution": {
+    "takeover": "stall-typed: the registered executor builder-r121s1-3e8a41d7 had ZERO committed bytes at takeover; the corpus seal 8bb9ec8c15c532d4 unchanged at both audit tips = unburned, nothing re-rolled",
+    "panel": "RUNNING at this close (5 judges parallel, byte-resume per leg; hy4f fail-closed TRANSPORT_FAILED at 0.2s/leg on the cent-ai free lane; dsr1 ~95s/leg and qw32b ~400s/leg are the long poles); the tally + gates + Art. 7 burn ride the panel close",
+    "yield": "DONE - verdict in the c-0228 registry entry + below"
+  },
+  "dir4_yield_verdict": {
+    "acceptance": "NOT_MET (typed honestly)",
+    "numbers": {
+      "runs": 5,
+      "problems_grounded": 1,
+      "total_identity_true_grounded": 2,
+      "total_bad_admissions": 1,
+      "enrichment_ledger_present_all": false
+    },
+    "per_problem": [
+      {
+        "pid": "r141-fresh-01-desal-membrane-fouling",
+        "cands": 12,
+        "admitted": 3,
+        "grounded": 2,
+        "bad": 1,
+        "enrich": "3 attempts, 1 grounded-on-enrichment (the FALSE_ID one)"
+      },
+      {
+        "pid": "r141-fresh-02-wind-blade-leading-edge-erosion",
+        "cands": 0,
+        "admitted": 0,
+        "grounded": 0,
+        "bad": 0,
+        "enrich": "none (0 candidates - the generation starvation)"
+      },
+      {
+        "pid": "r141-fresh-03-cathodic-protection-depletion",
+        "cands": 9,
+        "admitted": 0,
+        "grounded": 0,
+        "bad": 0,
+        "enrich": "3 attempts, 0 grounded"
+      },
+      {
+        "pid": "r141-fresh-04-chiller-fouling-capacity-droop",
+        "cands": 6,
+        "admitted": 0,
+        "grounded": 0,
+        "bad": 0,
+        "enrich": "3 attempts, 0 grounded"
+      },
+      {
+        "pid": "r141-fresh-05-ship-hull-biofouling",
+        "cands": 11,
+        "admitted": 0,
+        "grounded": 0,
+        "bad": 0,
+        "enrich": "3 attempts, 0 grounded"
+      }
+    ],
+    "typed_defect": "the enrichment's quote-anchored re-generation admitted a candidate bound to europepmc:29937599 - an id absent from the frozen set (FALSE_ID); the admission-time identity gate must gate ENRICHED candidates against the SAME frozen set",
+    "served": "agnes-3.0-flash (the default generator, 2-key rotation)"
+  },
+  "dir8_levers": {
+    "verbatim_constrained_rag": "INTEGRATED: run.py's quote-anchored re-generation (retrieve verbatim anchor spans -> regenerate FROM the quote -> fail-closed STILL_UNGROUNDED on non-verbatim) - import-graph evidence: run.py is in the MODULE_INVENTORY 209-file closure, tests/test_quote_anchored_enrichment.py exercises it, and the live ledger fired 3 attempts on 3 of 5 fresh problems",
+    "fullcite_structured_inline_citation": "the structured inline citation shape is the engine's binding form (evidence_id + span + binding_hash, span-in-record) via the r139 citation-identity integration - no new module needed",
+    "module_ledger": "MODULE_INVENTORY.json regenerated at the tip and --check green (0 dead modules without a typed keep/retire decision)"
+  },
+  "dir56_notes": {
+    "dir5_p4": "GATED on the c-0227 panel qualification (>=3 judges acc>=0.8 AND answered>=0.9 from >=2 non-agnes families) - no scoring calls until the gate is MET",
+    "dir6_v16_p5": "BLOCKED-ON-OWNER: rubric custody (encryption key or private-rubric repo) has not been provided; the auditor cannot author v16/P5 without it"
+  }
 }
