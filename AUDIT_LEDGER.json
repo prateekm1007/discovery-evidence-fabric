@@ -1688,6 +1688,54 @@
    "title": "AUDITOR_CONSTITUTION.md canonical commit",
    "evidence": "present at audit-branch root since R57 43e450e1c4df; tip f97bbbd4a008 digest 3775f869a1c19a96 verified",
    "status": "CLOSED"
+  },
+  {
+   "id": "R132-F1",
+   "round": "R132",
+   "severity": "MEDIUM",
+   "title": "Panel calibration reimplemented judging in scripts/r132_panel_calibrate.py (engine.route_adapter transport only) instead of reusing EXISTING engine/blind_panel.py (21054 bytes) + engine/panel_agreement.py \u2014 F63 pattern + integration gap",
+   "evidence": "scripts/r132_panel_calibrate.py imports (no blind_panel/panel_agreement); engine/blind_panel.py present",
+   "status": "OPEN"
+  },
+  {
+   "id": "R132-F2",
+   "round": "R132",
+   "severity": "MEDIUM",
+   "title": "SPECTER2 NOT integrated: engine/novelty_gate.py + prior_art_v2_bridge.py have no specter2/sentence-transformers imports; the P4 prior-art cosine gate (>=0.2 separation) lacks its deterministic embedding instrument",
+   "evidence": "import grep of novelty_gate.py(4531c)/prior_art_v2_bridge.py(1515c); requirements.txt omits specter2",
+   "status": "OPEN"
+  },
+  {
+   "id": "R132-F3",
+   "round": "R132",
+   "severity": "LOW",
+   "title": "Diagnostic census not reproduced: '6 ties across the panel' vs independent 16 per-judge order-majority ties (llama5/qwen3/deepseek3/cohere5); cohere A:B 13:0 vs claimed 13:1. Gate numbers unaffected",
+   "evidence": "eval/r132_panel_calibration.json diagnosis vs eval/r132_auditor_recompute.json",
+   "status": "OPEN"
+  },
+  {
+   "id": "R132-F4",
+   "round": "R132",
+   "severity": "LOW",
+   "title": "requirements.txt (R391 pin) omits mapie/sklearn/pint/cantera (CI-installed only) though conformal_predictor.py imports mapie+sklearn \u2014 reproducibility gap (Art.1 v1.3.0)",
+   "evidence": "requirements.txt vs conformal_predictor.py imports + surface.yml pip install",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F2",
+   "round": "R132",
+   "severity": "MEDIUM",
+   "title": "Capability logic in scripts/; F31e/panel measured paths bypass engine (architecture)",
+   "evidence": "r132_dir4_migration_plan.json inventory",
+   "status": "OPEN \u2014 plan accepted, execution next window (DIR3)"
+  },
+  {
+   "id": "R131-F3",
+   "round": "R132",
+   "severity": "MEDIUM",
+   "title": "Score-7 two-consecutive->=3.3 not strict (v12/v15 non-consecutive)",
+   "evidence": "ledger sealed_instruments",
+   "status": "OPEN \u2014 v16 consolidates (DIR5)"
   }
  ],
  "amendments": [
@@ -4493,6 +4541,26 @@
    "closed": [
     "R129-GOV-CLOSED"
    ]
+  },
+  {
+   "id": "V97",
+   "round": "R132 audit of P4 panel calibration + GEPA round-2 + hygiene",
+   "commit": "60657db7d78a9d771bdb0932816c093e1be2b9c6",
+   "gate": "P4 panel R-CAL NOT_MET (0/4, verified diff=0); GEPA round-2 LOSE->DELETED verified; DIR6/7/8 closed R131-F4/F5/F6",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r132_auditor_adjudication.json",
+   "findings": [
+    "R132-F1",
+    "R132-F2",
+    "R132-F3",
+    "R132-F4"
+   ],
+   "closed": [
+    "R131-F4",
+    "R131-F5",
+    "R131-F6"
+   ]
   }
  ],
  "gold_set": {
@@ -4790,7 +4858,7 @@
    "acceptance": "GRANTED (mean 3.9, CI[3.79, 4.01], 0/0/0)"
   }
  },
- "progress_note": "SCORE 7/10 (carried R131, no change). v15 ACCEPTED mean 3.9 CI[3.79,4.01] 0/0/0 BURNED; v12 ACCEPTED 3.400. R130S3 diff-min fold VERIFIED (independent recompute diff=0; FOLD no-regression 2/48<=2/48). R131 GEPA-round2 prereg ACCEPTED (c-0210 OPEN, twin lane; X<=1 strict-beat-or-delete). CORRECTIONS: AWS-bottleneck framing withdrawn (AM46 loop-owned panel); 'score-9 axis' renamed viability sub-metric; R129 governance finding CLOSED (AUDITOR_CONSTITUTION canonical at audit tip since R57). Score-7 two-consecutive->=3.3 needs v16 to consolidate (R131-F3). Path to 8: P4 loop-owned cross-family panel (HF router live) + v16 sealed set. Path to 9: P5 agent-run rediscovery + unattended 30-batch. Goal 9/10 fully agent-run (AM46; ~7 ceiling retired).",
+ "progress_note": "SCORE 7/10 (carried R132, no change). R132 P4 panel calibration VERIFIED HONEST NEGATIVE: 0/4 judges R-CAL qualified (independent recompute diff=0; llama0.4/qwen0.5/deepseek0.7/cohere0.222; answered 1.0/1.0/0.95/0.70). Protocol defect caught+amended before tally (pass1 excluded). GEPA round-2 LOSE->DELETED (Art.20, X=5, m5 7/96>v1 4/96; MF-2 directive-invariance confirmed). DIR6/7/8 closed R131-F4/F5/F6. NEW: R132-F1 panel bypasses engine/blind_panel.py (F63); R132-F2 SPECTER2 not integrated (P4 cosine gate); R132-F3 tie census 16 vs claimed 6; R132-F4 requirements pin gap. Path to 8: swap-robust vote+tie-policy prompt+larger rungs (Qwen3-235B callable) to R-CAL qualify >=3 judges, route panel through engine, integrate SPECTER2, v16 consolidates score-7. Path to 9: MOOSE-Chem post-cutoff rediscovery + unattended. Goal 9/10 fully agent-run (AM46). Worldwide: GEPA library/SPECTER2/MOOSE-Chem/AI-Scientist-v2 + China Qiushi/EvoScientist/AI-Researcher monitored for integration.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

@@ -1,0 +1,99 @@
+{
+ "record": "R132_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r132s1",
+ "audited_queue_tip": "697ac00ba44a (builder-r121s1-3e8a41d7, claim c-0211 DONE)",
+ "audit_branch_parent": "60657db7d78a9d771bdb0932816c093e1be2b9c6",
+ "R132_PANEL_VERDICT": {
+  "verdict": "VERIFIED HONEST NEGATIVE \u2014 the P4 panel-calibration gate is NOT_MET (0/4 judges R-CAL qualified). Independent Art.13 recompute from the 80 raw records matches every gate number exactly (diff=0); r5 labels cross-checked vs committed source (0 mismatches).",
+  "recompute": "llama acc0.4/ans1.0, qwen0.5/1.0, deepseek0.7/0.95, cohere0.222/0.70; qualified_panel=[]",
+  "protocol_integrity": "PASS \u2014 the blindness defect (caller-side swap, not _rubric_prompt) was caught and amended BEFORE any tally; pass1 (11 fixed-order legs) archived at eval/r132_panel_pass1_fixedorder/ and excluded; amendment 8b30355d9 pushed before close cc0e15b2f",
+  "claim_before_work": "c-0211 prereg pushed first (ebe933b3e); counter monotonic",
+  "D2_ci": "137342720147/137343445805/137363393508/137364725486 all surface success (verified)",
+  "diagnosis_accepted": "order-majority split=tie collides with never-tie auditor labels; first-position bias real (llama 15:5, cohere 13:0); per-order acc 0.7-0.8 > paired; decisive pairs all agree. Literature corroborates: position bias and within-judge agreement are orthogonal; exact-match overstates vs kappa. The R-CAL bar is a real filter, not a formality.",
+  "no_gate_claims": "correct \u2014 no agreement/kappa/AUC claimed from an unqualified panel"
+ },
+ "GEPA_ROUND2_VERDICT": {
+  "verdict": "LOSE -> DELETED VERIFIED (Art.20 round2). X=5 this draw; m5 pooled 7/96 > v1 pooled 4/96; STRICTLY-BEATS required X<=1. Correct application of the accepted R131 prereg. MF-2 directive-invariance CONFIRMED (X>=2). Arm stays deleted unless a new incumbent challenge wins."
+ },
+ "HYGIENE_VERDICT": {
+  "DIR6": "citation forward-pointer + KB in-place fix \u2014 R131-F4 CLOSED",
+  "DIR7": "single counter authority (claim_next_id.txt + refs/claims/next); numeric ref retired-preserved(203); c-0206 ALLOCATED-BUT-UNRECORDED (honest, no invented rationale); sandbox-clock rule typed \u2014 R131-F5/F6 CLOSED",
+  "DIR8": "F31e renamed sub-metric; AWS/Bedrock withdrawn; ~7 ceiling retired \u2014 CORR-R131-1/2 enacted",
+  "DIR4": "typed engine-migration plan accepted (check_layer+FIX_SCHEMA+directives -> engine/review_layer.py+prompts.py; test_article22 extended); EXECUTION next window"
+ },
+ "FINDINGS": [
+  {
+   "id": "R132-F1",
+   "severity": "MEDIUM",
+   "title": "Panel calibration reimplemented judging in scripts/r132_panel_calibrate.py (engine.route_adapter transport only) instead of reusing EXISTING engine/blind_panel.py (21054 bytes) + engine/panel_agreement.py \u2014 F63 pattern + integration gap",
+   "evidence": "scripts/r132_panel_calibrate.py imports (no blind_panel/panel_agreement); engine/blind_panel.py present",
+   "direction": "DIR2/DIR3 \u2014 route panel through the engine panel surface"
+  },
+  {
+   "id": "R132-F2",
+   "severity": "MEDIUM",
+   "title": "SPECTER2 NOT integrated: engine/novelty_gate.py + prior_art_v2_bridge.py have no specter2/sentence-transformers imports; the P4 prior-art cosine gate (>=0.2 separation) lacks its deterministic embedding instrument",
+   "evidence": "import grep of novelty_gate.py(4531c)/prior_art_v2_bridge.py(1515c); requirements.txt omits specter2",
+   "direction": "DIR4 \u2014 integrate allenai/specter2"
+  },
+  {
+   "id": "R132-F3",
+   "severity": "LOW",
+   "title": "Diagnostic census not reproduced: '6 ties across the panel' vs independent 16 per-judge order-majority ties (llama5/qwen3/deepseek3/cohere5); cohere A:B 13:0 vs claimed 13:1. Gate numbers unaffected",
+   "evidence": "eval/r132_panel_calibration.json diagnosis vs eval/r132_auditor_recompute.json",
+   "direction": "DIR7 \u2014 reconcile tie census, define tie unit"
+  },
+  {
+   "id": "R132-F4",
+   "severity": "LOW",
+   "title": "requirements.txt (R391 pin) omits mapie/sklearn/pint/cantera (CI-installed only) though conformal_predictor.py imports mapie+sklearn \u2014 reproducibility gap (Art.1 v1.3.0)",
+   "evidence": "requirements.txt vs conformal_predictor.py imports + surface.yml pip install",
+   "direction": "DIR7 \u2014 pin engine-imported deps"
+  },
+  {
+   "id": "R131-F2",
+   "severity": "MEDIUM",
+   "title": "Capability logic in scripts/; F31e/panel measured paths bypass engine (architecture)",
+   "evidence": "r132_dir4_migration_plan.json inventory",
+   "status": "OPEN \u2014 plan accepted, execution next window (DIR3)"
+  },
+  {
+   "id": "R131-F3",
+   "severity": "MEDIUM",
+   "title": "Score-7 two-consecutive->=3.3 not strict (v12/v15 non-consecutive)",
+   "evidence": "ledger sealed_instruments",
+   "status": "OPEN \u2014 v16 consolidates (DIR5)"
+  }
+ ],
+ "CLOSED": [
+  "R131-F4 (citation)",
+  "R131-F5 (counter)",
+  "R131-F6 (timestamp)"
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET",
+  "P1": "MET (score5)",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; GEPA DELETED, BoN ADOPTED, speed verified; v16 needed for two-consecutive)",
+  "P4": "NOT_MET \u2014 panel R-CAL NOT_MET (0/4); levers: swap-robust vote + tie-policy prompt + larger rungs (Qwen3-235B callable); SPECTER2 not integrated; >=50% viable rung later",
+  "P5": "NOT_MET \u2014 rediscovery + unattended pending; MOOSE-Chem post-cutoff benchmark is the reference"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "ledger V95 (v15 3.9) carried; R132 honest negative does not raise or lower",
+  "goal": "9/10 fully agent-run (AM46)",
+  "path_to_8": "R-CAL qualify >=3 judges (DIR2) + engine integration (DIR3) + SPECTER2 (DIR4) + v16 (DIR5)",
+  "path_to_9": "P5 rediscovery + unattended (DIR6)"
+ },
+ "WORLDWIDE_INTEGRATION": {
+  "GEPA": "hand-rolled scripts/r130_gepa_reviewer.py, NOT gepa-ai/gepa library; arm DELETED \u2014 if re-challenged use the real reflective-mutation library",
+  "SPECTER2": "NOT integrated (R132-F2) \u2014 wire allenai/specter2 into engine/prior_art_v2_bridge.py",
+  "MOOSE_Chem": "pattern referenced; wire engine/rediscovery_protocol.py to its post-cutoff inspiration-retrieval methodology (P5)",
+  "MAPIE": "INTEGRATED (conformal_predictor.py TimeSeriesRegressor) \u2713",
+  "AIDE": "retired F30; engine aide_tree_search.py present \u2014 re-authorizable per P3 via AI-Scientist-v2 agentic tree search OR prune if zero importers",
+  "panel": "engine/blind_panel.py+panel_agreement.py exist but R132 bypassed them (R132-F1) \u2014 reuse",
+  "China": "Qiushi Discovery Engine (real optical platform, T1/T2 reference), EvoScientist (idea-gen SOTA), AI-Researcher(hkuds), Gitee AI ecosystem \u2014 monitor for P5 validation patterns"
+ },
+ "recompute_pointer": "eval/r132_auditor_recompute.json (diff=0)"
+}
