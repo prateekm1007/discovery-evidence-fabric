@@ -1572,6 +1572,55 @@ class EngineRun:
                             self.problem, self.env.evidence or [])
                         grid_result["entry"] = _grid_entry
                         self._persist("EXPLORATION_GRID.json", grid_result)
+                        # R137 DIR-4B: grid candidates previously entered
+                        # the engineering pool with ONLY the lexical
+                        # span_derivation check as support evidence — the
+                        # mechanism_space verification instrument (the
+                        # same one every discovery-loop candidate faces)
+                        # never ran on them. Fix: build the structured
+                        # evidence view ONCE and run
+                        # verify_mechanism_support per grid candidate.
+                        # A lexical span score alone never establishes
+                        # scientific support (the directions' exact
+                        # constraint); each candidate now carries the
+                        # canonical SUPPORTED/PARTIALLY_SUPPORTED/
+                        # CONTESTED/NOT_ENOUGH_EVIDENCE verdict, and a
+                        # CONTRADICTS verdict marks the candidate
+                        # unverified-blocked (held for human review —
+                        # the same honest marker the release gate
+                        # already uses for unverified grid candidates).
+                        _grid_structured = []
+                        try:
+                            from . import stage_entry as _se_grid
+                            from . import mechanism_space as _ms_grid
+                            _by_id = {str(it.get("id")): it
+                                      for it in (self.env.evidence or [])}
+                            for _cls in _se_grid.verified_evidence_items(self.env):
+                                _rec = _by_id.get(str(_cls.get("source_id"))) or {}
+                                if not _rec:
+                                    continue
+                                _t = str(_rec.get("title") or "")
+                                _a = str(_rec.get("abstract") or "")
+                                _rt = f"{_t}. {_a}".strip()
+                                _grid_structured.append({
+                                    "item_id": f"lean_{_rec.get('id')}",
+                                    "structured_hash": __import__("hashlib").sha256(
+                                        _rt.encode("utf-8", "replace")).hexdigest(),
+                                    "fields": {"system": {"value": _t},
+                                               "abstract": {"value": _a},
+                                               "mechanism": {"value": _rt},
+                                               "observed_effect": {"value": _a}},
+                                    "source": _rec.get("source") or _rec.get("id"),
+                                    "relevance": _cls.get("relevance"),
+                                    "_record_text": _rt})
+                        except Exception as _exc:  # noqa: BLE001
+                            # the structured view is best-effort; an
+                            # empty view makes every candidate
+                            # NOT_ENOUGH_EVIDENCE (honest, never a pass)
+                            grid_result["verification_view_error"] = (
+                                f"{type(_exc).__name__}: {_exc}")
+                        _grid_verified = 0
+                        _grid_blocked = 0
                         for c in grid_result.get("candidates", []):
                             f = c.get("fields") or {}
                             if not f.get("intervention"):
@@ -1593,6 +1642,46 @@ class EngineRun:
                                                     .get("content_hash", ""))},
                                 "exploration_angle": c.get("angle"),
                                 "exploration_provider": c.get("provider_id")}
+                            # R137 DIR-4B: the canonical per-candidate
+                            # discovery verification (the same instrument
+                            # the lean path runs on ITS retained
+                            # candidates — one authority, no second
+                            # evaluator, Art. IV)
+                            _sup = None
+                            if _grid_structured:
+                                try:
+                                    from .mechanism_space import \
+                                        verify_mechanism_support
+                                    _sup = verify_mechanism_support(
+                                        grid_cand, _grid_structured,
+                                        self.problem)
+                                    grid_cand["mechanism_support"] = _sup
+                                    _state = _sup.get(
+                                        "mechanism_support_state")
+                                    if _state in (
+                                            "SUPPORTED",
+                                            "PARTIALLY_SUPPORTED"):
+                                        _grid_verified += 1
+                                    elif _state == "CONTESTED":
+                                        # a contradicting evidence item
+                                        # blocks the candidate from the
+                                        # automatic pool (held for human
+                                        # review; never silently dropped)
+                                        _grid_blocked += 1
+                                        c["_verification_blocked"] = _state
+                                    # NOT_ENOUGH_EVIDENCE: recorded on
+                                    # the candidate, still enters the
+                                    # pool explicitly UNVERIFIED (the
+                                    # release gate holds it for human
+                                    # review — unchanged discipline)
+                                except Exception as _vexc:  # noqa: BLE001
+                                    grid_cand["mechanism_support"] = {
+                                        "mechanism_support_state":
+                                            "VERIFICATION_ERROR",
+                                        "error": f"{type(_vexc).__name__}: "
+                                                 f"{_vexc}"[:200]}
+                            if c.get("_verification_blocked"):
+                                continue
                             # R401 resume-robustness: a grid candidate
                             # whose kill record already exists needs NO
                             # env_view (and NO re-burned per-candidate
@@ -1612,7 +1701,39 @@ class EngineRun:
                                           f"({c.get('provider_id')})",
                                 "span_underived": bool(
                                     (f.get("span_derivation") or {})
-                                    .get("underived"))})
+                                    .get("underived")),
+                                "mechanism_support_state": (
+                                    (_sup or {}).get(
+                                        "mechanism_support_state")
+                                    if _sup else "UNVERIFIED_NO_VIEW"),
+                                "discovery_verified": bool(
+                                    _sup and _sup.get(
+                                        "mechanism_support_state") in (
+                                        "SUPPORTED",
+                                        "PARTIALLY_SUPPORTED"))})
+                        grid_result["r137_verification"] = {
+                            "n_candidates_with_intervention": (
+                                _grid_verified + _grid_blocked
+                                + sum(1 for c in grid_result.get(
+                                    "candidates", [])
+                                    if (c.get("fields") or {}).get(
+                                        "intervention")
+                                    and not c.get("_verification_blocked")
+                                    and "mechanism_support" not in (
+                                        c.get("fields") or {}))),
+                            "n_verified": _grid_verified,
+                            "n_contested_blocked": _grid_blocked,
+                            "instrument": "mechanism_space."
+                                          "verify_mechanism_support "
+                                          "(the canonical instrument — "
+                                          "one authority, no second "
+                                          "evaluator)",
+                            "note": ("grid candidates now carry the same "
+                                     "per-candidate discovery verification "
+                                     "as lean-path candidates; a lexical "
+                                     "span score alone never establishes "
+                                     "scientific support")}
+                        self._persist("EXPLORATION_GRID.json", grid_result)
                     except Exception as exc:  # noqa: BLE001 — recorded, honest
                         import traceback as _tb
                         self._persist("EXPLORATION_GRID.json", {

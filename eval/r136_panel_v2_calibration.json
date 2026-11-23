@@ -1,9 +1,14 @@
 {
- "record": "R136_PANEL_V2_CALIBRATION/1.0.0",
- "claim": "c-0216",
+ "record": "R136_PANEL_V2_CALIBRATION/1.1.0 (the R137 instrument corrections applied)",
+ "claim": "c-0216 (tallied) / c-0218 (corrected)",
  "at": "2026-11-23 (sandbox clock)",
  "arm": "PANEL-V2 (the constraint line; prereg 2d1170f06)",
- "method": "the ENGINE rcal_qualification with the R136 FIXED expected-legs denominator + an independent recompute (same rule, separate code); the >=2-qualified guard before any panel-agreement number",
+ "authority": {
+  "pids_labels": "git show 009ce91a8:eval/auditor_judgments_r11_r5.json (the frozen r5 dataset \u2014 authoritative)",
+  "expected_legs": "PINNED 20 (10 frozen pairs x 2 orders), passed explicitly",
+  "judges": "all six preregistered judges represented; an absent judge scores 0/20",
+  "v1_source": "committed raw records: eval/r134_panel (dsr1,qw32b,qwen235b,dsv32,llama4mav) + eval/r135_panel (hy4f) \u2014 recomputed, no hard-coded baselines"
+ },
  "n_pairs": 10,
  "expected_legs_per_judge": 20,
  "judges": {
@@ -12,9 +17,11 @@
    "valid": 20,
    "expected_legs": 20,
    "answered_rate": 1.0,
+   "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
    "acc_vs_labels": 0.7,
    "hits": 7,
    "n_cmp": 10,
+   "missing_pids": [],
    "swap_instability": 0.3,
    "qualified": false
   },
@@ -23,9 +30,11 @@
    "valid": 20,
    "expected_legs": 20,
    "answered_rate": 1.0,
+   "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
    "acc_vs_labels": 0.6,
    "hits": 6,
    "n_cmp": 10,
+   "missing_pids": [],
    "swap_instability": 0.3,
    "qualified": false
   },
@@ -34,9 +43,11 @@
    "valid": 20,
    "expected_legs": 20,
    "answered_rate": 1.0,
+   "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
    "acc_vs_labels": 0.6,
    "hits": 6,
    "n_cmp": 10,
+   "missing_pids": [],
    "swap_instability": 0.2,
    "qualified": false
   },
@@ -45,21 +56,49 @@
    "valid": 20,
    "expected_legs": 20,
    "answered_rate": 1.0,
+   "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
    "acc_vs_labels": 0.9,
    "hits": 9,
    "n_cmp": 10,
+   "missing_pids": [],
    "swap_instability": 0.0,
    "qualified": true
   },
   "llama4mav": {
-   "legs": 17,
-   "valid": 17,
+   "legs": 20,
+   "valid": 20,
    "expected_legs": 20,
-   "answered_rate": 0.85,
-   "acc_vs_labels": 0.444,
-   "hits": 4,
-   "n_cmp": 9,
-   "swap_instability": 0.222,
+   "answered_rate": 1.0,
+   "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
+   "acc_vs_labels": 0.5,
+   "hits": 5,
+   "n_cmp": 10,
+   "missing_pids": [],
+   "swap_instability": 0.2,
+   "qualified": false
+  },
+  "hy4f": {
+   "legs": 0,
+   "valid": 0,
+   "expected_legs": 20,
+   "answered_rate": 0.0,
+   "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
+   "acc_vs_labels": null,
+   "hits": 0,
+   "n_cmp": 0,
+   "missing_pids": [
+    "bench-p02-leadacid-grid-corrosion",
+    "bench-p09-packaging-barrier",
+    "dev-fu-001-bearing-spalling",
+    "dev-fu-003-motor-insulation",
+    "dev-fu-005-bridge-bearing",
+    "eval-new01-supercap-dryout",
+    "eval-new02-slipring-predictor",
+    "eval-new04-chiller-fouling-predictor",
+    "eval-new05-liion-balance-drift",
+    "eval-new07-transformer-dga-predictor"
+   ],
+   "swap_instability": null,
    "qualified": false
   }
  },
@@ -117,15 +156,28 @@
    "qualified": true
   },
   "llama4mav": {
-   "legs": 17,
-   "valid": 17,
+   "legs": 20,
+   "valid": 20,
    "expected_legs": 20,
-   "answered_rate": 0.85,
+   "answered_rate": 1.0,
    "answered_rate_basis": "EXPECTED legs (the R136 fix; never legs-present)",
-   "acc_vs_labels": 0.444,
-   "hits": 4,
-   "n_cmp": 9,
-   "swap_instability": 0.222,
+   "acc_vs_labels": 0.5,
+   "hits": 5,
+   "n_cmp": 10,
+   "swap_instability": 0.2,
+   "vote_rule": "parity-drawn order votes; mirror = consistency check (swap_instability disclosed, never a vote-splitter)",
+   "qualified": false
+  },
+  "hy4f": {
+   "legs": 0,
+   "valid": 0,
+   "expected_legs": 20,
+   "answered_rate": 0.0,
+   "answered_rate_basis": "EXPECTED legs (the R136 fix; never legs-present)",
+   "acc_vs_labels": 0.0,
+   "hits": 0,
+   "n_cmp": 0,
+   "swap_instability": null,
    "vote_rule": "parity-drawn order votes; mirror = consistency check (swap_instability disclosed, never a vote-splitter)",
    "qualified": false
   }
@@ -138,58 +190,96 @@
   "deepseek"
  ],
  "panel": {
-  "guard": "TYPED REFUSAL (R136): fewer than 2 qualified judges — panel agreement undefined",
+  "guard": "TYPED REFUSAL (R136): fewer than 2 qualified judges \u2014 panel agreement undefined",
   "panel_agreement": null
  },
- "v1_vs_v2_delta_table": {
+ "v1_vs_v2_paired_common": {
   "dsr1": {
-   "v1_acc": 0.778,
-   "v2_acc": 0.7,
-   "delta": -0.078,
-   "note": "same judge, same labels, same vote rule"
+   "v1_n_total": 9,
+   "v2_n_total": 10,
+   "n_common": 9,
+   "v1_acc_common": 0.778,
+   "v2_acc_common": 0.667,
+   "paired_delta_common": -0.111,
+   "v1_sample_note": "v1 comparable n=9",
+   "v2_sample_note": "v2 comparable n=10 (['eval-new04-chiller-fouling-predictor'] absent from v1)",
+   "flipped_pids": [
+    "eval-new01-supercap-dryout"
+   ],
+   "comparability": "NOT DIRECTLY COMPARABLE \u2014 different samples; the paired delta is on the COMMON observations only (n=9)"
   },
   "qw32b": {
-   "v1_acc": 0.6,
-   "v2_acc": 0.6,
-   "delta": 0.0,
-   "note": "same judge, same labels, same vote rule"
+   "v1_n_total": 10,
+   "v2_n_total": 10,
+   "n_common": 10,
+   "v1_acc_common": 0.6,
+   "v2_acc_common": 0.6,
+   "paired_delta_common": 0.0,
+   "v1_sample_note": "v1 comparable n=10",
+   "v2_sample_note": "v2 comparable n=10",
+   "flipped_pids": [],
+   "comparability": "DIRECT (same comparable sample)"
   },
   "qwen235b": {
-   "v1_acc": 0.7,
-   "v2_acc": 0.6,
-   "delta": -0.1,
-   "note": "same judge, same labels, same vote rule"
+   "v1_n_total": 10,
+   "v2_n_total": 10,
+   "n_common": 10,
+   "v1_acc_common": 0.7,
+   "v2_acc_common": 0.6,
+   "paired_delta_common": -0.1,
+   "v1_sample_note": "v1 comparable n=10",
+   "v2_sample_note": "v2 comparable n=10",
+   "flipped_pids": [
+    "bench-p02-leadacid-grid-corrosion"
+   ],
+   "comparability": "DIRECT (same comparable sample)"
   },
   "dsv32": {
-   "v1_acc": 0.6,
-   "v2_acc": 0.9,
-   "delta": 0.3,
-   "note": "same judge, same labels, same vote rule"
+   "v1_n_total": 10,
+   "v2_n_total": 10,
+   "n_common": 10,
+   "v1_acc_common": 0.6,
+   "v2_acc_common": 0.9,
+   "paired_delta_common": 0.3,
+   "v1_sample_note": "v1 comparable n=10",
+   "v2_sample_note": "v2 comparable n=10",
+   "flipped_pids": [
+    "dev-fu-005-bridge-bearing",
+    "eval-new01-supercap-dryout",
+    "eval-new05-liion-balance-drift"
+   ],
+   "comparability": "DIRECT (same comparable sample)"
   },
   "llama4mav": {
-   "v1_acc": null,
-   "v2_acc": 0.444,
-   "delta": null,
-   "note": "llama4mav v1 was partial (n=4) — no legal v1 baseline"
+   "v1_n_total": 2,
+   "v2_n_total": 10,
+   "n_common": 2,
+   "v1_acc_common": 1.0,
+   "v2_acc_common": 0.5,
+   "paired_delta_common": -0.5,
+   "v1_sample_note": "v1 comparable n=2",
+   "v2_sample_note": "v2 comparable n=10 (['dev-fu-001-bearing-spalling', 'dev-fu-003-motor-insulation', 'dev-fu-005-bridge-bearing', 'eval-new01-supercap-dryout', 'eval-new02-slipring-predictor', 'eval-new04-chiller-fouling-predictor', 'eval-new05-liion-balance-drift', 'eval-new07-transformer-dga-predictor'] absent from v1)",
+   "flipped_pids": [
+    "bench-p02-leadacid-grid-corrosion"
+   ],
+   "comparability": "NOT DIRECTLY COMPARABLE \u2014 different samples; the paired delta is on the COMMON observations only (n=2)"
+  },
+  "hy4f": {
+   "v1_n_total": 10,
+   "v2_n_total": 0,
+   "n_common": 0,
+   "v1_acc_common": null,
+   "v2_acc_common": null,
+   "paired_delta_common": null,
+   "v1_sample_note": "v1 comparable n=10 (['bench-p02-leadacid-grid-corrosion', 'bench-p09-packaging-barrier', 'dev-fu-001-bearing-spalling', 'dev-fu-003-motor-insulation', 'dev-fu-005-bridge-bearing', 'eval-new01-supercap-dryout', 'eval-new02-slipring-predictor', 'eval-new04-chiller-fouling-predictor', 'eval-new05-liion-balance-drift', 'eval-new07-transformer-dga-predictor'] absent from v2)",
+   "v2_sample_note": "v2 comparable n=0",
+   "flipped_pids": [],
+   "comparability": "NOT DIRECTLY COMPARABLE \u2014 different samples; the paired delta is on the COMMON observations only (n=0)"
   }
  },
- "dir5_answered_100pct": {
-  "dsr1": true,
-  "qw32b": true,
-  "qwen235b": true,
-  "dsv32": true,
-  "llama4mav": false
- },
  "gate": {
-  "rcal": ">=3 judges acc>=0.8 AND answered>=0.9 (the FIXED denominator) from >=2 non-agnes families",
-  "outcome": "NOT_MET",
-  "then_agreement": null
+  "rcal": ">=3 judges acc>=0.8 AND answered>=0.9 from >=2 non-agnes families (bars UNCHANGED)",
+  "outcome": "NOT_MET"
  },
- "no_score_claims": true,
- "interim_state_typed": {
-  "state": "97/120 legs at window close (llama4mav 17/20 — 3 legs remain; hy4f 0/20 — the cent-ai legs did not start). The driver is BYTE-RESUME: the next window re-runs scripts/r136_panel_v2_driver.py hy4f llama4mav and only fetches the missing legs, then re-runs the tally.",
-  "the_headline": "dsv32 0.6 -> 0.9 (v1->v2, same judge/labels/rule; answered 1.0; swap_instability 0.0; QUALIFIED) — the FIRST judge above the 0.8 acc bar in nine judge-rounds; the constraint line is a REAL lift for the deepseek-V3.2 class. dsr1 0.778->0.7 (-0.078), qw32b 0.6->0.6, qwen235b 0.7->0.6 (-0.1) — the fix does not lift every family.",
-  "the_gate_at_interim": "NOT_MET — 1 qualified judge (dsv32) from 1 family; the >=2-qualified guard correctly TYPED-REFUSED the panel-agreement number; NO gate claim. The remaining legs (llama4mav 3 + hy4f 20) can only add candidates.",
-  "llama4mav_partial": "17/20 valid (acc 0.444 on n=9 cmp) — its R134 partial was 1.0 on n=4; the v2 reading is materially different and UNPROVEN until complete."
- }
+ "no_score_claims": true
 }
