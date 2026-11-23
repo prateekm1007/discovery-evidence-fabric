@@ -239,6 +239,64 @@ def _quote_present(text: str, quote: str, n_words: int = 8) -> bool:
     return " ".join(_re.findall(r"[a-z0-9]+", quote.lower())) in grams(text)
 
 
+def _frozen_fallback_items(frozen_items: List[Dict[str, Any]],
+                           mech: str, cap: int = 5) -> List[Dict[str, Any]]:
+    """R143S2 DIR-4 (the quote-anchored broadening, measured cause (a)):
+    the fresh enrichment retrieval returned ZERO records for 5 of 7
+    attempts in the r142 attempt-1 ledger ("no retrievable records"
+    typed) — the deterministic keyword index cannot see these
+    mechanisms. The run's FROZEN evidence is the quote source of last
+    resort: it is already in custody (identity-true by construction —
+    a binding to it resolves against the gate's own set), its text is
+    what the canonical verifier reads, and selecting from it needs no
+    retrieval at all. Deterministic term-overlap selection (the
+    mechanism's content words vs the record text, top-cap, score>0
+    only); the same lean-item shape the rest of the chain consumes.
+    No new framework (Art. 29): _verbatim_quote_anchors,
+    verify_mechanism_support and the R139 resolver are reused as-is."""
+    stop = {"the", "and", "for", "with", "that", "this", "from", "into",
+            "when", "then", "than", "thus", "such", "each", "any", "all",
+            "can", "may", "will", "are", "were", "has", "have", "its",
+            "their", "between", "which", "where", "while", "under",
+            "over", "after", "before", "during", "without", "within"}
+    words = [w for w in
+             "".join(ch if ch.isalnum() else " " for ch in mech.lower()
+                     ).split()
+             if len(w) > 3 and w not in stop]
+    if not words:
+        return []
+    scored = []
+    for it in (frozen_items or []):
+        if not isinstance(it, dict) or not it.get("id"):
+            continue
+        f = it.get("fields") or {}
+        _t = str((f.get("system") or {}).get("value")
+                 or it.get("title") or "")
+        _a = str((f.get("abstract") or {}).get("value")
+                 or it.get("abstract") or "")
+        _rt = f"{_t}. {_a}".strip() or str(it.get("_record_text") or "")
+        if not _rt:
+            continue
+        low = _rt.lower()
+        score = sum(1 for w in set(words) if w in low)
+        if score > 0:
+            scored.append((score, it, _t, _a, _rt))
+    scored.sort(key=lambda x: -x[0])
+    items = []
+    for _score, it, _t, _a, _rt in scored[:cap]:
+        items.append({
+            "id": it.get("id"),
+            "item_id": it.get("id"),
+            "content_hash": it.get("content_hash"),
+            "fields": {"system": {"value": _t},
+                       "abstract": {"value": _a},
+                       "mechanism": {"value": _rt},
+                       "observed_effect": {"value": _a}},
+            "source": it.get("source") or it.get("id"),
+            "_record_text": _rt})
+    return items
+
+
 def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                                  out_dir: Path,
                                  max_enrich: int = 3,
@@ -344,11 +402,22 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                     "source": rec.get("source") or rec.get("id"),
                     "_record_text": _rt})
             if not new_items:
-                attempt["outcome"] = (
-                    "STILL_UNGROUNDED (no retrievable records)")
-                c["enrichment_outcome"] = attempt["outcome"]
-                c["candidate_lifecycle"] = "HELD_UNGROUNDED"
-            else:
+                # R143S2 DIR-4 broadening (measured cause (a)): the
+                # fresh retrieval starved — fall back to the run's
+                # FROZEN evidence as the quote source (identity-true by
+                # construction; typed in the ledger, never silent).
+                fb = _frozen_fallback_items(frozen_items, mech) \
+                    if frozen_items else []
+                if fb:
+                    new_items = fb
+                    attempt["quote_source"] = "frozen_evidence_fallback"
+                    attempt["n_frozen_fallback_items"] = len(fb)
+                else:
+                    attempt["outcome"] = (
+                        "STILL_UNGROUNDED (no retrievable records)")
+                    c["enrichment_outcome"] = attempt["outcome"]
+                    c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+            if new_items:
                 attempt["n_structured_new_items"] = len(new_items)
                 # R142S1 CUSTODY JOIN (the structural consequence of
                 # merging the twin's FALSE_ID_FROZEN gate with the
@@ -492,6 +561,34 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                     b, _identity_pool)
                 if frozen_items is not None and not ok and str(reason).startswith("FALSE_ID"):
                     reason = ("FALSE_ID_FROZEN (the binding names no record in the run's FROZEN evidence set; it resolved only against the unfrozen enrichment snapshot)")
+                # R143S2 DIR-4 broadening (measured cause (b)): 2 of 7
+                # attempt-1 enrichment outcomes died at
+                # MALFORMED_BINDING (missing evidence_id or span) AFTER
+                # the support was verified PARTIALLY_SUPPORTED and the
+                # quote compliance PROVED the span verbatim in the
+                # regenerated text. The verbatim-compliant quote anchor
+                # IS the binding: evidence_id = the anchor's record, span
+                # = the anchor's quote (proven verbatim by the
+                # compliance check), content_hash = the record's hash.
+                # The repair is typed; without a verified quote the
+                # refusal stands (fail closed, unchanged).
+                if (not ok and str(reason).startswith("MALFORMED_BINDING")
+                        and quotes):
+                    _q0 = quotes[0]
+                    _it = next((x for x in new_items
+                                if str(x.get("id"))
+                                == str(_q0.get("record_id"))), None)
+                    if _it is not None:
+                        _rb = {"evidence_id": _it.get("id"),
+                               "span": _q0.get("quote"),
+                               "content_hash": _it.get("content_hash")}
+                        ok, reason, resolved = _resolve(
+                            _rb, _identity_pool)
+                        if ok:
+                            b = _rb
+                            attempt["binding_repair"] = {
+                                "from": "verbatim_quote_anchor",
+                                "record_id": _it.get("id")}
                 attempt["support_state"] = v.get(
                     "mechanism_support_state")
                 attempt["identity_resolution"] = reason
