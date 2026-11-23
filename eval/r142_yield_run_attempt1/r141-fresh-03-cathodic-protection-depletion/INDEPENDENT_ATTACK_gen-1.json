@@ -1,0 +1,343 @@
+{
+ "attack_version": "independent_attack/3.0.0",
+ "attack_purpose": "independent_attack",
+ "candidate_id": "inv:0b95cb81f5:gen1",
+ "generator_provider": "agnes",
+ "attacker_provider": "xkiro",
+ "attacker_model": "mistralai/ministral-14b",
+ "independence_mode": "SEPARATE_PROVIDER",
+ "independence_note": "the attacker ran on a different provider than the candidate's generator",
+ "prompt_hash": "9f9404c362c757bf18a3f7342eaaa56a2d3c419787df39b422751b66f621d046",
+ "output_hash": "c84a6d89b85c1ed7ac0367de034c1c903997ef0fee968c99adc9adc13cf517fb",
+ "llm_status": "OK",
+ "ring_pin": {
+  "requested": null,
+  "mode": "PRODUCTION_CASCADE",
+  "served_provider": "xkiro",
+  "served_model": "mistralai/ministral-14b",
+  "pin_status": null,
+  "note": "the sealed-corpus measurement pins the attacker ring so the instrument is measured on the ring it declares (rules x ring); production attacks keep the availability cascade"
+ },
+ "attacked_at": "2026-11-23T19:35:48+00:00Z",
+ "items": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate assumes exponential decay of current distribution along the pipeline is *solely* governed by coating conductance per unit length, ignoring **soil resistivity heterogeneity**, **stray current interference**, and **electrochemical noise**—all of which can dominate attenuation in 1970s coal-tar enamel systems. The claim that \"well-preserved mid-section coating acts as a high-resistance barrier\" is **unverifiable without soil resistivity profiles** and **coating defect mapping**, yet the candidate provides no evidence of their uniformity or measurement. The predicted 15% rectifier cu",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: coating, defect, electrochemical, provided)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'preserved mid section coating' (field: mechanism)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <no defect density or soil resistivity data provided; candidate claims \"exponential decay\" without citing soil/coating parameters> | SCOPE <boundary condition violates \"no trenching, no ex",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "verdict": "KILL",
+   "basis": "The intervention violates the **no trenching** constraint by implicitly requiring **underground anode bed preparation** (4 kg magnesium anodes at 6 m depth demand backfilled soil with controlled resistivity, which cannot be achieved without excavation or pre-drilling). The claim \"no trenching\" is **false**—deep-drive anodes require **soil displacement or compaction**, which alters local resistivity and invalidates the \"no exposure\" premise. GROUNDED_IN: RECORD \"Install two deep-drive magnesium anode grounds (4 kg each, 6 m deep)\" | SCOPE <boundary condition explicitly forbids trenching/exposur",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Protection-Oriented Assessment of Machine Learning-Based Fault Detection in Power Systems' (strong overlap: false, with)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'drive magnesium anode grounds' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Install two deep-drive magnesium anode grounds (4 kg each, 6 m deep)\" | SCOPE <boundary condition explicitly forbids trenching/exposure, but deep-drive anodes require soil modification>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "verdict": "ABSTAIN",
+   "basis": "The candidate cites **no cathodic protection (CP) field data** for coal-tar enamel pipelines, yet claims a **predictable 0.13 V potential shift** (−0.72 V → ≤−0.85 V) within 48 h. The held evidence ([doi:10.1016/j.bioelechem.2026.109489]) demonstrates that **SRB biofilm activity** (common in gas pipelines) **increases current demand by 30–100%** under cathodic polarization—directly contradicting the candidate’s assumption of a **fixed \"holiday-drain deficit\"**. The 72 h test prediction is **invalid** because biofilm growth would **dynamically alter current requirements**, making the −0.80 V th",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1016/j.bioelechem.2026.109489",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0.13', '0.72', '0.85', '48', '10.1016', '2026.109489']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'from 72 to 85' (field: predicted_effect)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE <doi:10.1016/j.bioelechem.2026.109489> | RECORD \"Predicted effect: Pipe-to-soil potential at both far ends shifts from −0.72 V to ≤−0.85 V within 48 h\" | COMPUTATION <candidate ignores 30–100",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "verdict": "KILL",
+   "basis": "The baseline (status quo) already employs **test stations for potential monitoring**—the candidate’s intervention **adds no new capability** beyond what exists. The claim that \"local anodes supply only the holiday-drain deficit\" is **circular**: if the deficit is unknown, the anode placement (30 m from terminals) is **arbitrary** and could **worsen protection** by creating **undermatched current zones**. The <15% rectifier current increase is **indistinguishable from natural variation** in CP systems without A/B testing. GROUNDED_IN: RECORD \"connected in parallel to the existing negative bus v",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: defect, from, potential, protection)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['30', '15']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in parallel to the' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"connected in parallel to the existing negative bus via existing test stations\" | COMPUTATION <no comparison to baseline current draw or defect mapping provided>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "verdict": "KILL",
+   "basis": "Magnesium anodes (4 kg each) in **parallel** will **rapidly deplete** due to **galvanic competition**, especially in **low-resistivity soils** (common near pipelines). The candidate provides **no anode life modeling**—industry standards (NACE SP0169) require **sacrificial anode life >20 years**; magnesium anodes in parallel **fail in <5 years** under high current demand. The 6 m depth is **insufficient** for deep-drive anodes in **clay-rich soils** (resistivity <10 Ω·m), where **anode bed collapse** or **passivation** occurs. GROUNDED_IN: COMPUTATION <no anode life calculation; 4 kg Mg in para",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: under, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['4', '0169', '20', '5', '6', '10']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <no anode life calculation; 4 kg Mg in parallel violates NACE SP0169 life expectancy> | SCOPE <boundary condition \"no trenching\" conflicts with required anode bed stability>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "MEASUREMENT_AMBIGUITY",
+   "verdict": "ABSTAIN",
+   "basis": "The **72 h test prediction** relies on **anode-to-soil potential >+0.5 V** as proof of function, but this metric is **irrelevant**—**anode current output** (not potential) determines protection efficacy. The candidate **fails to specify** whether the test includes **current interruption (CIG) or close-interval potential survey (CIPS)** to validate current distribution. The −0.80 V threshold is **arbitrary**—NACE standards require **−0.85 V vs. CSE for steel in soil**, but the candidate **ignores pH, temperature, or microbial activity** that shift this value. GROUNDED_IN: RECORD \"if potentials ",
+   "grounding": {
+    "grounded": false,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: microbial, potential, potentials, protection)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['72', '0.5', '0.80', '0.85', '0.80', '0.5']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'measured anode to soil' (field: testable_prediction)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"if potentials remain above −0.80 V despite confirmed anode function (measured anode-to-soil potential >+0.5 V)\" | COMPUTATION <anode potential >+0.5 V does not guarantee current output; no CIG",
+    "absence_ground": true,
+    "demotion_reason": "the asserted ground is an ABSENCE of evidence/support — absence is uncertainty, not failure (Art. XXI.3/XXV); the objection is preserved and escalated, never executed as a kill"
+   },
+   "demoted_from": "KILL",
+   "demotion_layer": "v2_grounding"
+  }
+ ],
+ "intervention_suggestions": [
+  {
+   "attack_class": "MECHANISM_FAILURE",
+   "suggestion": "Replace magnesium anodes with **high-silicon cast iron (HSCI) anodes** (designed for parallel operation) and **model soil resistivity along the pipeline** to validate exponential decay assumption. GROUNDED_IN: EVIDENCE <doi:10.1177/1478422x241278895> | COMPUTATION <HSCI anodes have 20+ year life in parallel; resistivity mapping required to justify decay model>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1177/1478422x241278895",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['10.1177', '1478422', '241278895', '20']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE <doi:10.1177/1478422x241278895> | COMPUTATION <HSCI anodes have 20+ year life in parallel; resistivity mapping required to justify decay model>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "suggestion": "Use **shallow (1–1.5 m) distributed anodes** with **pre-installed anode beds** (no trenching) and **conductive backfill** (e.g., bentonite-cement mix) to meet \"no exposure\" while ensuring anode-soil contact. GROUNDED_IN: SCOPE <1.5 m depth avoids deep-drive constraints; conductive backfill replaces excavation>",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Mixed-Integer Optimization for Bio-Inspired Robust Power Network Design' (strong overlap: constraints, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['1', '1.5', '1.5']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "SCOPE <1.5 m depth avoids deep-drive constraints; conductive backfill replaces excavation>",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "EVIDENCE_CONTRADICTION",
+   "suggestion": "Integrate **real-time SRB activity sensors** (e.g., electrochemical noise probes) into the test protocol to **adjust anode output dynamically** and validate the −0.85 V target against biofilm-induced demand. GROUNDED_IN: EVIDENCE <doi:10.1016/j.bioelechem.2026.109489> | RECORD \"predicted effect\" (must account for SRB variability)",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "record id doi:10.1016/j.bioelechem.2026.109489",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['0.85', '10.1016', '2026.109489']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "EVIDENCE <doi:10.1016/j.bioelechem.2026.109489> | RECORD \"predicted effect\" (must account for SRB variability)",
+    "absence_ground": false
+   },
+   "class": "GROUNDED_INTERVENTION",
+   "authority": "usable as a directional-loop SEED only (the DirectionalHypothesis ground gate still adjudicates any hypothesis built on it)"
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "suggestion": "Conduct **baseline CIPS survey** before intervention to **map",
+   "grounding": {
+    "grounded": false,
+    "bindings": [],
+    "claimed_ground": null,
+    "absence_ground": false,
+    "demotion_reason": "no evidence / computation / record / declared-scope binding found in the kill basis — a bare assertion carries no verdict authority (Art. XVIII); the objection is preserved and escalated"
+   },
+   "class": "UNGROUND_SUGGESTION",
+   "authority": "NONE — an ungrounded suggestion is preserved for human/escalation review and NEVER enters the hypothesis space (R450 §10: the attacker does not get authority to invent causal explanations)"
+  }
+ ],
+ "state": "ATTACK_RUN",
+ "overall": "KILLED",
+ "kill_basis": [
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The intervention violates the **no trenching** constraint by implicitly requiring **underground anode bed preparation** (4 kg magnesium anodes at 6 m depth demand backfilled soil with controlled resistivity, which cannot be achieved without excavation or pre-drilling). The claim \"no trenching\" is **false**—deep-drive anodes require **soil displacement or compaction**, which alters local resistivity and invalidates the \"no exposure\" premise. GROUNDED_IN: RECORD \"Install two deep-drive magnesium anode grounds (4 kg each, 6 m deep)\" | SCOPE <boundary condition explicitly forbids trenching/exposur",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Protection-Oriented Assessment of Machine Learning-Based Fault Detection in Power Systems' (strong overlap: false, with)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'drive magnesium anode grounds' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Install two deep-drive magnesium anode grounds (4 kg each, 6 m deep)\" | SCOPE <boundary condition explicitly forbids trenching/exposure, but deep-drive anodes require soil modification>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The baseline (status quo) already employs **test stations for potential monitoring**—the candidate’s intervention **adds no new capability** beyond what exists. The claim that \"local anodes supply only the holiday-drain deficit\" is **circular**: if the deficit is unknown, the anode placement (30 m from terminals) is **arbitrary** and could **worsen protection** by creating **undermatched current zones**. The <15% rectifier current increase is **indistinguishable from natural variation** in CP systems without A/B testing. GROUNDED_IN: RECORD \"connected in parallel to the existing negative bus v",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: defect, from, potential, protection)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['30', '15']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in parallel to the' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"connected in parallel to the existing negative bus via existing test stations\" | COMPUTATION <no comparison to baseline current draw or defect mapping provided>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Magnesium anodes (4 kg each) in **parallel** will **rapidly deplete** due to **galvanic competition**, especially in **low-resistivity soils** (common near pipelines). The candidate provides **no anode life modeling**—industry standards (NACE SP0169) require **sacrificial anode life >20 years**; magnesium anodes in parallel **fail in <5 years** under high current demand. The 6 m depth is **insufficient** for deep-drive anodes in **clay-rich soils** (resistivity <10 Ω·m), where **anode bed collapse** or **passivation** occurs. GROUNDED_IN: COMPUTATION <no anode life calculation; 4 kg Mg in para",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: under, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['4', '0169', '20', '5', '6', '10']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <no anode life calculation; 4 kg Mg in parallel violates NACE SP0169 life expectancy> | SCOPE <boundary condition \"no trenching\" conflicts with required anode bed stability>",
+    "absence_ground": false
+   }
+  }
+ ],
+ "counts": {
+  "KILL": 3,
+  "RISK": 0,
+  "SURVIVE": 0,
+  "ABSTAIN_DEMOTED": 3,
+  "INVALID": 0
+ }
+}

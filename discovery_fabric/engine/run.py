@@ -308,14 +308,19 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
             # prose alone starved the deterministic keyword-form
             # retrieval (the v2 desal enrichment attempts returned ZERO
             # records — "no retrievable records" typed). The query now
-            # carries the mechanism terms PLUS the problem's
-            # failure_mode + domain (the same fields the main retrieval
-            # uses) — still deterministic, no new framework.
+            # carries the problem's failure_mode + domain terms FIRST
+            # and the mechanism terms after (the R142 measured reorder:
+            # attempt-1's queries were dominated by the mechanism's
+            # abstract operator slugs within the [:6] truncation —
+            # Europe PMC returned NO_RESULTS for jargon like "same
+            # three arm differential observability anchor"; the
+            # concrete domain vocabulary is what the index actually
+            # carries). Still deterministic, no new framework.
             _ctx = " ".join(
                 str(problem.get(k) or "") for k in
                 ("failure_mode", "domain")).strip()
             fresh = _ev.retrieve_fresh_evidence(
-                problem, {"mechanism": f"{mech} {_ctx}".strip()},
+                problem, {"mechanism": f"{_ctx} {mech}".strip()},
                 snapshot_version="enrichment")
             attempt["retrieval_status"] = fresh.get("status")
             attempt["retrieval_query"] = fresh.get("query")
