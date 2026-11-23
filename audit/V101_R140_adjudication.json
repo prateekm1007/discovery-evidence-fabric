@@ -1,0 +1,60 @@
+{
+ "record": "V101_R140_ADJUDICATION/1.0.0",
+ "audited": {
+  "claim": "c-0222",
+  "session": "builder-r121s1-3e8a41d7",
+  "sha": "bd2ec4f2a",
+  "window": "R140 close"
+ },
+ "checked": [
+  {
+   "item": "DIR-2 c-0220 closure",
+   "result": "VERIFIED",
+   "evidence": "the probes re-run BYTE-IDENTICAL (f2f97e15ba52ef17); the flip contract holds (P1-P4/P9 refused, P5/P6 admitted verbatim-distinct, P7/P8 refused); the HVAC 3/3 typed SYNTHETIC_ALIAS_REFUSED fail-closed; the grounding tests 25/25"
+  },
+  {
+   "item": "the citation-identity integration (DIR-6)",
+   "result": "VERIFIED",
+   "evidence": "the import + the classify call site (evidence_classification.py:54/:269) grepped at bd2ec4f2a; tests/test_citation_identity.py 10/10 incl. the determinism test; the module ledger honest"
+  },
+  {
+   "item": "the panel R-CAL honesty (DIR-3)",
+   "result": "VERIFIED",
+   "evidence": "the independent recompute from the 60 raw legs vs the frozen r5 winners: dsr1 7/10, dsv32 9/10 (qualified), qw32b 6/10, qwen235b 6/10, llama4mav 5/10, hy4f 7/9 — matches the committed calibration exactly; 1 qualified judge < 3; the multiple-testing refusal lawful; the new-pairs request filed"
+  },
+  {
+   "item": "the census + read-depth (DIR-7)",
+   "result": "VERIFIED",
+   "evidence": "the builder quoted the moved-tip bytes (106/16/V100 at 6dc15be1d) and typed the directions' 97/39 divergence; the audit branch not mutated by the builder"
+  },
+  {
+   "item": "commit scope + the prune (DIR-8)",
+   "result": "PARTIAL",
+   "evidence": "the close commits are work_id-scoped (5 files, no UI churn); causal_correctness.py back at the head (R140-F1)"
+  },
+  {
+   "item": "secrets",
+   "result": "CLEAN",
+   "evidence": "tree 0 / messages 0 hits (the single match = the scanner's own AWS-EXAMPLE test fixture)"
+  },
+  {
+   "item": "CI",
+   "result": "GREEN",
+   "evidence": "bd2ec4f2a -> run 137850076028 completed success (API-read); R139S3-F4 CLOSED"
+  },
+  {
+   "item": "Art. 27",
+   "result": "ACCEPTED-WITH-TYPE",
+   "evidence": "0 engine / 137 total lines in the close window — governance-only with the typed exception; the engine share lives in the V100-audited twin lane (35-42%)"
+  }
+ ],
+ "score": 7,
+ "no_score_change": true,
+ "score_rationale": "the grounding-integrity gate is real now (the P1 defect repaired, independently reproducible) but the capability bars ahead (P4 >=50%, R-CAL >=3 judges, v16, P5 rediscovery) are unmet — no score movement until a capability bar clears",
+ "next_gates": [
+  "P4: >=50% viable+non-obvious by the calibrated panel",
+  "R-CAL: >=3 qualified judges (acc>=0.8 AND answered>=0.9) from >=2 non-agnes families on NEW auditor-authored sealed pairs; agreement>=0.7, alpha>=0.6, AUC>=0.8",
+  "v16: GRANTED mean>=3.3, CI lower>3.0, 0/0/0; v15->v16 >=3.3",
+  "P5 rediscovery: >=40% recovery, 0 canary, >=1 T1+T2 validated"
+ ]
+}
