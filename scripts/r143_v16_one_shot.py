@@ -37,7 +37,8 @@ import r40_machine_v77 as m77  # noqa: E402
 
 OUT = REPO / "eval" / "holdout_v16_generation"
 OUT.mkdir(exist_ok=True)
-EXECUTOR_ID = "builder-r121s1@holdout-v16-generation"
+EXECUTOR_ID = __import__("os").environ.get(
+    "V16_EXECUTOR_ID", "builder-r121s1@holdout-v16-generation")
 AUDIT_REF = "origin/audit/r11-auditor-verdict-20261114"
 PROBLEMS_PATH = "eval/holdout_v16/problems.json"
 PREREG_PATH = "eval/holdout_v16/PREREG.json"
