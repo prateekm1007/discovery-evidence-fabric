@@ -32,7 +32,8 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
-OUT = REPO / "eval" / "r142_yield_run"
+OUT = REPO / __import__("os").environ.get(
+    "R142_OUT", "eval/r142_yield_run")
 OUT.mkdir(exist_ok=True)
 
 # the R141S1 committed fresh four (byte-identical problems) + one NEW
@@ -184,6 +185,21 @@ def main() -> int:
                     _walk(v)
 
         _walk(freeze)
+        # R142S1: the acceptance's custody authority includes the
+        # enrichment snapshots (Art. XLIV: new evidence -> new snapshot
+        # -> new freeze; the identity gate resolves against the run's
+        # FULL custody — the frozen GEN-1 set + the hash-pinned
+        # enrichment snapshots, all committed bytes)
+        _snap_path = out_dir / "ENRICHMENT_SNAPSHOT.json"
+        if _snap_path.exists():
+            try:
+                _snap = json.loads(_snap_path.read_text())
+                for it in (_snap.get("items") or []):
+                    if it.get("id") and it.get("id") not in seen:
+                        seen.add(it["id"])
+                        frozen.append(it)
+            except Exception:
+                pass
 
         detail, n_adm, n_grounded, n_bad = [], 0, 0, 0
         for c in cands:

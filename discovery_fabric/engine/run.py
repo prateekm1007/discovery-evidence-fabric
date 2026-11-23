@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
 import os
 import re
 from pathlib import Path
@@ -349,6 +350,73 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                 c["candidate_lifecycle"] = "HELD_UNGROUNDED"
             else:
                 attempt["n_structured_new_items"] = len(new_items)
+                # R142S1 CUSTODY JOIN (the structural consequence of
+                # merging the twin's FALSE_ID_FROZEN gate with the
+                # enrichment path): the identity gate resolves against
+                # the run's evidence custody — fresh records that stay
+                # outside it make EVERY enrichment binding identity-
+                # false by construction (the yield bar unreachable).
+                # The lawful path (Art. XLIV: new evidence -> new
+                # snapshot -> new freeze, never a silent merge): the
+                # fresh items JOIN the run's evidence custody as a
+                # typed, hash-pinned snapshot — persisted as
+                # ENRICHMENT_SNAPSHOT.json (ids + content_hashes +
+                # snapshot_hash) AND appended to the custody list the
+                # gate reads (frozen_items is the caller's live list
+                # reference). A binding naming a record absent from
+                # custody is STILL refused (the twin's false-id hole
+                # stays closed); a binding naming a custody-joined
+                # snapshot record resolves identity-true from committed
+                # bytes (the acceptance recompute walks the snapshot).
+                _snap_path = Path(out_dir) / "ENRICHMENT_SNAPSHOT.json"
+                _snap = {"record": "ENRICHMENT_SNAPSHOT/1.0.0",
+                         "snapshot_version": fresh.get(
+                             "snapshot_version", "enrichment"),
+                         "retrieved_at": fresh.get("retrieved_at"),
+                         "query": fresh.get("query"),
+                         "items": [{"id": it["id"],
+                                    "content_hash": it["content_hash"],
+                                    "title": (it["fields"]["system"]
+                                              or {}).get("value"),
+                                    "abstract": (it["fields"]["abstract"]
+                                                 or {}).get("value")}
+                                   for it in new_items]}
+                _snap["snapshot_hash"] = hashlib.sha256(json.dumps(
+                    _snap["items"], sort_keys=True).encode(
+                        "utf-8")).hexdigest()
+                _existing = []
+                if _snap_path.exists():
+                    try:
+                        _existing = (json.loads(
+                            _snap_path.read_text(encoding="utf-8"))
+                            .get("items") or [])
+                    except Exception:
+                        _existing = []
+                _have = {str(x.get("id")) for x in _existing}
+                _added = [it for it in _snap["items"]
+                          if str(it.get("id")) not in _have]
+                if _added:
+                    _snap["items"] = _existing + _added
+                    _snap["snapshot_hash"] = hashlib.sha256(json.dumps(
+                        _snap["items"], sort_keys=True).encode(
+                            "utf-8")).hexdigest()
+                    try:
+                        _snap_path.write_text(
+                            json.dumps(_snap, indent=1) + "\n",
+                            encoding="utf-8")
+                    except Exception:
+                        pass
+                if frozen_items is not None:
+                    _custody_ids = {str(x.get("id"))
+                                    for x in frozen_items if
+                                    isinstance(x, dict)}
+                    for it in new_items:
+                        if str(it.get("id")) not in _custody_ids:
+                            frozen_items.append(dict(it))
+                attempt["custody_join"] = {
+                    "snapshot_hash_16": _snap["snapshot_hash"][:16],
+                    "n_items_in_snapshot": len(_snap["items"]),
+                    "n_new_this_attempt": len(_added)}
                 # R142 DIR-3 (the quote-anchored re-generation — the
                 # typed v3 next-capability): re-verifying the SAME
                 # paraphrase text can never fire the verbatim binding
