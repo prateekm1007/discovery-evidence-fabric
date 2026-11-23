@@ -85,11 +85,24 @@ def test_07_malformed_binding_refused():
     assert not ok and "MALFORMED_BINDING" in reason
 
 
-def test_08_alias_corrected_to_real_record():
+def test_08_synthetic_alias_refused():
+    # R139S3 (V99 + the DIR-2 acceptance contract): the R138-era
+    # "lean_" synthetic alias is REFUSED, never de-aliased — the
+    # stage-1 ALIAS_CORRECTED tolerance is deleted. A binding that
+    # names the alias is refused as SYNTHETIC_ALIAS_REFUSED.
     ok, reason, rec = _resolve_binding_identity(
         _binding(evidence_id="lean_doi:10.1080/x"), _recs())
-    assert ok and rec["id"] == "doi:10.1080/x"  # never the alias
-    assert "ALIAS_CORRECTED" in reason
+    assert not ok and rec is None
+    assert "SYNTHETIC_ALIAS_REFUSED" in reason
+
+
+def test_10_binding_hash_missing_refused():
+    # R139S3: the binding MUST carry its own content_hash — the
+    # stage-1 "(if present)" loophole admitted hash-less bindings
+    # (the R139S2 verifier probe P2 measured the admission).
+    ok, reason, _ = _resolve_binding_identity(
+        _binding(content_hash=None), _recs())
+    assert not ok and "UNKNOWN_HASH" in reason
 
 
 def test_09_empty_frozen_set_refused():

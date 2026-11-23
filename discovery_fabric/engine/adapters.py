@@ -1289,17 +1289,16 @@ def _resolve_binding_identity(binding: Dict[str, Any],
       2. The id must match EXACTLY ONE frozen record's id. Zero matches
          -> FALSE_ID. More than one -> AMBIGUOUS_ID (duplicate ids make
          the identity undecidable; unknown stays unknown).
-      3. The R138-era synthetic alias ("lean_" prefix) is de-aliased to
-         the real id and re-resolved — typed ALIAS_CORRECTED; the alias
-         itself is never admitted as an identity.
+      3. The R138-era synthetic alias ("lean_" prefix) is REFUSED
+         (SYNTHETIC_ALIAS_REFUSED — R139S3/V99: an alias is never a
+         source identity; the stage-1 de-alias tolerance is deleted).
       4. The span must appear IN the resolved record's text (the same
          normalized token form the binding instrument uses) — a span
          that names record A's id while quoting other bytes is refused
          as SPAN_NOT_IN_RECORD.
-      5. The record must carry a content_hash and the binding's
-         content_hash (if present) must EQUAL it; a record with NO
-         hash, or a binding hash that disagrees, is refused
-         (UNKNOWN_HASH / HASH_MISMATCH) — identity is proven by bytes,
+      5. BOTH the record and the BINDING must carry a content_hash and
+         they must be EQUAL (UNKNOWN_HASH on either absence,
+         HASH_MISMATCH on disagreement) — identity is proven by bytes,
          not by name (Art. 1: exact bytes beat semantic plausibility).
 
     PARTIALLY_SUPPORTED stays visibly distinct from direct support:
@@ -1318,15 +1317,18 @@ def _resolve_binding_identity(binding: Dict[str, Any],
                    and str(it.get("id") or it.get("item_id") or "") == rec_id]
         return matches
 
-    alias_corrected = False
     matches = _find(eid)
-    if not matches and eid.startswith("lean_"):
-        # the R138 synthetic alias — resolve the REAL record id
-        real_id = eid[len("lean_"):]
-        matches = _find(real_id)
-        alias_corrected = bool(matches)
-        if matches:
-            eid = real_id
+    if eid.startswith("lean_"):
+        # R139S3 (V99 + the DIR-2 acceptance contract): the R138-era
+        # "lean_" synthetic alias is REFUSED, never de-aliased — the
+        # stage-1 de-alias tolerated the alias by silently swapping in
+        # the real id, but a synthetic alias is not a source identity
+        # and the auditor's acceptance requires its refusal. The
+        # binding must name the ACTUAL frozen record id.
+        return False, (
+            f"SYNTHETIC_ALIAS_REFUSED ({eid!r} is an R138-era synthetic "
+            "alias, not a source identity — name the actual frozen "
+            "record id)"), None
     if not matches:
         return False, f"FALSE_ID (no frozen record named {eid!r})", None
     if len(matches) > 1:
@@ -1349,24 +1351,27 @@ def _resolve_binding_identity(binding: Dict[str, Any],
             "SPAN_NOT_IN_RECORD (the quoted span does not appear in "
             f"record {eid!r}'s text)"), None
 
-    # hash identity: the record must carry a hash; the binding's hash
-    # (when present) must equal it
+    # hash identity: the record must carry a hash AND the binding must
+    # carry one — identity is proven by bytes, not by name (Art. 1);
+    # a binding without its own hash cannot prove it names THESE bytes
     r_hash = (rec.get("content_hash")
               or (rec.get("provenance") or {}).get("content_hash"))
     if not r_hash:
         return False, (
             f"UNKNOWN_HASH (record {eid!r} carries no content_hash — "
             "identity unprovable by bytes, fail closed)"), None
-    if b_hash and str(b_hash) != str(r_hash):
+    if not b_hash:
+        return False, (
+            f"UNKNOWN_HASH (the binding names {eid!r} but carries no "
+            "content_hash — the stage-1 '(if present)' loophole is "
+            "closed: R139S3 requires the binding's own hash)"), None
+    if str(b_hash) != str(r_hash):
         return False, (
             f"HASH_MISMATCH (binding hash {str(b_hash)[:12]}... != "
             f"record hash {str(r_hash)[:12]}...)"), None
-    reason = "RESOLVED (exactly-one record; span-in-record; hash match)"
-    if alias_corrected:
-        reason = ("ALIAS_CORRECTED (the R138 'lean_' synthetic alias "
-                  f"resolved to the real record {eid!r})")
-    return True, reason, {"id": eid, "content_hash": str(r_hash),
-                          "record_text": rec_text}
+    return True, ("RESOLVED (exactly-one record; span-in-record; "
+                  "binding-hash == record-hash)"), {
+        "id": eid, "content_hash": str(r_hash), "record_text": rec_text}
 
 
 def apply_lifecycle_admission(retained: List[Dict[str, Any]],
@@ -1381,8 +1386,8 @@ def apply_lifecycle_admission(retained: List[Dict[str, Any]],
     Retention on distinctness is NOT admission. Admission requires
     BOTH:
       - a RESOLVED identity (R139: exactly-one frozen record by id,
-        span-in-record, hash match — synthetic aliases de-aliased,
-        typed), AND
+        span-in-record, binding-hash == record-hash — synthetic
+        aliases REFUSED per R139S3/V99), AND
       - the canonical support verdict (SUPPORTED or
         PARTIALLY_SUPPORTED — visibly distinct, recorded verbatim).
     Everything else is UNGROUNDED_HYPOTHESIS: retained (never
@@ -1853,7 +1858,13 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                "n_retained": len(retained)})
     verifications = [_ms.verify_mechanism_support(c, items, problem)
                      for c in retained]
-    apply_lifecycle_admission(retained, verifications, items)
+    # R139S3: the resolver sees the RAW frozen record set (env.evidence),
+    # NOT the deduped lean view — the lean build collapses duplicate
+    # record ids in its by-id dict, which made a duplicate-id frozen
+    # set silently resolvable (the stage-1 P9 gap). Duplicate ids must
+    # stay visible to identity resolution: AMBIGUOUS_ID, fail closed.
+    apply_lifecycle_admission(retained, verifications,
+                              list(env.evidence or []))
     _clk.mark("mechanism_support_verification",
               {"support_states": [
                   (v.get("mechanism_support_state")
