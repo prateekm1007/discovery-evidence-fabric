@@ -65,6 +65,44 @@ FRESH = [
          "repairs only at scheduled service windows",
          "device of record: 4 MW, 150 m rotor onshore turbine"],
      "split": "R141_FRESH"},
+    {"problem_id": "r141-fresh-03-cathodic-protection-depletion",
+     "device": "buried natural-gas transmission pipeline (36-inch, "
+               "coal-tar enamel coating, 1970s vintage)",
+     "failure": "cathodic protection potential cannot be maintained "
+                "at the far ends of the protected section; coating "
+                "holidays drain current and the pipe-to-soil "
+                "potential reads -0.72 V instead of -0.85 V",
+     "failure_mode": "cathodic protection under-protection at range",
+     "constraint": "no pipeline excavation permitted; rectifier "
+                   "power budget fixed",
+     "domain": "pipeline-integrity",
+     "question": "What engineering change, intervention, or design "
+                 "would prevent or mitigate the stated failure?",
+     "user_variables": [
+         "no pipeline excavation permitted",
+         "rectifier power budget fixed",
+         "device of record: 36-inch coal-tar enamel transmission "
+         "pipeline"],
+     "split": "R141_FRESH"},
+    {"problem_id": "r141-fresh-04-chiller-fouling-capacity-droop",
+     "device": "water-cooled centrifugal chiller plant (2 x 1,200 "
+               "tons, cooling tower shared)",
+     "failure": "condenser tube fouling from tower-water scale "
+                "raises condensing temperature and drops plant "
+                "capacity 11% at peak load with 22% higher kW/ton",
+     "failure_mode": "condenser scaling efficiency loss",
+     "constraint": "water treatment chemistry already optimized "
+                   "(provider-managed); shutdown windows limited to "
+                   "48 hours annually",
+     "domain": "hvac-plants",
+     "question": "What engineering change, intervention, or design "
+                 "would prevent or mitigate the stated failure?",
+     "user_variables": [
+         "water treatment chemistry fixed by provider",
+         "48-hour annual shutdown window",
+         "device of record: 2 x 1,200-ton water-cooled chiller "
+         "plant"],
+     "split": "R141_FRESH"},
 ]
 
 
