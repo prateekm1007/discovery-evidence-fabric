@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""r142s2_verifier_recompute — the R142S2 VERIFIER lane (claim c-0229,
+"""r142s2_verifier_recompute — the R142S2 VERIFIER lane (claim c-0230,
 session builder-r142s2; Art. 29(c): the verifier never re-runs the
 sealed or the live work — it recomputes from committed bytes).
 
