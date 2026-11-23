@@ -586,6 +586,16 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                             _rb, _identity_pool)
                         if ok:
                             b = _rb
+                            # the SAVED support object must carry the
+                            # repaired binding too — the acceptance
+                            # recompute re-resolves
+                            # mechanism_support.evidence_binding from
+                            # the candidate record; leaving v's
+                            # malformed binding there re-types the
+                            # identity-true candidate as bad at
+                            # acceptance time (the measured desal
+                            # dac04a51047f case, r143 yield run 1)
+                            v["evidence_binding"] = _rb
                             attempt["binding_repair"] = {
                                 "from": "verbatim_quote_anchor",
                                 "record_id": _it.get("id")}

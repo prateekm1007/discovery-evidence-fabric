@@ -33,7 +33,7 @@ sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
 OUT = REPO / __import__("os").environ.get(
-    "R142_OUT", "eval/r142_yield_run")
+    "R143_OUT", "eval/r143_yield_run")
 OUT.mkdir(exist_ok=True)
 
 # the R141S1 committed fresh four (byte-identical problems) + one NEW
