@@ -1,6 +1,6 @@
 {
  "record": "R133_MODULE_INTEGRATION_LEDGER/1.0.0 (DIR 8)",
- "method": "import-graph evidence: grep over discovery_fabric/ scripts/ tests/ eval/ for each module's importers; the CI surface list (.github/workflows/r11_queue_surface.yml) decides LIVE vs HISTORICAL for tests; Art. 16 accounting for every prune (reason + successor)",
+ "method": "import-graph evidence: grep over discovery_fabric/ scripts/ tests/ eval/ for each module's importers; the CI surface list (.github/workflows/r11_queue_surface.yml) decides LIVE vs HISTORICAL for tests; Art. 16 accounting for every prune (reason + successor) \u2014 CORRECTED at close: the import-graph surface MUST include .github/workflows/*.yml (the CI steps are live consumers; missing this cost one red push, disclosed in the retirement ledger's corrections)",
  "modules": [
   {
    "name": "GEPA (gepa-ai/gepa reflective-mutation library)",
@@ -28,15 +28,15 @@
   },
   {
    "name": "AIDE (agentic tree search) \u2014 engine/aide_tree_search.py (305 lines)",
-   "status": "PRUNED THIS WINDOW (the dead-weight prune, >=1 required): ZERO engine importers (only historical r95/r96/r97 scripts, which are not on any live path); its test (tests/test_r95_aide_tree_search.py) is NOT in the CI surface list. The P3 roadmap names 'AIDE-style ONLY now' for best-first search \u2014 the successor is a NEW engine implementation IF the P3 optimizer lane re-opens; the current P3 state (score 7 carried, BoN adopted) does not use it.",
+   "status": "PRUNED THIS WINDOW (the dead-weight prune, >=1 required): ZERO engine importers (only historical r95/r96/r97 scripts, which are not on any live path); its test (tests/test_r95_aide_tree_search.py) is NOT in the CI surface list. The P3 roadmap names 'AIDE-style ONLY now' for best-first search \u2014 the successor is a NEW engine implementation IF the P3 optimizer lane re-opens; the current P3 state (score 7 carried, BoN adopted) does not use it. \u2014 CONFIRMED at close: the workflow's r95/r97 references are the tool-grounded-critic tests (a different module); no aide_tree_search consumer exists in the workflow",
    "importers": "scripts/r95_flip_c0110.py, r95_claim_c0110.py, r96/r97_v12_one_shot.py (historical, not in CI); tests/test_r95_aide_tree_search.py (NOT in the CI list)",
    "decision": "PRUNE \u2014 retire with accounting; git history preserves the bytes; successor = a fresh engine implementation when the P3 optimizer lane re-opens (the direction's 're-authorize per P3 via AI-Scientist-v2 agentic tree search OR prune' resolves to PRUNE for this window)"
   },
   {
    "name": "repair_convergence \u2014 engine/repair_convergence.py (315 lines)",
-   "status": "PRUNED THIS WINDOW: ZERO engine importers (scripts/r93_convergence_ablation.py historical; tests/test_r93_repair_convergence.py NOT in the CI surface list). The convergence-ablation question it served closed at R93.",
-   "importers": "scripts/r93_convergence_ablation.py (historical); tests/test_r93_repair_convergence.py (not in CI)",
-   "decision": "PRUNE \u2014 retire with accounting; git history preserves the bytes"
+   "status": "KEEP (UN-RETIRED at close \u2014 the census missed the CI workflow consumer): the workflow's R93 dry-run step (scripts/r93_convergence_ablation.py) imports it every push; restored in the fix-forward after the close push 6c5c36ea8 went red",
+   "importers": "scripts/r93_convergence_ablation.py (LIVE: CI workflow step 9 runs its dry-run every push) + tests/test_r93_repair_convergence.py",
+   "decision": "KEEP \u2014 live CI consumer (the census method now includes the workflow file)"
   },
   {
    "name": "evolution \u2014 engine/evolution.py (906 lines)",
@@ -52,6 +52,6 @@
   "Gitee AI ecosystem": "NOT INTEGRATED \u2014 monitor item (same)",
   "note": "the monitor items carry NO import-graph evidence by definition (external platforms not yet reachable from the sandbox); they stay typed as monitor, never as integrated"
  },
- "prune_execution": "aide_tree_search.py + repair_convergence.py MOVED to eval/retired_modules/ (preserved bytes, out of the engine import surface \u2014 the engine/__init__ does not import them; the historical scripts that reference them are already not on any live path and are left untouched (their committed bytes are history)); retirement_ledger entry appended",
+ "prune_execution": "aide_tree_search.py PRUNED (confirmed: no workflow consumer; the r95/r97 workflow tests are the tool-grounded critic, not the tree search); repair_convergence.py prune REVERSED (the workflow's R93 dry-run step is a live consumer)",
  "at": "2026-11-23 (sandbox clock)"
 }
