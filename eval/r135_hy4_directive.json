@@ -1,0 +1,23 @@
+{
+ "record": "R135_HY4_DIRECTIVE/1.0.0",
+ "claim": "c-0214",
+ "base": "3e3a0a00b",
+ "at": "2026-11-23 (sandbox clock)",
+ "the_owner_directives": [
+  "a new cent-ai.dev key (settings page) with the instruction 'Put this key in huggingface vault'",
+  "use the HY4 model",
+  "the follow-up pins the lane: hy4-flash:free"
+ ],
+ "custody_execution": {
+  "env_vault": ".env.keys (gitignored, verified): CENT_AI_API_KEY (digest a5beece70d05, len 47) + CENT_AI_BASE_URL (https://api.cent-ai.dev/v1, digest 9eb06a0caddd after the base fix)",
+  "hf_vault": "prateekm1/operator-keys-vault (the Art. 17 v3.3.0 private vault): CENT_AI_API_KEY + CENT_AI_BASE_URL uploaded base64 + sha256_12 (the F74 scanner convention — raw tokens are structurally rejected even on private repos); restore-path VERIFIED byte-identical (decode + digest + value ==)",
+  "secret_grep": "0 repo-wide (the key appears nowhere committed)"
+ },
+ "the_probe_findings": {
+  "api_surface": "the API host is api.cent-ai.dev (OpenAI-compatible /v1); the apex cent-ai.dev Cloudflare-bans non-browser UAs (error 1010) — the BROWSER_UA rule is typed in the transport",
+  "hy4_models": "hy4-flash:free + hy4-preview on the /v1/models roster (49 models total)",
+  "hy4_flash_free": "a REASONING model: reasoning_content (thinking) + content (final); the reasoning is unbounded and budgets FIRST (a 4000-token call burned all 4000 on reasoning, content empty, finish=length); reasoning-effort controls NOT honored (reasoning_effort / reasoning.enabled / enable_thinking all ignored); the free lane's upstream times out ~90s into a generation (503 upstream_timeout, congestion-variable: identical payloads succeeded at 28-57s and 503'd within the same window); short/medium calls are fast and clean (2-9s)",
+  "the_transport": "engine cent_ai_chat (typed refusals: missing_key, auth, rate_limited, upstream_timeout, length_no_content, empty_content, malformed_response); the driver uses the budget ladder 4000->8000->12000 + patient retries for the 503 class"
+ },
+ "no_score_claims": true
+}

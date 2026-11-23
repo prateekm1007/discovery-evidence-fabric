@@ -560,6 +560,99 @@ def registered_route() -> Dict[str, Any]:
     return dict(ROUTE_REGISTRY["registered"])
 
 
+# ---------------------------------------------------------------------------
+# cent-ai (the R135 owner directive: the cent-ai.dev key in the vault +
+# "use HY4"; the owner's follow-up pinned the lane: hy4-flash:free).
+# The transport is OpenAI-compatible on api.cent-ai.dev/v1 with a
+# BROWSER User-Agent (the apex host Cloudflare-bans non-browser UAs
+# with error 1010 — measured). hy4-flash:free is a REASONING model:
+# the reply carries reasoning_content (thinking) + content (the final
+# text); the reasoning is unbounded and burns the generation budget
+# FIRST, and the free lane's upstream times out around ~90s of
+# generation — the caller uses a patient retry ladder (the upstream
+# congestion is variable: identical payloads succeeded at 28-57s and
+# 503'd at 90s within the same window).
+# ---------------------------------------------------------------------------
+def cent_ai_chat(messages: List[dict], model: str = "hy4-flash:free",
+                 max_tokens: int = 4000, timeout_s: float = 300.0,
+                 api_key: Optional[str] = None,
+                 api_base: Optional[str] = None,
+                 temperature: float = 0.0) -> Dict[str, Any]:
+    """One cent-ai call (the R135 owner directive). OpenAI-compatible
+    chat/completions on api.cent-ai.dev (the vault's CENT_AI_BASE_URL
+    is the API base, /v1 included). Typed refusals: missing_key,
+    degenerate_input, auth, rate_limited, upstream_timeout (the
+    measured free-lane 503 class), http_<code>, transport,
+    malformed_response, length_no_content (the reasoning burned the
+    whole budget — the caller retries with a larger budget)."""
+    key = api_key if api_key is not None else \
+        resolve_vault_key("CENT_AI_API_KEY")
+    if not key:
+        raise RouteRefused("missing_key", "cent_ai",
+                           "no CENT_AI_API_KEY in the vault (env-only, "
+                           "digests-only — Art. 17 custody)")
+    if not messages:
+        raise RouteRefused("degenerate_input", "cent_ai",
+                           "empty messages (typed refusal, F67)")
+    base = (api_base if api_base is not None else
+            resolve_vault_key("CENT_AI_BASE_URL")
+            or "https://api.cent-ai.dev/v1").rstrip("/")
+    body = json.dumps({"model": model, "messages": messages,
+                       "max_tokens": max_tokens,
+                       "temperature": temperature}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{base}/chat/completions", data=body, method="POST",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json",
+                 "User-Agent": BROWSER_UA})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout_s) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = e.read().decode("utf-8")[:180]
+        except Exception:  # noqa: BLE001
+            pass
+        kind = {401: "auth", 403: "auth", 429: "rate_limited",
+                503: "upstream_timeout"}.get(e.code, f"http_{e.code}")
+        raise RouteRefused(kind, "cent_ai",
+                           f"HTTP {e.code}: {detail}") from e
+    except Exception as e:  # noqa: BLE001
+        raise RouteRefused("transport", "cent_ai",
+                           f"{type(e).__name__}: {str(e)[:140]}") from e
+    try:
+        choice = data["choices"][0]
+        message = choice.get("message") or {}
+        text = str(message.get("content") or "")
+        usage = data.get("usage") or {}
+        reasoning = message.get("reasoning_content") or ""
+    except (KeyError, IndexError, TypeError) as e:
+        raise RouteRefused("malformed_response", "cent_ai",
+                           f"missing {e} in the envelope") from e
+    if not text.strip():
+        finish = choice.get("finish_reason")
+        if finish == "length" or (usage.get("completion_tokens") or 0) \
+                >= max_tokens:
+            raise RouteRefused(
+                "length_no_content", "cent_ai",
+                f"reasoning burned the budget (completion="
+                f"{usage.get('completion_tokens')} >= max_tokens="
+                f"{max_tokens}, reasoning chars={len(reasoning)}) — "
+                "retry with a larger budget")
+        raise RouteRefused("empty_content", "cent_ai",
+                           f"finish={finish} with empty content")
+    return {"content": text, "reasoning": reasoning,
+            "model": data.get("model", model),
+            "finish_reason": choice.get("finish_reason"),
+            "usage": {"prompt_tokens": usage.get("prompt_tokens"),
+                      "completion_tokens": usage.get("completion_tokens"),
+                      "reasoning_tokens": (
+                          (usage.get("completion_tokens_details")
+                           or {}).get("reasoning_tokens"))},
+            "raw": data}
+
+
 def require_registered_model(model: str) -> None:
     """Typed guard: a generation ledger that claims the registered
     route must carry the registered id (never a silently swapped
@@ -578,6 +671,6 @@ def require_registered_model(model: str) -> None:
 
 __all__ = ["ROUTE_ADAPTER_VERSION", "ROUTE_REGISTRY", "RouteRefused",
            "resolve_vault_key", "xkiro_chat", "agnes_chat",
-           "bedrock_converse", "hf_router_chat",
+           "bedrock_converse", "hf_router_chat", "cent_ai_chat",
            "registered_route", "require_registered_model",
            "BROWSER_UA", "REASONING_HEADROOM"]
