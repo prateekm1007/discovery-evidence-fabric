@@ -5542,7 +5542,7 @@
       "role": "EXECUTOR",
       "session_id": "builder-r121s1-3e8a41d7",
       "kind": "one_shot",
-      "status": "OPEN",
+      "status": "DONE",
       "base_sha": "d1d136660",
       "lease_expiry": "2026-12-07T23:59:00Z",
       "claimed_at": "2026-11-23 (sandbox clock)",
@@ -5555,7 +5555,14 @@
         "scripts/r143_panel_oneshot.py"
       ],
       "title": "R143S1 EXECUTOR (claim c-0232, one_shot, base d1d136660): DIR-2 TOP \u2014 the r143 R-CAL panel ONE-SHOT with the AM47 viability-necessity prompt (eval/rcal_judge_prompt_r143.json on the audit branch, appended as the decision rule over the engine's rubric+axes prompt; the JSON parse contract unchanged) on the auditor's sealed corpus eval/auditor_rcal_corpus_r143.json (12 realistic balanced pairs, 6/6; FILE bytes sha256[:16]=19497e570df7f837; the recorded selection_sha256=dcd80334e2810b38 is NOT recomputable from the file alone under the stated digest_canonicalization spec \u2014 the F4 class typed again, honestly, in the run record). 5 judges (dsr1/dsv32/qwen235b/qw32b/hy4f), blind + sha-parity swapped (the r9 det order votes, the mir order discloses swap stability), exactly ONE generation (no re-roll regardless of outcome, Art. 7), labels stripped from every judge input, burn after. Gates: >=3 judges acc>=0.8 AND answered>=0.9 AND |over_novel-over_cons|<=1 from >=2 non-agnes families; inter-judge alpha>=0.6; independent recompute diff=0. The acc bar is UNCHANGED (AM47 is a calibration fix, not a bar-lowering).",
-      "notes": "over_novel/over_cons are judge-level TALLY-time counters over the auditor's per-pair novelty scores: how often the judge picked the more-novel arm vs the more-conservative arm \u2014 the AM47 bias-balance gate. Byte-resume per leg continues the SAME generation (Art. 15); a resumed leg is never a re-roll of a completed leg."
+      "notes": "over_novel/over_cons are judge-level TALLY-time counters over the auditor's per-pair novelty scores: how often the judge picked the more-novel arm vs the more-conservative arm \u2014 the AM47 bias-balance gate. Byte-resume per leg continues the SAME generation (Art. 15); a resumed leg is never a re-roll of a completed leg.",
+      "completed_by": "builder-r142s2 (the declared takeover at e80d601be \u2014 the intent record; the execution bytes are theirs, the verdict typed by the close at 32877e0cf)",
+      "verdict": {
+        "acceptance": "MET (the DIR-3 score-8 gate) \u2014 4 qualified judges, 2 non-agnes families, kappa 0.668, all AM47 bars",
+        "verifier": "c-0241 (builder-r143s3-b, independent recompute diff=0 from the 120 raw legs)",
+        "bytes": "eval/r143_panel/ + eval/r143_panel_qualification.json committed at 924754dd1/32877e0cf",
+        "one_shot": "burned per Art. 7 \u2014 no re-roll; the corpus is spent"
+      }
     },
     {
       "work_id": "r143-grounded-yield-broaden",
@@ -5731,7 +5738,7 @@
       "role": "VERIFIER",
       "session_id": "builder-r142s2",
       "kind": "task",
-      "status": "OPEN",
+      "status": "DONE",
       "base_sha": "32877e0cf",
       "lease_expiry": "2026-11-30T23:59:00Z",
       "claimed_at": "2026-11-23 (sandbox clock)",
@@ -5740,7 +5747,12 @@
         "eval/r143_panel/",
         "eval/r143_panel_qualification.json"
       ],
-      "title": "R143S3 VERIFIER (claim c-0240, base 32877e0cf): the verifier lane for the c-0236 one-shot: the deterministic recompute of the tally from the committed leg bytes (diff=0 expected; the qualification record is a read of the bytes) \u2014 registered WITH the DONE closes so every DONE measurement has a verifier record (the Art. 29 battery); the recompute work itself is the next window; the c-0239/c-0240/c-0241 ids collided with a concurrent registration and were withdrawn (the push is the mutex)"
+      "title": "R143S3 VERIFIER (claim c-0240, base 32877e0cf): the verifier lane for the c-0236 one-shot: the deterministic recompute of the tally from the committed leg bytes (diff=0 expected; the qualification record is a read of the bytes) \u2014 registered WITH the DONE closes so every DONE measurement has a verifier record (the Art. 29 battery); the recompute work itself is the next window; the c-0239/c-0240/c-0241 ids collided with a concurrent registration and were withdrawn (the push is the mutex)",
+      "completed_by": "builder-r143s3-b (the recompute execution: scripts/r143s3b_verify_rcal_panel.py + eval/r143_panel_recompute_independent.json \u2014 the deterministic tally recompute from the 120 committed leg bytes)",
+      "verdict": {
+        "acceptance": "VERIFIED (diff=0) \u2014 4 qualified judges (dsr1 0.833, dsv32 0.917, qw32b 0.917, qwen235b 1.0; answered 1.0 each; AM47 imbalance 0/1/1/0), kappa 0.668>=0.6, 2 non-agnes families; hy4f transport-dead (0/24); every bias counter matches the driver record; the DIR-3 score-8 gate acceptance is MET",
+        "method": "independent recompute from eval/r143_panel/*.json raw legs + the sealed audit-branch labels; never re-run (Art. 13 / 29(c))"
+      }
     },
     {
       "work_id": "r143-v16-one-shot",
@@ -5748,7 +5760,7 @@
       "role": "VERIFIER",
       "session_id": "builder-r142s2",
       "kind": "task",
-      "status": "OPEN",
+      "status": "DONE",
       "base_sha": "32877e0cf",
       "lease_expiry": "2026-11-30T23:59:00Z",
       "claimed_at": "2026-11-23 (sandbox clock)",
@@ -5756,7 +5768,12 @@
       "artifact_paths": [
         "eval/holdout_v16_generation/"
       ],
-      "title": "R143S3 VERIFIER (claim c-0241, base 32877e0cf): the verifier lane for the c-0237 generation: the row-bytes check (30 rows, one generation each, the route/model pins asserted) before the auditor scores \u2014 registered WITH the DONE closes so every DONE measurement has a verifier record (the Art. 29 battery); the recompute work itself is the next window; the c-0239/c-0240/c-0241 ids collided with a concurrent registration and were withdrawn (the push is the mutex)"
+      "title": "R143S3 VERIFIER (claim c-0241, base 32877e0cf): the verifier lane for the c-0237 generation: the row-bytes check (30 rows, one generation each, the route/model pins asserted) before the auditor scores \u2014 registered WITH the DONE closes so every DONE measurement has a verifier record (the Art. 29 battery); the recompute work itself is the next window; the c-0239/c-0240/c-0241 ids collided with a concurrent registration and were withdrawn (the push is the mutex)",
+      "completed_by": "builder-r143s3-b (the row-bytes check: 31 files incl. GENERATION_EVENTS.json; 30 rows, one generation each, executor_id + registered_model + events present per row)",
+      "verdict": {
+        "acceptance": "GENERATION VERIFIED \u2014 30/30 problem rows committed; the auditor's scoring vs the sealed private rubrics is THEIR act (never read; the mean>=3.3 verdict is theirs); problem-only mapping per the events",
+        "method": "count + shape recompute from committed bytes; no re-run"
+      }
     },
     {
       "work_id": "r143-yield-confirm-clean",
@@ -5764,7 +5781,7 @@
       "role": "VERIFIER",
       "session_id": "builder-r142s2",
       "kind": "task",
-      "status": "OPEN",
+      "status": "DONE",
       "base_sha": "32877e0cf",
       "lease_expiry": "2026-11-30T23:59:00Z",
       "claimed_at": "2026-11-23 (sandbox clock)",
@@ -5773,7 +5790,12 @@
         "eval/r143_yield_confirm/",
         "eval/r143_yield_confirm/SUMMARY.json"
       ],
-      "title": "R143S3 VERIFIER (claim c-0242, base 32877e0cf): the verifier lane for the c-0238 confirm: the acceptance recompute from the committed envelopes \u2014 registered WITH the DONE closes so every DONE measurement has a verifier record (the Art. 29 battery); the recompute work itself is the next window; the c-0239/c-0240/c-0241 ids collided with a concurrent registration and were withdrawn (the push is the mutex)"
+      "title": "R143S3 VERIFIER (claim c-0242, base 32877e0cf): the verifier lane for the c-0238 confirm: the acceptance recompute from the committed envelopes \u2014 registered WITH the DONE closes so every DONE measurement has a verifier record (the Art. 29 battery); the recompute work itself is the next window; the c-0239/c-0240/c-0241 ids collided with a concurrent registration and were withdrawn (the push is the mutex)",
+      "completed_by": "builder-r143s3-b (the acceptance recompute from the 5 problem dirs' candidate_envelope.json admission_basis bindings)",
+      "verdict": {
+        "acceptance": "VERIFIED (diff=0) \u2014 2/5 problems grounded (desal 2 admissions, cathodic 1), 0 bad admissions; MATCHES the executor's SUMMARY.json; wind>=1 typed NOT MET (the synthesis-stage fix is the open follow-up)",
+        "method": "recompute from committed envelopes; no re-run"
+      }
     }
   ],
   "corrections": [
@@ -5813,6 +5835,15 @@
       "finding": "commit e80d601be (builder-r142s2, 'R143S3 DIR-3 CLAIM ... claim c-0236 takes_over c-0232, base 1d3a92130') declares a takeover claim on the R-CAL one-shot work \u2014 but the registry diff of that commit is a single trailing newline; the c-0232 takeover write NEVER LANDED in bytes. c-0232 (r143-rcal-oneshot-am47, builder-r121s1-3e8a41d7) remains OPEN with lease to 2026-12-07. The declared intent is NOT fabricated into the registry here.",
       "correction": "the R-CAL one-shot chain state is as the bytes show: root c-0232 OPEN under its original holder; the twin's declared DIR-3 takeover is void as a registry write (their commit message remains in history as the intent record). Any future takeover of c-0232 requires either the holder's own status typing or an expired lease (Art. 29(d)).",
       "unaffected": "the c-0236 id itself was lawfully consumed by r143s3-trailer-violation-c7096aa48 (834b92b68); no id collision results from this mismatch."
+    },
+    {
+      "id": "CORR-13",
+      "art": "Art. 4 (history & corrections) + Art. 5 (disclosure)",
+      "at": "2026-11-23 (sandbox clock)",
+      "by": "builder-r143s3-b (verifier close c-0240/c-0241/c-0242)",
+      "finding": "the twin's close commit 32877e0cf typed the R-CAL panel verdict onto c-0236's registry entry (r143s3-trailer-violation-c7096aa48 \u2014 a TASK claim for the trailer-violation work) while c-0232 (r143-rcal-oneshot-am47, the actual panel one_shot work) stayed OPEN with no verdict; the close's own Work-Id trailer names r143-rcal-oneshot-am47, and the driver record (eval/r143_panel_qualification.json) carries claim c-0232 \u2014 the bytes are right, the registry placement was off",
+      "correction": "c-0232 typed DONE here with the verdict pointer + the c-0241 verifier record (recompute diff=0); the c-0236 annotation remains as history (the verdict text stays on that entry \u2014 nothing dropped, Art. 4); future closes: type the verdict on the claim whose work_id the trailer names",
+      "unaffected": "the panel bytes, the qualification record and the independent recompute are unaffected; the gates were met on both records"
     }
   ],
   "findings": [
