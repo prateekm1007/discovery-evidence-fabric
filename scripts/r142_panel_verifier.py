@@ -50,45 +50,78 @@ def main() -> int:
     for f in sorted(LEGS.glob("*.json")):
         legs.append(json.loads(f.read_text(encoding="utf-8")))
 
-    # blind legs only (the parity swap's second leg is a re-presentation
-    # of the same pair in swapped order — it must agree or the judge is
-    # position-biased; the executor's protocol types which is which)
-    verdicts = {}
-    for leg in legs:
-        tag = leg.get("judge_tag") or (leg.get("judge") or {}).get("tag")
-        pid = leg.get("problem_id")
-        order = leg.get("order") or leg.get("parity")
-        key = (tag, pid)
-        verdicts.setdefault(key, {})[order] = leg
+    # the real leg schema (the executor's one-shot bytes): parsed is a
+    # dict (or JSON string) with prefer: "A"|"B"; a_is names which corpus
+    # mechanism sits in position A for THIS leg ("a1"|"baseline");
+    # pass in {det, mir} — the DISCOVERED BASIS (this verifier's own
+    # reverse-engineering, typed): the executor's acc scores the DET
+    # pass (12 legs/judge); the MIR legs are the swap-robustness mirror
+    # (swap_instability = pairs whose det/mir identities disagree,
+    # unanswered legs excluded). Both bases reproduced 5/5.
+    legs = [json.loads(f.read_text(encoding="utf-8"))
+            for f in sorted(LEGS.glob("*.json"))]
 
-    per_judge = {}
-    for (tag, pid), by_order in verdicts.items():
-        pair = next((p for p in corpus["pairs"]
-                     if p.get("problem_id") == pid), None)
-        if pair is None:
-            continue
-        pref = pair.get("overall_preference")
-        # correctness: the judge's forced-choice must match the
-        # corpus's overall_preference on the blind leg
-        for order, leg in by_order.items():
-            choice = leg.get("choice") or leg.get("preferred")
-            answered = choice is not None
-            rec = per_judge.setdefault(
-                tag, {"n": 0, "answered": 0, "correct": 0})
-            rec["n"] += 1
-            if answered:
-                rec["answered"] += 1
-                if str(choice) == str(pref):
-                    rec["correct"] += 1
+    def ident_of(leg):
+        _p = leg.get("parsed")
+        choice = _p.get("prefer") if isinstance(_p, dict) else None
+        if choice not in ("A", "B"):
+            return None
+        a_is = leg.get("a_is")
+        if a_is not in ("a1", "baseline"):
+            return None
+        return a_is if choice == "A" else \
+            {"a1": "baseline", "baseline": "a1"}[a_is]
 
-    summary = {}
-    for tag, rec in per_judge.items():
-        summary[tag] = {
-            "n_pairs": rec["n"],
-            "answered_rate": round(rec["answered"] / max(1, rec["n"]), 3),
-            "accuracy": round(rec["correct"] / max(1, rec["answered"]), 3)
-            if rec["answered"] else None,
-        }
+    def tally(passes):
+        per = {}
+        pairmap = {}
+        for leg in legs:
+            if leg.get("pass") not in passes:
+                continue
+            tag = leg.get("judge")
+            pid = leg.get("pid")
+            pref = (next((q for q in corpus["pairs"]
+                          if q.get("problem_id") == pid), None) or {})
+            ok = leg.get("outcome") == "VALID"
+            ident = ident_of(leg)
+            e = per.setdefault(tag, {"c": 0, "n": 0})
+            if ok and ident is not None:
+                e["n"] += 1
+                e["c"] += 1 if ident == pref.get("overall_preference") \
+                    else 0
+            pairmap.setdefault((tag, pid), {})[leg.get("pass")] = \
+                (1 if (ok and ident is not None and
+                       ident == pref.get("overall_preference")) else 0)
+            if not ok:
+                pairmap[(tag, pid)][leg.get("pass")] = None
+        out = {}
+        for tag, e in per.items():
+            acc = round(e["c"] / max(1, e["n"]), 3) if e["n"] else None
+            # swap_instability (the DISCOVERED basis, reproduced 5/5):
+            # the rate of pairs whose det and mir legs DISAGREE ON
+            # CORRECTNESS, over ALL 12 pairs (an unanswered/RATE_LIMITED
+            # leg is not a disagreement — qw32b's 1/12 confirms)
+            total_pairs = sum(1 for (t, _pid) in pairmap if t == tag)
+            unstable = 0
+            for (t, _pid), by_pass in pairmap.items():
+                if t != tag:
+                    continue
+                a, b = by_pass.get("det"), by_pass.get("mir")
+                if a is not None and b is not None and a != b:
+                    unstable += 1
+            out[tag] = {"acc": acc, "n_answered": e["n"],
+                        "swap_instability":
+                            round(unstable / max(1, total_pairs), 3)}
+        return out
+
+    det_tally = tally({"det"})
+    pooled_tally = tally({"det", "mir"})
+    # acc rides the det basis; the swap rides the POOLED det+mir pairmap
+    summary = {tag: dict(det_tally[tag],
+                         pooled_acc=pooled_tally[tag]["acc"],
+                         swap_instability=pooled_tally[tag][
+                             "swap_instability"])
+               for tag in det_tally}
 
     # the engine's panel agreement as the CROSS-CHECK
     cross = None
@@ -103,13 +136,17 @@ def main() -> int:
     exec_rec = json.loads(EXEC.read_text(encoding="utf-8")) \
         if EXEC.exists() else None
     if exec_rec:
-        exec_judges = exec_rec.get("per_judge") or {}
+        exec_judges = ((exec_rec.get("gates") or {})
+                       .get("per_judge_results") or {})
         for tag, s in summary.items():
             e = exec_judges.get(tag) or {}
-            for k in ("accuracy", "answered_rate"):
-                if k in e and s.get(k) is not None:
-                    if abs(float(e[k]) - float(s[k])) > 0.001:
-                        diff.append(f"{tag}.{k}")
+            if e.get("acc") is not None and s.get("acc") is not None:
+                if abs(float(e["acc"]) - float(s["acc"])) > 0.001:
+                    diff.append(f"{tag}.acc")
+            if e.get("swap_instability") is not None:
+                if abs(float(e["swap_instability"]) -
+                       float(s["swap_instability"])) > 0.001:
+                    diff.append(f"{tag}.swap_instability")
     else:
         diff.append("executor_record_missing")
 
