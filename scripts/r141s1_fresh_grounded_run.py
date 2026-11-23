@@ -17,6 +17,7 @@ rail-vehicles, building-services, subsea-oil-gas — and from the HVAC
 family). Byte-resume per problem like the R138 driver.
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -113,20 +114,24 @@ def main() -> int:
     from discovery_fabric.engine.adapters import _resolve_binding_identity
 
     summary = []
-    for prob in FRESH:
+    only = os.environ.get("R141_ONLY")
+    pkg = bool(int(os.environ.get("R141_WITH_PACKAGE", "0") or 0))
+    for prob in ([q for q in FRESH if q["problem_id"] == only]
+                 if only else FRESH):
         pid = prob["problem_id"]
-        outfile = OUT / f"{pid}.json"
+        tag = "package" if pkg else "mech"
+        outfile = OUT / f"{pid}.{tag}.json"
         if outfile.exists():  # byte-resume
             summary.append(json.loads(outfile.read_text()))
-            print(f"{pid}: resumed from the committed record", flush=True)
+            print(f"{pid}[{tag}]: resumed", flush=True)
             continue
-        out_dir = OUT / pid
+        out_dir = OUT / f"{pid}.{tag}" if pkg else OUT / pid
         out_dir.mkdir(exist_ok=True)
         t0 = time.monotonic()
         print(f"=== R141S1 LIVE RUN {pid} ...", flush=True)
         run = EngineRun(
             dict(prob), str(out_dir),
-            run_id=f"r141-{pid}",
+            run_id=f"r141-{pid}-{tag}",
             package_registry_path=str(
                 out_dir / "PACKAGE_ID_REGISTRY.json"),
             with_package=False, resume=False)
@@ -202,7 +207,7 @@ def main() -> int:
             "n_frozen_records": len(frozen),
             "detail": detail,
         }
-        rec = {"run_id": f"r141-{pid}",
+        rec = {"run_id": f"r141-{pid}-{tag}",
                "problem": {"problem_id": pid, "domain": prob["domain"]},
                "engine_manifest": manifest,
                "acceptance": acceptance}
