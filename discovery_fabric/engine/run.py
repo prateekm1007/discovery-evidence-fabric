@@ -162,6 +162,82 @@ def ms_pool_admission_split(ms_candidates: Any) -> tuple:
     return admissible, ungrounded
 
 
+def _verbatim_quote_anchors(items: List[Dict[str, Any]],
+                            mech_text: str,
+                            n_words: int = 8,
+                            max_quotes: int = 2) -> List[Dict[str, Any]]:
+    """R142 DIR-3 (the quote-anchored re-generation): extract VERBATIM
+    >=n-word spans from the retrieved records that TOPICALLY overlap
+    the hypothesis's mechanism terms — the anchor the regeneration
+    step must reproduce word-for-word so the canonical verbatim
+    binding can fire (the measured v3 cause: paraphrase-only
+    hypotheses never contain an 8-word verbatim span, so the
+    binding instrument cannot fire; re-verifying the SAME text can
+    never fix that — the TEXT must be re-generated from the quote).
+
+    Normalization-identical with mechanism_space's binding gram
+    search (lowercase [a-z0-9]+ tokens), but the span is SLICED FROM
+    THE RAW record text (character offsets over the raw string) so
+    the emitted quote is a genuine verbatim substring. Quotes are
+    ranked by content-word overlap with the hypothesis (topical
+    anchor, never a random span)."""
+    import re as _re
+    toks_m = [t for t in _re.findall(r"[a-z0-9]+",
+                                     str(mech_text or "").lower())]
+    if len(toks_m) < 3:
+        return []
+    stop = {"the", "a", "an", "of", "to", "and", "in", "on", "for",
+            "with", "by", "from", "at", "is", "are", "be", "was",
+            "were", "that", "this", "it", "as", "or", "can", "will",
+            "when", "into", "than", "then", "its", "their"}
+    mech_set = set(toks_m) - stop
+    if not mech_set:
+        return []
+    quotes = []
+    for it in (items or []):
+        if not isinstance(it, dict):
+            continue
+        raw = " ".join(str(it.get(k) or "") for k in
+                       ("title", "abstract", "text", "content",
+                        "summary", "_record_text")).strip()
+        if not raw:
+            continue
+        # token -> (start, end) character offsets over the RAW text
+        spans = [(m.group(), m.start(), m.end())
+                 for m in _re.finditer(r"[A-Za-z0-9]+", raw)]
+        toks = [s[0].lower() for s in spans]
+        if len(toks) < n_words:
+            continue
+        best = None
+        for i in range(len(toks) - n_words + 1):
+            gram = toks[i:i + n_words]
+            overlap = len(set(gram) - stop & mech_set)
+            # topical overlap (content words shared with the
+            # hypothesis); require at least 2 shared content words
+            if overlap >= 2 and (best is None or overlap > best[0]):
+                best = (overlap, i)
+        if best is None:
+            continue
+        i = best[1]
+        quote = raw[spans[i][1]:spans[i + n_words - 1][2]]
+        quotes.append({
+            "record_id": str(it.get("id") or it.get("item_id") or ""),
+            "quote": quote, "overlap": best[0]})
+    quotes.sort(key=lambda q: -q["overlap"])
+    return quotes[:max_quotes]
+
+
+def _quote_present(text: str, quote: str, n_words: int = 8) -> bool:
+    """The regeneration's compliance check: the anchor quote's
+    normalized n-gram appears verbatim in the regenerated text."""
+    import re as _re
+    def grams(s: str) -> set:
+        t = [x for x in _re.findall(r"[a-z0-9]+", s.lower())]
+        return set(" ".join(t[i:i + n_words])
+                   for i in range(max(0, len(t) - n_words + 1)))
+    return " ".join(_re.findall(r"[a-z0-9]+", quote.lower())) in grams(text)
+
+
 def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                                  out_dir: Path,
                                  max_enrich: int = 3) -> Dict[str, Any]:
@@ -254,7 +330,71 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                 c["candidate_lifecycle"] = "HELD_UNGROUNDED"
             else:
                 attempt["n_structured_new_items"] = len(new_items)
-                v = _verify(c, new_items, problem)
+                # R142 DIR-3 (the quote-anchored re-generation — the
+                # typed v3 next-capability): re-verifying the SAME
+                # paraphrase text can never fire the verbatim binding
+                # (the measured cause). The candidate's mechanism is
+                # RE-GENERATED from verbatim quotes of the fresh
+                # records (one bounded LLM call, the revise-pass
+                # precedent, Art. LI); the regeneration must reproduce
+                # the quote VERBATIM (the compliance check below) or
+                # the outcome is typed STILL_UNGROUNDED — fail closed,
+                # never admitted on an unanchored paraphrase.
+                quotes = _verbatim_quote_anchors(new_items, mech)
+                attempt["quote_anchors"] = [
+                    {"record_id": q["record_id"], "quote": q["quote"]}
+                    for q in quotes]
+                regen_ok, regen_text = False, None
+                if quotes:
+                    from . import mechanism_space as _ms_r
+                    _qlines = "\n".join(
+                        f'  [{q["record_id"]}] "{q["quote"]}"'
+                        for q in quotes)
+                    _rmeta = _ms_r.llm_generate(
+                        "Restate the following engineering mechanism "
+                        "hypothesis so that the quoted phrase appears "
+                        "VERBATIM (word for word) inside your restated "
+                        "text. Do not add any claim that is not already "
+                        "in the mechanism or in the quoted record text. "
+                        "Keep it under 120 words. Output ONLY the "
+                        "restated mechanism text.\n\n"
+                        f"MECHANISM HYPOTHESIS: {mech}\n\n"
+                        f"VERBATIM QUOTES FROM THE EVIDENCE RECORDS:\n"
+                        f"{_qlines}\n",
+                        system=("You are a rigorous mechanism engineer. "
+                                "Every claim must derive from the given "
+                                "evidence."),
+                        purpose="enrichment_regenerate", max_tokens=400)
+                    attempt["regeneration"] = {
+                        "ok": bool(_rmeta.get("ok")),
+                        "provider": _rmeta.get("provider"),
+                        "model": _rmeta.get("model")}
+                    if _rmeta.get("ok"):
+                        _cand_text = str(_rmeta.get("content") or "")
+                        if _quote_present(_cand_text,
+                                          quotes[0]["quote"]):
+                            regen_ok, regen_text = True, _cand_text
+                        else:
+                            attempt["regeneration"][
+                                "quote_present"] = False
+                            attempt["regeneration"]["note"] = (
+                                "the regenerated text does not contain "
+                                "the anchor verbatim — fail closed")
+                    else:
+                        attempt["regeneration"]["error"] = str(
+                            _rmeta.get("error"))[:200]
+                else:
+                    attempt["regeneration"] = {
+                        "ok": False,
+                        "note": "no topical verbatim anchor found in "
+                                "the retrieved records"}
+                if regen_ok:
+                    attempt["mechanism_pre_enrichment"] = mech[:160]
+                    c_regen = dict(c)
+                    c_regen["mechanism"] = regen_text
+                else:
+                    c_regen = c
+                v = _verify(c_regen, new_items, problem)
                 b = v.get("evidence_binding") or {}
                 ok, reason, resolved = _resolve(
                     b, new_items)
@@ -273,6 +413,18 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                         "EVIDENCE_GROUNDED_CANDIDATE_ENRICHED")
                     c["discovery_admissible"] = True
                     c["enrichment_required"] = False
+                    if regen_ok:
+                        # the verified REGENERATED text is what joins;
+                        # the original paraphrase stays for provenance
+                        c["mechanism"] = regen_text
+                        c["mechanism_pre_enrichment"] = mech
+                        c["regeneration_provenance"] = {
+                            "quote_anchor": quotes[0]["quote"],
+                            "record_id": quotes[0]["record_id"],
+                            "provider": (attempt.get("regeneration")
+                                         or {}).get("provider"),
+                            "model": (attempt.get("regeneration")
+                                      or {}).get("model")}
                     c["mechanism_support"] = v
                     c["admission_basis"] = {
                         "support_state": v.get("mechanism_support_state"),
