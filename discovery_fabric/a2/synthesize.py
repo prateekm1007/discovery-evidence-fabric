@@ -552,8 +552,45 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                         "mechanism_source_span"]
                     resp = resp + "\n" + resp2
         if not parsed.get("intervention"):
-            print("  [synthesize] no intervention in response")
-            continue
+            # R143S1 DIR-4 BROADEN (the measured F9 wind-starve class):
+            # a response that summarizes the paper instead of proposing
+            # an intervention starved WHOLE PROBLEMS (the r142 wind run:
+            # both papers' responses parsed intervention-less -> 0
+            # candidates -> the enrichment path never fired). ONE
+            # recorded same-provider retry with the response contract
+            # restated (the E15/R483 corrective-retry precedent — the
+            # defect named, the contract restated; the provider/model
+            # unchanged, the retry rides the candidate provenance).
+            print("  [synthesize] no intervention in response — one "
+                  "recorded same-provider retry (the R143 broaden)")
+            _retry2 = _timed_chat(
+                prompt + "\n\nCONTRACT CORRECTION: your previous "
+                "response summarized the paper but did not propose an "
+                "engineering intervention. Answer again in the SAME "
+                "format: it MUST contain an INTERVENTION line (a "
+                "concrete device/design change that mitigates the "
+                "stated failure), a MECHANISM line, an EXPECTED_EFFECT "
+                "line, a FALSIFICATION_TEST line, and a "
+                "MECHANISM_SOURCE_SPAN line quoting THIS abstract "
+                "verbatim (>= 8 consecutive words).",
+                system="You are a medical device engineer.",
+                max_tokens=1024)
+            if _retry2:
+                parsed2 = _parse_fields(_retry2)
+                if parsed2.get("intervention"):
+                    parsed = parsed2
+                    resp = _retry2
+                    retry_note = ("R143 broaden: the first response "
+                                  "carried no intervention (a summary); "
+                                  "one recorded same-provider retry with "
+                                  "the response contract restated "
+                                  "rescued this candidate")
+                else:
+                    print("  [synthesize] retry still intervention-"
+                          "less — the paper is skipped (typed)")
+                    continue
+            else:
+                continue
 
         def _candidate_from(text, parsed):
             return {
