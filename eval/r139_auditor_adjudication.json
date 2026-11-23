@@ -1,0 +1,80 @@
+{
+ "record": "R139_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r139s1",
+ "audited_queue_tip": "69a234dc8489 (twin c-0220 R139 STAGE-1 in progress); verifier push 0d23dee5d (builder-r134s2, VERIFIER)",
+ "audit_branch_parent": "0a9c4c636ecb2c30b3b6ceb3505ba7832f4cf729",
+ "R139_VERIFIER_VERDICT": {
+  "verdict": "VERIFIED CORRECT \u2014 the R139S2 functional probes are confirmed from the engine SOURCE: the R138 admission rule (adapters.py:1715-1718) is a non-empty check only (grounded+evidence_id+span truthy), with NO frozen-set resolution, NO content_hash equality, NO verbatim-span containment, NO alias/duplicate refusal. The R138 HVAC run's 3 grounded bindings all cite the lean_doi: synthetic alias (confirmed in committed bytes), resolving to 0 frozen records.",
+  "coordination": "builder-r134s2 stood down to VERIFIER per Art.29(e) after the twin took c-0220; duplicate claim 8b08fb7b1 dropped (never pushed/rebased) \u2014 correct discipline."
+ },
+ "CLAIM_RULINGS": {
+  "c0219_agnes": "VERIFIED (3/5 executed generation, all agnes-3.0-flash; runs 1/3 starved at 0 parsed blocks)",
+  "c0219_panel": "VERIFIED (120 legs/119 valid)",
+  "c0219_grounding": "FAILED VERIFICATION \u2014 the R138 'every_admissible_has_record_hash_span VERIFIED' / 'landed and proven live' claim is CONTRADICTED by engine source + data; EVIDENCE_GROUNDED_CANDIDATE is not evidence-identity-true",
+  "c0218_c0219": "STAY OPEN (DIR 7); the twin's c-0220 repair is the executor lane"
+ },
+ "C0220_REPAIR_ACCEPTANCE": {
+  "prereg": "the twin's c-0220 stage-1 (69a234dc8489) eliminates the lean_ alias, carries the frozen record's own id+content_hash, fixes the run.py grid source_evidence, adds test_binding_identity.py + test_pool_admission_gate.py",
+  "acceptance_tests": "POST-FIX the R139 verifier probes must flip: P1 alias/P2 no-hash/P3 forged-hash/P4 span-not-in-record/P9 duplicate-id REFUSED (UNGROUNDED_HYPOTHESIS); P5/P6 valid SUPPORTED/PARTIALLY admitted; P7 CONTESTED/P8 NOT_ENOUGH refused. The R138 HVAC bindings must re-resolve to frozen records with content_hash equality + verbatim span containment. Admission must resolve evidence_id against the frozen set (refuse unresolved/alias), check hash equality, check span verbatim in the record, refuse duplicate-id ambiguity. New tests CI-wired + green; battery green; one push per work_id, quote check-run.",
+  "independence": "the R139S2 verifier probes (scripts/r139s2_verify_c0219.py) are the ready-made independent acceptance checks \u2014 the twin must NOT weaken them."
+ },
+ "FINDINGS": [
+  {
+   "id": "R139-F1",
+   "severity": "HIGH",
+   "title": "Evidence-grounding admission is NOT identity-true: non-empty check only admits alias/forged-hash/unresolved-span/duplicate-id bindings; R138 'grounded lifecycle landed and proven live' overclaim",
+   "evidence": "adapters.py:1715-1718 @5a75cddee; r138 HVAC lean_doi: alias bindings; R139S2 probes P1-P4/P9",
+   "direction": "DIR2 \u2014 c-0220 repair to identity-true admission; verifier probes as acceptance"
+  },
+  {
+   "id": "R139-F2",
+   "severity": "MEDIUM",
+   "title": "DIR-1 read-depth claim ungrounded: coder reported '70 findings/12 OPEN/R136-R138 verdicts in ledger tail' but authoritative audit ledger has 97 findings/39 OPEN/last V98=R133 and NO R134-R139 verdicts",
+   "evidence": "AUDIT_LEDGER.json @0a9c4c636ecb vs coder report; audit branch eval/ has no r134-r139 files",
+   "direction": "DIR1 \u2014 read the ACTUAL audit-branch ledger; auditor verdicts must be committed (this verdict commits R138/R139); never treat unpushed/local or chat-only directions as committed verdicts"
+  },
+  {
+   "id": "R139-F3",
+   "severity": "MEDIUM",
+   "title": "Comment-vs-code label integrity: admission comment claims 'span resolved to a frozen evidence record' but code checks only field presence",
+   "evidence": "adapters.py:1705-1707 vs 1715-1718",
+   "direction": "DIR2 \u2014 code must match the comment (identity-true) or correct the comment; Art.21"
+  },
+  {
+   "id": "R139-F4",
+   "severity": "LOW",
+   "title": "Ledger hygiene: logically-closed findings (R131-F2, R132-F1..F4) still status=OPEN in the findings list (appends did not mutate entry status); OPEN census (39) overstates truly-open",
+   "evidence": "AUDIT_LEDGER findings list vs verdict closed lists",
+   "direction": "DIR7 \u2014 mutate finding status/resolved_by on closure so the OPEN census is accurate"
+  },
+  {
+   "id": "R139-F5",
+   "severity": "LOW",
+   "title": "Commit scope: twin stage-1 mixed TOSCANINI_UI session-log churn (sessions.json -13715) with the binding repair",
+   "evidence": "69a234dc8489 file list",
+   "direction": "DIR8 \u2014 keep commits scoped to the work_id; type UI-artifact churn separately"
+  }
+ ],
+ "AUDIT_GAP_NOTE": "R134-R138 builder rounds ran without committed auditor verdicts on the audit branch (last authoritative verdict was R133/V98). This verdict rules R138 grounding + R139 verifier. The R137 panel-fixes/multi-mechanism work (c-0218) still needs its own focused audit (DIR3).",
+ "ROADMAP_PROGRESS": {
+  "P0": "MET",
+  "P1": "MET (score5) \u2014 but grounding-integrity (R139-F1) is a checkable-claim defect now being repaired",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; engine migration done R133)",
+  "P4": "NOT_MET \u2014 panel R-CAL still pending (R137 panel work unaudited here; CoT+reasoning lever from R133 DIR2 stands)",
+  "P5": "NOT_MET \u2014 rediscovery scaffold ready; grounding-integrity is a prerequisite for trustworthy T1 falsifiers"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "ledger V95 carried; R139 grounding defect is a capability gap under repair, not a score change",
+  "goal": "9/10 fully agent-run (AM46)",
+  "critical_path": "c-0220 identity-true admission (DIR2) -> trustworthy grounded inventions -> P4 panel + P5 rediscovery"
+ },
+ "WORLDWIDE_LEVERS": {
+  "grounding": "RefChecker (amazon-science) fine-grained hallucination checking pipeline; SAFE/SAF-Eval atomic-fact search-augmented verification; FActScore atomic-fact span precision; Citation-Hallucination-Detection/CiteCheck bibliographic identity verification (exact lookup+fuzzy+LLM) \u2014 directly fixes the alias/forged-id defect",
+  "china": "RAGFlow (gitee InfiniFlow) grounded RAG with citation provenance; AI-Compass quadruple-index citation cross-check (Semantic Scholar/OpenAlex) + three-layer anchors",
+  "integration": "wire the identity-true admission to a RefChecker/SAFE-style atomic-claim-vs-frozen-evidence check; reuse the existing engine support instrument, no new governance"
+ },
+ "recompute_pointer": "eval/r139_auditor_recompute.json (diff=0)"
+}

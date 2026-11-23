@@ -1776,6 +1776,46 @@
    "title": "Score-7 two-consecutive->=3.3 not strict (v12/v15 non-consecutive)",
    "evidence": "ledger sealed_instruments",
    "status": "OPEN \u2014 v16 consolidates (DIR4)"
+  },
+  {
+   "id": "R139-F1",
+   "round": "R139",
+   "severity": "HIGH",
+   "title": "Evidence-grounding admission is NOT identity-true: non-empty check only admits alias/forged-hash/unresolved-span/duplicate-id bindings; R138 'grounded lifecycle landed and proven live' overclaim",
+   "evidence": "adapters.py:1715-1718 @5a75cddee; r138 HVAC lean_doi: alias bindings; R139S2 probes P1-P4/P9",
+   "status": "OPEN"
+  },
+  {
+   "id": "R139-F2",
+   "round": "R139",
+   "severity": "MEDIUM",
+   "title": "DIR-1 read-depth claim ungrounded: coder reported '70 findings/12 OPEN/R136-R138 verdicts in ledger tail' but authoritative audit ledger has 97 findings/39 OPEN/last V98=R133 and NO R134-R139 verdicts",
+   "evidence": "AUDIT_LEDGER.json @0a9c4c636ecb vs coder report; audit branch eval/ has no r134-r139 files",
+   "status": "OPEN"
+  },
+  {
+   "id": "R139-F3",
+   "round": "R139",
+   "severity": "MEDIUM",
+   "title": "Comment-vs-code label integrity: admission comment claims 'span resolved to a frozen evidence record' but code checks only field presence",
+   "evidence": "adapters.py:1705-1707 vs 1715-1718",
+   "status": "OPEN"
+  },
+  {
+   "id": "R139-F4",
+   "round": "R139",
+   "severity": "LOW",
+   "title": "Ledger hygiene: logically-closed findings (R131-F2, R132-F1..F4) still status=OPEN in the findings list (appends did not mutate entry status); OPEN census (39) overstates truly-open",
+   "evidence": "AUDIT_LEDGER findings list vs verdict closed lists",
+   "status": "OPEN"
+  },
+  {
+   "id": "R139-F5",
+   "round": "R139",
+   "severity": "LOW",
+   "title": "Commit scope: twin stage-1 mixed TOSCANINI_UI session-log churn (sessions.json -13715) with the binding repair",
+   "evidence": "69a234dc8489 file list",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -4623,6 +4663,22 @@
     "R132-F3",
     "R132-F4"
    ]
+  },
+  {
+   "id": "V99",
+   "round": "R139 audit of binding-identity verifier + R138 grounding claim",
+   "commit": "0a9c4c636ecb2c30b3b6ceb3505ba7832f4cf729",
+   "gate": "c-0219 grounding FAILED (admission non-empty-only, verified from source); Agnes+panel VERIFIED; c-0218/c-0219 OPEN; c-0220 repair acceptance set",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r139_auditor_adjudication.json",
+   "findings": [
+    "R139-F1",
+    "R139-F2",
+    "R139-F3",
+    "R139-F4",
+    "R139-F5"
+   ]
   }
  ],
  "gold_set": {
@@ -4920,7 +4976,7 @@
    "acceptance": "GRANTED (mean 3.9, CI[3.79, 4.01], 0/0/0)"
   }
  },
- "progress_note": "SCORE 7/10 (carried R133). R133 P4 panel round-2 VERIFIED HONEST NEGATIVE (0/4 R-CAL; recompute diff=0; levers worked: ties eliminated/forced-choice/429 cleared; acc cap ~0.7, llama4mav one short). dev-fu-001 r5 'baseline' label RULED GROUNDED (baseline dominates novelty2>1+testability4>3) \u2014 unanimous judge a1 is a shared blind spot, NOT a label error; bar stays. ENGINE MIGRATION DONE (prompts.py byte-faithful + review_layer.py check_layer + panel engine-routed; test_article22 extended; R131-F2/R132-F1 CLOSED). SPECTER2 integrated, separation +0.037 vs 0.2 NOT_MET (gate miscalibrated for compressed cosine band; reframe retrieval-distance + owner amendment, R133-F2). Census reconciled (16=5/3/3/5), requirements pinned (R132-F3/F4 CLOSED). Prune error (repair_convergence CI consumer) honestly fix-forwarded; aide_tree_search pruned. NEW: R133-F1 cross-round accuracy claim overstated (dsv32 0.7->0.6); R133-F3 Art.27 share self-reported; R133-F4 SPECTER2 not CI-wired. Path to 8: CoT comparative prompting + reasoning rungs (DeepSeek-R1/QwQ, +76pts agreement literature) to qualify >=3 judges; SPECTER2 retrieval gate; v16. Path to 9: auditor-sealed post-cutoff rediscovery slice (Qiushi reference) + unattended. Goal 9/10 fully agent-run (AM46).",
+ "progress_note": "SCORE 7/10 (carried R139). R139S2 VERIFIER work VERIFIED CORRECT from engine source: the R138 evidence-grounding admission rule (adapters.py:1715-1718) is a NON-EMPTY CHECK ONLY \u2014 admits synthetic lean_doi: alias / no-hash / forged-hash / span-not-in-record / duplicate-id bindings (probes P1-P4/P9). R138 HVAC run's 3 grounded bindings all cite the lean_doi: alias resolving to 0 frozen records (confirmed in bytes). c-0219 GROUNDING claim FAILED (R138 'landed and proven live' overclaim); Agnes (3/5 executed, all agnes-3.0-flash) + panel (120/119) VERIFIED. c-0218/c-0219 stay OPEN; twin c-0220 stage-1 (69a234dc8489) repair in progress \u2014 acceptance = verifier probes flip (P1-P4/P9 refused, P5/P6 admitted, P7/P8 refused) + HVAC bindings re-resolve with hash+verbatim span + new tests green. NEW: R139-F1 HIGH grounding integrity; R139-F2 coder DIR-1 ledger read ungrounded (claimed 70 findings/12 OPEN/R136-138 verdicts; actual 97/39/last R133, NO R134-139 verdicts committed); R139-F3 comment-vs-code; R139-F4 ledger OPEN-census hygiene; R139-F5 commit scope. AUDIT GAP: R134-R138 ran without committed auditor verdicts; R137 panel needs focused audit. Worldwide grounding levers: RefChecker/SAFE/FActScore/CiteCheck + China RAGFlow/AI-Compass. Critical path: identity-true admission -> trustworthy grounded inventions -> P4 panel + P5 rediscovery. Goal 9/10 fully agent-run (AM46).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
