@@ -47,15 +47,33 @@ def arm_vote(rec):
 
 
 def load_raw():
-    recs = []
+    # the typed retry-merge (claim c-0214, prereg
+    # eval/r134s2_resume_prereg.json): a __retry1 record supersedes
+    # the canonical record ONLY IF the canonical is a typed transport
+    # fail and the retry outcome is VALID; canonical bytes are never
+    # mutated and a failed retry leaves the typed fail standing.
+    canon, retries = {}, {}
     for f in sorted(RAW.glob("*.json")):
         parts = f.stem.split("__")
-        if len(parts) != 3:
-            continue
-        tag, pid, pas = parts
-        if tag not in TAGS:
-            continue
-        recs.append((tag, pid, pas, json.loads(f.read_text())))
+        if len(parts) == 3:
+            tag, pid, pas = parts
+            if tag in TAGS:
+                canon[(tag, pid, pas)] = json.loads(f.read_text())
+        elif len(parts) == 4 and parts[3] == "retry1":
+            tag, pid, pas = parts[0], parts[1], parts[2]
+            if tag in TAGS:
+                retries[(tag, pid, pas)] = json.loads(f.read_text())
+    recs = []
+    for key, rec in canon.items():
+        r = retries.get(key)
+        if r is not None and rec.get("outcome") != "VALID":
+            if r.get("outcome") == "VALID":
+                rec = dict(r)
+                rec["superseded_retry"] = True
+            else:
+                rec = dict(rec)
+                rec["retry_stood"] = True
+        recs.append((key[0], key[1], key[2], rec))
     return recs
 
 
