@@ -128,3 +128,125 @@ def specter2_separation(known_novel: list, known_obvious: list,
         "determinism": "eval mode, fixed weights, no sampling; "
                        "identical across calls/seeds/processes",
     }
+
+
+# ---------------------------------------------------------------------------
+# The RETRIEVAL-DISTANCE instrument (R134 DIR-3 / R133-F2): prior-art
+# novelty as a RANKING problem (AUC of novel-vs-obvious retrieval
+# distance) + the nearest-K prior-claim retrieval distance, per the
+# literature's retrieval-based novelty (nearest-50 cosine, threshold
+# ~0.75) — NOT a fixed per-problem absolute margin. Deterministic.
+# ---------------------------------------------------------------------------
+def specter2_auc(known_novel: list, known_obvious: list,
+                 prior_art_corpus: list) -> dict:
+    """The RANKING form of the separation gate: for every control,
+    the retrieval distance = 1 - max cosine to the prior-art corpus
+    (the nearest-claim distance; the literature's retrieval form).
+    AUC = P(novel's distance > obvious's distance) via Mann-Whitney U
+    over all novel x obvious pairs. AUC 0.5 = no discrimination;
+    1.0 = perfect ranking. This is the scale-free form the compressed
+    cosine band (~0.84-0.94) needs — the margin compression that
+    made the >=0.2 absolute gate unreachable does NOT compress the
+    RANKING."""
+    import numpy as np
+    corpus_vecs = [np.asarray(specter2_embed(t))
+                   for t in prior_art_corpus]
+
+    def nearest_cos(text):
+        v = np.asarray(specter2_embed(text))
+        return float(np.max([v @ c for c in corpus_vecs]))
+
+    nov_near = [round(nearest_cos(t), 6) for t in known_novel]
+    obv_near = [round(nearest_cos(t), 6) for t in known_obvious]
+    if not nov_near or not obv_near:
+        return {"auc": None, "n_novel": len(nov_near),
+                "n_obvious": len(obv_near)}
+    u = (sum(1 for g in obv_near for b in nov_near if g > b)
+         + 0.5 * sum(1 for g in obv_near for b in nov_near
+                     if g == b))
+    auc = round(u / (len(nov_near) * len(obv_near)), 6)
+    return {
+        "instrument": "SPECTER2 nearest-claim retrieval distance, "
+                      "AUC(novel farther than obvious)",
+        "novel_nearest_cos": nov_near,
+        "obvious_nearest_cos": obv_near,
+        "novel_mean_nearest": round(float(np.mean(nov_near)), 6),
+        "obvious_mean_nearest": round(float(np.mean(obv_near)), 6),
+        "auc_novel_farther": auc,
+        "gate_auc_ge_0.8": bool(auc >= 0.8),
+        "n_novel": len(nov_near), "n_obvious": len(obv_near),
+        "n_corpus": len(corpus_vecs),
+        "determinism": "identical across calls/seeds/processes",
+    }
+
+
+def specter2_retrieval_novelty(text: str, prior_art_corpus: list,
+                               k: int = 5,
+                               threshold: float = 0.75) -> dict:
+    """The PER-CANDIDATE retrieval-distance verdict: the nearest-K
+    prior claims by cosine (the retrieval form), the distance to the
+    nearest claim, and the thresholded novelty flag. The threshold
+    default (0.75) is the literature's retrieval threshold (NIH
+    NOT-OD-26-087 nearest-50 form); the CALLER owns the corpus, the
+    instrument is deterministic."""
+    import numpy as np
+    v = np.asarray(specter2_embed(text))
+    sims = sorted(
+        ((float(v @ np.asarray(specter2_embed(t))), i)
+         for i, t in enumerate(prior_art_corpus)),
+        reverse=True)
+    nearest = sims[0][0] if sims else None
+    return {
+        "nearest_cos": round(nearest, 6) if nearest is not None else None,
+        "nearest_k": [
+            {"cos": round(s, 6), "index": i} for s, i in sims[:k]],
+        "threshold": threshold,
+        "novel_by_retrieval": (bool(nearest is not None
+                                    and nearest < threshold)),
+        "k": min(k, len(sims)) if sims else 0,
+    }
+
+
+def specter2_ica_separation(known_novel: list, known_obvious: list,
+                            prior_art_corpus: list) -> dict:
+    """The ICA-normalized dynamic-range test (R133-F2's second
+    lever): whiten + ICA-rotate the pooled control+corpus embeddings,
+    then measure the absolute-margin separation in the rotated space.
+    ICA rotation preserves inner products' discrimination structure
+    while re-scaling axes; IF the compression is an artifact of the
+    raw CLS geometry, the rotated margin widens. Deterministic (fixed
+    random_state; FastICA on n_components=min(dim, n_samples-1))."""
+    import numpy as np
+    try:
+        from sklearn.decomposition import FastICA
+    except ImportError as e:
+        raise Specter2Unavailable(
+            f"sklearn absent for the ICA test: {e}") from e
+    texts = known_novel + known_obvious + prior_art_corpus
+    n_nov, n_obv = len(known_novel), len(known_obvious)
+    X = np.asarray([specter2_embed(t) for t in texts])
+    n_comp = min(X.shape[1], X.shape[0] - 1)
+    ica = FastICA(n_components=n_comp, random_state=0,
+                  whiten="arbitrary-variance", max_iter=1000)
+    Y = ica.fit_transform(X)
+    # re-L2-normalize the rotated rows (unit vectors in the new basis)
+    Yn = Y / np.maximum(
+        np.linalg.norm(Y, axis=1, keepdims=True), 1e-12)
+    corpus = Yn[n_nov + n_obv:]
+    nov = Yn[:n_nov]
+    obv = Yn[n_nov:n_nov + n_obv]
+    nov_cos = [float(np.max([v @ c for c in corpus])) for v in nov]
+    obv_cos = [float(np.max([v @ c for c in corpus])) for v in obv]
+    sep = round(float(np.mean(obv_cos) - np.mean(nov_cos)), 6)
+    return {
+        "instrument": "SPECTER2 + FastICA rotation (random_state=0), "
+                      "unit-normalized rows, nearest-claim cosine",
+        "novel_nearest_cos": [round(c, 6) for c in nov_cos],
+        "obvious_nearest_cos": [round(c, 6) for c in obv_cos],
+        "ica_margin_obvious_minus_novel": sep,
+        "raw_margin_reference": "+0.037 (the R133 record, same "
+                                "controls, unrotated)",
+        "dynamic_range_widened": None,  # filled by the caller
+        "n_components": n_comp,
+        "determinism": "FastICA random_state=0 — deterministic",
+    }

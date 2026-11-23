@@ -86,6 +86,31 @@ numbers or citations that the evidence packet does not support).
 Your response is ONE JSON object with the rubric keys AND the eight
 axis keys AND "prefer" ("A" or "B" only). No other text."""
 
+# The R134 lever (a) — the COMPARATIVE CHAIN-OF-THOUGHT contract
+# (frozen in eval/r134_panel_prereg.json before any panel call; the
+# expert weighting operationalizes the auditor's dev-fu-001 ruling:
+# the baseline dominated a1 on novelty 2>1 AND testability 4>3).
+COT_COMPARATIVE_SUFFIX = """
+Before the JSON, REASON as a domain-expert judge comparing the two
+answers (2-6 sentences):
+- For each axis (novelty, feasibility, testability,
+  constraint-compliance) state in one sentence why EACH answer earns
+  its score — compare MECHANISMS, not prose, length, or polish.
+- EXPERT WEIGHTING for the preference: novelty and testability
+  DOMINATE. An answer that applies the field-standard practice
+  excellently and at length is a WORSE answer than one with a
+  genuinely novel mechanism and a concrete falsification test, even
+  when the standard answer is more polished. Feasibility and
+  constraint-compliance act as gates (an infeasible or
+  constraint-violating answer cannot win), not as tiebreakers.
+- Finish your reasoning, then output the JSON. FORCED CHOICE:
+  "prefer" MUST be "A" or "B" — a tie is NOT available. If the two
+  answers are genuinely equal, choose the one with fewer fabrication
+  risks.
+Your response: your reasoning FIRST, then ONE JSON object with the
+eight axis keys AND "prefer" ("A" or "B" only). The JSON object must
+be the LAST thing in your reply."""
+
 # The reviewer fix schema (byte-faithful to scripts/r127_phaseA_gate.py
 # FIX_SCHEMA — the structured-output contract the parse-first-try
 # metric is based on).

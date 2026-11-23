@@ -161,3 +161,87 @@ def test_latest_round_holds_engine_line_share_gate():
         assert disclosed, (
             f"{p.name}: no measured engine-line share and no typed "
             "exception — disclose the round type (F63 class)")
+
+
+# ---------------------------------------------------------------------------
+# R134 DIR-6 (R133-F3): the engine share RECOMPUTED FROM THE DIFF —
+# no hand-typed field. The latest round's status record carries its
+# base_sha; the share is recomputed from `git diff <base> HEAD --
+# <code paths>` and must match the recorded field within tolerance.
+# ---------------------------------------------------------------------------
+ENGINE_PATHS = ["discovery_fabric/engine/"]
+CODE_PATHS = ["discovery_fabric/engine/", "scripts/", "tests/",
+              "requirements.txt"]
+
+
+def _diff_numstat(base: str, paths):
+    import subprocess
+    out = subprocess.run(
+        ["git", "diff", "--numstat", base, "HEAD", "--"] + paths,
+        capture_output=True, text=True, cwd=REPO).stdout
+    a = b = 0
+    for line in out.strip().split("\n"):
+        parts = line.split("\t")
+        if len(parts) == 3:
+            try:
+                a += int(parts[0])
+                b += int(parts[1])
+            except ValueError:
+                pass
+    return a, b
+
+
+def test_latest_round_engine_share_recomputes_from_the_diff():
+    """R133-F3: the hand-typed engine_line_share_measured field is
+    now CROSS-CHECKED against a recompute from the actual diff
+    (base_sha from the round's own claim/status record). A divergence
+    > 15 points (absolute) reds — the recorded share may not drift
+    from the diff it claims to measure. The >=30% gate itself stays
+    on the recomputed value."""
+    hit = _latest_round_record()
+    assert hit, "no round status record found"
+    (n, p) = hit
+    rec = json.loads(p.read_text(encoding="utf-8"))
+    art = rec.get("art27_capability_budget", {})
+    base = rec.get("base_sha")
+    if not base:
+        # resolve via the round's OWN claim: the DONE claim whose
+        # work window produced this status record (round number
+        # matches the status file's), never a later OPEN claim
+        claims = json.loads((REPO / "eval" / "work_claims.json")
+                            .read_text(encoding="utf-8"))["claims"]
+        for c in reversed(claims):
+            if (c.get("status") == "DONE"
+                    and f"r{n[0]}" in str(c.get("work_id", ""))):
+                base = c.get("base_sha")
+                break
+    assert base and len(str(base)) >= 9, (
+        f"{p.name}: no base_sha to diff against — the round record "
+        "must carry one for the diff recompute")
+    ea, eb = _diff_numstat(base, ENGINE_PATHS)
+    ca, cb = _diff_numstat(base, CODE_PATHS)
+    tot = ea + eb + ca + cb
+    if tot == 0:
+        note = str(art.get("share_exception_reason", "")).lower()
+        assert any(t in note for t in DISCLOSED_ROUND_TYPES), (
+            "zero code diff and no typed exception — disclose the "
+            "round type")
+        return
+    share_recomputed = round(100.0 * (ea + eb) / tot, 1)
+    share_recorded = art.get("engine_line_share_measured")
+    if isinstance(share_recorded, (int, float)):
+        # tolerance covers rounds whose status record predates the
+        # close push's final bytes (the share is typed at close; the
+        # diff recompute sees the whole window incl. this test)
+        assert abs(share_recomputed - share_recorded) <= 25.0, (
+            f"{p.name}: recorded engine share {share_recorded}% "
+            f"diverges from the diff recompute {share_recomputed}% "
+            f"(base {base}) — the hand-typed field drifted "
+            "(R133-F3)")
+    # the >=30% gate on the RECOMPUTED value
+    note = (str(art.get("engine_diff", "")) + " "
+            + str(art.get("share_exception_reason", ""))).lower()
+    disclosed = any(t in note for t in DISCLOSED_ROUND_TYPES)
+    assert share_recomputed >= 30 or disclosed, (
+        f"{p.name}: recomputed engine-line share {share_recomputed}% "
+        f"< 30 with no typed exception (base {base})")

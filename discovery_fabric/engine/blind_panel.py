@@ -489,13 +489,18 @@ def run_panel(seats: Sequence[PanelSeat], rows: dict,
 # canonical constants, byte-verified against the committed
 # instrument bytes at migration).
 # ---------------------------------------------------------------------------
-def build_pair_prompt(problem: dict, a_text: str, b_text: str) -> str:
+def build_pair_prompt(problem: dict, a_text: str, b_text: str,
+                      cot: bool = False) -> str:
     """The blind A/B rubric prompt. The CALLER decides which arm sits
     in slot A (the r9 blind_order parity convention — the engine
     never sees arm names, only slot bytes; a_is rides the CALLER's
-    record). Forced-choice prefer per the R133 lever (b): no TIE."""
+    record). Forced-choice prefer per the R133 lever (b): no TIE.
+    cot=True appends the R134 COMPARATIVE CoT contract (reason
+    per-axis before the JSON, expert weighting novelty+testability)
+    in place of the bare forced-choice suffix."""
     from discovery_fabric.engine.prompts import (
-        RUBRIC_CRITERIA, PER_AXIS_SUFFIX, FORCED_CHOICE_SUFFIX)
+        RUBRIC_CRITERIA, PER_AXIS_SUFFIX, FORCED_CHOICE_SUFFIX,
+        COT_COMPARATIVE_SUFFIX)
     clar = problem.get("clarification_text")
     lines = [
         "You judge two engineering answers to the same user problem.",
@@ -529,7 +534,8 @@ Then score BOTH answers 1 (bad) to 5 (excellent) on:
         lines.append(f"5 {RUBRIC_CRITERIA['e_clarification']}")
     lines.append(f"6 {RUBRIC_CRITERIA['f_novelty']}")
     lines.append(PER_AXIS_SUFFIX)
-    lines.append(FORCED_CHOICE_SUFFIX)
+    lines.append(COT_COMPARATIVE_SUFFIX if cot
+                 else FORCED_CHOICE_SUFFIX)
     out = "\n".join(lines)
     assert_blind_prompt(out)
     canary = scan_canary(out)
@@ -539,20 +545,33 @@ Then score BOTH answers 1 (bad) to 5 (excellent) on:
 
 
 def parse_pair_rating(text: str) -> dict:
-    """Strict parse of the pair-judge reply: the FIRST JSON object;
-    the eight per-axis keys must be ints (out-of-range values are
-    TYPED out_of_range, preserved — never clamped), prefer must be
-    'A' or 'B' (the forced-choice contract; a 'TIE' reply is a PARSE
+    """Strict parse of the pair-judge reply — CoT-ROBUST (R134): the
+    LAST flat JSON object in the text (reasoning models emit thinking
+    BEFORE the final JSON; the last object is the answer). The eight
+    per-axis keys must be ints (out-of-range values are TYPED
+    out_of_range, preserved — never clamped), prefer must be 'A' or
+    'B' (the forced-choice contract; a 'TIE' reply is a PARSE
     FAILURE = the one-retry class — the model is re-asked, never
-    silently coerced)."""
-    m = re.search(r"\{.*\}", text or "", re.S)
-    if not m:
+    silently coerced). Byte-compatible with the R133 parse on
+    non-thinking replies (the single flat object is the last
+    object)."""
+    cands = re.findall(r"\{[^{}]*\}", text or "", re.S)
+    j = None
+    for cand in reversed(cands):  # last object that parses with prefer
+        try:
+            c = json.loads(cand)
+        except Exception:  # noqa: BLE001 — keep scanning
+            continue
+        if isinstance(c, dict) and "prefer" in c:
+            j = c
+            break
+    if j is None:
+        if not text or not text.strip():
+            raise ValueError(
+                f"no JSON object in pair reply: {(text or '')[:120]!r}")
         raise ValueError(
-            f"no JSON object in pair reply: {(text or '')[:120]!r}")
-    try:
-        j = json.loads(m.group(0))
-    except Exception as e:  # noqa: BLE001 — the retry class
-        raise ValueError(f"unparseable pair JSON: {e}") from e
+            "no flat JSON object with 'prefer' in pair reply "
+            f"(thinking-only reply?): {(text or '')[:120]!r}")
     axes = {}
     for k in ("N", "F", "T", "C"):
         for s in ("A", "B"):

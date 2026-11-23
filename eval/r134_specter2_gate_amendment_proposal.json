@@ -1,0 +1,24 @@
+{
+ "record": "R134_SPECTER2_GATE_AMENDMENT_PROPOSAL/1.0.0 (DIR 3 — escalated to the OWNER per the R133-F2 ruling; NOT a silent change)",
+ "proposed_at": "2026-11-23 (sandbox clock)",
+ "proposer": "builder-r121s1-3e8a41d7 (claim c-0213)",
+ "the_current_gate": "the P4 prior-art cosine gate: separation >= 0.2 (an absolute per-problem margin: mean cosine of known-obvious controls to the prior-art corpus minus that of known-novel controls)",
+ "the_measurements": {
+  "R133_absolute_margin": "+0.037 on the paired own-art controls (direction CORRECT on all 3 problems; an order below the 0.2 bar)",
+  "R134_auc_ranking": "1.0 on the SAME frozen controls — every novel control's nearest-claim distance exceeds every obvious control's (Mann-Whitney U over 3x3 = 9/9)",
+  "the_band_problem": "SPECTER2 same-domain engineering cosines live in a compressed ~0.84-0.94 band; an absolute 0.2 margin is unreachable INSIDE the band regardless of instrument quality — the R133-F2 finding, now measured"
+ },
+ "the_proposal": "AMEND the P4 prior-art gate from the absolute-margin form to the RANKING form: separation AUC(novel farther than obvious) >= 0.8 on the paired controls (the same >=0.8 value the P4 panel gate uses), with the retrieval-distance instrument (specter2_retrieval_novelty: nearest-K prior claims, threshold 0.75 per the NIH NOT-OD-26-087 nearest-50 retrieval form) as the per-candidate verdict once a patent-scale corpus is attached. The absolute >=0.2 margin is RETIRED as the gate value (kept as a disclosed diagnostic).",
+ "the_basis": [
+  "prior-art novelty in the literature is retrieval-based (nearest-50 cosine, threshold ~0.75), not a fixed per-problem absolute margin",
+  "the ranking form is scale-free: the band compression that makes the absolute margin unreachable does not compress the ranking (measured: margin +0.037 vs AUC 1.0 on identical inputs)",
+  "the >=0.8 AUC value keeps the P4 family's own bar (the panel AUC gate uses the same number)"
+ ],
+ "what_is_NOT_proposed": "no threshold tuning to pass a specific run; the controls stay the auditor-labeled paired set; the corpus stays caller-owned (auditor-sealed for any gate-deciding run)",
+ "the_owner_decision_requested": "ACCEPT the ranking-form amendment (AUC>=0.8) / REJECT (keep the absolute >=0.2) / REDIRECT (a different instrument or value). Until the owner rules, the gate record carries BOTH numbers typed: absolute margin NOT_MET (+0.037 vs 0.2) and AUC 1.0 (>=0.8) — no gate pass is claimed on the un-amended form.",
+ "caveats_typed": [
+  "n=3x3 controls: the AUC is exact on the frozen set but small-n; the auditor's enlarged corpus (~20-30) will give it power",
+  "the 0.75 retrieval threshold flagged NOTHING novel on the 3-doc own-art corpus — absolute thresholds need a patent-scale corpus (the per-candidate verdict is corpus-dependent; typed, not hidden)",
+  "the ICA dynamic-range test measured 0.0 margin (n=9 samples cannot support a 768-dim rotation — underdetermined; the ICA lever is typed NOT-INFORMATIVE at this n, not 'tested and failed')"
+ ]
+}

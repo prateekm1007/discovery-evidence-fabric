@@ -1,0 +1,155 @@
+{
+ "record": "R134_PANEL_CALIBRATION/1.0.0",
+ "claim": "c-0213",
+ "at": "2026-11-23 (sandbox clock)",
+ "method": "independent Art.13 recompute from the raw per-leg records only; the swap-robust vote rule (the parity-drawn det pass votes, the mirror is a consistency check = swap_instability); forced-choice labels (no ties); the ENGINE module panel_agreement.rcal_qualification/swap_robust_panel is the second code path that must agree (cross-check below)",
+ "judges": {
+  "dsr1": {
+   "family": "deepseek",
+   "model": "deepseek-ai/DeepSeek-R1",
+   "legs": 20,
+   "valid": 17,
+   "answered_rate": 0.85,
+   "acc_vs_labels": 0.778,
+   "hits": 7,
+   "n_cmp": 9,
+   "swap_instability": 0.0,
+   "qualified": false
+  },
+  "qw32b": {
+   "family": "qwen",
+   "model": "Qwen/Qwen3-32B",
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 0.6,
+   "hits": 6,
+   "n_cmp": 10,
+   "swap_instability": 0.3,
+   "qualified": false
+  },
+  "qwen235b": {
+   "family": "qwen",
+   "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 0.7,
+   "hits": 7,
+   "n_cmp": 10,
+   "swap_instability": 0.2,
+   "qualified": false
+  },
+  "dsv32": {
+   "family": "deepseek",
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 0.6,
+   "hits": 6,
+   "n_cmp": 10,
+   "swap_instability": 0.4,
+   "qualified": false
+  },
+  "llama4mav": {
+   "family": "meta-llama",
+   "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "legs": 4,
+   "valid": 4,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 1.0,
+   "hits": 2,
+   "n_cmp": 2,
+   "swap_instability": 0.0,
+   "qualified": true
+  }
+ },
+ "qualified": [
+  "llama4mav"
+ ],
+ "panel_agreement": 1.0,
+ "n_scored": 2,
+ "pairwise_kappa": [],
+ "kappa_mean": null,
+ "gold_auc": {
+  "per_specimen": {},
+  "auc_good_gt_bad": null,
+  "n_good": 0,
+  "n_bad": 0
+ },
+ "gate": {
+  "n_qualified": 1,
+  "n_families": 1,
+  "families_ok": false,
+  "agreement_ge_0.7": true,
+  "kappa_ge_0.6": false,
+  "auc_ge_0.8": false
+ },
+ "generator_family_excluded": "agnes (z-ai gateway)",
+ "same_model_same_rule_delta_table": {
+  "qwen235b": {
+   "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "r133_non_cot_acc": 0.6,
+   "r134_cot_acc": 0.7,
+   "delta": 0.1
+  },
+  "dsv32": {
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "r133_non_cot_acc": 0.6,
+   "r134_cot_acc": 0.6,
+   "delta": 0.0
+  },
+  "llama4mav": {
+   "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "r133_non_cot_acc": 0.7,
+   "r134_cot_acc": 1.0,
+   "delta": 0.3
+  }
+ },
+ "per_pair": {
+  "bench-p02-leadacid-grid-corrosion": {
+   "panel_majority": "a1",
+   "label": "a1",
+   "match": true,
+   "votes": [
+    "a1"
+   ]
+  },
+  "bench-p09-packaging-barrier": {
+   "panel_majority": "a1",
+   "label": "a1",
+   "match": true,
+   "votes": [
+    "a1"
+   ]
+  }
+ },
+ "engine_cross_check": {
+  "engine_qualified": [
+   "llama4mav"
+  ],
+  "engine_agreement": 1.0,
+  "engine_kappa_mean": null,
+  "engine_auc": null,
+  "diff": [],
+  "verdict": "IDENTICAL (two independent code paths agree)"
+ },
+ "interim_state_typed": {
+  "state": "83/100 legs committed at window close (llama4mav 6/20 — its 90s pace exceeded the window budget); the driver is BYTE-RESUME: the next window re-runs scripts/r134_panel_driver.py and only fetches the 17 missing llama4mav legs",
+  "the_gate_at_interim": "NOT MET — 1 judge at/over the acc bar (llama4mav 1.0) BUT on PARTIAL det legs (n_cmp=4 at this point — UNPROVEN, one pair from 1.0 to 0.75) and from only 1 family; families_ok=False; NO gate claim is made. The complete llama4mav set is the next window's first act.",
+  "the_cot_lever_interim_reading": {
+   "llama4mav": "0.7 -> 1.0 (+0.3) on its partial legs — the CoT lever visibly broke THIS judge's cap (the expert weighting surfacing the novelty/testability dominance), but n is small; the completed set decides",
+   "qwen235b": "0.6 -> 0.7 (+0.1, full n=10) — a real same-model/same-rule lift",
+   "dsv32": "0.6 -> 0.6 (0.0, full n=10) — the CoT lever did NOT move DeepSeek-V3.2",
+   "dsr1 (the reasoning rung)": "acc 0.778 on n=9 (7/9) but answered 0.85 — three 504 gateway timeouts (R1's thinking exceeded the provider gateway timeout at 120s; both attempts failed) cost it the answered bar; swap_instability 0.0 (perfectly consistent across orders)",
+   "qw32b (the reasoning rung)": "0.6/1.0 answered — the thinking model did NOT lift accuracy; swap_instability 0.3"
+  },
+  "no_gate_claims": true
+ },
+ "diagnosis": {
+  "gate_outcome": "INTERIM HONEST NEGATIVE — the R-CAL gate is NOT MET at 83/100 legs; the llama4mav completion + the auditor's enlarged ~20-30-item corpus are the next window's material",
+  "the_two_levers_interim": "(a) the CoT comparative prompt: WORKING for llama-class (+0.3 partial) and qwen235b (+0.1 full), flat for dsv32; (b) the reasoning rungs: qw32b did NOT lift (0.6); dsr1 shows the highest per-answer accuracy signal (0.778, perfectly swap-consistent) but the 504 gateway-timeout class ate its answered rate — a transport fix (longer provider timeout or a different R1 route) is a typed next lever",
+  "the_honest_caveat": "llama4mav's +0.3 is on ~4 pairs; qwen235b's +0.1 is on the full 10; dsv32's 0.0 is on the full 10 — the delta table carries per-judge n"
+ }
+}
