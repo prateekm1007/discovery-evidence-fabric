@@ -976,6 +976,22 @@ class EngineRun:
                               {"stage": stage, "error": sf.error})
             self._persist_envelope(stage)
 
+        # ---- R141 DIR-4: the enrichment executor on the LIVE mech path
+        # (the auditor's R141 finding: the executor was wired only at
+        # the post-rank pool gate, which the mech-path runs never reach
+        # — ungrounded hypotheses starved instead of enriching). Here,
+        # immediately after MECHANISM_SPACE persisted its envelope, the
+        # SAME executor (the existing retrieval + canonical verification
+        # + the identity resolver — no new framework, Art. 29) retries
+        # each retained ungrounded hypothesis against fresh retrieval of
+        # its own mechanism terms; ENRICHED_GROUNDED joins the space
+        # (full provenance), otherwise the hypothesis stays explicitly
+        # HELD with its typed outcome. Fail-closed is untouched: a
+        # candidate joins ONLY through the same identity-true admission
+        # bar (the resolver runs inside the enrichment), and an
+        # enrichment failure is recorded, never fatal.
+        self._enrich_ungrounded_mech_path()
+
         # ---- Critique -> revise (Art. LI, one bounded pass) ----------
         # A candidate the gauntlet killed is NEVER silently dropped and
         # never presented as the invention. It gets ONE revision pass:
@@ -4192,6 +4208,53 @@ class EngineRun:
         _cctx.set_stage("POST_RANK")
 
     # ------------------------------------------------------------------
+    def _enrich_ungrounded_mech_path(self) -> None:
+        """R141 DIR-4: the enrichment executor wired into the LIVE
+        mechanism-space path (not only the post-rank pool gate). Runs
+        at most once per run, bounded (max_enrich=3), typed at every
+        outcome; the enriched candidates join the mechanism space with
+        full provenance and the ledger persists as ENRICHMENT_LEDGER.json.
+        Zero LLM/retrieval spend when there is nothing ungrounded."""
+        try:
+            ms = self.env.mechanism_space or {}
+            cands = ms.get("candidates") or []
+            if not cands:
+                return
+            _adm, _ungrounded = ms_pool_admission_split(cands)
+            if not _ungrounded:
+                return
+            _enr = enrich_ungrounded_hypotheses(
+                self.problem, _ungrounded, self.out)
+            enriched = _enr.get("enriched") or []
+            ledger = _enr.get("ledger") or {}
+            if enriched:
+                by_id = {c.get("candidate_id"): c for c in cands
+                         if c.get("candidate_id")}
+                for e in enriched:
+                    cid = e.get("candidate_id")
+                    if cid and cid in by_id:
+                        by_id[cid].update(e)
+                    else:
+                        cands.append(e)
+                ms["candidates"] = cands
+            ms["enrichment_ledger"] = ledger
+            self._persist("ENRICHMENT_LEDGER.json", ledger)
+            # re-persist the mechanism-space envelope so the committed
+            # snapshot carries the post-enrichment states + the ledger
+            self._persist_envelope("MECHANISM_SPACE")
+        except Exception as exc:  # noqa: BLE001 — visible, never fatal
+            try:
+                self._persist("ENRICHMENT_LEDGER_ERROR.json", {
+                    "stage": "MECHANISM_SPACE",
+                    "error": "%s: %s" % (type(exc).__name__,
+                                         str(exc)[:200]),
+                    "consequence": ("the enrichment executor failed; the "
+                                    "ungrounded hypotheses stay "
+                                    "explicitly HELD (never admitted, "
+                                    "never silently dropped)")})
+            except Exception:
+                pass
+
     def _maybe_revise_killed_candidate(self) -> Dict[str, Any]:
         """One bounded critique->revise->re-attack pass (Art. LI, one
         mutation, no loop, no new governance). Called only after the

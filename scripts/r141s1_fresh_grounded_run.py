@@ -26,7 +26,8 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
-OUT = REPO / "eval" / "r141s1_fresh_grounded_run"
+OUT = REPO / "eval" / os.environ.get(
+    "R141_OUT", "r141s1_fresh_grounded_run")
 OUT.mkdir(exist_ok=True)
 
 FRESH = [
