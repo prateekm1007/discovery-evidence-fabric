@@ -1,16 +1,16 @@
 {
  "gen": 1,
- "invention_id": "inv:85b47967c2:gen1",
+ "invention_id": "inv:10fb9edeed:gen1",
  "parent_id": null,
  "lineage": [
-  "inv:85b47967c2:gen1"
+  "inv:10fb9edeed:gen1"
  ],
  "origin": "BASELINE_SYNTHESIS",
  "architecture": {
-  "mechanism": "Three-arm differential observability with a witness-ratio guard distinguishes reversible concentration polarization from irreversible mineral scaling and biofouling on RO membranes, restoring Rank-2 Fisher observability and cutting estimation error by over 89%.",
-  "intervention": "Retrofit the existing 2-arm differential RO cartridge array to a 3-arm configuration, deploy the witness-ratio guard (τref = |rref(t) − rref,0|/rref,0 > 0.03) as a runtime software invariant on the soft-sensor diagnostic pipeline, and harden all production classes to remove simulator oracle access, thereby enabling earlier and unambiguous biofilm-onset identification separate from CP and scaling signals.",
-  "expected_effect": "Earlier detection of irreversible biofouling signatures relative to the present 3-week CIP interval-driven reactive strategy, enabling targeted non-chlorine biofilm mitigation (e.g., enhanced pre-treatment biofilter backwash frequency or UV dosing adjustments) before normalized flux droop reaches 15%, supporting return toward the designed quarterly cleaning schedule without reducing permeate recovery.",
-  "falsification_test": "Run the hardened 3-arm soft-sensor diagnostic in parallel with existing 2-arm diagnostics for 6 months; if normalized-flux-droop data and inline biofilm sensor readings show no statistically significant improvement in time-to-first-biofilm-diagnosis warning (no sooner than current CIP-triggering thresholds) under identical feed-water conditions, the mechanism fails."
+  "mechanism": "Three-arm differential observability using a witness-ratio guard to distinguish reference contamination from test fouling",
+  "intervention": "Install a third parallel RO membrane cartridge (witness arm) in the SWRO feed train and configure the control system to continuously monitor the witness-ratio guard (τref > 0.03 threshold) to decouple biofouling diagnosis from sensor drift or reference channel contamination",
+  "expected_effect": "Accurate isolation of biofilm fouling from reversible concentration polarization, enabling targeted bio-remediation and reducing CIP frequency from 3 weeks to quarterly intervals while preventing false-positive chemical cleanings",
+  "falsification_test": "Introduce controlled 10% partial biofouling on the reference arm while monitoring the test arm; if the system maintains a 7.72% or lower estimation error and does not trigger a false CIP alarm, the mechanism is valid; if error approaches 71.17% or a cleaning is falsely triggered, the mechanism fails"
  },
  "state": "INVENTION_SURVIVED",
  "maturity": "GENERATED",

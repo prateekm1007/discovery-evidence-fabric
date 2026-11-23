@@ -2,8 +2,8 @@
  "composer_version": "answer_composer/1.5.0",
  "n_llm_calls": 3,
  "question_type": "intervention-proposal",
- "started_at": "2026-11-23T17:39:55+00:00Z",
- "prompt_sha256": "82db19e9c5a6939efa3488c2b8aa1cd4262898b17b4242653dd8d9cfb2ed3c6a",
+ "started_at": "2026-11-23T17:08:09+00:00Z",
+ "prompt_sha256": "64e69d0ee440dd526a73af4e450f4c595c9017d68ce128d29226b0cfc5bcab66",
  "provider_route": [
   {
    "provider": "agnes",
@@ -12,8 +12,8 @@
    "status": "OK",
    "attempts": 1,
    "retry_count": 0,
-   "latency_ms": 2986,
-   "ttfb_s": 2.985,
+   "latency_ms": 2924,
+   "ttfb_s": 2.924,
    "gateway_hang": false,
    "failure_type": null,
    "fallback_provider": null
@@ -31,7 +31,7 @@
   "policy": "ZERO_PAID_COST",
   "policy_version": "model_cost_policy/1.1.0"
  },
- "output_sha256": "2c5d95a2ac5bac00c7efa7f2f722d6ff64cd75bcea93dc6ad194e3711c392526",
+ "output_sha256": "834e0557339438774b56f43847a4a7e14c0eac60d831d699c018cc9d011e1cf9",
  "truncation": {
   "first_call_finish_reason": "stop",
   "first_call_truncated": false,
@@ -88,10 +88,8 @@
  "contract_first_pass": {
   "valid": false,
   "violations": [
-   "intervention contract: falsification test states no test temperature (a real protocol states its conditions, e.g. 60 C ambient or the operating temperature)",
    "intervention contract: falsification test states no sample size n",
-   "intervention contract: EVIDENCE-BACKED user citation [user problem statement] does not jointly support its parameter (unrelated_source)",
-   "intervention contract: EVIDENCE-BACKED user citation [user problem statement] does not jointly support its parameter (unrelated_source)"
+   "clean-output contract: internal state/narration token 'the evidence packet' present in the answer text"
   ]
  },
  "constraint_audit_first_pass": {
@@ -102,9 +100,7 @@
  "contract_after_repair_1": {
   "valid": false,
   "violations": [
-   "intervention contract: falsification test states no sample size n",
-   "intervention contract: EVIDENCE-BACKED user citation [user problem statement] does not jointly support its parameter (unrelated_source)",
-   "intervention contract: EVIDENCE-BACKED user citation [user problem statement] does not jointly support its parameter (unrelated_source)"
+   "intervention contract: falsification test states no sample size n"
   ]
  },
  "constraint_audit_after_repair_1": {
@@ -120,9 +116,7 @@
  "contract_after_repair_2": {
   "valid": false,
   "violations": [
-   "intervention contract: falsification test states no sample size n",
-   "intervention contract: EVIDENCE-BACKED label without a referenced source id or evidence citation",
-   "intervention contract: EVIDENCE-BACKED label without a referenced source id or evidence citation"
+   "intervention contract: falsification test states no sample size n"
   ]
  },
  "constraint_audit_after_repair_2": {
@@ -136,88 +130,128 @@
  "downgrade_arm": "on",
  "downgrade": {
   "applied": true,
-  "n_relabels": 1,
-  "n_citations_dropped": 1,
+  "n_relabels": 0,
+  "n_citations_dropped": 0,
   "n_jargon_stripped": 0,
-  "relabels": [
-   "EVIDENCE-BACKED"
-  ],
-  "citations_dropped": [
-   "device: 2 x 1,200 tons"
-  ],
+  "relabels": [],
+  "citations_dropped": [],
   "valid_after_downgrade": false
  },
- "answer": "Recommended intervention: Install a differential pressure (DP) transmitter across a bypass of the chiller condenser water inlet and outlet, plus one redundant temperature sensor at the condenser outlet, on both chiller circuits. Use these measurements to compute a real-time condenser thermal resistance baseline. This method directly targets the fouling mechanism (scale buildup reducing heat transfer area) without altering the fixed water chemistry or requiring shutdowns longer than the 48-hour limit, as it is a passive monitoring retrofit.\n\nPARAMETER: Number of chiller circuits instrumented — 2 — ASSUMPTION \nPARAMETER: Monitoring Method — Differential pressure and temperature logging — EVIDENCE-BACKED [doi:10.5281/zenodo.22691356]\nPARAMETER: Fouling Indicator — Condenser Thermal Resistance — ASSUMPTION\nPARAMETER: Baseline Establishment Period — 14 days of healthy operation — ASSUMPTION\nPARAMETER: Action Threshold — Deviation of +3 sigma from baseline thermal resistance — ASSUMPTION\nPARAMETER: Target Capacity Loss Prevention — 11% — EVIDENCE-BACKED [user problem statement]\nPARAMETER: Target Energy Penalty Reduction — 22% — EVIDENCE-BACKED [user problem statement]\n\nExpected measurable effect: The system will identify the onset of fouling when the calculated condenser thermal resistance exceeds the 3-sigma threshold. This allows operators to schedule cleaning within the 48-hour annual window before the 11% capacity loss and 22% kW/ton penalty occur, rather than reacting to catastrophic failure.\n\nFalsification test:\nTest Temperature: 30 C ambient (peak load summer conditions)\nDuration: 30 days continuous monitoring post-installation\nSample Size n: 2 chiller circuits\nPass/Fail Criteria: PASS if the system triggers an alarm within 24 hours of a simulated fouling event (introducing a controlled resistance drop) and no false alarms occur during the first 14 days of healthy baseline. FAIL if the system does not detect the simulated event or generates more than one false alarm per month.",
+ "answer": "This intervention is UNVERIFIED and requires the specified field test to confirm efficacy.\n\nPARAMETER: Condenser tube internal configuration — Twisted-tape inserts or wire-wound geometry to enhance turbulence — ASSUMPTION\nPARAMETER: Minimum Reynolds number target — 15,000 to maintain turbulent flow and reduce boundary layer thickness — ASSUMPTION\nPARAMETER: Pressure drop allowance — Max 2.0 psid increase at 100% flow to avoid significant head loss — ASSUMPTION\nPARAMETER: Installation window duration — 40 hours per chiller, staggered to fit within annual 48-hour limit — ASSUMPTION\nPARAMETER: Baseline thermal resistance — Derived from 14 days of healthy chiller data pre-installation to establish R_baseline — ASSUMPTION\nPARAMETER: Target capacity restoration — 8% increase in cooling capacity at peak load — ASSUMPTION\nPARAMETER: Target efficiency improvement — 15% reduction in kW/ton at peak load — ASSUMPTION\n\nThe proposed mechanism involves installing flow straighteners or replacing straight tubes with twisted-tape or wire-wound inserts in the condenser heat exchanger of the 2 x 1,200-ton water-cooled chiller plant. This increases internal turbulence and reduces boundary layer thickness, which prevents scale nucleation by maintaining supersaturation below the critical precipitation threshold, thereby reducing thermal resistance due to scaling. This intervention respects the fixed water treatment chemistry by not altering chemical dosing or provider-managed parameters, and it respects the 48-hour annual shutdown window by scheduling the physical tube replacement or insert installation within that limit, split across the two chillers. Supporting data does not directly support specific thermal or hydraulic performance values for twisted-tape inserts in this chiller context, so all parameter values are engineering assumptions based on standard heat exchanger design principles.\n\nFalsification test:\nTest temperature: 35 C cooling water inlet temperature\nDuration: 4 weeks of continuous operation post-installation\nSample size n: 2 chillers\nPass/fail criteria: kW/ton at peak load decreases by 10% or more relative to pre-installation baseline, AND condensing temperature at rated load decreases by 2.0 C or more relative to baseline. If either criterion is not met, the intervention fails to restore the expected efficiency.",
  "contract": {
   "valid": false,
   "violations": [
-   "intervention contract: falsification test states no sample size n",
-   "intervention contract: EVIDENCE-BACKED user citation [user problem statement] does not jointly support its parameter (unrelated_source)",
-   "intervention contract: EVIDENCE-BACKED user citation [user problem statement] does not jointly support its parameter (unrelated_source)"
+   "intervention contract: falsification test states no sample size n"
   ],
   "bindings": {
-   "evidence_bound": 12,
-   "assumption": 0,
+   "evidence_bound": 13,
+   "assumption": 1,
    "unbound_numbers": 0,
-   "all_numbers": 12,
+   "all_numbers": 14,
    "claims": [
     {
-     "parameter": "PARAMETER: Number of chiller circuits instrumented — 2 —",
-     "label": "evidence-backed",
-     "cited": "[doi:10.5281/zenodo.22691356]",
-     "source_kind": "packet_record",
-     "quantity": [
-      "chiller",
-      "circuits",
-      "instrumented",
-      "number"
-     ],
-     "pairs": [],
-     "conversion_recorded": false
-    },
-    {
-     "parameter": "PARAMETER: Monitoring Method — Differential pressure and temperature logging —",
-     "label": "evidence-backed",
-     "cited": "[doi:10.5281/zenodo.22691356]",
-     "source_kind": "packet_record",
-     "quantity": [
-      "differential",
-      "logging",
-      "method",
-      "monitoring",
-      "pressure",
-      "temperature"
-     ],
-     "pairs": [],
-     "conversion_recorded": false
-    },
-    {
-     "parameter": "PARAMETER: Fouling Indicator — Condenser Thermal Resistance — ASSUMPTION",
+     "parameter": "PARAMETER: Condenser tube internal configuration — Twisted-tape inserts or wire-wound geometry to enhance turbulence — ASSUMPTION",
      "label": "assumption",
      "cited": null,
      "source_kind": null,
      "quantity": [
       "condenser",
-      "fouling",
-      "indicator",
-      "resistance",
-      "thermal"
+      "configuration",
+      "enhance",
+      "geometry",
+      "inserts",
+      "internal",
+      "tape",
+      "tube",
+      "turbulence",
+      "twisted",
+      "wire",
+      "wound"
      ],
      "pairs": [],
      "conversion_recorded": false
     },
     {
-     "parameter": "PARAMETER: Baseline Establishment Period — 14 days of healthy operation — ASSUMPTION",
+     "parameter": "PARAMETER: Minimum Reynolds number target — 15,000 to maintain turbulent flow and reduce boundary layer thickness — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "boundary",
+      "flow",
+      "layer",
+      "maintain",
+      "minimum",
+      "number",
+      "reduce",
+      "reynolds",
+      "thickness",
+      "turbulent"
+     ],
+     "pairs": [],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Pressure drop allowance — Max 2.0 psid increase at 100% flow to avoid significant head loss — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "allowance",
+      "avoid",
+      "drop",
+      "flow",
+      "head",
+      "increase",
+      "loss",
+      "pressure",
+      "psid",
+      "significant"
+     ],
+     "pairs": [
+      {
+       "value": "100",
+       "unit": "%"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Installation window duration — 40 hours per chiller, staggered to fit within annual 48-hour limit — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "annual",
+      "chiller",
+      "duration",
+      "hour",
+      "hours",
+      "installation",
+      "limit",
+      "staggered",
+      "window",
+      "within"
+     ],
+     "pairs": [],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Baseline thermal resistance — Derived from 14 days of healthy chiller data pre-installation to establish R_baseline — ASSUMPTION",
      "label": "assumption",
      "cited": null,
      "source_kind": null,
      "quantity": [
       "baseline",
+      "chiller",
+      "data",
       "days",
-      "establishment",
+      "derived",
+      "establish",
       "healthy",
-      "operation",
-      "period"
+      "installation",
+      "resistance",
+      "thermal"
      ],
      "pairs": [
       {
@@ -225,23 +259,125 @@
        "unit": "days"
       }
      ],
-     "conversion_recorded": false
+     "conversion_recorded": true
     },
     {
-     "parameter": "PARAMETER: Action Threshold — Deviation of +3 sigma from baseline thermal resistance — ASSUMPTION",
+     "parameter": "PARAMETER: Target capacity restoration — 8% increase in cooling capacity at peak load — ASSUMPTION",
      "label": "assumption",
      "cited": null,
      "source_kind": null,
      "quantity": [
-      "action",
-      "baseline",
-      "deviation",
-      "resistance",
-      "sigma",
-      "thermal",
-      "threshold"
+      "capacity",
+      "cooling",
+      "increase",
+      "load",
+      "peak",
+      "restoration"
      ],
-     "pairs": [],
+     "pairs": [
+      {
+       "value": "8",
+       "unit": "%"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Target efficiency improvement — 15% reduction in kW/ton at peak load — ASSUMPTION\n\nThe proposed mechanism involves installing flow straighteners or replacing straight tubes with twisted-tap",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "across",
+      "altering",
+      "annual",
+      "below",
+      "boundary",
+      "chemical",
+      "chemistry",
+      "chiller",
+      "chillers",
+      "condenser",
+      "context",
+      "cooled",
+      "critical",
+      "data",
+      "directly",
+      "does",
+      "dosing",
+      "efficiency",
+      "exchanger",
+      "fixed",
+      "flow",
+      "heat",
+      "hour",
+      "hydraulic",
+      "improvement",
+      "increases",
+      "insert",
+      "inserts",
+      "installation",
+      "installing",
+      "internal",
+      "intervention",
+      "involves",
+      "layer",
+      "limit",
+      "load",
+      "maintaining",
+      "managed",
+      "mechanism",
+      "nucleation",
+      "parameters",
+      "peak",
+      "performance",
+      "physical",
+      "plant",
+      "precipitation",
+      "prevents",
+      "proposed",
+      "provider",
+      "reduces",
+      "reducing",
+      "reduction",
+      "replacement",
+      "replacing",
+      "resistance",
+      "respects",
+      "scale",
+      "scaling",
+      "scheduling",
+      "shutdown",
+      "specific",
+      "split",
+      "straight",
+      "straighteners",
+      "supersaturation",
+      "support",
+      "supporting",
+      "tape",
+      "thereby",
+      "thermal",
+      "thickness",
+      "threshold",
+      "treatment",
+      "tube",
+      "tubes",
+      "turbulence",
+      "twisted",
+      "water",
+      "which",
+      "window",
+      "wire",
+      "within",
+      "wound"
+     ],
+     "pairs": [
+      {
+       "value": "15",
+       "unit": "%"
+      }
+     ],
      "conversion_recorded": false
     }
    ]
@@ -312,12 +448,12 @@
  "caveats": [
   "Note: some supporting details in this answer could not be verified against the retrieved records and are labeled as engineering assumptions; the falsification test is the precondition for relying on them."
  ],
- "finished_at": "2026-11-23T17:40:06+00:00Z",
+ "finished_at": "2026-11-23T17:08:16+00:00Z",
  "admitted_candidates": [
   {
-   "candidate_id": "cand:A2:r141-fresh-04-chiller-fouling-capacity-droop:b2bab114084cc9eb",
-   "attack_verdict": "PASS",
-   "hypothesis": false
+   "candidate_id": "cand:MS:DOMAIN_KNOWLEDGE_FIRST:ed29cbdf5705",
+   "attack_verdict": "KILLED",
+   "hypothesis": true
   }
  ]
 }
