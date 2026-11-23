@@ -1736,6 +1736,46 @@
    "title": "Score-7 two-consecutive->=3.3 not strict (v12/v15 non-consecutive)",
    "evidence": "ledger sealed_instruments",
    "status": "OPEN \u2014 v16 consolidates (DIR5)"
+  },
+  {
+   "id": "R133-F1",
+   "round": "R133",
+   "severity": "MEDIUM",
+   "title": "Progress-honesty: 'every judge's accuracy rose vs R132' is overstated \u2014 dsv32 (same model) went 0.7 (R132 order-majority) -> 0.6 (R133 swap-robust); cross-round comparison mixes models AND vote rules",
+   "evidence": "r133_panel_calibration diagnosis vs r132_calibration + recompute",
+   "status": "OPEN"
+  },
+  {
+   "id": "R133-F2",
+   "round": "R133",
+   "severity": "MEDIUM",
+   "title": "SPECTER2 >=0.2 absolute-margin gate miscalibrated for the compressed same-domain cosine band (~0.84-0.94); prior-art novelty is retrieval-based in the literature (nearest-50 cosine, threshold ~0.75), not a fixed per-problem margin",
+   "evidence": "r133_specter2_separation.json (+0.037, direction correct); NIH NOT-OD-26-087 retrieval threshold; ICA-normalization literature",
+   "status": "OPEN"
+  },
+  {
+   "id": "R133-F3",
+   "round": "R133",
+   "severity": "LOW",
+   "title": "Art.27 self-reported engine share 91.7% (404/440) does not reconcile with the diff (613 engine additions, ~553 script additions); test trusts hand-typed field. Share >=30% under any code-only counting (gate MET)",
+   "evidence": "r133s1_status art27 vs commit diff; test_article27 reads hand-typed field",
+   "status": "OPEN"
+  },
+  {
+   "id": "R133-F4",
+   "round": "R133",
+   "severity": "LOW",
+   "title": "SPECTER2 instrument (torch/transformers/adapters) NOT CI-wired (surface.yml installs only pint/cantera/mapie/hf-hub); separation/determinism local-only",
+   "evidence": "requirements.txt pins vs surface.yml pip install",
+   "status": "OPEN"
+  },
+  {
+   "id": "R131-F3",
+   "round": "R133",
+   "severity": "MEDIUM",
+   "title": "Score-7 two-consecutive->=3.3 not strict (v12/v15 non-consecutive)",
+   "evidence": "ledger sealed_instruments",
+   "status": "OPEN \u2014 v16 consolidates (DIR4)"
   }
  ],
  "amendments": [
@@ -4561,6 +4601,28 @@
     "R131-F5",
     "R131-F6"
    ]
+  },
+  {
+   "id": "V98",
+   "round": "R133 audit of panel round-2 + engine migration + SPECTER2 + hygiene/prune",
+   "commit": "009ce91a85bdca07f3b8428d2654c5a119eea3c6",
+   "gate": "P4 R-CAL NOT_MET (0/4 verified diff=0); SPECTER2 separation NOT_MET (+0.037); migration DONE; R131-F2/R132-F1..F4 CLOSED",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r133_auditor_adjudication.json",
+   "findings": [
+    "R133-F1",
+    "R133-F2",
+    "R133-F3",
+    "R133-F4"
+   ],
+   "closed": [
+    "R131-F2",
+    "R132-F1",
+    "R132-F2",
+    "R132-F3",
+    "R132-F4"
+   ]
   }
  ],
  "gold_set": {
@@ -4858,7 +4920,7 @@
    "acceptance": "GRANTED (mean 3.9, CI[3.79, 4.01], 0/0/0)"
   }
  },
- "progress_note": "SCORE 7/10 (carried R132, no change). R132 P4 panel calibration VERIFIED HONEST NEGATIVE: 0/4 judges R-CAL qualified (independent recompute diff=0; llama0.4/qwen0.5/deepseek0.7/cohere0.222; answered 1.0/1.0/0.95/0.70). Protocol defect caught+amended before tally (pass1 excluded). GEPA round-2 LOSE->DELETED (Art.20, X=5, m5 7/96>v1 4/96; MF-2 directive-invariance confirmed). DIR6/7/8 closed R131-F4/F5/F6. NEW: R132-F1 panel bypasses engine/blind_panel.py (F63); R132-F2 SPECTER2 not integrated (P4 cosine gate); R132-F3 tie census 16 vs claimed 6; R132-F4 requirements pin gap. Path to 8: swap-robust vote+tie-policy prompt+larger rungs (Qwen3-235B callable) to R-CAL qualify >=3 judges, route panel through engine, integrate SPECTER2, v16 consolidates score-7. Path to 9: MOOSE-Chem post-cutoff rediscovery + unattended. Goal 9/10 fully agent-run (AM46). Worldwide: GEPA library/SPECTER2/MOOSE-Chem/AI-Scientist-v2 + China Qiushi/EvoScientist/AI-Researcher monitored for integration.",
+ "progress_note": "SCORE 7/10 (carried R133). R133 P4 panel round-2 VERIFIED HONEST NEGATIVE (0/4 R-CAL; recompute diff=0; levers worked: ties eliminated/forced-choice/429 cleared; acc cap ~0.7, llama4mav one short). dev-fu-001 r5 'baseline' label RULED GROUNDED (baseline dominates novelty2>1+testability4>3) \u2014 unanimous judge a1 is a shared blind spot, NOT a label error; bar stays. ENGINE MIGRATION DONE (prompts.py byte-faithful + review_layer.py check_layer + panel engine-routed; test_article22 extended; R131-F2/R132-F1 CLOSED). SPECTER2 integrated, separation +0.037 vs 0.2 NOT_MET (gate miscalibrated for compressed cosine band; reframe retrieval-distance + owner amendment, R133-F2). Census reconciled (16=5/3/3/5), requirements pinned (R132-F3/F4 CLOSED). Prune error (repair_convergence CI consumer) honestly fix-forwarded; aide_tree_search pruned. NEW: R133-F1 cross-round accuracy claim overstated (dsv32 0.7->0.6); R133-F3 Art.27 share self-reported; R133-F4 SPECTER2 not CI-wired. Path to 8: CoT comparative prompting + reasoning rungs (DeepSeek-R1/QwQ, +76pts agreement literature) to qualify >=3 judges; SPECTER2 retrieval gate; v16. Path to 9: auditor-sealed post-cutoff rediscovery slice (Qiushi reference) + unattended. Goal 9/10 fully agent-run (AM46).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

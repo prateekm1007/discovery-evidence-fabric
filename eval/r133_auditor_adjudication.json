@@ -1,0 +1,87 @@
+{
+ "record": "R133_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r133s1",
+ "audited_queue_tip": "c76a26a597cd (builder-r121s1-3e8a41d7, claim c-0212 DONE)",
+ "audit_branch_parent": "009ce91a85bdca07f3b8428d2654c5a119eea3c6",
+ "R133_PANEL_VERDICT": {
+  "verdict": "VERIFIED HONEST NEGATIVE round-2 \u2014 P4 R-CAL gate NOT_MET (0/4). Independent Art.13 recompute matches every gate number (diff=0); engine second-code-path cross-check corroborated. The three levers WORKED structurally (ties eliminated, forced-choice no TIE, 429 class fully cleared incl Llama-4-Maverick 20/20) but accuracy caps ~0.7 (llama4mav one hit short).",
+  "recompute": "qwen235b 0.6/ans1.0, dsv32 0.6/1.0, llama4mav 0.7/1.0, llama33 0.5/0.85; qualified=[]",
+  "dev_fu_001_label_ruling": "The r5 'baseline' label is GROUNDED and CORRECT \u2014 baseline dominates a1 on novelty (2>1) AND testability (4>3), equal feasibility/constraint. The unanimous 4-judge a1 vote is a SHARED JUDGE BLIND SPOT, not a label error. NO Art.9 correction. The R-CAL acc>=0.8 bar is a legitimate filter; do NOT lower it or tune labels to pass (Art.3/6).",
+  "claim_before_work": "c-0212 prereg pushed first (39c29c0d5); D2 fix-forward chain honest (6c5c36ea8 red disclosed -> d4f9a4caf -> c76a26a59 green)"
+ },
+ "MIGRATION_VERDICT": {
+  "DIR3": "DONE \u2014 engine/prompts.py (M5=195c byte-faithful, FIX_SCHEMA/AUTHORING/PER_AXIS constants), engine/review_layer.py (check_layer), test_article22 extended (CI green), R132 records recompute identically. Engine capability additions verified across 6 modules (prompts137/review_layer72/blind_panel88/panel_agreement177/prior_art98/rediscovery41). R131-F2 + R132-F1 CLOSED.",
+  "DIR4_SPECTER2": "INTEGRATED (AutoAdapterModel, adapter binding cos0.955, deterministic self-cos1.0, canary-clean); direction correct all 3 problems; separation +0.037 vs >=0.2 NOT_MET; threshold NOT recalibrated (Art.9). R132-F2 CLOSED at integration.",
+  "DIR6": "scaffold complete (T1/T2/canary tiers in engine/rediscovery_protocol.py); NO items run (honest); needs auditor-sealed post-cutoff corpus + typed generator cutoff",
+  "DIR7": "census reconciled EXACT (16=5/3/3/5, cohere13:0+1TIE, unit defined); requirements pinned (pint/cantera/mapie/sklearn/torch/transformers/adapters). R132-F3/F4 CLOSED.",
+  "DIR8": "module ledger 7 modules import-graph evidence; aide_tree_search PRUNED (no workflow consumer); repair_convergence KEPT (live R93 CI consumer, restored byte-identically); evolution KEPT (live). Census method corrected to include .github/workflows."
+ },
+ "PRUNE_ERROR_RULING": "The repair_convergence prune missed the CI workflow consumer (R93 dry-run) -> close push red. HONESTLY disclosed + fix-forwarded (module restored byte-identically, verified at tip). The lesson (workflow file is a consumer surface) is wired into the census method. Good Art.9 discipline; the prune liveness check must ALWAYS include .github/workflows/*.yml.",
+ "FINDINGS": [
+  {
+   "id": "R133-F1",
+   "severity": "MEDIUM",
+   "title": "Progress-honesty: 'every judge's accuracy rose vs R132' is overstated \u2014 dsv32 (same model) went 0.7 (R132 order-majority) -> 0.6 (R133 swap-robust); cross-round comparison mixes models AND vote rules",
+   "evidence": "r133_panel_calibration diagnosis vs r132_calibration + recompute",
+   "direction": "DIR7 \u2014 same-model/same-rule deltas only"
+  },
+  {
+   "id": "R133-F2",
+   "severity": "MEDIUM",
+   "title": "SPECTER2 >=0.2 absolute-margin gate miscalibrated for the compressed same-domain cosine band (~0.84-0.94); prior-art novelty is retrieval-based in the literature (nearest-50 cosine, threshold ~0.75), not a fixed per-problem margin",
+   "evidence": "r133_specter2_separation.json (+0.037, direction correct); NIH NOT-OD-26-087 retrieval threshold; ICA-normalization literature",
+   "direction": "DIR3 \u2014 AUC/ranking + retrieval-distance reframe; escalate gate value to OWNER (dated amendment, not silent lowering)"
+  },
+  {
+   "id": "R133-F3",
+   "severity": "LOW",
+   "title": "Art.27 self-reported engine share 91.7% (404/440) does not reconcile with the diff (613 engine additions, ~553 script additions); test trusts hand-typed field. Share >=30% under any code-only counting (gate MET)",
+   "evidence": "r133s1_status art27 vs commit diff; test_article27 reads hand-typed field",
+   "direction": "DIR6 \u2014 test recompute share from diff"
+  },
+  {
+   "id": "R133-F4",
+   "severity": "LOW",
+   "title": "SPECTER2 instrument (torch/transformers/adapters) NOT CI-wired (surface.yml installs only pint/cantera/mapie/hf-hub); separation/determinism local-only",
+   "evidence": "requirements.txt pins vs surface.yml pip install",
+   "direction": "DIR6 \u2014 lightweight CI determinism test or typed local-only caveat"
+  },
+  {
+   "id": "R131-F3",
+   "severity": "MEDIUM",
+   "title": "Score-7 two-consecutive->=3.3 not strict (v12/v15 non-consecutive)",
+   "evidence": "ledger sealed_instruments",
+   "status": "OPEN \u2014 v16 consolidates (DIR4)"
+  }
+ ],
+ "CLOSED": [
+  "R131-F2 (architecture/migration)",
+  "R132-F1 (panel engine-reuse)",
+  "R132-F2 (SPECTER2 integration)",
+  "R132-F3 (census)",
+  "R132-F4 (pins)"
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET",
+  "P1": "MET (score5)",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; engine migration DONE \u2014 capability logic now engine-routed; GEPA deleted, BoN adopted, speed verified; v16 needed)",
+  "P4": "NOT_MET \u2014 R-CAL 0/4 (acc cap ~0.7; lever: CoT comparative prompting + reasoning rungs, up to +76pts agreement on reasoning models); SPECTER2 integrated but separation NOT_MET (+0.037; reframe retrieval-distance + owner gate amendment)",
+  "P5": "NOT_MET \u2014 scaffold ready (T1/T2/canary); needs auditor-sealed post-cutoff corpus + typed cutoff; Qiushi reproducible-verification is the reference"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "ledger V95 carried; R133 honest negatives do not change score; architecture cleaner (engine-routed)",
+  "goal": "9/10 fully agent-run (AM46)",
+  "path_to_8": "CoT+reasoning judges to R-CAL qualify >=3 (DIR2) + SPECTER2 retrieval gate (DIR3) + v16 (DIR4)",
+  "path_to_9": "P5 rediscovery slice (DIR5) + unattended"
+ },
+ "WORLDWIDE_LEVERS": {
+  "judge_CoT": "RETHINKING LLM JUDGES (Chen): comparative CoT prompting lifts agreement up to +76pts on reasoning-trained models (DeepSeek-R1); use CoT + DeepSeek-R1/QwQ-32B rung (DIR2)",
+  "specter2": "prior-art novelty is retrieval-based (NIH NOT-OD-26-087: nearest-50 cosine threshold 0.75); ICA-normalized embeddings widen cosine dynamic range (DIR3)",
+  "P5_reference": "Qiushi Discovery Engine (Oxelra-AI, real optical platform, reproduces published experiment on non-original platform + reproducible verification); EvoScientist (self-evolving multi-agent memory); AI-Researcher (hkuds, NeurIPS2025 Spotlight) \u2014 monitor/integrate patterns",
+  "integration_status": "GEPA library not installed (arm deleted); SPECTER2 integrated; MOOSE-Chem scaffolded; MAPIE integrated+pinned; AIDE pruned; repair_convergence/evolution kept live"
+ },
+ "recompute_pointer": "eval/r133_auditor_recompute.json (diff=0)"
+}
