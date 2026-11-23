@@ -71,7 +71,12 @@ def load_v16_problems() -> list:
     the prereg's model pin. The auditor's PRIVATE rubric is never
     touched (unauth 404 — the custody discipline)."""
     prereg = json.loads(_git_show_audit(PREREG_PATH))
-    assert str(prereg.get("model_pin") or "") == MODEL_PIN, (
+    # the prereg's pin carries the owner's provenance annotation
+    # ("agnes-3.0-flash (default generator)"); the MODEL SERVED must be
+    # exactly the pinned model — the comparison normalizes the
+    # parenthetical annotation, never the model identity itself
+    _prereg_pin = str(prereg.get("model_pin") or "").split(" (")[0].strip()
+    assert _prereg_pin == MODEL_PIN, (
         f"the prereg's model_pin is {prereg.get('model_pin')!r} but "
         f"the instrument serves {MODEL_PIN!r} (typed abort)")
     assert int(prereg.get("n") or 0) == 30, (
@@ -81,7 +86,11 @@ def load_v16_problems() -> list:
         f"the route registry's registered id is {reg_model!r} but "
         f"the instrument serves {MODEL_PIN!r} (typed abort)")
     raw = json.loads(_git_show_audit(PROBLEMS_PATH))
-    probs = raw.get("problems", raw if isinstance(raw, list) else [])
+    # the audit-branch seal is a BARE LIST of the 30 problem objects
+    # (the queue-tip publication eval/holdout_v16_problems.json has the
+    # same shape) — accept both a {"problems": [...]} wrapper and a list
+    probs = raw.get("problems") if isinstance(raw, dict) else raw
+    probs = probs or []
     assert len(probs) == 30, f"expected 30 v16 problems, got {len(probs)}"
     # the problem-only mapping (no invention — the fields the pipeline
     # needs, filled from the problem text or typed defaults)
@@ -102,6 +111,24 @@ def load_v16_problems() -> list:
             "contamination_tag": p.get("split", "V16"),
         })
     return mapped
+
+
+def _gateway_key() -> str:
+    """The local gateway bearer (ZAI_API_KEY from .env.keys / env).
+    The r97 run_rows path gets it from m77.start_gateway(); this driver
+    drives machine_generate_v79 directly, so the key must be passed
+    explicitly — passing None produced the 401->nvidia-fallback
+    RuntimeError that killed attempts 1-4 (typed fix, c-0237)."""
+    import os
+    k = os.environ.get("ZAI_API_KEY")
+    if not k:
+        env_keys = REPO / ".env.keys"
+        if env_keys.exists():
+            for line in env_keys.read_text().splitlines():
+                if line.startswith("ZAI_API_KEY="):
+                    k = line.split("=", 1)[1].strip()
+                    break
+    return k or ""
 
 
 def main() -> int:
@@ -131,7 +158,7 @@ def main() -> int:
                                       rule)
         t_row = r97._now()
         final, attempts, final_meta = r97.machine_generate_v79(
-            machine_prob, None, used_templates={})
+            machine_prob, _gateway_key(), used_templates={})
         row_wall_s = round(time.time() - row_wall_start, 1)
         decl = m77.declared_template(final)
         row = {

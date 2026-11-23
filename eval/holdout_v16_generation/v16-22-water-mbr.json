@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-22-water-mbr",
+ "domain": "water",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:646c123413e1": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:4b7c624be205": "borderline-judge"
+  }
+ },
+ "generated_at": "2026-11-23T22:24:27Z",
+ "attempts_n": 1,
+ "row_wall_s": 10.5,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice prevents MBR fouling spikes via mechanical scouring or intermittent backwashing, a design change that disrupts biofilm accumulation. My mechanism departs by using closed-loop pH titration and conductivity feedback to modulate trans-membrane hydraulic driving force, delivering the same mitigation outcome through active hydraulic control rather than physical cleaning. The failure-physics connection is that extracellular polymeric substance (EPS) release and subsequent membrane cake layer growth are rate-limited by the net hydraulic flux; reducing the flux below a critical threshold allows EPS diffusion to outpace deposition, effectively preventing the fouling spike before it occurs.\n\nPHYSICS CHECK\nThe governing relation is the critical flux hypothesis for fouling, where the net deposition rate $J_{dep}$ becomes zero when the trans-membrane pressure (TMP) is reduced such that convective transport is offset by back-diffusion of EPS. $J_{dep} \\propto J_{h} - J_{diff}$. When $J_{h}$ (hydraulic flux) is lowered via TMP reduction, the system reaches a state where $J_{diff} \\ge J_{h}$, halting cake growth. Magnitude verification: Typical MBR operating flux is ~10–20 LMH. To prevent EPS spike, flux must be reduced to < 2 LMH (ASSUMPTION: based on standard critical flux models for activated sludge). The hydraulic head required to maintain 2 LMH is ~5 m of water column (CALCULATED: $h = \\frac{\\mu J}{\\rho g}$, assuming permeate viscosity $\\mu \\approx 10^{-3}$ Pa·s and specific resistance negligible for clean membrane, which holds for the initial phase of spike mitigation).\n\nIMPLEMENTATION BILL\n1.  Controller Unit (PLC/Logic): Uses ALREADY-RECORDED pH and Conductivity signals from standard plant monitoring. (DERIVED: pH shifts indicate metabolic activity and EPS release; Conductivity changes indicate ionic strength variations associated with extracellular matrix exudation).\n2.  Variable Speed Drive (VSD) on Feed/Pump: Modulates flow to maintain reduced TMP. (DERIVED: Existing instrumentation class; no new sensors required).\n3.  Solenoid Valve Adjustment: Fine-tunes TMP setpoint. (DERIVED: Existing control hardware).\n4.  Reference Threshold: EPS Release Index = $k \\cdot \\frac{d(pH)}{dt} + m \\cdot \\Delta Conductivity$. (CALCULATED: Coefficients $k, m$ derived from stated physics of EPS ionic composition and pH sensitivity; no baseline collection program, uses instantaneous dynamic response relative to steady-state nominal values already logged in plant DCS).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Same as standard, uses existing VSDs and DCS tags. No new physical installation required beyond control logic updates.\nOperability: Automatic. Triggers on pH/Conductivity spikes.\nMaintenance: Software only. No mechanical wear parts added compared to backwash systems.\nCost: Negligible (software logic).\nStandard practice (backwash) has high water/energy cost. My approach has zero incremental utility cost, only logic implementation. Burden class is SAME (minimal), mechanism is DIFFERENT (hydraulic throttling vs mechanical flushing).\n\nEXECUTABLE TEST\nProtocol:\n1.  Identify historical periods in the plant data log (ALREADY-RECORDED) where TMP rose sharply indicative of fouling spikes.\n2.  Simulate the controller logic in offline mode using these historical pH/Conductivity traces.\n3.  Pass/Fail Threshold: The simulated flux reduction strategy must correlate with a drop in predicted TMP rise rate by > 50% compared to \"no action\" baseline in the simulation.\n4.  Kill Criterion: If the pH/Conductivity lag time relative to TMP rise exceeds 15 minutes (ASSUMPTION: control loop delay limit), the method fails because the intervention is too late.\n\nCONSTRAINT BIND\nPrimary stated indicator: TMP (Trans-Membrane Pressure). The mechanism does not replace TMP monitoring; it uses pH/Conductivity as *leading* indicators to proactively adjust the hydraulic force driving the TMP increase. The \"spike\" is defined by TMP deviation; the intervention prevents the deviation by lowering the driving force. The constraint \"chemistry\" signals (pH, conductivity) are strictly adhered to as the trigger inputs.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "a1ef9e650d85273c"
+}
