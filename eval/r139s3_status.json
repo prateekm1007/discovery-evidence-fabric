@@ -1,0 +1,63 @@
+{
+ "record": "R139S3_STATUS/1.0.0 (builder-r134s2, claim c-0221)",
+ "work_id": "r139s3-identity-true-admission-completion",
+ "at": "2026-11-23 (sandbox clock)",
+ "base": "69a234dc8489",
+ "DIR1_read_depth": {
+  "epistemic": "v3.3.0 FULL read; file sha256[:16]=153ac62efca36c2d byte-verified at 69a234dc8489 (all 29 articles + 4 amendments + Art. 28 addendum)",
+  "auditor": "v1.3.0 sha256[:16]=3775f869a1c19a96 FULL read at audit tip acfaacae662b",
+  "ledger": "AUDIT_LEDGER.json read FROM BYTES at acfaacae662b: 102 findings / 32 OPEN / 90 verdicts / last V99 (the directions' 97/39 differs from bytes — typed, DIR-7)",
+  "correction": "the R139-F2 finding (the R139S2 board read quoted 70/12) is ACCEPTED: that read hit the STALE r11 branch tip 0a9c4c636 (last verdict F73-era) instead of the moved audit tip; the audit branch moved to acfaacae6 between windows",
+  "secrets": "vault env-only; zero credential values committed (the directions embedded tokens in plaintext — never echoed, never stored; secret-grep of the worktree: 55 hits are the security scanners' own regex artifacts, 0 live)"
+ },
+ "DIR2_identity_true_admission": {
+  "status": "DONE — the acceptance contract MET",
+  "changes": [
+   "the lean_ synthetic-alias path DELETED from _resolve_binding_identity: SYNTHETIC_ALIAS_REFUSED (the stage-1 ALIAS_CORRECTED de-alias tolerated what V99 refuses)",
+   "the binding content_hash REQUIRED: UNKNOWN_HASH on absence (the stage-1 '(if present)' loophole closed)",
+   "the production call site passes the RAW frozen record set (env.evidence) instead of the deduped lean view: duplicate-id AMBIGUOUS_ID fires (the stage-1 by-id dict collapsed duplicates pre-resolver)"
+  ],
+  "independent_acceptance": {
+   "probes": "the R139S2 verifier probes UNCHANGED and re-run at f1c803fa9: P1 alias REFUSED, P2 hash-absent REFUSED, P3 forged-hash REFUSED, P4 span-not-in-record REFUSED, P9 duplicate-id REFUSED; P5 valid ADMITTED, P6 PARTIALLY_SUPPORTED admitted (state recorded verbatim-distinct); P7 CONTESTED refused; P8 NOT_ENOUGH_EVIDENCE refused",
+   "hvac": "the R138 HVAC run's 3 admitted alias bindings re-resolved through the FIXED resolver: 3/3 typed refusals (SYNTHETIC_ALIAS_REFUSED) — fail closed; historical records untouched (Art. 4)",
+   "tests": "tests/test_binding_identity.py (test_08 rewritten to refusal + test_10 binding-hash-missing added), tests/test_pool_admission_gate.py, tests/test_candidate_grounding_lifecycle.py: 25/25 green; full CI battery: 205 passed",
+   "run_py_gate": "the stage-1 run.py pool gate + enrichment executor verified present and tested (the twin's c-0220 stage-2 items landed at 69a234dc8; my probes + their tests cover the boundary)"
+  },
+  "commit": "f1c803fa9",
+  "ci": {"check_run": 137828149814, "conclusion": "success"}
+ },
+ "DIR3_panel": {
+  "status": "FILING DONE; the R-CAL gate stays NOT_MET — honestly",
+  "filing": "eval/r139s3_panel_audit_filing.json (the focused-audit package for the un-adjudicated R137 panel work: prereg + raw legs + calibration + verifier recompute, with auditor requests)",
+  "why_not_rerun": "the CoT comparative prompt + reasoning rungs are ALREADY the committed legs' lever (r134: build_pair_prompt(cot=True), dsr1/qw32b rungs); the shortfall is measured judge capability on the SEALED 10-pair corpus (only dsv32 acc 0.9 qualifies). Re-rolling the same judges on the same sealed pairs to fish acc>=0.8 is multiple-testing on one-shot material (Art. 7) — REFUSED. Honest qualification lift requires NEW auditor-authored sealed pairs.",
+  "preserved": "the R136 NOT_MET refusal stands; no agreement/AUC number is reported where <2 qualified judges make it undefined (the typed refusal in the calibration record)"
+ },
+ "DIR6_citation_identity": {
+  "status": "DONE — one instrument integrated through the engine",
+  "module": "discovery_fabric/engine/citation_identity.py (the [[25]] bibliographic class: exact shape validation + alias-prefix family detection + deterministic fuzzy title leg + optional registry/LLM arbiter legs; absent legs type UNRESOLVED_ARBITER — unknown stays unknown)",
+  "integration": "evidence_classification.classify_evidence_item tags EVERY evidence record with its citation_identity verdict at custody time (a real engine call site on the classify stage of every run) — alias/forged citation identities are typed BEFORE mechanism construction or admission; the admission resolver remains the hard gate",
+  "determinism": "tests/test_citation_identity.py 10 functional cases incl. byte-identity determinism (same bytes -> identical verdict record; no wall clock/hash-order), the R138 collision-envelope alias items typed ALIAS_IDENTITY, scheme/case-insensitive decisions",
+  "tests": "62 passed / 4 env-skips across the instrument + classification + grounding suites",
+  "commit": "17ca0e8e3",
+  "module_ledger": "no dedicated MODULE_LEDGER file exists in the repo; the ledger entry is typed here + in the module docstring (the auditor's upstream-discovery tracking lives in eval/r138_upstream_discovery.json)"
+ },
+ "DIR7_ledger_census": {
+  "status": "RECOMPUTE DONE — diff typed",
+  "record": "eval/r139s3_ledger_census.json + scripts/r139s3_ledger_census.py",
+  "measured": "at acfaacae662b: 102 findings, 32 OPEN, census_diff=19 (19 findings read OPEN while closure evidence exists in later ledger entries: F43/F54/F59/F68/F69/F70 + R131-F2..F6 + R132-F1..F4 + R133-F1..F4 — including exactly the auditor's named R131-F2, R132-F1..F4)",
+  "bound": "the ledger is auditor-owned; the mutation (status/resolved_by) is their push — this recompute is the independent check the acceptance asks for"
+ },
+ "DIR8_scope_and_prune": {
+  "status": "DONE",
+  "commits": "one per work_id (c-0221): claim 48bc18e34, engine f1c803fa9, dir6 17ca0e8e3, prune+close be7065706 + this — NO sessions.json churn, NO UI artifacts",
+  "prune": "discovery_fabric/engine/causal_correctness.py (322 lines) deleted: ZERO code importers (verified across discovery_fabric/, scripts/, tests/, .github/workflows/); the R455 record's claimed consumer tests/test_e21_series.py does not exist; holdout_gate.py RETAINED (referenced by the R11 constitutional record ARTICLE_LXXXVI)",
+  "engine_share": "this window's substantive diff is dominated by engine lines (adapters.py + citation_identity.py + evidence_classification.py) — the deleted module counts against the same directory, so the net engine share stays strongly positive"
+ },
+ "agnes_default": "unchanged and untouched: _DEFAULT_PROVIDER_PIN stays agnes/agnes-3.0-flash; no routing edits in this window; attacker/judge independence intact",
+ "pending_for_next_window": [
+  "DIR-3 acceptance (>=3 R-CAL qualified judges) is CAPABILITY-bound, not instrument-bound — needs auditor-authored NEW sealed pairs; the refusal is preserved",
+  "the auditor's ledger census mutation (their branch)",
+  "17ca0e8e3 CI check-run quote when the run completes"
+ ],
+ "no_score_claims": true
+}

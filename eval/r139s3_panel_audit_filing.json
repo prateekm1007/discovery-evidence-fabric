@@ -1,0 +1,30 @@
+{
+ "record": "R139S3_PANEL_AUDIT_FILING/1.0.0",
+ "claim": "c-0221",
+ "work_id": "r139s3-identity-true-admission-completion",
+ "at": "2026-11-23 (sandbox clock)",
+ "purpose": "DIR-3 clause 1: the R137 panel-fixes + live-multi-mechanism work (claim c-0218) RAN WITHOUT A COMMITTED AUDITOR VERDICT - this filing assembles the focused-audit package so the auditor can adjudicate it; nothing here re-rolls sealed material (Art. 7 one-shot preserved).",
+ "filing_items": [
+  {"item": "prereg", "path": "eval/r134_panel_prereg.json", "sha_at_commit": "see git log for the prereg push (typed be4eb8794 in the driver header)"},
+  {"item": "raw judge legs (5 judges x 20 legs, CoT comparative prompt + reasoning rungs)", "path": "eval/r134_panel/", "n_files": "see directory"},
+  {"item": "hy4f legs (6th preregistered judge)", "path": "eval/r135_panel/"},
+  {"item": "the R136 v2 calibration (the R137 instrument corrections applied)", "path": "eval/r136_panel_v2_calibration.json"},
+  {"item": "the independent verifier recompute (120 recorded legs / 119 valid; qualified=[dsv32] only; GATE NOT_MET preserved)", "path": "eval/r137s2_panel_verifier_recompute.json"},
+  {"item": "the twin's final recompute at the R138 tip", "path": "eval/r136_panel_v2_calibration.json (regenerated final states)"}
+ ],
+ "measured_state_at_filing": {
+  "legs": "120 recorded / 119 valid (hy4f 19 VALID + 1 TRANSPORT_FAILED)",
+  "qualified": ["dsv32 (acc 0.9, answered 1.0)"],
+  "per_judge_acc": {"dsr1": 0.7, "qw32b": 0.6, "qwen235b": 0.6, "dsv32": 0.9, "llama4mav": 0.5, "hy4f": 0.778},
+  "answered": {"dsr1": 1.0, "qw32b": 1.0, "qwen235b": 1.0, "dsv32": 1.0, "llama4mav": 1.0, "hy4f": 0.95},
+  "qualified_families": ["deepseek"],
+  "gate": "NOT_MET (>=3 judges acc>=0.8 AND answered>=0.9 from >=2 non-agnes families)"
+ },
+ "why_not_a_rerun": "The CoT comparative prompt + reasoning rungs (dsr1/qw32b) are ALREADY the r134/r135 legs' lever - the qualification shortfall is measured judge capability on the sealed 10-pair corpus, not an instrument gap. Re-rolling the SAME judges on the SAME sealed pairs to fish acc past 0.8 is multiple-testing on one-shot sealed material (Art. 7) and is REFUSED. Lifting qualification honestly requires NEW sealed pairs authored by the auditor (their instrument custody) - requested in this filing.",
+ "requests_to_auditor": [
+  "issue the missing verdict for the R137 panel-fixes + multi-mechanism work (c-0218) from the committed bytes listed above",
+  "if the R-CAL gate is to be re-attempted, author NEW sealed pairs (Art. 7 custody) - the frozen r5 corpus is one-shot and stays one-shot",
+  "reconcile the ledger OPEN census to the truly-open set (this lane's recompute measured census_diff=19 at acfaacae662b: eval/r139s3_ledger_census.json)"
+ ],
+ "no_score_claims": true
+}
