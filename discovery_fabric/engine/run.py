@@ -214,8 +214,18 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
             "hypothesis_lifecycle_before": c.get(
                 "candidate_lifecycle")}
         try:
+            # R141 DIR-4 (the live-path yield fix): the raw mechanism
+            # prose alone starved the deterministic keyword-form
+            # retrieval (the v2 desal enrichment attempts returned ZERO
+            # records — "no retrievable records" typed). The query now
+            # carries the mechanism terms PLUS the problem's
+            # failure_mode + domain (the same fields the main retrieval
+            # uses) — still deterministic, no new framework.
+            _ctx = " ".join(
+                str(problem.get(k) or "") for k in
+                ("failure_mode", "domain")).strip()
             fresh = _ev.retrieve_fresh_evidence(
-                problem, {"mechanism": mech},
+                problem, {"mechanism": f"{mech} {_ctx}".strip()},
                 snapshot_version="enrichment")
             attempt["retrieval_status"] = fresh.get("status")
             attempt["retrieval_query"] = fresh.get("query")
@@ -228,6 +238,7 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                 _a = str(rec.get("abstract") or "")
                 _rt = f"{_t}. {_a}".strip()
                 new_items.append({
+                    "id": rec.get("id"),
                     "item_id": rec.get("id"),
                     "content_hash": rec.get("content_hash"),
                     "fields": {"system": {"value": _t},
