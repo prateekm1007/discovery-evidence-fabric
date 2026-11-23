@@ -662,7 +662,19 @@ ROLE_TRANSFORM = "transform"        # simple JSON shaping (prefer no LLM)
 # (Art. XLV attack-independence, Art. V cooldown demotion).
 # ENGINE_DEFAULT_PROVIDER (env) still overrides or disables ("" = no
 # pin) — the ENGINE_* operator-override class.
-_DEFAULT_PROVIDER_PIN = "zai"
+# R138 owner directive (2026-11-23, "agnes-3.0-flash must be first
+# choice"; "Agnes must actually be the production default"): the
+# default pin moves to agnes. The R6-era zai pin (successor of the
+# 2026-09-16 Atria directive — Atria retired from mechanism_space in
+# R517/R518) routed R137's live mechanism-generation runs to
+# xkiro/mistralai/ministral-14b — the measured routing deviation the
+# R138 directions call out. agnes carries the AGNES_API_KEY rotation
+# (vault custody, Art. 17). The two standing rules STILL take
+# precedence over the pin: Art. XLV attack-independence (the attack
+# role demotes the generator's provider) and Art. V cooldown demotion
+# (a rate-limited agnes slides to the end, never refuses) — alternate
+# providers serve only through the recorded cascade, never silently.
+_DEFAULT_PROVIDER_PIN = "agnes"
 
 # R518/R519: THE single routing-retirement authority (Art. X: one
 # canonical state; R519 §5-6: no scattered hard-coded retirement tuples
@@ -714,19 +726,23 @@ RETIRED_ROUTE_PROVIDERS: Dict[str, set] = {
     # MECHANISM_SPACE, both ROLE_SYNTHESIS (110-226s / 12-128s latency
     # in the R517 battery).
     "atria": {ROLE_ATTACK, ROLE_SYNTHESIS},
-    # Agnes: retired from EVERY engine role this window (R6 owner
-    # round 2026-11-12, MEASURED — audit facts + the fu-001 smoke):
-    # the upstream enforces "used up today's text quota ... 1 request
-    # every 3 minutes" (429 RATE_LIMITED probe record). A SINGLE
-    # capability probe still passes (the smoke's baseline probe
-    # returned OK) — which is exactly the trap: real demand burns the
-    # retry budget on 429s until the breaker opens (measured: the
-    # smoke's baseline arm ended CIRCUIT_BREAKER_OPEN, and the
-    # SYNTHESIZE stage resolved agnes through the post-zai cascade;
-    # the problem timed out at the 300 s wall). One call per 3 minutes
-    # serves NO role. Reversible: re-enter on a measured quota reset
-    # (Art. XXV — recorded reality over aspiration).
-    "agnes": {ROLE_SYNTHESIS, ROLE_EXTRACTION, ROLE_ATTACK,
+    # Agnes: MEASURED RE-ENTRY for ROLE_SYNTHESIS (the R138 owner
+    # directive 2026-11-23, "agnes-3.0-flash must be first choice" /
+    # "Agnes must actually be the production default"; the retirement
+    # record's own re-entry clause — "re-enter on a measured quota
+    # reset (Art. XXV: recorded reality over aspiration)" — is
+    # satisfied: 3/3 back-to-back 200 OK agnes-3.0-flash calls
+    # (0.4-0.5 s) measured 2026-11-23, vs the R6 "used up today's
+    # text quota ... 1 request every 3 minutes" state). The R6
+    # removal reason (quota-exhausted 429s burning retry budgets)
+    # stays on record; a recurrence re-opens it through the same
+    # measured mechanism (the health book's cooldown + this map —
+    # a 429 wall re-retires the role in the same change that
+    # measures it). Retained retirements: EXTRACTION/ATTACK/
+    # TRANSFORM stay off agnes this window (the directive scopes
+    # agnes to GENERATION; judges and attackers keep their own
+    # providers — Art. XLV independence is untouched).
+    "agnes": {ROLE_EXTRACTION, ROLE_ATTACK,
               ROLE_TRANSFORM},
     # Openrouter: retired from EVERY engine role this window (R6 owner
     # round 2026-11-12, MEASURED — audit facts + the fu-001 smoke 3):

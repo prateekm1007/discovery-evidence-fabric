@@ -1,0 +1,533 @@
+{
+ "run_id": "r138-r138-fresh-01-gearbox-lubrication-starvation",
+ "session_id": null,
+ "isolation_rule": "run_id equality on the append-only routing ledger — no time window, no ledger tail (R451-C1.3-3)",
+ "line_count": 4,
+ "run_owned_call_lines": 4,
+ "capability_probe_lines": 0,
+ "paid_cost_class_lines": 4,
+ "lines": [
+  {
+   "account_domain": "OWNER_XKIRO_ACCOUNT",
+   "attempt": 1,
+   "call_class": "RUN_OWNED",
+   "capability_state": "PROBE_OK",
+   "cost_class": "FREE_TIER_API",
+   "engine_stage": "ATTACK",
+   "error": "",
+   "estimated_cost": null,
+   "failure_class": null,
+   "fallback_from": null,
+   "fallback_reason": "",
+   "fallback_to": null,
+   "generate_spans": {
+    "chain_source": "policy.preferred_providers",
+    "cost_refusals": [],
+    "generate_call_id": "gen_2dddafecc03b",
+    "generate_elapsed_s": 4.278743,
+    "generate_start_epoch": 1795443152.9603512,
+    "generate_total_s": 4.278741,
+    "instrument": "gen_spans/1.0",
+    "ladder_before_filtering": [
+     [
+      "xkiro",
+      "mistralai/ministral-14b"
+     ],
+     [
+      "agnes",
+      "agnes-3.0-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-8b"
+     ],
+     [
+      "agnes",
+      "agnes-2.5-flash"
+     ]
+    ],
+    "post_success_sleep_note": "no fixed post-success sleep in generate(); the 0.5 s sleep lives in a2/synthesize.llm_chat and rides inside llm_chat_total_s",
+    "post_success_sleep_s": null,
+    "purpose": "attack",
+    "response_normalization_note": "no response-normalization step exists in generate(); provider content flows straight to the result record",
+    "response_normalization_s": null,
+    "retirement_removed": [
+     "agnes"
+    ],
+    "rungs": [
+     {
+      "admission": {
+       "admitted": true,
+       "capability_state": "PROBE_OK",
+       "note": null,
+       "probe_admission_s": 0.50631,
+       "probe_retry_sleep_s": 0.0
+      },
+      "attempts": [
+       {
+        "attempt_budget": 512,
+        "attempt_index": 1,
+        "dispatch_s": 3.751,
+        "end_utc": "2026-11-23T14:12:37+00:00Z",
+        "failure_type": null,
+        "gateway_hang": false,
+        "outcome": "OK",
+        "retry_sleep_s": 0.0,
+        "start_utc": "2026-11-23T14:12:33+00:00Z",
+        "total_s": 3.751,
+        "transition_to_next_s": null,
+        "ttfb_s": 3.751
+       }
+      ],
+      "model": "mistralai/ministral-14b",
+      "note": null,
+      "post_provider_local_s": 0.000812,
+      "provider": "xkiro",
+      "purpose": "attack",
+      "rung_index": 0
+     }
+    ],
+    "selection_diag": {
+     "availability_report_s": 0.017659,
+     "availability_score_s": 0.017734,
+     "n_availability_report_scans": 12,
+     "n_availability_score_calls": 4,
+     "n_discover_catalog_cache_hits": 18,
+     "n_discover_catalog_calls": 18,
+     "n_eligible_models_calls": 6,
+     "n_eligible_models_returned": 6,
+     "n_ladder_rungs_emitted": 4,
+     "n_models_inspected": 4,
+     "n_providers_inspected": 3,
+     "n_selection_memo_hits": 8,
+     "n_span_failed_recently_calls": 0
+    },
+    "selection_ordering_s": 0.019927,
+    "selection_subspans": {
+     "A_availability_matrix_s": 0.000761,
+     "B_chain_construction_s": 4e-06,
+     "C_route_retirement_s": 1.6e-05,
+     "D_cost_policy_s": 1.5e-05,
+     "E_build_ladder_s": 0.018788,
+     "F_catalog_detail_s": 0.000733,
+     "G_scoring_detail_s": 0.017734,
+     "H_capability_evidence_s": 6.3e-05,
+     "I_selection_remainder_s": 0.00028,
+     "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+     "instrument": "gen_spans/1.0"
+    }
+   },
+   "latency": 3751,
+   "latency_ms": 3751,
+   "model": "mistralai/ministral-14b",
+   "ok": true,
+   "provider": "xkiro",
+   "recorded_at": "2026-11-23T14:12:37Z",
+   "recorded_at_epoch": 1795443157.2390985,
+   "request_id": "gen_2dddafecc03b",
+   "run_id": "r138-r138-fresh-01-gearbox-lubrication-starvation",
+   "selected": true,
+   "session_id": null,
+   "stage": "attack",
+   "status": "OK",
+   "task": "FAST",
+   "task_degradation": {
+    "actual_task_capability": "FAST",
+    "degraded_reason": "the serving model declares the requested task capability",
+    "requested_task": "FAST",
+    "task_capability_match": true
+   },
+   "tokens": null
+  },
+  {
+   "account_domain": "OWNER_AGNES_ACCOUNT",
+   "attempt": 1,
+   "call_class": "RUN_OWNED",
+   "capability_state": "PROBE_OK",
+   "cost_class": "FREE_TIER_API",
+   "engine_stage": "COMPOSE",
+   "error": "",
+   "estimated_cost": null,
+   "failure_class": null,
+   "fallback_from": null,
+   "fallback_reason": "",
+   "fallback_to": null,
+   "generate_spans": {
+    "chain_source": "policy.preferred_providers",
+    "cost_refusals": [],
+    "generate_call_id": "gen_019c6c66d601",
+    "generate_elapsed_s": 5.363646,
+    "generate_start_epoch": 1795443157.3593535,
+    "generate_total_s": 5.363645,
+    "instrument": "gen_spans/1.0",
+    "ladder_before_filtering": [
+     [
+      "agnes",
+      "agnes-3.0-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-14b"
+     ],
+     [
+      "agnes",
+      "agnes-2.5-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-8b"
+     ]
+    ],
+    "post_success_sleep_note": "no fixed post-success sleep in generate(); the 0.5 s sleep lives in a2/synthesize.llm_chat and rides inside llm_chat_total_s",
+    "post_success_sleep_s": null,
+    "purpose": "answer_composer",
+    "response_normalization_note": "no response-normalization step exists in generate(); provider content flows straight to the result record",
+    "response_normalization_s": null,
+    "retirement_removed": [],
+    "rungs": [
+     {
+      "admission": {
+       "admitted": true,
+       "capability_state": "PROBE_OK",
+       "note": null,
+       "probe_admission_s": 2.7e-05,
+       "probe_retry_sleep_s": 0.0
+      },
+      "attempts": [
+       {
+        "attempt_budget": 1000,
+        "attempt_index": 1,
+        "dispatch_s": 5.343,
+        "end_utc": "2026-11-23T14:12:42+00:00Z",
+        "failure_type": null,
+        "gateway_hang": false,
+        "outcome": "OK",
+        "retry_sleep_s": 0.0,
+        "start_utc": "2026-11-23T14:12:37+00:00Z",
+        "total_s": 5.343,
+        "transition_to_next_s": null,
+        "ttfb_s": 5.343
+       }
+      ],
+      "model": "agnes-3.0-flash",
+      "note": null,
+      "post_provider_local_s": 0.000756,
+      "provider": "agnes",
+      "purpose": "answer_composer",
+      "rung_index": 0
+     }
+    ],
+    "selection_diag": {
+     "availability_report_s": 0.017607,
+     "availability_score_s": 0.017671,
+     "n_availability_report_scans": 12,
+     "n_availability_score_calls": 4,
+     "n_discover_catalog_cache_hits": 12,
+     "n_discover_catalog_calls": 12,
+     "n_eligible_models_calls": 3,
+     "n_eligible_models_returned": 4,
+     "n_ladder_rungs_emitted": 4,
+     "n_models_inspected": 4,
+     "n_providers_inspected": 3,
+     "n_selection_memo_hits": 8,
+     "n_span_failed_recently_calls": 0
+    },
+    "selection_ordering_s": 0.019436,
+    "selection_subspans": {
+     "A_availability_matrix_s": 0.000635,
+     "B_chain_construction_s": 8e-06,
+     "C_route_retirement_s": 1.2e-05,
+     "D_cost_policy_s": 1.7e-05,
+     "E_build_ladder_s": 0.018633,
+     "F_catalog_detail_s": 0.000513,
+     "G_scoring_detail_s": 0.017671,
+     "H_capability_evidence_s": 0.000103,
+     "I_selection_remainder_s": 2.8e-05,
+     "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+     "instrument": "gen_spans/1.0"
+    }
+   },
+   "latency": 5343,
+   "latency_ms": 5343,
+   "model": "agnes-3.0-flash",
+   "ok": true,
+   "provider": "agnes",
+   "recorded_at": "2026-11-23T14:12:42Z",
+   "recorded_at_epoch": 1795443162.7230024,
+   "request_id": "gen_019c6c66d601",
+   "run_id": "r138-r138-fresh-01-gearbox-lubrication-starvation",
+   "selected": true,
+   "session_id": null,
+   "stage": "answer_composer",
+   "status": "OK",
+   "task": "STRONG",
+   "task_degradation": {
+    "actual_task_capability": "STRONG",
+    "degraded_reason": "the serving model declares the requested task capability",
+    "requested_task": "STRONG",
+    "task_capability_match": true
+   },
+   "tokens": null
+  },
+  {
+   "account_domain": "OWNER_AGNES_ACCOUNT",
+   "attempt": 1,
+   "call_class": "RUN_OWNED",
+   "capability_state": "PROBE_OK",
+   "cost_class": "FREE_TIER_API",
+   "engine_stage": "COMPOSE",
+   "error": "",
+   "estimated_cost": null,
+   "failure_class": null,
+   "fallback_from": null,
+   "fallback_reason": "",
+   "fallback_to": null,
+   "generate_spans": {
+    "chain_source": "policy.preferred_providers",
+    "cost_refusals": [],
+    "generate_call_id": "gen_f45a5dfcfec2",
+    "generate_elapsed_s": 2.317469,
+    "generate_start_epoch": 1795443162.730981,
+    "generate_total_s": 2.317468,
+    "instrument": "gen_spans/1.0",
+    "ladder_before_filtering": [
+     [
+      "agnes",
+      "agnes-3.0-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-14b"
+     ],
+     [
+      "agnes",
+      "agnes-2.5-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-8b"
+     ]
+    ],
+    "post_success_sleep_note": "no fixed post-success sleep in generate(); the 0.5 s sleep lives in a2/synthesize.llm_chat and rides inside llm_chat_total_s",
+    "post_success_sleep_s": null,
+    "purpose": "answer_composer_repair",
+    "response_normalization_note": "no response-normalization step exists in generate(); provider content flows straight to the result record",
+    "response_normalization_s": null,
+    "retirement_removed": [],
+    "rungs": [
+     {
+      "admission": {
+       "admitted": true,
+       "capability_state": "PROBE_OK",
+       "note": null,
+       "probe_admission_s": 2.2e-05,
+       "probe_retry_sleep_s": 0.0
+      },
+      "attempts": [
+       {
+        "attempt_budget": 1000,
+        "attempt_index": 1,
+        "dispatch_s": 2.296,
+        "end_utc": "2026-11-23T14:12:45+00:00Z",
+        "failure_type": null,
+        "gateway_hang": false,
+        "outcome": "OK",
+        "retry_sleep_s": 0.0,
+        "start_utc": "2026-11-23T14:12:42+00:00Z",
+        "total_s": 2.296,
+        "transition_to_next_s": null,
+        "ttfb_s": 2.296
+       }
+      ],
+      "model": "agnes-3.0-flash",
+      "note": null,
+      "post_provider_local_s": 0.000757,
+      "provider": "agnes",
+      "purpose": "answer_composer_repair",
+      "rung_index": 0
+     }
+    ],
+    "selection_diag": {
+     "availability_report_s": 0.018305,
+     "availability_score_s": 0.018368,
+     "n_availability_report_scans": 12,
+     "n_availability_score_calls": 4,
+     "n_discover_catalog_cache_hits": 12,
+     "n_discover_catalog_calls": 12,
+     "n_eligible_models_calls": 3,
+     "n_eligible_models_returned": 4,
+     "n_ladder_rungs_emitted": 4,
+     "n_models_inspected": 4,
+     "n_providers_inspected": 3,
+     "n_selection_memo_hits": 8,
+     "n_span_failed_recently_calls": 0
+    },
+    "selection_ordering_s": 0.020067,
+    "selection_subspans": {
+     "A_availability_matrix_s": 0.000486,
+     "B_chain_construction_s": 6e-06,
+     "C_route_retirement_s": 1.2e-05,
+     "D_cost_policy_s": 1.7e-05,
+     "E_build_ladder_s": 0.019407,
+     "F_catalog_detail_s": 0.000546,
+     "G_scoring_detail_s": 0.018368,
+     "H_capability_evidence_s": 0.000109,
+     "I_selection_remainder_s": 3e-05,
+     "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+     "instrument": "gen_spans/1.0"
+    }
+   },
+   "latency": 2296,
+   "latency_ms": 2296,
+   "model": "agnes-3.0-flash",
+   "ok": true,
+   "provider": "agnes",
+   "recorded_at": "2026-11-23T14:12:45Z",
+   "recorded_at_epoch": 1795443165.048457,
+   "request_id": "gen_f45a5dfcfec2",
+   "run_id": "r138-r138-fresh-01-gearbox-lubrication-starvation",
+   "selected": true,
+   "session_id": null,
+   "stage": "answer_composer_repair",
+   "status": "OK",
+   "task": "STRONG",
+   "task_degradation": {
+    "actual_task_capability": "STRONG",
+    "degraded_reason": "the serving model declares the requested task capability",
+    "requested_task": "STRONG",
+    "task_capability_match": true
+   },
+   "tokens": null
+  },
+  {
+   "account_domain": "OWNER_AGNES_ACCOUNT",
+   "attempt": 1,
+   "call_class": "RUN_OWNED",
+   "capability_state": "PROBE_OK",
+   "cost_class": "FREE_TIER_API",
+   "engine_stage": "COMPOSE",
+   "error": "",
+   "estimated_cost": null,
+   "failure_class": null,
+   "fallback_from": null,
+   "fallback_reason": "",
+   "fallback_to": null,
+   "generate_spans": {
+    "chain_source": "policy.preferred_providers",
+    "cost_refusals": [],
+    "generate_call_id": "gen_b70c0aece154",
+    "generate_elapsed_s": 1.492772,
+    "generate_start_epoch": 1795443165.053222,
+    "generate_total_s": 1.492771,
+    "instrument": "gen_spans/1.0",
+    "ladder_before_filtering": [
+     [
+      "agnes",
+      "agnes-3.0-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-14b"
+     ],
+     [
+      "agnes",
+      "agnes-2.5-flash"
+     ],
+     [
+      "xkiro",
+      "mistralai/ministral-8b"
+     ]
+    ],
+    "post_success_sleep_note": "no fixed post-success sleep in generate(); the 0.5 s sleep lives in a2/synthesize.llm_chat and rides inside llm_chat_total_s",
+    "post_success_sleep_s": null,
+    "purpose": "answer_composer_repair",
+    "response_normalization_note": "no response-normalization step exists in generate(); provider content flows straight to the result record",
+    "response_normalization_s": null,
+    "retirement_removed": [],
+    "rungs": [
+     {
+      "admission": {
+       "admitted": true,
+       "capability_state": "PROBE_OK",
+       "note": null,
+       "probe_admission_s": 2.1e-05,
+       "probe_retry_sleep_s": 0.0
+      },
+      "attempts": [
+       {
+        "attempt_budget": 1000,
+        "attempt_index": 1,
+        "dispatch_s": 1.471,
+        "end_utc": "2026-11-23T14:12:46+00:00Z",
+        "failure_type": null,
+        "gateway_hang": false,
+        "outcome": "OK",
+        "retry_sleep_s": 0.0,
+        "start_utc": "2026-11-23T14:12:45+00:00Z",
+        "total_s": 1.472,
+        "transition_to_next_s": null,
+        "ttfb_s": 1.471
+       }
+      ],
+      "model": "agnes-3.0-flash",
+      "note": null,
+      "post_provider_local_s": 0.000712,
+      "provider": "agnes",
+      "purpose": "answer_composer_repair",
+      "rung_index": 0
+     }
+    ],
+    "selection_diag": {
+     "availability_report_s": 0.018211,
+     "availability_score_s": 0.018278,
+     "n_availability_report_scans": 12,
+     "n_availability_score_calls": 4,
+     "n_discover_catalog_cache_hits": 12,
+     "n_discover_catalog_calls": 12,
+     "n_eligible_models_calls": 3,
+     "n_eligible_models_returned": 4,
+     "n_ladder_rungs_emitted": 4,
+     "n_models_inspected": 4,
+     "n_providers_inspected": 3,
+     "n_selection_memo_hits": 8,
+     "n_span_failed_recently_calls": 0
+    },
+    "selection_ordering_s": 0.019965,
+    "selection_subspans": {
+     "A_availability_matrix_s": 0.000488,
+     "B_chain_construction_s": 6e-06,
+     "C_route_retirement_s": 1e-05,
+     "D_cost_policy_s": 1.5e-05,
+     "E_build_ladder_s": 0.019318,
+     "F_catalog_detail_s": 0.000566,
+     "G_scoring_detail_s": 0.018278,
+     "H_capability_evidence_s": 0.000101,
+     "I_selection_remainder_s": 2.7e-05,
+     "accounting": "A+B+C+D+E+H+I = selection_ordering_s; F+G are detail-of-E (inclusive), not additive; F = eligible_models wall inclusive of catalog fetches; G = availability_score wall inclusive of ledger scans",
+     "instrument": "gen_spans/1.0"
+    }
+   },
+   "latency": 1471,
+   "latency_ms": 1471,
+   "model": "agnes-3.0-flash",
+   "ok": true,
+   "provider": "agnes",
+   "recorded_at": "2026-11-23T14:12:46Z",
+   "recorded_at_epoch": 1795443166.5459945,
+   "request_id": "gen_b70c0aece154",
+   "run_id": "r138-r138-fresh-01-gearbox-lubrication-starvation",
+   "selected": true,
+   "session_id": null,
+   "stage": "answer_composer_repair",
+   "status": "OK",
+   "task": "STRONG",
+   "task_degradation": {
+    "actual_task_capability": "STRONG",
+    "degraded_reason": "the serving model declares the requested task capability",
+    "requested_task": "STRONG",
+    "task_capability_match": true
+   },
+   "tokens": null
+  }
+ ]
+}

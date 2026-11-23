@@ -1686,6 +1686,57 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                      for c in retained]
     for c, v in zip(retained, verifications):
         c["mechanism_support"] = v
+        # R138 DIR-2 (the owner's CRITICAL evidence-grounding mandate,
+        # audited base b24b22793): retention on distinctness is NOT
+        # admission. The R137 live runs measured the defect — every
+        # retained candidate carried
+        # grounding_state=UNGROUNDED_SYNTHESIS with
+        # mechanism_support_state=PARTIALLY_SUPPORTED and yet sat in
+        # the production candidate set. The candidate LIFECYCLE is now
+        # explicit and enforced:
+        #   GENERATED -> DISTINCT -> EVIDENCE_GROUNDED_CANDIDATE ->
+        #   ADMISSIBLE SURVIVOR -> RELEASED INVENTION,
+        # with the ungrounded tier RETAINED (the creative work is
+        # never discarded — the R138 directive) as
+        #   UNGROUNDED_HYPOTHESIS (discovery_admissible=False,
+        #   enrichment_required=True — routed to evidence enrichment /
+        #   further research / testing; NEVER represented as
+        #   evidence-verified or admissible).
+        # Automatic discovery admission requires a VALID evidence
+        # binding (grounded=True AND the span resolved to a frozen
+        # evidence record: evidence_id + span present) AND the
+        # canonical support verdict (SUPPORTED or
+        # PARTIALLY_SUPPORTED). Contradictions stay visible (the
+        # CONTESTED state rides the support verdict unchanged);
+        # unknown evidence stays unknown (NOT_ENOUGH_EVIDENCE never
+        # converts — the instrument's own rule).
+        _sup_state = (v or {}).get("mechanism_support_state")
+        _binding = (v or {}).get("evidence_binding") or {}
+        _binding_valid = bool(
+            _binding.get("grounded")
+            and _binding.get("evidence_id")
+            and _binding.get("span"))
+        if _binding_valid and _sup_state in (
+                "SUPPORTED", "PARTIALLY_SUPPORTED"):
+            c["candidate_lifecycle"] = "EVIDENCE_GROUNDED_CANDIDATE"
+            c["discovery_admissible"] = True
+            c["admission_basis"] = {
+                "support_state": _sup_state,
+                "binding": {"grounded": True,
+                            "evidence_id": _binding.get("evidence_id"),
+                            "span": _binding.get("span")},
+                "rule": "R138_ADMISSION_GROUNDED_BINDING_PLUS_SUPPORT"}
+        else:
+            c["candidate_lifecycle"] = "UNGROUNDED_HYPOTHESIS"
+            c["discovery_admissible"] = False
+            c["enrichment_required"] = True
+            c["enrichment_reason"] = (
+                f"binding_grounded={bool(_binding.get('grounded'))}"
+                f" support_state={_sup_state} — retained as an "
+                "explicitly ungrounded hypothesis (R138): route "
+                "through evidence enrichment / further research / "
+                "testing; never represented as evidence-verified or "
+                "admissible")
     _clk.mark("mechanism_support_verification",
               {"support_states": [
                   (v.get("mechanism_support_state")
@@ -1704,6 +1755,25 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                       else "NO_CANDIDATES")
     space["n_candidates_generated"] = len(all_candidates)
     space["n_candidates_retained"] = len(retained)
+    # R138 DIR-2: the lifecycle counters + the admission state (the
+    # run's honest read: how many retained hypotheses are actually
+    # evidence-grounded, how many are explicitly ungrounded and routed
+    # to enrichment)
+    _n_adm = sum(1 for c in retained
+                 if c.get("discovery_admissible"))
+    space["lifecycle_counts"] = {
+        "n_generated": len(all_candidates),
+        "n_retained_distinct": len(retained),
+        "n_evidence_grounded": _n_adm,
+        "n_ungrounded_hypotheses": len(retained) - _n_adm,
+        "admission_rule": "grounded binding (evidence_id + span "
+                          "resolved) AND canonical support verdict "
+                          "(SUPPORTED/PARTIALLY_SUPPORTED)"}
+    space["n_candidates_admissible"] = _n_adm
+    space["admission_state"] = (
+        "ADMISSIBLE_CANDIDATES_PRESENT" if _n_adm
+        else ("ONLY_UNGROUNDED_HYPOTHESES" if retained
+              else "NO_CANDIDATES"))
     # R548: the Art. LXXXIV minimum is now enforced by the
     # distinctness instrument's own count — n_candidates_required
     # records the MINIMUM_DISTINCT_MECHANISMS bar (2), not the

@@ -4,10 +4,10 @@
  "at": "2026-11-23 (sandbox clock)",
  "arm": "PANEL-V2 (the constraint line; prereg 2d1170f06)",
  "authority": {
-  "pids_labels": "git show 009ce91a8:eval/auditor_judgments_r11_r5.json (the frozen r5 dataset \u2014 authoritative)",
+  "pids_labels": "git show 009ce91a8:eval/auditor_judgments_r11_r5.json (the frozen r5 dataset — authoritative)",
   "expected_legs": "PINNED 20 (10 frozen pairs x 2 orders), passed explicitly",
   "judges": "all six preregistered judges represented; an absent judge scores 0/20",
-  "v1_source": "committed raw records: eval/r134_panel (dsr1,qw32b,qwen235b,dsv32,llama4mav) + eval/r135_panel (hy4f) \u2014 recomputed, no hard-coded baselines"
+  "v1_source": "committed raw records: eval/r134_panel (dsr1,qw32b,qwen235b,dsv32,llama4mav) + eval/r135_panel (hy4f) — recomputed, no hard-coded baselines"
  },
  "n_pairs": 10,
  "expected_legs_per_judge": 20,
@@ -78,27 +78,18 @@
    "qualified": false
   },
   "hy4f": {
-   "legs": 0,
-   "valid": 0,
+   "legs": 20,
+   "valid": 19,
    "expected_legs": 20,
-   "answered_rate": 0.0,
+   "answered_rate": 0.95,
    "answered_rate_basis": "expected legs PINNED at 20 (10 frozen pairs x 2 orders)",
-   "acc_vs_labels": null,
-   "hits": 0,
-   "n_cmp": 0,
+   "acc_vs_labels": 0.778,
+   "hits": 7,
+   "n_cmp": 9,
    "missing_pids": [
-    "bench-p02-leadacid-grid-corrosion",
-    "bench-p09-packaging-barrier",
-    "dev-fu-001-bearing-spalling",
-    "dev-fu-003-motor-insulation",
-    "dev-fu-005-bridge-bearing",
-    "eval-new01-supercap-dryout",
-    "eval-new02-slipring-predictor",
-    "eval-new04-chiller-fouling-predictor",
-    "eval-new05-liion-balance-drift",
-    "eval-new07-transformer-dga-predictor"
+    "dev-fu-005-bridge-bearing"
    ],
-   "swap_instability": null,
+   "swap_instability": 0.111,
    "qualified": false
   }
  },
@@ -169,15 +160,15 @@
    "qualified": false
   },
   "hy4f": {
-   "legs": 0,
-   "valid": 0,
+   "legs": 20,
+   "valid": 19,
    "expected_legs": 20,
-   "answered_rate": 0.0,
+   "answered_rate": 0.95,
    "answered_rate_basis": "EXPECTED legs (the R136 fix; never legs-present)",
-   "acc_vs_labels": 0.0,
-   "hits": 0,
-   "n_cmp": 0,
-   "swap_instability": null,
+   "acc_vs_labels": 0.778,
+   "hits": 7,
+   "n_cmp": 9,
+   "swap_instability": 0.111,
    "vote_rule": "parity-drawn order votes; mirror = consistency check (swap_instability disclosed, never a vote-splitter)",
    "qualified": false
   }
@@ -190,7 +181,7 @@
   "deepseek"
  ],
  "panel": {
-  "guard": "TYPED REFUSAL (R136): fewer than 2 qualified judges \u2014 panel agreement undefined",
+  "guard": "TYPED REFUSAL (R136): fewer than 2 qualified judges — panel agreement undefined",
   "panel_agreement": null
  },
  "v1_vs_v2_paired_common": {
@@ -206,7 +197,7 @@
    "flipped_pids": [
     "eval-new01-supercap-dryout"
    ],
-   "comparability": "NOT DIRECTLY COMPARABLE \u2014 different samples; the paired delta is on the COMMON observations only (n=9)"
+   "comparability": "NOT DIRECTLY COMPARABLE — different samples; the paired delta is on the COMMON observations only (n=9)"
   },
   "qw32b": {
    "v1_n_total": 10,
@@ -262,24 +253,41 @@
    "flipped_pids": [
     "bench-p02-leadacid-grid-corrosion"
    ],
-   "comparability": "NOT DIRECTLY COMPARABLE \u2014 different samples; the paired delta is on the COMMON observations only (n=2)"
+   "comparability": "NOT DIRECTLY COMPARABLE — different samples; the paired delta is on the COMMON observations only (n=2)"
   },
   "hy4f": {
    "v1_n_total": 10,
-   "v2_n_total": 0,
-   "n_common": 0,
-   "v1_acc_common": null,
-   "v2_acc_common": null,
-   "paired_delta_common": null,
-   "v1_sample_note": "v1 comparable n=10 (['bench-p02-leadacid-grid-corrosion', 'bench-p09-packaging-barrier', 'dev-fu-001-bearing-spalling', 'dev-fu-003-motor-insulation', 'dev-fu-005-bridge-bearing', 'eval-new01-supercap-dryout', 'eval-new02-slipring-predictor', 'eval-new04-chiller-fouling-predictor', 'eval-new05-liion-balance-drift', 'eval-new07-transformer-dga-predictor'] absent from v2)",
-   "v2_sample_note": "v2 comparable n=0",
+   "v2_n_total": 9,
+   "n_common": 9,
+   "v1_acc_common": 0.778,
+   "v2_acc_common": 0.778,
+   "paired_delta_common": 0.0,
+   "v1_sample_note": "v1 comparable n=10 (['dev-fu-005-bridge-bearing'] absent from v2)",
+   "v2_sample_note": "v2 comparable n=9",
    "flipped_pids": [],
-   "comparability": "NOT DIRECTLY COMPARABLE \u2014 different samples; the paired delta is on the COMMON observations only (n=0)"
+   "comparability": "NOT DIRECTLY COMPARABLE — different samples; the paired delta is on the COMMON observations only (n=9)"
   }
  },
  "gate": {
   "rcal": ">=3 judges acc>=0.8 AND answered>=0.9 from >=2 non-agnes families (bars UNCHANGED)",
   "outcome": "NOT_MET"
  },
- "no_score_claims": true
+ "no_score_claims": true,
+ "final_state": {
+  "legs_recorded": "120/120 (the completed run: every judge x every frozen pair x both orders has a recorded leg file)",
+  "legs_valid": "119 (hy4f carries ONE TRANSPORT_FAILED leg — the auditor's independent inspection agrees: 19 VALID + 1 empty-content transport failure; not rerun per the directions)",
+  "recorded_vs_valid_note": "the 120 recorded legs and the 119 valid responses are reported SEPARATELY; answered_rate keys on the valid count over the PINNED 20 expectation",
+  "dir5_acceptance": {
+   "dsr1": "100% (20/20)",
+   "qw32b": "100% (20/20)",
+   "qwen235b": "100% (20/20)",
+   "dsv32": "100% (20/20)",
+   "llama4mav": "100% (20/20 — the R134 partial completed)",
+   "hy4f": "95% (19/20 valid — above the 0.9 bar, below literal 100%, typed)"
+  },
+  "verdict": "DIR-5's '100% of expected legs answered': literal for 5/6 judges; hy4f 19/20 (0.95). No judge lost to transport (the dsr1 504 class and llama4mav's missing legs fully recovered under streaming; hy4f's one failure typed honestly).",
+  "gate": "NOT_MET — one qualified judge (dsv32 0.9); the >=2-qualified guard's TYPED REFUSAL stands; no agreement number; no gate claim. The constraint line lifted dsv32 +0.3 (DIRECT) and did NOT lift the others (qw32b 0.0, qwen235b -0.1, dsr1 -0.111 common-only, llama4mav -0.5 common-only n=2, hy4f 0.0 common-only n=9).",
+  "recompute_provenance": "the tally + the twin's independent verifier (eval/r137s2_panel_verifier_recompute.json) BOTH rerun 2026-11-23 against the committed 120-leg records; engine_vs_indep_diffs = [] (agreement); frozen labels + thresholds preserved; zero judge calls re-run",
+  "incident_correction": "the R137 close commit (06ab7dbfd) shipped this file STALE (hy4f 0/20, no final_state) because a mid-window git stash captured the final edits and was never popped; this record is the regenerated final state (deterministic zero-LLM recompute from the same committed bytes — byte-equivalent to the lost version; Art. 4/5)"
+ }
 }

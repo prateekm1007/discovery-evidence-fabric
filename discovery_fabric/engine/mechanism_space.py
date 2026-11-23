@@ -3367,6 +3367,12 @@ def _public_candidate(c: Dict[str, Any]) -> Dict[str, Any]:
         "mechanism_source_span", "span_binding", "extraction_confidence",
         "mechanism_support", "distinctness_verdict",
         "distinctness_basis",
+        # R138 DIR-2: the candidate lifecycle travels with the public
+        # envelope — the gauntlet, the ranker and the buyer-package
+        # stage read the TRUTHFUL state (grounded vs explicitly
+        # ungrounded), never a bare retention count
+        "candidate_lifecycle", "discovery_admissible",
+        "admission_basis", "enrichment_required", "enrichment_reason",
         # R6 audit round 2026-11-12 (directive 3): the gimmick-anchor
         # instrument's typed verdict travels with the candidate — the
         # auditor reads the PUBLIC envelope, not just the full records

@@ -1706,11 +1706,20 @@ class EngineRun:
                                     (_sup or {}).get(
                                         "mechanism_support_state")
                                     if _sup else "UNVERIFIED_NO_VIEW"),
+                                # R138 DIR-2: the grid rule now
+                                # matches the lean path — a GROUNDED
+                                # binding is REQUIRED; PARTIALLY_
+                                # SUPPORTED alone (the R137 defect)
+                                # no longer marks a candidate
+                                # discovery_verified
                                 "discovery_verified": bool(
                                     _sup and _sup.get(
                                         "mechanism_support_state") in (
                                         "SUPPORTED",
-                                        "PARTIALLY_SUPPORTED"))})
+                                        "PARTIALLY_SUPPORTED")
+                                    and (((_sup or {}).get(
+                                        "evidence_binding") or {})
+                                        .get("grounded")))})
                         grid_result["r137_verification"] = {
                             "n_candidates_with_intervention": (
                                 _grid_verified + _grid_blocked

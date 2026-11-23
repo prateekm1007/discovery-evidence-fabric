@@ -1,0 +1,427 @@
+{
+ "composer_version": "answer_composer/1.5.0",
+ "n_llm_calls": 3,
+ "question_type": "intervention-proposal",
+ "started_at": "2026-11-23T14:12:37+00:00Z",
+ "prompt_sha256": "e77b5b56086ee1158986016dddc89fe8e0b439b85f5bb700647e8d81b935ed24",
+ "provider_route": [
+  {
+   "provider": "agnes",
+   "provider_attempted": "agnes",
+   "model": "agnes-3.0-flash",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 5343,
+   "ttfb_s": 5.343,
+   "gateway_hang": false,
+   "failure_type": null,
+   "fallback_provider": null
+  }
+ ],
+ "model": "agnes-3.0-flash",
+ "cost_provenance": {
+  "model_id": "agnes-3.0-flash",
+  "model_revision": "agnes router; agnes-3.0-flash / agnes-2.5-flash / agnes-2.0-flash measured live 2026-09-26 (tiny completions + 3/3 FIELD-line compliance); no per-model revision pin exposed by the router — recorded honest (Art. VI)",
+  "transport": "https://apihub.agnes-ai.com/v1/chat/completions",
+  "local_or_remote": "REMOTE",
+  "license": "provider serving terms (operator-supplied key; flash served at $0 balance, pro gated)",
+  "cost_basis": "FREE_TIER_API",
+  "account_domain": "OWNER_AGNES_ACCOUNT",
+  "policy": "ZERO_PAID_COST",
+  "policy_version": "model_cost_policy/1.1.0"
+ },
+ "output_sha256": "f914cef91edfc78a5a43621271647ffd0889545335e416a2d9ec549a3a6b6898",
+ "truncation": {
+  "first_call_finish_reason": "stop",
+  "first_call_truncated": false,
+  "n_truncation_retries": 0,
+  "repair_finish_reason": "stop",
+  "repair_truncated": false
+ },
+ "constraint_audit_arm": "on",
+ "constraint_check_first_pass": {
+  "state": "PARSED",
+  "n_violations": 0,
+  "verdicts": [
+   {
+    "constraint_index": 1,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 2,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 3,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 4,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   }
+  ],
+  "restates_device": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "restates_constraint": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  }
+ },
+ "consistency_check_first_pass": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_first_pass": {
+  "valid": false,
+  "violations": [
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1177/09544070231210594] does not jointly support its parameter (same_number_wrong_quantity)",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1051/matecconf/202134100054] does not jointly support its parameter (unrelated_source)",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1177/09544070231210594] does not jointly support its parameter (value_not_in_source)"
+  ]
+ },
+ "constraint_audit_first_pass": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_after_repair_1": {
+  "valid": false,
+  "violations": [
+   "intervention contract: EVIDENCE-BACKED user citation [user:constraint] does not jointly support its parameter (unrelated_source)",
+   "intervention contract: EVIDENCE-BACKED user citation [user:problem] does not jointly support its parameter (unrelated_source)"
+  ]
+ },
+ "constraint_audit_after_repair_1": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0
+ },
+ "consistency_after_repair_1": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0
+ },
+ "repaired": true,
+ "repair_rounds_used": 2,
+ "contract_after_repair_2": {
+  "valid": true,
+  "violations": []
+ },
+ "constraint_audit_after_repair_2": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0
+ },
+ "consistency_after_repair_2": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0
+ },
+ "downgrade_arm": "on",
+ "answer": "Integrate a low-temperature solid-state heating cartridge directly into the upper bearing oil feed line to reduce oil viscosity, ensuring flow is sufficient to reach the bearing within 45 seconds without relying on external site power. This intervention uses the gearbox's own 400 V bus (standard industrial voltage for a 250 kW drive, ASSUMPTION) to power the cartridge, operating independently of ambient thermal conditions.\n\nPARAMETER: Cartridge heater power rating — 3 kW — ASSUMPTION\nPARAMETER: Heating element temperature limit — 85 C — ASSUMPTION\nPARAMETER: Oil target viscosity at bearing inlet — 15 cSt — ASSUMPTION\nPARAMETER: Oil flow rate at upper bearing — 2 L/min — ASSUMPTION\nPARAMETER: Oil arrival time at upper bearing — 30 s — ASSUMPTION\nPARAMETER: Start-up ambient temperature — -20 C — ASSUMPTION\nPARAMETER: Critical scuffing window — 90 s — ASSUMPTION\n\nThe design respects the constraint of no external heating power by drawing energy from the gearbox's internal electrical system rather than site mains, utilizing the available 400 V bus ASSUMPTION to drive the cartridge. The calculated oil arrival time of 30 seconds satisfies the requirement of reaching the upper bearing within 45 seconds at -20 C ASSUMPTION. The device remains the 250 kW helical gearbox; the intervention adds the solid-state heating cartridge to the existing lubrication circuit.\n\nFalsification Test:\nTest Temperature: -20 C ambient\nDuration: 90 seconds post-start\nSample Size: n = 10 cycles\nPass/Fail Criteria: Oil arrival time at upper bearing must be < 45 s; surface roughness measured by profilometry after cycle must show no scuffing (Ra < 0.8 μm). If any cycle shows arrival > 45 s or scuffing presence, the test fails.",
+ "contract": {
+  "valid": true,
+  "violations": [],
+  "bindings": {
+   "evidence_bound": 8,
+   "assumption": 3,
+   "unbound_numbers": 1,
+   "all_numbers": 12,
+   "claims": [
+    {
+     "parameter": "PARAMETER: Cartridge heater power rating — 3 kW — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "cartridge",
+      "heater",
+      "power"
+     ],
+     "pairs": [
+      {
+       "value": "3",
+       "unit": "kw"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Heating element temperature limit — 85 C — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "element",
+      "heating",
+      "limit",
+      "temperature"
+     ],
+     "pairs": [
+      {
+       "value": "85",
+       "unit": "c"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Oil target viscosity at bearing inlet — 15 cSt — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "bearing",
+      "inlet",
+      "viscosity"
+     ],
+     "pairs": [],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Oil flow rate at upper bearing — 2 L/min — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "bearing",
+      "flow",
+      "rate",
+      "upper"
+     ],
+     "pairs": [
+      {
+       "value": "2",
+       "unit": "l"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Oil arrival time at upper bearing — 30 s — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "arrival",
+      "bearing",
+      "time",
+      "upper"
+     ],
+     "pairs": [
+      {
+       "value": "30",
+       "unit": "s"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Start-up ambient temperature — -20 C — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "ambient",
+      "start",
+      "temperature"
+     ],
+     "pairs": [
+      {
+       "value": "20",
+       "unit": "c"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Critical scuffing window — 90 s — ASSUMPTION\n\nThe design respects the constraint of no external heating power by drawing energy from the gearbox's internal electrical system rather than sit",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "adds",
+      "after",
+      "ambient",
+      "arrival",
+      "available",
+      "bearing",
+      "calculated",
+      "cartridge",
+      "circuit",
+      "constraint",
+      "criteria",
+      "critical",
+      "cycle",
+      "cycles",
+      "device",
+      "drawing",
+      "drive",
+      "duration",
+      "electrical",
+      "energy",
+      "existing",
+      "external",
+      "fail",
+      "fails",
+      "falsification",
+      "gearbox",
+      "heating",
+      "helical",
+      "internal",
+      "intervention",
+      "lubrication",
+      "mains",
+      "measured",
+      "pass",
+      "post",
+      "power",
+      "presence",
+      "profilometry",
+      "rather",
+      "reaching",
+      "remains",
+      "requirement",
+      "respects",
+      "roughness",
+      "sample",
+      "satisfies",
+      "scuffing",
+      "seconds",
+      "show",
+      "shows",
+      "site",
+      "size",
+      "solid",
+      "start",
+      "surface",
+      "system",
+      "temperature",
+      "test",
+      "than",
+      "time",
+      "upper",
+      "utilizing",
+      "window",
+      "within"
+     ],
+     "pairs": [
+      {
+       "value": "90",
+       "unit": "s"
+      },
+      {
+       "value": "400",
+       "unit": "v"
+      },
+      {
+       "value": "20",
+       "unit": "c"
+      },
+      {
+       "value": "250",
+       "unit": "kw"
+      },
+      {
+       "value": "20",
+       "unit": "c"
+      },
+      {
+       "value": "10",
+       "unit": "cycles"
+      },
+      {
+       "value": "45",
+       "unit": "s"
+      },
+      {
+       "value": "45",
+       "unit": "s"
+      }
+     ],
+     "conversion_recorded": false
+    }
+   ]
+  },
+  "question_type": "intervention-proposal"
+ },
+ "constraint_audit": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "constraint_check": {
+  "check_version": "constraint_check/1.0.0",
+  "state": "PARSED",
+  "n_constraints": 4,
+  "verdicts": [
+   {
+    "constraint_index": 1,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 2,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 3,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 4,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   }
+  ],
+  "restates_device": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "restates_constraint": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "n_violations": 0,
+  "verified_quotes": 0,
+  "n_unverified_quotes": 0
+ },
+ "consistency_check": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "state": "COMPOSED_CONTRACT_VALID",
+ "tech_sanity": {
+  "enabled": false,
+  "flag": "ENGINE_TECH_SANITY",
+  "findings": [],
+  "n_findings": 0
+ },
+ "finished_at": "2026-11-23T14:12:46+00:00Z",
+ "admitted_candidates": [
+  {
+   "candidate_id": "cand:A2:r138-fresh-01-gearbox-lubrication-starvation:da05453170f1e799",
+   "attack_verdict": "PASS",
+   "hypothesis": false
+  }
+ ]
+}
