@@ -1,0 +1,57 @@
+{
+ "record": "R142S4_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r142s4",
+ "audited_queue_tip": "5c74c0ca430e (panel one-shot c-0227 DONE + yield c-0228 + fail-closed fix)",
+ "audit_branch_parent": "1e7d32cded551ca3328ce9952fdea886e0fea03b",
+ "PANEL_VERDICT": {
+  "verdict": "VERIFIED HONEST NEGATIVE \u2014 the score-8 R-CAL gate is NOT_MET (0/5 judges qualified). Independent Art.13 recompute from the 120 raw legs matches the qualification EXACTLY (dsr1/dsv32/hy4f/qwen235b acc 0.75=9/12, qw32b 0.667=8/12; answered 0.958-1.0). The corpus is discriminative (lazy floor 0.5); healthy judges cap at 0.75, ONE pair short of the 0.8 bar. Art.7 outcome FINAL \u2014 re-attempt only on a new auditor-sealed corpus or an owner gate-value amendment.",
+  "art7_race": "the concurrent builder-r142s2 generation was killed + ~70 legs quarantined untallied; the executor's 08356de98 is the canonical one-shot; corpus burned once. Discipline correct."
+ },
+ "YIELD_VERDICT": {
+  "verdict": "quote-anchored lift REAL where it fired (desal 2 identity-true grounded admissions vs 0 across R141's 13 runs); yield bar >=2/5 NOT_MET (1/5; wind starves). ONE FALSE_ID bad admission (enriched candidate europepmc:29937599 bypassed the frozen-identity gate) \u2014 FOUND by the acceptance pass and FIXED NOW (2a38d9d4c: the enrichment identity gate now reads the run FROZEN set, not its own fresh retrieval snapshot; +121-line regression test). The fail-closed invariant is restored."
+ },
+ "FINDINGS": [
+  {
+   "id": "R142-F8",
+   "severity": "MEDIUM",
+   "title": "R-CAL gate-value question (OWNER): healthy open judges cap ~0.75 exact-match across THREE corpora (r5/R134/R142), one pair short of acc>=0.8; the bar is not crossed by available open models. Options: amend the R-CAL bar (e.g. acc>=0.75 + chance-corrected kappa>=0.6), authorize stronger frontier judges via HF providers, or a new corpus. Data attached.",
+   "evidence": "r142_panel_qualification + auditor recompute (0/5, 9/12); r5/R134 history",
+   "direction": "DIR2 \u2014 compute inter-judge alpha + kappa-vs-labels to inform the owner amendment; do NOT lower the bar unilaterally"
+  },
+  {
+   "id": "R142-F9",
+   "severity": "MEDIUM",
+   "title": "Yield bar >=2/5 NOT_MET (1/5): quote-anchored re-generation fires on desal but wind starves at 0 candidates; broaden the quote-anchored firing + verify the enriched-identity fix holds (0 bad admissions)",
+   "evidence": "r142_yield_run/SUMMARY problems_grounded=1",
+   "direction": "DIR4 \u2014 broaden quote-anchored yield >=2/5; 0 bad admissions post-fix"
+  }
+ ],
+ "CLOSED_THIS_ROUND": [
+  "R142-F6 (panel bytes landed, gate decided)",
+  "enriched-identity FALSE_ID leak (fixed 2a38d9d4c)"
+ ],
+ "STILL_OPEN": [
+  "R142-F1/F9 (yield bar)",
+  "R142-F2 (v16/P5 owner custody)",
+  "R142-F5 (CI-red closes edf825a3d/aa45584d0)",
+  "R142-F8 (gate-value owner)",
+  "R131-F3 (v16)",
+  "R133-F2 (SPECTER2 gate)"
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET (tree scans); history credential rotation = owner P0",
+  "P1": "MET (score5) + grounding identity-TRUE; enriched-identity leak fixed",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; v16 needed)",
+  "P4": "NOT_MET \u2014 R-CAL 0/5 qualified (acc 0.75 cap); gate-value question to OWNER; quote-anchored yield lift real but 1/5",
+  "P5": "NOT_MET \u2014 needs owner-custodied sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "ledger carried; panel gate NOT_MET (honest, Art.7 final); yield lift real but bar not met; no score change",
+  "goal": "9/10 fully agent-run (AM46)",
+  "critical_path": "OWNER gate-value decision (R-CAL bar) OR stronger judges -> panel qualification (8); quote-anchored yield >=2/5; v16 (owner custody) -> rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r142s4_auditor_recompute.json (diff=0)"
+}

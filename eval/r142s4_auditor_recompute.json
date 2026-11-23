@@ -1,0 +1,53 @@
+{
+ "record": "R142_PANEL_AUDITOR_RECOMPUTE/1.0.0",
+ "auditor_session": "auditor-r142s4",
+ "authority": "Auditor Art.13 independent tally from the 120 raw legs vs the sealed corpus labels",
+ "source": "eval/r142_panel/*.json (120 legs) @ queue 5c74c0ca430e; labels eval/auditor_rcal_corpus_r142.json @ audit 1e7d32cded55 (overall_preference)",
+ "vote_rule": "parity-drawn det pass unswapped via a_is vs label; mirror=consistency (swap_instability disclosed)",
+ "judges": {
+  "dsr1": {
+   "valid": 24,
+   "answered": 1.0,
+   "acc": 0.75,
+   "hits": 9,
+   "qualified": false
+  },
+  "dsv32": {
+   "valid": 24,
+   "answered": 1.0,
+   "acc": 0.75,
+   "hits": 9,
+   "qualified": false
+  },
+  "hy4f": {
+   "valid": 24,
+   "answered": 1.0,
+   "acc": 0.75,
+   "hits": 9,
+   "qualified": false
+  },
+  "qw32b": {
+   "valid": 23,
+   "answered": 0.958,
+   "acc": 0.667,
+   "hits": 8,
+   "qualified": false
+  },
+  "qwen235b": {
+   "valid": 24,
+   "answered": 1.0,
+   "acc": 0.75,
+   "hits": 9,
+   "qualified": false
+  }
+ },
+ "total_qualified": 0,
+ "gate": "NOT_MET (0/5; bar acc>=0.8 AND answered>=0.9)",
+ "match_vs_qualification": "EXACT every judge (diff=0)",
+ "pattern": "THIRD corpus (r5, R134, R142) where healthy open judges cap ~0.75 exact-match (9/12), one pair short of 0.8 (10/12); corpus discriminative (lazy floor 0.5). The acc>=0.8 R-CAL bar is not crossed by available open models \u2014 gate-value question for the OWNER (amend bar / chance-corrected kappa / stronger frontier judges).",
+ "yield": "eval/r142_yield_run/SUMMARY: 5 runs, problems_grounded=1 (desal 2 identity-true admissions doi:10.5281/zenodo.24324955), acceptance_ge_2_of_5=false, total_bad_admissions=1 (FALSE_ID europepmc:29937599 enriched candidate). Quote-anchored lift REAL where it fired (desal 2 vs 0 across R141 13 runs).",
+ "false_id_fix": "2a38d9d4c \u2014 the enrichment identity gate read its OWN fresh retrieval snapshot (unfrozen) instead of the run FROZEN set; fixed run.py +28 + tests/test_enrichment_frozen_identity_gate.py +121. The fail-closed breach fixed NOW.",
+ "art7_race": "the builder-r142s2 concurrent panel generation killed + ~70 legs quarantined untallied; the executor's 08356de98 one-shot is canonical; corpus burned once",
+ "ci": "08356de98=137953509170 SUCCESS; df4f323f3 SUCCESS; edf825a3d=137960445339 FAILURE; aa45584d0=137961267413 FAILURE; tip 5c74c0ca4 pending",
+ "diff": 0
+}

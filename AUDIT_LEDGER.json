@@ -2003,7 +2003,9 @@
    "severity": "MEDIUM",
    "title": "Panel one-shot (c-0227) + yield (c-0228) raw bytes ABSENT (eval/r142_panel/, eval/r142_yield_run/ 404) \u2014 the score-8 gate is stalled; the executor run (>1hr) must land its bytes or type the stall",
    "evidence": "contents API 404; verifier record AWAITING",
-   "status": "OPEN"
+   "status": "CLOSED",
+   "closed_round": "R142S4",
+   "resolved_by": "panel one-shot bytes landed (08356de98); gate decided NOT_MET (0/5)"
   },
   {
    "id": "R142-F7",
@@ -2011,6 +2013,22 @@
    "severity": "LOW",
    "title": "Two redundant verifier lanes on the same panel (c-0229 builder-r141s1 + c-0230 builder-r142s2) \u2014 coordination overhead; consolidate to ONE verifier per work item (Art.29)",
    "evidence": "work_claims c-0229/c-0230 both VERIFIER OPEN on r142 panel",
+   "status": "OPEN"
+  },
+  {
+   "id": "R142-F8",
+   "round": "R142S4",
+   "severity": "MEDIUM",
+   "title": "R-CAL gate-value question (OWNER): healthy open judges cap ~0.75 exact-match across THREE corpora (r5/R134/R142), one pair short of acc>=0.8; the bar is not crossed by available open models. Options: amend the R-CAL bar (e.g. acc>=0.75 + chance-corrected kappa>=0.6), authorize stronger frontier judges via HF providers, or a new corpus. Data attached.",
+   "evidence": "r142_panel_qualification + auditor recompute (0/5, 9/12); r5/R134 history",
+   "status": "OPEN"
+  },
+  {
+   "id": "R142-F9",
+   "round": "R142S4",
+   "severity": "MEDIUM",
+   "title": "Yield bar >=2/5 NOT_MET (1/5): quote-anchored re-generation fires on desal but wind starves at 0 candidates; broaden the quote-anchored firing + verify the enriched-identity fix holds (0 bad admissions)",
+   "evidence": "r142_yield_run/SUMMARY problems_grounded=1",
    "status": "OPEN"
   }
  ],
@@ -5011,6 +5029,22 @@
     "R142-F6",
     "R142-F7"
    ]
+  },
+  {
+   "id": "V106",
+   "round": "R142S4 audit of the panel one-shot verdict + quote-anchored yield + enriched-identity fix",
+   "commit": "1e7d32cded551ca3328ce9952fdea886e0fea03b",
+   "gate": "P4 R-CAL NOT_MET (0/5, acc 0.75 cap, recompute diff=0, Art.7 final); yield lift real (desal 2) but 1/5; FALSE_ID enriched-identity leak FIXED; gate-value question to owner",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r142s4_auditor_adjudication.json",
+   "findings": [
+    "R142-F8",
+    "R142-F9"
+   ],
+   "closed": [
+    "R142-F6"
+   ]
   }
  ],
  "gold_set": {
@@ -5317,7 +5351,7 @@
    "path": "eval/auditor_rcal_corpus_r142.json"
   }
  },
- "progress_note": "SCORE 7/10 (carried R142S3). R142S2 verifier lane discipline CORRECT (stood down, zero judge calls/live runs, no double-burn of the one-shot corpus; seal 67764d0c 12 pairs 6/6 verified; AWAITING typed; duplicate c-0229->c-0230 corrected Art.9). BUT the score-8 gate is UNDECIDED: eval/r142_panel/ + eval/r142_yield_run/ raw bytes ABSENT (c-0227 one-shot panel + c-0228 yield OPEN, executor builder-r121s1). Queue tip CI-RED 4 consecutive (e989893ae/a73722272/7fbc869be/b54c01272) \u2014 the r142s2_status.json record missing art27_capability_budget/remote_ci shape; the red-tip repair v2 itself failed (R142-F5). Two redundant verifier lanes c-0229/c-0230 (R142-F7) \u2014 consolidate. NEW: R142-F5 CI-red record-shape, R142-F6 panel bytes absent (gate stalled), R142-F7 redundant verifiers. Critical path: twin lands panel+yield raw bytes -> fix record shape -> green tip -> verifier recompute diff=0 -> panel qualification (8); quote-anchored yield (R142-F1); v16/P5 owner custody (R142-F2); history credential rotation = standing owner P0. Goal 9/10 fully agent-run (AM46).",
+ "progress_note": "SCORE 7/10 (carried R142S4). P4 R-CAL panel one-shot VERIFIED HONEST NEGATIVE: 0/5 judges qualified (independent recompute diff=0; dsr1/dsv32/hy4f/qwen235b acc 0.75=9/12, qw32b 0.667; answered 0.958-1.0). THIRD corpus where healthy open judges cap ~0.75, one pair short of acc>=0.8 \u2014 the R-CAL gate-value question is now an OWNER decision (R142-F8: amend bar to acc>=0.75+kappa>=0.6, authorize stronger frontier judges via HF providers, or new corpus). Art.7 outcome FINAL; concurrent generation quarantined (corpus burned once). Quote-anchored yield lift REAL (desal 2 identity-true grounded vs 0 across R141 13 runs) but bar >=2/5 NOT_MET (1/5, wind starves; R142-F9). ONE FALSE_ID bad admission (enriched candidate europepmc:29937599 bypassed frozen-identity gate) FOUND + FIXED NOW (2a38d9d4c: enrichment identity gate reads the run FROZEN set; +121-line test). R142-F6 CLOSED (panel bytes landed). CI-red closes edf825a3d/aa45584d0 (battery) still open (R142-F5). v16/P5 + history credential rotation = owner actions. Critical path: owner gate-value decision -> panel (8); quote-anchored yield >=2/5; v16 -> rediscovery + unattended (9). Goal 9/10 fully agent-run (AM46).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
