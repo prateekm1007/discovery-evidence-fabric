@@ -56,21 +56,53 @@
  },
  "no_score_claims": true,
  "remote_ci": {
-  "pushed_sha": "ec5254721",
+  "pushed_sha": "fb965684c",
   "remote_ci_conclusion": "success",
   "check_runs": [
    {
-    "check_run_id": 137861460503,
+    "check_run_id": 137873170111,
     "name": "R11 Queue Surface Check",
     "conclusion": "success"
    }
   ],
-  "note": "quoted from the API read at close time; this close's own check-run gets a QUOTE follow-up commit per the twin's convention"
+  "chain": [
+   {
+    "pushed_sha": "d86f59aec",
+    "check_run_id": 137864029194,
+    "conclusion": "success",
+    "note": "prune + driver (id read from the runs list; conclusion success)"
+   },
+   {
+    "pushed_sha": "ec5254721",
+    "check_run_id": 137861460503,
+    "conclusion": "success",
+    "note": "driver v2 (problems 3-4)"
+   },
+   {
+    "pushed_sha": "b25d6788e",
+    "check_run_id": 137871088010,
+    "conclusion": "failure",
+    "note": "the close: F42 schema rejected status 'CLOSED' — fixed to DONE"
+   },
+   {
+    "pushed_sha": "7c4e98b74",
+    "check_run_id": 137872119033,
+    "conclusion": "failure",
+    "note": "the fix: Art. 29(a) session registration missing — fixed"
+   },
+   {
+    "pushed_sha": "fb965684c",
+    "check_run_id": 137873170111,
+    "conclusion": "success",
+    "note": "the current green tip"
+   }
+  ],
+  "note": "the chain is quoted honestly: two typed failures (the F42 CLOSED-status enum + the Art. 29(a) session registration), both fixed forward-only; every conclusion read from the API"
  },
  "base_sha": "bd2ec4f2a9e3",
  "art27_capability_budget": {
   "engine_line_share_measured": 56.0,
-  "share_basis": "code-only formula from base bd2ec4f2a9e3 to the close tip: 322 engine lines (the causal_correctness.py deletion, -322) / 575 code lines",
+  "share_basis": "code-only formula from base bd2ec4f2a9e3 to the close tip: 322 engine lines (the causal_correctness.py deletion, -322) / 575 code lines (the close-tip recompute: 322 engine / 575 code lines = 56.0%)",
   "engine_diff": "322 substantive engine lines: the re-applied DIR-5 prune (-322 dead lines, zero importers re-verified) — no engine additions this window (the engine repair landed in R139S3; this window EXERCISES it live)",
   "primary_metric_delta": "the identity-true admission exercised live: 1 of 5 fresh runs admitted an EVIDENCE_GROUNDED_CANDIDATE resolving identity-true (real frozen id + hash equality + verbatim span); 0 alias/forged/unresolved admissions across all runs; c-0218/c-0219 closed on verified evidence",
   "deletions": "discovery_fabric/engine/causal_correctness.py (-322, the re-applied prune; zero importers; holdout_gate retained)",
