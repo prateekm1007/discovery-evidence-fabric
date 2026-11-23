@@ -1,0 +1,37 @@
+{
+ "record": "R136_VERIFIER_RECORD/1.0.0 (JSON ONLY — the R136 direction: 'Land the verifier record now as JSON only. Drop the docx and PDF')",
+ "claim": "c-0216",
+ "at": "2026-11-23 (sandbox clock)",
+ "provenance_typed": "the verifier session's 35-page Word report was NEVER IN BUILDER CUSTODY — the builder workspace is fresh (no .docx anywhere in /home/z/my-project); the verifier session pushed nothing to any branch (the queue tip is the builder's own close 1613e109a). This record reconstructs the verifier's findings from (a) the owner's R136 directions message — which carries the verified audit basis and the checklist state — and (b) the builder's own independent code verification (every claim re-derived against the bytes at 1613e109a and quoted below). Typed as RECONSTRUCTED-FROM-DIRECTIONS + INDEPENDENTLY-VERIFIED; the docx itself is NOT a deliverable and is NOT reproduced.",
+ "the_verifier_findings_and_their_verification": [
+  {
+   "finding": "Every judge in nine judge-rounds across six families (hy4-flash included) caps at ~0.7 accuracy against the 10 frozen auditor labels — the 0.8 bar has never been reachable",
+   "verification": "CONFIRMED from the committed tallies: R133 (qwen235b 0.6, dsv32 0.6, llama4mav 0.7, llama33 0.5), R134 (dsr1 0.778 n=9, qw32b 0.6, qwen235b 0.7, dsv32 0.6, llama4mav 1.0 partial n=4 unproven), R135 (hy4f 0.7). No judge at >=0.8 with answered>=0.9 on a complete set."
+  },
+  {
+   "finding": "The panel prompt (engine/blind_panel.py::build_pair_prompt) shows judges only device, failure, question and the two answers — never the problem's constraint, and the frozen labels were scored on constraint compliance as well. dev-fu-005 turns on compliance (a1 3 vs baseline 1); eval-new01 leans on feasibility and compliance. Judges are not shown the information that decides those items",
+   "verification": "CONFIRMED BY INSPECTION at 1613e109a: the problem-facts block renders DEVICE / FAILURE / USER'S QUESTION / USER'S CLARIFICATION only; problem['constraint'] is never read (every r5 pair carries one — e.g. bench-p02 'achieve 15-year float service life at 2.27 V per cell...'). REFINEMENT typed honestly: the prompt DOES carry a constraint-compliance CRITERION (the C_A/C_B axes + the rubric line 'does the answer respect every stated user constraint') — so the judge is asked to score compliance against a constraint it was never shown. The core finding stands; the fix (the R136 v2 arm: show_constraint=True) is now run."
+  },
+  {
+   "finding": "The Art. 27 gate counts engine lines twice: tot = ea + eb + ca + cb and CODE_PATHS already contains the engine, so the '30%' bar is really about 43% true engine share",
+   "verification": "CONFIRMED NUMERICALLY: at 1613e109a, tests/test_article27_capability_budget.py line 172-173 ENGINE_PATHS=['discovery_fabric/engine/'] and CODE_PATHS=['discovery_fabric/engine/', 'scripts/', 'tests/', 'requirements.txt'] with tot=ea+eb+ca+cb — engine counted twice. Corrected shares: R133 36.5%->57.6%, R134 18.9%->23.3%, R135 14.9%->17.5%. The '~43%' was the audit's R133-class estimate; the exact R133 number is 57.6%. FIXED this round (OTHER_CODE_PATHS = scripts/tests/requirements only); no round's gate outcome flips."
+  },
+  {
+   "finding": "The R-CAL answered-rate denominator counts only legs present, so a judge with missing legs cannot fail it",
+   "verification": "CONFIRMED: panel_agreement.rcal_qualification computed answered = len(valid)/len(legs) with legs = the on-disk records only. FIXED this round: the denominator is the EXPECTED leg count (2 x distinct pids across the whole judge_rows, or an explicit expected_legs pin); a partial-run judge now FAILS the 0.9 bar (pinned by tests/test_panel_denominator.py: a 4-legs-of-20 judge scores 0.2 and is NOT qualified)."
+  },
+  {
+   "finding": "The verifier session pushed nothing and built a 35-page Word report instead",
+   "verification": "CONFIRMED: no verifier commits on any branch (the queue tip is the builder's close); the builder workspace contains no .docx (the only PDFs are the old BENCHMARK_ENGINEERING_DOSSIERS corpus). This record IS the JSON landing the directions ordered."
+  }
+ ],
+ "what_the_verifier_did_NOT_find": "no label error, no bar miscalibration, no tally arithmetic error — the R134/R135 NOT_MET verdicts stand as typed (the directions' own checklist: 'R134 and R135 tallies recomputed (NOT_MET confirmed)')",
+ "the_fixes_this_round": [
+  "DIR 1: the v2 constraint arm (engine blind_panel show_constraint=True; v1 byte-identical to 1613e109a — verified programmatically; the v2 run on the frozen 10 pairs)",
+  "DIR 2: the expected-legs denominator + the >=2-qualified-judges TYPED-REFUSAL guard (4 CI-pinned tests)",
+  "DIR 3: the Art.27 double count fixed + R133-R135 recomputed + disclosed (eval/r136_art27_recompute.json)",
+  "DIR 5: the streamed HF-router transport (the dsr1 504 class — first v2 legs completed at 54-86s streamed)"
+ ],
+ "no_score_claims": true,
+ "superseded_by": "eval/r136_verifier_record.json (the r136s2 verifier lane's own record for c-0216 — the canonical verification; THIS reconstruction-from-directions record is kept as the supplementary provenance trail)"
+}

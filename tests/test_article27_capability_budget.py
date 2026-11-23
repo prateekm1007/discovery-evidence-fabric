@@ -170,8 +170,11 @@ def test_latest_round_holds_engine_line_share_gate():
 # <code paths>` and must match the recorded field within tolerance.
 # ---------------------------------------------------------------------------
 ENGINE_PATHS = ["discovery_fabric/engine/"]
-CODE_PATHS = ["discovery_fabric/engine/", "scripts/", "tests/",
-              "requirements.txt"]
+# The R136 fix (the verifier's finding): the OTHER-CODE term is
+# scripts/tests/requirements ONLY — CODE_PATHS previously contained
+# the engine, so tot = (engine) + (code-including-engine) counted
+# every engine line TWICE (R133's true share was 57.6%, not 36.5%).
+OTHER_CODE_PATHS = ["scripts/", "tests/", "requirements.txt"]
 
 
 def _diff_numstat(base: str, paths):
@@ -219,7 +222,9 @@ def test_latest_round_engine_share_recomputes_from_the_diff():
         f"{p.name}: no base_sha to diff against — the round record "
         "must carry one for the diff recompute")
     ea, eb = _diff_numstat(base, ENGINE_PATHS)
-    ca, cb = _diff_numstat(base, CODE_PATHS)
+    ca, cb = _diff_numstat(base, OTHER_CODE_PATHS)
+    # the corrected formula: engine counted ONCE + the other-code
+    # term (scripts/tests/requirements) — the double count removed
     tot = ea + eb + ca + cb
     if tot == 0:
         note = str(art.get("share_exception_reason", "")).lower()

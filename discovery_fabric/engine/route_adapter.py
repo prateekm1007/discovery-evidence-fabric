@@ -497,12 +497,20 @@ def bedrock_converse(messages: List[dict], model_id: str,
 
 def hf_router_chat(messages: List[dict], model: str,
                    max_tokens: int = 4000, timeout_s: float = 300.0,
-                   api_key: Optional[str] = None) -> Dict[str, Any]:
+                   api_key: Optional[str] = None,
+                   stream: bool = False) -> Dict[str, Any]:
     """One Hugging Face Inference Providers call (r128 dir-4: the
     SECOND funded path) — POST https://router.huggingface.co/v1/
     chat/completions, OpenAI-compatible, bearer HF_TOKEN (env-only,
     digests-only). Typed refusals: missing_key, payment_required
-    (HTTP 402 — the measured no-credits state), rate_limited, auth."""
+    (HTTP 402 — the measured no-credits state), rate_limited, auth.
+    stream=True (the R136 fix for the reasoning-rung 504 class):
+    SSE streaming — the non-streaming gateway 504s long-thinking
+    generations (DeepSeek-R1's 3 timed-out legs at R134; the
+    cent-ai lane's identical wall measured + bypassed at R135);
+    with bytes flowing the same payload completes. The return shape
+    is identical (content/finish_reason/usage assembled from the
+    deltas)."""
     key = api_key if api_key is not None else \
         resolve_vault_key("HF_TOKEN")
     if not key:
@@ -514,7 +522,8 @@ def hf_router_chat(messages: List[dict], model: str,
                            "empty messages (typed refusal, F67)")
     body = json.dumps({"model": model, "messages": messages,
                        "max_tokens": max_tokens,
-                       "temperature": 0.0}).encode("utf-8")
+                       "temperature": 0.0,
+                       "stream": bool(stream)}).encode("utf-8")
     req = urllib.request.Request(
         "https://router.huggingface.co/v1/chat/completions",
         data=body, method="POST",
@@ -522,8 +531,42 @@ def hf_router_chat(messages: List[dict], model: str,
                  "Content-Type": "application/json",
                  "User-Agent": BROWSER_UA})
     try:
-        with urllib.request.urlopen(req, timeout=timeout_s) as r:
-            data = json.loads(r.read())
+        if stream:
+            content_parts: List[str] = []
+            finish = None
+            usage: Dict[str, Any] = {}
+            with urllib.request.urlopen(
+                    req, timeout=timeout_s) as r:
+                for raw_line in r:
+                    line = raw_line.decode(
+                        "utf-8", "replace").strip()
+                    if not line.startswith("data: "):
+                        continue
+                    chunk = line[6:]
+                    if chunk == "[DONE]":
+                        break
+                    try:
+                        j = json.loads(chunk)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(j.get("usage"), dict):
+                        usage = j["usage"]
+                    ch = (j.get("choices") or [{}])[0]
+                    delta = ch.get("delta") or {}
+                    if delta.get("content"):
+                        content_parts.append(
+                            str(delta["content"]))
+                    if ch.get("finish_reason"):
+                        finish = ch["finish_reason"]
+            data = {"model": model,
+                    "choices": [{"message": {"content":
+                                                 "".join(
+                                                     content_parts)},
+                                 "finish_reason": finish}],
+                    "usage": usage}
+        else:
+            with urllib.request.urlopen(req, timeout=timeout_s) as r:
+                data = json.loads(r.read())
     except urllib.error.HTTPError as e:
         detail = ""
         try:

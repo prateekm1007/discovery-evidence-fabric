@@ -355,7 +355,8 @@ def canonical_json(record: dict) -> str:
 def rcal_qualification(judge_rows: dict,
                        labels: dict,
                        acc_bar: float = 0.8,
-                       answered_bar: float = 0.9) -> dict:
+                       answered_bar: float = 0.9,
+                       expected_legs: int = None) -> dict:
     """Per-judge R-CAL qualification from raw per-leg records.
 
     judge_rows: {family: [{pid, order, pass, a_is, outcome, parsed},
@@ -366,15 +367,34 @@ def rcal_qualification(judge_rows: dict,
     labels: {pid: 'a1'|'baseline'} — the auditor's forced-choice
     ground truth (ties impossible; a tie-labeled corpus raises).
 
-    Returns per-judge: legs, valid, answered_rate, acc (exact match
-    on the parity-drawn vote), swap_instability (the mirror-order
-    disagreement rate — disclosed, NOT a vote), qualified flag.
+    expected_legs: the R136 fix — the answered-rate denominator is
+    the EXPECTED leg count (n_pairs x 2), never the legs-present
+    count. A judge whose legs are MISSING on disk can now FAIL the
+    answered bar (the verifier's finding: the legs-present
+    denominator made the bar unfailable by omission). None = infer
+    per judge as 2 x (the distinct pids seen across the WHOLE
+    judge_rows — a partial run is penalized because every other
+    judge's pids count toward the expectation); an explicit int
+    pins it.
+
+    Returns per-judge: legs, valid, expected, answered_rate, acc
+    (exact match on the parity-drawn vote), swap_instability (the
+    mirror-order disagreement rate — disclosed, NOT a vote),
+    qualified flag.
     """
     out = {}
+    all_pids = set()
+    for legs in judge_rows.values():
+        for l in legs:
+            all_pids.add(l.get("pid"))
+    inferred_expected = 2 * len(all_pids) if all_pids else 0
     for fam, legs in judge_rows.items():
         n = len(legs)
+        expected = (expected_legs if expected_legs is not None
+                    else inferred_expected)
         valid = [l for l in legs if l.get("outcome") == "VALID"]
-        answered = len(valid) / n if n else 0.0
+        # the R136 denominator fix: EXPECTED legs, not legs-present
+        answered = len(valid) / expected if expected else 0.0
         votes, mirrors, hits, n_cmp = {}, {}, 0, 0
         for l in valid:
             p = l.get("parsed") or {}
@@ -400,7 +420,10 @@ def rcal_qualification(judge_rows: dict,
         acc = hits / n_cmp if n_cmp else 0.0
         out[fam] = {
             "legs": n, "valid": len(valid),
+            "expected_legs": expected,
             "answered_rate": round(answered, 3),
+            "answered_rate_basis": "EXPECTED legs (the R136 fix; "
+                                   "never legs-present)",
             "acc_vs_labels": round(acc, 3), "hits": hits,
             "n_cmp": n_cmp,
             "swap_instability": round(
@@ -422,7 +445,25 @@ def swap_robust_panel(judge_rows: dict, qualified: Sequence,
     parity-drawn per-judge votes; a split panel = the plurality
     winner, a true tie = 'split' — disclosed), panel-vs-labels
     agreement, pairwise Cohen's kappa (mean), and the gold-set AUC
-    (panel mean novelty, GOOD > BAD, Mann-Whitney U)."""
+    (panel mean novelty, GOOD > BAD, Mann-Whitney U).
+
+    The R136 guard: fewer than 2 distinct qualified judges => the
+    panel-agreement number is NOT COMPUTED (a single judge's
+    agreement with the labels is just that judge's accuracy —
+    reporting it as 'panel agreement' overstates the instrument;
+    typed refusal, never a silent pass)."""
+    if len(set(qualified)) < 2:
+        return {
+            "qualified": list(qualified),
+            "panel_agreement": None,
+            "n_scored": 0,
+            "guard": "TYPED REFUSAL (R136): panel agreement is "
+                     "undefined below 2 distinct qualified judges — "
+                     "a single judge's label agreement is its own "
+                     "accuracy, not a panel property",
+            "agreement_ge_bar": False, "kappa_ge_bar": False,
+            "auc_ge_bar": False,
+        }
     fam_votes = {}
     for fam in qualified:
         fam_votes[fam] = {}

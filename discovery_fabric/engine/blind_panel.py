@@ -490,18 +490,27 @@ def run_panel(seats: Sequence[PanelSeat], rows: dict,
 # instrument bytes at migration).
 # ---------------------------------------------------------------------------
 def build_pair_prompt(problem: dict, a_text: str, b_text: str,
-                      cot: bool = False) -> str:
+                      cot: bool = False,
+                      show_constraint: bool = False) -> str:
     """The blind A/B rubric prompt. The CALLER decides which arm sits
     in slot A (the r9 blind_order parity convention — the engine
     never sees arm names, only slot bytes; a_is rides the CALLER's
     record). Forced-choice prefer per the R133 lever (b): no TIE.
     cot=True appends the R134 COMPARATIVE CoT contract (reason
     per-axis before the JSON, expert weighting novelty+testability)
-    in place of the bare forced-choice suffix."""
+    in place of the bare forced-choice suffix.
+    show_constraint=True is the R136 PANEL-V2 ARM: the problem's
+    constraint text is passed to the judge (a 'USER'S CONSTRAINT'
+    line in the problem-facts block) so the C-axis compliance
+    scoring is no longer blind — the judge sees the same
+    information the labeler had. The default False keeps the v1
+    bytes EXACTLY as they were at 1613e109a (the baseline arm,
+    byte-untouched)."""
     from discovery_fabric.engine.prompts import (
         RUBRIC_CRITERIA, PER_AXIS_SUFFIX, FORCED_CHOICE_SUFFIX,
         COT_COMPARATIVE_SUFFIX)
     clar = problem.get("clarification_text")
+    constraint = problem.get("constraint") if show_constraint else None
     lines = [
         "You judge two engineering answers to the same user problem.",
         "Fabrication check: any number, unit, or measurement that is "
@@ -515,6 +524,13 @@ def build_pair_prompt(problem: dict, a_text: str, b_text: str,
     ]
     if clar:
         lines.append(f"USER'S CLARIFICATION (a stated fact): {clar}")
+    if constraint:
+        # the R136 v2 line — the judge is shown the stated
+        # requirement the C-axis rubric already asked it to score
+        # against (the verifier's finding: scored blind until now)
+        lines.append(
+            f"USER'S CONSTRAINT (a stated requirement every answer "
+            f"must respect): {constraint}")
     lines += [
         "",
         "=== ANSWER A ===",
