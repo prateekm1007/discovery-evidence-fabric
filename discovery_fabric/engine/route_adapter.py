@@ -577,7 +577,8 @@ def cent_ai_chat(messages: List[dict], model: str = "hy4-flash:free",
                  max_tokens: int = 4000, timeout_s: float = 300.0,
                  api_key: Optional[str] = None,
                  api_base: Optional[str] = None,
-                 temperature: float = 0.0) -> Dict[str, Any]:
+                 temperature: float = 0.0,
+                 stream: bool = False) -> Dict[str, Any]:
     """One cent-ai call (the R135 owner directive). OpenAI-compatible
     chat/completions on api.cent-ai.dev (the vault's CENT_AI_BASE_URL
     is the API base, /v1 included). Typed refusals: missing_key,
@@ -599,15 +600,61 @@ def cent_ai_chat(messages: List[dict], model: str = "hy4-flash:free",
             or "https://api.cent-ai.dev/v1").rstrip("/")
     body = json.dumps({"model": model, "messages": messages,
                        "max_tokens": max_tokens,
-                       "temperature": temperature}).encode("utf-8")
+                       "temperature": temperature,
+                       "stream": bool(stream)}).encode("utf-8")
     req = urllib.request.Request(
         f"{base}/chat/completions", data=body, method="POST",
         headers={"Authorization": f"Bearer {key}",
                  "Content-Type": "application/json",
                  "User-Agent": BROWSER_UA})
     try:
-        with urllib.request.urlopen(req, timeout=timeout_s) as r:
-            data = json.loads(r.read())
+        if stream:
+            # the measured gateway-wall bypass (R135): the free lane
+            # 503s non-streaming generations at ~90s; with SSE bytes
+            # flowing the SAME payload completes (53s measured for
+            # 32K reasoning chars + the final JSON). Assemble the
+            # deltas; the typed-refusal contract is identical.
+            content_parts: List[str] = []
+            reasoning_parts: List[str] = []
+            finish = None
+            usage: Dict[str, Any] = {}
+            with urllib.request.urlopen(
+                    req, timeout=timeout_s) as r:
+                for raw_line in r:
+                    line = raw_line.decode(
+                        "utf-8", "replace").strip()
+                    if not line.startswith("data: "):
+                        continue
+                    chunk = line[6:]
+                    if chunk == "[DONE]":
+                        break
+                    try:
+                        j = json.loads(chunk)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(j.get("usage"), dict):
+                        usage = j["usage"]
+                    ch = (j.get("choices") or [{}])[0]
+                    delta = ch.get("delta") or {}
+                    if delta.get("content"):
+                        content_parts.append(
+                            str(delta["content"]))
+                    if delta.get("reasoning_content"):
+                        reasoning_parts.append(
+                            str(delta["reasoning_content"]))
+                    if ch.get("finish_reason"):
+                        finish = ch["finish_reason"]
+            text = "".join(content_parts)
+            reasoning = "".join(reasoning_parts)
+            data = {"model": model,
+                    "choices": [{"message": {"content": text,
+                                             "reasoning_content":
+                                                 reasoning},
+                                 "finish_reason": finish}],
+                    "usage": usage}
+        else:
+            with urllib.request.urlopen(req, timeout=timeout_s) as r:
+                data = json.loads(r.read())
     except urllib.error.HTTPError as e:
         detail = ""
         try:
