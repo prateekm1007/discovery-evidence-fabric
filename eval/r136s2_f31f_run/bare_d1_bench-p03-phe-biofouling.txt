@@ -1,0 +1,33 @@
+**Mitigation Proposal: Surface-Modified Titanium Alloys with Anti-Fouling Coatings**
+
+**Mechanism:**
+Replace the standard stainless steel plates with **Titanium Alloy (Ti-6Al-4V) plates coated with a micro-patterned, bio-inert PTFE (Polytetrafluoroethylene) hybrid coating**. 
+
+1.  **Material Incompatibility for Scaling:** Titanium is inherently more resistant to chloride-induced corrosion and, more importantly for this application, has a significantly lower affinity for calcium carbonate and other scale minerals compared to stainless steel, reducing the "nucleation" of scale.
+2.  **Anti-Biofilm Surface:** The PTFE hybrid coating is micro-patterned (via laser ablation or electrodeposition) to create a surface with ultra-low surface energy and specific roughness that prevents the initial attachment of biofilm cells (a "slip" effect). This inhibits the formation of the mature biofilm layer that typically increases pressure drop and acts as a core for scale.
+3.  **No Chlorine Dependency:** Since the protection relies on material passivity and surface physics rather than chemical biocide, it operates effectively within the 0.5 ppm chlorination constraint.
+
+**Implementation:**
+1.  **Design Phase:** Redesign the heat exchanger plate pack to accommodate titanium plates, which may require slight adjustments to gasket materials (to ensure compatibility with Ti) and bolt clamping force calculations (Ti has a different thermal expansion and modulus of elasticity than SS).
+2.  **Manufacturing:** Procure pre-fabricated Ti-6Al-4V plates with the specified micro-patterned PTFE coating applied to both fluid-facing sides. The coating thickness should be in the range of 5–10 micrometers to minimize thermal resistance.
+3.  **Integration:** Install the new plate pack in the existing district cooling loop frame. Ensure all new gaskets are compatible with titanium (e.g., EPDM or specific fluoropolymers).
+
+**Measures It Relies On:**
+1.  **Thermal Resistance of Coating:** The PTFE coating must have extremely low thickness (<10 µm) to ensure its thermal resistance ($R_{th} = \delta/k$) does not drop the overall $U$-value below 2500 W/m²K. PTFE has a low thermal conductivity (~0.2 W/mK), so the thermal penalty is $\approx 10 \times 10^{-6} / 0.2 = 5 \times 10^{-5}$ m²K/W. The baseline stainless steel $U$-value must be high enough (e.g., >2600 W/m²K clean) to tolerate this penalty and any residual fouling.
+2.  **Surface Energy Physics:** Relies on the proven hydrophobic/oleophobic properties of PTFE and the specific micro-structure to prevent cell adhesion. This is a physical barrier, not a chemical one, thus compliant with the no-high-chlorine constraint.
+3.  **Corrosion Residue:** Relies on the passivity of titanium in neutral to slightly alkaline district cooling fluids, ensuring no galvanic corrosion if other metals are present (gaskets/seals must be non-metallic or compatible).
+
+**Concrete Test to Falsify the Approach:**
+
+**Test Protocol: "Aged Fouling Factor" Challenge in a Loop Simulator**
+
+1.  **Setup:** Create a closed-loop pilot system using the new Ti/PTFE plates in a flow loop with water matching the district cooling chemistry (except for the chlorination cap). Introduce a seeded culture of *Legionella* and *Pseudomonas* spores, plus a supersaturated calcium bicarbonate solution to induce scale.
+2.  **Operation:** Run the loop continuously for 12 months (or an accelerated 3-month period with temperature/chemistry stressors) without mechanical cleaning and with chlorination strictly capped at 0.5 ppm.
+3.  **Measurement:**
+    *   Measure the Overall Heat Transfer Coefficient ($U$) at 0 months, 3 months, 6 months, 9 months, and 12 months using a calibrated heat flux method or by comparing actual cooling load vs. approach temperatures.
+    *   Monitor pressure drop ($\Delta P$) across the exchanger weekly.
+4.  **Falsification Condition:**
+    *   The approach is **falsified** if the calculated $U$-value drops **below 2500 W/m²K** at any point during the 12-month period *before* the first scheduled mechanical cleaning.
+    *   Alternatively, it is falsified if the pressure drop increase exceeds 30% relative to the clean-state $\Delta P$ by month 6, indicating uncontrolled fouling that would prevent the 12-month target.
+
+This test directly measures the two key performance indicators ($U$ and $\Delta P$) under the exact constraint (12 months, <0.5 ppm Cl) and falsifies the proposal if the physical barrier fails to prevent the accumulation that degrades performance.

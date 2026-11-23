@@ -1,0 +1,34 @@
+**Mitigation Proposal: Electrostatic Repulsive Barrier via Fixed-Charged Polymer Membrane**
+
+**Mechanism:**
+The failure is driven by the accumulation of plasma proteins and cellular debris on the sensor surface (biofouling), which physically blocks glucose diffusion and electrically insulates the electrode. The proposed intervention is the integration of a **fixed-charge polyelectrolyte membrane** (e.g., poly(styrene sulfonate) or a quaternary ammonium functionalized layer) on the surface of the glucose enzyme layer, facing the tissue. This membrane carries a permanent net charge (positive or negative) that is opposite to the predominant charge of the target proteins at physiological pH.
+
+*   **How it works:** Proteins and cells are large, charged macromolecules. At physiological pH, most tissue proteins carry a net negative charge (below their isoelectric point) or are encapsulated in negatively charged cell membranes. A fixed-charge layer (e.g., positive charge if repelling negative proteins, or negative charge if repelling anionic surfactants/proteins, though typically cationic membranes are used to repel anionic proteins/fouling layers) creates a strong electrostatic repulsion force. This prevents the initial adsorption of proteins onto the electrode interface. Furthermore, the hydrophilic nature of the polymer keeps the local environment hydrated, maintaining fast diffusion of small, neutral glucose molecules while excluding large, charged foulants.
+
+**Implementation:**
+1.  **Material Synthesis:** Synthesize a thin, ionically conductive but electron-insulating polymer layer (50–200 nm thick). A common candidate is a crosslinked poly(diallyldimethylammonium chloride) (PDADMAC) layer, modified to reduce non-specific binding.
+2.  **Integration:** Apply this layer as the outermost "skin" of the CGM, directly between the tissue and the existing glucose oxidase enzyme layer. The thickness must be calibrated to allow <10% attenuation of glucose flux (since glucose is a small molecule, diffusion through a thin hydrogel is rapid) while maximizing the Debye screening length to repel large proteins.
+3.  **Stability:** Ensure the membrane is covalently anchored or densely cross-linked to prevent delamination during the 14-day wear period.
+
+**Measures it Relies On:**
+1.  **Electrostatic Repulsion:** The magnitude of the repulsive force must exceed the van der Waals attractive forces that drive initial protein adsorption. This relies on the fixed charge density of the membrane being high enough to maintain a surface potential that repels foulants.
+2.  **Size-Selective Permeability:** The membrane structure must have pore sizes or mesh densities that allow free diffusion of glucose (MW 180 Da) but physically and electrostatically hinder proteins (MW > 10 kDa) and cells.
+3.  **Hydrophilicity:** The polymer must remain highly hydrophilic to prevent hydrophobic interactions that could lead to secondary fouling (e.g., lipid adhesion).
+4.  **Chemical Stability:** The charge groups must remain protonated/deprotonated and stable in the harsh, reactive environment of interstitial fluid over 14 days without degradation or charge neutralization.
+
+**Concrete Test to Falsify the Proposed Approach:**
+**Test Name:** *In Vitro Biofouling Kinetics with Signal Attenuation Monitoring*
+
+**Procedure:**
+1.  Fabricate two sets of sensors: a control set (standard CGM without the fixed-charge membrane) and a test set (with the fixed-charge membrane).
+2.  Expose both sets to a standardized "worst-case" biofouling medium: 5% human plasma spiked with 10^5 cells/mL (modeling tissue encapsulation) and maintained at 37°C with gentle agitation to simulate perfusion.
+3.  Simultaneously step the glucose concentration in the medium (e.g., from 5 mM to 10 mM) every hour.
+4.  Record the current response of the sensors to calculate the apparent glucose concentration.
+5.  Calculate the Mean Absolute Relative Difference (MARD) between the sensor reading and the known reference glucose concentration at each time point.
+6.  Continue the test for 14 days.
+
+**Falsification Criterion:**
+The proposal is falsified if **either** of the following occurs:
+1.  **MARD Exceeds Limit:** The MARD of the test sensors exceeds 10% at any point during the 14-day period, indicating that despite the membrane, biofouling or signal attenuation occurred.
+2.  **No Significant Improvement:** The MARD of the test sensors is not statistically significantly lower than the control sensors (e.g., p < 0.05) by Day 7, suggesting the membrane did not effectively mitigate the specific failure mechanism of protein/encapsulation.
+3.  **Membrane Failure:** Scanning Electron Microscopy (SEM) or Surface-Enhanced Raman Spectroscopy (SERS) after the test shows that the fixed-charge membrane has been stripped, delaminated, or completely covered by a thick biofilm indistinguishable from the control, proving the barrier was ineffective.

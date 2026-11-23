@@ -1,0 +1,20 @@
+**Mitigation Proposal: Active Closed-Loop Thermal Compensation via Fiber Optic Sensors**
+
+**Mechanism:**
+Implement an active compensation system that measures the actual thermal displacement of the spindle shaft in real-time and instructs the machine’s kinematic control system to offset the tool’s commanded position. Instead of waiting for the spindle to reach a steady-state thermal equilibrium (which is prohibited by the "no warmup idle cycles" constraint), the machine cuts immediately. The control system continuously adjusts the X, Y, and Z coordinates of the tool path to counteract the predicted and measured thermal growth of the spindle axis.
+
+**Implementation:**
+1.  **Sensing:** Install a miniature, non-contact Fiber Bragg Grating (FBG) sensor embedded within the spindle housing near the primary bearing set. FBG sensors are immune to electromagnetic interference, have high temperature sensitivity, and minimal footprint.
+2.  **Thermal Model:** Develop a calibrated transfer function (or machine learning model) that maps the real-time temperature profile from the FBG sensors to the linear thermal expansion of the shaft ($\Delta L = \alpha \cdot L \cdot \Delta T$) and any associated deflection.
+3.  **Control Integration:** Embed the compensation logic into the CNC’s Motion Controller (M-code or PLC). As the spindle spools up and heat accumulates, the controller applies a dynamic coordinate transformation to the tool path. For example, if the thermal model predicts the tip of the tool moves 5 µm in the +Z direction, the controller commands the Z-axis to move -5 µm relative to the workpiece.
+
+**Measures Relied On:**
+*   **Real-Time Thermal Measurement:** Accuracy of the FBG sensor temperature-to-displacement correlation (< 1 µm resolution).
+*   **Latency:** The feedback loop latency must be significantly shorter than the rate of thermal drift to prevent overshoot (typically < 100ms sampling rate is sufficient for thermal drift which occurs over minutes).
+*   **Kinematic Authority:** The machine’s servo system must be able to make sub-micron adjustments at the required frequency without introducing vibration.
+
+**Concrete Falsification Test:**
+1.  **Setup:** Mount a high-precision interferometric laser probe (resolution < 0.1 µm) on the machine table pointing at the tool holder or a calibration artifact attached to the spindle nose.
+2.  **Execution:** Run the machine at 0% load with the spindle at operational speed (full RPM) and coolant active, simulating worst-case thermal load. Simultaneously cut a series of test blocks using the closed-loop compensation algorithm.
+3.  **Measurement:** Record the actual tool center point (TCP) displacement relative to the workpiece coordinate system over the 20-minute transient using the laser probe.
+4.  **Criterion:** The approach is **falsified** (failed) if the measured TCP displacement exceeds 10 µm at any point during the 20-minute window, OR if the dimensional accuracy of the cut parts deviates from the nominal by more than 10 µm in any axis. If the displacement remains < 10 µm throughout the transient, the mitigation is successful.

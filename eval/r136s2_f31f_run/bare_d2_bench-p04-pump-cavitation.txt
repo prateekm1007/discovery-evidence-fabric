@@ -1,0 +1,23 @@
+**Mitigation Proposal:**
+
+**Mechanism:**
+**Variable Speed Pump Control with VFD (Variable Frequency Drive)** to modulate pump speed (and thus flow rate) instead of throttling, combined with a **low-NPSHr impeller trim (shorter eye diameter, larger hub diameter at the eye)**.
+
+**Implementation:**
+1.  **Install a VFD** on the pump motor to allow continuous speed adjustment. This eliminates the high-shear, low-pressure zones at the impeller eye caused by throttling a fixed-speed pump, which drastically reduces the local static pressure drop and the intensity of cavitation bubble collapse.
+2.  **Trim the impeller eye** (increase the hub diameter at the inlet, reduce the outer diameter slightly at the inlet) to shift the pump’s NPSHr curve upward at low-flow conditions. A trimmed impeller requires a higher NPSH to operate, but crucially, it operates at a higher suction pressure margin at the vane leading edges when running at reduced speeds, keeping the local pressure above the vapor pressure with greater consistency.
+3.  **Control Strategy:** The process control system targets 85% of BEP *flow* by adjusting VFD frequency, not by opening a discharge valve. This ensures the pump operates on its speed-scaled NPSHr curve, maintaining a consistent NPSH margin.
+
+**Measures it Relies On:**
+*   **NPSH Margin > 1.5 m:** The VFD reduces NPSHr proportional to $(n/n_{ref})^2$. At 85% flow (approx. 85% speed if on same curve), NPSHr drops significantly, easily maintaining >1.5 m margin if the system NPSHa is stable. The impeller trim optimizes the NPSHr curve specifically for the low-flow region to prevent the "steepness" that causes NPSHr spikes at part-load.
+*   **Vane Life > 5 Years:** By eliminating throttling-induced recirculation and high-velocity jets at the eye (the primary cause of cavitation at off-design flow), the erosion rate is reduced by orders of magnitude. The smoother flow profile and maintained positive pressure margin prevent the high-energy bubble collapses.
+*   **Operation at 85% BEP Flow:** Achieved via speed control, not throttling, ensuring the impeller operates in a hydrodynamically stable region where relative velocity vectors are aligned with the vanes, reducing secondary flows that exacerbate cavitation.
+
+**Concrete Falsification Test:**
+1.  **Setup:** Install the modified pump (VFD + trimmed impeller) in a test loop with the same source water temperature, pressure, and system resistance as the original plant.
+2.  **Procedure:** Operate the pump at exactly 85% of its rated best-efficiency flow rate using the VFD. Simultaneously, measure the actual NPSH margin at the impeller eye via calibrated pressure transducers placed at the suction nozzle and correcting for static head, friction losses, and local dynamic pressure.
+3.  **Falsification Criteria:** If, under this 85% flow condition:
+    *   The measured NPSH margin drops to or below 1.5 m at any point in a 24-hour continuous run, **OR**
+    *   Acoustic/vibration sensors detect classic cavitation signatures (broadband high-frequency noise, characteristic "gravel" sound) at the impeller eye for more than 10% of the runtime, **OR**
+    *   A post-6-month inspection reveals visible pitting or erosion on the vane leading edges (indicating cavitation damage occurred within a fraction of the 5-year life requirement),
+    then the mitigation is **falsified**. The approach is deemed unsuccessful if it cannot maintain both the NPSH margin constraint and the absence of cavitation-induced erosion at the specified off-design flow point.

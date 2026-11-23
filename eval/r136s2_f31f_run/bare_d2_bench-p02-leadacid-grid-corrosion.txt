@@ -1,0 +1,40 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Substitute the conventional antimony-tin-lead alloy positive grid with a **Calcium-Tin-Lead (Ca-Sn-Pb) alloy grid**.
+
+This approach mitigates positive grid corrosion by shifting the alloying element from antimony (which catalyzes oxygen recombination but accelerates lead dissolution/corrosion at high overpotentials and high temperature) to calcium and tin. Calcium acts as a potent inhibitor of lead grid corrosion by forming stable calcium-lead intermetallic phases that passivate the grid surface against dissolution in the acidic electrolyte. Tin stabilizes the lead matrix against creep and reduces the corrosion rate further. While this reduces the battery's ability to recombine oxygen (increasing gassing compared to Sb-alloyed batteries), the VRLA design manages this through the oxygen recombination valve and enhanced water management, rather than relying solely on antimony catalysis. This allows the battery to meet the 15-year life requirement via superior grid corrosion resistance, staying within the constraint of <2% antimony (the alloy will typically contain ~0% antimony, relying on the Ca/Sn system).
+
+**Implementation:**
+1.  **Alloy Specification:** Formulate the positive grid alloy as 99.0% Lead, 0.8% Tin, and 0.2% Calcium (totaling 99.8%, with 0.2% impurities). This meets the "<2% antimony" constraint (0% Sb).
+2.  **Grid Design:** Use a thicker, more robust grid cross-section geometry optimized for the slower corrosion rate of Ca-Sn alloys. Since corrosion is slower, the initial active material loading can be optimized to maximize capacity density without requiring the high initial thickness associated with fast-corroding Sb grids.
+3.  **Electrolyte Adjustment:** Ensure the electrolyte density is slightly higher to compensate for the reduced specific gravity change during float and to maintain conductivity.
+4.  **Plate Paste:** Use a positive active material paste with a higher amount of lead dioxide and a specific expander to ensure good porosity and electrolyte absorption, aiding in thermal management since Ca-Sn batteries gas more than Sb batteries.
+5.  **Valve Design:** Enhance the Valve Regulated Lead Acid (VRLA) valve design to ensure optimal oxygen flow for recombination at the negative plate, compensating for the reduced oxygen recombination efficiency at the positive plate compared to Sb-alloyed cells.
+
+**Measures It Relies On:**
+1.  **Corrosion Inhibition Kinetics:** The formation of protective calcium-lead intermetallic layers (e.g., $Pb_2Ca$) on the grid surface that resist acid attack.
+2.  **Oxygen Recombination Management:** The ability of the VRLA system to recombine the increased oxygen generation at the positive plate at the negative plate, preventing excessive water loss.
+3.  **Thermal Stability:** The lower internal resistance gain over time due to slower corrosion, preventing thermal runaway under float conditions.
+
+**Concrete Test to Falsify the Approach:**
+
+**Test Name:** Accelerated Calendar Life Test at Elevated Temperature with Periodic Internal Resistance Monitoring.
+
+**Protocol:**
+1.  **Setup:** Place 10 prototype cells (and 10 Sb-alloyed control cells) in a temperature-controlled chamber at **45°C** (25°C above standard float temperature to accelerate aging).
+2.  **Charge Condition:** Apply a continuous float charge of **2.41 V/cell** (which is equivalent to 2.27 V/cell at 25°C when adjusted for the 25°C temperature rise, using a coefficient of -0.003 V/°C per cell). This simulates the "continuous charge" stress.
+3.  **Duration:** Run the test for **12 months** (equivalent to ~15 years at 25°C float life via Arrhenius acceleration, assuming a standard Q10 or Arrhenius factor for VRLA failure).
+4.  **Monitoring:**
+    *   Measure **Internal Resistance (mΩ)** monthly.
+    *   Measure **Capacity (Ah)** at the standard rate (C/20) every 3 months.
+    *   Measure **Water Loss (g/cell)** every 2 weeks via weight change.
+    *   Perform **Post-Mortem Cross-Section Analysis** at failure or end-of-test.
+
+**Falsification Criterion:**
+The proposal is falsified if, by the end of the 12-month accelerated test (representing 15-year equivalent life):
+1.  The **Internal Resistance** of the Ca-Sn-Pb cells has increased by more than **50%** of their initial value *while* the capacity remains above 80%, **OR**
+2.  The **Capacity** of the Ca-Sn-Pb cells falls below **80%** of the initial capacity (service threshold), **OR**
+3.  The **Water Loss** exceeds the valve's ability to maintain electrolyte levels, leading to dry-out (visible in post-mortem analysis) before 12 months.
+
+If the Ca-Sn-Pb cells fail these criteria significantly worse than the Sb-alloyed controls (which are expected to fail via grid corrosion), the mitigation fails. However, the specific falsification of the *Ca-Sn mitigation* is if the grid corrosion (visible in post-mortem as thinning or porosity in the grid structure) is still rapid enough to cause the capacity drop or resistance rise within the 12-month window, indicating that the Ca-Sn alloy does not provide sufficient corrosion inhibition at 45°C/2.41V float to meet the 15-year life target.
