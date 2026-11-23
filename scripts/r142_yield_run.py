@@ -237,7 +237,8 @@ def main() -> int:
     rollup = {
         "record": "R142_YIELD_RUN/1.0.0",
         "claim": "c-0228", "work_id": "r142-grounded-yield-lift",
-        "session": "builder-r121s1-3e8a41d7",
+        "session": __import__("os").environ.get(
+            "R142_SESSION", "builder-r121s1-3e8a41d7"),
         "at": "2026-11-23 (sandbox clock)",
         "runs": len(summary),
         "problems_grounded": grounded_problems,

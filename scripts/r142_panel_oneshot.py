@@ -269,7 +269,8 @@ def main() -> int:
     record = {
         "record": "R142_PANEL_ONESHOT/1.0.0",
         "claim": "c-0227", "work_id": "r142-rcal-panel-oneshot",
-        "session": "builder-r121s1-3e8a41d7",
+        "session": os.environ.get(
+            "R142_SESSION", "builder-r121s1-3e8a41d7"),
         "at": "2026-11-23 (sandbox clock)",
         "corpus": {
             "source": f"{AUDIT_REF}:{CORPUS_PATH}",
