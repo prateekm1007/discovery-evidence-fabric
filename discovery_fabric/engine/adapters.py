@@ -23,6 +23,7 @@ import importlib.util
 import json
 import os
 import time as _time
+import re as _re_mod
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -1267,6 +1268,161 @@ def _ms_starved_cause(env, label):
     }
 
 
+def _resolve_binding_identity(binding: Dict[str, Any],
+                              frozen_items: List[Dict[str, Any]],
+                              ) -> tuple:
+    """R139 DIR-2: resolve a mechanism's evidence binding to an ACTUAL
+    frozen evidence record. Returns (ok, reason, resolved_record).
+
+    The R138 admission accepted any binding with non-empty
+    grounded/evidence_id/span — it never established that the id names
+    a real frozen record, that the quoted span lives in THAT record's
+    text, or that the bytes are the record's (hash match). The R138
+    HVAC run measured the consequence: a binding naming the synthetic
+    alias "lean_doi:10.1080/..." while the frozen record is
+    "doi:10.1080/...".
+
+    Resolution rules (fail closed — Art. 3; a binding that cannot
+    resolve is never admitted, and the refusal is typed):
+      1. evidence_id + span must be present (a malformed binding is
+         refused as MALFORMED_BINDING, never silently dropped).
+      2. The id must match EXACTLY ONE frozen record's id. Zero matches
+         -> FALSE_ID. More than one -> AMBIGUOUS_ID (duplicate ids make
+         the identity undecidable; unknown stays unknown).
+      3. The R138-era synthetic alias ("lean_" prefix) is de-aliased to
+         the real id and re-resolved — typed ALIAS_CORRECTED; the alias
+         itself is never admitted as an identity.
+      4. The span must appear IN the resolved record's text (the same
+         normalized token form the binding instrument uses) — a span
+         that names record A's id while quoting other bytes is refused
+         as SPAN_NOT_IN_RECORD.
+      5. The record must carry a content_hash and the binding's
+         content_hash (if present) must EQUAL it; a record with NO
+         hash, or a binding hash that disagrees, is refused
+         (UNKNOWN_HASH / HASH_MISMATCH) — identity is proven by bytes,
+         not by name (Art. 1: exact bytes beat semantic plausibility).
+
+    PARTIALLY_SUPPORTED stays visibly distinct from direct support:
+    this resolver decides IDENTITY only — the support verdict rides
+    unchanged, and the admission basis records which state fired.
+    """
+    eid = str((binding or {}).get("evidence_id") or "").strip()
+    span = str((binding or {}).get("span") or "").strip()
+    b_hash = (binding or {}).get("content_hash")
+    if not eid or not span:
+        return False, "MALFORMED_BINDING (missing evidence_id or span)", None
+
+    def _find(rec_id: str):
+        matches = [it for it in (frozen_items or [])
+                   if isinstance(it, dict)
+                   and str(it.get("id") or it.get("item_id") or "") == rec_id]
+        return matches
+
+    alias_corrected = False
+    matches = _find(eid)
+    if not matches and eid.startswith("lean_"):
+        # the R138 synthetic alias — resolve the REAL record id
+        real_id = eid[len("lean_"):]
+        matches = _find(real_id)
+        alias_corrected = bool(matches)
+        if matches:
+            eid = real_id
+    if not matches:
+        return False, f"FALSE_ID (no frozen record named {eid!r})", None
+    if len(matches) > 1:
+        return False, (
+            f"AMBIGUOUS_ID ({len(matches)} frozen records share id "
+            f"{eid!r} — identity undecidable, fail closed)"), None
+    rec = matches[0]
+
+    # span-in-record verification (normalized tokens, same form the
+    # binding instrument uses)
+    rec_text = " ".join(str(rec.get(k) or "") for k in
+                        ("title", "abstract", "text", "content",
+                         "summary", "_record_text"))
+    span_toks = _re_mod.findall(r"[a-z0-9]+", span.lower())
+    rec_toks = _re_mod.findall(r"[a-z0-9]+", rec_text.lower())
+    span_norm = " ".join(span_toks)
+    rec_norm = " ".join(rec_toks)
+    if not span_norm or span_norm not in rec_norm:
+        return False, (
+            "SPAN_NOT_IN_RECORD (the quoted span does not appear in "
+            f"record {eid!r}'s text)"), None
+
+    # hash identity: the record must carry a hash; the binding's hash
+    # (when present) must equal it
+    r_hash = (rec.get("content_hash")
+              or (rec.get("provenance") or {}).get("content_hash"))
+    if not r_hash:
+        return False, (
+            f"UNKNOWN_HASH (record {eid!r} carries no content_hash — "
+            "identity unprovable by bytes, fail closed)"), None
+    if b_hash and str(b_hash) != str(r_hash):
+        return False, (
+            f"HASH_MISMATCH (binding hash {str(b_hash)[:12]}... != "
+            f"record hash {str(r_hash)[:12]}...)"), None
+    reason = "RESOLVED (exactly-one record; span-in-record; hash match)"
+    if alias_corrected:
+        reason = ("ALIAS_CORRECTED (the R138 'lean_' synthetic alias "
+                  f"resolved to the real record {eid!r})")
+    return True, reason, {"id": eid, "content_hash": str(r_hash),
+                          "record_text": rec_text}
+
+
+def apply_lifecycle_admission(retained: List[Dict[str, Any]],
+                              verifications: List[Dict[str, Any]],
+                              frozen_items: List[Dict[str, Any]],
+                              ) -> None:
+    """R138/R139: the candidate LIFECYCLE admission — the production
+    block the lean mechanism space runs on every retained candidate.
+    Factored here so tests drive the REAL admission (functional
+    coverage, not source-text patterns; the R139 directions).
+
+    Retention on distinctness is NOT admission. Admission requires
+    BOTH:
+      - a RESOLVED identity (R139: exactly-one frozen record by id,
+        span-in-record, hash match — synthetic aliases de-aliased,
+        typed), AND
+      - the canonical support verdict (SUPPORTED or
+        PARTIALLY_SUPPORTED — visibly distinct, recorded verbatim).
+    Everything else is UNGROUNDED_HYPOTHESIS: retained (never
+    discarded), enrichment_required, never represented as verified or
+    admissible. CONTESTED stays visible; NOT_ENOUGH_EVIDENCE never
+    converts."""
+    for c, v in zip(retained, verifications):
+        c["mechanism_support"] = v
+        _sup_state = (v or {}).get("mechanism_support_state")
+        _binding = (v or {}).get("evidence_binding") or {}
+        _res_ok, _res_reason, _res_rec = _resolve_binding_identity(
+            _binding, frozen_items)
+        if (_res_ok and _sup_state in (
+                "SUPPORTED", "PARTIALLY_SUPPORTED")):
+            c["candidate_lifecycle"] = "EVIDENCE_GROUNDED_CANDIDATE"
+            c["discovery_admissible"] = True
+            _binding["evidence_id"] = _res_rec["id"]
+            _binding["content_hash"] = _res_rec["content_hash"]
+            c["admission_basis"] = {
+                "support_state": _sup_state,
+                "binding": {"grounded": True,
+                            "evidence_id": _res_rec["id"],
+                            "content_hash": _res_rec["content_hash"],
+                            "span": _binding.get("span")},
+                "identity_resolution": _res_reason,
+                "rule": "R139_ADMISSION_RESOLVED_IDENTITY"}
+        else:
+            c["candidate_lifecycle"] = "UNGROUNDED_HYPOTHESIS"
+            c["discovery_admissible"] = False
+            c["enrichment_required"] = True
+            c["enrichment_reason"] = (
+                f"binding_grounded={bool(_binding.get('grounded'))}"
+                f" identity_resolution={_res_reason}"
+                f" support_state={_sup_state} — retained as an "
+                "explicitly ungrounded hypothesis (R138/R139): route "
+                "through evidence enrichment / further research / "
+                "testing; never represented as evidence-verified or "
+                "admissible")
+
+
 def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     """R453-LEAN-CORE: the lean mechanism-space construction (the
     external auditor mandate — no extraction fan-out; reuse the
@@ -1322,7 +1478,14 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         # unbound/unextracted mechanism still caps at
         # PARTIALLY_SUPPORTS (never direct SUPPORTS).
         items.append({
-            "item_id": f"lean_{rec.get('id')}",
+            # R139 DIR-2 (the auditor's binding-identity mandate): the
+            # item id is the FROZEN RECORD'S OWN id — the synthetic
+            # "lean_" prefix is GONE. The R138 admission accepted a
+            # binding whose evidence_id was "lean_doi:10.1080/..." while
+            # the frozen record is "doi:10.1080/..." — an alias, not an
+            # identity. Every binding must resolve to the actual frozen
+            # record; the alias made that impossible.
+            "item_id": rec.get("id"),
             "structured_hash": _h.sha256(
                 record_text.encode("utf-8", "replace")).hexdigest(),
             "fields": {"system": {"value": title},
@@ -1336,6 +1499,12 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
                 "claim_classification": cls_item.get("classification"),
             },
+            # R139 DIR-2: the record's content_hash surfaces at the TOP
+            # level so the verbatim binding can carry it and the
+            # admission resolver can verify binding-hash == record-hash
+            # (the R138 rule checked only non-emptiness; a binding now
+            # carries the actual hash of the record it names)
+            "content_hash": rec.get("content_hash"),
             # the verifier's relevance measurement, verbatim when the
             # classifier emitted it (None on legacy envelopes): the
             # canonical full-text overlap basis the operator selection
@@ -1684,59 +1853,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                "n_retained": len(retained)})
     verifications = [_ms.verify_mechanism_support(c, items, problem)
                      for c in retained]
-    for c, v in zip(retained, verifications):
-        c["mechanism_support"] = v
-        # R138 DIR-2 (the owner's CRITICAL evidence-grounding mandate,
-        # audited base b24b22793): retention on distinctness is NOT
-        # admission. The R137 live runs measured the defect — every
-        # retained candidate carried
-        # grounding_state=UNGROUNDED_SYNTHESIS with
-        # mechanism_support_state=PARTIALLY_SUPPORTED and yet sat in
-        # the production candidate set. The candidate LIFECYCLE is now
-        # explicit and enforced:
-        #   GENERATED -> DISTINCT -> EVIDENCE_GROUNDED_CANDIDATE ->
-        #   ADMISSIBLE SURVIVOR -> RELEASED INVENTION,
-        # with the ungrounded tier RETAINED (the creative work is
-        # never discarded — the R138 directive) as
-        #   UNGROUNDED_HYPOTHESIS (discovery_admissible=False,
-        #   enrichment_required=True — routed to evidence enrichment /
-        #   further research / testing; NEVER represented as
-        #   evidence-verified or admissible).
-        # Automatic discovery admission requires a VALID evidence
-        # binding (grounded=True AND the span resolved to a frozen
-        # evidence record: evidence_id + span present) AND the
-        # canonical support verdict (SUPPORTED or
-        # PARTIALLY_SUPPORTED). Contradictions stay visible (the
-        # CONTESTED state rides the support verdict unchanged);
-        # unknown evidence stays unknown (NOT_ENOUGH_EVIDENCE never
-        # converts — the instrument's own rule).
-        _sup_state = (v or {}).get("mechanism_support_state")
-        _binding = (v or {}).get("evidence_binding") or {}
-        _binding_valid = bool(
-            _binding.get("grounded")
-            and _binding.get("evidence_id")
-            and _binding.get("span"))
-        if _binding_valid and _sup_state in (
-                "SUPPORTED", "PARTIALLY_SUPPORTED"):
-            c["candidate_lifecycle"] = "EVIDENCE_GROUNDED_CANDIDATE"
-            c["discovery_admissible"] = True
-            c["admission_basis"] = {
-                "support_state": _sup_state,
-                "binding": {"grounded": True,
-                            "evidence_id": _binding.get("evidence_id"),
-                            "span": _binding.get("span")},
-                "rule": "R138_ADMISSION_GROUNDED_BINDING_PLUS_SUPPORT"}
-        else:
-            c["candidate_lifecycle"] = "UNGROUNDED_HYPOTHESIS"
-            c["discovery_admissible"] = False
-            c["enrichment_required"] = True
-            c["enrichment_reason"] = (
-                f"binding_grounded={bool(_binding.get('grounded'))}"
-                f" support_state={_sup_state} — retained as an "
-                "explicitly ungrounded hypothesis (R138): route "
-                "through evidence enrichment / further research / "
-                "testing; never represented as evidence-verified or "
-                "admissible")
+    apply_lifecycle_admission(retained, verifications, items)
     _clk.mark("mechanism_support_verification",
               {"support_states": [
                   (v.get("mechanism_support_state")

@@ -120,6 +120,181 @@ def _cemetery_sandbox_path(out_dir: Any) -> Path:
     return box
 
 
+def ms_pool_admission_split(ms_candidates: Any) -> tuple:
+    """R139 DIR-3 (the auditor's lifecycle-enforcement mandate): split
+    the mechanism-space candidates at the ACTUAL ENGINE BOUNDARY — the
+    gauntlet pool build. Returns (admissible, ungrounded).
+
+    The R138 lifecycle labels were ADDED in adapters.py but this file
+    appended EVERY retained candidate to the post-rank pool regardless
+    of discovery_admissible — the admission rule existed as a label,
+    not as a gate. Now:
+      - a candidate joins the AUTOMATIC gauntlet (collision -> spec ->
+        physics -> attack -> rank -> package) only when its lifecycle
+        says EVIDENCE_GROUNDED_CANDIDATE / discovery_admissible=True;
+      - everything else is the UNGROUNDED tier: RETAINED (the creative
+        work is never discarded — the R138 directive), flagged
+        enrichment_required, and routed to the enrichment executor;
+      - legacy envelopes that predate the lifecycle fields (no
+        discovery_admissible key) are treated as UNGROUNDED — an
+        unlabeled candidate is NOT an admissible candidate (fail
+        closed, Art. 3).
+
+    This function IS the production gate (the engine loop calls it;
+    tests call the same function — functional coverage of the real
+    boundary, not source-text patterns)."""
+    admissible, ungrounded = [], []
+    for c in (ms_candidates or []):
+        if not isinstance(c, dict) or not c.get("candidate_id"):
+            continue
+        _lc = str(c.get("candidate_lifecycle") or "")
+        if (c.get("discovery_admissible") is True
+                and (_lc == "EVIDENCE_GROUNDED_CANDIDATE"
+                     # the enrichment path's grounded variant — the
+                     # full provenance trail rides the candidate
+                     or _lc == "EVIDENCE_GROUNDED_CANDIDATE_ENRICHED")):
+            admissible.append(c)
+        else:
+            c.setdefault("enrichment_required", True)
+            c.setdefault("candidate_lifecycle", "UNGROUNDED_HYPOTHESIS")
+            c.setdefault("discovery_admissible", False)
+            ungrounded.append(c)
+    return admissible, ungrounded
+
+
+def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
+                                 out_dir: Path,
+                                 max_enrich: int = 3) -> Dict[str, Any]:
+    """R139 DIR-3: the REAL enrichment execution path for ungrounded
+    hypotheses — through the EXISTING retrieval and verification
+    machinery (no new framework, Art. 29 duplication ban):
+
+      for each hypothesis (bounded by max_enrich — wall-clock honest):
+        1. retrieve_fresh_evidence(problem, {"mechanism": <the
+           hypothesis's own mechanism terms>}) — the same deterministic
+           keyword-form retrieval the evolution channel uses;
+        2. build the structured items from the NEW records (the same
+           lean-item construction: the record's OWN id + content_hash —
+           R139 DIR-2 identity discipline);
+        3. verify_mechanism_support (THE canonical instrument) on the
+           hypothesis against the NEW items;
+        4. resolve the binding identity (the R139 resolver);
+        5. outcomes:
+           - ENRICHED_GROUNDED: the hypothesis grounds on the new
+             evidence -> it JOINS the pool (full provenance trail:
+             query, retrieved record ids, hashes, support state);
+           - STILL_UNGROUNDED / RETRIEVAL_FAILED: the hypothesis stays
+             explicitly HELD — recorded in ENRICHMENT_LEDGER.json with
+             its typed outcome, never discarded, never treated as
+             verified.
+
+    Every step's outcome is recorded per hypothesis (zero silent
+    failures — the R139 directions' acceptance)."""
+    ledger: Dict[str, Any] = {
+        "record": "ENRICHMENT_LEDGER/1.0.0",
+        "note": ("the R139 enrichment path: ungrounded hypotheses are "
+                 "RETRIED against fresh retrieval of their own "
+                 "mechanism terms; grounded-on-enrichment joins the "
+                 "pool with its provenance; otherwise explicitly HELD"),
+        "attempts": []}
+    enriched: List[Dict[str, Any]] = []
+    if not ungrounded:
+        ledger["n_attempts"] = 0
+        return {"ledger": ledger, "enriched": enriched}
+    from . import evolution as _ev
+    from .mechanism_space import verify_mechanism_support as _verify
+    from .adapters import _resolve_binding_identity as _resolve
+    import datetime as _dt
+    for c in (ungrounded or [])[:max(0, max_enrich)]:
+        mech = str(c.get("mechanism") or "")[:400]
+        cid = str(c.get("candidate_id"))
+        attempt: Dict[str, Any] = {
+            "candidate_id": cid,
+            "mechanism": mech[:160],
+            "hypothesis_lifecycle_before": c.get(
+                "candidate_lifecycle")}
+        try:
+            fresh = _ev.retrieve_fresh_evidence(
+                problem, {"mechanism": mech},
+                snapshot_version="enrichment")
+            attempt["retrieval_status"] = fresh.get("status")
+            attempt["retrieval_query"] = fresh.get("query")
+            attempt["n_retrieved"] = fresh.get("n_items") or 0
+            new_items = []
+            for rec in (fresh.get("items") or [])[:5]:
+                if not isinstance(rec, dict) or not rec.get("id"):
+                    continue
+                _t = str(rec.get("title") or "")
+                _a = str(rec.get("abstract") or "")
+                _rt = f"{_t}. {_a}".strip()
+                new_items.append({
+                    "item_id": rec.get("id"),
+                    "content_hash": rec.get("content_hash"),
+                    "fields": {"system": {"value": _t},
+                               "abstract": {"value": _a},
+                               "mechanism": {"value": _rt},
+                               "observed_effect": {"value": _a}},
+                    "source": rec.get("source") or rec.get("id"),
+                    "_record_text": _rt})
+            if not new_items:
+                attempt["outcome"] = (
+                    "STILL_UNGROUNDED (no retrievable records)")
+                c["enrichment_outcome"] = attempt["outcome"]
+                c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+            else:
+                attempt["n_structured_new_items"] = len(new_items)
+                v = _verify(c, new_items, problem)
+                b = v.get("evidence_binding") or {}
+                ok, reason, resolved = _resolve(
+                    b, new_items)
+                attempt["support_state"] = v.get(
+                    "mechanism_support_state")
+                attempt["identity_resolution"] = reason
+                attempt["binding"] = {
+                    "evidence_id": (resolved or {}).get("id"),
+                    "content_hash": (resolved or {}).get("content_hash"),
+                    "span": b.get("span")}
+                if ok and v.get("mechanism_support_state") in (
+                        "SUPPORTED", "PARTIALLY_SUPPORTED"):
+                    attempt["outcome"] = "ENRICHED_GROUNDED"
+                    c["enrichment_outcome"] = "ENRICHED_GROUNDED"
+                    c["candidate_lifecycle"] = (
+                        "EVIDENCE_GROUNDED_CANDIDATE_ENRICHED")
+                    c["discovery_admissible"] = True
+                    c["enrichment_required"] = False
+                    c["mechanism_support"] = v
+                    c["admission_basis"] = {
+                        "support_state": v.get("mechanism_support_state"),
+                        "binding": attempt["binding"],
+                        "identity_resolution": reason,
+                        "rule": "R139_ENRICHMENT_ADMISSION"}
+                    enriched.append(c)
+                else:
+                    attempt["outcome"] = (
+                        f"STILL_UNGROUNDED ({reason[:80]})")
+                    c["enrichment_outcome"] = attempt["outcome"]
+                    c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+        except Exception as exc:  # noqa: BLE001 — typed, never silent
+            attempt["outcome"] = (
+                f"RETRIEVAL_FAILED ({type(exc).__name__}: "
+                f"{exc}"[:160] + ")")
+            attempt["failure_class"] = "INFRASTRUCTURE (typed, Art. 15)"
+            c["enrichment_outcome"] = attempt["outcome"]
+            c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+        attempt["at"] = _dt.datetime.now(
+            _dt.timezone.utc).isoformat(timespec="seconds")
+        ledger["attempts"].append(attempt)
+    ledger["n_attempts"] = len(ledger["attempts"])
+    ledger["n_enriched_grounded"] = len(enriched)
+    ledger["n_held"] = (ledger["n_attempts"] - len(enriched))
+    try:
+        (Path(out_dir) / "ENRICHMENT_LEDGER.json").write_text(
+            json.dumps(ledger, indent=1) + "\n", encoding="utf-8")
+    except Exception:  # noqa: BLE001 — persistence best-effort, typed
+        ledger["persist_error"] = True
+    return {"ledger": ledger, "enriched": enriched}
+
+
 class EngineRun:
     def __init__(self, problem: Dict[str, Any], out_dir: str,
                  credentials_path: Optional[str] = None,
@@ -1635,11 +1810,20 @@ class EngineRun:
                                 "mechanism_source_span":
                                     f.get("mechanism_source_span", ""),
                                 "span_derivation": f.get("span_derivation"),
+                                # R139 DIR-3 (the auditor's fix): the
+                                # grid candidate's source_evidence cited
+                                # self.env.evidence[0] — the FIRST
+                                # frozen record, whatever it was, i.e.
+                                # a citation of a record that may not
+                                # support the mechanism at all. The
+                                # citation now comes from the
+                                # candidate's OWN verified binding
+                                # (assigned below from the canonical
+                                # verification); until the binding
+                                # resolves this stays EMPTY — never a
+                                # wrong record.
                                 "source_evidence": {
-                                    "source_id": ((self.env.evidence or [{}])[0]
-                                                  .get("id", "")),
-                                    "source_hash": ((self.env.evidence or [{}])[0]
-                                                    .get("content_hash", ""))},
+                                    "source_id": "", "source_hash": ""},
                                 "exploration_angle": c.get("angle"),
                                 "exploration_provider": c.get("provider_id")}
                             # R137 DIR-4B: the canonical per-candidate
@@ -1658,6 +1842,32 @@ class EngineRun:
                                     grid_cand["mechanism_support"] = _sup
                                     _state = _sup.get(
                                         "mechanism_support_state")
+                                    # R139 DIR-3: the grid candidate's
+                                    # source_evidence cites ITS OWN
+                                    # resolved binding record (the
+                                    # frozen record the support
+                                    # verification actually matched) —
+                                    # the identity resolution rules from
+                                    # the lean path apply here too:
+                                    # exactly-one record, span-in-record,
+                                    # hash match; a non-resolving binding
+                                    # leaves the citation EMPTY (never
+                                    # evidence[0], never an alias).
+                                    try:
+                                        from .adapters import \
+                                            _resolve_binding_identity
+                                        _b = (_sup or {}).get(
+                                            "evidence_binding") or {}
+                                        _gok, _gr, _grec = \
+                                            _resolve_binding_identity(
+                                                _b, _grid_structured)
+                                        if _gok and _grec:
+                                            grid_cand["source_evidence"] = {
+                                                "source_id": _grec["id"],
+                                                "source_hash":
+                                                    _grec["content_hash"]}
+                                    except Exception:  # noqa: BLE001
+                                        pass  # citation stays empty
                                     if _state in (
                                             "SUPPORTED",
                                             "PARTIALLY_SUPPORTED"):
@@ -1760,16 +1970,29 @@ class EngineRun:
             _cctx.set_stage("POST_RANK")
 
             # ---- R401: the structured mechanism space candidates ----
-            # Every mechanism-space candidate joins the gauntlet pool
-            # carrying its OWN mechanism-level evidence verification
-            # (unlike the grid candidates, whose discovery verification
-            # was not re-run). Each faces the SAME canonical downstream
-            # chain: collision -> spec -> physics gate -> engineering
-            # attack -> INDEPENDENT attack -> repair -> quality ->
-            # selection -> package.
+            # R139 DIR-3: the lifecycle gate at the ACTUAL engine
+            # boundary. Only ADMISSIBLE candidates join the automatic
+            # gauntlet pool; ungrounded hypotheses are RETAINED and
+            # routed through the enrichment executor (the existing
+            # retrieval + canonical verification), then either join
+            # ENRICHED (with full provenance) or stay explicitly HELD —
+            # never silently discarded, never treated as verified.
             ms = self.env.mechanism_space or {}
+            _ms_adm, _ms_ungrounded = ms_pool_admission_split(
+                ms.get("candidates") or [])
+            if _ms_ungrounded:
+                _enr = enrich_ungrounded_hypotheses(
+                    self.problem, _ms_ungrounded, self.out)
+                _ms_adm.extend(_enr["enriched"])
+                ms["enrichment_ledger"] = _enr["ledger"]
+                self._persist("ENRICHMENT_LEDGER.json", _enr["ledger"])
+                _pra["pool"]["enrichment"] = {
+                    "n_ungrounded_held": len(_ms_ungrounded),
+                    "n_enriched_grounded": len(_enr["enriched"]),
+                    "n_attempts": (_enr["ledger"] or {}).get(
+                        "n_attempts", 0)}
             _ms_seq: Dict[str, int] = {}
-            for c in (ms.get("candidates") or []):
+            for c in _ms_adm:
                 if not c.get("candidate_id"):
                     continue
                 op = c.get("transformation_operator", "OP")

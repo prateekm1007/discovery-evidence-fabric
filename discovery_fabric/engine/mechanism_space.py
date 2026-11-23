@@ -2696,9 +2696,17 @@ def _verbatim_eight_word_binding(mechanism_text: str,
         hit = grams.keys() & eshop
         if hit:
             span = max(hit, key=len)
+            # R139 DIR-2: the binding carries the NAMED RECORD'S actual
+            # content_hash (top-level item field, else its provenance)
+            # — the admission resolver verifies
+            # binding.content_hash == record.content_hash, so a binding
+            # cannot name record A while quoting record B's bytes.
+            _ch = (it.get("content_hash")
+                   or (it.get("provenance") or {}).get("content_hash"))
             best = {"grounded": True, "evidence_id": str(
                         it.get("id") or it.get("item_id") or ""),
-                    "span": span, "word_count": n_words}
+                    "span": span, "word_count": n_words,
+                    "content_hash": str(_ch) if _ch else None}
             break
     return best
 

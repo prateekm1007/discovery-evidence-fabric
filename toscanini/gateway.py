@@ -112,6 +112,33 @@ def registry_external_transport() -> dict | None:
         load_credentials()
         from discovery_fabric.engine import llm_registry as reg
         spec, ledger = reg.select_provider(reg.SelectionPolicy())
+        # R139 (measured worker defect): the C1.7 admission requires a
+        # CURRENT measured probe (TTL 300 s) and this caller never
+        # refreshed stale ones — a run spawned with only
+        # PROBE_EXPIRED rungs (staleness, NOT failure) died
+        # RUN_BLOCKED_TRANSPORT even though a live probe passes. The
+        # registry's own contract says "the caller probes before it
+        # admits; generate() probes lazily on the rungs it walks" —
+        # this entry was the one caller that did neither. ONE typed
+        # lazy refresh: for the head-provider refusal whose class is
+        # exactly PROBE_EXPIRED (transient staleness), run the real
+        # live probe (the same one-call authority runtime_admission
+        # uses) and re-select once. A real failure (PROBE_FAILED /
+        # auth / model-not-found) is NOT refreshed — the honest
+        # refusal stands.
+        if spec is None:
+            _cap_ref = (ledger or {}).get("capability_refusals") or []
+            _stale = [r for r in _cap_ref
+                      if str(r.get("capability_state")) == "PROBE_EXPIRED"]
+            if _stale:
+                from discovery_fabric.engine.runtime_admission import (
+                    probe_capability)
+                _head = _stale[0]
+                _pr = probe_capability(str(_head.get("provider")),
+                                       str(_head.get("model")),
+                                       timeout_s=20)
+                if _pr.get("ok"):
+                    spec, ledger = reg.select_provider(reg.SelectionPolicy())
     except Exception:  # noqa: BLE001 — unavailable, not silent success
         return None
     if spec is None:
