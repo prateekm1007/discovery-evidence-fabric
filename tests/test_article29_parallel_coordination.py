@@ -59,7 +59,8 @@ def _git(*args: str) -> str:
 
 def _validate_registry(reg, where: str, kind_violations=None,
                        status_violations=None, artifact_violations=None,
-                       lease_violations=None):
+                       lease_violations=None,
+                       live_lease_violations=None):
     """Schema validation for work-claims/v1 (Art. 29 CI line: registry
     schema valid). Returns (sessions, claims).
 
@@ -173,6 +174,20 @@ def _validate_registry(reg, where: str, kind_violations=None,
                 f"{where}: lease violation for {v.get('claim_id')} must "
                 "be remediated (forward-only disclosure)")
             registered_leases.setdefault(v["claim_id"], []).append(v)
+    registered_live_leases = {}
+    if live_lease_violations is not None:
+        assert isinstance(live_lease_violations, list), \
+            f"{where}: claim_live_lease_violations must be an array"
+        for v in live_lease_violations:
+            assert isinstance(v, dict) and v.get("claim_id"), \
+                f"{where}: live-lease violation entries need claim_id"
+            assert v.get("live_predecessor"), (
+                f"{where}: live-lease violation for {v.get('claim_id')} "
+                "must name the live_predecessor")
+            assert v.get("status") == "remediated", (
+                f"{where}: live-lease violation for {v.get('claim_id')} "
+                "must be remediated (forward-only disclosure)")
+            registered_live_leases.setdefault(v["claim_id"], []).append(v)
     by_id = {}
     for c in claims:
         cid = c.get("claim_id")
@@ -244,9 +259,30 @@ def _validate_registry(reg, where: str, kind_violations=None,
                 f"{c['claim_id']}: takeover across work_ids"
             assert prev["role"] == "EXECUTOR", \
                 f"{c['claim_id']}: takeover of a non-EXECUTOR claim"
-            assert prev["status"] in DEAD, \
-                f"{c['claim_id']}: takeover of a live lease " \
-                f"({prev['status']})"
+            if prev["status"] not in DEAD and live_lease_violations is not None:
+                # R143s3-b (F42/R39b pattern, third instance): a live-lease
+                # takeover recorded in an IMMUTABLE HISTORICAL snapshot
+                # passes ONLY when registered in the current registry's
+                # claim_live_lease_violations[] with the live predecessor
+                # named AND that predecessor's status typing (TAKEN_OVER)
+                # has actually landed in the CURRENT registry — the
+                # tolerance is disclosed remediation, not silent
+                # acceptance. The CURRENT registry itself never passes
+                # through this branch (its callers validate strictly with
+                # live_lease_violations=None).
+                regd = registered_live_leases.get(c["claim_id"])
+                assert regd and any(
+                    r.get("live_predecessor") == t for r in regd), (
+                    f"{c['claim_id']}: takeover of a live lease "
+                    f"({prev['status']}) (R143s3-b: a live-lease takeover "
+                    "in an immutable historical snapshot must be REGISTERED "
+                    "in claim_live_lease_violations[] with the live "
+                    "predecessor named — forward-only disclosure; history "
+                    "rewrites are not a remedy, Art. 4)")
+            else:
+                assert prev["status"] in DEAD, \
+                    f"{c['claim_id']}: takeover of a live lease " \
+                    f"({prev['status']})"
     return sessions, claims
 
 
@@ -420,7 +456,8 @@ def test_canonical_measurement_commits_match_a_claim():
             kind_violations=cur.get("claim_kind_violations"),
             status_violations=cur.get("claim_status_violations"),
             artifact_violations=cur.get("claim_artifact_violations"),
-            lease_violations=cur.get("claim_lease_violations"))
+            lease_violations=cur.get("claim_lease_violations"),
+            live_lease_violations=cur.get("claim_live_lease_violations"))
         matching = [
             c for c in claims
             if c["role"] == "EXECUTOR"
