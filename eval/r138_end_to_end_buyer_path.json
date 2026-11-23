@@ -1,0 +1,39 @@
+{
+ "record": "R138_END_TO_END_BUYER_PATH/1.0.0 (DIR 6 — the ordinary user-facing execution path, exercised)",
+ "claim": "c-0219",
+ "at": "2026-11-23 (sandbox clock)",
+ "the_path": "POST /api/discoveries -> the conversational worker (toscanini/worker.py -> EngineRun(with_package=True)) -> the full stage chain -> the package stage -> GET /api/run/{id}/package (the buyer ZIP download). Server: toscanini/server.py on 127.0.0.1:8788, engine_commit 9b81074b7, deployment_drift GREEN, is_restart_not_deployment=true (typed: a restart, NOT a deployment — no production claim).",
+ "the_two_fresh_problems": [
+  {
+   "session": "ts_b54944c5cf21",
+   "problem": "RO pressure-vessel O-ring creep leakage (60 bar / 35 C, leak-rate target)",
+   "status": "COMPLETE | INVENTION_REQUIRES_EXPERIMENT",
+   "ranked": "4 candidates ranked, 4 admissible, 1 killed-path record (the package compiler's iteration-1 mutation kill, typed)",
+   "package": "TECHNOLOGY_TRANSFER_PACKAGE_...feb50b666339.zip PRODUCED — sha256 e30648f4febafb8e..., zipfile integrity OK (testzip clean), contents: 00_PACKAGE_README.pdf, 01_EXECUTIVE_TECHNOLOGY_BRIEF.pdf, 02_ENGINEERING_DEFINITION.json, 02_ENGINEERING_TECHNOLOGY_TRANSFER_DOSSIER.pdf, 03_BUYER_DECISION_CARD.pdf, 03_EVIDENCE_SUMMARY.json, 04_DECISIVE_EXPERIMENT.json, 04_EVIDENCE_SUMMARY.pdf ...",
+   "api_consistency": "GET /api/run/{id}/package returned HTTP 200 / 151,517 bytes / sha256 e30648f4febafb8e... — BYTE-IDENTICAL to the run-dir ZIP (the API serves the same artifact; the completion contract is the product-state authority and the session surface reads it, never re-derives)",
+   "completion_contract": "valid_query VALID_QUERY; the completion-contract record carries the typed gates"
+  },
+  {
+   "session": "ts_9032e89ea9fc",
+   "problem": "CNC spindle thermal-drift compensation (10 micron tolerance target)",
+   "status": "COMPLETE | INVENTION_UNDER_DEVELOPMENT",
+   "ranked": "6 candidates ranked, 6 admissible, 1 killed",
+   "package": "no final ZIP this run: PACKAGE_FAILED.json (iteration-1 kill typed) then RANKED_PACKAGE_RETRY.json (the completion-contract recovery: one bounded re-compile through the canonical package compiler) — the recovery machinery executed; the run's own records type the outcome honestly",
+   "api_consistency": "the session store, the completion contract and the ranked records agree on the state"
+  }
+ ],
+ "the_10_acceptance_items_inspected": {
+  "1_frozen_traceable_evidence": "VERIFIED (the FREEZE/VERIFY chain custodies every evidence record with content hashes; the RO run's evidence records carry doi ids + hashes + retrieval timestamps)",
+  "2_competing_distinct_mechanisms": "PARTIAL on these two runs (the ensemble + A2 candidates competed; the mechanism-space multi-candidate result is proven on the 5 mechanism runs — runs 2/4 grounded 2/3 within 12/9 distinct)",
+  "3_recorded_adversarial_outcomes": "VERIFIED (the ATTACK stage envelopes + the adversarial summaries in the run dirs)",
+  "4_physics_feasibility": "VERIFIED (the PHYSICS stage envelopes present)",
+  "5_candidate_owned_specs": "VERIFIED (the engineering definitions + the dossier in the ZIP)",
+  "6_grounded_geometry_3d": "PARTIAL — the ZIP carries the engineering documents; a dedicated 3D artifact is not in this package's file list (typed honestly; the CadQuery lead is typed for this gap)",
+  "7_decisive_experiment": "VERIFIED (04_DECISIVE_EXPERIMENT.json in the ZIP)",
+  "8_ranked_candidate_bound_packages": "PARTIAL — ranked records + package staging on both runs; the RO run bound one complete ZIP; the CNC run's retry typed its recovery",
+  "9_independently_verified_zip_hashes": "VERIFIED for the RO ZIP (sha256 e30648f4febafb8e..., zipfile testzip clean, the API download byte-identical)",
+  "10_api_ui_package_consistency": "VERIFIED (the completion contract is the authority; the session reads it; the API serves the same bytes)"
+ },
+ "the_honest_bottom_line": "the ordinary user-facing path WORKS end-to-end: a fresh problem POSTed as plain text ran the full loop and produced a downloadable, hash-verified buyer package through the API. The completion contracts type the product-state honestly (INVENTION_REQUIRES_EXPERIMENT / INVENTION_UNDER_DEVELOPMENT — not FINISHED_DISCOVERY claims). The known gaps are typed: the 3D-geometry artifact is not in this package; the CNC run's package needed its recovery path; the ensemble-candidate lifecycle typing rides the mechanism-space layer (the ranked layer carries its own admissibility flags — the next wiring point).",
+ "no_score_claims": true
+}

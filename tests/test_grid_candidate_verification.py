@@ -59,13 +59,17 @@ def test_pool_entries_carry_support_state():
                      SRC.index("R401: the structured mechanism space")]
     assert '"mechanism_support_state"' in grid_block
     assert '"discovery_verified"' in grid_block
-    # verified ONLY on the canonical support states
+    # verified ONLY on the canonical support states AND a GROUNDED
+    # binding (the R138 strengthening — PARTIALLY_SUPPORTED alone was
+    # the R137 measured defect)
     assert re.search(
         r'"discovery_verified": bool\(\s*_sup and _sup\.get\(\s*'
         r'"mechanism_support_state"\) in \(\s*"SUPPORTED",\s*'
-        r'"PARTIALLY_SUPPORTED"\)\)', grid_block), (
+        r'"PARTIALLY_SUPPORTED"\)\s*and', grid_block), (
         "discovery_verified must key on the canonical verifier's "
-        "own states — never on the lexical span score")
+        "own states AND the grounded binding — never on the lexical "
+        "span score alone")
+    assert '.get("grounded")' in grid_block
 
 
 def test_grid_stays_conditional():

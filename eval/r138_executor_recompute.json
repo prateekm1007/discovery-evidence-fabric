@@ -1,0 +1,44 @@
+{
+ "record": "R138_EXECUTOR_RECOMPUTE/1.0.0 (DIR 8 — the recomputation surface the independent verifier audits; the verifier recomputes from committed bytes, never re-runs, Art. 29(c))",
+ "claim": "c-0219 (executor) — the c-0218 VERIFIER pass is the twin session's lane; c-0218 is NOT closed by this record",
+ "at": "2026-11-23 (sandbox clock)",
+ "items": {
+  "1_final_120_leg_panel": {
+   "source": "eval/r136_panel_v2_calibration.json (regenerated) + eval/r137s2_panel_verifier_recompute.json (rerun)",
+   "recompute": "120 recorded legs / 119 valid responses (hy4f 1 TRANSPORT_FAILED typed, matching the auditor's own inspection); expected_legs=20 pinned; all six judges represented; qualified [dsv32] only (0.9); GATE NOT_MET (the >=2-qualified typed refusal); the v1/v2 paired deltas on common observations only (dsr1 n=9 typed NOT DIRECTLY COMPARABLE); engine_vs_indep_diffs=[] (two code paths agree)",
+   "verifier_surface": "scripts/r136_panel_v2_tally.py (zero-LLM, deterministic) + scripts/r137s2_panel_verifier_recompute.py (the twin's independent recompute)"
+  },
+  "2_f31f_verification": {
+   "source": "eval/r137_f31f_verifier_record.json (the R137 independent verification, unchanged)",
+   "recompute": "48 legs present, zero byte-identity failures, every number matches (rates, damage, per-class counts, the >=3-class gate NEGATIVE retained, the clustered CI seed 131 [-0.125, 0.125], the exact sign test p=1.0); F31E stays NOT-RUN; c-0217 DONE-as-PARTIAL-RESULT",
+   "verifier_surface": "scripts/r137_f31f_verifier.py (fully independent code, zero import of the claimant's scoring)"
+  },
+  "3_five_live_run_raw_records": {
+   "source": "eval/r137_live_multi_mechanism/ (the R137 five, reconciled) + eval/r138_fresh_runs/ (the R138 five)",
+   "recompute": "scripts/r138_run_extractor.py derives the 8-row table from committed raw bytes: the R137 runs — blocks 12/run, distinct 6-10, GROUNDED 0-1, ADMISSIBLE 0; the R138 runs — blocks parsed where generation executed, GROUNDED == ADMISSIBLE (2/3/1 on runs 2/4/5), the bindings resolve to DOI records with content hashes + verbatim spans",
+   "verifier_surface": "scripts/r138_run_extractor.py <run-dir-base> (zero-LLM, deterministic)"
+  },
+  "4_evidence_binding_and_admission": {
+   "source": "discovery_fabric/engine/adapters.py (the lifecycle block) + discovery_fabric/engine/mechanism_space.py (_public_candidate) + tests/test_candidate_grounding_lifecycle.py (6 tests)",
+   "recompute": "admission = grounded binding (evidence_id + verbatim span) AND the canonical verdict; ungrounded = retained UNGROUNDED_HYPOTHESIS with enrichment_required; CONTESTED stays visible; NOT_ENOUGH_EVIDENCE never converts",
+   "verifier_surface": "the CI tests + a read of the lifecycle block (the rule is 30 lines, commented with the R138 authority)"
+  },
+  "5_exploration_grid_verification": {
+   "source": "discovery_fabric/engine/run.py (the grid pool builder) + tests/test_grid_candidate_verification.py (5 tests)",
+   "recompute": "the canonical verify_mechanism_support per grid candidate; CONTESTED blocked+recorded; discovery_verified requires the GROUNDED binding (the R137 PARTIALLY_SUPPORTED-alone defect fixed)",
+   "verifier_surface": "the CI tests + the run.py block"
+  },
+  "6_provider_model_attribution": {
+   "source": "eval/r138_fresh_runs/*/ROUTING_LEDGER_RUN.json + the healthz payload (provider agnes, model agnes-3.0-flash, probe OK) + eval/r138_grounding_agnes_acceptance.json",
+   "recompute": "the routing ledger lines carry account_domain per line (OWNER_AGNES_ACCOUNT vs OWNER_XKIRO_ACCOUNT — an xkiro line is never relabeled); the 5-run transport attribution shows agnes served mechanism generation on every run where generation executed",
+   "verifier_surface": "the ledger lines + ENGINE_RUNS/model_routing/ledger.jsonl (the append-only record)"
+  },
+  "7_downstream_candidate_outcomes": {
+   "source": "the corrected extractor's exact-join reach + outcome rows (the stage envelopes' own records)",
+   "recompute": "per-candidate outcomes typed passed/killed/blocked/unresolved from the stage records; the substring-based R137 claim retracted in favor of the record joins",
+   "verifier_surface": "scripts/r138_run_extractor.py"
+  }
+ },
+ "c_0218_disposition": "LEFT OPEN by design (the auditor's instruction: do not close prematurely). The registry note records: the R138 directions' verifier recomputation covers the 7 items above; the c-0218 VERIFIER pass belongs to the independent session (the twin) per Art. 29(b)/(c); closure follows its verification record. The R137 stash incident (the close commit shipping pre-final bytes) is disclosed in the calibration record + LOG.",
+ "no_score_claims": true
+}
