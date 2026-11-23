@@ -240,7 +240,9 @@ def _quote_present(text: str, quote: str, n_words: int = 8) -> bool:
 
 def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                                  out_dir: Path,
-                                 max_enrich: int = 3) -> Dict[str, Any]:
+                                 max_enrich: int = 3,
+                                 frozen_items: List[Dict] = None
+                                 ) -> Dict[str, Any]:
     """R139 DIR-3: the REAL enrichment execution path for ungrounded
     hypotheses — through the EXISTING retrieval and verification
     machinery (no new framework, Art. 29 duplication ban):
@@ -254,7 +256,19 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
            R139 DIR-2 identity discipline);
         3. verify_mechanism_support (THE canonical instrument) on the
            hypothesis against the NEW items;
-        4. resolve the binding identity (the R139 resolver);
+        4. resolve the binding identity (the R139 resolver) — R142S1
+           FAIL-CLOSED FIX (the FALSE_ID bad admission): the resolver
+           runs against the RUN'S FROZEN EVIDENCE SET (frozen_items —
+           the set the acceptance recompute uses), NEVER against the
+           enrichment's own fresh retrieval items (new_items are an
+           unfrozen snapshot; a binding that resolves only against
+           them is identity-false against the run's frozen evidence —
+           the R142 yield run admitted exactly such a candidate:
+           europepmc:29937599, absent from the frozen set). The
+           verification (step 3) still reads the new items' text; the
+           IDENTITY gate reads the frozen set. A binding absent from
+           the frozen set is refused (FALSE_ID_FROZEN, typed) and the
+           hypothesis stays HELD_UNGROUNDED — 0 bad admissions;
         5. outcomes:
            - ENRICHED_GROUNDED: the hypothesis grounds on the new
              evidence -> it JOINS the pool (full provenance trail:
@@ -396,8 +410,15 @@ def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
                     c_regen = c
                 v = _verify(c_regen, new_items, problem)
                 b = v.get("evidence_binding") or {}
+                # R142S1 fail-closed: the IDENTITY gate reads the FROZEN
+                # set (the acceptance recompute's authority), never the
+                # unfrozen fresh retrieval snapshot
+                _identity_pool = frozen_items if frozen_items is not None \
+                    else new_items
                 ok, reason, resolved = _resolve(
-                    b, new_items)
+                    b, _identity_pool)
+                if frozen_items is not None and not ok and str(reason).startswith("FALSE_ID"):
+                    reason = ("FALSE_ID_FROZEN (the binding names no record in the run's FROZEN evidence set; it resolved only against the unfrozen enrichment snapshot)")
                 attempt["support_state"] = v.get(
                     "mechanism_support_state")
                 attempt["identity_resolution"] = reason
@@ -2172,7 +2193,8 @@ class EngineRun:
                 ms.get("candidates") or [])
             if _ms_ungrounded:
                 _enr = enrich_ungrounded_hypotheses(
-                    self.problem, _ms_ungrounded, self.out)
+                    self.problem, _ms_ungrounded, self.out,
+                    frozen_items=self.env.evidence or [])
                 _ms_adm.extend(_enr["enriched"])
                 ms["enrichment_ledger"] = _enr["ledger"]
                 self._persist("ENRICHMENT_LEDGER.json", _enr["ledger"])
@@ -4387,7 +4409,8 @@ class EngineRun:
             if not _ungrounded:
                 return
             _enr = enrich_ungrounded_hypotheses(
-                self.problem, _ungrounded, self.out)
+                self.problem, _ungrounded, self.out,
+                frozen_items=self.env.evidence or [])
             enriched = _enr.get("enriched") or []
             ledger = _enr.get("ledger") or {}
             if enriched:
