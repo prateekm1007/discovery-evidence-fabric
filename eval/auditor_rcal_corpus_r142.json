@@ -1,0 +1,301 @@
+{
+ "record": "AUDITOR_RCAL_CORPUS_R142/1.0.0",
+ "author": "auditor (appointed)",
+ "at": "2026-11-23",
+ "purpose": "FRESH one-shot R-CAL calibration corpus for the P4 panel (Art.7): 12 blind pairs, domains DISJOINT from r5/R138/R141. BALANCED 6 a1 / 6 baseline so a lazy always-a1 judge scores 0.5 (FAILS 0.8). Builder runs judges blind+swapped ONCE; recompute vs overall_preference; NO re-roll; burn after.",
+ "protocol": "judge sees problem + A/B mechanisms (blind, sha-parity swap), forced-choice prefer; per-judge acc>=0.8 AND answered>=0.9 to qualify; >=3 qualified from >=2 non-agnes families; then agreement>=0.7 (alpha>=0.6) + AUC>=0.8.",
+ "n_pairs": 12,
+ "prefer_a1": 6,
+ "prefer_baseline": 6,
+ "pairs": [
+  {
+   "problem_id": "rcal-01-aluminum-anode-effect",
+   "domain": "metals",
+   "problem": "Hall-H\u00e9roult cell emits PFCs during anode effects when dissolved alumina falls below ~1.5 wt%.",
+   "a1_mechanism": "Estimate dissolved alumina from cell resistance slope plus acoustic emission of anode bubble coverage and dose alumina predictively before effect onset.",
+   "baseline_mechanism": "Run a fixed underfeed/overfeed alumina cycle and manually quench when cell voltage spikes.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 3,
+   "overall_preference": "a1",
+   "label_rationale": "a1 novel predictive sensor-fusion control on existing signals; feasible+testable on voltage logs; more novel than the standard cycle."
+  },
+  {
+   "problem_id": "rcal-02-glass-tempering-quench",
+   "domain": "materials",
+   "problem": "Thin-glass thermal tempering warps because the air-quench heat-transfer coefficient is non-uniform across the sheet.",
+   "a1_mechanism": "Grade the quench nozzle aperture spatially via an inverse heat-transfer model of the sheet to equalize the local Biot number.",
+   "baseline_mechanism": "Raise overall fan pressure and slow the conveyor to soak the sheet longer.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta": 3,
+   "overall_preference": "a1",
+   "label_rationale": "a1 attacks spatial non-uniformity (root cause) with a model-designed profile; baseline brute-forces pressure, hurting throughput."
+  },
+  {
+   "problem_id": "rcal-03-paper-dryer-condensate",
+   "domain": "process",
+   "problem": "Paper dryer cylinders lose heat transfer when condensate rims inside the shell at high speed.",
+   "a1_mechanism": "Fit stationary siphon spoons with tuned clearance and a speed-matched differential-pressure condensate evacuation schedule.",
+   "baseline_mechanism": "Raise steam pressure to push heat through the condensate film.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 3,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta": 2,
+   "overall_preference": "a1",
+   "label_rationale": "a1 removes the insulating film (root cause) with a speed-matched siphon; baseline wastes energy and risks over-pressure."
+  },
+  {
+   "problem_id": "rcal-07-cmp-dishing",
+   "domain": "semiconductor",
+   "problem": "Copper CMP dishes wide features because pad pressure concentrates at the feature center.",
+   "a1_mechanism": "Use a zone-controlled carrier head with independently pressurized concentric membranes tuned by a Preston-equation layout model.",
+   "baseline_mechanism": "Switch to a softer pad and reduce down-force globally.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 2,
+   "overall_preference": "a1",
+   "label_rationale": "a1 zone-controlled head attacks the spatial pressure root cause; baseline softer pad cuts removal rate globally."
+  },
+  {
+   "problem_id": "rcal-08-injection-molding-sink",
+   "domain": "manufacturing",
+   "problem": "Thick-section moldings sink because the core shrinks after the gate freezes.",
+   "a1_mechanism": "Gate the pack-pressure profile on a cavity-pressure sensor so the core stays fed past gate freeze, with conformal cooling.",
+   "baseline_mechanism": "Increase pack pressure and hold time uniformly until the part looks full.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 3,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 3,
+     "testability": 3,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta": 1,
+   "overall_preference": "a1",
+   "label_rationale": "a1 cavity-pressure-gated packing feeds the core until solidification (testable); baseline over-packs -> flash + residual stress."
+  },
+  {
+   "problem_id": "rcal-11-heat-exchanger-fouling",
+   "domain": "process",
+   "problem": "Shell-and-tube exchangers foul, dropping U-value and raising pumping power.",
+   "a1_mechanism": "Trigger online sponge-ball cleaning from a real-time U-value estimate (terminal temperatures + flow) instead of a fixed calendar.",
+   "baseline_mechanism": "Clean on a fixed monthly calendar regardless of condition.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 3,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 4
+    },
+    "baseline": {
+     "novelty": 1,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 2,
+   "overall_preference": "a1",
+   "label_rationale": "a1 condition-triggered cleaning uses existing sensors, testable on U-value, avoids over/under-cleaning; more novel than calendar."
+  },
+  {
+   "problem_id": "rcal-04-cement-kiln-ring",
+   "domain": "process",
+   "problem": "Cement rotary kilns form clinker rings that block the cross-section, forcing shutdowns.",
+   "a1_mechanism": "Insert a water-cooled plasma lance through the kiln hood to melt rings online during operation.",
+   "baseline_mechanism": "Schedule periodic shutdowns and mechanically clear the ring with a jackhammer.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 1,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 2,
+   "overall_preference": "baseline",
+   "label_rationale": "a1 plasma-lance online melting is novel but feasibility/testability low (refractory damage, two-phase heat load unvalidated); baseline mechanical clear is sound+testable. Prefer baseline."
+  },
+  {
+   "problem_id": "rcal-05-textile-dyeing-unlevelness",
+   "domain": "process",
+   "problem": "Reactive cotton dyeing gives unlevel shade when exhaustion outruns liquor exchange.",
+   "a1_mechanism": "Drive dye exhaustion with a megasonic field across the dye bath to levitate and uniformly agitate the fabric.",
+   "baseline_mechanism": "Stage salt/alkali dosing as a feedback ramp on inline liquor conductivity and colorimetry.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 1,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 3,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 1,
+   "overall_preference": "baseline",
+   "label_rationale": "a1 megasonic levitation is novel but impractical at bath scale (untestable uniformity, transducer fouling); baseline feedback dosing is feasible+testable. Prefer baseline."
+  },
+  {
+   "problem_id": "rcal-06-freeze-drying-collapse",
+   "domain": "food",
+   "problem": "High-sugar fruit freeze-drying collapses the cake when product temperature exceeds Tg' in primary drying.",
+   "a1_mechanism": "Apply microwave-assisted volumetric heating to accelerate sublimation through the dried layer.",
+   "baseline_mechanism": "Hold shelf temperature on a conservative ramp validated below the measured collapse temperature.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 4
+    }
+   },
+   "novelty_delta": 2,
+   "overall_preference": "baseline",
+   "label_rationale": "a1 microwave sublimation is novel but risks runaway collapse + plasma arcing (low feasibility/testability); baseline conservative ramp is sound. Prefer baseline."
+  },
+  {
+   "problem_id": "rcal-09-friction-stir-welding-kissing-bond",
+   "domain": "manufacturing",
+   "problem": "Friction stir welds show kissing bonds when heat input is too low.",
+   "a1_mechanism": "Add a high-power laser preheat ahead of the tool to decouple heat input from travel speed.",
+   "baseline_mechanism": "Close the loop on shoulder temperature via IR pyrometry and adjust travel speed to hold a validated heat-input window.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 3,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 1,
+   "overall_preference": "baseline",
+   "label_rationale": "a1 laser-hybrid FSW is novel but costly and hard to validate (HAZ softening, keyhole); baseline pyrometry feedback is feasible+testable. Prefer baseline."
+  },
+  {
+   "problem_id": "rcal-10-compressor-surge",
+   "domain": "turbomachinery",
+   "problem": "Centrifugal compressors surge at low flow, damaging blades.",
+   "a1_mechanism": "Suppress surge with active magnetic-bearing rotor axial modulation at the stall frequency.",
+   "baseline_mechanism": "Detect the pre-surge stall precursor from dynamic-pressure spectral coherence and open a fast recycle valve.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 1,
+     "testability": 2,
+     "constraint_compliance": 2
+    },
+    "baseline": {
+     "novelty": 3,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 3
+    }
+   },
+   "novelty_delta": 1,
+   "overall_preference": "baseline",
+   "label_rationale": "a1 AMB axial modulation is novel but impractical (actuator bandwidth, rotordynamic risk); baseline precursor-detection recycle is feasible+testable. Prefer baseline."
+  },
+  {
+   "problem_id": "rcal-12-pump-cavitation-erosion",
+   "domain": "turbomachinery",
+   "problem": "Centrifugal pumps erode the impeller when NPSH margin collapses at off-design flow.",
+   "a1_mechanism": "Induce controlled inlet pre-rotation with a variable guide vane scheduled by suction-pressure fluctuation RMS.",
+   "baseline_mechanism": "Throttle the discharge valve to keep flow near BEP.",
+   "auditor_scores": {
+    "a1": {
+     "novelty": 4,
+     "feasibility": 2,
+     "testability": 2,
+     "constraint_compliance": 3
+    },
+    "baseline": {
+     "novelty": 2,
+     "feasibility": 4,
+     "testability": 4,
+     "constraint_compliance": 2
+    }
+   },
+   "novelty_delta": 2,
+   "overall_preference": "baseline",
+   "label_rationale": "a1 inlet pre-rotation is novel but guide-vane retrofit + two-phase validation hard (low feasibility/testability); baseline throttling feasible+testable though energy-costly. Prefer baseline."
+  }
+ ],
+ "selection_sha256": "67764d0cb1d105bc6db58b9b2f96d1af5f707b29c17be4936de88e767330cdf9"
+}

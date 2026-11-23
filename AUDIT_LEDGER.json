@@ -1919,7 +1919,7 @@
    "id": "R140-F2",
    "severity": "LOW",
    "title": "The 'restored byte-identical from 17ca0e8e3' provenance claim is UNVERIFIED: the source commit object is unreachable in the fetched history",
-   "status": "OPEN",
+   "status": "CLOSED",
    "opened": "2026-11-23",
    "last_checked": "bd2ec4f2a",
    "rounds_open": 1,
@@ -1933,7 +1933,9 @@
    "articles": [
     "Art. 1 (bytes over claims)"
    ],
-   "accepted_fix": "push 17ca0e8e3 to a reachable ref (a tag) so the byte-identity recompute becomes possible, or re-type the restoration provenance as 'from the ae59bcf5a record; the source object unverifiable'"
+   "accepted_fix": "push 17ca0e8e3 to a reachable ref (a tag) so the byte-identity recompute becomes possible, or re-type the restoration provenance as 'from the ae59bcf5a record; the source object unverifiable'",
+   "closed_round": "R142",
+   "resolved_by": "provenance re-typed UNVERIFIED-SOURCED + reachable lineage"
   },
   {
    "id": "R141-F1",
@@ -1941,7 +1943,9 @@
    "severity": "MEDIUM",
    "title": "DIR-2 fresh grounded run not yet executed/committed \u2014 the c-0218/c-0219 closure evidence (>=1 identity-true grounded admissible candidate on a NEW problem) is pending; the driver is ready",
    "evidence": "eval/r141s1_fresh_grounded_run/ absent at tip; driver scripts/r141s1_fresh_grounded_run.py present",
-   "status": "OPEN"
+   "status": "CLOSED",
+   "closed_round": "R142",
+   "resolved_by": "R141S2 raw bytes materialized + grounding recompute"
   },
   {
    "id": "R141-F2",
@@ -1949,6 +1953,24 @@
    "severity": "MEDIUM",
    "title": "Resurrection/stale-tree close class still unguarded: no reappearance guard test, no close_window.sh (R139S3-F2 open); causal_correctness was resurrected once already",
    "evidence": "tests/ no reappearance guard; scripts/close_window.sh absent",
+   "status": "CLOSED",
+   "closed_round": "R142",
+   "resolved_by": "reappearance guard + close_window.sh present"
+  },
+  {
+   "id": "R142-F1",
+   "round": "R142",
+   "severity": "MEDIUM",
+   "title": "Grounded yield is evidence-density sensitive: only 1 of 4-5 fresh problems crosses the identity-true+SUPPORTED bar; the enrichment executor must lift ungrounded hypotheses to grounded (the twin's DIR-4 wiring started)",
+   "evidence": "r141s2_verifier_record rows (3/4 runs grounded_present=false)",
+   "status": "OPEN"
+  },
+  {
+   "id": "R142-F2",
+   "round": "R142",
+   "severity": "LOW",
+   "title": "v16 + P5 sealed authoring BLOCKED on owner custody (encrypted rubric key / private repo); the HF token has zero repo-write perms",
+   "evidence": "P0 owner custody action outstanding; F60 public-plaintext custody failure class",
    "status": "OPEN"
   }
  ],
@@ -4904,6 +4926,24 @@
    "closed": [
     "R140-F1"
    ]
+  },
+  {
+   "id": "V103",
+   "round": "R142 audit of R141S2 grounding verification + auditor R-CAL corpus authoring",
+   "commit": "0a10805ace7406135d29017c2a7f7d10d00e1a28",
+   "gate": "grounding byte-verified (R141-F1 closed); guards present (R141-F2 closed); R-CAL corpus authored (12 balanced pairs); panel one-shot pending builder",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r142_auditor_adjudication.json",
+   "findings": [
+    "R142-F1",
+    "R142-F2"
+   ],
+   "closed": [
+    "R141-F1",
+    "R141-F2",
+    "R140-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -5199,9 +5239,18 @@
    "disjointness": "stenter/ring-spinning clashes replaced (warp-sizing/fabric-shearing/tfo-twister/fabric-compactor); r99 guard full v1-v14 required pre-run",
    "burned_at": "2026-11-20",
    "acceptance": "GRANTED (mean 3.9, CI[3.79, 4.01], 0/0/0)"
+  },
+  "rcal_corpus_r142": {
+   "status": "SEALED_ONE_SHOT",
+   "selection_sha256": "67764d0cb1d105bc6db58b9b2f96d1af5f707b29c17be4936de88e767330cdf9",
+   "n": 12,
+   "balance": "6 a1/6 baseline",
+   "author": "auditor",
+   "custody": "labels audit branch; blind+swapped; one-shot; burn after",
+   "path": "eval/auditor_rcal_corpus_r142.json"
   }
  },
- "progress_note": "SCORE 7/10 (carried R141S1). R141S1 (c-0223) PARTIAL PROGRESS VERIFIED: DIR-3 prune-reapply DONE (causal_correctness.py absent at tip ec5254721, R140-F1 CLOSED); DIR-2 fresh-grounded-run driver written+correct (NEW domains desal/wind-blade, EngineRun agnes-first, re-resolves every binding via the fixed identity-true resolver) but NOT yet executed/committed (R141-F1 \u2014 c-0218/c-0219 closure pending); module ledger live (import != integration discipline). Reappearance guard + close_window.sh ABSENT (R141-F2 \u2014 resurrection class unguarded). Consistent with V101 (c-0220 identity-true closure verified, panel dsv32 9/10 only qualified, R-CAL NOT_MET honest). Critical path: execute fresh grounded run -> fresh auditor sealed R-CAL corpus (one-shot) -> panel qualification (8) + v16 (consolidate 7) -> post-cutoff rediscovery + unattended (9). Worldwide: ScienceOne 100 (CAS), MechEvalAgent execution-grounded eval, AutoScientists self-organizing teams, Patent Deep Research Agent. Goal 9/10 fully agent-run (AM46).",
+ "progress_note": "SCORE 7/10 (carried R142). R141S2 grounding VERIFIED with raw bytes committed (1 identity-true grounded candidate doi:10.48550/arxiv.2010.16033, 0 bad admissions; retrieval-mix difference typed; bar holds in both runs). R141-F1/F2 + R140-F2 CLOSED. Reappearance guard + close_window.sh present; producer lean_ alias leak fixed; credential helper moved untracked. AUDITOR AUTHORED the fresh sealed R-CAL corpus (eval/auditor_rcal_corpus_r142.json, 12 balanced blind pairs 6a1/6baseline, sha256_16=67764d0cb1d105bc, one-shot, burn) \u2014 builder runs >=3 strong judges blind+swapped ONCE to qualify (acc>=0.8 AND answered>=0.9 from >=2 non-agnes families; agreement>=0.7 alpha>=0.6 AUC>=0.8). NEW: R142-F1 grounded yield evidence-density sensitive (enrichment wiring to lift >=2/5); R142-F2 v16+P5 authoring blocked on owner rubric custody (encryption key/private repo). Critical path: R-CAL one-shot -> panel (8) + v16 (owner custody) -> rediscovery + unattended (9). Goal 9/10 fully agent-run (AM46).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
