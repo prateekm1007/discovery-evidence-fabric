@@ -1778,6 +1778,17 @@ class EngineRun:
                                 _a = str(_rec.get("abstract") or "")
                                 _rt = f"{_t}. {_a}".strip()
                                 _grid_structured.append({
+                                    # the REAL frozen record id — a
+                                    # grid-sourced binding must name a
+                                    # record the resolver can resolve;
+                                    # the R138-era lean_ item_id alias
+                                    # is RETIRED as an evidence_id
+                                    # source (the DELETE LIST: the
+                                    # producer never emits aliases;
+                                    # item_id keeps the lean_ tag for
+                                    # grid-view traceability only, and
+                                    # the binding producer prefers "id")
+                                    "id": str(_rec.get("id")),
                                     "item_id": f"lean_{_rec.get('id')}",
                                     "structured_hash": __import__("hashlib").sha256(
                                         _rt.encode("utf-8", "replace")).hexdigest(),

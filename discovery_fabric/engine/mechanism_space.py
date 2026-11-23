@@ -2703,8 +2703,20 @@ def _verbatim_eight_word_binding(mechanism_text: str,
             # cannot name record A while quoting record B's bytes.
             _ch = (it.get("content_hash")
                    or (it.get("provenance") or {}).get("content_hash"))
-            best = {"grounded": True, "evidence_id": str(
-                        it.get("id") or it.get("item_id") or ""),
+            # R141 DELETE LIST (defense in depth): the producer NEVER
+            # emits a synthetic alias as an evidence_id — known alias
+            # prefixes are stripped at the boundary (the grid's lean_
+            # item_id traceability tags; citation_identity's
+            # ALIAS_PREFIXES family). The admission resolver still
+            # refuses any residual alias (fail closed); this line makes
+            # the producer clean so a lawful binding never depends on
+            # the resolver's mercy.
+            _eid = str(it.get("id") or it.get("item_id") or "")
+            for _pfx in ("lean_", "doied_", "ref_"):
+                if _eid.startswith(_pfx):
+                    _eid = _eid[len(_pfx):]
+                    break
+            best = {"grounded": True, "evidence_id": _eid,
                     "span": span, "word_count": n_words,
                     "content_hash": str(_ch) if _ch else None}
             break
