@@ -18,7 +18,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-RUN_DIR = REPO / "eval" / "r141s1_fresh_grounded_run"
+# the EXECUTOR-ORIGINAL raw bytes (the verifier's re-execution at the
+# canonical eval/r141s1_fresh_grounded_run/ path is a DIFFERENT live
+# run — its grounded candidate is on fresh-03; the executor's
+# execution-of-record bytes, which this recompute re-derives, live here)
+RUN_DIR = REPO / "eval" / "r141s1_fresh_grounded_run_executor_originals"
 PID = "r141-fresh-04-chiller-fouling-capacity-droop"
 TARGET = "cand:MS:DIRECT_TRANSFER:41c5f98f44ba"
 
@@ -112,12 +116,21 @@ def main() -> int:
     out = {
         "record": "R141S2_RECOMPUTE_BY_BUILDER/1.0.0",
         "work_id": "r141s2-verify-fresh-run (executor-side repair)",
+        "provenance_note": ("the source bytes are the executor's "
+                            "execution-of-record raw run bytes (the "
+                            "b25d6788e omission), preserved at "
+                            "eval/r141s1_fresh_grounded_run_executor_"
+                            "originals/ after the rebase — the "
+                            "verifier's canonical re-execution at the "
+                            "canonical path crosses the same bar on "
+                            "fresh-03 (live retrieval variance, typed "
+                            "by the verifier); BOTH sets are committed"),
         "session": "builder-r141s1",
         "at": "2026-11-23 (sandbox clock)",
         "source_bytes": [
-            f"eval/r141s1_fresh_grounded_run/{PID}.json",
-            f"eval/r141s1_fresh_grounded_run/{PID}/envelope_MECHANISM_SPACE.json",
-            f"eval/r141s1_fresh_grounded_run/{PID}/envelope_FREEZE.json"],
+            f"eval/r141s1_fresh_grounded_run_executor_originals/{PID}.json",
+            f"eval/r141s1_fresh_grounded_run_executor_originals/{PID}/envelope_MECHANISM_SPACE.json",
+            f"eval/r141s1_fresh_grounded_run_executor_originals/{PID}/envelope_FREEZE.json"],
         "independent_derivation": independent,
         "committed_acceptance_row": committed_claims,
         "diff": diff,
