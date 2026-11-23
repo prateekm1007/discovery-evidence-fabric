@@ -1,0 +1,82 @@
+{
+ "record": "R134_PANEL_PREREG/1.0.0",
+ "claim": "c-0213",
+ "base": "c76a26a59",
+ "typed_at": "2026-11-23 (sandbox clock; no false Z suffix)",
+ "authority": "the R134 directions DIR 2 (TOP) + the R133 adjudication (accuracy caps ~0.7; the levers worked structurally; dev-fu-001 label GROUNDED — baseline dominates novelty 2>1 AND testability 4>3; the unanimous judge a1 is a SHARED BLIND SPOT)",
+ "the_two_new_levers": {
+  "a_cot_comparative_prompt": "the judge prompt gains a COMPARATIVE CHAIN-OF-THOUGHT contract (the exact bytes frozen in engine/prompts.py COT_COMPARATIVE_SUFFIX, quoted in this prereg): reason per-axis BEFORE the forced-choice prefer — one sentence per answer per axis comparing MECHANISMS; the EXPERT WEIGHTING names novelty and testability as the DOMINANT prefer factors (a field-standard practice executed excellently is a WORSE answer than a genuinely novel mechanism with a concrete falsification test; feasibility/constraint-compliance are gates, not tiebreakers) — this operationalizes the auditor's dev-fu-001 ruling; the forced-choice contract is UNCHANGED (prefer must be A|B, no tie)",
+  "b_reasoning_rung": "DeepSeek-R1 (probed callable on the router, 1s) + Qwen3-32B (thinking-capable; the probed QwQ-32B is NOT SERVED by any router provider — typed, substitute declared). Reasoning models emit thinking before the JSON; the engine parser becomes LAST-FLAT-OBJECT (the final JSON after the reasoning) — strictly more robust, byte-compatible on non-thinking replies (the single flat object is the last object)"
+ },
+ "judges": [
+  {
+   "model": "deepseek-ai/DeepSeek-R1",
+   "family": "deepseek",
+   "tag": "dsr1",
+   "kind": "reasoning rung (new)",
+   "pace": 20,
+   "max_tokens": 8000,
+   "timeout_s": 420
+  },
+  {
+   "model": "Qwen/Qwen3-32B",
+   "family": "qwen",
+   "tag": "qw32b",
+   "kind": "reasoning rung (new; QwQ-32B not served — substitute)",
+   "pace": 20,
+   "max_tokens": 8000,
+   "timeout_s": 420
+  },
+  {
+   "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "family": "qwen",
+   "tag": "qwen235b",
+   "kind": "R133 rung re-run under CoT (same-model delta)",
+   "pace": 20,
+   "max_tokens": 4000,
+   "timeout_s": 300
+  },
+  {
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "family": "deepseek",
+   "tag": "dsv32",
+   "kind": "R133 rung re-run under CoT (same-model delta)",
+   "pace": 20,
+   "max_tokens": 4000,
+   "timeout_s": 300
+  },
+  {
+   "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "family": "meta-llama",
+   "tag": "llama4mav",
+   "kind": "R133 rung re-run under CoT (one hit short at R133)",
+   "pace": 90,
+   "max_tokens": 4000,
+   "timeout_s": 300
+  }
+ ],
+ "corpora": "UNCHANGED: the auditor's r5 per-axis labels (10 pairs, audit-branch bytes, dev-fu-001 label GROUNDED — no label tuning); the auditor's PUBLIC gold set for the AUC axis. The auditor will enlarge the corpus to ~20-30 next; THIS run stays on the 10 (the spec's own calibration slice) with the delta table on the same slice",
+ "protocol": {
+  "engine_routing": "ALL judging through engine/blind_panel.py build_pair_prompt(cot=True) + parse_pair_rating (the CoT-robust last-flat-object parse) + engine/panel_agreement.py rcal_qualification/swap_robust_panel; scripts/r134_panel_driver.py is transport/pacing only",
+  "vote_rule": "UNCHANGED from R133: the r9 parity-drawn order (pass=det) votes; the mirror (pass=mir) is a consistency check (swap_instability disclosed), never a vote-splitter",
+  "legs": "5 judges x 10 pairs x 2 orders = 100 legs; llama33 NOT re-run (R133: 0.85 answered, worst acc, same family as llama4mav — dropped for budget; the family is covered)",
+  "the_delta_table_rule": "per model: R133 non-CoT acc vs R134 CoT acc (SAME model, SAME vote rule, SAME labels) — the only legal cross-run comparison (R133-F1); the R132 numbers (different vote rule) are NOT compared"
+ },
+ "gate_preregistered": {
+  "rcal_qualify": "per judge: acc >= 0.8 on the 10 r5 labels (exact match, forced-choice) AND answered_rate >= 0.9",
+  "panel": ">=3 qualified judges from >=2 distinct non-agnes families (rungs within a family count ONCE); then panel agreement >= 0.7, pairwise kappa >= 0.6, AUC >= 0.8 on the gold set",
+  "independence": "ALL gate numbers by scripts/r134_panel_recompute.py (independent, raw records only) + the engine module as the second code path (diff must be 0)",
+  "no_bar_lowering": "the thresholds are the P4 spec's own; if <3 qualify the gate is typed NOT_MET again — honestly, with the same-model/same-rule deltas and the diagnosis"
+ },
+ "artifacts": [
+  "eval/r134_panel/<tag>__<pid>__<pass>.json (raw per-leg records, thinking text included)",
+  "eval/r134_panel_calibration.json (the independent recompute + the engine cross-check + the delta table)"
+ ],
+ "frozen": [
+  "the r5 labels + gold set (audit-branch bytes)",
+  "the r9 parity convention",
+  "the P4 thresholds",
+  "the COT_COMPARATIVE_SUFFIX bytes (engine/prompts.py at the prereg push)"
+ ],
+ "power_note": "auditor Art. 14: n=10 pairs is the P4-spec'd calibration slice; per-judge qualification on 10 labels is the spec's own power; the auditor's ~20-30 enlargement comes next and will re-run the same instrument"
+}
