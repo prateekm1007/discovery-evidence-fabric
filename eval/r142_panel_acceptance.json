@@ -1,0 +1,44 @@
+{
+ "record": "R142_PANEL_ONESHOT_ACCEPTANCE/1.0.0",
+ "claim": "c-0227", "work_id": "r142-rcal-panel-oneshot",
+ "role": "EXECUTOR", "session": "builder-r121s1-3e8a41d7",
+ "at": "2026-11-23 (sandbox clock)",
+ "verdict": "NOT_MET (typed honest; FINAL — no re-roll, Art. 7; the corpus is BURNED)",
+ "gates": {
+  "per_judge_bar": "acc>=0.8 AND answered>=0.9",
+  "per_judge_results": {
+   "dsr1": {"acc": 0.75, "answered": 1.0, "swap_instability": 0.25},
+   "qw32b": {"acc": 0.667, "answered": 0.958, "swap_instability": 0.083},
+   "qwen235b": {"acc": 0.75, "answered": 1.0, "swap_instability": 0.083},
+   "dsv32": {"acc": 0.75, "answered": 1.0, "swap_instability": 0.167},
+   "hy4f": {"acc": 0.75, "answered": 1.0, "swap_instability": 0.0}},
+  "n_qualified": 0,
+  "qualified_from_ge2_non_agnes_families": false,
+  "panel_agreement": null,
+  "alpha": null,
+  "auc": null,
+  "agreement_bar": "NOT REACHED (the R136 typed refusal: panel agreement is undefined below 2 distinct qualified judges — a single judge's label agreement is its own accuracy, not a panel property)"},
+ "what_the_data_shows": {
+  "the_corpus_IS_discriminative": "every judge sits at 0.67-0.75 accuracy — ABOVE the 0.5 chance line a lazy always-a1 judge scores; the judges independently agree with the auditor's preference in ~3 of 4 pairs; the anti-correlation signature of a decode error is absent (manual leg traces confirm the parity decode hits and misses line up with the votes)",
+  "the_bar_is_not_reached": "no judge from any of the 4 non-agnes families reaches acc>=0.8; the miss pattern is distributed across pairs and judges, not concentrated (the per-pair votes + rationales are committed in the raw legs)",
+  "swap_instability": "hy4f 0.0 / qw32b 0.083 / qwen235b 0.083 / dsv32 0.167 / dsr1 0.25 — short-text order sensitivity is present (dsr1, dsv32) but not the primary cause: even the zero-instability judge (hy4f) sits at 0.75",
+  "typed_open_question": "the corpus's arm texts are SHORT mechanism summaries (~150 chars), unlike the r5 corpus's full engineering answers (specifics, numbers, hedges) where dsv32 scored 0.9 under the SAME convention — whether the 0.8 bar is unreachable because the signal is thinner in summary form, or because the pairs' novelty gap is genuinely harder to see, is the AUDITOR's design question; the builder may not author or re-roll sealed material (Art. 7/29)",
+  "the_instrument_is_not_the_cause": "the same engine prompt/parse/vote path qualified dsv32 at 0.9 on the r5 corpus (R135, committed); the convention is unchanged; the corpus is the changed variable"},
+ "one_shot_discipline": {
+  "generations": 1,
+  "re_rolls": 0,
+  "legs": 120,
+  "valid": 119,
+  "the_one_infra_leg": "qw32b__rcal-10-compressor-surge__mir: PARSE_FAILED after the retry ladder — typed, counted in the answered denominator (0.958)",
+  "byte_resume_events": "the two launcher infra events (the serial runner's NameError crash before any leg persisted — 1 unrecorded dsr1 call consumed, typed Art. 15; the serial-to-parallel replatform — disjoint leg files, the SAME generation, each leg called at most once)",
+  "burn": "the r142 corpus is consumed; a re-run of these pairs is Art.-7 multiple-testing and will be REFUSED"},
+ "raw_evidence": {
+  "legs_dir": "eval/r142_panel/ (120 leg records with the FULL raw replies)",
+  "qualification_record": "eval/r142_panel_qualification.json",
+  "independent_recompute": "eval/r142_panel_recompute_independent.json (zero import of the runner's logic; diff=0 vs the committed record)",
+  "corpus_source": "audit branch origin/audit/r11-auditor-verdict-20261114:eval/auditor_rcal_corpus_r142.json (file sha256[:16]=8bb9ec8c15c532d4; the recorded selection_sha256=67764d0cb1d105bc is the auditor's selection-process digest — typed, not recomputable from the file alone)"},
+ "consequences": {
+  "score_8_gate": "NOT CLEARED this window — the panel is NOT qualified on the r142 corpus",
+  "what_would_clear_it": "an auditor-authored corpus whose arm texts carry the r5-form answer signal (or whose difficulty is recalibrated to the acc>=0.8 bar the four families can actually separate); the builder's role stays one-shot execution",
+  "no_score_claims": true}
+}
