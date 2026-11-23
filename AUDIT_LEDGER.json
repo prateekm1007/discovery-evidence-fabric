@@ -1988,6 +1988,30 @@
    "title": "Corpus selection_sha256 is a selection-process digest not recomputable from the committed file alone (file includes the digest); document the canonicalization (hash over pairs / strip digest field) for reproducibility",
    "evidence": "twin c-0227 typed file sha 8bb9ec8c vs selection sha 67764d0c",
    "status": "OPEN"
+  },
+  {
+   "id": "R142-F5",
+   "round": "R142S3",
+   "severity": "MEDIUM-HIGH",
+   "title": "Queue tip CI-red streak: e989893ae/a73722272/7fbc869be/b54c01272 all FAILURE; the r142s2_status.json record is missing the art27_capability_budget/remote_ci shape; the 'RED-TIP REPAIR v2' itself failed. Cross-session writes to the same status record collide. Work is NOT done until CI green (D2/Art.18).",
+   "evidence": "check-runs API; b54c01272 message names the missing-art27 defect",
+   "status": "OPEN"
+  },
+  {
+   "id": "R142-F6",
+   "round": "R142S3",
+   "severity": "MEDIUM",
+   "title": "Panel one-shot (c-0227) + yield (c-0228) raw bytes ABSENT (eval/r142_panel/, eval/r142_yield_run/ 404) \u2014 the score-8 gate is stalled; the executor run (>1hr) must land its bytes or type the stall",
+   "evidence": "contents API 404; verifier record AWAITING",
+   "status": "OPEN"
+  },
+  {
+   "id": "R142-F7",
+   "round": "R142S3",
+   "severity": "LOW",
+   "title": "Two redundant verifier lanes on the same panel (c-0229 builder-r141s1 + c-0230 builder-r142s2) \u2014 coordination overhead; consolidate to ONE verifier per work item (Art.29)",
+   "evidence": "work_claims c-0229/c-0230 both VERIFIER OPEN on r142 panel",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -4973,6 +4997,20 @@
     "R142-F3",
     "R142-F4"
    ]
+  },
+  {
+   "id": "V105",
+   "round": "R142S3 audit of the R142S2 verifier lane + panel-one-shot stall + CI-red streak",
+   "commit": "e3c4e49ae49d687e8224b12ab083a5ae698512e2",
+   "gate": "verifier lane discipline CORRECT (no double-burn); panel/yield bytes ABSENT (gate UNDECIDED); queue tip CI-RED 4 streak (record-shape gate); score 7 carried",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r142s3_auditor_adjudication.json",
+   "findings": [
+    "R142-F5",
+    "R142-F6",
+    "R142-F7"
+   ]
   }
  ],
  "gold_set": {
@@ -5279,7 +5317,7 @@
    "path": "eval/auditor_rcal_corpus_r142.json"
   }
  },
- "progress_note": "SCORE 7/10 (carried R142S2). R141S2 executor grounding VERIFIED both ways: executor originals preserved + independent recompute diff=0 (doi:10.5281/zenodo.22691356, exactly-one id, span-in-record contract form, hash equality); 0 bad admissions across 13 live runs. Enrichment wiring MET (ledger present 4/4 v2, v4 re-materialized); yield 0/4 identity-true grounded honestly typed \u2014 paraphrase hypotheses cannot fire the verbatim 8-word binding; NEXT capability = quote-anchored re-generation (literature: >90% verbatim quote attachment from prompting alone). Two starve fixes (query context + id field gap). Honest Art.9 disclosures accepted (span-check literal->normalized correction; guard claim_id-only diagnosis correction; v2/v3 untracked-dir loss + v4 re-materialization). R-CAL panel ONE-SHOT (twin c-0227) IN PROGRESS on the authored 12-pair corpus \u2014 the P4 gate critical path; NO re-roll. NEW: R142-F3 commit raw bytes immediately (untracked loss); R142-F4 corpus digest canonicalization. v16/P5 authoring blocked on owner rubric custody. Critical path: panel one-shot -> qualification (8) + quote-anchored yield + v16 -> rediscovery + unattended (9). Goal 9/10 fully agent-run (AM46).",
+ "progress_note": "SCORE 7/10 (carried R142S3). R142S2 verifier lane discipline CORRECT (stood down, zero judge calls/live runs, no double-burn of the one-shot corpus; seal 67764d0c 12 pairs 6/6 verified; AWAITING typed; duplicate c-0229->c-0230 corrected Art.9). BUT the score-8 gate is UNDECIDED: eval/r142_panel/ + eval/r142_yield_run/ raw bytes ABSENT (c-0227 one-shot panel + c-0228 yield OPEN, executor builder-r121s1). Queue tip CI-RED 4 consecutive (e989893ae/a73722272/7fbc869be/b54c01272) \u2014 the r142s2_status.json record missing art27_capability_budget/remote_ci shape; the red-tip repair v2 itself failed (R142-F5). Two redundant verifier lanes c-0229/c-0230 (R142-F7) \u2014 consolidate. NEW: R142-F5 CI-red record-shape, R142-F6 panel bytes absent (gate stalled), R142-F7 redundant verifiers. Critical path: twin lands panel+yield raw bytes -> fix record shape -> green tip -> verifier recompute diff=0 -> panel qualification (8); quote-anchored yield (R142-F1); v16/P5 owner custody (R142-F2); history credential rotation = standing owner P0. Goal 9/10 fully agent-run (AM46).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

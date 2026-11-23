@@ -1,0 +1,58 @@
+{
+ "record": "R142S3_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r142s3",
+ "audited_queue_tip": "b54c01272763 (R142S2 verifier lane c-0230 + R142S1 red-tip repair; panel c-0227/yield c-0228 OPEN, bytes absent)",
+ "audit_branch_parent": "e3c4e49ae49d687e8224b12ab083a5ae698512e2",
+ "R142S2_VERIFIER_LANE_VERDICT": {
+  "verdict": "lane discipline CORRECT \u2014 stood down to VERIFIER (Art.29/7), made ZERO judge calls / ZERO live runs (no double-burn of the one-shot corpus), discarded the redundant DIR-3 driver at divergence-refuse, seal verified (67764d0c, 12 pairs 6/6), AWAITING_EXECUTOR_BYTES typed honestly, duplicate c-0229->c-0230 corrected (Art.9). The verifier instrument (scripts/r142s2_verifier_recompute.py) is ready.",
+  "BUT": "the queue tip is CI-RED (4 consecutive failures) and the panel/yield raw bytes are ABSENT \u2014 the score-8 gate is UNDECIDED and the window is NOT closed green."
+ },
+ "FINDINGS": [
+  {
+   "id": "R142-F5",
+   "severity": "MEDIUM-HIGH",
+   "title": "Queue tip CI-red streak: e989893ae/a73722272/7fbc869be/b54c01272 all FAILURE; the r142s2_status.json record is missing the art27_capability_budget/remote_ci shape; the 'RED-TIP REPAIR v2' itself failed. Cross-session writes to the same status record collide. Work is NOT done until CI green (D2/Art.18).",
+   "evidence": "check-runs API; b54c01272 message names the missing-art27 defect",
+   "direction": "DIR3 \u2014 complete the record shape (art27_capability_budget + remote_ci with the real API-quoted run), get the tip green"
+  },
+  {
+   "id": "R142-F6",
+   "severity": "MEDIUM",
+   "title": "Panel one-shot (c-0227) + yield (c-0228) raw bytes ABSENT (eval/r142_panel/, eval/r142_yield_run/ 404) \u2014 the score-8 gate is stalled; the executor run (>1hr) must land its bytes or type the stall",
+   "evidence": "contents API 404; verifier record AWAITING",
+   "direction": "DIR2 \u2014 twin lands the panel+yield raw bytes; verifier recomputes; decide the gate"
+  },
+  {
+   "id": "R142-F7",
+   "severity": "LOW",
+   "title": "Two redundant verifier lanes on the same panel (c-0229 builder-r141s1 + c-0230 builder-r142s2) \u2014 coordination overhead; consolidate to ONE verifier per work item (Art.29)",
+   "evidence": "work_claims c-0229/c-0230 both VERIFIER OPEN on r142 panel",
+   "direction": "DIR7 \u2014 one verifier lane; the other stands down"
+  }
+ ],
+ "CLOSED_THIS_ROUND": [],
+ "STILL_OPEN": [
+  "R142-F1 (quote-anchored yield)",
+  "R142-F2 (v16/P5 owner custody)",
+  "R142-F3/F4",
+  "R142-F5/F6/F7",
+  "R131-F3 (v16)",
+  "R133-F2 (SPECTER2 gate)"
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET (tree scans); history credential rotation = standing owner P0 action",
+  "P1": "MET (score5) + grounding identity-TRUE byte-verified",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; v16 needed)",
+  "P4": "NOT_MET / UNDECIDED \u2014 panel one-shot bytes absent; the gate cannot be read until the executor lands eval/r142_panel/",
+  "P5": "NOT_MET \u2014 needs owner-custodied sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "ledger carried; panel gate UNDECIDED (bytes absent); no score claim from an AWAITING verifier",
+  "goal": "9/10 fully agent-run (AM46)",
+  "critical_path": "land panel+yield bytes -> green tip -> verifier recompute -> panel qualification (8) + v16 (owner custody) -> rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r142s3_auditor_recompute.json (diff=0)"
+}
