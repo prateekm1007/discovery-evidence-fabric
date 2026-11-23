@@ -1965,7 +1965,9 @@
    "severity": "MEDIUM",
    "title": "Grounded yield is evidence-density sensitive: only 1 of 4-5 fresh problems crosses the identity-true+SUPPORTED bar; the enrichment executor must lift ungrounded hypotheses to grounded (the twin's DIR-4 wiring started)",
    "evidence": "r141s2_verifier_record rows (3/4 runs grounded_present=false)",
-   "status": "OPEN"
+   "status": "CLOSED",
+   "closed_round": "R143S2",
+   "resolved_by": "quote-anchored yield bar MET 4/5 (11 grounded, 0 bad), genuine freeze-custody identity-true"
   },
   {
    "id": "R142-F2",
@@ -2031,6 +2033,24 @@
    "severity": "MEDIUM",
    "title": "Yield bar >=2/5 NOT_MET (1/5): quote-anchored re-generation fires on desal but wind starves at 0 candidates; broaden the quote-anchored firing + verify the enriched-identity fix holds (0 bad admissions)",
    "evidence": "r142_yield_run/SUMMARY problems_grounded=1",
+   "status": "CLOSED",
+   "closed_round": "R143S2",
+   "resolved_by": "quote-anchored yield bar MET 4/5 (11 grounded, 0 bad), genuine freeze-custody identity-true"
+  },
+  {
+   "id": "R143-F1",
+   "round": "R143S2",
+   "severity": "MEDIUM",
+   "title": "Yield acceptance is an offline recompute (save-path repair applied), CI RED \u2014 confirm with a clean engine re-run on a green tip; wind still starves (0 candidates), the synthesis-stage complement is the typed follow-up",
+   "evidence": "r143_yield_recompute.py offline; CI 138018474357 failure",
+   "status": "OPEN"
+  },
+  {
+   "id": "R143-F2",
+   "round": "R143S2",
+   "severity": "MEDIUM",
+   "title": "v16-lane CI reds block a green tip: one_shot r143-v16-one-shot has 2 chain roots; commit f58c46a63 touches eval/holdout_v16_problems.json without a covering EXECUTOR claim; twin trailer-less c7096aa48",
+   "evidence": "test_article29 failures; coder DIR-5 log",
    "status": "OPEN"
   }
  ],
@@ -5074,6 +5094,24 @@
    "score": 7,
    "no_score_change": true,
    "adjudication": "eval/r143_delegated_owner_adjudication.json"
+  },
+  {
+   "id": "V108",
+   "round": "R143S2 audit of the quote-anchored yield acceptance + v16-lane reds + digest fix",
+   "commit": "3bc59b530e9645ffd2b9f08eea534c2ff4e1135f",
+   "gate": "yield bar MET 4/5 (genuine, verified); CI red (v16 chain); r143 R-CAL one-shot pending; digest canonicalization fixed",
+   "score": 7,
+   "no_score_change": true,
+   "adjudication": "eval/r143s2_auditor_adjudication.json",
+   "findings": [
+    "R143-F1",
+    "R143-F2"
+   ],
+   "closed": [
+    "R142-F1",
+    "R142-F9",
+    "R143-F3"
+   ]
   }
  ],
  "gold_set": {
@@ -5387,7 +5425,7 @@
    "author": "delegated owner/auditor",
    "custody": "labels audit branch; AM47 viability-necessity prompt; blind+swapped; one-shot; burn after",
    "path": "eval/auditor_rcal_corpus_r143.json",
-   "digest_canonicalization": "sha256 over json.dumps(corpus_without_selection_sha256_field, indent=1, sort_keys=True); recompute by removing selection_sha256 then hashing"
+   "digest_canonicalization": "sha256 over json.dumps(corpus with BOTH selection_sha256 AND digest_canonicalization fields REMOVED, indent=1, sort_keys=True). Verified recomputes to the recorded selection_sha256."
   },
   "holdout_v16": {
    "status": "SEALED_ONE_SHOT",
@@ -5401,7 +5439,7 @@
    "burn_after": true
   }
  },
- "progress_note": "SCORE 7/10 (carried). DELEGATED OWNER (owner: end-to-end AI loop, you are delegated owner/reviewer): AM47 R-CAL viability-necessity calibration amendment + fresh r143 one-shot corpus (12 realistic balanced pairs, sha dcd80334); AM48 P4 prior-art retrieval gate (R133-F2 CLOSED). v16 SEALED SET AUTHORED: 30 fresh cluster-disjoint problems (eval/holdout_v16/problems.json) + rubrics in PRIVATE def-rubric-custody (sha 31f255d4, unauth 404, builder never reads); bar mean>=3.3 CI lower>3.0 0/0/0; one-shot, burn after; v15->v16 consecutive consolidates score-7. Builder: run r143 R-CAL one-shot (AM47 prompt) -> qualify >=3 judges; v16 generation one-shot -> auditor scores; broaden quote-anchored yield >=2/5; fix CI-red closes. Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 (carried). R143S2 YIELD BAR MET (FIRST across R141-R143): quote-anchored yield 4/5 problems grounded (desal5/cathodic3/chiller1/ship-hull2=11 identity-true, 0 bad). Independent desal re-resolve GENUINE: 5 grounded resolve against FREEZE custody alone (snapshot union +0 records; hash equality + span; 4 direct + 1 ledger-repair). Broadening (frozen-evidence fallback + verbatim-quote binding repair + save-path fix) = real capability gain. R142-F1/F9 CLOSED. CAVEAT: offline recompute + CI RED (v16-lane 2 chain roots + canonical-bytes-without-EXECUTOR-claim + trailer); confirm with clean re-run on green tip (R143-F1/F2). r143 corpus digest canonicalization FIXED (strip both fields -> dcd80334). r143 R-CAL one-shot (c-0232) NOT run (0 legs); AM47 prompt+corpus ready. v16 one-shot (c-0234) chain reds. Critical path: green tip -> r143 R-CAL one-shot -> panel (8) + v16 (7) -> P5 (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

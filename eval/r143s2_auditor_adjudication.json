@@ -1,0 +1,53 @@
+{
+ "record": "R143S2_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r143s2",
+ "audited_queue_tip": "dfbc4a1a38b3 (R143S2 yield acceptance c-0233 + v16 lane c-0234 reds)",
+ "audit_branch_parent": "3bc59b530e9645ffd2b9f08eea534c2ff4e1135f",
+ "YIELD_VERDICT": {
+  "verdict": "ACCEPTANCE MET and GENUINE \u2014 quote-anchored yield 4/5 problems grounded (11 identity-true admissions, 0 bad), the FIRST yield-bar pass across R141-R143. Independent desal re-resolve confirms the 5 grounded bindings resolve against the FREEZE custody alone (snapshot union added 0 records; hash equality + span-in-record through the actual resolver; 4/5 direct, 1 ledger-repair). The broadening (frozen-evidence fallback + verbatim-quote binding repair + save-path fix) is a real capability gain.",
+  "caveat": "offline recompute applying the save-path repair, CI RED; a clean engine re-run / green tip fully confirms. Identity-truth verified."
+ },
+ "FINDINGS": [
+  {
+   "id": "R143-F1",
+   "severity": "MEDIUM",
+   "title": "Yield acceptance is an offline recompute (save-path repair applied), CI RED \u2014 confirm with a clean engine re-run on a green tip; wind still starves (0 candidates), the synthesis-stage complement is the typed follow-up",
+   "evidence": "r143_yield_recompute.py offline; CI 138018474357 failure",
+   "direction": "DIR3 \u2014 green tip + clean re-run confirm; broaden wind synthesis"
+  },
+  {
+   "id": "R143-F2",
+   "severity": "MEDIUM",
+   "title": "v16-lane CI reds block a green tip: one_shot r143-v16-one-shot has 2 chain roots; commit f58c46a63 touches eval/holdout_v16_problems.json without a covering EXECUTOR claim; twin trailer-less c7096aa48",
+   "evidence": "test_article29 failures; coder DIR-5 log",
+   "direction": "DIR2 \u2014 consolidate the v16 chain to one root under a covering EXECUTOR claim; fix trailers"
+  },
+  {
+   "id": "R143-F3",
+   "severity": "LOW",
+   "title": "r143 corpus digest canonicalization bug (auditor authoring): recipe stripped only selection_sha256, leaving digest_canonicalization -> 014181ff vs recorded dcd80334; FIXED recipe strips both fields",
+   "evidence": "auditor recompute; coder DIR-1 typed",
+   "direction": "FIXED this verdict (recipe updated; recomputes to dcd80334)"
+  }
+ ],
+ "CLOSED_THIS_ROUND": [
+  "R142-F1/F9 (yield bar MET 4/5, genuine)",
+  "R143-F3 (digest canonicalization fixed)"
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; v16/P5 custody unblocked (delegated owner)",
+  "P1": "MET (score5) + grounding identity-TRUE + YIELD bar MET (4/5)",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; v16 one-shot pending)",
+  "P4": "NOT_MET \u2014 r143 R-CAL one-shot (c-0232) NOT run (0 legs); AM47 prompt + corpus ready",
+  "P5": "NOT_MET \u2014 needs sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "ledger carried; yield bar MET (capability gain) but roadmap score gates (panel/v16/P5) unchanged",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "green tip (v16 chain) -> r143 R-CAL one-shot (AM47) -> panel qualification (8) + v16 one-shot (consolidate 7) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r143s2_auditor_recompute.json"
+}
