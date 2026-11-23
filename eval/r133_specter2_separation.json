@@ -1,0 +1,34 @@
+{
+ "record": "R133_SPECTER2_SEPARATION/1.0.0",
+ "claim": "c-0212",
+ "instrument": "allenai/specter2 via engine/prior_art_v2_bridge (AutoAdapterModel, the documented route; CLS-pool, L2-normalized, local CPU torch; deterministic \u2014 eval mode, fixed weights, no sampling; adapter binding verified: cos(base-only, adaptered)=0.955)",
+ "integration": "R132-F2 CLOSED at the integration level: the engine bridge is live, deterministic, canary-clean, and importable; the instrument runs through the engine (no scripts/-side embedding code)",
+ "the_gate_axis": "the P4 spec's prior-art cosine gate: separation = mean cos(obvious, own_art) - mean cos(novel, own_art) \u2014 novel mechanisms must sit FARTHER from the problem's own art than obvious ones",
+ "controls": "3 problems x (own-art corpus doc, auditor-labeled GOOD novel mechanism, field-standard obvious statement) \u2014 the paired per-problem design",
+ "results": [
+  {
+   "problem": "packaging",
+   "novel_vs_own_art": 0.8911,
+   "obvious_vs_own_art": 0.9409,
+   "novel_vs_obvious": 0.9108
+  },
+  {
+   "problem": "bridge",
+   "novel_vs_own_art": 0.9189,
+   "obvious_vs_own_art": 0.9401,
+   "novel_vs_obvious": 0.9039
+  },
+  {
+   "problem": "bearing",
+   "novel_vs_own_art": 0.8974,
+   "obvious_vs_own_art": 0.9382,
+   "novel_vs_obvious": 0.8974
+  }
+ ],
+ "separation": 0.0373,
+ "gate_ge_0.2": false,
+ "verdict_typed": "NOT_MET \u2014 the direction is CORRECT and consistent (novel farther from own art than obvious, all 3 problems: 0.891/0.919/0.897 vs 0.941/0.940/0.938) but the margin is +0.037, an order below the 0.2 gate. SPECTER2 cosine margins on same-domain engineering text live in a narrow band (~0.84-0.94); the 0.2 threshold reads as calibrated for patent-scale corpora with diffuse art, not per-problem own-art discrimination. The threshold is the P4 spec's own number \u2014 NOT recalibrated here (Art. 9: no silent threshold change); the finding is typed for the auditor",
+ "negative_controls_disclosed": "two earlier control designs measured NEGATIVE separation and are disclosed: (1) generic mechanism statements vs a generic practice corpus (-0.032), (2) full proposal prose a1-vs-baseline (-0.016) \u2014 domain vocabulary dominates when the novel and obvious arms address the same problem in the same register; the paired own-art design is the correct axis",
+ "determinism": "identical across calls and processes (verified: self-cosine 1.000000); cross-seed stability is structural (no hash-order containers, no sampling)",
+ "at": "2026-11-23 (sandbox clock)"
+}

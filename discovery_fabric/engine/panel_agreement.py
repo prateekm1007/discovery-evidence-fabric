@@ -346,3 +346,180 @@ def canonical_json(record: dict) -> str:
     F64 determinism convention)."""
     return json.dumps(record, indent=1, ensure_ascii=False,
                       sort_keys=True)
+
+
+# ---------------------------------------------------------------------------
+# The R-CAL + swap-robust panel qualification tally (R133 DIR-2 —
+# engine code; the R132-F1 fix). All functions pure/deterministic.
+# ---------------------------------------------------------------------------
+def rcal_qualification(judge_rows: dict,
+                       labels: dict,
+                       acc_bar: float = 0.8,
+                       answered_bar: float = 0.9) -> dict:
+    """Per-judge R-CAL qualification from raw per-leg records.
+
+    judge_rows: {family: [{pid, order, pass, a_is, outcome, parsed},
+    ...]} — the raw legs, BOTH orders (det + mir). The VOTING leg is
+    the r9 parity-drawn order ('det'); the mirror leg ('mir') is a
+    consistency check, never a vote-splitter (the R133 lever (a)).
+
+    labels: {pid: 'a1'|'baseline'} — the auditor's forced-choice
+    ground truth (ties impossible; a tie-labeled corpus raises).
+
+    Returns per-judge: legs, valid, answered_rate, acc (exact match
+    on the parity-drawn vote), swap_instability (the mirror-order
+    disagreement rate — disclosed, NOT a vote), qualified flag.
+    """
+    out = {}
+    for fam, legs in judge_rows.items():
+        n = len(legs)
+        valid = [l for l in legs if l.get("outcome") == "VALID"]
+        answered = len(valid) / n if n else 0.0
+        votes, mirrors, hits, n_cmp = {}, {}, 0, 0
+        for l in valid:
+            p = l.get("parsed") or {}
+            pref = str(p.get("prefer") or "")
+            pick = None
+            if pref in ("A", "B"):
+                pick = (l["a_is"] if pref == "A"
+                        else ("baseline" if l["a_is"] == "a1" else "a1"))
+            if pick is None:
+                continue  # a VALID leg whose prefer was coerced out
+            if l.get("pass") == "det":
+                votes[l["pid"]] = pick
+            else:
+                mirrors[l["pid"]] = pick
+        instability_n = 0
+        for pid, v in votes.items():
+            if pid in labels:
+                n_cmp += 1
+                if v == labels[pid]:
+                    hits += 1
+            if pid in mirrors and mirrors[pid] != v:
+                instability_n += 1
+        acc = hits / n_cmp if n_cmp else 0.0
+        out[fam] = {
+            "legs": n, "valid": len(valid),
+            "answered_rate": round(answered, 3),
+            "acc_vs_labels": round(acc, 3), "hits": hits,
+            "n_cmp": n_cmp,
+            "swap_instability": round(
+                instability_n / len(votes), 3) if votes else None,
+            "vote_rule": "parity-drawn order votes; mirror = "
+                         "consistency check (swap_instability "
+                         "disclosed, never a vote-splitter)",
+            "qualified": bool(acc >= acc_bar and answered >= answered_bar),
+        }
+    return out
+
+
+def swap_robust_panel(judge_rows: dict, qualified: Sequence,
+                       labels: dict, gold_novelty: dict = None,
+                       agreement_bar: float = 0.7,
+                       kappa_bar: float = 0.6,
+                       auc_bar: float = 0.8) -> dict:
+    """The qualified-panel tally: per-pair majority vote (the
+    parity-drawn per-judge votes; a split panel = the plurality
+    winner, a true tie = 'split' — disclosed), panel-vs-labels
+    agreement, pairwise Cohen's kappa (mean), and the gold-set AUC
+    (panel mean novelty, GOOD > BAD, Mann-Whitney U)."""
+    fam_votes = {}
+    for fam in qualified:
+        fam_votes[fam] = {}
+        for l in judge_rows.get(fam, []):
+            if (l.get("outcome") != "VALID"
+                    or l.get("pass") != "det"):
+                continue
+            p = l.get("parsed") or {}
+            pref = str(p.get("prefer") or "")
+            if pref not in ("A", "B"):
+                continue
+            pick = (l["a_is"] if pref == "A"
+                    else ("baseline" if l["a_is"] == "a1" else "a1"))
+            fam_votes[fam][l["pid"]] = pick
+    pids = sorted(set().union(*[set(v) for v in fam_votes.values()])
+                  if fam_votes else set())
+    per_pair, agreement_hits = {}, 0
+    for pid in pids:
+        prefs = [fam_votes[f][pid] for f in qualified
+                 if pid in fam_votes.get(f, {})]
+        if not prefs:
+            continue
+        counts = {}
+        for x in prefs:
+            counts[x] = counts.get(x, 0) + 1
+        top = max(counts.values())
+        winners = sorted([k for k, v in counts.items() if v == top])
+        maj = winners[0] if len(winners) == 1 else "split"
+        lab = labels.get(pid)
+        match = (maj == lab)
+        if lab is not None:
+            agreement_hits += 1 if match else 0
+        per_pair[pid] = {"panel_majority": maj, "label": lab,
+                         "match": match, "votes": prefs}
+    n_scored = sum(1 for v in per_pair.values()
+                   if v["label"] is not None)
+    agreement = (agreement_hits / n_scored) if n_scored else 0.0
+    kappas = []
+    for fa, fb in itertools.combinations(sorted(qualified), 2):
+        shared = sorted(set(fam_votes.get(fa, {}))
+                        & set(fam_votes.get(fb, {})))
+        if not shared:
+            continue
+        xs = [fam_votes[fa][p] for p in shared]
+        ys = [fam_votes[fb][p] for p in shared]
+        k = cohen_kappa(xs, ys)
+        kappas.append((f"{fa}:{fb}", k.get("kappa")))
+    kappa_vals = [k for _, k in kappas if k is not None]
+    kappa_mean = (round(sum(kappa_vals) / len(kappa_vals), 3)
+                  if kappa_vals else None)
+    auc = None
+    gold_detail = {}
+    if gold_novelty:
+        # gold_novelty: {specimen_id: {pid, arm, label}}; novelty per
+        # specimen = mean over qualified judges of the parity-drawn
+        # leg's N_<arm> axis
+        goods, bads = [], []
+        for sid, g in sorted(gold_novelty.items()):
+            vals = []
+            for fam in qualified:
+                for l in judge_rows.get(fam, []):
+                    if (l.get("outcome") == "VALID"
+                            and l.get("pass") == "det"
+                            and l["pid"] == g["pid"]):
+                        v = (l.get("parsed") or {}).get(
+                            "axes", {}).get(f"N_{g['arm']}")
+                        if v is not None:
+                            vals.append(v)
+            if not vals:
+                continue
+            mean = round(sum(vals) / len(vals), 3)
+            gold_detail[sid] = {"label": g["label"], "mean": mean,
+                                "vals": vals}
+            (goods if g["label"] == "GOOD" else bads).append(mean)
+        if goods and bads:
+            u = (sum(1 for g in goods for b in bads if g > b)
+                 + 0.5 * sum(1 for g in goods for b in bads
+                             if g == b))
+            auc = round(u / (len(goods) * len(bads)), 3)
+    return {
+        "qualified": list(qualified),
+        "panel_agreement": round(agreement, 3), "n_scored": n_scored,
+        "pairwise_kappa": kappas, "kappa_mean": kappa_mean,
+        "gold_auc": {"per_specimen": gold_detail,
+                     "auc_good_gt_bad": auc,
+                     "n_good": len(gold_detail) and sum(
+                         1 for v in gold_detail.values()
+                         if v["label"] == "GOOD"),
+                     "n_bad": len(gold_detail) and sum(
+                         1 for v in gold_detail.values()
+                         if v["label"] == "BAD")},
+        "gate": {
+            "agreement_ge_bar": (agreement >= agreement_bar
+                                 if n_scored else None),
+            "kappa_ge_bar": (kappa_mean is not None
+                             and kappa_mean >= kappa_bar),
+            "auc_ge_bar": (auc is not None and auc >= auc_bar),
+        },
+        "per_pair": per_pair,
+    }

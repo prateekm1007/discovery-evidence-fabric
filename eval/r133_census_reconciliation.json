@@ -1,0 +1,24 @@
+{
+ "record": "R133_CENSUS_RECONCILIATION/1.0.0 (DIR 7 / R132-F3)",
+ "the_tie_unit_DEFINED": "a PER-JUDGE PAIR CELL tie: judge J's cell on pair P is a tie iff J's two order-passes (det, mir) yield different arm-votes, or J's only served pass voted TIE. The unit is the (judge, pair) cell \u2014 NOT the panel-level pair (my R132 '6' was the panel-majority unit, and even that was miscounted: the true panel-level count is 3, and the per-judge count the auditor used is 16). The CANONICAL unit going forward = the per-judge pair cell (the auditor's unit; it is the one that governs qualification arithmetic: a judge's ties are that judge's instability).",
+ "the_recompute": {
+  "method": "from the 80 raw records at eval/r132_panel/ (697ac00ba): per judge x pair, det/mir arm-votes unswapped via each record's own a_is; cell tie = det!=mir or the single served pass = TIE",
+  "per_judge_ties": {
+   "meta-llama": 5,
+   "qwen": 3,
+   "deepseek": 3,
+   "cohere": 5
+  },
+  "total": 16,
+  "cohere_A_B": "13:0 (1 TIE vote on eval-new04-chiller-fouling-predictor mir)",
+  "match_vs_auditor": "EXACT (16 = 5+3+3+5; 13:0 confirmed) \u2014 diff=0",
+  "my_R132_errors_confirmed": [
+   "the '6 ties across the panel' claim: WRONG UNIT (panel-majority) AND wrong count (the true panel-level figure is 3; the per-judge cell figure is 16)",
+   "the 'cohere 13:1' claim: the 1 is a TIE vote, not a B vote \u2014 the position-vote ratio is 13:0 with 1 TIE (both were in my diagnosis text, now corrected)"
+  ]
+ },
+ "why_it_mattered": "the gate numbers were unaffected (the auditor verified EXACT match on every gate number) \u2014 this was a DIAGNOSTIC-TEXT census defect, not a gate defect; but diagnostic text is what the next window's levers are chosen from, so the census unit is now defined and CI-checked (the recompute script below is committed)",
+ "the_committed_recompute": "scripts/r133_tie_census_recompute.py \u2014 reproduces 16/5/3/3/5 and 13:0 from the raw bytes; wired as the tie-census authority",
+ "panel_progress_note": "the R133 round-2 protocol RETIRES the order-majority vote rule entirely (the parity-drawn order votes; the mirror is a consistency check) \u2014 the tie cell class this census counts cannot arise in the round-2 tally by construction",
+ "at": "2026-11-23 (sandbox clock)"
+}

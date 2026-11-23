@@ -75,3 +75,43 @@ def test_route_legality_tests_stay_wired() -> None:
                  "test_route_physics_runs_only_with_supplied_inputs",
                  "test_route_contract_legality_is_recorded"):
         assert f"def {name}" in t, f"{name} must stay wired"
+
+
+def test_f31e_measured_path_runs_through_the_engine() -> None:
+    """R133 DIR-3 (the R131-F2/F63 debt): the F31e measured path —
+    the check layer + the reviewer schema — resolves through
+    discovery_fabric/engine/, not a scripts/-local definition. The
+    historical scripts stay importable via thin re-export shims."""
+    r = subprocess.run(
+        [sys.executable, "-I", "-c",
+         "import sys; sys.path.insert(0, '.'); "
+         "sys.path.insert(0, 'scripts'); "
+         "from discovery_fabric.engine.review_layer import check_layer; "
+         "assert check_layer.__module__ == "
+         "'discovery_fabric.engine.review_layer', check_layer.__module__; "
+         "import r121_successor_run; "
+         "assert r121_successor_run.check_layer is check_layer; "
+         "from discovery_fabric.engine.review_layer import REVIEWER_FIX_SCHEMA; "
+         "assert REVIEWER_FIX_SCHEMA['json_schema']['name'] == 'reviewer_fix'; "
+         "from discovery_fabric.engine.prompts import ("
+         "improved_directive, AUTHORING_DIRECTIVE); "
+         "assert len(improved_directive()) == 762; "
+         "print('f31e-path engine-routed')"],
+        capture_output=True, text=True, cwd=REPO, timeout=120)
+    assert r.returncode == 0, (
+        f"the F31e path must resolve through the engine: "
+        f"{r.stderr[-300:]}")
+
+
+def test_panel_measured_path_runs_through_the_engine() -> None:
+    """R133 DIR-2 (R132-F1): the panel's judging contract + tally
+    logic live in the engine (blind_panel pair contract +
+    panel_agreement R-CAL/swap-robust tally); the driver script is a
+    thin transport/pacing layer (tests/_panel_engine_check.py)."""
+    r = subprocess.run(
+        [sys.executable, "-I",
+         str(REPO / "tests" / "_panel_engine_check.py")],
+        capture_output=True, text=True, cwd=REPO, timeout=120)
+    assert r.returncode == 0, (
+        f"the panel path must resolve through the engine: "
+        f"{r.stderr[-400:]}")

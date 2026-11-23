@@ -480,3 +480,91 @@ def run_panel(seats: Sequence[PanelSeat], rows: dict,
         "quota_budget": budget.as_dict() if budget else None,
         "zero_scoring_relevance": True,
     }
+
+
+# ---------------------------------------------------------------------------
+# The PAIR-JUDGING contract (R133 DIR-2 — the P4 R-CAL instrument as
+# engine code; the R132-F1 fix: the judging path lives HERE, the
+# script is a thin driver). Prompt assembled from engine.prompts (the
+# canonical constants, byte-verified against the committed
+# instrument bytes at migration).
+# ---------------------------------------------------------------------------
+def build_pair_prompt(problem: dict, a_text: str, b_text: str) -> str:
+    """The blind A/B rubric prompt. The CALLER decides which arm sits
+    in slot A (the r9 blind_order parity convention — the engine
+    never sees arm names, only slot bytes; a_is rides the CALLER's
+    record). Forced-choice prefer per the R133 lever (b): no TIE."""
+    from discovery_fabric.engine.prompts import (
+        RUBRIC_CRITERIA, PER_AXIS_SUFFIX, FORCED_CHOICE_SUFFIX)
+    clar = problem.get("clarification_text")
+    lines = [
+        "You judge two engineering answers to the same user problem.",
+        "Fabrication check: any number, unit, or measurement that is "
+        "clearly unsupported by engineering reality is a fabrication "
+        "risk (score 1 on the affected criterion). A well-hedged "
+        "admission is HONEST, never a failure.",
+        "",
+        f"DEVICE: {problem.get('device', '')}",
+        f"FAILURE: {problem.get('failure', '')}",
+        f"USER'S QUESTION: {problem.get('question', '')}",
+    ]
+    if clar:
+        lines.append(f"USER'S CLARIFICATION (a stated fact): {clar}")
+    lines += [
+        "",
+        "=== ANSWER A ===",
+        anonymize_solution(a_text or "")[:6000],
+        "",
+        "=== ANSWER B ===",
+        anonymize_solution(b_text or "")[:6000],
+    ]
+    lines.append(f"""
+First, three YES/NO compliance gates for EACH answer (0 = fails, 1 = passes):
+1 {RUBRIC_CRITERIA['a_answered']}
+2 {RUBRIC_CRITERIA['b_user_vars']}
+3 {RUBRIC_CRITERIA['c_prediction']}
+Then score BOTH answers 1 (bad) to 5 (excellent) on:
+4 {RUBRIC_CRITERIA['d_evidence']}""")
+    if clar:
+        lines.append(f"5 {RUBRIC_CRITERIA['e_clarification']}")
+    lines.append(f"6 {RUBRIC_CRITERIA['f_novelty']}")
+    lines.append(PER_AXIS_SUFFIX)
+    lines.append(FORCED_CHOICE_SUFFIX)
+    out = "\n".join(lines)
+    assert_blind_prompt(out)
+    canary = scan_canary(out)
+    if canary:  # fail-closed: a canary-bearing prompt never serves
+        raise ValueError(f"canary findings in pair prompt: {canary}")
+    return out
+
+
+def parse_pair_rating(text: str) -> dict:
+    """Strict parse of the pair-judge reply: the FIRST JSON object;
+    the eight per-axis keys must be ints (out-of-range values are
+    TYPED out_of_range, preserved — never clamped), prefer must be
+    'A' or 'B' (the forced-choice contract; a 'TIE' reply is a PARSE
+    FAILURE = the one-retry class — the model is re-asked, never
+    silently coerced)."""
+    m = re.search(r"\{.*\}", text or "", re.S)
+    if not m:
+        raise ValueError(
+            f"no JSON object in pair reply: {(text or '')[:120]!r}")
+    try:
+        j = json.loads(m.group(0))
+    except Exception as e:  # noqa: BLE001 — the retry class
+        raise ValueError(f"unparseable pair JSON: {e}") from e
+    axes = {}
+    for k in ("N", "F", "T", "C"):
+        for s in ("A", "B"):
+            try:
+                axes[f"{k}_{s}"] = int(j[f"{k}_{s}"])
+            except (KeyError, TypeError, ValueError) as e:
+                raise ValueError(
+                    f"pair rating shape invalid: missing {k}_{s}"
+                ) from e
+    prefer = str(j.get("prefer") or "").strip().upper()
+    if prefer not in ("A", "B"):
+        raise ValueError(
+            f"forced-choice violation: prefer={prefer!r} (must be A|B)"
+            " — the one-retry class")
+    return {"axes": axes, "prefer": prefer}

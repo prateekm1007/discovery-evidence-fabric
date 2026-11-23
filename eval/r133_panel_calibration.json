@@ -1,0 +1,105 @@
+{
+ "record": "R133_PANEL_CALIBRATION/1.0.0",
+ "claim": "c-0212",
+ "at": "2026-11-23 (sandbox clock)",
+ "method": "independent Art.13 recompute from the raw per-leg records only; the swap-robust vote rule (the parity-drawn det pass votes, the mirror is a consistency check = swap_instability); forced-choice labels (no ties); the ENGINE module panel_agreement.rcal_qualification/swap_robust_panel is the second code path that must agree (cross-check below)",
+ "judges": {
+  "qwen235b": {
+   "family": "qwen",
+   "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 0.6,
+   "hits": 6,
+   "n_cmp": 10,
+   "swap_instability": 0.2,
+   "qualified": false
+  },
+  "dsv32": {
+   "family": "deepseek",
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 0.6,
+   "hits": 6,
+   "n_cmp": 10,
+   "swap_instability": 0.2,
+   "qualified": false
+  },
+  "llama4mav": {
+   "family": "meta-llama",
+   "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "legs": 20,
+   "valid": 20,
+   "answered_rate": 1.0,
+   "acc_vs_labels": 0.7,
+   "hits": 7,
+   "n_cmp": 10,
+   "swap_instability": 0.2,
+   "qualified": false
+  },
+  "llama33": {
+   "family": "meta-llama",
+   "model": "meta-llama/Llama-3.3-70B-Instruct",
+   "legs": 20,
+   "valid": 17,
+   "answered_rate": 0.85,
+   "acc_vs_labels": 0.5,
+   "hits": 4,
+   "n_cmp": 8,
+   "swap_instability": 0.375,
+   "qualified": false
+  }
+ },
+ "qualified": [],
+ "panel_agreement": 0.0,
+ "n_scored": 0,
+ "pairwise_kappa": [],
+ "kappa_mean": null,
+ "gold_auc": {
+  "per_specimen": {},
+  "auc_good_gt_bad": null,
+  "n_good": 0,
+  "n_bad": 0
+ },
+ "gate": {
+  "n_qualified": 0,
+  "n_families": 0,
+  "families_ok": false,
+  "agreement_ge_0.7": null,
+  "kappa_ge_0.6": false,
+  "auc_ge_0.8": false
+ },
+ "generator_family_excluded": "agnes (z-ai gateway)",
+ "per_pair": {},
+ "engine_cross_check": {
+  "engine_qualified": [],
+  "engine_agreement": 0.0,
+  "engine_kappa_mean": null,
+  "engine_auc": null,
+  "diff": [],
+  "verdict": "IDENTICAL (two independent code paths agree)"
+ },
+ "diagnosis": {
+  "gate_outcome": "HONEST NEGATIVE round-2 — 0/4 R-CAL qualified; the P4 panel-calibration gate remains NOT_MET",
+  "the_levers_measured": {
+   "a_swap_robust_vote": "WORKED — ties eliminated from the tally entirely (the R132 16-tie class cannot arise; swap_instability is now disclosed as a diagnostic: 0.2 for the three full judges, 0.375 for llama33 whose 3 parse failures also hit its answered rate)",
+   "b_tie_policy_prompt": "WORKED — every valid reply carried a decisive A|B prefer; the TIE lazy-out is gone (llama33's 3 PARSE_FAILED legs are retries that still violated the contract, honestly typed)",
+   "c_larger_rungs": "WORKED at the transport level — llama4mav served 20/20 VALID at 90s pacing (the R132 429 class fully cleared); qwen235b 20/20 at ~3s/leg",
+   "accuracy_moved": "llama4mav 0.7 (7/10 — ONE hit short of the 0.8 bar); qwen235b and dsv32 0.6 (vs R132's 0.4/0.5/0.7/0.22 — the levers lifted every judge's accuracy but not past the bar)"
+  },
+  "the_vote_matrix_reading": "the panel agrees with the auditor on 6-7 of 10 pairs with a consistent structure: UNANIMOUS agreement on 6 pairs (bench-p09, dev-fu-003, eval-new01/02/04/07); the disagreements concentrate in 4 pairs. On dev-fu-001-bearing-spalling ALL THREE full judges say a1 while the auditor label is baseline — a unanimous-judge-vs-label disagreement, honestly typed as a finding for the auditor (NOT a label challenge — the r5 labels are the gate's ground truth; but a unanimous 3-family disagreement on one item is exactly what a calibration corpus should surface for cross-check)",
+  "no_gate_claims": "no agreement/kappa/AUC claimed from an unqualified panel (computed-by-construction N/A); the two-code-path check PASSED (the engine module and the independent recompute agree exactly, diff=0)",
+  "next_lever_typed": "(a) the R-CAL bar needs 8/10 — one more hit on llama4mav-class rungs; the 4 disagreement pairs are the material for the auditor's cross-check (>=20%); (b) a longer calibration corpus (the spec's own 10-item slice limits resolution: one item = 0.1 acc); (c) the dev-fu-001 unanimous disagreement deserves the auditor's attention (either a label the panel legitimately contests or a prompt-side signal)"
+ },
+ "run_census": {
+  "legs_total": 80,
+  "valid": 77,
+  "parse_failed": 3,
+  "transport_failed": 0,
+  "pacing": "20s standard, 90s llama4mav — the 429 class fully cleared (R132 cohere never served >70%; this window every judge served)",
+  "engine_routing": "all judging through engine/blind_panel.py (build_pair_prompt + parse_pair_rating); the tally by BOTH scripts/r133_panel_recompute.py (independent, Art. 13) AND engine/panel_agreement.py (cross-check diff=0)"
+ }
+}

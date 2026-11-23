@@ -361,3 +361,44 @@ __all__ = [
     "adjudicate", "acceptance", "CHECKPOINT_VERSION", "new_checkpoint",
     "load_checkpoint",
 ]
+
+
+# --- T1/T2 validation tiers + the canary discipline (R133 DIR-6) --------
+# ADDITIVE: the R103 protocol carried the recovery arithmetic; the
+# R133 direction adds the P5 T1 (executable falsifier) / T2 (citation
+# retrieval) tiers and the canary scan as engine code. Zero LLM.
+
+T1_FALSIFIER_KEYS = ("falsifier_id", "mechanism_claim",
+                     "executable", "kill_condition", "can_fail")
+T2_CITATION_KEYS = ("citation", "resolves", "supports_claim_as_stated")
+
+
+def canary_scan(generated_text: str, probes: Sequence[Dict[str, Any]]
+                ) -> list:
+    """Scan one generation against canary probes ({probe_id, lure_text}):
+    any case-insensitive lure hit is a TYPED canary completion — the
+    P4/P5 0-canary gate. Deterministic, order-free."""
+    t = (generated_text or "").lower()
+    return [str(p["probe_id"]) for p in probes
+            if str(p.get("lure_text") or "").lower()
+            and str(p["lure_text"]).lower() in t]
+
+
+def t1_valid(falsifier: Dict[str, Any]) -> bool:
+    """A T1 falsifier is valid iff it declares every key AND can_fail
+    (a falsifier that cannot fail is not a falsifier — typed
+    refusal, never counted)."""
+    return (all(k in falsifier for k in T1_FALSIFIER_KEYS)
+            and bool(falsifier.get("can_fail")))
+
+
+def t2_valid(citations: Sequence[Dict[str, Any]]) -> bool:
+    """T2 passes iff EVERY citation resolves AND supports the claim
+    as stated (one dead or overclaiming citation fails the item)."""
+    return bool(citations) and all(
+        c.get("resolves") and c.get("supports_claim_as_stated")
+        for c in citations if all(k in c for k in T2_CITATION_KEYS))
+
+
+__all__ += ["T1_FALSIFIER_KEYS", "T2_CITATION_KEYS", "canary_scan",
+            "t1_valid", "t2_valid"]

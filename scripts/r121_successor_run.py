@@ -41,6 +41,10 @@ _load_key_vault()
 
 from discovery_fabric.engine import route_adapter as ra  # noqa: E402
 import r40_machine_v77 as m77                  # noqa: E402
+# R133 DIR-3: check_layer MOVED to discovery_fabric/engine/review_layer.py
+# (the F63 rule); this name is now a thin re-export shim so the
+# historical importers (r127_phaseA_gate et al.) stay importable.
+from discovery_fabric.engine.review_layer import check_layer  # noqa: E402,F401
 
 V = "agnes-3.0-flash"
 
@@ -50,35 +54,6 @@ FIX_DIRECTIVE = (
     "problem. Fix the proposal so the findings no longer apply, "
     "changing as little else as possible. Return the complete "
     "corrected proposal.")
-
-
-def check_layer(prob: dict, bill: str, gw_key: str | None) -> dict:
-    """The stripped machine's own scans over (prob, bill) — the
-    successor machine's check leg, minus the LLM direction check
-    (which needs the gateway; the deterministic scans are the check
-    layer's defect-detection surface and match the amendment-1
-    detector set exactly)."""
-    vio: dict = {}
-    vio.update(m77.base_scan(bill))
-    vio.update(m77.scan_deliverable_class(bill))
-    vio.update(m77.scan_stated_formula_direction(bill))
-    vio.update(m77.scan_constraint_fit(prob, bill))
-    vio.update(m77.scan_catalog(prob, bill))
-    sb = m77.scan_standard_bill(bill, "intervention-proposal")
-    if sb:
-        vio.update(sb)
-    ol = m77.scan_operational_loss(bill, "intervention-proposal")
-    if ol:
-        vio.update(ol)
-    cv = m77.scan_conversion(bill, "intervention-proposal", prob)
-    if cv:
-        vio.update(cv)
-    vio.update(m77.scan_allowed_measures_class(prob, bill))
-    vio.update(m77.scan_physics_direction(prob, bill))
-    vio.update(m77.direction_lexicon_check(prob, bill))
-    vio.update(m77.scan_input_availability(prob, bill))
-    vio.update(m77.scan_duty_cycle_pricing(bill))
-    return vio
 
 
 def reviewer_call(prob: dict, bill: str, findings: list) -> str:
