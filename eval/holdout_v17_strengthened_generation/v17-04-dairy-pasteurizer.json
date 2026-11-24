@@ -1,0 +1,133 @@
+{
+ "problem_id": "v17-04-dairy-pasteurizer",
+ "domain": "fouling_deposition",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P1",
+   "P5"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "geometry",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:5535f0fff989": "borderline-judge",
+   "cand:MS:DIRECT_TRANSFER:db864817237e": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "fouling_deposition",
+   "confidence": 1.0,
+   "evidence_span": "foul, fouls, deposit",
+   "allowed_mech_classes": [
+    "surface_energy_modification",
+    "in_situ_mechanical_cleaning",
+    "ultrasonic_antifouling",
+    "crystallization_control_by_dosing",
+    "flow_geometry_antifouling"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "flow_geometry_antifouling",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "chemistry",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 5,
+    "top_class": "surface_energy_modification",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "clean more often: schedule more frequent chemical/mechanical cleaning"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:14:59Z",
+ "attempts_n": 1,
+ "row_wall_s": 9.4,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE via in_situ_mechanical_cleaning (e.g., mechanical scrapers or ball cleaning) which physically removes accumulated protein before it hardens.\nMy mechanism departs via surface_energy_modification (SLIPS – Slippery Liquid-Infused Porous Surface) applied to the heating tube interior, where a micro-textured, food-grade silicone-infused layer creates a liquid interface that prevents protein adhesion at the primary deposition site.\nThe failure-physics connection is that protein fouling in dairy pasteurizers is driven by strong adhesion of denatured whey/casein to the hot metal wall; by replacing the solid-liquid interface with a lubricating liquid-liquid interface, the shear stress at the wall exceeds the adhesion threshold, causing the deposit to slough off continuously during operation rather than accumulating.\n\nPHYSICS CHECK\nGoverning relation: The critical shear stress ($\\tau_{crit}$) required to detach a foulant layer is proportional to its adhesion energy ($E_{adh}$). On a standard stainless steel surface, $E_{adh}$ is high (~50-100 mJ/m²). On a SLIPS surface infused with a low-surface-energy lubricant ($\\gamma_{lub} < \\gamma_{protein}$), the effective adhesion energy is reduced to the interfacial tension between the lubricant and the aqueous protein phase ($\\gamma_{protein-lub}$).\nMagnitude verification: For a typical pasteurizer flow velocity $v = 1.5$ m/s (ASSUMED: standard CIP/processing flow rate), channel width $h = 0.01$ m (ASSUMED: typical tube ID), fluid viscosity $\\mu = 0.003$ Pa·s (ASSUMED: warm milk), the wall shear stress is $\\tau_{wall} = \\frac{6\\mu v}{h} = \\frac{6(0.003)(1.5)}{0.01} = 2.7$ Pa. Standard steel fouling adhesion stress is ~10-20 Pa. A SLIPS surface reduces the effective adhesion to <1 Pa due to the lubricant layer, allowing the 2.7 Pa operating shear to keep the surface self-cleaning.\n\nIMPLEMENTATION BILL\n1. **Surface Coating Process**: Apply a micro-porous nickel or stainless steel electroless plating layer (thickness ~50 µm) to the inner surface of the heat transfer tubes. *Tag: DERIVED from standard manufacturing capability for heat exchanger tubes.*\n2. **Lubricant Infusion**: Saturate the porous layer with a food-grade, high-viscosity silicone oil (e.g., polydimethylsiloxane, PDMS, 100 cSt). *Tag: DERIVED from food-grade material safety standards (FDA 21 CFR 175.300 for silicone elastomers/liquids).*\n3. **Sealing/Containment**: Install precision-fitted O-rings at tube ends to prevent lubricant leakage into the product side while allowing the porous layer to be resaturated during maintenance. *Tag: DERIVED from standard sanitary fitting practices.*\n4. **Input Stream**: The primary monitored indicator is the **heat transfer coefficient ($U$)** or **fouling resistance ($R_f$)**. *Tag: ALREADY-RECORDED ��� The pasteurizer control system already logs supply/return temperatures and flow rates, from which $R_f$ is calculated via $R_f = \\frac{1}{U} - \\frac{1}{U_{clean}}$.*\n5. **Reference Threshold**: $R_f < 0.0005 \\, \\text{m}^2\\text{K/W}$ (cleanliness limit). *Tag: DERIVED – Typical design value for clean dairy heat exchangers is ~0.0001; 0.0005 represents a 5x increase in resistance, a standard maintenance trigger.*\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: Standard practice (mechanical cleaning) requires installing scrapers or ball systems into existing tubes. SLIPS requires re-coating tubes, which is a one-time modification. Burden: SLIPS is higher initially (tube replacement/coating) but lower long-term (no moving parts).\n- **Operability**: Standard practice operates on a schedule (cleaning cycles). SLIPS operates continuously without changing the process flow parameters. Burden: SLIPS is lower (no cleaning cycle downtime).\n- **Maintenance**: Standard practice requires replacing scraper seals or balls. SLIPS requires periodic re-infusion of lubricant (every 6-12 months) via injection ports. Burden: SLIPS is comparable, but simpler (no mechanical wear).\n- **Cost Class**: Standard practice is low (parts cost). SLIPS is medium (coating + silicone cost), but savings in energy (lower $R_f$) and downtime (no cleaning shutdowns) offset it.\n\nEXECUTABLE TEST\n**Protocol**: Install SLIPS-coated tubes in a parallel channel of the pasteurizer, while keeping standard stainless steel tubes in the other channels. Run both under identical dairy load conditions for 72 hours.\n**Instruments**: Measure $\\Delta T$ (supply/return) and flow rate ($Q$) for both channels using existing telemetry. Calculate $R_f$ for each.\n**Pass/Fail Threshold**:\n- Pass: $R_f$ of SLIPS channel remains < 0.0002 m²K/W (clean level) while $R_f$ of standard channel exceeds 0.0008 m²K/W (fouled level).\n- Fail (Kill Condition): The mechanism is falsified if $R_f$ of the SLIPS channel does not show a difference of at least 0.0006 m²K/W compared to the standard channel within the 72-hour window, or if the lubricant leaks into the product (detected by residual silicone in product samples).\n\nCONSTRAINT BIND\nThe monitored indicator is the **fouling resistance ($R_f$)**, which is the primary stated indicator for \"raising energy use\" (energy use $\\propto \\Delta T$ required to maintain temperature, which increases with $R_f$). $R_f$ is derived from ALREADY-RECORDED temperature and flow data. No new sensors are added; the calculation is performed on existing logs.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Surface Coating Process**: Apply a micro-porous nickel or stainless steel electroless",
+    "2. **Lubricant Infusion**: Saturate the porous layer with a food-grade, high-viscosity sil",
+    "3. **Sealing/Containment**: Install precision-fitted O-rings at tube ends to prevent lubri",
+    "4. **Input Stream**: The primary monitored indicator is the **heat transfer coefficient ($",
+    "5. **Reference Threshold**: $R_f < 0.0005 \\, \\text{m}^2\\text{K/W}$ (cleanliness limit). *T",
+    "- **Installability**: Standard practice (mechanical cleaning) requires installing scrapers",
+    "- **Operability**: Standard practice operates on a schedule (cleaning cycles). SLIPS opera",
+    "- **Maintenance**: Standard practice requires replacing scraper seals or balls. SLIPS requ",
+    "- **Cost Class**: Standard practice is low (parts cost). SLIPS is medium (coating + silico"
+   ],
+   "NAMED_VARIANT": [
+    "model/brand-marker: FDA 21 | 2. **Lubricant Infusion**: Saturate the porous layer with a food-grade, high-vis"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 1,
+   "mapped_mechanism": "flow_geometry_antifouling",
+   "cross_domain": "biomimetics"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "quantity": "droplet-impact erosion intensity ordering (v^5 scaling)",
+    "predicted_value": "relative 1.000 dimensionless vs a 100 m/s reference",
+    "calc_trace": "(100.0 m/s / 100 m/s)^5 = 1.000 dimensionless",
+    "falsifier": "a rain-erosion whirling-arm coupon must track the v^5 curve; a compliant layer's benefit shows as a threshold shift — if the coating does NOT raise the damaging-speed threshold >= 15%, it falsifies",
+    "units_ok": true,
+    "status": "computed",
+    "route": "specific:compliant_elastomer_coating"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "faa0d0006e0a5b2a"
+}

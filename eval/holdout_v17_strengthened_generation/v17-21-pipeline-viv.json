@@ -1,0 +1,148 @@
+{
+ "problem_id": "v17-21-pipeline-viv",
+ "domain": "vibration_resonance",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P18"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:5c85a5bd375b": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:9fe9d6abd0bb": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:bad9c0a098b2": "reject-duplicate"
+  },
+  "strength_kit": {
+   "failure_class": "vibration_resonance",
+   "confidence": 0.55,
+   "evidence_span": "vortex-induced vibration, vortex-induced vibration fatigue",
+   "allowed_mech_classes": [
+    "tuned_mass_damper",
+    "vortex_shedding_suppression",
+    "support_stiffness_reconfiguration"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 3,
+    "top_class": "tuned_mass_damper",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "stiffen the structure or add damping mass at the vibration site"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:20:47Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.7,
+ "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers: a design change (material/procedure) that stiffens the subsea pipeline span or adds distributed damping mass to shift the natural frequency away from the vortex shedding frequency.\n- My mechanism's departure: Reconfigures the support stiffness locally by adding discrete, passive, high-density mass blocks to the span's mid-point, which lowers the span's first-mode natural frequency $f_n$ to fall below the Strouhal shedding frequency $f_s$, exiting the lock-in zone without adding damping or changing the pipe wall thickness.\n- Failure-physics connection: Vortex-induced vibration (VIV) fatigue occurs when $f_n \\approx f_s$ (lock-in). By lowering $f_n$ below the operational $f_s$ (via mass loading), the frequency ratio $f_n/f_s < 0.8$, preventing resonant amplification of displacement amplitude, thereby reducing cyclic stress and fatigue damage.\n\nPHYSICS CHECK\n- Governing relation: Strouhal number $St = f_s D / U$ (where $f_s$ is shedding frequency, $D$ is pipe diameter, $U$ is flow velocity). The natural frequency of a simply supported span with added point mass is approximated by $f_n \\propto 1/\\sqrt{m_{eff}}$.\n- Magnitude verification: Assume a typical subsea pipeline $D = 0.3 \\, \\text{m}$ (ASSUMPTION: standard flowline diameter). Assume flow velocity $U = 1.5 \\, \\text{m/s}$ (ASSUMPTION: typical design flow). Strouhal number $St \\approx 0.2$ (ASSUMPTION: standard for circular cylinders).\n  - Calculated shedding frequency: $f_s = St \\cdot U / D = 0.2 \\cdot 1.5 / 0.3 = 1.0 \\, \\text{Hz}$ (CALCULATED).\n  - If the existing span's first mode is at $f_{n,old} = 1.0 \\, \\text{Hz}$ (locked), adding mass to lower it to $f_{n,new} = 0.6 \\, \\text{Hz}$ (CALCULATED target, $<0.8 f_s$) breaks lock-in. This requires increasing effective mass by a factor of $(1.0/0.6)^2 \\approx 2.78$. This is achievable with discrete added mass blocks without modifying the pipe wall.\n\nIMPLEMENTATION BILL\n- Component: Discrete high-density mass blocks (e.g., tungsten or lead-encased steel) attached to the pipeline span at one-third and two-third points.\n- Material: Lead-encased steel (corrosion-resistant, high density $11,340 \\, \\text{kg/m}^3$).\n- Instrument: NONE. The intervention is passive. The \"monitoring\" is the existing pressure and flow rate telemetry which confirm the operating point $U$ (flow rate) and system status (pressure) remain stable.\n- Input stream: ALREADY-RECORDED flow_rate (to determine $U$ and thus $f_s$) and ALREADY-RECORDED pressure (to confirm no hydraulic changes that alter $U$ significantly).\n- Reference/Threshold: DERIVED from stated physics: $f_n/f_s < 0.8$ is the kill condition for lock-in. Threshold $f_s$ is CALCULATED from $St, U, D$.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: HIGHER burden than adding damping pads, but LOWER than replacing the pipe. Requires lift-off of mass blocks during installation or maintenance.\n- Operability: ZERO additional operational burden. Passive mechanism. No power, no control system.\n- Maintenance: LOW. Mass blocks are corrosion-protected; inspection is visual/ROV-based, same as existing supports.\n- Cost Class: SAME as adding structural stiffeners (moderate capital cost), but no recurring OPEX for damping system maintenance.\n\nEXECUTABLE TEST\n- Protocol: Install mass blocks. Record pipeline natural frequency via ambient vibration analysis (using existing accelerometers if present, or derived from pressure fluctuations via transfer function if no accelerometers are stated, BUT WAIT — the problem states \"add_monitoring is forbidden\". I must use existing data. The problem says signals_used: flow_rate, pressure. I cannot assume accelerometers.\n- Correction: The test must use flow_rate and pressure.\n- Falsification Test: Measure the reduction in pressure fluctuation amplitude $\\Delta P_{fluc}$. VIV causes characteristic pressure pulsations. If lock-in is broken, the peak-to-peak pressure fluctuation $\\Delta P_{p-p}$ associated with the 1.0 Hz frequency component should drop.\n- Pass/Fail Threshold: The peak-to-peak pressure fluctuation at frequency $f_s = 1.0 \\, \\text{Hz}$ must decrease by at least 50% within 24 hours of mass installation.\n- Kill Condition: The mechanism is falsified if $\\Delta P_{p-p}$ at 1.0 Hz does not decrease by at least 50% within 24 hours.\n\nCONSTRAINT BIND (predictor)\n- Primary Stated Indicator: The problem states \"vortex-induced vibration fatigues the span\". The primary physical indicator of VIV is the vibration amplitude. Since \"add_monitoring\" is forbidden as an intervention, and I cannot add sensors, I must use the ALREADY-RECORDED signals: flow_rate and pressure.\n- Why pressure? Pressure fluctuations are a direct proxy for flow-induced structural forces. The coupling between vortex shedding and structural motion modulates the local pressure. A reduction in coherent pressure fluctuations at the shedding frequency indicates reduced fluid-structure interaction energy, implying reduced vibration amplitude and thus reduced fatigue.\n- Secondary Indicator: Flow_rate confirms the operating condition ($U$) is constant, ensuring the calculated $f_s$ is valid.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Component: Discrete high-density mass blocks (e.g., tungsten or lead-encased steel) atta",
+    "- Material: Lead-encased steel (corrosion-resistant, high density $11,340 \\, \\text{kg/m}^3",
+    "- Instrument: NONE. The intervention is passive. The \"monitoring\" is the existing pressure",
+    "- Input stream: ALREADY-RECORDED flow_rate (to determine $U$ and thus $f_s$) and ALREADY-R",
+    "- Reference/Threshold: DERIVED from stated physics: $f_n/f_s < 0.8$ is the kill condition ",
+    "- Installability: HIGHER burden than adding damping pads, but LOWER than replacing the pip",
+    "- Operability: ZERO additional operational burden. Passive mechanism. No power, no control",
+    "- Maintenance: LOW. Mass blocks are corrosion-protected; inspection is visual/ROV-based, s",
+    "- Cost Class: SAME as adding structural stiffeners (moderate capital cost), but no recurri"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "WAIT — the problem states \"add_monitoring is forbidden\". I must use existing data. The problem says signals_used: flow_rate, p",
+    "Correction: The test must use flow_rate and pressure."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'vibration' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'fatigue' and the stated failure driver 'fatigues' are the same action class (thermal-cycling) — a remedy may not be its own driver",
+    "the mechanism's action ingredient 'vibration' and the stated failure driver 'vibration' are the same action class (vibration) — a remedy may not be its own driver"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "tuned_mass_damper",
+   "cross_domain": ""
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "transmissibility at the tuning point",
+    "predicted_value": "T = 2.02 at f/fn = 0.71",
+    "calc_trace": "T = 1/|1-(0.71)^2| = 2.02",
+    "falsifier": "the measured amplitude at the forcing band must fall below T < 1 in the bench shaker sweep; the opposite result falsifies the invention",
+    "route": "class-generic:vibration_resonance"
+   },
+   "machine_scan": {
+    "PHYSICS_MAGNITUDE_MISSING": [
+     "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+    ]
+   },
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "8aefc4c16d509cf2"
+}

@@ -1,0 +1,135 @@
+{
+ "problem_id": "v17-23-pcb-solder",
+ "domain": "thermal_mismatch",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P18",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9dbaa8d8f21c": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:5d7a4eb72fd9": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:cbeb56c1680a": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "thermal_mismatch",
+   "confidence": 0.714,
+   "evidence_span": "cte mismatch, power cycling",
+   "allowed_mech_classes": [
+    "heat_spreader_enhancement",
+    "active_cooling_loop",
+    "duty_redistribution"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 3,
+    "top_class": "heat_spreader_enhancement",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "more compliant mounting or looser tolerances at the joint"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:21:28Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.7,
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a mitigation via a design change: it increases solder joint compliance or uses a larger joint volume to absorb CTE strain. My mechanism departs by using heat_spreader_enhancement to lower the local thermal gradient at the joint, thereby reducing the cyclic plastic strain amplitude that drives fatigue. The failure-physics connection is that by spreading the heat flux from the hot component before it reaches the joint, the ΔT across the joint is reduced, which directly scales down the CTE mismatch strain (ε = Δα·ΔT).\n\nPHYSICS CHECK — The governing relation for CTE mismatch strain is ε_mismatch = Δα · ΔT_joint. For a typical PCB (FR4) and high-power component, Δα ≈ 50 × 10⁻⁶/K (ASSUMPTION: based on standard material datasheets for FR4 vs. high-heat-generating IC packages). If the standard practice relies on the joint to dissipate heat, ΔT_joint might be 50 K. ε_mismatch ≈ 50e-6/K * 50 K = 2500e-6 = 0.25%. By inserting a thermal spreader that reduces the local temperature rise at the joint by 50%, ΔT_joint becomes 25 K. New ε_mismatch ≈ 50e-6/K * 25 K = 1250e-6 = 0.125%. This cuts the cyclic strain amplitude by 50%, which, per Basquin/Coffin-Manson fatigue laws, significantly extends cycle life (N ∝ ε^-m, where m≈3-5 for solder). Magnitude verification: a 50% reduction in strain amplitude typically results in a factor of 8-32 increase in fatigue life.\n\nIMPLEMENTATION BILL —\n1.  **Thermal Spreader Plate:** A machined aluminum or copper insert (DERIVED: Stated spec of high thermal conductivity metals; ASSUMPTION: Cu k=400 W/mK vs. FR4 k=0.3 W/mK) designed to bridge the thermal gap between the heat-generating component and the PCB mass, placed *outside* the direct thermal path to the solder joints.\n    *   *Tag:* ALREADY-RECORDED: Stated component power and PCB material properties allow calculation of required spreader area.\n    *   *Tag:* DERIVED: Spreader thickness and area derived from Fourier's Law to target a 50% reduction in local joint ΔT.\n2.  **PCB Layout Modification:** Redesigning the thermal vias or copper pour to channel heat laterally away from the joint row, ensuring the spreader's flux does not concentrate at a single joint but is distributed across the board's mass.\n    *   *Tag:* ALREADY-RECORDED: Existing PCB topology and via counts are available for simulation.\n3.  **No New Sensors:** The mechanism relies on passive material properties. No new instrumentation is required. The \"trust\" comes from the stated physical relation between thermal conductivity, geometry, and temperature drop.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —\n*   **Installability:** SAME burden class. Replaces a standard solder assembly with one that includes a metal insert and modified pad layout. No new assembly steps beyond placing the spreader.\n*   **Operability:** SAME. Passive mechanism, no power draw, no moving parts.\n*   **Maintenance:** SAME. No maintenance, unlike active cooling loops which require pump life management.\n*   **Rough Cost Class:** Higher than \"looser tolerances\" but lower than \"active cooling loop.\" The cost is in PCB re-spin and material for the spreader. It is justified by the 8-32x life extension predicted, which reduces failure rates and warranty costs.\n\nEXECUTABLE TEST —\n*   **Protocol:** Perform thermal cycling (e.g., -40°C to +125°C, 30 min soak) on two coupon boards: one with standard practice (compliant joint only) and one with the heat_spreader_enhancement design.\n*   **Instruments:** Thermocouples placed directly on the PCB surface adjacent to the joints to measure local ΔT; X-ray or microscopy for post-failure analysis of joint cracks.\n*   **Pass/Fail Threshold:** The test passes if the mean time to failure (MTTF) of the spreader-enhanced board is at least 8 times greater than the control board (consistent with the 50% strain reduction and m=3 fatigue exponent). Alternatively, a quick pass/fail is if the measured ΔT at the joint for the enhanced board is ≤ 50% of the control board's ΔT at steady-state power on.\n*   **Kill Condition:** The mechanism is falsified if the measured reduction in cyclic plastic strain amplitude at the joint is less than 20% compared to the control, or if the spreader causes a new thermal stress concentration leading to delamination within the first 10 cycles.\n\nCONSTRAINT BIND — The primary stated indicator is \"PCB solder joints fatigue from CTE mismatch.\" The heat_spreader_enhancement directly mitigates this by reducing the ΔT term in the CTE mismatch strain equation. It is not a secondary indicator like \"temperature\" alone, but a design intervention that alters the physical driver (ΔT) of the primary failure. The mechanism is a design change (inserting a spreader), not a monitoring scheme, complying with the FORBIDDEN clause \"add_monitoring.\"",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Thermal Spreader Plate:** A machined aluminum or copper insert (DERIVED: Stated spec",
+    "*   *Tag:* ALREADY-RECORDED: Stated component power and PCB material properties allow calc",
+    "*   *Tag:* DERIVED: Spreader thickness and area derived from Fourier's Law to target a 50%",
+    "2.  **PCB Layout Modification:** Redesigning the thermal vias or copper pour to channel he",
+    "*   *Tag:* ALREADY-RECORDED: Existing PCB topology and via counts are available for simula",
+    "3.  **No New Sensors:** The mechanism relies on passive material properties. No new instru",
+    "*   **Installability:** SAME burden class. Replaces a standard solder assembly with one th",
+    "*   **Operability:** SAME. Passive mechanism, no power draw, no moving parts.",
+    "*   **Maintenance:** SAME. No maintenance, unlike active cooling loops which require pump ",
+    "*   **Rough Cost Class:** Higher than \"looser tolerances\" but lower than \"active cooling l",
+    "*   **Protocol:** Perform thermal cycling (e.g., -40°C to +125°C, 30 min soak) on two coup",
+    "*   **Instruments:** Thermocouples placed directly on the PCB surface adjacent to the join",
+    "*   **Pass/Fail Threshold:** The test passes if the mean time to failure (MTTF) of the spr",
+    "*   **Kill Condition:** The mechanism is falsified if the measured reduction in cyclic pla"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 3,
+   "mapped_mechanism": "heat_spreader_enhancement",
+   "cross_domain": ""
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 50% gain)",
+    "predicted_value": "the measured quantity must reach 1.50x the baseline",
+    "calc_trace": "1 + 0.50 = 1.50",
+    "falsifier": "the measured gain must reach 1.50x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "c5ba86aa2f152ab5"
+}

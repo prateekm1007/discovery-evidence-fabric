@@ -1,0 +1,135 @@
+{
+ "problem_id": "v17-30-capacitor-dielectric",
+ "domain": "electrical_insulation",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:3a812efd20e4": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:0090043b97ad": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:470c5668eaf4": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "electrical_insulation",
+   "confidence": 1.0,
+   "evidence_span": "dielectric",
+   "allowed_mech_classes": [
+    "stress_grading",
+    "environmental_enclosure",
+    "creepage_path_extension"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 3,
+    "top_class": "stress_grading",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "more insulation material / higher dielectric rating at the site"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:23:01Z",
+ "attempts_n": 1,
+ "row_wall_s": 7.1,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice: Adds thickness or higher dielectric strength material to the capacitor volume to withstand the design voltage, relying on volume insulation.\nDeparture: Implements a surface-stress grading ring (corona ring/shunt) at the dielectric edge interface to homogenize the electric field distribution and eliminate local field concentration at geometric discontinuities.\nFailure-physics connection: Dielectric breakdown is initiated not by bulk stress but by localized field enhancement at edges/defects where $E_{local} = E_{avg} \\times \\beta$ ($\\beta > 1$). By adding a conductive ring at the dielectric boundary, the equipotential surface is reshaped, reducing $\\beta$ to $\\approx 1$ at the critical interface, preventing partial discharges that lead to catastrophic breakdown.\n\nPHYSICS CHECK\nGoverning relation: Field enhancement factor $\\beta = E_{max} / E_{applied}$. For a bare dielectric edge, $\\beta \\approx 1.5 - 2.0$ due to geometry. With a shunt ring, $\\beta \\approx 1.0 - 1.1$.\nMagnitude verification: Assume applied voltage $V = 10\\text{ kV}$ (ASSUMPTION: typical medium-voltage class capacitor). Dielectric gap $d = 1\\text{ cm}$ (ASSUMPTION). Average field $E_{avg} = 10\\text{ kV/cm}$. Without ring, local field at edge $E_{local} \\approx 15\\text{ kV/cm}$ (CALCULATED: $\\beta=1.5$). If breakdown strength of dielectric is $20\\text{ kV/cm}$, margin is only $25\\%$. With ring, $E_{local} \\approx 10\\text{ kV/cm}$, margin increases to $50\\%$. The physical mechanism is valid because the conductive ring forces the electric potential to vary more gradually across the interface, physically eliminating the point of highest curvature where field lines concentrate.\n\nIMPLEMENTATION BILL\n1. **Component**: Annular conductive ring (Corona/Shunt ring).\n   - **Material**: Aluminum or copper (STOCK Datasheet: high conductivity, standard in HV equipment).\n   - **Geometry**: Toroidal profile, radius slightly larger than dielectric outer surface.\n   - **Input Stream**: ALREADY-RECORDED: Capacitor terminal voltage trace (stated sensor in standard monitoring) and physical dimensions from design drawings (stated spec).\n   - **Reference**: DERIVED from stated physics: Minimum distance from ring to nearby conductive structures must exceed $V / (30\\text{ kV/cm})$ to prevent arcing to the ring itself. If $V=10\\text{kV}$, min gap $> 0.33\\text{ cm}$ (CALCULATED).\n   - **Procedure**: Mechanically clamp ring to capacitor end-cap or encapsulate with potting compound during assembly. No new sensors required.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: Standard practice (thicker dielectric) requires retooling or new inventory. This design adds a passive mechanical part (ring) that can be retrofitted or integrated into existing assembly fixtures. Burden: SAME class (mechanical assembly).\n- **Operability**: No active components, no power supply, no maintenance. Passive static device.\n- **Maintenance**: Zero. Non-consumable.\n- **Cost**: Aluminum ring cost is negligible compared to dielectric material cost or failure cost.\n\nEXECUTABLE TEST\nProtocol: Fabricate two capacitor cells: Cell A (standard thick dielectric, no ring), Cell B (standard dielectric + shunt ring).\nInstruments: Oscilloscope for partial discharge (PD) detection and voltage divider.\nPass/Fail Thresholds:\n1. Measure PD onset voltage ($V_{PD}$). Cell B must show $V_{PD}$ $\\geq$ $1.5 \\times V_{PD}$ of Cell A (CALCULATED based on field reduction).\n2. Apply $1.1 \\times$ rated voltage for 48 hours. Cell A must show PD activity; Cell B must show zero PD activity.\nKill Condition: The mechanism is falsified if Cell B does not exhibit a Partial Discharge Inception Voltage increase of at least 50% (kV) compared to Cell A under identical voltage sweep conditions.\n\nCONSTRAINT BIND\nPrimary Indicator: Electric Field Strength at dielectric edge (inferred via Partial Discharge magnitude, which is a direct function of local $E > E_{critical}$).\nReason: The stated failure is \"field concentration.\" PD is the measurable proxy for field concentration exceeding dielectric strength locally. It is the primary indicator because it directly reflects the physical stress state being mitigated. No secondary indicators are used; PD is the sole validation metric for this specific mechanism.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Component**: Annular conductive ring (Corona/Shunt ring).",
+    "- **Material**: Aluminum or copper (STOCK Datasheet: high conductivity, standard in HV equ",
+    "- **Geometry**: Toroidal profile, radius slightly larger than dielectric outer surface.",
+    "- **Input Stream**: ALREADY-RECORDED: Capacitor terminal voltage trace (stated sensor in s",
+    "- **Reference**: DERIVED from stated physics: Minimum distance from ring to nearby conduct",
+    "- **Procedure**: Mechanically clamp ring to capacitor end-cap or encapsulate with potting ",
+    "- **Installability**: Standard practice (thicker dielectric) requires retooling or new inv",
+    "- **Operability**: No active components, no power supply, no maintenance. Passive static d",
+    "- **Maintenance**: Zero. Non-consumable.",
+    "- **Cost**: Aluminum ring cost is negligible compared to dielectric material cost or failu"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "stress_grading",
+   "cross_domain": ""
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 50% gain)",
+    "predicted_value": "the measured quantity must reach 1.50x the baseline",
+    "calc_trace": "1 + 0.50 = 1.50",
+    "falsifier": "the measured gain must reach 1.50x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {
+    "PHYSICS_MAGNITUDE_MISSING": [
+     "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+    ]
+   },
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "b83ad6e83fac4c65"
+}

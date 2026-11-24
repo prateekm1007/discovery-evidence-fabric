@@ -1,0 +1,126 @@
+{
+ "problem_id": "v17-01-slurry-pump",
+ "domain": "abrasion_erosion",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P13",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9c6e6efd81d5": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:7fdbe7233abe": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:66dc67c100ec": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "abrasion_erosion",
+   "confidence": 1.0,
+   "evidence_span": "slurry, erode, erodes",
+   "allowed_mech_classes": [
+    "compliant_elastomer_coating",
+    "surface_hardening_treatment",
+    "micro_texturing",
+    "particle_trajectory_deflection",
+    "sacrificial_replaceable_shield"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "compliant_elastomer_coating",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 5,
+    "top_class": "compliant_elastomer_coating",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "a harder/thicker surface: apply a hard-facing or add material at the wear site"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:14:05Z",
+ "attempts_n": 1,
+ "row_wall_s": 14.6,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MATERIAL/GEOMETRY DESIGN CHANGE: increasing impeller mass/height or applying hard-facing to raise the wear threshold, thereby slowing material removal via increased cross-sectional inertia.\nMy mechanism delivers the SAME CLASS (design change preventing erosion) via COMPLIANT ELASTOMER COATING: replacing the rigid metal surface with a low-modulus polyurethane layer that elastically absorbs particle impact energy, cutting the transmitted stress peak below the material fatigue/erosion threshold, decoupling impact velocity from surface stress via strain-rate-dependent damping rather than mass increase.\nThe failure-physics connection is that hard quartz particles in slurry cause erosion via high-frequency micro-impact stress waves; a compliant layer increases the contact duration ($t_c$) from microseconds (rigid steel) to milliseconds (elastomer), reducing peak contact stress $\\sigma_{peak} \\propto \\frac{1}{t_c}$ according to the springer droplet/particle erosion model, thereby keeping the local stress below the plastic deformation threshold required for material removal.\n\nPHYSICS CHECK\nThe governing physical relation is the peak contact stress during particle impact, $\\sigma_{peak} = \\frac{F_{peak}}{A}$, where $F_{peak}$ is derived from the impulse-momentum theorem over the contact time $t_c$.\nFor a rigid target, $t_{c,rigid} \\approx 10^{-6}$ s; for a compliant elastomer layer, $t_{c,elastic} \\approx 10^{-3}$ s.\nMagnitude verification: Assuming particle mass $m_p = 1 \\times 10^{-5}$ kg, impact velocity $v_{imp} = 20$ m/s, and $t_c$ increases by a factor of 1000 due to elastomer compliance, the peak force $F_{peak} = \\frac{m_p v_{imp}}{t_c}$ drops by a factor of 1000, reducing $\\sigma_{peak}$ by 3 orders of magnitude, which is below the yield strength of the underlying steel and prevents dislodgement of the quartz particle from the matrix or cutting of the steel.\nNumber label: $t_{c,rigid} = 10^{-6}$ s is an ASSUMPTION based on typical acoustic transit time in steel for 100 $\\mu$m particles; $t_{c,elastic} = 10^{-3}$ s is an ASSUMPTION based on viscoelastic relaxation time of polyurethane.\n\nIMPLEMENTATION BILL\nComponents: Impeller casting (unchanged), Polyurethane elastomer coating (thickness 2-5 mm), Bonding primer.\nMaterials: High-purity polyurethane elastomer (modulus < 10 MPa), standard impeller steel (unchanged).\nInstruments: Dip-coating equipment, curing oven.\nInput streams: ALREADY-RECORDED flow_rate and pressure logs confirm the operating velocity range (20 m/s impeller tip speed) and ensure the coating is within the valid strain-rate window.\nReferences/Thresholds: DERIVED from stated physics: the coating thickness is derived to ensure strain < 10% at operating pressure; the modulus is selected to keep $t_c$ in the millisecond range. No new sensors required; reliance on existing flow/pressure telemetry to confirm no clogging (which would indicate coating degradation) serves as the condition monitor.\nProcedure: 1. Sandblast impeller. 2. Apply primer. 3. Dip in elastomer bath. 4. Cure. 5. Install.\nBurden Class: SAME as standard practice (coating application is similar in effort to hard-facing or welding; cost is comparable; maintenance involves checking for delamination via existing pressure drops rather than new inspection campaigns).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Same (coating application is standard foundry practice, no new installation steps beyond standard surface prep).\nOperability: Same (no change to flow/pressure characteristics; existing telemetry valid).\nMaintenance: Same or Lower (elastomer is replaceable/repairable locally; hard-facing requires re-grinding or replacement).\nCost: Same class (elastomer coating cost is within the same order of magnitude as ceramic hard-facing; the bill row for \"polyurethane material\" is a material cost, not a validation program).\n\nEXECUTABLE TEST\nProtocol: Run the pump with the coated impeller at 100% design flow_rate (ALREADY-RECORDED baseline). Monitor pressure (ALREADY-RECORDED) for a period of 1000 hours.\nFalsification Test: If the pressure drop across the pump increases by more than 5% relative to the healthy baseline (derived from initial commissioning data) within 1000 hours, the mechanism is falsified, indicating coating erosion or delamination.\nKill Condition: The mechanism is falsified if the pressure drop does not remain within 5% of the baseline within the 1000-hour window, indicating that the compliant layer failed to mitigate erosion.\nInstruments: Existing pressure transducers and flow meters (ALREADY-EXISTING).\nDuration: 1000 hours.\nPass/Fail: Pass if $\\Delta P < 5\\%$; Fail if $\\Delta P \\ge 5\\%$.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: The problem states erosion of the impeller. The PRIMARY indicator of failure is the loss of performance, measured by pressure (a stated signal in the typed plan). The pressure drop is the proxy for impeller mass loss/geometry change. The mechanism prevents the mass loss, thereby keeping pressure stable. No secondary indicator is used; pressure is the sole monitor.\n\nNOVELTY STATEMENT (EPO Steps)\n1. CLOSEST CONVENTIONAL PRACTICE: Hard-facing or increasing impeller thickness to slow wear.\n2. DISTINGUISHING FEATURES: The mechanism has a low-modulus compliant layer that alters the *duration* of the impact stress pulse, rather than the *hardness* or *mass* of the target. The conventional knob (hardness) fails because quartz is harder than steel; increasing hardness is a race to the top. The compliant layer changes the physics from \"cutting\" to \"damping.\"\n3. OBJECTIVE TECHNICAL PROBLEM: How to reduce the peak contact stress of high-velocity hard particles below the material removal threshold without matching the hardness of the abrasive.\n4. MECHANISM: Compliant elastomer coating (Rank 1).\n5. PREDICTION: Peak stress reduction of 3 orders of magnitude, resulting in wear rate drop of >= 90% (ASSUMPTION: 90% based on typical erosion reduction factors in compliant layer literature for this class of impact).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 3,
+   "mapped_mechanism": "compliant_elastomer_coating",
+   "cross_domain": "aerospace"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "quantity": "droplet-impact erosion intensity ordering (v^5 scaling)",
+    "predicted_value": "relative 0.000 dimensionless vs a 100 m/s reference",
+    "calc_trace": "(20.0 m/s / 100 m/s)^5 = 0.000 dimensionless",
+    "falsifier": "a rain-erosion whirling-arm coupon must track the v^5 curve; a compliant layer's benefit shows as a threshold shift — if the coating does NOT raise the damaging-speed threshold >= 15%, it falsifies",
+    "units_ok": true,
+    "status": "computed",
+    "route": "specific:compliant_elastomer_coating"
+   },
+   "machine_scan": {
+    "PHYSICS_MAGNITUDE_MISSING": [
+     "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+    ]
+   },
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "74240c33f66143b5"
+}

@@ -1,0 +1,129 @@
+{
+ "problem_id": "v17-26-vacuum-chamber",
+ "domain": "leakage_sealing",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:c823508db5a6": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:ff05045797b2": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:a0e4667bf0e2": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "leakage_sealing",
+   "confidence": 0.667,
+   "evidence_span": "leak, permeation",
+   "allowed_mech_classes": [
+    "seal_geometry_reload",
+    "double_isolation_barrier",
+    "self_healing_elastomer_seal"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 3,
+    "top_class": "seal_geometry_reload",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "a tighter/better seal of the same type"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:22:04Z",
+ "attempts_n": 1,
+ "row_wall_s": 9.1,
+ "a1_answer": "DESIGN CHANGE\n\nNOVELTY STATEMENT\nStandard practice: A tighter/better seal of the same type (e.g., upgraded Viton O-ring or harder metal gasket) delivers a static, geometric improvement that assumes the failure is a lack of initial pre-load.\nMechanism departure: `seal_geometry_reload` implemented via a direct-thermal-pressure transfer loop that uses the chamber's own exhaust gas flow rate as the primary actuator signal to dynamically re-stress the gasket, rather than relying on static clamping force.\nFailure-physics connection: Outgassing and permeation leak rates are strongly correlated with temperature gradients and gas flow velocity at the seal interface; high flow rates induce convective cooling that lowers local gas viscosity and increases permeation flux through elastomers. By coupling seal pressure to flow rate, the seal dynamically compensates for the thermal/mechanical shifts that static gaskets cannot.\n\nPHYSICS CHECK\nGoverning relation: Leak rate $Q_{leak} \\propto P_{internal} \\cdot A_{effective} / R_{seal}$, where $R_{seal}$ (resistance) decreases as contact pressure $P_c$ drops. For elastomer gaskets, $P_c = P_{pre} - \\Delta P_{thermal\\_stress}$.\nMagnitude verification: For a 100L chamber at $10^{-4}$ mbar, a static gasket relaxation of 5% (typical for Viton under vacuum over 24h) causes $R_{seak}$ to drop, increasing $Q_{leak}$ by ~5%. The system targets reducing this drift to <1% by modulating $P_c$ in real-time.\n\nIMPLEMENTATION BILL\nComponents:\n1. Primary Gasket: Standard elastomeric O-ring (ALREADY-RECORDED problem component).\n2. Actuator: A miniature pneumatic bladder integrated into the gasket housing (Material: PTFE-diaphragm, Size: 5mm dia).\n3. Controller: Embedded MCU reading the existing exhaust flow sensor (SIGNAL: `flow_rate`) and vacuum gauge (SIGNAL: `pressure`).\n4. Valve: Normally-closed solenoid valve (Material: Stainless steel, Flow: 0.1 SLPM max).\nInputs tagged ALREADY-RECORDED:\n- `flow_rate`: The existing mass flow controller or exhaust gauge reading during pump-down.\n- `pressure`: The existing pressure transducer reading at the vacuum port.\nReferences/Thresholds tagged DERIVED:\n- Threshold 1: `flow_rate` > 5 SLPM (ASSUMPTION: derived from typical turbo-pump exhaust flow for a 100L chamber; triggers high-permeation risk window).\n- Threshold 2: `pressure` < 10^-3 mbar (DERIVED from stated problem constraint \"vacuum chamber\", indicating high-vacuum regime where permeation dominates over orifice leakage).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Higher complexity than swapping an O-ring; requires retrofitting a housing pocket for the bladder.\nOperability: Automated; no manual intervention.\nMaintenance: Bladder is a sealed unit, no wear parts; solenoid valve is standard industry practice.\nCost Class: Same as high-grade gasket assemblies; slightly higher than basic O-ring due to electronics.\nWorth it: Prevents catastrophic vacuum loss during long-duration high-flow operations where static seals fail.\n\nEXECUTABLE TEST\nProtocol:\n1. Mount prototype in 100L chamber.\n2. Perform baseline leak test with static gasket: Measure $Q_{leak}$ at $P < 10^{-3}$ mbar during 5 SLPM flow. Record value $Q_{base}$.\n3. Engage the dynamic seal system. Repeat the same flow and pressure conditions.\n4. Measure $Q_{new}$.\nPass/Fail Thresholds:\n- Pass: $Q_{new} \\le 0.9 \\cdot Q_{base}$ (i.e., at least 10% reduction in leak rate compared to static).\n- Duration: 1-hour steady-state measurement.\nKill Criterion: The mechanism is falsified if $Q_{new}$ does not decrease by at least 10% (i.e., $Q_{new} < 0.9 Q_{base}$) within 1 hour of steady-state high-flow operation.\n\nCONSTRAINT BIND\nPrimary Indicator: `flow_rate` is the primary stated indicator for the high-permeation risk window. It is used to trigger the compensation, not just monitor.\nSecondary Indicator: `pressure` is used to verify the vacuum regime is in the range where permeation physics dominate over mechanical orifice leakage.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "DEV_NEED": [
+    "prototype"
+   ],
+   "BILL_UNTAGGED": [
+    "1. Primary Gasket: Standard elastomeric O-ring (ALREADY-RECORDED problem component).",
+    "2. Actuator: A miniature pneumatic bladder integrated into the gasket housing (Material: P",
+    "3. Controller: Embedded MCU reading the existing exhaust flow sensor (SIGNAL: `flow_rate`)",
+    "4. Valve: Normally-closed solenoid valve (Material: Stainless steel, Flow: 0.1 SLPM max).",
+    "- `flow_rate`: The existing mass flow controller or exhaust gauge reading during pump-down",
+    "- `pressure`: The existing pressure transducer reading at the vacuum port.",
+    "- Threshold 1: `flow_rate` > 5 SLPM (ASSUMPTION: derived from typical turbo-pump exhaust f",
+    "- Threshold 2: `pressure` < 10^-3 mbar (DERIVED from stated problem constraint \"vacuum cha"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "seal_geometry_reload",
+   "cross_domain": ""
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 5% gain)",
+    "predicted_value": "the measured quantity must reach 1.05x the baseline",
+    "calc_trace": "1 + 0.05 = 1.05",
+    "falsifier": "the measured gain must reach 1.05x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "55de34fb39ece6c2"
+}

@@ -1,0 +1,131 @@
+{
+ "problem_id": "v17-20-machine-spindle",
+ "domain": "vibration_resonance",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P18"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:1cbaee5738a3": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:5c4aaff25e0b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:c8235b62c60c": "reject-duplicate"
+  },
+  "strength_kit": {
+   "failure_class": "vibration_resonance",
+   "confidence": 1.0,
+   "evidence_span": "resonance, chatter, spindle chatter",
+   "allowed_mech_classes": [
+    "tuned_mass_damper",
+    "vortex_shedding_suppression",
+    "support_stiffness_reconfiguration"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 3,
+    "top_class": "tuned_mass_damper",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "stiffen the structure or add damping mass at the vibration site"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:20:36Z",
+ "attempts_n": 1,
+ "row_wall_s": 10.8,
+ "a1_answer": "NOVELTY STATEMENT — Standard practice for machine-tool spindle chatter resonance delivers a DESIGN CHANGE via local stiffness increase (thicker housing) or passive damping mass (concentrated viscoelastic layers) applied directly at the vibration node. My same-class departure replaces local stiffness/damping with a **tuned_mass_damper (TMD)** architecture consisting of a low-stiffness, high-mass radial spring ring embedded within the spindle support structure, tuned specifically to the spindle's critical speed rather than the static natural frequency. The physical connection is that chatter is a self-excited resonance at the rotating system's critical speed; a TMD does not stiffen the structure (which shifts all modes) but provides a targeted, out-of-phase inertial counter-force that dissipates vibrational energy at the specific resonant frequency without altering the fundamental stiffness of the spindle-bearing interface.\n\nPHYSICS CHECK — The governing physical relation is the tuned natural frequency of the TMD matching the system's critical speed ($f_{cr}$). For a rotor system, $f_{cr} = \\frac{1}{2\\pi}\\sqrt{\\frac{k_{eff}}{m_{total}}}$. The TMD natural frequency is $f_{tdm} = \\frac{1}{2\\pi}\\sqrt{\\frac{k_{tdm}}{m_{tdm}}}$. The mechanism works when $f_{tdm} \\approx f_{cr}$. Magnitude verification: For a typical 5,000 RPM spindle (83.3 Hz), if the total effective modal mass is 15 kg and we assume an optimal TMD mass ratio $\\mu = 0.02$ (2%), the TMD mass is $m_{tdm} = 0.3$ kg. To tune this 0.3 kg mass to 83.3 Hz, the required spring stiffness is $k_{tdm} = (2\\pi f_{tdm})^2 m_{tdm} = (523.6)^2 \\times 0.3 \\approx 82,300$ N/m. This stiffness is mechanically achievable with a high-load-capability Belleville washer stack or a radial air-spring seal integrated into the spindle housing.\n\nIMPLEMENTATION BILL — \n1. **Tuned Mass Unit**: 0.3 kg (ASSUMPTION: 2% mass ratio of 15 kg modal mass because optimal TMD performance occurs at 2-3% for high-Q systems) radial ring made of aluminum 6061, machined concentrically with a bore for the spindle shaft.\n2. **Stiffening Element**: 10 N/mm radial stiffness spring (DERIVED: CALCULATED from $k_{tdm} \\approx 82,300$ N/m for $f_{tdm}=83.3$ Hz and $m_{tdm}=0.3$ kg) realized via a stack of three high-load Belleville washers or a custom-molded elastomer core.\n3. **Damping Element**: 0.5 N·s/m viscous damper (ASSUMPTION: 5% critical damping of the TMD subsystem because optimal energy dissipation for a 2% mass ratio TMD is approx 2-5% of its critical damping) implemented via a squeeze-film damper or a low-cost dashpot.\n4. **Integration**: Radial slots machined into the spindle housing (ALREADY-RECORDED: existing housing geometry allows internal access; no external protrusion) to isolate the TMD ring from the main bearing cage, preventing static load transfer.\n5. **Input Stream**: Spindle RPM (ALREADY-RECORDED: standard PLC/NC variable) and Vibration Acceleration (ALREADY-RECORDED: existing accelerometer channels in the spindle head).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- **Installability**: The TMD requires machining radial slots in the spindle housing, a step comparable to the internal re-routing of cooling channels in standard practice. It is not an external add-on; it is an internal component.\n- **Operability**: The TMD is passive. It requires no active control loops, no additional power, and no real-time computation. The operator does not interact with it; it works automatically at the tuned frequency.\n- **Maintenance**: The TMD ring is sealed inside the housing. Its maintenance burden is equivalent to the standard bearing inspection cycle. The damping element (squeeze-film) is maintenance-free.\n- **Cost Class**: Same as a precision-machined housing modification. The materials (aluminum, washers, elastomer) are commodity parts. The cost is dominated by the precision machining of the radial slots, which is similar to the cost of adding local stiffening ribs or damping layers. The burden is SAME class, but the mechanism is DIFFERENT (targeted inertial damping vs. global stiffness/damping).\n\nEXECUTABLE TEST — \n- **Protocol**: Mount the modified spindle in a test rig. Run the spindle at its critical speed (83.3 Hz / 5,000 RPM). Introduce a standard force excitation (e.g., a 10 N harmonic force via an electromagnetic shaker) at the critical speed. Measure the vibration amplitude at the tool end using the existing accelerometer.\n- **Pass/Fail Thresholds**: The vibration amplitude at the critical speed must drop by at least 30% (ASSUMPTION: 30% peak reduction is the minimum effective TMD performance for a 2% mass ratio) compared to the unmodified spindle baseline.\n- **Duration**: 30-minute steady-state run to allow thermal and dynamic stabilization.\n- **Kill Criterion**: The mechanism is falsified if the vibration amplitude at the critical speed does not decrease by at least 30% (i.e., remains above 70% of the baseline amplitude) within the 30-minute observation window. If the amplitude increases or remains unchanged, the TMD is either detuned or the mass ratio is insufficient, and the mechanism is considered ineffective.\n\nCONSTRAINT BIND (predictor): The primary stated indicator is the **vibration amplitude** at the spindle tool end, which directly correlates to chatter and finish degradation. The TMD mechanism is designed to reduce this specific indicator. The secondary indicator is the **power consumption** of the spindle drive, which may increase slightly due to the damping losses; however, this is a supplementary metric and does not replace the primary vibration indicator in the decision logic. The TMD’s effectiveness is judged solely by the reduction in the primary vibration amplitude.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Tuned Mass Unit**: 0.3 kg (ASSUMPTION: 2% mass ratio of 15 kg modal mass because opti",
+    "2. **Stiffening Element**: 10 N/mm radial stiffness spring (DERIVED: CALCULATED from $k_{t",
+    "3. **Damping Element**: 0.5 N·s/m viscous damper (ASSUMPTION: 5% critical damping of the T",
+    "4. **Integration**: Radial slots machined into the spindle housing (ALREADY-RECORDED: exis",
+    "5. **Input Stream**: Spindle RPM (ALREADY-RECORDED: standard PLC/NC variable) and Vibratio",
+    "- **Installability**: The TMD requires machining radial slots in the spindle housing, a st",
+    "- **Operability**: The TMD is passive. It requires no active control loops, no additional ",
+    "- **Maintenance**: The TMD ring is sealed inside the housing. Its maintenance burden is eq",
+    "- **Cost Class**: Same as a precision-machined housing modification. The materials (alumin",
+    "- **Protocol**: Mount the modified spindle in a test rig. Run the spindle at its critical ",
+    "- **Pass/Fail Thresholds**: The vibration amplitude at the critical speed must drop by at ",
+    "- **Duration**: 30-minute steady-state run to allow thermal and dynamic stabilization.",
+    "- **Kill Criterion**: The mechanism is falsified if the vibration amplitude at the critica"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 3,
+   "mapped_mechanism": "tuned_mass_damper",
+   "cross_domain": ""
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "transmissibility at the tuning point",
+    "predicted_value": "T = 2.02 at f/fn = 0.71",
+    "calc_trace": "T = 1/|1-(0.71)^2| = 2.02",
+    "falsifier": "the measured amplitude at the forcing band must fall below T < 1 in the bench shaker sweep; the opposite result falsifies the invention",
+    "route": "class-generic:vibration_resonance"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "8698d7e90c5e0708"
+}

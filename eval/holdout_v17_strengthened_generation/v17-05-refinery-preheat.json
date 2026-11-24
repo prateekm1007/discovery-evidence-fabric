@@ -1,0 +1,149 @@
+{
+ "problem_id": "v17-05-refinery-preheat",
+ "domain": "fouling_deposition",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:a44953a9e546": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:9b8ad4c4d32d": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "fouling_deposition",
+   "confidence": 1.0,
+   "evidence_span": "deposition, asphaltene, foul, fouls, deposit",
+   "allowed_mech_classes": [
+    "surface_energy_modification",
+    "in_situ_mechanical_cleaning",
+    "ultrasonic_antifouling",
+    "crystallization_control_by_dosing",
+    "flow_geometry_antifouling"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "flow_geometry_antifouling",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "chemistry",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 5,
+    "top_class": "surface_energy_modification",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "clean more often: schedule more frequent chemical/mechanical cleaning"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:15:09Z",
+ "attempts_n": 2,
+ "row_wall_s": 62.0,
+ "a1_answer": "NOVELTY STATEMENT\nStandard Practice: Scheduling frequent chemical/mechanical cleaning (high-frequency intervention to manage accumulated mass).\nDeparture: Surface energy modification via asphaltene-compatible slip-infused porous layer (SLIPS) that shifts the failure mode from \"adhesion-accumulation\" to \"shear-detachment,\" eliminating the need for scheduled shutdowns by changing the interfacial physics rather than the maintenance schedule.\nFailure-Physics Connection: Asphaltene deposition is governed by the adhesion energy between the deposit and the hot surface ($G_a$). Standard practice removes accumulated mass via high-energy cleaning. The SLIPS mechanism reduces the effective adhesion energy by interposing a stable, low-elastic-modulus liquid layer (derived from the process stream itself) between the solid substrate and the foulant. When the operating fluid shear stress ($\\tau_w$) exceeds the modified interfacial shear strength ($\\tau_{int}$), the deposit detaches in the liquid film state rather than bonding to the solid, preventing the hardening layer that necessitates shutdown.\n\nPHYSICS CHECK\nGoverning Relation: Detachment occurs when Operating Shear Stress $\\tau_w > \\tau_{int}$.\n$\\tau_w = C_f \\frac{1}{2} \\rho v^2$ (where $C_f$ is skin friction coefficient).\n$\\tau_{int} \\approx \\sqrt{\\frac{G_a \\gamma_{sl}}{h_l}}$ (where $\\gamma_{sl}$ is liquid-liquid interfacial tension, $h_l$ is SLIPS film thickness).\nMagnitude Verification:\nAssume a typical crude preheat train: $\\rho \\approx 850 \\text{ kg/m}^3$ (ASSUMPTION: typical heavy crude density), $v \\approx 2 \\text{ m/s}$ (ASSUMPTION: typical heat exchanger tube velocity), $C_f \\approx 0.005$ (ASSUMPTION: turbulent flow, $Re > 10^4$).\n$\\tau_w = 0.005 \\times 0.5 \\times 850 \\times (2)^2 = 8.5 \\text{ Pa}$ (CALCULATED).\nFor standard bare metal, asphaltene adhesion requires $\\tau_{clean} > 50 \\text{ Pa}$ for removal (ASSUMPTION: based on mechanical pigging thresholds).\nWith SLIPS: Use asphaltene-rich solvent compatible with the film. Assume $\\gamma_{sl} \\approx 5 \\text{ mJ/m}^2$, $G_a \\approx 10 \\text{ mJ/m}^2$ (reduced by lubricant), $h_l \\approx 50 \\text{ \\mu m}$ (porosity scale).\n$\\tau_{int} \\approx \\sqrt{\\frac{10 \\times 10^{-3} \\times 5 \\times 10^{-3}}{50 \\times 10^{-6}}} \\approx \\sqrt{\\frac{50 \\times 10^{-6}}{50 \\times 10^{-6}}} = 1 \\text{ Pa}$ (CALCULATED).\nSince $\\tau_w (8.5 \\text{ Pa}) > \\tau_{int} (1 \\text{ Pa})$, the surface is self-cleaning at operating conditions without scheduled interventions.\n\nIMPLEMENTATION BILL\nComponents/Materials:\n1. Substrate: Existing preheat train tubes/coils. No new heat transfer surfaces required.\n2. Coating Layer: Electrochemically etched or plasma-treated porous nickel/steel surface (depth ~50 $\\mu m$, porosity ~30%). (ASSUMPTION: standard manufacturing process for fouling mitigation).\n3. Infused Liquid: A stable, low-viscosity solvent fraction extracted from the refinery's own waste solvent stream or a dedicated alkane stream (e.g., $n$-hexane fraction) with low interfacial tension against asphaltene-laden crude.\nProcedure:\n1. Surface Modification: Strip existing fouling, etch tube internals to create porous texture.\n2. Infusion: Immersion of tubes in the infused liquid; capillary action fills the pores.\n3. Integration: Return to service. No change in process piping geometry, valves, or control loops.\nInput Streams:\n- ALREADY-RECORDED: Crude oil composition data (asphaltene content) used to select the infused liquid's viscosity and polarity to ensure $\\gamma_{sl}$ remains low.\n- ALREADY-RECORDED: Heat exchanger pressure drop logs. A rising trend in $\\Delta P$ at constant flow rate indicates fouling; with SLIPS, the baseline $\\Delta P$ remains flat at the clean-tube value.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Higher initial installation burden (etching/infusion) compared to simple chemical cleaning schedule setup, but lower than replacing tubes.\nOperability: Zero additional operational burden. No dosing pumps, no chemical inventory management, no scheduling of shutdowns for cleaning.\nMaintenance: Infused liquid migrates slowly; requires periodic \"re-wetting\" checks (visual or via $\\Delta P$ baseline monitoring).\nRough Cost Class: Similar to a major turnaround for chemical cleaning systems, but amortized over 3-5 years of clean service. The \"burden\" of the cleaning schedule is removed from the operations team.\nConclusion: SAME burden class (moderate CAPEX, low OPEX) as a dedicated chemical cleaning loop, but DIFFERENT mechanism (passive interfacial physics vs. active chemical/thermal shock).\n\nEXECUTABLE TEST\nProtocol:\n1. Baseline Measurement: Record heat duty ($Q$) and flow rate ($F$) for a representative heat exchanger in the train. Calculate fouling resistance $R_f = \\frac{1}{U A} - \\frac{1}{U_0 A}$ where $U_0$ is clean-tube overall conductance.\n2. Intervention: Install SLIPS-modified tubes.\n3. Monitoring: Track $R_f$ over 90 days under identical process conditions (crude type, temperature profile).\nPass/Fail Threshold:\n- PASS: $R_f$ remains $< 0.0005 \\text{ m}^2\\text{K/W}$ for 90 days (ASSUMPTION: typical clean-tube threshold).\n- KILL CONDITION: The mechanism is falsified if the pressure drop ($\\Delta P$) increases by $\\ge 20\\%$ or if the fouling resistance $R_f$ exceeds $0.0010 \\text{ m}^2\\text{K/W}$ within 90 days, indicating that the $\\tau_w > \\tau_{int}$ inequality has failed (i.e., liquid migration or interfacial tension increased due to crude variability).\n\nCONSTRAINT BIND\nPrimary Stated Indicator: Fouling Deposition (cutting recovery/heat transfer).\nSecondary Indicator: Pressure Drop (used as a proxy for accumulation).\nThe monitored indicator is the heat transfer degradation (recovery loss). The SLIPS mechanism directly addresses the primary indicator by preventing the physical accumulation of mass on the surface. The pressure drop is a supplementary diagnostic to verify the \"clean\" state without opening the heat exchanger.\n\nDESIGN POINT (RUNNABLE)\nGoverning Relation: $\\tau_w = \\tau_{int}$ (Equilibrium Point)\nInputs:\n- $\\rho$ (Density of crude): $850 \\text{ kg/m}^3$ (ASSUMPTION: typical heavy crude).\n- $v$ (Velocity): $2 \\text{ m/s}$ (ASSUMPTION: standard tube side velocity).\n- $C_f$ (Friction Coeff): $0.005$ (ASSUMPTION: turbulent, smooth).\n- $\\gamma_{sl}$ (Interfacial Tension): $5 \\text{ mJ/m}^2$ (ASSUMPTION: low tension alkane solvent vs asphaltene-rich phase).\n- $G_a$ (Adhesion Energy): $10 \\text{ mJ/m}^2$ (ASSUMPTION: reduced by SLIPS effect).\n- $h_l$ (Film Thickness): $50 \\text{ \\mu m}$ (ASSUMPTION: porous layer depth).\n\nSubstitution:\n$\\tau_w = 0.005 \\cdot 0.5 \\cdot 850 \\cdot 4 = 8.5 \\text{ Pa}$.\n$\\tau_{int} = \\sqrt{\\frac{10 \\cdot 10^{-3} \\cdot 5 \\cdot 10^{-3}}{50 \\cdot 10^{-6}}} = \\sqrt{\\frac{50 \\cdot 10^{-6}}{50 \\cdot 10^{-6}}} = 1 \\text{ Pa}$.\n\nNumeric Result:\nSafety Factor $SF = \\frac{\\tau_w}{\\tau_{int}} = 8.5$.\nThe surface is stable against fouling if $SF > 1$. The design point predicts self-cleaning behavior under these assumptions.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Substrate: Existing preheat train tubes/coils. No new heat transfer surfaces required.",
+    "2. Coating Layer: Electrochemically etched or plasma-treated porous nickel/steel surface (",
+    "3. Infused Liquid: A stable, low-viscosity solvent fraction extracted from the refinery's ",
+    "1. Surface Modification: Strip existing fouling, etch tube internals to create porous text",
+    "2. Infusion: Immersion of tubes in the infused liquid; capillary action fills the pores.",
+    "3. Integration: Return to service. No change in process piping geometry, valves, or contro",
+    "- ALREADY-RECORDED: Crude oil composition data (asphaltene content) used to select the inf",
+    "- ALREADY-RECORDED: Heat exchanger pressure drop logs. A rising trend in $\\Delta P$ at con"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "flow_geometry_antifouling",
+   "cross_domain": "biomimetics"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "the Springer implied speed reduction (v^5, 30% erosion cut)",
+    "predicted_value": "the damaging-speed threshold must rise by 7% (=1/(1-x)^(1/5)-1)",
+    "calc_trace": "(1-0.30)^(1/5) = 0.931",
+    "falsifier": "the whirling-arm threshold speed must rise by 7% in the droplet-impact coupon test; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {
+    "PHYSICS_MAGNITUDE_MISSING": [
+     "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+    ]
+   },
+   "demand": {
+    "fired": true,
+    "first_state": {
+     "computed": false,
+     "quant_test_missing": true,
+     "generic_status": "insufficient_parameters"
+    },
+    "retry_computed": true,
+    "retry_quant_test_missing": false,
+    "retry_accepted": true,
+    "demand_block_sha16": "e122d7eff4717008"
+   }
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "7fef601fe84d8ace"
+}

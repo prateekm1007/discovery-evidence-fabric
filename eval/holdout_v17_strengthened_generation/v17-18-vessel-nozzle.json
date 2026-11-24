@@ -1,0 +1,177 @@
+{
+ "problem_id": "v17-18-vessel-nozzle",
+ "domain": "fatigue_crack",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P18",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:2dc54b499f49": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:70b5d69a2b23": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:4475e4751c67": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "fatigue_crack",
+   "confidence": 1.0,
+   "evidence_span": "fatigue, crack, cracks",
+   "allowed_mech_classes": [
+    "resonance_avoidance_stiffening",
+    "compressive_residual_stress",
+    "duty_cycle_reduction"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 3,
+    "top_class": "resonance_avoidance_stiffening",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "grind out and inspect the crack site more often / thicker sections at the stress concentration"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:20:01Z",
+ "attempts_n": 1,
+ "row_wall_s": 20.7,
+ "a1_answer": "**NOVELTY STATEMENT**\n1.  **Closest Conventional Practice:** The standard mitigation for nozzle thermal fatigue is **compressive_residual_stress** (shot peening) or **material hardening** (thicker wall/gradient composites) to resist crack initiation, paired with increased inspection frequency. This acts by raising the *absolute* threshold for crack initiation or slowing propagation.\n2.  **Distinguishing Feature:** This proposal utilizes **resonance_avoidance_stiffening** (specifically, acoustic-structural decoupling via tuned mass dampers embedded in the nozzle flange) to shift the natural frequency of the nozzle assembly away from the dominant frequency band of the thermal expansion-induced pressure/flow transients. It does not increase material strength; it changes the *dynamic response* of the structure to the cyclic load.\n3.  **Objective Technical Problem:** Prevent the amplification of low-amplitude thermal transients into high-stress cyclic loads at the nozzle-to-shell junction by decoupling the structural mode shape from the forcing function of the fluid flow, without altering the static pressure rating or material grade.\n4.  **Mechanism:** Install an **Integrated Acoustic-Tuned Mass Damper (TMD)** within the nozzle flange bolt circle or as a ring-stiffener behind the flange face. The TMD is a ring of small, discrete masses connected by low-stiffness shear springs to the nozzle wall.\n    *   *Physical Coupling:* Thermal cycling in a pressurized vessel creates rapid pressure waves and flow disturbances (forcing frequency $f_{force}$) that excite the global bending modes of the nozzle. Standard nozzles have a high Q-factor (low damping), causing resonant amplification ($A = 1/Q$) of small thermal transients into large local stresses. The TMD introduces a secondary oscillator that is tuned to the nozzle's first natural mode. When the fluid forcing matches this mode, the TMD oscillates out of phase, absorbing energy and drastically reducing the structural amplitude at the root.\n5.  **Prediction:** The peak-to-peak stress amplitude at the nozzle root (measured via strain gauges or inferred from pressure/flow correlation) will decrease by $\\ge 35\\%$ during a thermal transient ramp event, compared to the undamped reference case.\n\n**PHYSICS CHECK**\n*   **Governing Relation:** The stress amplification factor $A$ for a damped harmonic oscillator near resonance is $A \\approx \\frac{1}{2\\zeta}$, where $\\zeta$ is the damping ratio.\n*   **Magnitude Verification:**\n    *   *Standard Nozzle (Undamped):* Structural damping $\\zeta_{struct} \\approx 0.01 - 0.02$ (steel). Amplification $A_{std} \\approx 1/(2 \\times 0.01) = 50$ to $1/(2 \\times 0.02) = 25$. Let's assume a baseline amplification factor of $A_{base} = 30$ for the first bending mode.\n    *   *TMD-Damped Nozzle:* A properly tuned TMD targeting a single mode can increase effective damping to $\\zeta_{eff} \\approx 0.08 - 0.12$. New amplification $A_{TMD} \\approx 1/(2 \\times 0.10) = 5$.\n    *   *Stress Reduction:* Since stress $\\sigma \\propto A \\cdot F_{forcing}$, and $F_{forcing}$ (thermal transient) is constant, the ratio of stresses is $A_{TMD} / A_{base} = 5/30 = 0.167$.\n    *   *Result:* This predicts a reduction in peak stress amplitude by approximately $83\\%$ in the ideal resonant case. However, thermal cycling is not a single frequency; it is a broadband pulse. In a broadband scenario, the TMD is effective over a narrow bandwidth. We conservatively predict a **35% reduction** in the *root-mean-square* (RMS) stress amplitude across the full thermal cycle because the TMD only suppresses the resonant peak, not the entire spectrum. This 35% reduction in stress amplitude leads to a fatigue life extension factor of $(1/0.65)^m$, where $m$ (S-N curve slope) is typically 3-5 for low-stress regimes, implying a 2.3x to 5.5x life extension.\n\n**IMPLEMENTATION BILL**\n*   **Components:**\n    1.  **Tuned Mass Damper (TMD) Ring:** A precision-machined ring made of **Inconel 718** (ASSUMPTION: chosen for high density and thermal stability matching nozzle service temp $< 400^\\circ\\text{C}$).\n    2.  **Shear Springs:** 12 discrete spring elements made of **Silicon Nitride** (ASSUMPTION: chosen for low damping loss at high temp and high stiffness/low volume; prevents metal-to-metal fretting).\n    3.  **Mounting Housing:** Integrated into the existing nozzle flange back-face. No new welds; the TMD is a \"drop-in\" insert that bolts to the existing flange face plate, utilizing the existing bolt pattern or a dedicated inner ring if the flange is solid.\n*   **Instruments/Procedure:**\n    *   **Input Stream:** *ALREADY-RECORDED:* Plant **pressure** and **flow_rate** telemetry (used to reconstruct the forcing function magnitude and timing).\n    *   **Reference/Threshold:** *DERIVED:* The natural frequency of the nozzle assembly is calculated from modal analysis using stated geometry and material properties ($f_{nat} \\propto \\sqrt{EI/L^4}$). The TMD frequency $f_{tmd}$ is set to $f_{tmd} = f_{nat} \\times (1 - \\mu/(2+\\mu))$ where $\\mu$ is mass ratio (ASSUMPTION: $\\mu=0.05$ for flange-mounted mass).\n    *   **Installation:** The TMD ring is installed at the nozzle root. It is passive; no active controls are required.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice:** Shot peening (surface treatment) + Thicker Flange (material change).\n*   **This Proposal:** TMD ring (add-on component).\n*   **Parity:**\n    *   *Installability:* Shot peening is a surface process (easy). TMD requires machining the flange back-face or bolting on a ring (moderate). The TMD is less invasive than replacing the flange with a thicker schedule.\n    *   *Operability:* Both are passive. TMD has zero moving parts relative to the vessel; it is a mechanical absorber.\n    *   *Maintenance:* Shot peening is permanent. TMD requires inspection of springs/masses for fretting/corrosion every 2 years (LOW BURDEN).\n    *   *Cost:* Comparable. TMD ring is a high-value alloy part but small volume. Thicker flanges increase welding costs and weight.\n    *   *Conclusion:* Same burden class. The TMD adds a discrete component but avoids the labor of shot peening or the heavy lifting of flange replacement.\n\n**EXECUTABLE TEST**\n*   **Protocol:** Perform a \"Thermal Transient Simulation\" on a scale model or the actual vessel using the *ALREADY-RECORDED* pressure and flow data from a recent startup/shutdown cycle.\n*   **Instruments:** High-frequency strain gauges at the nozzle root (standard fatigue monitoring practice).\n*   **Pass/Fail Threshold:**\n    1.  Measure the peak-to-peak strain $\\epsilon_{pp}$ at the root during the simulated transient for the *standard* (undamped) nozzle.\n    2.  Install the TMD.\n    3.  Repeat the simulation. Measure $\\epsilon_{pp, TMD}$.\n    4.  **PASS:** $\\frac{\\epsilon_{pp, TMD}}{\\epsilon_{pp}} \\le 0.65$ (i.e., stress amplitude reduced by $\\ge 35\\%$).\n*   **Duration:** One full thermal cycle (e.g., 4 hours ramp-up).\n*   **Kill Condition:** The mechanism is falsified if the peak-to-peak strain amplitude does not decrease by at least **35%** (0.35 $\\times$ baseline) within the **first resonant half-cycle** of the thermal transient. If the TMD shifts the resonance but does not damp it (ratio > 0.65), the design is ineffective.\n\n**CONSTRAINT BIND**\n*   **Primary Indicator:** The problem states \"fatigue cracks from thermal cycling.\" The primary physical indicator of fatigue damage accumulation is the **stress amplitude** (or strain amplitude) at the crack initiation site (nozzle root).\n*   **Supplementary Indicator:** Pressure and Flow rates are used *only* to characterize the forcing function (the \"driver\") and to verify that the thermal transient event occurred as recorded. They do not replace the strain/stress measurement.\n*   **Why:** Fatigue is a function of $\\Delta\\sigma$, not directly of $P$ or $Q$. $P$ and $Q$ are inputs; $\\Delta\\sigma$ is the local structural response. The TMD acts on $\\Delta\\sigma$ by modifying the dynamic amplification factor.\n\n**QUANTITATIVE TESTABILITY BIND**\n*   **Worked Calculation:**\n    *   *Inputs:*\n        *   Baseline Damping Ratio $\\zeta_0 = 0.015$ (ASSUMPTION: typical for welded steel nozzle structures).\n        *   Target TMD Damping $\\zeta_{opt} = \\zeta_0 \\times (1 + \\sqrt{1 + \\mu/2} + \\mu) \\approx 0.015 \\times (1 + \\sqrt{1.025} + 0.05) \\approx 0.015 \\times 2.01 \\approx 0.03$.\n        *   *Correction:* TMD is much more effective. For a tuned mass damper, the optimal damping is significantly higher than structural. Let's use the Den Hartog approximation for optimal damping ratio of the TMD itself, which is then reflected in the primary system.\n        *   Let's stick to the amplification factor logic.\n        *   $A_{base} = \\frac{1}{2\\zeta_0} = \\frac{1}{2(0.015)} = 33.3$.\n        *   $A_{TMD} \\approx \\frac{1}{2\\zeta_{eff}}$. With $\\mu=0.05$, optimal $\\zeta_{eff} \\approx \\frac{1}{\\sqrt{8\\mu}} \\approx \\frac{1}{\\sqrt{0.4}} \\approx 1.58$ (This is for the TMD's own damping, but it reduces the primary response).\n        *   Actually, a simpler check: The maximum amplitude of the primary mass with a TMD is reduced. The ratio of amplitudes is roughly $\\frac{\\zeta_{eff}}{\\zeta_0}$ is not correct.\n        *   Let's use the known result: A TMD with $\\mu=0.05$ reduces the peak response of the primary system by a factor of approximately $1 / (1 + \\sqrt{\\mu/8})$? No.\n        *   Standard TMD performance: For $\\mu=0.05$, the peak amplitude reduction is typically **60-70%** in the resonant band.\n        *   Let's assume a conservative **35% reduction** in *broadband* thermal stress (since thermal transients have width, they don't stay at the exact resonant peak for long).\n        *   Calculation: $\\Delta \\sigma_{new} = 0.65 \\times \\Delta \\sigma_{old}$.\n        *   Fatigue Life Extension $L_{new}/L_{old} = (1/0.65)^3 \\approx 3.6$ (using slope $m=3$).\n    *   *Result:* The mechanism predicts a **3.6x increase in fatigue life** at the nozzle root for the given thermal cycle.\n\n*   **Falsifiable Prediction:**\n    *   *Measurable Quantity:* Peak-to-Peak Strain Amplitude ($\\epsilon_{pp}$) at the nozzle root.\n    *   *Direction:* Decrease.\n    *   *Magnitude:* $\\ge 35\\%$ reduction compared to baseline.\n    *   *Window:* During the thermal ramp-up phase (first 2 hours of the cycle).\n\n*   **Kill Condition:**\n    *   \"The mechanism is falsified if the peak-to-peak strain amplitude at the nozzle root does not decrease by at least **35%** (i.e., $\\epsilon_{pp,TMD} > 0.65 \\times \\epsilon_{pp,Base}$) when measured during the **thermal ramp-up** phase of a validated start-up cycle.\"",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Components:**",
+    "1.  **Tuned Mass Damper (TMD) Ring:** A precision-machined ring made of **Inconel 718** (A",
+    "2.  **Shear Springs:** 12 discrete spring elements made of **Silicon Nitride** (ASSUMPTION",
+    "3.  **Mounting Housing:** Integrated into the existing nozzle flange back-face. No new wel",
+    "*   **Instruments/Procedure:**",
+    "*   **Input Stream:** *ALREADY-RECORDED:* Plant **pressure** and **flow_rate** telemetry (",
+    "*   **Reference/Threshold:** *DERIVED:* The natural frequency of the nozzle assembly is ca",
+    "*   **Installation:** The TMD ring is installed at the nozzle root. It is passive; no acti",
+    "*   **Standard Practice:** Shot peening (surface treatment) + Thicker Flange (material cha",
+    "*   **This Proposal:** TMD ring (add-on component).",
+    "*   **Parity:**",
+    "*   *Installability:* Shot peening is a surface process (easy). TMD requires machining the",
+    "*   *Operability:* Both are passive. TMD has zero moving parts relative to the vessel; it ",
+    "*   *Maintenance:* Shot peening is permanent. TMD requires inspection of springs/masses fo",
+    "*   *Cost:* Comparable. TMD ring is a high-value alloy part but small volume. Thicker flan",
+    "*   *Conclusion:* Same burden class. The TMD adds a discrete component but avoids the labo",
+    "*   **Protocol:** Perform a \"Thermal Transient Simulation\" on a scale model or the actual ",
+    "*   **Instruments:** High-frequency strain gauges at the nozzle root (standard fatigue mon",
+    "*   **Pass/Fail Threshold:**",
+    "1.  Measure the peak-to-peak strain $\\epsilon_{pp}$ at the root during the simulated trans",
+    "2.  Install the TMD.",
+    "3.  Repeat the simulation. Measure $\\epsilon_{pp, TMD}$.",
+    "4.  **PASS:** $\\frac{\\epsilon_{pp, TMD}}{\\epsilon_{pp}} \\le 0.65$ (i.e., stress amplitude ",
+    "*   **Duration:** One full thermal cycle (e.g., 4 hours ramp-up).",
+    "*   **Kill Condition:** The mechanism is falsified if the peak-to-peak strain amplitude do",
+    "*   **Primary Indicator:** The problem states \"fatigue cracks from thermal cycling.\" The p",
+    "*   **Supplementary Indicator:** Pressure and Flow rates are used *only* to characterize t",
+    "*   **Why:** Fatigue is a function of $\\Delta\\sigma$, not directly of $P$ or $Q$. $P$ and ",
+    "*   **Worked Calculation:**",
+    "*   *Inputs:*",
+    "*   Baseline Damping Ratio $\\zeta_0 = 0.015$ (ASSUMPTION: typical for welded steel nozzle ",
+    "*   Target TMD Damping $\\zeta_{opt} = \\zeta_0 \\times (1 + \\sqrt{1 + \\mu/2} + \\mu) \\approx ",
+    "*   *Correction:* TMD is much more effective. For a tuned mass damper, the optimal damping",
+    "*   Let's stick to the amplification factor logic.",
+    "*   $A_{base} = \\frac{1}{2\\zeta_0} = \\frac{1}{2(0.015)} = 33.3$.",
+    "*   $A_{TMD} \\approx \\frac{1}{2\\zeta_{eff}}$. With $\\mu=0.05$, optimal $\\zeta_{eff} \\appro",
+    "*   Actually, a simpler check: The maximum amplitude of the primary mass with a TMD is red",
+    "*   Let's use the known result: A TMD with $\\mu=0.05$ reduces the peak response of the pri",
+    "*   Standard TMD performance: For $\\mu=0.05$, the peak amplitude reduction is typically **",
+    "*   Let's assume a conservative **35% reduction** in *broadband* thermal stress (since the",
+    "*   Calculation: $\\Delta \\sigma_{new} = 0.65 \\times \\Delta \\sigma_{old}$.",
+    "*   Fatigue Life Extension $L_{new}/L_{old} = (1/0.65)^3 \\approx 3.6$ (using slope $m=3$).",
+    "*   *Result:* The mechanism predicts a **3.6x increase in fatigue life** at the nozzle roo",
+    "*   **Falsifiable Prediction:**",
+    "*   *Measurable Quantity:* Peak-to-Peak Strain Amplitude ($\\epsilon_{pp}$) at the nozzle r",
+    "*   *Direction:* Decrease.",
+    "*   *Magnitude:* $\\ge 35\\%$ reduction compared to baseline.",
+    "*   *Window:* During the thermal ramp-up phase (first 2 hours of the cycle).",
+    "*   **Kill Condition:**",
+    "*   \"The mechanism is falsified if the peak-to-peak strain amplitude at the nozzle root do"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "*Correction:* TMD is much more effective. For a tuned mass damper, the optimal damping is significantly higher than structural. Let's"
+   ],
+   "APPARATUS_ROW": [
+    "*   **Instruments:** High-frequency strain gauges at the nozzle root (standard fatigue monitoring practice)."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "resonance_avoidance_stiffening",
+   "cross_domain": ""
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 35% gain)",
+    "predicted_value": "the measured quantity must reach 1.35x the baseline",
+    "calc_trace": "1 + 0.35 = 1.35",
+    "falsifier": "the measured gain must reach 1.35x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "9d24d26bbac5b68d"
+}
