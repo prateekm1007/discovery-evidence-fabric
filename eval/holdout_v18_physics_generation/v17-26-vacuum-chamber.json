@@ -1,0 +1,136 @@
+{
+ "problem_id": "v17-26-vacuum-chamber",
+ "domain": "leakage_sealing",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:c823508db5a6": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:ff05045797b2": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:a0e4667bf0e2": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "leakage_sealing",
+   "confidence": 0.667,
+   "evidence_span": "leak, permeation",
+   "allowed_mech_classes": [
+    "seal_geometry_reload",
+    "double_isolation_barrier",
+    "self_healing_elastomer_seal"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:45:55Z",
+ "attempts_n": 1,
+ "row_wall_s": 10.5,
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice: Delivers a design change via \"seal_geometry_reload\" or static material replacement (e.g., higher-density O-rings, PTFE, or metal gaskets) to increase initial contact pressure or reduce static permeation coefficients.  \nDeparture: A \"dynamic seal_geometry_reload\" mechanism where the seal interface geometry is continuously modulated by applying a cyclic pneumatic/hydraulic preload to the flange or housing, causing elastic deformation of the seal body that dynamically re-tightens the interface against outgassing-induced micro-gaps, physically preventing the permeation path from stabilizing.  \nPhysics connection: Outgassing and permeation cause local plastic creep or thermal cycling gaps in static seals; dynamic cyclic loading (via superposition of harmonic pressure) prevents the relaxation of contact stress (viscoelastic recovery), maintaining a contact pressure $P_c(t)$ above the critical threshold $P_{crit}$ required to block molecular diffusion, even as the seal material degrades or outgasses.\n\nPHYSICS CHECK  \nGoverning relation: The seal integrity is maintained if the instantaneous contact pressure $P_c(t)$ exceeds the permeation threshold pressure $P_{perm}$.  \nMagnitude verification: For a typical vacuum O-ring (EPDM or FFKM), the creep relaxation of contact pressure $P_c$ over hours drops by $\\Delta P_{relax} \\approx 5-15\\%$ (ASSUMPTION: typical viscoelastic relaxation rate for elastomers at 25°C). By applying a cyclic preload $\\Delta P_{load} \\approx 10\\%$ of the static squeeze, the net pressure oscillates between $P_{static}(1 - 0.10) + \\Delta P_{load}$ and $P_{static}(1 + 0.10) + \\Delta P_{load}$. This ensures the minimum pressure never falls below $0.9 P_{static}$, effectively resetting the creep relaxation cycle (hysteresis loop) and maintaining $P_c > P_{perm}$ (where $P_{perm}$ is the pressure required to collapse the permeation micro-paths, typically $> 0.5 P_{static}$). The mechanism physically couples to the failure by using energy input (pneumatic actuation) to counteract the time-dependent material relaxation that static seals cannot.\n\nIMPLEMENTATION BILL  \n- **Component:** Pneumatic preloading actuator (e.g., small air cylinder or electro-pneumatic valve) integrated into the chamber flange assembly.  \n- **Material:** Stainless steel flange with radial slots to allow elastic deformation (or standard gasket with external clamping mechanism).  \n- **Instrument:** Pressure transducer (flow_rate/pressure signal source) monitoring the actuator supply line and chamber pressure.  \n- **Input Stream:** ALREADY-RECORDED: Chamber pressure telemetry (stated in problem as \"pressure\") and pump/flow status (stated as \"flow_rate\").  \n- **Reference/Threshold:** DERIVED: The baseline static squeeze ratio (typically 15-25% for O-rings) is a stated engineering spec for the gasket class. The cyclic amplitude is derived as 50% of the observed pressure drift rate over the first hour of operation (from ALREADY-RECORDED pressure logs).  \n- **Procedure:** The actuator applies a periodic pulse of air pressure (e.g., 10-50 psi) to the flange bolts or housing, causing a micro-deformation (0.1-0.5 mm) that compresses the seal further, then releases, allowing elastic recovery. This is synchronized with the vacuum pump cycle (using flow_rate signal to trigger compression during pumping, when outgassing rates are highest).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- **Installability:** Requires adding a pneumatic valve/cylinder to the flange area. Standard practice requires swapping the gasket. Both are flange-level interventions. The pneumatic line adds a small routing burden, comparable to adding a gauge tap.  \n- **Operability:** Automated cycle requires no operator intervention, similar to the \"tighter seal\" which is passive.  \n- **Maintenance:** Pneumatic actuator has a finite life (e.g., 10,000 cycles), comparable to gasket replacement intervals.  \n- **Cost Class:** Small pneumatic valve + cylinder ($200-$500) is within the same order of magnitude as a high-grade vacuum gasket set ($100-$1000).  \n- **Conclusion:** SAME burden class (hardware modification to the seal interface), DIFFERENT mechanism (dynamic active compensation vs. static material selection).\n\nEXECUTABLE TEST  \n- **Protocol:** Install the dynamic preloading actuator on a vacuum chamber with a known leak path (e.g., intentionally under-squeezed O-ring or porous gasket).  \n- **Instruments:** Mass flow controller (MFC) to measure helium leak rate (in sccm) and chamber pressure transducer.  \n- **Pass/Fail Thresholds:** The helium leak rate (or chamber pressure rise rate at a set vacuum) must stabilize at a level $\\le 20\\%$ above the initial \"fresh seal\" baseline after 48 hours of operation with the dynamic cycle active. Without the dynamic cycle (control), the leak rate is expected to rise by $\\ge 50\\%$ over the same period due to relaxation.  \n- **Duration:** 48 hours continuous cycling.  \n- **Kill Criterion:** The mechanism is FALSIFIED if the chamber pressure rise rate does not decrease by at least 30% (relative to the static control) within 48 hours of initiating the cyclic preload, measured by the pressure transducer.  \n- **Validation:** Use the ALREADY-RECORDED pressure decay curves from the static seal to establish the relaxation baseline; the test validates the dynamic seal's deviation from this baseline.\n\nCONSTRAINT BIND  \n- **Primary Indicator:** The problem states \"flow_rate\" and \"pressure\" as the signals. The PRIMARY indicator of seal leakage is the **pressure rise rate** (or equivalent leak rate) in the vacuum chamber. The dynamic mechanism is triggered by and evaluated against this pressure transient.  \n- **Secondary:** Flow_rate is used to synchronize the actuation cycle (compress during pump operation to counter outgassing peaks), supplementing the pressure signal but not replacing it as the failure criterion.  \n- **Reason:** Pressure is the direct physical consequence of leak volume accumulation ($V dP/dt$); flow_rate is a proxy for the source of the outgassing (pump speed). The intervention must maintain $P$ at setpoint, so $P$ is primary.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Component:** Pneumatic preloading actuator (e.g., small air cylinder or electro-pneuma",
+    "- **Material:** Stainless steel flange with radial slots to allow elastic deformation (or ",
+    "- **Instrument:** Pressure transducer (flow_rate/pressure signal source) monitoring the ac",
+    "- **Input Stream:** ALREADY-RECORDED: Chamber pressure telemetry (stated in problem as \"pr",
+    "- **Reference/Threshold:** DERIVED: The baseline static squeeze ratio (typically 15-25% fo",
+    "- **Procedure:** The actuator applies a periodic pulse of air pressure (e.g., 10-50 psi) t",
+    "- **Installability:** Requires adding a pneumatic valve/cylinder to the flange area. Stand",
+    "- **Operability:** Automated cycle requires no operator intervention, similar to the \"tigh",
+    "- **Maintenance:** Pneumatic actuator has a finite life (e.g., 10,000 cycles), comparable ",
+    "- **Cost Class:** Small pneumatic valve + cylinder ($200-$500) is within the same order of",
+    "- **Conclusion:** SAME burden class (hardware modification to the seal interface), DIFFERE"
+   ],
+   "APPARATUS_ROW": [
+    "- **Instrument:** Pressure transducer (flow_rate/pressure signal source) monitoring the actuator supply line a"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "seal_geometry_reload",
+   "cross_domain": ""
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 25% gain)",
+    "predicted_value": "the measured quantity must reach 1.25x the baseline",
+    "calc_trace": "1 + 0.25 = 1.25",
+    "falsifier": "the measured gain must reach 1.25x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "85b687ffc99bea79"
+}

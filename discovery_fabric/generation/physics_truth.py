@@ -122,10 +122,28 @@ _RE_REDUCTION_FORMULA = re.compile(
     r"R\s*[≈=]\s*eps(ins)?_?\w*/\s*eps(grade|eff|eff)_?\w*", re.I)
 
 
+_RE_REJECTION = re.compile(
+    r"rather than|instead of|unlike|avoid\w*|reject\w*|not (adding|using|"
+    r"inserting|placing)|no (low|voids)|without", re.I)
+
+
+def _low_eps_not_rejected(text: str) -> bool:
+    """True when at least one low-eps mention is the answer's OWN choice
+    (not a rejected alternative in a 'rather than' clause)."""
+    for s in _sentences(text):
+        if _RE_LOW_EPS.search(s) and not _RE_REJECTION.search(s):
+            return True
+    return False
+
+
 def check_sign_field_grading(answer: str) -> Optional[Dict]:
-    for w in _window(answer):
-        if _RE_LOW_EPS.search(w) and _RE_FIELD_REDUCE.search(w) \
-                and _RE_SERIES_ZONE.search(w):
+    # same-sentence co-reference + the rejection exemption (a 'rather
+    # than adding low-permittivity voids' clause is the answer naming
+    # the WRONG direction it avoided — the v17-30 false-positive class)
+    for s in _sentences(answer):
+        if _RE_LOW_EPS.search(s) and _RE_FIELD_REDUCE.search(s) \
+                and _RE_SERIES_ZONE.search(s) \
+                and not _RE_REJECTION.search(s):
             return {
                 "id": "SIGN_FIELD_GRADING",
                 "verdict": "FAIL",
@@ -141,7 +159,13 @@ def check_sign_field_grading(answer: str) -> Optional[Dict]:
                            "conductivity, never by inserting voids in "
                            "series."),
             }
-    if _RE_REDUCTION_FORMULA.search(answer):
+    if _RE_REDUCTION_FORMULA.search(answer) \
+            and _low_eps_not_rejected(answer):
+        # the R = eps_ins/eps_eff reduction claim is wrong ONLY when the
+        # inserted layer is LOW-eps; a HIGH-k grading layer (eps_eff >
+        # eps_ins) correctly sees LESS field — the v17-30 false positive
+        # is exactly this case (its low-eps mention is the REJECTED
+        # alternative, 'rather than adding low-permittivity voids')
         return {
             "id": "SIGN_FIELD_GRADING",
             "verdict": "FAIL",
