@@ -37,7 +37,7 @@ RETRIEVED PAPER:
 
 Respond in EXACTLY this format (each field on ONE line):
 MECHANISM: <mechanism from the paper>
-INTERVENTION: <specific intervention transferring mechanism to device>
+INTERVENTION: <specific intervention transferring the mechanism to a device, material, surface, or process change (all four classes admissible)>
 EXPECTED_EFFECT: <expected effect>
 FALSIFICATION_TEST: <concrete test>
 {span_instruction}
@@ -568,7 +568,8 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                 "response summarized the paper but did not propose an "
                 "engineering intervention. Answer again in the SAME "
                 "format: it MUST contain an INTERVENTION line (a "
-                "concrete device/design change that mitigates the "
+                "concrete device, material, surface, or process change that "
+                "mitigates the "
                 "stated failure), a MECHANISM line, an EXPECTED_EFFECT "
                 "line, a FALSIFICATION_TEST line, and a "
                 "MECHANISM_SOURCE_SPAN line quoting THIS abstract "
