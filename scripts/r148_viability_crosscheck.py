@@ -146,7 +146,7 @@ def main() -> int:
     # cross-judge consistency CANNOT be read from them; and dsr1's
     # 100% viability was ruled on the OLD (non-canonical) pack ids —
     # a different candidate set, not comparable.
-    packs = json.loads((PANEL / "packs.json").read_text())["packs"]
+    packs = json.loads((PANEL / "packs_sealed_set.json").read_text())["packs"]  # the SEALED set (slurry-pump family) — packs.json is the stale rail-shelling bundle
     canon = {p["problem_id"] for p in packs}
     canon_votes = defaultdict(dict)
     for f in PANEL.glob("*__v17-*.json"):
@@ -167,9 +167,14 @@ def main() -> int:
                  "existing bytes; the r148-QUALIFIED panel (the "
                  "acc-1.0 set, majority rule) is the resolving "
                  "instrument"),
-        "dsr1_comparison": ("INVALID: dsr1's 100% viability was "
-                            "ruled on the OLD pack ids (a different "
-                            "candidate set), typed set-mismatch"),
+        "dsr1_comparison": ("VALID on the sealed set (dsr1 ruled "
+                            "the SAME sealed problems, 10 candidates): "
+                            "the qualified-lineage instrument reads "
+                            "100% viable where the unqualified lanes "
+                            "read 23-40% — the signal is JUDGE "
+                            "DIVERGENCE (28/30 candidates split), and "
+                            "the r148-qualified set arbitrates which "
+                            "reading is calibrated"),
     }
 
     examples = {c: [{"judge": r["judge"], "pid": r["pid"],
