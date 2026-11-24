@@ -1,0 +1,159 @@
+{
+ "problem_id": "v17-27-subsea-connector",
+ "domain": "leakage_sealing",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:dbdb63774276": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:3b063ea6e7b6": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:6af934173956": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "leakage_sealing",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "leakage_sealing",
+   "n_analogies": 0,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:22:58Z",
+ "attempts_n": 1,
+ "row_wall_s": 7.5,
+ "a1_answer": "NOVELTY STATEMENT\n- **Standard Practice**: A tighter or better passive seal of the same type (e.g., higher pre-load elastomer gasket), which relies on static contact pressure that degrades as thermal expansion differentials and pressure transients reduce the clamping force below the minimum leak-tight threshold.\n- **Mechanism Departure**: **Seal geometry reload via pressure-actuated mechanical re-clamping** (Transferred from Pipeline Mechanical Joints). This introduces a dynamic, self-energizing feedback loop where the leakage driving force (system pressure) mechanically generates the counteracting force (contact pressure), physically coupling the pressure transient to the seal interface stiffness rather than relying on static pre-load.\n- **Failure Physics Connection**: Thermal cycling induces differential expansion between the connector body and seal ring, reducing the static interference. By transferring pressure from the high-pressure side to the seal face via a piston-like geometry (similar to pipeline mechanical joints), the mechanism converts internal pressure $P$ into an additional contact stress $\\Delta \\sigma$, which restores the leak-tight threshold even as the static pre-load degrades due to temperature or creep.\n\nPHYSICS CHECK\n- **Governing Relation**: The pressure-actuated component adds a contact stress proportional to the system pressure: $\\Delta \\sigma_{dynamic} = C_{geom} \\cdot P_{system}$, where $C_{geom}$ is the area ratio of the pressure-actuated face to the seal contact area. The total contact pressure is $\\sigma_{total} = \\sigma_{static} + \\Delta \\sigma_{dynamic}$. Leak-tightness requires $\\sigma_{total} > \\sigma_{leak\\_threshold}$.\n- **Magnitude Verification**: \n    - Assumed: System pressure $P_{system} = 10$ MPa (Assumed: standard subsea hydraulic operating pressure).\n    - Assumed: Geometry ratio $C_{geom} = 0.5$ (Assumed: standard pipeline joint piston area ratio).\n    - Assumed: Static pre-load $\\sigma_{static} = 4$ MPa (Assumed: typical elastomer crimp).\n    - Assumed: Leak threshold $\\sigma_{leak\\_threshold} = 7$ MPa (Assumed: material seal requirement).\n    - Calculation: $\\Delta \\sigma_{dynamic} = 0.5 \\cdot 10 \\text{ MPa} = 5$ MPa.\n    - $\\sigma_{total} = 4 + 5 = 9$ MPa.\n    - $9 \\text{ MPa} > 7$ MPa. The mechanism restores containment when static pre-load alone would fail.\n\nIMPLEMENTATION BILL\n- **Component**: Pressure-actuated seal ring interface within the existing connector housing.\n- **Material**: Stainless steel piston/actuator ring interfacing with existing elastomer seal (Assumed: standard subsea materials).\n- **Input Streams**: \n    - **ALREADY-RECORDED**: System pressure telemetry (stated in problem: \"under pressure\").\n    - **ALREADY-RECORDED**: Thermal cycle data (stated in problem: \"thermal cycling\").\n- **Reference/Threshold**: \n    - **DERIVED**: $\\sigma_{leak\\_threshold}$ derived from material datasheet specs for the elastomer and metal components (stated physics/spec).\n    - **DERIVED**: $C_{geom}$ calculated from the geometric dimensions of the new piston ring and the seal contact area (stated geometry).\n- **Procedure**: Modify the connector assembly to include a spring-loaded or pressure-biased actuator ring that pushes the seal into the groove as pressure rises. No new sensors; relies on internal fluid pressure as the actuating medium.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: Same as standard practice. Fits within existing connector housing envelope. No external plumbing or new sensor wiring required.\n- **Operability**: Passive. No active control systems. Operates automatically with system pressure.\n- **Maintenance**: Same as standard practice. Replaced with the connector assembly. No additional inspection points.\n- **Cost**: Same burden class. Adds one precision-machined steel ring and a spring (if pre-loaded). Marginal cost increase, negligible integration complexity.\n- **Conclusion**: SAME burden class, DIFFERENT mechanism. The mechanism is superior because it self-corrects for thermal and pressure transients without external monitoring.\n\nEXECUTABLE TEST\n- **Protocol**: Bench rig test with a connector prototype equipped with the pressure-actuated seal.\n- **Instruments**: \n    - Pressure transducer (measured $P_{system}$).\n    - Mass flow meter or bubble detection system (measured leakage rate $Q_{leak}$).\n    - Temperature chamber (simulates thermal cycling).\n- **Pass/Fail Thresholds**: \n    - At $P_{system} = 10$ MPa and Temperature $T = 50^\\circ C$ (thermal expansion reduces static pre-load), leakage rate $Q_{leak}$ must be $< 0.1$ mL/min.\n    - At $P_{system} = 10$ MPa and $T = -20^\\circ C$, leakage rate $Q_{leak}$ must remain $< 0.1$ mL/min.\n- **Duration**: 500 thermal cycles ($-20^\\circ C$ to $50^\\circ C$) over 72 hours.\n- **Kill Criterion**: The mechanism is **falsified** if the leakage rate $Q_{leak}$ does not remain below $0.1$ mL/min within the 72-hour window during the thermal cycling test at $10$ MPa system pressure.\n- **Validation**: Test uses existing telemetry data types (pressure, flow) and standard bench instruments. No new calibration campaigns; thresholds are derived from stated material specs.\n\nCONSTRAINT BIND (predictor)\n- **Primary Stated Indicator**: Leakage rate (implied by \"leaks under pressure\"). The mechanism acts directly on the leak path geometry to reduce $Q_{leak}$.\n- **Secondary Indicator**: System pressure (used as the actuating input, not just a monitor).\n\nDESIGN POINT\n- **Key Magnitude**: $\\Delta \\sigma_{dynamic} = 5$ MPa (Calculated: $0.5 \\times 10$ MPa). This magnitude is sufficient to bridge the gap between degraded static pre-load ($4$ MPa) and the leak threshold ($7$ MPa).\n- **Assumed Parameter**: $C_{geom} = 0.5$ (Assumed: standard mechanical joint area ratio).",
+ "quant_prediction": {
+  "status": "insufficient_parameters",
+  "missing": [
+   "a recognizable failure physics AND a stated design point or magnitude"
+  ],
+  "measurement_plan": "the invention must name the failure physics it addresses and state its claimed magnitude; the prediction is then computed",
+  "route": "typed-missing"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "insufficient_parameters"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "seal_geometry_reload",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Thermal cycling and pressure transients reduce the static seal contact pressure below the leak-tight threshold, allowing high internal pressure to drive fluid through the interface. | ingredient: The pressure-actuated piston geometry converts internal fluid pressure into an additional mechanical contact stress that increases the total seal interface pressure. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Thermal cycling and pressure transients reduce the static seal contact pressure below the leak-tight threshold, allowing high internal pressure to drive fluid through the interface.",
+   "ingredient_action": "The pressure-actuated piston geometry converts internal fluid pressure into an additional mechanical contact stress that increases the total seal interface pressure.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "DEV_NEED": [
+    "prototype"
+   ],
+   "BILL_UNTAGGED": [
+    "- **Component**: Pressure-actuated seal ring interface within the existing connector housi",
+    "- **Material**: Stainless steel piston/actuator ring interfacing with existing elastomer s",
+    "- **Input Streams**:",
+    "- **ALREADY-RECORDED**: System pressure telemetry (stated in problem: \"under pressure\").",
+    "- **ALREADY-RECORDED**: Thermal cycle data (stated in problem: \"thermal cycling\").",
+    "- **Reference/Threshold**:",
+    "- **DERIVED**: $\\sigma_{leak\\_threshold}$ derived from material datasheet specs for the el",
+    "- **DERIVED**: $C_{geom}$ calculated from the geometric dimensions of the new piston ring ",
+    "- **Procedure**: Modify the connector assembly to include a spring-loaded or pressure-bias",
+    "- **Installability**: Same as standard practice. Fits within existing connector housing en",
+    "- **Operability**: Passive. No active control systems. Operates automatically with system ",
+    "- **Maintenance**: Same as standard practice. Replaced with the connector assembly. No add",
+    "- **Cost**: Same burden class. Adds one precision-machined steel ring and a spring (if pre",
+    "- **Conclusion**: SAME burden class, DIFFERENT mechanism. The mechanism is superior becaus"
+   ],
+   "APPARATUS_ROW": [
+    "- **Conclusion**: SAME burden class, DIFFERENT mechanism. The mechanism is superior because it self-corrects f"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'Thermal cycling' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "155c710318e54b1f"
+}

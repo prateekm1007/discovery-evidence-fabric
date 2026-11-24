@@ -1,0 +1,139 @@
+{
+ "problem_id": "v17-22-ceramic-metal-seal",
+ "domain": "thermal_mismatch",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P18",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:ccf757aa6fcf": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:55d32a25fe4e": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:bdc2503eb92b": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "thermal_mismatch",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "thermal_mismatch",
+   "n_analogies": 0,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:22:16Z",
+ "attempts_n": 1,
+ "row_wall_s": 18.2,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers: A design change via compliant mounting or looser tolerances that increases local flexibility to absorb thermal expansion strain (mechanism: elastic deformation accommodation).\nMy mechanism's departure: A heat_spreader_enhancement design change that reduces the peak thermal gradient at the ceramic-metal interface by laterally redistributing heat flux (mechanism: lateral thermal conduction spreading, reducing local $\\Delta T$ driving the CTE mismatch strain).\nFailure-physics connection: Thermal fatigue cracking is driven by thermally induced stress $\\sigma_{th} = E \\alpha \\Delta T_{local} / (1-\\nu)$. By spreading heat laterally, $\\Delta T_{local}$ at the interface is reduced below the threshold for crack initiation, even if $\\alpha$ mismatch remains unchanged.\n\nPHYSICS CHECK\nGoverning relation: 2D steady-state lateral temperature distribution in a slab heated at a localized spot. The temperature drop $\\Delta T$ across the interface is proportional to the local heat flux $q''$. If the heat source area is $A_s$ and the total power is $P$, $q'' = P/A_s$. The standard practice assumes $q''$ is fixed by external conditions; the spreader increases the effective area $A_{eff}$ over which $P$ is distributed, lowering $q''$ and thus $\\Delta T_{local} = q'' R_{th}$, where $R_{th}$ is the thermal resistance of the layer.\nMagnitude verification: Assume a localized heater of 10 mm diameter ($A_s = \\pi (5\\text{mm})^2 \\approx 78.5\\text{mm}^2$) delivering 50 W. Without spreading, $q'' \\approx 637\\text{ W/cm}^2$. With a high-conductivity spreader (e.g., sintered AlN or a specific ceramic insert compatible with the seal, or a compliant metal layer acting as a lateral conductor) increasing the effective isothermal area to 50 mm diameter ($A_{eff} \\approx 1963\\text{mm}^2$), the average flux drops to $\\approx 25\\text{ W/cm}^2$. The local $\\Delta T$ at the interface scales down by the ratio of areas if the spreader is isothermal, or by a factor dependent on the thermal conductivity ratio if non-isothermal. For a highly conductive spreader, the reduction in $\\Delta T_{local}$ is roughly proportional to $A_s/A_{eff} \\approx 4\\%$, but more accurately governed by the Biot number and spreader conductivity. A conservative estimate for a 5 W/cm^2 reduction in flux across a 1mm thick layer with $k=100\\text{ W/mK}$ is $\\Delta T = (50\\text{ W/cm}^2 \\times 0.0001\\text{ m}) / 100 \\times 100 \\text{ (unit conversion)} = 0.5\\text{ K}$ reduction per $1\\text{ W/cm}^2$? No, let's use standard units. $q'' = 50\\text{ W/cm}^2 = 500\\text{ kW/m}^2$. $\\Delta T = q'' L / k = 500\\text{ kW/m}^2 \\times 0.001\\text{ m} / 100\\text{ W/mK} = 5\\text{ K}$. If flux is reduced by 50% via spreading, $\\Delta T$ reduces by 5 K. This 5 K reduction in local gradient significantly reduces thermally induced stress $\\sigma_{th}$.\n\nIMPLEMENTATION BILL\nComponent: Lateral heat-spreading interface layer inserted between the ceramic body and the metal housing, or integrated into the ceramic seal interface.\nMaterial: High thermal conductivity ceramic (e.g., Aluminum Nitride, AlN, $k \\approx 160\\text{ W/mK}$) or a compliant high-conductivity metal layer (e.g., Copper, $k \\approx 400\\text{ W/mK}$) with CTE-matched transition zones to prevent immediate interfacial failure.\nInstrument/Procedure: No new instrumentation is required. The design change is a physical insert or modified layer thickness/geometry.\nInput Streams:\n- ALREADY-RECORDED: Design thermal load $P$ (W) and heating spot size $D_s$ (mm) from the problem specification or device datasheet.\n- ALREADY-RECORDED: Ceramic seal material properties ($\\alpha_{cer}$, $\\alpha_{met}$, $\\sigma_{ult}$, $k$) from standard material databases.\n- DERIVED: The threshold $\\Delta T_{limit}$ for crack initiation is derived from the material's fatigue limit $\\sigma_{ult}$ and CTE mismatch $\\Delta \\alpha = \\alpha_{met} - \\alpha_{cer}$ via the relation $\\Delta T_{limit} = \\sigma_{ult} / (E_{cer} \\Delta \\alpha (1-\\nu_{cer}))$.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: The spreader layer is part of the seal manufacturing process (co-curing or co-sintering). No field installation is required, identical burden to applying a compliant adhesive or tolerance change.\nOperability: Passive. No pumps, no power, no controls. Identical burden to the standard practice.\nMaintenance: None. Identical burden.\nCost Class: Moderate increase in material cost (high-purity ceramic or metal layer) compared to simple tolerance adjustments. However, it prevents catastrophic failure, yielding a better cost-benefit ratio over the device's lifetime. The burden class is the same (passive, in-situ), but the material bill is higher.\n\nEXECUTABLE TEST\nProtocol: Fabricate two seal coupons: one with the standard compliant mount, one with the lateral heat-spreader layer.\nInstruments: IR thermal imager to measure surface temperature distribution and a strain gauge or Digital Image Correlation (DIC) system to measure interfacial strain during thermal cycling.\nPass/Fail Thresholds: The spreader coupon must show a peak interfacial strain reduction of $\\geq 20\\%$ compared to the standard coupon under identical thermal cycling profiles ($\\Delta T_{cycle} = 100\\text{ K}$, $10\\text{ cycles}$).\nDuration: 10 thermal cycles.\nKill Criterion: The mechanism is FALSIFIED if the peak interfacial strain does not reduce by at least 20% within 10 thermal cycles.\nValidation: The expected 20% reduction is calculated from the ratio of thermal gradients. If the spreader reduces local $\\Delta T$ by 20%, the induced strain $\\epsilon_{th} = \\Delta \\alpha \\Delta T$ also reduces by 20%, assuming linear elasticity.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: Peak interfacial thermal strain ($\\epsilon_{th}$) or local temperature gradient ($\\nabla T$).\nReason: The failure is \"ceramic-metal seal cracks from CTE mismatch on thermal cycling.\" The direct cause of cracking is the mismatch strain, which is proportional to the local temperature difference $\\Delta T$. Therefore, monitoring or measuring $\\Delta T$ (or the resulting strain) is the primary indicator. A secondary indicator would be the total heat flux $q''$, but it is the local gradient that drives the mismatch stress.\n\nDESIGN POINT\nThe mechanism acts through a 20% reduction in peak local temperature difference $\\Delta T_{local}$ at the ceramic-metal interface.\nAssumed: The standard design has a peak $\\Delta T_{local} = 50\\text{ K}$ during a $100\\text{ K}$ cycle due to concentrated heating.\nCalculation: $\\Delta T_{new} = \\Delta T_{local} \\times (1 - 0.20) = 50\\text{ K} \\times 0.8 = 40\\text{ K}$.\nThe thermally induced stress $\\sigma_{th} = E \\alpha \\Delta T_{local}$ decreases from $\\sigma_{standard} = E \\alpha (50)$ to $\\sigma_{spreader} = E \\alpha (40)$, a 20% reduction in driving stress for crack initiation. This 20% margin is assumed to be sufficient to prevent crack initiation if the original design was near the fatigue limit.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "implied enhancement factor (the stated 50% gain)",
+  "predicted_value": "the measured quantity must reach 1.50x the baseline",
+  "calc_trace": "1 + 0.50 = 1.50",
+  "falsifier": "the measured gain must reach 1.50x baseline in the stated test protocol; the opposite result falsifies the invention",
+  "route": "implied-claim"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "heat_spreader_enhancement",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Thermal cycling creates large local temperature differences across the ceramic-metal junction, driving differential expansion/contraction due to CTE mismatch that generates tensile stress. | ingredient: The lateral heat spreader increases the effective area of heat dissipation, lowering the local heat flux and thereby reducing the magnitude of the local temperature gradient and thermal stress at the interface. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Thermal cycling creates large local temperature differences across the ceramic-metal junction, driving differential expansion/contraction due to CTE mismatch that generates tensile stress.",
+   "ingredient_action": "The lateral heat spreader increases the effective area of heat dissipation, lowering the local heat flux and thereby reducing the magnitude of the local temperature gradient and thermal stress at the interface.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- ALREADY-RECORDED: Design thermal load $P$ (W) and heating spot size $D_s$ (mm) from the ",
+    "- ALREADY-RECORDED: Ceramic seal material properties ($\\alpha_{cer}$, $\\alpha_{met}$, $\\si",
+    "- DERIVED: The threshold $\\Delta T_{limit}$ for crack initiation is derived from the mater"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'fatigue' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "6ee216ab9ccb6a8a"
+}

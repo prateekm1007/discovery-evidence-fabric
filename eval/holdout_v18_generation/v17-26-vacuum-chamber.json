@@ -1,0 +1,156 @@
+{
+ "problem_id": "v17-26-vacuum-chamber",
+ "domain": "leakage_sealing",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:c823508db5a6": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:ff05045797b2": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:a0e4667bf0e2": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "leakage_sealing",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "leakage_sealing",
+   "n_analogies": 0,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:22:50Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.5,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a design change by replacing the static elastomeric seal with a tighter metal C-ring or O-ring, maintaining a static compressive stress that degrades over time as outgassing and permeation reduce the seal's effective modulus. My mechanism departs by implementing a `seal_geometry_reload` class using a pressure-energized, self-sealing metal gasket geometry that converts the chamber's own low-pressure differential into increasing radial contact stress, reversing the conventional degradation path where stress decreases with time. The failure physics connection is that outgassing permeation increases the internal gas load on the seal face; by designing the gasket such that this internal gas load pushes the gasket lips inward (self-energizing), the leakage path resistance increases in tandem with the permeation flux, maintaining a constant high seal contact pressure despite the time-varying outgassing environment.\n\nPHYSICS CHECK\nThe governing physical relation is the self-energizing seal equilibrium: $F_{contact} = F_{preload} + \\eta \\cdot P_{chamber} \\cdot A_{energized}$, where $\\eta$ is the mechanical advantage factor of the gasket geometry and $A_{energized}$ is the projected area exposed to chamber pressure. As outgassing increases $P_{chamber}$, the contact force $F_{contact}$ increases linearly rather than decaying. Magnitude verification: For a standard vacuum chamber at $P_{chamber} = 10^{-1} \\text{ Pa}$, the gas force is negligible, but the preload must dominate. However, the mechanism relies on the *ratio* of forces remaining stable; in a permeation-dominated regime where gas transport is diffusive, the key is that the seal gap $s$ is governed by $s \\propto 1/F_{contact}$. By ensuring $F_{contact} > F_{min\\_threshold}$ at all times via the self-energizing term $\\eta \\cdot P_{chamber} \\cdot A_{energized}$, the leakage rate $Q_{leak} \\propto s$ is kept below the limit. The physics holds because the failure mode is permeation/outgassing, which is a gas-filled path; pressure-energizing acts directly on that gas-filled path to compress it.\n\nIMPLEMENTATION BILL\n- Component: Replace standard static O-ring with a **Pressure-Energized Metal Gasket (PEG)** featuring inward-curving lips.\n- Material: Spring steel (A449) with PTFE or metalized coating, standard for vacuum applications.\n- Instrument: None new. The mechanism uses the existing chamber pressure sensor (stated as `pressure` in signals_used) and the existing mass flow controller readings (stated as `flow_rate` in signals_used) as the feedback source for the pressure term $P_{chamber}$.\n- Procedure: During assembly, apply a static preload $F_{preload}$ to the gasket. No new calibration is required; the geometry dictates the self-energizing ratio $\\eta$.\n- Input Streams:\n  - Chamber Pressure ($P_{chamber}$): **ALREADY-RECORDED** (stated in problem: \"pressure\").\n  - Pump Exhaust Flow ($Q_{exhaust}$): **ALREADY-RECORDED** (stated in problem: \"flow_rate\").\n- Reference/Threshold:\n  - Minimum Seal Contact Pressure ($P_{contact,min}$): **DERIVED** from standard gasket datasheet values for the chosen metal material (ASSUMPTION: 200 MPa yield-based limit, typical for spring steel).\n  - Leak Rate Limit: **DERIVED** from the vacuum performance specification (ASSUMED: $10^{-1} \\text{ scc}$).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME class. Both require bolting the flange; the PEG is slightly thicker but fits within standard flange grooves.\n- Operability: SAME class. No new operator training required; the seal self-adjusts automatically with pressure.\n- Maintenance: LOWER burden. Standard O-rings require periodic replacement due to creep/extraction; the PEG's self-energizing nature extends service life between inspections.\n- Cost: HIGHER material cost per gasket, but lower lifecycle cost due to reduced replacement frequency.\n- Conclusion: SAME burden class for installation/operation, DIFFERENT mechanism (active self-energizing vs. passive static preload). The higher maintenance burden of standard seals is shifted to the manufacturer's replacement cycle, whereas this mechanism reduces that burden.\n\nEXECUTABLE TEST\n- Protocol: Bench test two flange assemblies, one with standard O-ring, one with PEG. Pump to $P_{chamber} = 10^{-2} \\text{ Pa}$, then introduce a controlled permeation load via a heated water reservoir at the flange joint. Monitor the chamber pressure rise rate $\\Delta P/\\Delta t$.\n- Instruments: Existing pressure transducer and flow meters (ALREADY-RECORDED data types).\n- Pass/Fail Thresholds: The PEG assembly must show a pressure rise rate $\\Delta P/\\Delta t$ that is at least 50% lower than the O-ring assembly under identical permeation load, after 24 hours of operation.\n- Duration: 24 hours.\n- Kill Criterion: The mechanism is FALSIFIED if the pressure rise rate $\\Delta P/\\Delta t$ for the PEG assembly does not decrease by at least 50% relative to the baseline O-ring assembly within 24 hours.\n\nCONSTRAINT BIND\n- Primary Stated Indicator: `pressure` (chamber pressure). The leak is manifested as an increase in pressure or required pumping power.\n- Secondary Indicator: `flow_rate` (pump exhaust flow). Used to corroborate the pressure rise.\n- Why Primary: The failure \"seal leaks\" is directly detected by the deviation of `pressure` from the setpoint. The self-energizing mechanism acts on the pressure differential to maintain seal integrity, making `pressure` the direct physical variable governing the seal state.\n\nDESIGN POINT\n- Explicit Magnitude: The mechanical advantage factor $\\eta$ is designed to be **1.5** (ASSUMED: typical for inward-lip metal gaskets), meaning a 1 Pa increase in chamber pressure adds 1.5 Pa of equivalent contact stress, counteracting the stress relaxation from outgassing.\n- Parameter: The static preload $F_{preload}$ is set to **200 N** (ASSUMED: based on flange bolt torque limit) to ensure $F_{contact} > F_{min\\_threshold}$ at all times during the permeation event.",
+ "quant_prediction": {
+  "quantity": "droplet-impact erosion intensity ordering (v^5 scaling)",
+  "predicted_value": "relative 1.000 dimensionless vs a 100 m/s reference",
+  "calc_trace": "(100.0 m/s / 100 m/s)^5 = 1.000 dimensionless",
+  "falsifier": "a rain-erosion whirling-arm coupon must track the v^5 curve; a compliant layer's benefit shows as a threshold shift — if the coating does NOT raise the damaging-speed threshold >= 15%, it falsifies",
+  "units_ok": true,
+  "status": "computed",
+  "route": "specific:compliant_elastomer_coating"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "seal_geometry_reload",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "UNCLEAR",
+   "reason": "driver: The failure is caused by the permeation of gas molecules through the seal material, which is driven by the partial pressure difference of the gas species across the seal thickness, not by the bulk chamber pressure. | ingredient: The remedy imposes a static or pressure-dependent contact force that increases the elastic deformation and compressive stress on the seal interface, which does not change the sign of the permeation flux defined by the gas concentration gradient. | ingredient sign vs driver: UNSTATED -> UNCLEAR",
+   "established_driver": "The failure is caused by the permeation of gas molecules through the seal material, which is driven by the partial pressure difference of the gas species across the seal thickness, not by the bulk chamber pressure.",
+   "ingredient_action": "The remedy imposes a static or pressure-dependent contact force that increases the elastic deformation and compressive stress on the seal interface, which does not change the sign of the permeation flux defined by the gas concentration gradient.",
+   "sign_of_ingredient_vs_driver": "UNSTATED",
+   "divergence": "the model labeled INVERTED but the sign comparison derives UNCLEAR — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Component: Replace standard static O-ring with a **Pressure-Energized Metal Gasket (PEG)",
+    "- Material: Spring steel (A449) with PTFE or metalized coating, standard for vacuum applic",
+    "- Instrument: None new. The mechanism uses the existing chamber pressure sensor (stated as",
+    "- Procedure: During assembly, apply a static preload $F_{preload}$ to the gasket. No new c",
+    "- Input Streams:",
+    "- Chamber Pressure ($P_{chamber}$): **ALREADY-RECORDED** (stated in problem: \"pressure\").",
+    "- Pump Exhaust Flow ($Q_{exhaust}$): **ALREADY-RECORDED** (stated in problem: \"flow_rate\")",
+    "- Reference/Threshold:",
+    "- Minimum Seal Contact Pressure ($P_{contact,min}$): **DERIVED** from standard gasket data",
+    "- Leak Rate Limit: **DERIVED** from the vacuum performance specification (ASSUMED: $10^{-1",
+    "- Installability: SAME class. Both require bolting the flange; the PEG is slightly thicker",
+    "- Operability: SAME class. No new operator training required; the seal self-adjusts automa",
+    "- Maintenance: LOWER burden. Standard O-rings require periodic replacement due to creep/ex",
+    "- Cost: HIGHER material cost per gasket, but lower lifecycle cost due to reduced replaceme",
+    "- Conclusion: SAME burden class for installation/operation, DIFFERENT mechanism (active se"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_UNPROVEN": [
+    "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "efa22eaa670fc8a9"
+}

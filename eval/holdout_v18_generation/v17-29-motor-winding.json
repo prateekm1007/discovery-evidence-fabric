@@ -1,0 +1,179 @@
+{
+ "problem_id": "v17-29-motor-winding",
+ "domain": "electrical_insulation",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:f500014a4d37": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:399098ebf18c": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:941f56e1f39d": "reject-duplicate"
+  },
+  "failure_physics": {
+   "failure_class": "electrical_insulation",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "electrical_insulation",
+   "n_analogies": 0,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:23:24Z",
+ "attempts_n": 1,
+ "row_wall_s": 13.3,
+ "a1_answer": "**NOVELTY STATEMENT**\n**Standard Practice:** The field-standard practice for motor winding insulation failure due to partial discharge (PD) at voltage spikes is the **MONITORING/INDICATION** class: deploying high-frequency current transformers (HFCT) or capacitive dividers to detect PD pulses in the kV range, coupled with **DESIGN CHANGE** classes such as increasing dielectric thickness or using higher-grade insulation (Class B/H) to raise the breakdown voltage threshold.\n**My Mechanism Departure:** My proposal delivers the **DESIGN CHANGE** class (a physical modification that prevents the failure) via a novel **mechanical-dynamic stress-grading** mechanism: embedding a **ferrofluid-filled, micro-perforated copper foil layer** within the slot insulation at the turn-to-turn interfaces. This utilizes the magnetorheological/dynamic response of the ferrofluid to instantaneous magnetic flux density changes (caused by the dI/dt of the voltage spike) to locally concentrate the electric field in a controlled, dissipative plasma region *outside* the critical insulation volume, rather than passively relying on static dielectric strength.\n**Failure-Physics Connection:** Voltage spikes in motors are transient overvoltages caused by switching harmonics or line disturbances. Standard insulation fails because the local electric field at geometric defects (turn ends, slot openings) exceeds the critical PD inception field ($E_{pd}$). The ferrofluid layer responds to the high-frequency magnetic component of the spike, shifting the dielectric constant locally and dynamically grading the field away from the insulation interfaces toward the foil-perforation gaps, where the field is clamped by the low-impedance copper path and the gap breakdown voltage is engineered to be higher than the local PD inception threshold.\n\n**PHYSICS CHECK**\n**Governing Relation:** The PD inception voltage $V_{pd}$ is proportional to the critical electric field $E_{critical}$ and the insulation thickness $d$: $V_{pd} \\approx E_{critical} \\cdot d$. However, in the presence of a ferromagnetic/fluid layer subjected to time-varying magnetic fields $B(t)$, the local permittivity $\\epsilon(\\omega)$ and the effective field distribution shift. The key physical effect is the **magnetoresistive/magnetodielectric coupling**: the ferrofluid particles align along magnetic field lines, creating anisotropic conductivity and permittivity. For a transient spike with rise time $t_r$, the displacement current $I_d = \\epsilon \\frac{dV}{dt}$ is locally enhanced in the ferrofluid zone, shunting charge away from the static insulation interfaces before the voltage reaches the critical $V_{pd}$ of the dry paper/mica insulation.\n**Magnitude Verification:** \nAssume a standard 400V motor winding subjected to a 2.5kV voltage spike (common in inverter drive scenarios). \nStandard insulation thickness $d_{ins} = 0.5$ mm. Critical PD inception field for slot insulation $\\approx 3$ kV/mm. $V_{pd, standard} \\approx 1.5$ kV. \nWith the dynamic grading layer, we aim to shift the effective PD inception threshold to $> 3.0$ kV. \nCalculation: The ferrofluid layer introduces a time-dependent shunt impedance. If the layer reduces the effective local field stress at the turn-to-turn interface by 50% during the 10 $\\mu$s spike duration, the local $E$ drops from $3$ kV/mm to $1.5$ kV/mm, keeping it well below the $E_{pd}$ of the insulation. The energy dissipated in the foil gap must be $< 10$ J to avoid thermal damage. $E_{energy} = \\frac{1}{2} C_{gap} V^2$. Assuming a capacitance per turn of $C_{gap} \\approx 1$ nF, $E = 0.5 \\cdot 10^{-9} \\cdot (3000)^2 = 4.5 \\times 10^{-3}$ J per turn. This is negligible compared to the thermal mass of the copper. The physics holds.\n\n**IMPLEMENTATION BILL**\n*   **Component:** Micro-perforated electrolytic copper foil (50 $\\mu$m thickness, perforation pattern: 10% open area, hole diameter 0.5 mm).\n*   **Material:** Carbonyl-iron particle ferrofluid (particle size 10-20 nm, carrier fluid: naphthenic oil with viscosity $< 10$ cSt at operating temperature).\n*   **Procedure:** \n    1.  During motor manufacturing, lay the perforated copper foil at the slot head and slot outlet turn-to-turn interfaces.\n    2.  Inject the ferrofluid into the enclosed void between the foil and the slot liner, ensuring the fluid fills the perforations but is contained by a thin hydrophobic PTFE membrane facing the insulation.\n    3.  The PTFE membrane prevents fluid leakage but allows magnetic coupling.\n*   **Input Streams (ALREADY-RECORDED):** \n    *   **ALREADY-RECORDED:** Motor nameplate voltage (400V) and inverter drive switching frequency (e.g., 16 kHz) – *derived from problem context \"voltage spikes\" and standard industry practice for such motors*.\n    *   **ALREADY-RECORDED:** Existing insulation resistance test data (Megger test) – *stated as standard commissioning check*.\n*   **Reference/Threshold (DERIVED):** \n    *   **DERIVED:** The critical PD inception field for the specific slot insulation material is derived from the manufacturer's datasheet specification of \"PD inception voltage at 1.3x rated voltage\" (USER CONSTRAINT: implied by \"voltage spikes\" causing failure; standard IEC 60034-24 requires PD immunity to 1.5x U0 for inverter feeds). If the nameplate is 400V, the spike tolerance is assumed to be $400V \\cdot 1.5 \\cdot \\sqrt{2} \\approx 850V$ phase-to-neutral, or higher for line-to-line. The mechanism must raise the local PD threshold above this.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice:** Re-wind motor with higher-grade insulation (e.g., Class H instead of Class B) or install surge arresters at the terminals. \n*   **My Approach:** \n    *   *Installability:* Slightly higher manufacturing complexity due to fluid injection step. However, no external components (arresters) or re-wind labor for higher-grade paper (which is labor-intensive). \n    *   *Operability:* Zero additional maintenance. Ferrofluid is sealed. No external power. \n    *   *Cost Class:* Same order of magnitude as high-grade insulation. Copper foil and ferrofluid are cheap compared to labor for re-winding. \n    *   *Parity:* The burden is shifted from \"external electrical protection\" (arresters, which require installation, grounding, and failure mode analysis) or \"passive material upgrade\" (thicker insulation, which reduces slot fill efficiency and increases cost of copper) to \"integrated passive component\" (the foil/fluid). It is a same-class burden: passive, non-electronic, integrated into the winding structure.\n\n**EXECUTABLE TEST**\n*   **Protocol:** \n    1.  Take a prototype stator assembly with the ferrofluid-copper foil layer and an identical control assembly with standard slot insulation.\n    2.  Apply a synthetic voltage spike wave: 2.5 kV amplitude, 10 $\\mu$s rise time, 1 kHz repetition rate, for 100 hours.\n    3.  Measure **Partial Discharge Charge ($Q_{pd}$)** in pC using a standard IEC 60270 measurement system (HFCT or capacitive divider) connected to the terminals.\n*   **Pass/Fail Thresholds:** \n    *   Control Assembly: Expected $Q_{pd} > 100$ pC (indicating PD activity).\n    *   Prototype Assembly: Must show $Q_{pd} < 10$ pC (noise floor).\n*   **Duration:** 100 hours of stress test.\n*   **Kill Criterion:** The mechanism is **falsified** if the prototype assembly shows an increase in $Q_{pd}$ by **at least 50 pC** (from baseline noise) within **100 hours** of the spike stress test, OR if the insulation resistance drops by **> 50%** from its pre-test value.\n\n**CONSTRAINT BIND**\n*   **Primary Stated Indicator:** The problem states \"partial discharge at voltage spikes.\" The primary indicator is **PD charge quantity ($Q_{pd}$)**.\n*   **Secondary Indicator:** Insulation resistance ($R_{ins}$) serves as a secondary degradation indicator.\n*   **Why Primary?** PD charge is the direct physical evidence of the failure mechanism (insulation breakdown at microscopic voids) preceding total failure. Voltage spikes are the *cause*, PD is the *observable effect* of the stress. Monitoring PD directly validates the mitigation of the stress effect on the insulation.\n\n**DESIGN_POINT**\n*   **Magnitude 1:** The local electric field stress at the turn-to-turn interface is reduced by **50%** during the 10 $\\mu$s spike duration. (Assumed: based on the capacitance ratio of the foil-perforation layer to the insulation thickness; $C_{foil} \\approx 2 C_{ins}$ for equal area).\n*   **Magnitude 2:** The ferrofluid layer thickness is **0.2 mm**. (Assumed: sufficient to maintain the perforation pattern integrity while allowing magnetic coupling; derived from standard slot insulation gap sizes).\n*   **Magnitude 3:** The spike amplitude tested is **2.5 kV**. (Assumed: typical 625 V/µs rise time spike from a 400V inverter system; derived from standard VPI guidelines for medium voltage).",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "field stress vs the air breakdown anchor",
+  "predicted_value": "E = 5.0 kV/mm (air anchor ~3 kV/mm)",
+  "calc_trace": "2.5 kV / 0.5 mm = 5.0 kV/mm",
+  "falsifier": "the partial-discharge onset must stay above 1.5x the working E in the PD bench test; the opposite result falsifies the invention",
+  "route": "class-generic:electrical_insulation"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "stress_grading",
+  "off_target": false,
+  "novelty": "strong",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "INVERTED",
+   "reason": "driver: Partial discharge is caused by localized electric field intensification at geometric defects or voids in the insulation that exceeds the critical PD inception field during voltage spikes. | ingredient: The ferrofluid-filled micro-perforated foil layer introduces conductive and permittivity-heterogeneous phases within the insulation volume, creating new void-like or high-field regions that lower the local PD inception threshold and promote discharge activity rather than suppress | ingredient sign vs driver: SAME -> INVERTED",
+   "established_driver": "Partial discharge is caused by localized electric field intensification at geometric defects or voids in the insulation that exceeds the critical PD inception field during voltage spikes.",
+   "ingredient_action": "The ferrofluid-filled micro-perforated foil layer introduces conductive and permittivity-heterogeneous phases within the insulation volume, creating new void-like or high-field regions that lower the local PD inception threshold and promote discharge activity rather than suppress",
+   "sign_of_ingredient_vs_driver": "SAME"
+  },
+  "residual_findings": {
+   "DEV_NEED": [
+    "prototype"
+   ],
+   "BILL_UNTAGGED": [
+    "*   **Component:** Micro-perforated electrolytic copper foil (50 $\\mu$m thickness, perfora",
+    "*   **Material:** Carbonyl-iron particle ferrofluid (particle size 10-20 nm, carrier fluid",
+    "*   **Procedure:**",
+    "1.  During motor manufacturing, lay the perforated copper foil at the slot head and slot o",
+    "2.  Inject the ferrofluid into the enclosed void between the foil and the slot liner, ensu",
+    "3.  The PTFE membrane prevents fluid leakage but allows magnetic coupling.",
+    "*   **Input Streams (ALREADY-RECORDED):**",
+    "*   **ALREADY-RECORDED:** Motor nameplate voltage (400V) and inverter drive switching freq",
+    "*   **ALREADY-RECORDED:** Existing insulation resistance test data (Megger test) – *stated",
+    "*   **Reference/Threshold (DERIVED):**",
+    "*   **DERIVED:** The critical PD inception field for the specific slot insulation material",
+    "*   **Standard Practice:** Re-wind motor with higher-grade insulation (e.g., Class H inste",
+    "*   **My Approach:**",
+    "*   *Installability:* Slightly higher manufacturing complexity due to fluid injection step",
+    "*   *Operability:* Zero additional maintenance. Ferrofluid is sealed. No external power.",
+    "*   *Cost Class:* Same order of magnitude as high-grade insulation. Copper foil and ferrof",
+    "*   *Parity:* The burden is shifted from \"external electrical protection\" (arresters, whic",
+    "*   **Protocol:**",
+    "1.  Take a prototype stator assembly with the ferrofluid-copper foil layer and an identica",
+    "2.  Apply a synthetic voltage spike wave: 2.5 kV amplitude, 10 $\\mu$s rise time, 1 kHz rep",
+    "3.  Measure **Partial Discharge Charge ($Q_{pd}$)** in pC using a standard IEC 60270 measu",
+    "*   **Pass/Fail Thresholds:**",
+    "*   Control Assembly: Expected $Q_{pd} > 100$ pC (indicating PD activity).",
+    "*   Prototype Assembly: Must show $Q_{pd} < 10$ pC (noise floor).",
+    "*   **Duration:** 100 hours of stress test.",
+    "*   **Kill Criterion:** The mechanism is **falsified** if the prototype assembly shows an ",
+    "*   **Primary Stated Indicator:** The problem states \"partial discharge at voltage spikes.",
+    "*   **Secondary Indicator:** Insulation resistance ($R_{ins}$) serves as a secondary degra",
+    "*   **Why Primary?** PD charge is the direct physical evidence of the failure mechanism (i",
+    "*   **Magnitude 1:** The local electric field stress at the turn-to-turn interface is redu",
+    "*   **Magnitude 2:** The ferrofluid layer thickness is **0.2 mm**. (Assumed: sufficient to",
+    "*   **Magnitude 3:** The spike amplitude tested is **2.5 kV**. (Assumed: typical 625 V/µs "
+   ],
+   "APPARATUS_ROW": [
+    "*   **Why Primary?** PD charge is the direct physical evidence of the failure mechanism (insulation breakdown "
+   ],
+   "NAMED_VARIANT": [
+    "variant-marker: prototype | 1.  Take a prototype stator assembly with the ferrofluid-copper foil layer and a",
+    "variant-marker: Prototype | *   Prototype Assembly: Must show $Q_{pd} < 10$ pC (noise floor).",
+    "variant-marker: prototype | *   **Kill Criterion:** The mechanism is **falsified** if the prototype assembly"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: Partial discharge is caused by localized electric field intensification at geometric defects or voids in the insulation that exceeds the critical PD inc"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "f046565f7325df59"
+}

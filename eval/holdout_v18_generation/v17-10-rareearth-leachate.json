@@ -1,0 +1,140 @@
+{
+ "problem_id": "v17-10-rareearth-leachate",
+ "domain": "contamination_separation",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:45b48cc6c9f5": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:3ab21a023b7b": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "contamination_separation",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "contamination_separation",
+   "n_analogies": 2,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 5
+  }
+ },
+ "generated_at": "2026-11-24T15:26:43Z",
+ "attempts_n": 5,
+ "row_wall_s": 56.1,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice delivers a **DESIGN CHANGE** via sequential precipitation/co-precipitation (adjusting pH and redox potential) to form insoluble metal hydroxides, followed by filtration or settling to remove solid phases. The proposal departs from this by using **density_settling_separation** (ranked #4, as ranks #1-3 are physically infeasible for dissolved species under the V17 constraints), specifically exploiting the difference in sedimentation terminal velocities between aggregated iron-rich floc and the dissolved rare-earth fraction, using a high-shear inline flocculation step followed by a lamella settling channel, without chemical pH adjustment beyond the leachate's native range. The failure-physics connection is that iron and thorium (often as particulate colloids or small aggregates during leaching) have significantly higher density and form larger settling particles than the light rare-earth carbonate/oxalate complexes, allowing gravitational separation in a controlled residence time without contacting the dissolved product stream with a second reagent.\n\nPHYSICS CHECK\nGoverning relation is Stokes' Law for terminal velocity: $v_t = \\frac{2}{9} \\frac{(\\rho_p - \\rho_f) g d_p^2}{\\mu}$.\nMagnitude verification: Assume a representative iron-rich floc particle density $\\rho_p = 3000 \\text{ kg/m}^3$ (ASSUMPTION: typical for ferric/ferroxic aggregates in leachate), leachate density $\\rho_f \\approx 1050 \\text{ kg/m}^3$ (ASSUMPTION: saline/halide-rich leachate), viscosity $\\mu \\approx 1.2 \\text{ mPa}\\cdot\\text{s}$ (ASSUMPTION: warm leachate), and floc diameter $d_p = 50 \\text{ \\mu m} = 50 \\times 10^{-6} \\text{ m}$ (ASSUMPTION: median floc size after high-shear aggregation).\n$v_t = \\frac{2}{9} \\frac{(3000 - 1050) \\cdot 9.81 \\cdot (50 \\times 10^{-6})^2}{1.2 \\times 10^{-3}} \\approx \\frac{0.222 \\cdot 1950 \\cdot 9.81 \\cdot 2.5 \\times 10^{-9}}{0.0012} \\approx 0.0094 \\text{ m/s}$ (CALCULATED).\nThis settling velocity is high enough to allow separation within a residence time of ~10–20 seconds in a compact lamella settler, while dissolved rare-earth ions (effective $d_p \\approx 0$) do not settle. The mechanism relies on physical size/density differential, not chemical precipitation.\n\nIMPLEMENTATION BILL\n1. **Inline High-Shear Flocculator**: A static mixer (e.g., Kenics-type) located upstream of the settler. Input stream: Leachate from leach tank (ALREADY-RECORDED: process flow data confirms continuous flow; no new sensors required, uses existing flow meter). Reference: Floc size target $d_p > 40 \\text{ \\mu m}$ (DERIVED: calculated from Stokes' Law to ensure $v_t > 0.006 \\text{ m/s}$ for 15s residence time).\n2. **Lamella Settling Channel (Aluminum Alloy)**: A series of inclined plates (60° angle) installed in a rectangular tank. Material: Anodized aluminum (corrosion-resistant to leachate pH ~4-6). Residence time: 15 seconds (DESIGN POINT: 15 s ensures $v_t \\cdot t >$ channel height). No chemical dosing (unlike standard practice).\n3. **Sludge Scraper**: A mechanical conveyor or pump at the bottom of the lamella tank to remove the settled iron/thorium-rich sludge.\n4. **Underflow Recycle Loop**: The concentrated sludge is pumped back to the leaching tank for re-leaching, recovering the valuable REEs in the sludge and removing the impurities.\n5. **Monitoring**: Conductivity and pH probes at the settler outlet (ALREADY-RECORDED: standard leach plant telemetry; no new instrumentation). Primary indicator: pH (stated in problem context as a key variable for leaching, used here to ensure it remains in the native range where floc stability is maintained without chemical precipitation of REEs).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: The lamella settler and static mixer are off-the-shelf chemical engineering equipment, comparable in footprint and installation burden to a standard precipitation/filtration skid. Operability: The system operates continuously without manual pH adjustment or reagent dosing (reducing operability burden compared to standard precipitation). Maintenance: Sludge scraping requires periodic inspection, similar to standard filter maintenance. Rough cost class: SAME. The hardware (mixer, tank, plates, pump) is standard; the novelty is in the configuration (no reagents, high-shear pre-flocculation), not in exotic materials or complex automation. The burden is equivalent to a conventional thickener, but the mechanism is physical separation of pre-aggregated solids rather than chemical precipitation.\n\nEXECUTABLE TEST\nProtocol: Construct a bench-scale rig (1:10 scale) with a static mixer and a small lamella settler. Feed synthetic leachate containing suspended iron-rich flocs (50 μm, 3000 kg/m³) and dissolved REE tracers (e.g., Nd³⁺ at 10 mg/L).\nInstruments: Laser diffraction particle size analyzer (PDA) at the inlet and outlet of the settler; ICP-MS for iron and REE concentration in the underflow (sludge) and overflow (treated leachate).\nPass/Fail Thresholds: The overflow must contain >99% of the input REE tracers (recovery) and <1% of the input iron mass. The underflow must contain >90% of the input iron mass.\nDuration: 4 hours of continuous operation at design flow rate.\nKill Criterion: The mechanism is FALSIFIED if the iron removal efficiency in the underflow does not reach at least 85% within 15 seconds of residence time (i.e., if $v_t$ is too low to separate the flocs from the liquid phase in the given geometry). Test vehicle: Bench-scale lamella settler rig with PDA and ICP-MS sampling.\n\nCONSTRAINT BIND\nThe monitored indicator is pH (primary, as stated in problem context for leachate control). It supplements the density-based separation by ensuring the leachate remains in the range where iron species form stable, large flocs rather than dissolving or precipitating as fine, non-settling colloids. The primary indicator for the separation performance is the settling velocity $v_t$ (derived from floc size and density), but pH is the stated process variable that bounds the floc stability.\n\nDESIGN POINT\nThe mechanism acts through a floc settling velocity $v_t \\approx 0.0094 \\text{ m/s}$ (CALCULATED) achieved by maintaining a median floc diameter $d_p = 50 \\text{ \\mu m}$ (ASSUMPTION) and a density difference $\\Delta \\rho = 1950 \\text{ kg/m}^3$ (ASSUMPTION). The residence time is set to 15 seconds (DESIGN POINT) to allow the flocs to traverse the 0.14 m vertical height of the lamella plates ($h = v_t \\cdot t = 0.0094 \\cdot 15 = 0.141 \\text{ m}$). This physical separation allows the removal of iron/thorium solids without chemical precipitation, mitigating the impurity carryover into the REE product.",
+ "quant_prediction": {
+  "quantity": "particle settling velocity (Stokes, laminar)",
+  "predicted_value": "926.50 mm/s",
+  "calc_trace": "v = 9.81*(0.0005 m)^2*(7800.0-1000.0)/(18*0.001 Pa.s) = 926.50 mm/s",
+  "falsifier": "a settling test must show the target fraction settled within t = 0.0 min for a 1 m path; slower settling falsifies",
+  "units_ok": true,
+  "status": "computed",
+  "route": "specific:density_settling_separation"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "density_settling_separation",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Chemical dissolution and solvation of impurities that keep them in a dissolved ionic state, preventing solid-liquid phase separation. | ingredient: Imposes gravitational sedimentation and flocculation, which physically extract solid impurity phases from the liquid stream to reduce the dissolved impurity load. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Chemical dissolution and solvation of impurities that keep them in a dissolved ionic state, preventing solid-liquid phase separation.",
+   "ingredient_action": "Imposes gravitational sedimentation and flocculation, which physically extract solid impurity phases from the liquid stream to reduce the dissolved impurity load.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE",
+   "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Inline High-Shear Flocculator**: A static mixer (e.g., Kenics-type) located upstream ",
+    "2. **Lamella Settling Channel (Aluminum Alloy)**: A series of inclined plates (60° angle) ",
+    "3. **Sludge Scraper**: A mechanical conveyor or pump at the bottom of the lamella tank to ",
+    "4. **Underflow Recycle Loop**: The concentrated sludge is pumped back to the leaching tank",
+    "5. **Monitoring**: Conductivity and pH probes at the settler outlet (ALREADY-RECORDED: sta"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "bf0737a482f027d9"
+}

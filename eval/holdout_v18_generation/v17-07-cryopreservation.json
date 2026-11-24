@@ -1,0 +1,143 @@
+{
+ "problem_id": "v17-07-cryopreservation",
+ "domain": "nucleation_phase_change",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:f7c1b7c5610f": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:17fbf99a9218": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:ce5025aa23cb": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "nucleation_phase_change",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "nucleation_phase_change",
+   "n_analogies": 2,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:16:37Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.6,
+ "a1_answer": "NOVELTY STATEMENT\n1. Closest conventional practice: Standard cryopreservation relies on slow uncontrolled cooling rates (typically 1°C/min) to allow continuous water loss and minimize intracellular ice formation, accepting stochastic, heterogeneous ice nucleation events that cause cellular osmotic and mechanical stress.\n2. Distinguishing features: This mechanism introduces engineered, geometrically defined nucleation sites (micro-cavities) on the vessel wall to pin the location of ice initiation, replacing the stochastic volume-based nucleation of the standard practice with a controlled surface-initiated process.\n3. Objective technical problem: How to ensure ice nucleation occurs at a precise, predictable temperature without altering the cooling rate or requiring chemical additives, thereby preventing the high supercooling (delayed nucleation) that leads to massive, damaging intracellular ice formation.\n4. Mechanism: Controlled nucleation sites via a micro-cavity structured surface (mechanism class: controlled_nucleation_sites). The micro-cavities act as heterogeneous nuclei with a reduced critical radius for ice crystal formation, forcing nucleation to begin at the surface at a higher temperature (less supercooling) than in the bulk fluid.\n5. Prediction: Nucleation temperature (T_nuc) increases by >= 5 K (from ~-15°C to ~-10°C) when cooling at 1°C/min, measured by differential thermal analysis (DTA) or high-speed imaging in a micro-scale chamber.\n6. Kill condition: The mechanism is FALSIFIED if the nucleation temperature (T_nuc) does not increase by at least 5 K within a 10-minute cooling window at 1°C/min, as measured by a DTA exotherm peak shift in a 10 µL aliquot test.\n\nPHYSICS CHECK\nThe governing physical relation is the Gibbs-Thomson effect for heterogeneous nucleation, where the critical radius r* for a stable nucleus is reduced by surface tension and interfacial energy differences. In micro-cavities, the effective free-energy barrier ΔG* is lowered by a factor f(θ) < 1 (where θ is the contact angle), meaning the supercooling ΔT required to overcome this barrier is reduced.\nMagnitude verification: For a cavity depth of 50 µm (ASSUMPTION: typical lithography scale), the local concentration of solutes can vary, but the primary effect is the geometric reduction of the nucleation barrier. A reduction in the barrier typically allows nucleation to occur 3–8 K higher than in a clean bulk solution. Thus, a 5 K shift is physically consistent with the reduction of stochastic bulk nucleation delays.\n\nIMPLEMENTATION BILL\n1. Component: Micro-cavity structured cryovessel.\n   - Material: Polystyrene (ASSUMPTION: standard cryovial material) or glass, patterned via laser ablation or nano-imprint lithography.\n   - Feature: 10 µm × 10 µm square cavities, 100 nm deep, density of 10⁶ cavities/cm². (DERIVED: Depth and density chosen to maximize surface area and heterogeneous nucleation probability without affecting bulk viscosity).\n   - Input stream: ALREADY-RECORDED standard cryoprotectant solution (e.g., 10% DMSO in PBS) and cell suspension (stated as \"cryopreservation of cells\").\n   - Reference/Threshold: Nucleation temperature T_nuc derived from DTA measurement of the exotherm peak. Threshold: T_nuc >= -10°C (DERIVED: -15°C is typical bulk supercooling; +5 K shift targets -10°C).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Same as standard cryovials; no new handling equipment.\n- Operability: No change in cooling rate or freezer type; the surface structure operates passively.\n- Maintenance: None; single-use vials.\n- Cost: Moderate increase due to surface patterning (laser/lithography) compared to standard injection-molded vials, but within the same order of magnitude as current high-precision cryovials (ASSUMPTION: patterning adds <$0.50/vial at scale).\n- Conclusion: Same burden class (passive container), different mechanism (surface-controlled nucleation vs. bulk-stochastic nucleation).\n\nEXECUTABLE TEST\nProtocol: Prepare 10 µL aliquots of standard cryoprotectant solution (10% DMSO, no cells for baseline; with cells for validation) in two types of vials: (A) standard smooth-walled polystyrene, (B) micro-cavity structured polystyrene (100 nm deep, 10 µm wide, 10⁶/cm² density). Load into a differential thermal analysis (DTA) instrument with a cooling rate of 1°C/min from 0°C to -40°C.\nInstruments: DTA with 10 µL sample capacity, temperature calibrated to ±0.1°C.\nPass/fail thresholds:\n- Pass: Vial B shows a DTA exotherm peak (T_nuc) that is >= 5 K higher (i.e., warmer, less negative) than Vial A. For example, if Vial A peaks at -15.0°C, Vial B must peak at >= -10.0°C.\n- Fail: Vial B peak is within 5 K of Vial A, or shifts lower (more supercooling).\nDuration: ~50 minutes per sample run (cooling from 0 to -40°C at 1°C/min).\nKill criterion: The mechanism is FALSIFIED if the nucleation temperature (T_nuc) does not increase by at least 5 K within a 10-minute cooling window (i.e., between -20°C and -10°C) at 1°C/min, as measured by the DTA exotherm peak shift in the 10 µL aliquot test.\n\nCONSTRAINT BIND\nPrimary stated indicator: Nucleation temperature (T_nuc), which defines the failure (damaging intracellular ice). The mechanism directly acts on T_nuc by shifting it warmer. No secondary indicator is used to replace this primary threshold.\n\nDESIGN_POINT\nThe mechanism acts through a micro-cavity depth of 100 nm (ASSUMPTION: sufficient to lower the heterogeneous nucleation barrier via the f(θ) factor without being too large to disrupt cell suspension homogeneity) and a density of 10⁶ cavities/cm² (ASSUMPTION: high enough to ensure a nucleation event occurs at the wall before bulk stochastic nucleation, but low enough to avoid clogging or viscous drag changes on the cell suspension). The target effect is a +5 K shift in T_nuc, moving from ~-15°C to ~-10°C.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "implied enhancement factor (the stated 10% gain)",
+  "predicted_value": "the measured quantity must reach 1.10x the baseline",
+  "calc_trace": "1 + 0.10 = 1.10",
+  "falsifier": "the measured gain must reach 1.10x baseline in the stated test protocol; the opposite result falsifies the invention",
+  "route": "class-generic:nucleation_phase_change"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "controlled_nucleation_sites",
+  "off_target": false,
+  "novelty": "strong",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The failure is driven by high supercooling (bulk nucleation delay) which allows excessive intracellular water accumulation prior to ice formation, causing osmotic and mechanical stress. | ingredient: The micro-cavities act as heterogeneous nuclei that lower the free-energy barrier for ice formation, promoting nucleation at a warmer temperature (reduced supercooling) and thereby limiting intracellular ice damage. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The failure is driven by high supercooling (bulk nucleation delay) which allows excessive intracellular water accumulation prior to ice formation, causing osmotic and mechanical stress.",
+   "ingredient_action": "The micro-cavities act as heterogeneous nuclei that lower the free-energy barrier for ice formation, promoting nucleation at a warmer temperature (reduced supercooling) and thereby limiting intracellular ice damage.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Component: Micro-cavity structured cryovessel.",
+    "- Material: Polystyrene (ASSUMPTION: standard cryovial material) or glass, patterned via l",
+    "- Feature: 10 µm × 10 µm square cavities, 100 nm deep, density of 10⁶ cavities/cm². (DERIV",
+    "- Input stream: ALREADY-RECORDED standard cryoprotectant solution (e.g., 10% DMSO in PBS) ",
+    "- Reference/Threshold: Nucleation temperature T_nuc derived from DTA measurement of the ex",
+    "- Installability: Same as standard cryovials; no new handling equipment.",
+    "- Operability: No change in cooling rate or freezer type; the surface structure operates p",
+    "- Maintenance: None; single-use vials.",
+    "- Cost: Moderate increase due to surface patterning (laser/lithography) compared to standa",
+    "- Conclusion: Same burden class (passive container), different mechanism (surface-controll"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'cooling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": "controlled_nucleation_sites). the micro-cavities act as heterogeneous nuclei wit",
+ "sha256_16": "436a4f8fe2795a73"
+}

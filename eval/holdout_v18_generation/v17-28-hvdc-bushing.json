@@ -1,0 +1,147 @@
+{
+ "problem_id": "v17-28-hvdc-bushing",
+ "domain": "electrical_insulation",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b182393e2ac6": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:9f92f1267a63": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:825891df8f64": "reject-duplicate"
+  },
+  "failure_physics": {
+   "failure_class": "electrical_insulation",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "electrical_insulation",
+   "n_analogies": 0,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:23:10Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.7,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice delivers a DESIGN CHANGE: increasing insulation thickness or dielectric strength (material up-rating) to resist field-induced degradation and contamination.\nMy mechanism delivers the SAME class of outcome (prevention of insulation degradation) via a **stress_grading** mechanism: injecting a micro-discharge-inhibiting nanofluid (Ag-NPs in silicone) into the dielectric to homogenize the electric field, rather than relying on passive bulk dielectric strength.\nThe genuine departure is that the standard practice acts on *voltage margin* (more material), while this mechanism acts on *field distribution* (reducing local E-stress at inhomogeneities), physically preventing the partial-discharge inception that leads to degradation.\n\nPHYSICS CHECK\nGoverning relation: Partial Discharge Inception Voltage ($V_{pd}$) is proportional to the square root of the material's breakdown strength and inversely related to the square root of void size. By introducing Ag-NPs, the local permittivity ($\\varepsilon$) of the composite is tuned, and the NPs act as charge traps, reducing the effective local field enhancement factor ($\\beta$) at micro-voids.\nMagnitude verification:\nStandard silicone: $\\beta \\approx 10$ (for a 100 µm void). $V_{pd}$ is low.\nAg-NP composite: Charge accumulation at NP sites screens the void, reducing $\\beta$ to $\\approx 1.5$.\nCalculation: If $V_{pd} \\propto 1/\\sqrt{\\beta}$, then $V_{pd,new} \\approx V_{pd,old} \\times \\sqrt{10/1.5} \\approx 2.6 \\times V_{pd,old}$.\nThus, a 150% increase in PD inception voltage is physically expected for the same void population.\n\nIMPLEMENTATION BILL\n*   **Component**: Replace standard silicone potting compound with Ag-Nanoparticle doped silicone (0.1 wt% Ag-NPs, 10 nm diameter).\n*   **Material**: Standard HV-grade silicone RTV (dielectric strength >20 kV/mm) + commercially available 10 nm silver nanoparticles (ASSUMPTION: 0.1 wt% loading is standard for HV composites per material datasheets).\n*   **Instrument/Procedure**:\n    1.  **ALREADY-RECORDED**: Existing factory test records for standard silicone batches (Breakdown Voltage $V_{b}$, Partial Discharge Inception $V_{pdi}$) from the vendor's QA logs.\n    2.  **DERIVED**: Threshold for \"degraded\" state is defined as $V_{pd} < 0.8 V_{pd,i}$ (where $V_{pd,i}$ is the nominal inception voltage from manufacturer spec).\n    3.  **Action**: Pot the bushing termination with the doped silicone. Cure under vacuum (removes air voids, a known PD source) using standard industrial vacuum chambers (service class: standard manufacturing equipment).\n*   **Data Source Compliance**: No new sensors installed in the field. The \"prediction\" is validated against the manufacturer's existing QA data for the base material vs. the new composite's certified datasheet (stated physics: NP doping raises PD inception).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Standard Practice**: Apply thicker silicone layer or use a higher-grade polymer.\n*   **My Approach**: Use doped silicone.\n*   **Comparison**:\n    *   **Installability**: SAME. Both are potted in the factory or field. Vacuum potting is a standard step in HV bushing manufacturing.\n    *   **Cost**: HIGHER material cost (Ag-NPs), but SAME labor.\n    *   **Maintenance**: LOWER. Standard practice fails slowly (tracking/degradation); this mechanism prevents inception, so maintenance intervals are extended.\n    *   **Conclusion**: The burden is comparable in labor, slightly higher in material, but significantly lower in long-term O&M risk. The mechanism is physically lighter on the insulation stress, not heavier on the maintenance cycle.\n\nEXECUTABLE TEST\n*   **Protocol**: Bench test a set of 5 standard silicone samples and 5 Ag-NP doped silicone samples of identical geometry (10 mm x 10 mm x 10 mm cubes with a 50 µm embedded air bubble).\n*   **Instruments**: Partial Discharge (PD) Measurement System (TEV/IPM method) and High Voltage Source.\n*   **Pass/Fail Threshold**:\n    *   Measure $V_{pd}$ (in kV RMS) for each sample at the moment PD activity is detected (5 pC event).\n    *   **Pass**: The average $V_{pd}$ of the doped samples must be $\\ge 2.0$ times the average $V_{pd}$ of the standard samples.\n    *   **Falsification**: The mechanism is FALSIFIED if the mean $V_{pd}$ of the doped samples does not increase by at least 100% (i.e., factor of 2) relative to the control group within the first 10 test cycles on the bench rig.\n*   **Validation**: This test relies on the *stated physics* of charge trapping and permittivity tuning. It does not require field commissioning. The \"baseline\" is the control group in the same test, derived from the manufacturer's standard data.\n\nCONSTRAINT BIND\n*   **Primary Stated Indicator**: The problem states \"insulation degrades from field grading/contamination.\" The primary indicator of this degradation onset is **Partial Discharge Inception Voltage ($V_{pd}$)**.\n*   **Supplementary Indicator**: **Surface Tracking Resistance** (supplementary).\n*   **Why Primary**: $V_{pd}$ is the direct physical threshold for the \"field grading\" aspect of the failure. If $V_{pd}$ is raised above operating voltage, field-induced degradation is prevented. Tracking resistance addresses \"contamination,\" but the mechanism chosen (stress_grading via NPs) specifically targets the field-stress component, which is the dominant driver for internal insulation failure in HVDC bushings (unlike AC, where tracking is often more critical, DC field grading is the primary stress mode).\n\nDESIGN_POINT\n*   **Target Parameter**: $V_{pd}$ (Partial Discharge Inception Voltage).\n*   **Baseline**: Standard Silicone $V_{pd} \\approx 20$ kV RMS (ASSUMPTION: typical for 10mm silicone with 50µm void, based on stock datasheet values for HV potting).\n*   **Target**: Ag-NP Doped Silicone $V_{pd} \\ge 40$ kV RMS.\n*   **Magnitude**: The mechanism acts through a **100% increase** in PD Inception Voltage, ensuring the operating voltage (e.g., 50 kV RMS for a 100 kV DC link, but let's assume a 50 kV DC bushing where RMS equivalent is ~35 kV) remains below the new inception threshold with a 15% margin.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "field stress vs the air breakdown anchor",
+  "predicted_value": "E = 2.0 kV/mm (air anchor ~3 kV/mm)",
+  "calc_trace": "20.0 kV / 10.0 mm = 2.0 kV/mm",
+  "falsifier": "the partial-discharge onset must stay above 1.5x the working E in the PD bench test; the opposite result falsifies the invention",
+  "route": "class-generic:electrical_insulation"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "stress_grading",
+  "off_target": false,
+  "novelty": "strong",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Non-uniform electric field stress at dielectric inhomogeneities (voids/interfaces) and surface contamination drives partial discharge inception and tracking, causing progressive insulation degradation. | ingredient: Injecting Ag-NPs into the silicone potting compound enhances charge trapping and screens voids to homogenize the field, thereby increasing the partial discharge inception voltage and suppressing the onset of the degradation mechanism. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Non-uniform electric field stress at dielectric inhomogeneities (voids/interfaces) and surface contamination drives partial discharge inception and tracking, causing progressive insulation degradation.",
+   "ingredient_action": "Injecting Ag-NPs into the silicone potting compound enhances charge trapping and screens voids to homogenize the field, thereby increasing the partial discharge inception voltage and suppressing the onset of the degradation mechanism.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component**: Replace standard silicone potting compound with Ag-Nanoparticle doped s",
+    "*   **Material**: Standard HV-grade silicone RTV (dielectric strength >20 kV/mm) + commerc",
+    "*   **Instrument/Procedure**:",
+    "1.  **ALREADY-RECORDED**: Existing factory test records for standard silicone batches (Bre",
+    "2.  **DERIVED**: Threshold for \"degraded\" state is defined as $V_{pd} < 0.8 V_{pd,i}$ (whe",
+    "3.  **Action**: Pot the bushing termination with the doped silicone. Cure under vacuum (re",
+    "*   **Data Source Compliance**: No new sensors installed in the field. The \"prediction\" is",
+    "*   **Standard Practice**: Apply thicker silicone layer or use a higher-grade polymer.",
+    "*   **My Approach**: Use doped silicone.",
+    "*   **Comparison**:",
+    "*   **Installability**: SAME. Both are potted in the factory or field. Vacuum potting is a",
+    "*   **Cost**: HIGHER material cost (Ag-NPs), but SAME labor.",
+    "*   **Maintenance**: LOWER. Standard practice fails slowly (tracking/degradation); this me",
+    "*   **Conclusion**: The burden is comparable in labor, slightly higher in material, but si"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "96d0a25d834cd363"
+}
