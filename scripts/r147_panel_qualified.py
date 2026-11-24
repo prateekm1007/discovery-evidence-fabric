@@ -198,7 +198,11 @@ def recount(packs: list, tags: list) -> dict:
 
 def main() -> int:
     judges, qual = qualified_panel_judges()
-    packs_doc = json.loads((OUT_DIR / "packs.json").read_text())
+    # the SEALED-SET packs (the A-lane's a0b71b93e mistake-caught
+    # lesson: packs.json is the PRE-SEAL candidate set — the panel
+    # runs on packs_sealed_set.json, the sealed/strengthened rows)
+    packs_doc = json.loads(
+        (OUT_DIR / "packs_sealed_set.json").read_text())
     packs = packs_doc["packs"]
     problems = sealed_problems()
     tags = [j["tag"] for j in judges]
