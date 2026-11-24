@@ -201,8 +201,16 @@ def main() -> int:
         for pk in packs:
             pid = pk["problem_id"]
             outp = OUT_DIR / f"{j['tag']}__{pid}.json"
-            if outp.exists():  # byte-resume, same ruling
-                continue
+            if outp.exists():
+                # byte-resume, same ruling — but a TRANSPORT_FAILED
+                # record is a RETRYABLE leg (the measured 402 state),
+                # not evidence of a ruling; only VALID legs skip
+                try:
+                    _prev = json.loads(outp.read_text())
+                except Exception:  # noqa: BLE001
+                    _prev = {}
+                if _prev.get("outcome") == "VALID":
+                    continue
             prob_text = (problems.get(pid) or {}).get("problem", "")
             prompt = build_prompt(prob_text, pk["candidate_text"],
                                   pk["prior_arts"])
