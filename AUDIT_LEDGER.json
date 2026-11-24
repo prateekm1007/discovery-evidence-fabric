@@ -2090,6 +2090,22 @@
    "title": "8/30 v16 inventions are off-target (chemical CP for abrasion, flow-modulation for tramp metal, passive insulation for nucleation, monitoring for mitigation) \u2014 the operator-to-problem mapping is mismatched",
    "evidence": "v16-02/03/05/07/13/23/25/27",
    "status": "OPEN"
+  },
+  {
+   "id": "R144-F1",
+   "round": "R144",
+   "severity": "MEDIUM",
+   "title": "Quantitative-testability lever fires on only 2/8 dev problems (predictions_present=false); the rubric's strong(4) requires a running unit-checked prediction on EVERY invention",
+   "evidence": "r144s1_strength_dev/SUMMARY quant_computed=2",
+   "status": "OPEN"
+  },
+  {
+   "id": "R144-F2",
+   "round": "R144",
+   "severity": "MEDIUM",
+   "title": "P4 rung PASS cherry-picked (9/13 subset + within-answer proxy); calibrated panel not run; full-set non-obviousness 6.7%",
+   "evidence": "r144_p4_production_rung.json",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5190,6 +5206,19 @@
     "R143-F6",
     "R143-F7"
    ]
+  },
+  {
+   "id": "V111",
+   "round": "R144 audit: generation-strength kit dev-verified + v17 authored + P4 rung rejected + yield 5/5",
+   "commit": "42e4d2e4698dd9d60efd5d3184c721db3549cb4d",
+   "gate": "strength kit dev-verified (0/8 off-target, 7 strong; quant 2/8); v17 sealed authored; P4 rung REJECTED (cherry-picked); yield 5/5; tip P1.4 refresh",
+   "score": 7,
+   "provisional": true,
+   "adjudication": "eval/r144_auditor_adjudication.json",
+   "findings": [
+    "R144-F1",
+    "R144-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -5517,9 +5546,21 @@
    "burn_after": true,
    "score_mean": 2.733,
    "acceptance": "NOT_GRANTED (mean 2.73<3.3, CI lower 2.57<3.0; 0/0/0 hard clauses pass)"
+  },
+  "holdout_v17": {
+   "status": "SEALED_ONE_SHOT",
+   "n": 30,
+   "failure_classes": 10,
+   "author": "delegated owner/auditor",
+   "rubric_custody": "PRIVATE def-rubric-custody (unauth 404)",
+   "rubric_sha256_16": "1db1539e935038db",
+   "bar": "mean>=3.3, CI lower>3.0, >=30% strong, 0 off-target, 0/0/0",
+   "problems_path": "eval/holdout_v17/problems.json",
+   "one_shot": true,
+   "burn_after": true
   }
  },
- "progress_note": "SCORE 7/10 PROVISIONAL (NOT consolidated). R-CAL panel calibration gate MET (V109: 3 judges acc>=0.8, kappa 0.668, AM47/AM49). BUT delegated-owner v16 scoring: NOT_GRANTED \u2014 mean 2.73, CI[2.57,2.89], 0/0/0 hard clauses pass; 22 sound / 8 off-target / 0 strong. GENERATION STRENGTH is the binding capability constraint (R143-F6 HIGH): the engine applies generic TRIZ operators (DIRECT_TRANSFER P5, flow/pressure modulation) without problem-aware mechanism selection or quantitative testability; v15's 3.9 NOT reproduced on fresh problem-only v16 (~2.7). 8/30 off-target (R143-F7). Score-7 two-consecutive FAILS (v15 3.9, v16 2.7); the fresh-input generation capability is ~2.7/4, below the score-6 bar \u2014 the prior v15-based 6/7 overstates fresh-input capability. Critical path: generation strength (problem-aware mechanisms + quantitative testability + novelty) -> fresh sealed set >=3.3 -> P4 production rung (8) -> P5 (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 PROVISIONAL. R144 generation-strength kit BUILT + DEV-VERIFIED (discovery_fabric/generation/: mechanism_map 10 failure classes, quant_test pint formulas, novelty_gate retiring blind operators, inspiration_retrieval); dev dry-run 0/8 off-target, 7 strong + 1 marginal (R143-F7 corrected) BUT quant predictions only 2/8 (R144-F1). v17 SEALED AUTHORED (delegated owner; 30 problems, 10 failure classes, private rubrics 1db1539e) \u2014 builder one-shot with the kit, auditor scores; bar mean>=3.3 + >=30% strong + 0 off-target. P4 rung REJECTED (R144-F2: cherry-picked 9/13 subset + within-answer proxy; full-set non-obviousness 6.7%; calibrated panel not run) \u2014 run the calibrated panel on the full set + external-prior-art non-obviousness. Yield 5/5 grounded 0 bad (best); wind broken. Tip red = P1.4/F77 byte-identity (plan reorder); fix 7438f8dd2 refreshes r52 (conscious re-freeze); verify green. Critical path: v17 one-shot -> >=3.3 + >=30% strong (consolidate 6/7) -> calibrated-panel P4 rung (8) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
