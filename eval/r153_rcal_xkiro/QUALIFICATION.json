@@ -1,0 +1,156 @@
+{
+ "record": "R153_RCAL_XKIRO_QUALIFICATION/1.0.0",
+ "claim": "c-0264",
+ "work_id": "r153-xkiro-qualify-panel-v18",
+ "session": "builder-r153s1",
+ "at": "2026-11-24 (sandbox clock)",
+ "corpus": {
+  "source": "b218b1e9d:eval/auditor_rcal_corpus_r148.json",
+  "canonicalization_digest_match": true,
+  "digest16": "c598682b56c9c33f",
+  "n_pairs": 12,
+  "prefer_a1": 6,
+  "prefer_baseline": 6,
+  "balance_note": "the r148 BALANCED corpus (the R147-F2 fix): alpha computable"
+ },
+ "prompt": {
+  "record": "RCAL_JUDGE_PROMPT_R143/1.0.0",
+  "am47_suffix_applied": true
+ },
+ "protocol": "AM47 viability-necessity; blind+sha-parity swap; per-judge acc>=0.8 AND answered>=0.9 AND miss-bias<=1; >=3 from >=2 non-agnes families; inter-judge alpha>=0.6 (now computable with balanced labels).",
+ "instrument_note": "byte-identical machinery to scripts/r148_rcal_centai.py; ONE seam — the xkiro_chat transport + the free-plan roster (the engine route adapter's existing transport)",
+ "transport": {
+  "provider": "xkiro (api.xkiro.com/v1)",
+  "plan": "FREE (the key's included free models; premium 403, nvidia paid-only, deepseek/moonshot maintenance — typed in the c-0264 claim)"
+ },
+ "one_shot": "exactly one generation per leg; byte-resume continues the same generation; NO re-roll (Art. 7)",
+ "qualification": {
+  "mistral:mst8b": {
+   "legs": 24,
+   "valid": 24,
+   "expected_legs": 24,
+   "answered_rate": 1.0,
+   "answered_rate_basis": "EXPECTED legs (the R136 fix; never legs-present)",
+   "acc_vs_labels": 0.833,
+   "hits": 10,
+   "n_cmp": 12,
+   "swap_instability": 0.25,
+   "vote_rule": "parity-drawn order votes; mirror = consistency check (swap_instability disclosed, never a vote-splitter)",
+   "qualified": false,
+   "am47_bias": {
+    "over_novel": 2,
+    "over_cons": 0,
+    "imbalance": 2
+   }
+  },
+  "cohere:cmdr7b": {
+   "legs": 24,
+   "valid": 24,
+   "expected_legs": 24,
+   "answered_rate": 1.0,
+   "answered_rate_basis": "EXPECTED legs (the R136 fix; never legs-present)",
+   "acc_vs_labels": 0.75,
+   "hits": 9,
+   "n_cmp": 12,
+   "swap_instability": 0.333,
+   "vote_rule": "parity-drawn order votes; mirror = consistency check (swap_instability disclosed, never a vote-splitter)",
+   "qualified": false,
+   "am47_bias": {
+    "over_novel": 0,
+    "over_cons": 3,
+    "imbalance": 3
+   }
+  },
+  "sensenova:snlite": {
+   "legs": 24,
+   "valid": 24,
+   "expected_legs": 24,
+   "answered_rate": 1.0,
+   "answered_rate_basis": "EXPECTED legs (the R136 fix; never legs-present)",
+   "acc_vs_labels": 1.0,
+   "hits": 12,
+   "n_cmp": 12,
+   "swap_instability": 0.083,
+   "vote_rule": "parity-drawn order votes; mirror = consistency check (swap_instability disclosed, never a vote-splitter)",
+   "qualified": true,
+   "am47_bias": {
+    "over_novel": 0,
+    "over_cons": 0,
+    "imbalance": 0
+   }
+  }
+ },
+ "qualified_keys": [
+  "sensenova:snlite"
+ ],
+ "qualified_tags": [
+  "snlite"
+ ],
+ "qualified_families": [
+  "sensenova"
+ ],
+ "am47_bias": {
+  "mistral:mst8b": {
+   "over_novel": 2,
+   "over_cons": 0,
+   "imbalance": 2
+  },
+  "cohere:cmdr7b": {
+   "over_novel": 0,
+   "over_cons": 3,
+   "imbalance": 3
+  },
+  "sensenova:snlite": {
+   "over_novel": 0,
+   "over_cons": 0,
+   "imbalance": 0
+  }
+ },
+ "interjudge_alpha": {
+  "alpha": 0.450464,
+  "metric": "nominal",
+  "degenerate_class": null,
+  "n_units_input": 24,
+  "n_pairable": 24,
+  "d_o": 0.277778,
+  "d_e": 0.505477,
+  "pooled_counts": {
+   "a1": 34,
+   "baseline": 38
+  },
+  "n_units": 24,
+  "judges": [
+   "cohere:cmdr7b",
+   "mistral:mst8b",
+   "sensenova:snlite"
+  ]
+ },
+ "pooled_alpha_with_hy4f": {
+  "alpha": 0.572259,
+  "metric": "nominal",
+  "degenerate_class": null,
+  "n_units_input": 24,
+  "n_pairable": 24,
+  "d_o": 0.215278,
+  "d_e": 0.503289,
+  "pooled_counts": {
+   "a1": 45,
+   "baseline": 51
+  },
+  "n_units": 24,
+  "judges": [
+   "cohere:cmdr7b",
+   "hy4:hy4f",
+   "mistral:mst8b",
+   "sensenova:snlite"
+  ]
+ },
+ "gate": {
+  "n_qualified": 1,
+  "n_families": 1,
+  "alpha": 0.450464,
+  "alpha_degenerate_class": null,
+  "pooled_alpha_with_hy4f": 0.572259,
+  "pass": false
+ }
+}
