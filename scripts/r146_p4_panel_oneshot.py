@@ -185,8 +185,11 @@ def main() -> int:
     _load_key_vault()
     packs_doc = json.loads(PACKS.read_text())
     packs = packs_doc["packs"]
-    problems = {p["problem_id"]: p for p in json.loads(
-        (REPO / "eval/holdout_v17/problems.json").read_text())}
+    raw_probs = json.loads(
+        (REPO / "eval/holdout_v17/problems.json").read_text())
+    prob_list = (raw_probs.get("problems") if isinstance(raw_probs, dict)
+                 else raw_probs)
+    problems = {p["problem_id"]: p for p in prob_list}
 
     only = os.environ.get("R146_JUDGE", "").strip()
     judges = ([j for j in JUDGES if j["tag"] == only] if only
