@@ -251,6 +251,19 @@ def epo_prompt_block(ranking: Dict[str, Any]) -> str:
         "NOT computed from a named formula are FORBIDDEN — if a "
         "parameter is missing, state its assumed value and mark it "
         "'assumed'.")
+    # R146S1 (the twin's mandatory-wording finding, adopted forward —
+    # a real epistemic demand, never screen-gaming): the kill
+    # condition must use 'falsified' VERBATIM and name the PHYSICAL
+    # TEST VEHICLE (coupon/rig/bench/whirling apparatus) —
+    # falsifiability + a named apparatus, not a vague test intent.
+    lines.append(
+        "6. KILL CONDITION WORDING: state 'the mechanism is "
+        "FALSIFIED if <metric> does not change by at least "
+        "<N><unit> within <window>' VERBATIM (the word falsified "
+        "itself), and NAME the physical test vehicle that measures "
+        "it (a coupon test, a bench rig, a whirling apparatus, an "
+        "in-line probe — a named apparatus, never a vague "
+        "'testing').")
     return "\n".join(lines)
 
 
