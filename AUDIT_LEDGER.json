@@ -2242,6 +2242,22 @@
    "title": "Sealed v18 scoring (auditor's act) is the second leg of score-8 \u2014 the v18 generation must land the >=3.3 mean on a fresh sealed set",
    "evidence": "v18 generation PRESENT; auditor scoring pending",
    "status": "OPEN"
+  },
+  {
+   "id": "R153-F1",
+   "round": "R153",
+   "severity": "MEDIUM",
+   "title": "P4 panel one qualifier short: snlite + hy4f qualified (2 judges); a 3rd (tayae/big-pickle/ministral-3b) needs the 00:00 UTC xkiro free-quota reset; then run the full v18 panel >=50%",
+   "evidence": "r153 QUALIFICATION gate pass=false (1 xkiro qualifier); pooled alpha 0.572; hy4f 15/30 panel legs",
+   "status": "OPEN"
+  },
+  {
+   "id": "R153-F2",
+   "round": "R153",
+   "severity": "LOW",
+   "title": "tip RED (c9dd5b4d7397 surface failure) \u2014 heal to green",
+   "evidence": "check-run 138665857932 failure",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5449,6 +5465,19 @@
     "R152-F1",
     "R152-F2"
    ]
+  },
+  {
+   "id": "V119",
+   "round": "R153 audit: xkiro free-plan transport breakthrough \u2014 snlite qualified, serving panel 2/3, score-8 one qualifier from completion",
+   "commit": "776f67e6daedd1a85aa16d948a1e5c76acce8d13",
+   "gate": "transport SOLVED (xkiro free, no payment); snlite acc 1.0 qualified; hy4f qualified; 3rd judge post-quota-reset; v18 panel pending",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r153_auditor_adjudication.json",
+   "findings": [
+    "R153-F1",
+    "R153-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -5819,9 +5848,25 @@
    "physics_errors": 0,
    "acceptance": "GRANTED (mean 3.73>=3.3, CI lower>3.0, 73% strong>=30%, 0 off-target, 0/0/0)",
    "scorer": "delegated owner/auditor"
+  },
+  "rcal_xkiro_r153": {
+   "status": "SEALED_ONE_SHOT",
+   "corpus": "r148 balanced",
+   "qualified": [
+    "sensenova:snlite"
+   ],
+   "failed": [
+    "mistral:mst8b (miss-bias 2)",
+    "cohere:cmdr7b (acc 0.75, bias 3)"
+   ],
+   "quota_blocked": [
+    "big-pickle",
+    "tiny-aya"
+   ],
+   "note": "xkiro free-plan path; snlite+hy4f serving panel; 3rd qualifier post 00:00 UTC reset"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED (V116). State verified: v18 generation PRESENT 30 rows (physics_truth lever validated 6/6 regression 0 FP); physics_truth.py 23777 bytes engine-wired; r148 R-CAL GATE PASS (4 cent-ai judges, alpha 0.835, 4 families); P4 panel instrument 25/30 on v16 (83.3%); F30 AIDE re-authorized + restored; prune TYPED-ZERO; cent-ai transport FUNDED (4 paid lanes alive). SCORE-8 GATE DIAGNOSIS (two legs): (1) P4 panel on v18 >=50% viable+non-obvious (judge!=generator; cent-ai 4 r148-qualified judges; one-shot no re-roll); (2) delegated-owner sealed v18 scoring >=3.3 mean (auditor's act; fresh sealed set; bar mean>=3.3 CI lower>3.0 >=30% strong 0 off-target 0/0/0). If both pass, score 8 lands. Critical path: P4 panel on v18 >=50% + sealed v18 >=3.3 (8) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run. F45 standing owner rotation.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. TRANSPORT BREAKTHROUGH: the score-8 gate is NO LONGER owner-funded-gated. The vault xkiro key carries a FREE plan with usable free models (verified through the engine's xkiro_chat). R-CAL on r148 balanced corpus (83 legs): sensenova:snlite QUALIFIED (acc 1.0, bias 0, swap 0.083); mistral:mst8b failed miss-bias (2); cohere:cmdr7b failed acc 0.75+bias 3 (final, no re-roll); big-pickle/tiny-aya hit the account-wide daily free-token quota (resets 00:00 UTC). Serving panel 2/3 judges: snlite (sensenova) + hy4f (hunyuan, cent-ai free, r148), pairwise alpha 1.0 (perfect agreement). v18 P4 panel: hy4f 15/30 VALID legs stand; one more qualifier (tayae/big-pickle/ministral-3b) post-reset completes the >=3-judge panel on the full 30-candidate set -> >=50% viable+non-obvious = score 8. Tip RED (c9dd5b4d) \u2014 heal. Critical path: post-reset 3rd judge qualifier -> full v18 P4 panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run. F45 standing owner rotation.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

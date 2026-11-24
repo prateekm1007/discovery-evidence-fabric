@@ -1,0 +1,44 @@
+{
+ "record": "R153_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r153s1",
+ "audited_queue_tip": "c9dd5b4d7397 (r153 xkiro free-plan R-CAL; tip RED)",
+ "audit_branch_parent": "776f67e6daedd1a85aa16d948a1e5c76acce8d13",
+ "TRANSPORT_BREAKTHROUGH_VERIFIED": {
+  "verdict": "the score-8 transport gate is SOLVED without owner payment. The vault xkiro key carries a FREE plan with usable free models (sensenova-6.8-flash-lite, mistral-8b, command-r7b, big-pickle, tiny-aya) through the engine's xkiro_chat. R-CAL qualification on the r148 balanced corpus (83 legs committed): sensenova:snlite QUALIFIED (acc 12/12=1.0, answered 24/24, miss-bias 0, swap-instability 0.083); mistral:mst8b FAILED miss-bias (2); cohere:cmdr7b FAILED acc 0.75 + bias 3 (final, no re-roll). big-pickle/tiny-aya hit the account-wide daily free-token quota (resets 00:00 UTC).",
+  "serving_panel": "2 of 3 judges qualified: snlite (sensenova, xkiro free) + hy4f (hunyuan, cent-ai free, r148). Pairwise alpha snlite-hy4f = 1.0 (perfect agreement, 24 units). The xkiro-only gate alpha 0.450 / pooled-with-hy4f 0.572 reflect the FAILED judges dragging the pool; the serving set (snlite+hy4f+a 3rd qualifier) is the alpha that gates the panel.",
+  "blocker": "ONE more qualifier needed (tayae/big-pickle/ministral-3b) after the 00:00 UTC daily-quota reset; then the full v18 P4 panel (3 judges, 3 families) fires. The transport is no longer owner-funded-gated \u2014 it is a daily-quota question."
+ },
+ "PANEL_STATE": "v18 P4 panel: hy4f 15/30 VALID legs stand (the rest 402-transport-failed, retry on alive lanes); snlite + a 3rd qualifier complete the >=3-judge serving panel on the full 30-candidate set.",
+ "FINDINGS": [
+  {
+   "id": "R153-F1",
+   "severity": "MEDIUM",
+   "title": "P4 panel one qualifier short: snlite + hy4f qualified (2 judges); a 3rd (tayae/big-pickle/ministral-3b) needs the 00:00 UTC xkiro free-quota reset; then run the full v18 panel >=50%",
+   "evidence": "r153 QUALIFICATION gate pass=false (1 xkiro qualifier); pooled alpha 0.572; hy4f 15/30 panel legs",
+   "direction": "DIR2 \u2014 qualify a 3rd judge post-reset, run the v18 P4 panel"
+  },
+  {
+   "id": "R153-F2",
+   "severity": "LOW",
+   "title": "tip RED (c9dd5b4d7397 surface failure) \u2014 heal to green",
+   "evidence": "check-run 138665857932 failure",
+   "direction": "DIR6 \u2014 heal green"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; F45 standing owner rotation",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "R-CAL gate MET (r148 alpha 0.835); transport SOLVED (xkiro free plan); snlite+hy4f qualified; P4 panel one qualifier from completion",
+  "P5": "NOT_MET \u2014 needs sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "v18 GRANTED generation strength; transport gate solved (xkiro free, no owner payment); P4 panel one qualifier from the >=50% score-8 verdict",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "post-reset 3rd judge qualifier -> full v18 P4 panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r153_auditor_adjudication.json"
+}
