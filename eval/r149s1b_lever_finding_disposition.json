@@ -1,0 +1,31 @@
+{
+  "record": "R148S1B_LEVER_FINDING_DISPOSITION/1.0.0",
+  "author": "builder-r148s1-b (claim c-0257, the panel-arbitration verifier lane)",
+  "date": "2026-11-24",
+  "subject": "the generation-time physics-truth gate (discovery_fabric/generation/physics_truth.py, the c-0260 lane's landed lever) as exercised by the 30 landed v18 rows",
+  "row_evidence": "eval/holdout_v18_physics_generation/*.json final_meta.physics_gate — 23 PASS / 7 FAIL (all FAILs surfaced for the reviewer: stop_reason FINDINGS_SURFACED_FOR_REVIEWER, repairs 0)",
+  "dispositions": [
+    {
+      "id": "FD1",
+      "row": "v17-30-capacitor-dielectric",
+      "check": "SIGN_FIELD_GRADING",
+      "gate_verdict": "FAIL",
+      "disposition": "FALSE_POSITIVE (adjudicated by byte-read of the answer, the recompute discipline)",
+      "evidence": "the answer EXPLICITLY rejects low-permittivity voids ('rather than adding low-permittivity voids or series barriers'), applies D-continuity CORRECTLY (void eps=1: E_defect=4000 V/mm = 4x bulk, spikes), and the 'reduced' claim attaches to the HIGH-k filler (eps=10: E=400 V/mm), including the correct adjacent-bulk slight increase; the worked series example (10000/2.485 etc.) is internally consistent",
+      "root_cause": "the check's pattern matched 'low-permittivity' and 'reduces the local field' as one claim; the text's referent for 'reduced' is the high-eps filler, not the low-eps layer — the zero-LLM pattern cannot resolve the referent",
+      "impact": "NONE on the V116 GRANT — the auditor's 0-genuine-physics-errors verdict is consistent with the bytes; the flag was reviewer-surfaced and did not corrupt generation (repairs 0, the answer text is correct)",
+      "typed_improvement_for_next_window": "add a referent-resolver (or an exclusion for 'rather than adding low-permittivity voids' style negations) to check_sign_field_grading; the v17-30 row is the regression case; the sealed v18 bytes stay untouched (the GRANT's instrument identity is preserved)"
+    },
+    {
+      "id": "FD2",
+      "rows": ["v17-02-pneumatic-elbow", "v17-04-dairy-pasteurizer", "v17-10-rareearth-leachate", "v17-11-lithium-brine", "v17-18-vessel-nozzle", "v17-28-hvdc-bushing"],
+      "check": "ASSUMPTION_BOUNDS",
+      "gate_verdict": "FAIL x6",
+      "disposition": "QUALITY_FLAGS — partially valid: each flagged assumption states a VALUE and usually a reason, but not always an explicit FALSIFIABLE bound (the DIR-6 contract wants 'source/falsifiable bound' per assumption)",
+      "impact": "absorbed by the sealed scoring (V116 GRANT mean 3.73 over the full set; the flags were disclosed to the reviewer, repairs intentionally 0 to keep the one-shot discipline)",
+      "typed_improvement_for_next_window": "generation-time prompt nudge: every ASSUMPTION: line must end with a falsifiable bound clause ('falsified if ...'); do NOT regenerate the granted set for this"
+    }
+  ],
+  "verifier_conclusion": "the landed v18 bytes are physics-correct on the byte-read recompute of every gate-FAIL row; the generation-time gate over-surfaces (1 sign FP + 6 quality flags) without corrupting the granted set; the instrument's next-window improvements are typed above and gated on NOT touching the sealed v18 bytes",
+  "panel_note": "the assembled panel packs (packs_v18.json) carry row_sha256_16 provenance per candidate, so the panel judges exactly the granted bytes; the v17-30 FP is recorded here so a judge flag on it is expected to be a re-derivation of FD1, not a new finding"
+}
