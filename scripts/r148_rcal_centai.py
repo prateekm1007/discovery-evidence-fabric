@@ -54,6 +54,9 @@ JUDGES = [
     {"model": "glm-5.3-flash", "family": "glm", "tag": "glm53f",
      "transport": "cent", "pace": 6, "budgets": [4000, 8000, 12000],
      "timeout_s": 240.0},
+    {"model": "glm-5.3-flash:free", "family": "glm", "tag": "glm53ff",
+     "transport": "cent", "pace": 6, "budgets": [4000, 8000, 12000],
+     "timeout_s": 240.0},
 ]
 
 SYSTEM = ("You are a strict blind rubric judge. English only. "
