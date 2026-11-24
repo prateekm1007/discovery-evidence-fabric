@@ -2130,6 +2130,22 @@
    "title": "Quant pint-computed coverage 21-25/30 post-hoc (quant_generic.py); full 30/30 needs the generation-time contract (the runner demanding the design point); 4 rows QUANT_TEST_MISSING",
    "evidence": "r145s1b_quant_pass/SUMMARY; sealed screen QUANT_TEST_MISSING 4",
    "status": "OPEN"
+  },
+  {
+   "id": "R147-F1",
+   "round": "R147",
+   "severity": "MEDIUM",
+   "title": "cent-ai judges need R-CAL qualification on r147 before the P4 panel (they are new models, not the V109-qualified HF judges); the free-tier glm pool is 429 rate-limited",
+   "evidence": "cent-ai /v1/models 49; r147 corpus; glm-5.3-flash:free 429",
+   "status": "OPEN"
+  },
+  {
+   "id": "R147-F2",
+   "round": "R147",
+   "severity": "LOW",
+   "title": "r147 prefer-arm is all-a1 (novelty-direction 4 more/8 less); blind+swap handles position bias, but a future corpus should balance the prefer-arm 6/6 for robustness",
+   "evidence": "r147 corpus",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5257,6 +5273,19 @@
     "R145-F2",
     "R145-F3"
    ]
+  },
+  {
+   "id": "V113",
+   "round": "R147 delegated-owner: cent-ai funded judge path verified + r147 R-CAL corpus authored (score-8 unblocked)",
+   "commit": "f0941fc303241afe9b47cea74bc3b0e11067fd67",
+   "gate": "cent-ai judge path funded (owner) + verified; r147 corpus authored; qualify cent-ai judges + P4 panel on v17 pending",
+   "score": 7,
+   "provisional": true,
+   "adjudication": "eval/r147_auditor_adjudication.json",
+   "findings": [
+    "R147-F1",
+    "R147-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -5596,9 +5625,17 @@
    "problems_path": "eval/holdout_v17/problems.json",
    "one_shot": true,
    "burn_after": true
+  },
+  "rcal_corpus_r147": {
+   "status": "SEALED_ONE_SHOT",
+   "selection_sha256": "543fc2f4cf450cd7",
+   "n": 12,
+   "author": "delegated owner/auditor",
+   "purpose": "qualify the cent-ai judge path",
+   "path": "eval/auditor_rcal_corpus_r147.json"
   }
  },
- "progress_note": "SCORE 7/10 PROVISIONAL. v17 sealed one-shot ran on the owner's 30 problems (strength kit wired): OFF-TARGET CLOSED (0/30, auditor read 10/10 on-physics + numeric; vs v16's 8 off-target) \u2014 the mechanism_map works. Novelty strength 4/30=13% strong < the >=30% bar; sealed mean borderline ~3.1-3.3; NOT_GRANTED yet (R145-F1). P4 calibrated-panel rung 25/30=83.3% (full set, blind+swapped, external prior art, EPO problem-solution, diff=0 two-lane verified) BUT rated the v16 WEAK candidates, not v17 \u2014 re-run on v17 (R145-F2). Quant pint-computed 21-25/30 post-hoc (quant_generic.py); full 30/30 needs generation-time contract (R145-F3). Yield 5/5, wind broken. Tip green. Critical path: v17 novelty >=30% strong + quant 30/30 -> sealed mean>=3.3 (consolidate 6/7) -> P4 panel on v17 >=50% (8) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 PROVISIONAL. OWNER provided a FUNDED judge path: cent-ai gateway api.cent-ai.dev/v1 (key env-only), 49 models incl hy4-flash:free/deepseek-v4-flash/qwen3.8-flash/glm-5.3-flash \u2014 VERIFIED (deepseek-v4-flash returns valid forced-choice prefer on a blind r147 pair). This UNBLOCKS the score-8 gate (was HF-credit-gated, 402). Fresh R-CAL corpus r147 authored (12 pairs, sha 543fc2f4) to qualify the cent-ai judges (NEW models, not V109 HF judges): acc>=0.8, answered>=0.9, miss-bias<=1, >=3 from >=2 non-agnes families, alpha>=0.6. Then run the P4 panel on the v17 STRENGTHENED candidates (builder-side MET: 16/30 strong=53.3%, 0 off-target, quant 30/30; dsr1 pre-exhaustion 10/10 viable+non-obvious). Sealed v17 scoring (mean>=3.3) is the auditor's act. glm-5.3-flash:free is 429 free-pool limited (use paid or backoff). Critical path: qualify cent-ai judges (r147) -> P4 panel on v17 >=50% (8) + sealed v17 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
