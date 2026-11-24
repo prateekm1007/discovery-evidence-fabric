@@ -1,0 +1,127 @@
+{
+ "problem_id": "v17-10-rareearth-leachate",
+ "domain": "contamination_separation",
+ "question_type": "invention",
+ "executor_id": "builder-r146s1@holdout-v17-s2-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r146_v17_s2_one_shot/1.0.0 — the FRESH sealed one-shot (the R146 DIR-2 order after V112's R145-F1): the owner's sealed 30-problem bytes, problem-only, agnes-3.0-flash pinned; the STRENGTHENED instrument — the EPO problem-solution non-obviousness contract on the SPECTER2-retrieved external prior art + the quant design-point contract at generation time + the standing strength kit (mechanism_map + quant_test + novelty_gate + inspiration); the scoring is the delegated owner's act. The first sealed run (c-0247) stands as the V112-scored evidence; this is the fresh attempt, one generation.",
+ "run": "holdout-v17-s2-dev (the strengthened instrument)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:45b48cc6c9f5": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:3ab21a023b7b": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "contamination_separation",
+   "confidence": 1.0,
+   "evidence_span": "impurit, separation",
+   "allowed_mech_classes": [
+    "magnetic_gradient_separation",
+    "eddy_current_separation",
+    "self_cleaning_screen",
+    "density_settling_separation",
+    "process_isolation_chamber"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "magnetic_gradient_separation",
+   "prior_art_ids": [
+    "HO9-02-bayer-digestion-scale",
+    "HO11-09-soda-carbonator-scaling",
+    "HO9-01-chloralkali-brine-hardness"
+   ],
+   "prior_art_nearest_cosine": 0.9141,
+   "inspiration_analogies_n": 2,
+   "winner_measure_class": "chemistry",
+   "winner_rule": "non_schedule_first"
+  }
+ },
+ "generated_at": "2026-11-24T08:12:02Z",
+ "attempts_n": 1,
+ "row_wall_s": 19.0,
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a magnetic_gradient_separation mechanism using a high-gradient magnetic field to extract ferrous impurities. The proposed mechanism deploys a multi-stage, counter-current magnetic cascade with optimized field gradients and residence times to separate both iron and thorium simultaneously. This works because thorium's paramagnetic susceptibility and iron's ferromagnetic response allow sequential extraction in a single pass via tailored field strengths and flow dynamics.  \n\nPHYSICS CHECK  \nGoverning relation: Magnetic force on particle = (χ·V·B·∇B) / μ₀, where χ is magnetic susceptibility, V is particle volume, B is magnetic field, ∇B is field gradient, and μ₀ is permeability of free space.  \n- χ_iron = 200,000 (dimensionless, ferromagnetic, assumed from material properties)  \n- χ_thorium = 1.3 (dimensionless, paramagnetic, assumed from material properties)  \n- B = 1.5 T (tesla, USER CONSTRAINT: typical high-gradient separator field)  \n- ∇B = 1000 T/m (tesla per meter, CALCULATED: 1.5 T / 0.0015 m gap, stated separator geometry)  \n- V = 1e-15 m³ (cubic meters, CALCULATED: 10 μm particle diameter, assumed leachate particle size)  \n- μ₀ = 4πe-7 H/m (henries per meter, stated physics constant)  \nForce_iron = (200,000 · 1e-15 · 1.5 · 1000) / 4πe-7 = 2.4e-4 N (newtons)  \nForce_thorium = (1.3 · 1e-15 · 1.5 · 1000) / 4πe-7 = 1.6e-9 N  \nForce ratio (iron/thorium) = 150,000:1, sufficient for sequential separation.  \n\nIMPLEMENTATION BILL  \nComponents:  \n- High-gradient magnetic separator (HGMS) coil (copper, USER CONSTRAINT: standard industrial HGMS)  \n- Ferromagnetic matrix (stainless steel wool, USER CONSTRAINT: stated matrix material)  \n- Thorium-specific paramagnetic capture stage (neodymium magnets, USER CONSTRAINT: rare-earth magnet)  \n- Counter-current flow distributor (polypropylene, USER CONSTRAINT: stated chemical compatibility)  \nInstruments:  \n- pH sensor (ALREADY-RECORDED: \"stated telemetry feed\")  \n- Conductivity sensor (ALREADY-RECORDED: \"stated telemetry feed\")  \n- Magnetic field strength meter (ALREADY-RECORDED: \"stated inspection record\")  \n- Particle size analyzer (ALREADY-RECORDED: \"stated log\")  \nProcedure:  \n1. Pass leachate through iron-capture stage at B = 1.5 T, ∇B = 1000 T/m (CALCULATED from stated geometry).  \n2. Direct effluent to thorium-capture stage at B = 0.5 T, ∇B = 500 T/m (CALCULATED from reduced field requirement).  \n3. Monitor pH (USER CONSTRAINT: primary indicator) and conductivity (secondary indicator) for stability thresholds.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: Same as standard HGMS (USER CONSTRAINT: same instrument class).  \n- Operability: No additional training (USER CONSTRAINT: same procedure class).  \n- Maintenance: Matrix cleaning same as standard (USER CONSTRAINT: same maintenance class).  \n- Cost: Same class (USER CONSTRAINT: same material/instrument class).  \n\nEXECUTABLE TEST  \nProtocol: Pass synthetic leachate (10 ppm iron, 5 ppm thorium) through the separator at 1 L/min.  \nInstruments: Particle size analyzer, ICP-MS for effluent concentration.  \nPass/fail: Iron removal >=99.9%, thorium removal >=95% (both CALCULATED from stated purity requirements).  \nDuration: 4 hours (USER CONSTRAINT: stated test duration).  \nKill criterion: The mechanism is FALSIFIED if effluent iron > 0.01 ppm or thorium > 0.25 ppm, measured by ICP-MS.  \n\nNON-OBVIOUSNESS  \n1. CLOSEST PRIOR ART: HO9-02-bayer-digestion-scale uses a single-stage magnetic separator with fixed field strength for scale removal.  \n2. DISTINGUISHING FEATURES: (a) Counter-current flow design enabling sequential capture, (b) Dual-stage field optimization (high B for iron, low B for thorium).  \n3. OBJECTIVE TECHNICAL PROBLEM: Sequential separation avoids thorium recontamination by iron-laden matrix.  \n4. OBVIOUS-KNOB REJECTION: Increasing field strength (closest art's obvious fix) fails as it co-captures both, reducing purity.  \n5. CROSS-DOMAIN TRANSFER: Counter-current flow from chemical engineering (inspiration: extraction cascades) enables multi-stage separation without additional hardware.  \n\nCONSTRAINT BIND  \nPrimary indicator is pH (USER CONSTRAINT: \"pH defines failure\" per problem statement). Conductivity supplements as secondary indicator.  \n\nRISK: Assumed particle size (10 μm) may vary; if actual particles are smaller, force ratio drops, risking incomplete separation.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- High-gradient magnetic separator (HGMS) coil (copper, USER CONSTRAINT: standard industri",
+    "- Ferromagnetic matrix (stainless steel wool, USER CONSTRAINT: stated matrix material)",
+    "- Thorium-specific paramagnetic capture stage (neodymium magnets, USER CONSTRAINT: rare-ea",
+    "- Counter-current flow distributor (polypropylene, USER CONSTRAINT: stated chemical compat",
+    "- pH sensor (ALREADY-RECORDED: \"stated telemetry feed\")",
+    "- Conductivity sensor (ALREADY-RECORDED: \"stated telemetry feed\")",
+    "- Magnetic field strength meter (ALREADY-RECORDED: \"stated inspection record\")",
+    "- Particle size analyzer (ALREADY-RECORDED: \"stated log\")",
+    "1. Pass leachate through iron-capture stage at B = 1.5 T, ∇B = 1000 T/m (CALCULATED from s",
+    "2. Direct effluent to thorium-capture stage at B = 0.5 T, ∇B = 500 T/m (CALCULATED from re",
+    "3. Monitor pH (USER CONSTRAINT: primary indicator) and conductivity (secondary indicator) ",
+    "- Installability: Same as standard HGMS (USER CONSTRAINT: same instrument class).",
+    "- Operability: No additional training (USER CONSTRAINT: same procedure class).",
+    "- Maintenance: Matrix cleaning same as standard (USER CONSTRAINT: same maintenance class).",
+    "- Cost: Same class (USER CONSTRAINT: same material/instrument class)."
+   ],
+   "APPARATUS_ROW": [
+    "3. Monitor pH (USER CONSTRAINT: primary indicator) and conductivity (secondary indicator) for stability thresh"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "magnetic_gradient_separation",
+   "cross_domain": "recycling"
+  },
+  "generic_quant": {
+   "status": "computed",
+   "quantity": "the Springer implied speed reduction (v^5, 95% erosion cut)",
+   "predicted_value": "the damaging-speed threshold must rise by 82% (=1/(1-x)^(1/5)-1)",
+   "calc_trace": "(1-0.95)^(1/5) = 0.549",
+   "falsifier": "the whirling-arm threshold speed must rise by 82% in the droplet-impact coupon test; the opposite result falsifies the invention",
+   "route": "class-generic:contamination_separation"
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "2483cbe1cb000fcc"
+}

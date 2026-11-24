@@ -167,10 +167,15 @@ QUANT_CONTRACT = (
     "+ COMPARISON (e.g. '>= 45:1', '< 0.2 mm', 'at least 30%', "
     "'reduces wear rate by at least 40% within 500 h'), plus the "
     "observation that would refute the mechanism.\n"
-    "State the percent/magnitude claim EXPLICITLY ('reduces X by N%') "
-    "so the prediction is pint-checkable from the stated numbers. "
-    "Never present invented measured data; every assumed number is a "
-    "TYPED assumption (Art. 9).")
+    "MANDATORY WORDING: the kill condition MUST use the word "
+    "'FALSIFIED' verbatim ('the mechanism is FALSIFIED if ...') and "
+    "MUST name the physical test vehicle that observes the threshold "
+    "(a coupon test, a test rig, a bench test, a whirling/pit test "
+    "— the concrete apparatus). State the percent/magnitude claim "
+    "EXPLICITLY ('reduces X by N%') so the prediction is "
+    "pint-checkable from the stated numbers. Never present invented "
+    "measured data; every assumed number is a TYPED assumption "
+    "(Art. 9).")
 
 
 def _gateway_key() -> str:
