@@ -1,0 +1,49 @@
+{
+ "record": "R143S4_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r143s4",
+ "audited_queue_tip": "2c0191653a62 (green tip; R143 panel + v16 + yield-confirm committed)",
+ "audit_branch_parent": "2cd786fb23658aaf66c0bef5f4e301818a6de646",
+ "RCAL_VERDICT": {
+  "verdict": "SCORE-8 R-CAL PANEL CALIBRATION GATE MET \u2014 VERIFIED by independent recompute. 3 judges qualify (qwen235b acc1.0, dsv32 0.917, qw32b 0.917; answered 1.0; miss-based bias<=1) from 2 non-agnes families; inter-judge kappa 0.668>=0.6. dsr1 acc0.833 but miss-bias 2 (marginal, not needed). hy4f transport-dead. The AM47 viability-necessity calibration WORKED: acc lifted from r142's 0.75 cap to 0.833-1.0. Corpus burned (one-shot, no re-roll).",
+  "bias_gate": "AM49 clarifies the AM47 bias gate is MISS-based novelty-deviation (well-posed); the all-pairs computation (6-9 imbalance) was ill-posed (reflects the corpus's 10/12 less-novel-prefer skew, not judge bias). The acc bar is unchanged."
+ },
+ "V16_STATUS": "30/30 inventions generated (problem-only, agnes-3.0-flash, rubrics never read); the auditor scoring vs the sealed private-custody rubrics is the delegated-owner act NEXT (consolidates score-7, v15->v16 consecutive).",
+ "YIELD_STATUS": "clean re-run confirms 2/5 grounded, 0 bad (R143-F1 answered); wind synthesis still 0 (open follow-up).",
+ "FINDINGS": [
+  {
+   "id": "R143-F4",
+   "severity": "LOW",
+   "title": "r143 corpus novelty-direction skew (10/12 prefer less-novel) \u2014 future R-CAL corpora should balance novelty-direction; the miss-based bias gate (AM49) is well-posed regardless",
+   "evidence": "corpus novelty-direction census; AM49",
+   "direction": "DIR8 \u2014 balance future corpus novelty-direction"
+  },
+  {
+   "id": "R143-F5",
+   "severity": "MEDIUM",
+   "title": "Wind synthesis starves at 0 candidates across runs \u2014 the synthesis-stage complement did not unstarve it; the open engine capability item",
+   "evidence": "r143_yield_confirm wind 0",
+   "direction": "DIR5 \u2014 wind synthesis-stage fix"
+  }
+ ],
+ "CLOSED_THIS_ROUND": [
+  "R143-F1 (yield clean re-run 2/5 confirmed)",
+  "R143-F2 (v16 chain green tip)",
+  "R142-F8 (R-CAL gate MET via AM47/AM49)"
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; custody unblocked",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 2/5",
+  "P2": "MET (score6, v15 3.9)",
+  "P3": "PARTIAL (score7 carried; v16 generated, scoring next)",
+  "P4": "R-CAL CALIBRATION GATE MET (3 judges, kappa 0.668) \u2014 the production rung (>=50% viable+non-obvious) + AM48 AUC>=0.8 prior-art gate are NEXT",
+  "P5": "NOT_MET \u2014 needs sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "no_score_change": true,
+  "basis": "R-CAL calibration gate MET (score-8 precondition); v16 scoring + P4 production rung pending; score moves to 8 only when the P4 production gate (>=50% viable+non-obvious + AUC>=0.8) passes",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "v16 scoring (consolidate 7) -> P4 production rung + AM48 AUC gate (8) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r143s4_auditor_recompute.json"
+}

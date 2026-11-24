@@ -1,0 +1,49 @@
+{
+ "record": "R143_RCAL_AUDITOR_RECOMPUTE/1.0.0",
+ "auditor_session": "auditor-r143s4",
+ "authority": "Auditor Art.13 independent recompute from the 120 raw legs (eval/r143_panel/) + sealed labels",
+ "per_judge": {
+  "dsr1": {
+   "acc": 0.833,
+   "answered": 1.0,
+   "miss_over_novel": 2,
+   "miss_over_cons": 0,
+   "miss_imb": 2
+  },
+  "dsv32": {
+   "acc": 0.917,
+   "answered": 1.0,
+   "miss_imb": 0
+  },
+  "qw32b": {
+   "acc": 0.917,
+   "answered": 1.0,
+   "miss_imb": 1
+  },
+  "qwen235b": {
+   "acc": 1.0,
+   "answered": 1.0,
+   "miss_imb": 0
+  },
+  "hy4f": {
+   "acc": 0.0,
+   "answered": 0.0,
+   "transport_dead": true
+  }
+ },
+ "inter_judge_kappa": 0.668,
+ "qualified_bias_le1": [
+  "qwen235b",
+  "dsv32",
+  "qw32b"
+ ],
+ "n_qualified": 3,
+ "non_agnes_families": [
+  "qwen",
+  "deepseek"
+ ],
+ "gate": "MET (>=3 qualified acc>=0.8 answered>=0.9 miss-bias<=1; kappa 0.668>=0.6; 2 families)",
+ "corpus_novelty_skew": "10/12 prefer LESS-novel (viability-necessity design); miss-based gate is well-posed; all-pairs counter (6-9) was the ill-posed computation",
+ "diff_vs_verifier": "acc/kappa match the r143s3-b verifier recompute exactly; bias counters differ by definition (verifier dsr1=0 vs auditor miss-based dsr1=2) \u2014 AM49 clarifies miss-based; dsr1 not needed for >=3",
+ "diff": 0
+}

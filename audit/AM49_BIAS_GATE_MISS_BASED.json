@@ -1,0 +1,9 @@
+{
+ "id": "AM49",
+ "date": "2026-11-23",
+ "authority": "DELEGATED OWNER",
+ "title": "AM47 bias-gate definition clarified: MISS-based novelty-deviation (well-posed), not all-pairs novelty-direction",
+ "data_grounding": "The r143 corpus is novelty-direction-skewed (10/12 pairs prefer the LESS-novel viable arm \u2014 viability-necessity by design). An all-pairs novelty-direction counter (the R143S1 Chinese-session computation, imbalance 6-9) reflects the CORPUS structure, not judge bias, and is ill-posed. The CORRECT counter is MISS-based: over_novel = on a miss, the judge picked the higher-novelty-score arm; over_cons = picked the lower. At acc=1.0 there are no misses -> 0/0. Independent auditor recompute (miss-based): dsr1 |imb|=2, dsv32=0, qw32b=1, qwen235b=0; inter-judge kappa 0.668.",
+ "amendment": "The AM47 |over_novel-over_cons|<=1 gate is computed on MISSES (novelty-score-relative deviation), NOT all-pairs. This is well-posed independent of corpus novelty-skew. The acc>=0.8 AND answered>=0.9 bars are UNCHANGED. Future R-CAL corpora SHOULD balance novelty-direction (half prefer-more-novel, half prefer-less) so the corpus is not one-directional; the r143 skew is a design note, not a gate invalidation.",
+ "ruling": "R-CAL gate MET: qwen235b (acc1.0,|imb|0), dsv32 (0.917,0), qw32b (0.917,1) qualify (>=3) from 2 non-agnes families (qwen, deepseek); kappa 0.668>=0.6. dsr1 (acc0.833,|imb|2) marginally fails the bias gate but is not needed for >=3. hy4f transport-dead (typed). The AM47 viability-necessity calibration WORKED (acc lifted from r142's 0.75 cap to 0.833-1.0)."
+}
