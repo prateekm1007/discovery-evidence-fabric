@@ -253,7 +253,36 @@ def main() -> int:
         t_row = r97._now()
         final, attempts, final_meta = r97.machine_generate_v79(
             machine_prob, _gateway_key(), used_templates={})
-        gate = ng.gate(final, sel)
+        # the gate needs the ENGINE's mapped mechanism class (the
+        # engine_prediction leg's class when the formula exists, else
+        # the first mapped class) — classify_failure leaves
+        # selected_mech_class empty by design
+        mapped_mech = eng_pred.get("mech_class") or (
+            sel.allowed_mech_classes[0] if sel.allowed_mech_classes
+            else "")
+        gate = ng.gate(final, mm.MechanismSelection(
+            failure_class=sel.failure_class, confidence=sel.confidence,
+            evidence_span=sel.evidence_span,
+            allowed_mech_classes=sel.allowed_mech_classes,
+            selected_mech_class=mapped_mech,
+            root_cause_chain=sel.root_cause_chain,
+            cross_domain=(insp.get("analogies") or [{}])[0].get(
+                "from_domain", "") if insp.get("analogies") else "",
+            notes=sel.notes))
+        # the POST-HOC generic quant pass (the R145S1B quant_generic
+        # layer): the canonical pint formula per failure class runs on
+        # the DELIVERED answer — computed predictions recorded per row
+        # (the R144-F1 evidence), typed insufficient_parameters with
+        # the measurement plan where the invention states nothing
+        # computable (never invented numbers, Art. 9)
+        try:
+            from discovery_fabric.generation.quant_generic import (
+                emit_prediction_generic)
+            generic_quant = emit_prediction_generic(sel.failure_class,
+                                                   final)
+        except Exception as e:  # typed, never silent
+            generic_quant = {"status": "compute_error",
+                             "error": f"{type(e).__name__}: {e}"}
         row_wall_s = round(time.time() - row_wall_start, 1)
         decl = m77.declared_template(final)
         row = {
@@ -281,6 +310,7 @@ def main() -> int:
                 "findings_disclosed": final_meta.get(
                     "findings_disclosed"),
                 "novelty_gate": gate,
+                "generic_quant": generic_quant,
             },
             "declared_template_prose": decl,
             "sha256_16": r97._sha16(final),
@@ -294,6 +324,7 @@ def main() -> int:
             "final_chars": len(final),
             "failure_class": sel.failure_class,
             "engine_prediction_status": eng_pred.get("status"),
+            "generic_quant_status": generic_quant.get("status"),
             "novelty_gate": gate.get("novelty"),
             "residual_findings": sorted(
                 (final_meta.get("residual_findings") or {}).keys()),
