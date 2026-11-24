@@ -67,6 +67,9 @@ JUDGES_CENT = [
     {"model": "minimax-m3.1-flash", "family": "minimax",
      "tag": "mm31", "transport": "cent-ai", "pace": 4,
      "budgets": [4000, 6000, 8000], "timeout_s": 150},
+    {"model": "deepseek-v4-flash", "family": "deepseek",
+     "tag": "dsv4f", "transport": "cent-ai", "pace": 4,
+     "budgets": [4000, 6000, 8000], "timeout_s": 120},
 ]
 CALIBRATION_NOTE = ("OWNER-DESIGNATED FALLBACK JUDGE (R147 DIR 2) "
                     "— NOT V109-qualified (acc/kappa vs the "
