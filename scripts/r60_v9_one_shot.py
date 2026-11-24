@@ -237,6 +237,34 @@ def challenger_prob(prob: dict, winner: dict, rule: str) -> dict:
         "signals_used": list(winner.get("signals_used") or []),
         "selection_rule": rule,
     }
+    # R144 DIR-2/3 (claim c-0243): the failure-physics conditioning —
+    # the detected failure family + its admitted mechanism classes
+    # ride the SAME typed_plan payload (the machine logic stays
+    # byte-unchanged; the payload gains a field). The generator is
+    # told WHY this class: the stated failure physics admits these
+    # mechanism classes and excludes the anti-classes — the v16
+    # off-target shapes (chemical CP for abrasion, flow-modulation
+    # for tramp metal, monitoring for nucleation) are the measured
+    # cost of conditioning without the physics.
+    try:
+        from discovery_fabric.engine.failure_mechanism_map import (
+            detect_failure_family, family_classes)
+        fam = detect_failure_family(prob)
+        if fam is not None:
+            adm, anti = family_classes(fam)
+            p["typed_plan"]["failure_physics"] = {
+                "family": fam,
+                "admitted_mechanism_classes": list(adm),
+                "excluded_mechanism_classes": list(anti),
+                "directive": (
+                    "the stated failure mode is of this family — the "
+                    "mechanism MUST act on this failure physics via "
+                    "the admitted classes; the excluded classes "
+                    "cannot address it (their mechanisms act on "
+                    "different physics)"),
+            }
+    except Exception:  # noqa: BLE001 — conditioning is additive
+        pass
     return p
 
 

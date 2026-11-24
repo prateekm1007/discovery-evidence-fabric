@@ -274,6 +274,53 @@ def enumerate_plans(problem: dict) -> list:
         p["chemistry_elicited"] = True
     plans.sort(key=lambda q: 0 if q["measure_class"] == "chemistry"
                else 1)
+    # 7. R144 DIR-3 (R143-F7's remedy, claim c-0243): the failure-mode
+    #    -> mechanism-class MAP reorders the population AFTER every
+    #    legacy ordering rule — the stated failure physics decides
+    #    which mechanism classes CAN act on it, and anti-class plans
+    #    (a class whose mechanism cannot act on the stated failure
+    #    mode — the measured off-target shapes: chemical CP for
+    #    abrasion, flow-modulation for tramp metal, monitoring for
+    #    nucleation) are demoted to the tail. The pre-registered
+    #    winner rule (first contract-satisfied non-duty_cycle plan in
+    #    population order) stays BYTE-IDENTICAL — the MAP is an
+    #    ordering lever, the same shape as the AM63 elicitation.
+    #    Every plan is TAGGED with its fit record (map_source) — the
+    #    reorder is measured, never assumed; no detection = no
+    #    reorder (Art. XXV).
+    from .failure_mechanism_map import mechanism_class_fit
+    for p in plans:
+        p["mechanism_fit"] = mechanism_class_fit(
+            problem, p.get("measure_class", ""))
+    # 7b. admitted-class PROMOTION (the AM63 elicitation precedent,
+    #     claim c-0243): when a failure family is detected and NO
+    #     plan carries an admitted class, the plan space itself is
+    #     blind to the failure physics — promote the LAST plan to the
+    #     family's first admitted class (flagged map_promoted, never
+    #     silent, Art. 4). The winner rule still picks by population
+    #     order; the promotion guarantees an on-physics plan EXISTS.
+    from .failure_mechanism_map import family_classes
+    _fam = plans[0].get("mechanism_fit", {}).get("family") if plans else None
+    if _fam and not any(p.get("mechanism_fit", {}).get("admitted")
+                        for p in plans):
+        _adm, _ = family_classes(_fam)
+        if _adm:
+            p = plans[-1]
+            taken = {q["principle_id"] for q in plans[:-1]}
+            p["measure_class"] = _adm[0]
+            p["principle_id"] = next(
+                (c for c in CLASS_PRINCIPLES[_adm[0]]
+                 if c not in taken),
+                CLASS_PRINCIPLES[_adm[0]][0])
+            p["signals_used"] = CLASS_SIGNALS[_adm[0]]
+            p["mechanism_fit"] = mechanism_class_fit(
+                problem, p["measure_class"])
+            p["map_promoted"] = True
+    _pre = [tuple(p.items()) for p in plans]  # stability anchor
+    plans.sort(key=lambda q: q.get("mechanism_fit", {}).get("rank", 0))
+    if [tuple(p.items()) for p in plans] != _pre:
+        for p in plans:
+            p.setdefault("map_reordered", True)
     for p in plans:
         p.pop("_kf_pool", None)
     return plans[:K]

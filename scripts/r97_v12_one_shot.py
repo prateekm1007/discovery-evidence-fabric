@@ -261,6 +261,23 @@ def machine_generate_v79(prob: dict, gw_key: str,
         vio.update(m77.scan_allowed_measures_class(prob, final))
         vio.update(m77.scan_physics_direction(prob, final))
         vio.update(m77.direction_lexicon_check(prob, final))
+        # R144 DIR-2 lever (b), claim c-0243: the QUANTITATIVE
+        # TESTABILITY bind — the v16 measured gap (22/30 sound but
+        # not strong: the rubric's 4 needs a running unit-checked
+        # calculation + a falsifiable numeric prediction). The typed
+        # scan surfaces QUANT_TEST_MISSING / PHYSICS_MAGNITUDE_
+        # MISSING into final_meta and the neutral repair directive —
+        # never a silent gate, never a bar change.
+        from r144_quantitative_testability_scan import (
+            scan_quantitative_testability)
+        vio.update(scan_quantitative_testability(prob, final))
+        # R144 DIR-3 lever (c), claim c-0243: the OFF-TARGET bind —
+        # the delivered mechanism's vocabulary must not be an
+        # ANTI-class mechanism for the stated failure family (the 8
+        # v16 off-target shapes). Fires only on the three-condition
+        # conjunction; findings feed the neutral repair directive.
+        from r144_off_target_scan import scan_off_target
+        vio.update(scan_off_target(prob, final))
         vio.update(m77.scan_input_availability(prob, final))
         vio.update(m77.scan_duty_cycle_pricing(final))
         vio.update(m77.scan_mechanism_template(final,
