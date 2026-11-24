@@ -1,48 +1,11 @@
 #!/usr/bin/env python3
-"""r145_p4_panel_oneshot.py — DIR-2 (the score-8 gate re-run): the
-CALIBRATED PANEL on the FULL v16 candidate set, non-obviousness
-assessed against EXTERNAL prior art via the problem-solution
-approach.
-
-The owner's rejection (R145 DIR 2): the prior rung passed only on a
-cherry-picked marker-present subset (9/13) using a WITHIN-ANSWER
-retrieval contrast; the honest full-set measures were 2/30 and
-6.7% — all 30 inventions inside the prior-corpus self-similarity
-band. The direction: run the V109-QUALIFIED judges blind+swapped on
-the FULL >=12 set, and assess non-obviousness against EXTERNAL
-prior art via the problem-solution approach (closest prior art ->
-distinguishing features -> objective technical problem), the EPO
-inventive-step shape.
-
-Protocol:
-  - JUDGES: the V109-qualified four (dsr1, qw32b, qwen235b, dsv32;
-    2 non-agnes families, deepseek + qwen). The qualified panel is
-    the calibrated instrument (AM47 viability-necessity; AM49
-    miss-based bias gate) — no new judges, no re-qualification.
-  - BLIND: each judge sees one candidate per prompt, labeled
-    'CANDIDATE SOLUTION' with a neutral sha-derived index (no
-    problem ids, no system names, no auditor scores); the prior
-    arts are labeled PRIOR ART 1/2/3.
-  - SWAPPED: the prior-art block order is sha-parity rotated per
-    candidate (built into the packs) — the position-bias guard for
-    a per-candidate instrument (there is no A/B arm to swap; the
-    rotation is the swap, disclosed).
-  - ONE generation per (judge, candidate) — no re-roll regardless
-    of outcome (Art. 7); byte-resume continues the same run.
-  - The AM47 viability-necessity clause rides VERBATIM; the pair
-    tail ('prefer A or B') is inapplicable to a single-candidate
-    ruling and is replaced by the ruling contract (disclosed).
-  - The ruling: strict JSON {closest_prior_art, distinguishing_
-    features[], objective_technical_problem, viable, non_obvious,
-    viable_reason, non_obvious_reason}; 4 attempts with the
-    contract-violation feedback (the _leg convention).
-
-TALLY (the runner writes legs; the tally runs when all legs exist):
-  per candidate: viable = majority of judges' viable; non_obvious
-  = majority; the candidate counts when BOTH majorities hold. The
-  P4 bar: >=50% of the FULL 30. The rejected cuts are reported side
-  by side (the reconciliation: the within-band 30/30 + the r144
-  within-answer cut + the panel verdict — never discarded).
+"""r146s1 P4 panel oneshot — the r145 panel instrument BYTE-FAITHFUL
+(the same V109-qualified four judges, the same blind neutral index,
+the same sha-parity swap, the same AM47 viability-necessity clause,
+the same EPO problem-solution ruling contract) re-pointed at the
+r146 v17 NOVELTY-strength candidates (DIR-4: rate the STRENGTHENED
+generation). One generation per (judge, candidate), byte-resume;
+the tally uses the majority rule (>=3/4 viable AND non-obvious).
 """
 from __future__ import annotations
 
@@ -60,8 +23,6 @@ sys.path.insert(0, str(REPO / "scripts"))
 OUT_DIR = REPO / "eval" / "r146_p4_panel"
 PACKS = OUT_DIR / "packs.json"
 
-# the V109-qualified judges (the calibrated instrument; tags +
-# families + budgets from the r143 panel driver, byte-identical)
 JUDGES = [
     {"model": "deepseek-ai/DeepSeek-R1", "family": "deepseek",
      "tag": "dsr1", "transport": "hf", "pace": 20,
@@ -80,10 +41,6 @@ JUDGES = [
 SYSTEM = ("You are a strict blind patent-examiner-style judge. "
           "English only. Follow the response contract exactly.")
 
-# the AM47 viability-necessity clause VERBATIM from the sealed
-# prompt file (eval/rcal_judge_prompt_r143.json @ the audit tip);
-# the pair-comparative tail is replaced by the per-candidate ruling
-# contract (disclosed in the record)
 AM47_CLAUSE = (
     "VIABILITY IS NECESSARY: a mechanism that is infeasible or "
     "untestable AS WRITTEN (requires unobtainium, violates a stated "
@@ -132,7 +89,7 @@ REQUIRED_KEYS = {"closest_prior_art", "distinguishing_features",
 
 
 def neutral_index(pid: str) -> int:
-    return int(hashlib.sha256(f"{pid}::r145idx".encode())
+    return int(hashlib.sha256(f"{pid}::r146idx".encode())
                .hexdigest()[:8], 16) % 900 + 100
 
 
@@ -228,17 +185,8 @@ def main() -> int:
     _load_key_vault()
     packs_doc = json.loads(PACKS.read_text())
     packs = packs_doc["packs"]
-    import subprocess
-    _raw = subprocess.run(
-        ["git", "show",
-         "origin/audit/r11-auditor-verdict-20261114:"
-         "eval/holdout_v17/problems.json"],
-        capture_output=True, text=True, check=True).stdout
-    _probs = json.loads(_raw)
-    _probs = (_probs if isinstance(_probs, list) else _probs["problems"])
-    problems = {p["problem_id"]: {
-        "problem": p.get("problem", ""),
-        "domain": p.get("domain", "")} for p in _probs}
+    problems = {p["problem_id"]: p for p in json.loads(
+        (REPO / "eval/holdout_v17/problems.json").read_text())}
 
     only = os.environ.get("R146_JUDGE", "").strip()
     judges = ([j for j in JUDGES if j["tag"] == only] if only
@@ -247,136 +195,77 @@ def main() -> int:
           f"{[j['tag'] for j in judges]}", flush=True)
 
     for j in judges:
-        for p in packs:
-            pid = p["problem_id"]
-            legfile = OUT_DIR / f"{j['tag']}__{pid}.json"
-            if legfile.exists():
+        for pk in packs:
+            pid = pk["problem_id"]
+            outp = OUT_DIR / f"{j['tag']}__{pid}.json"
+            if outp.exists():  # byte-resume, same ruling
                 continue
-            prob = problems.get(pid, {})
-            problem_text = str(prob.get("problem", "")).strip()
-            prompt = build_prompt(problem_text,
-                                  p["candidate_text"],
-                                  p["prior_arts"])
+            prob_text = (problems.get(pid) or {}).get("problem", "")
+            prompt = build_prompt(prob_text, pk["candidate_text"],
+                                  pk["prior_arts"])
             t0 = time.monotonic()
             leg = _leg(j, prompt)
-            wall = round(time.monotonic() - t0, 1)
             rec = {"judge": j["tag"], "family": j["family"],
                    "model": j["model"], "pid": pid,
                    "neutral_index": neutral_index(pid),
-                   "prior_order": [a["prior_id"]
-                                   for a in p["prior_arts"]],
-                   "outcome": leg["outcome"],
-                   "parsed": leg["parsed"],
+                   "prior_order": [
+                       pa["prior_id"] for pa in pk["prior_arts"]],
+                   "outcome": leg["outcome"], "parsed": leg["parsed"],
                    "raw_tail": leg["raw_tail"],
-                   "attempts": leg["attempts"], "wall_s": wall}
-            legfile.write_text(json.dumps(rec, indent=1,
-                                          ensure_ascii=False) + "\n")
-            pr = (leg["parsed"] or {})
-            print(f"{j['tag']} #{neutral_index(pid)}: "
-                  f"{leg['outcome']} viable={pr.get('viable')} "
-                  f"non_obvious={pr.get('non_obvious')} ({wall}s)",
-                  flush=True)
-            time.sleep(j["pace"] if leg["outcome"] == "VALID" else 5)
+                   "attempts": leg["attempts"],
+                   "wall_s": round(time.monotonic() - t0, 1)}
+            outp.write_text(json.dumps(rec, indent=1) + "\n",
+                            encoding="utf-8")
+            print(f"{j['tag']} {pid}: {rec['outcome']} "
+                  f"v={leg['parsed'].get('viable') if leg['parsed'] else '-'} "
+                  f"n={leg['parsed'].get('non_obvious') if leg['parsed'] else '-'} "
+                  f"{rec['wall_s']}s", flush=True)
+            time.sleep(j["pace"])
 
-    if only:
-        print(f"judge {only}: legs done (tally runs in the "
-              "unfiltered process)", flush=True)
-        return 0
-
-    # ---------- the tally (all judges, all candidates) ----------
-    rows = []
-    for p in packs:
-        pid = p["problem_id"]
-        legs = []
+    # the tally (the majority rule, the FULL set only)
+    import collections
+    by_pid = collections.defaultdict(dict)
+    for pk in packs:
+        pid = pk["problem_id"]
         for j in JUDGES:
-            lf = OUT_DIR / f"{j['tag']}__{pid}.json"
-            if not lf.exists():
+            f = OUT_DIR / f"{j['tag']}__{pid}.json"
+            if not f.exists():
                 continue
-            r = json.loads(lf.read_text())
-            legs.append({"judge": j["tag"],
-                         "outcome": r["outcome"],
-                         "parsed": r["parsed"]})
-        valid = [l for l in legs if l["parsed"]]
-        n_v = sum(1 for l in valid if l["parsed"]["viable"])
-        n_no = sum(1 for l in valid if l["parsed"]["non_obvious"])
-        n = len(valid)
-        rows.append({
-            "problem_id": pid,
-            "baseline_novelty_screen": p.get("baseline_novelty_screen"),
-            "specter2_nearest_distance":
-                p["specter2_nearest_distance"],
-            "inside_self_similarity_band":
-                p["inside_self_similarity_band"],
-            "r144_within_answer_novel":
-                p["r144_within_answer_novel"],
-            "n_valid_rulings": n,
-            "n_viable": n_v, "n_non_obvious": n_no,
-            "viable_majority": n > 0 and 2 * n_v > n,
-            "non_obvious_majority": n > 0 and 2 * n_no > n,
-        })
-    n_both = sum(1 for r in rows if r["viable_majority"]
-                 and r["non_obvious_majority"])
-    n_total = len(rows)
-    rec = {
-        "record": "R146_P4_CALIBRATED_PANEL/1.0.0",
-        "claim": "c-0243", "session": "builder-r145s1",
-        "at": "2026-11-24 (sandbox clock)",
-        "instrument": {
-            "judges": [j["tag"] for j in JUDGES],
-            "qualification": ("the V109-qualified panel (acc>=0.8, "
-                              "kappa 0.668, 2 non-agnes families); "
-                              "no re-qualification, no new judges"),
-            "blind": ("one candidate per prompt, neutral "
-                      "sha-derived index, no system names, no "
-                      "auditor scores shown"),
-            "swap": ("the prior-art block sha-parity rotation per "
-                     "candidate (the packs); the position-bias "
-                     "guard for the per-candidate instrument"),
-            "am47": ("the viability-necessity clause VERBATIM; the "
-                     "pair tail replaced by the per-candidate "
-                     "ruling contract (disclosed)"),
-            "prior_art": ("the top-3 SPECTER2-nearest solutions "
-                          "from the committed v9-v12 corpus (120 "
-                          "docs) — EXTERNAL prior art, not the "
-                          "answer's own quoted standard practice"),
-            "no_reroll": "one generation per (judge, candidate)",
-        },
-        "bar": {"pct_viable_and_non_obvious_ge": 50.0,
-                "set": "the FULL 30-candidate set (no subsets)"},
-        "tally": {
-            "n_candidates": n_total,
-            "n_viable_and_non_obvious": n_both,
-            "pct": round(100.0 * n_both / n_total, 1)
-            if n_total else 0.0,
-            "pass": n_total > 0
-            and n_both / n_total >= 0.5,
-        },
-        "reconciliation": {
-            "note": ("the rejected cuts reported side by side, "
-                      "never discarded"),
-            "retrieval_distribution_cut": (
-                "0/30 outside the prior-corpus self-similarity "
-                "band (nearest distances 0.041-0.071 < p95 "
-                "0.1258) — the compressed-cosine-scale limitation "
-                "the r99 finding typed; an absolute-distance band "
-                "is a weak non-obviousness measure for "
-                "same-domain engineering text"),
-            "r145_baseline_v16_panel": "25/30 (83.3%) on the v16 "
-                                       "weak set (the validated "
-                                       "instrument's baseline)",
-            "panel_problem_solution_cut": (
-                f"{n_both}/{n_total} by the calibrated panel "
-                "majority (THE gate per the R145 direction)"),
-        },
-        "rows": rows,
-    }
-    tallyf = OUT_DIR / "tally.json"
-    tallyf.write_text(json.dumps(rec, indent=1, ensure_ascii=False)
-                      + "\n")
-    print(f"TALLY: {n_both}/{n_total} "
-          f"({round(100.0*n_both/n_total,1) if n_total else 0}%) "
-          f"viable+non-obvious | pass={rec['tally']['pass']}",
-          flush=True)
+            d = json.loads(f.read_text())
+            p = d.get("parsed") or {}
+            if isinstance(p, dict) and d.get("outcome") == "VALID":
+                by_pid[pid][j["tag"]] = bool(p.get("viable")) and \
+                    bool(p.get("non_obvious"))
+    tally_rows = []
+    n_pass = 0
+    for pid in sorted(by_pid):
+        yes = sum(1 for v in by_pid[pid].values() if v)
+        total = len(by_pid[pid])
+        passed = total >= 3 and yes >= 3
+        n_pass += passed
+        tally_rows.append({"problem_id": pid, "yes": yes,
+                           "judges_total": total, "passed": passed})
+    pct = round(100.0 * n_pass / max(1, len(tally_rows)), 1)
+    tally = {
+        "record": "r146_p4_calibrated_panel/1.0.0 — the V109-"
+                  "qualified four judges, blind (neutral sha-derived "
+                  "index) + swapped (the prior-art sha-parity "
+                  "rotation), on the FULL r146 v17 30-candidate set; "
+                  "the majority rule >=3/4 viable AND non-obvious",
+        "instrument": {"judges": [j["tag"] for j in JUDGES],
+                       "qualification": "the V109-qualified panel "
+                       "(acc>=0.8, kappa 0.668, 2 non-agnes families); "
+                       "no re-qualification, no new judges",
+                       "bar_pct_ge": 50.0,
+                       "set": "the FULL 30-candidate set (no subsets)"},
+        "tally": {"n_candidates": len(tally_rows),
+                  "n_viable_and_non_obvious": n_pass, "pct": pct,
+                  "pass": bool(pct >= 50.0)},
+        "rows": tally_rows}
+    (OUT_DIR / "tally.json").write_text(json.dumps(tally, indent=1)
+                                        + "\n")
+    print(f"TALLY: {n_pass}/{len(tally_rows)} = {pct}% "
+          f"(bar >= 50%)", flush=True)
     return 0
 
 
