@@ -1,0 +1,51 @@
+{
+ "record": "R148_SIX_PHYSICS_ERRORS_VERIFIED/1.0.0",
+ "at": "2026-11-24 (sandbox clock)",
+ "verifier": "builder-r147s1 (bytes-first independent verification of the owner's DIR-2 deep-review list; every verdict recomputed from the committed v17 row bytes + pint arithmetic + first principles; the record doubles as the physics-validation lever's REGRESSION SPEC for the c-0258 lane)",
+ "source_rows": "eval/holdout_v17_strengthened_generation/{v17-11,v17-14,v17-15,v17-17,v17-28,v17-29} (the committed strengthened-generation bytes)",
+ "verdict": "ALL SIX CONFIRMED as GENUINE_PHYSICS_ERROR — none is an assumption dispute; the re-generation (v18) must clear these six as regression cases before any panel run",
+ "cases": [
+  {"pid": "v17-11", "error_class": "MECHANISM_CLASS_AT_SCALE",
+   "claim_in_row": "the row's own Departure text admits 'B and Mg are non-magnetic impurities ... negligible magnetic susceptibility', then pivots the magnetic-gradient mechanism to 'separate ferrous tramp (which might be co-mingled)'",
+   "verification": "dissolved ions' volume susceptibility (diamagnetic/paramagnetic, x ~ 1e-6 class) gives magnetic body forces orders of magnitude below thermal (kT) mixing at any practical B.gradB; and ferrous-tramp removal does not address the STATED failure mode (B/Mg chemical degradation of battery-grade lithium) — the mechanism neither acts on the target species nor survives the row's own admission",
+   "verdict": "CONFIRMED — mechanism dodges the stated problem (off-target pivot inside the answer)"},
+  {"pid": "v17-14", "error_class": "WRONG_SIGNED_ELECTROCHEMISTRY",
+   "claim_in_row": "'cathodic_protection_sizing through a sacrificial anode array directly coupled to the anode bus'",
+   "verification": "cathodic protection drives the protected metal to be the CATHODE against a sacrificial anode; the anode bus in an electrolytic cell is at ANODIC (positive) potential — coupling a sacrificial array to it puts both at anodic polarity (the 'protected' member stays the anode; the array just corrodes additionally), and the anode's deliberate dissolution IS its electrode function — protecting it cathodically defeats the cell",
+   "verdict": "CONFIRMED — polarity inversion, provable from the galvanic-series definition"},
+  {"pid": "v17-15", "error_class": "MAGNITUDE (decidable by arithmetic, not an assumption dispute)",
+   "claim_in_row": "'the total neutralizable acid load is 2 kg/h; injecting 100 L/h of 10% slurry releases ~142 kJ of heat' offered as a duct-wall thermal effect",
+   "verification": "pint recompute: 10,000 m3/h x 200 ppm SO2 = 89.2 mol/h = 5.72 kg/h SO2 (their 2 kg/h is ~3x low); neutralization at their own 57.3 kJ/mol -> 5113 kJ/h = 1420 W (their ~142 kJ is ~36x low); over ~100 m2 of duct wall that is 14.2 W/m2 -> wall dT ~ 1.4 K against 10 W/m2K convection — no stated corrosion-prevention thermal effect is reachable; the heat is 2-3 orders too small for the claimed purpose",
+   "verdict": "CONFIRMED — magnitude error 36x on the energy number and the effect ~2 orders below physical significance"},
+  {"pid": "v17-17", "error_class": "WRONG_SIGNED_DYNAMIC_RESPONSE",
+   "claim_in_row": "'By adding mass to the main journals (increasing inertia) ... we shift the natural frequency f_n = (1/2pi)sqrt(k/I) above the maximum firing frequency', conceding mid-passage 'Increasing I_eff by 50% reduces f_n by sqrt(1.5) (i.e., lowers it) or ... we increase stiffness k_eff'",
+   "verification": "f_n = (1/2pi)sqrt(k/I): dI>0 strictly LOWERS f_n (their own 1.22 arithmetic concedes it); raising f_n requires a stiffness increase, and the row's described modification (added journal mass) contains NO stiffness mechanism — the lead mechanism contradicts its own governing relation and the rescue path is not in the design",
+   "verdict": "CONFIRMED — wrong-signed lead claim; the honest mechanism (stiffening) is asserted without a physical implementation"},
+  {"pid": "v17-28", "error_class": "FORMULA_INVALID + UNIT_MISLABEL",
+   "claim_in_row": "'permittivity eps_i = 5.0 F/m'; uniform-gap formula 'E_max = V ln(r_o/r_i) / (r_i (r_o - r_i))' evaluated as '320000 x ln(4)/(0.02 x 0.06) ~ 37 kV/mm'; graded claim 'E_max reduces to ~15-18 kV/mm'",
+   "verification": "pint: their formula's DIMENSIONS are V/m^2, not V/m — a field formula with the wrong dimensions is invalid as written (the pint DimensionalityError is the exhibit); the correct coaxial solution E_max = V/(r_i ln(r_o/r_i)) = 14.6 kV/mm (their printed 37 kV/mm is ~2.5x the correct value AND inconsistent with their own inputs r_i=0.02, r_o=0.06 where they typed (r_i x r_o) as the denominator pair); '5.0 F/m' as absolute permittivity implies eps_r ~ 5.6e11 — the intended value is the dimensionless eps_r=5.0 (absolute ~4.4e-11 F/m): the unit label breaks every downstream field relation",
+   "verdict": "CONFIRMED — dimensionally invalid formula + absolute/relative permittivity unit mislabel"},
+  {"pid": "v17-29", "error_class": "REVERSED_FIELD_RELATION",
+   "claim_in_row": "'local field reduction factor R = eps_ins / eps_eff = 3.5 / 1.8 = 1.94' for a low-permittivity porous pad (eps_r ~ 1.1-1.3) inserted at the barrier interface to 'locally reduce the electric field intensity'",
+   "verification": "D-continuity for series dielectrics (normal field): E_low-eps/E_ins = eps_ins/eps_layer — the LOW-permittivity layer sees a HIGHER field, and the adjacent defect site in the high-eps insulation sees the field INCREASE by ~1.94x, not decrease; stress grading works by RAISING local permittivity (high-k fillers) or graded conductivity, never by inserting voids in series; the claimed reduction is the reversed relation",
+   "verdict": "CONFIRMED — wrong-signed relation (the owner's exemplar of the re-labeling prohibition)"}
+ ],
+ "taxonomy_correction_DIR6": {
+  "prior_typing": "the R147/R148 investigation typed these rows' objections STATED_PARAM ('assumption/calculus disputes resolvable only by the sealed scoring')",
+  "correction": "WRONG for 5 of the 6 (v17-11/14/17/28/29): wrong-signed relations, dimensionally invalid formulas, unit mislabels, and mechanism-class-at-scale failures are GENUINE_PHYSICS_ERROR — decidable NOW by arithmetic and first principles, never by judge taste; only a genuine-parameter-window disagreement (e.g. a fouling factor choice) stays STATED_PARAM",
+  "rule_for_the_lever": "an objection is STATED_PARAM only when BOTH derivations are valid physics within stated assumption bounds; a sign inversion, a dimensional inconsistency, a 10x+ magnitude error against the row's own inputs, or a mechanism that cannot act on the stated target is GENUINE_PHYSICS_ERROR",
+  "misclassification_count": 5
+ },
+ "lever_regression_spec": {
+  "checks_demanded_at_generation_time": [
+   "SIGN: every claimed effect direction must follow from the row's own governing relation (dI>0 => f down; low-eps in series => E up in the low-eps layer and its neighbors; anode-bus coupling => anodic polarity)",
+   "DIMENSIONS: every closed-form relation must be dimensionally consistent (pint) — a V/m^2 'field formula' refuses",
+   "MAGNITUDE: every quantitative claim recomputed from the row's own inputs; a >=10x deviation from the row's own numbers or a >=2-order shortfall against the stated purpose is a hard fail (the v17-15 class)",
+   "MECHANISM_AT_SCALE: the mechanism must act on the STATED target species/scope with a force/effect above the thermal or practical background (the v17-11 class); pivots to a different contaminant/region typed as off-target",
+   "UNIT_LABELS: absolute vs relative permittivity (and every material constant) labeled and consumed consistently",
+   "BOUNDS: every assumption carries a source or a falsifiable bound (the owner's DIR-6 requirement, unchanged)"
+  ],
+  "six_regression_cases": ["v17-11", "v17-14", "v17-15", "v17-17", "v17-28", "v17-29"],
+  "acceptance_hook": "v18 rows for these six problem ids must carry the corrected physics; the r148-qualified panel still arbitrates the full-set >=50% (the c-0259 lane's scope)"
+ }
+}
