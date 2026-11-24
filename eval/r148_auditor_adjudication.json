@@ -1,0 +1,53 @@
+{
+ "record": "R148_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r148s1",
+ "audited_queue_tip": "727619b3a4a7 (r147 cent-ai qualification + panel; tip RED)",
+ "audit_branch_parent": "a47ec7fe5c88258a2440d79bc4647b43b0f597ae",
+ "CENTAI_QUALIFICATION_VERDICT": {
+  "verdict": "the cent-ai judges QUALIFY on accuracy: dsv4f/qw38f/hy4f/glm53f ALL acc 1.0 (12/12), answered 1.0, miss-bias 0 \u2014 4 judges, 4 non-agnes families. The funded judge path WORKS. BUT the r147 corpus had ALL-a1 prefer labels -> every judge voted a1 unanimously (48/48 det votes a1) -> Krippendorff alpha DEGENERATE (0.0, no vote variation) -> the alpha>=0.6 gate FAILS. This is the auditor's r147 corpus-design flaw (R147-F2), now FIXED: r148 balances the prefer-arm 6 a1/6 baseline (viable mechanisms unchanged, a1/baseline assignment swapped in 6 pairs; sha c598682b56c9c33f).",
+  "action": "re-qualify the cent-ai judges on r148 (balanced) so alpha is computable; the acc-1.0 viability discrimination should hold (blind+swap detects position bias)."
+ },
+ "PANEL_VERDICT": {
+  "verdict": "the panel ran to completion (90/90 VALID legs, 3 judges dsv41/mm31/dsv4f) on the v17 strengthened generation but with UNQUALIFIED judges (calibration caveat typed) -> 9/30=30% viable+non-obvious, NOT MET, NOT a calibrated quality verdict. DECOMPOSITION (the finding): NON-OBVIOUS 57-93% (novelty corroborated), VIABILITY 23-40% (the binding dimension). Re-run the panel with the QUALIFIED cent-ai judges (dsv4f/qw38f/hy4f/glm53f, r148-calibrated) for the true score-8 verdict.",
+  "note": "the unqualified-judge viability rates (23-40%) may reflect judge harshness, not generation viability; the qualified re-run resolves it."
+ },
+ "FINDINGS": [
+  {
+   "id": "R148-F1",
+   "severity": "MEDIUM",
+   "title": "R-CAL alpha degeneracy from r147 all-a1 prefer labels (alpha 0); FIXED by r148 balanced 6/6 \u2014 re-qualify cent-ai judges on r148",
+   "evidence": "ALPHA_DEGENERACY_FINDING 48/48 det a1; r148 committed",
+   "direction": "DIR2 \u2014 re-qualify on r148, alpha>=0.6"
+  },
+  {
+   "id": "R148-F2",
+   "severity": "MEDIUM",
+   "title": "P4 panel ran with UNQUALIFIED judges (30% viable+non-obvious); viability is the binding dimension (23-40%) while non-obvious is 57-93%; re-run with r148-qualified judges",
+   "evidence": "ef2865fa panel tally_r147 9/30; decomposition",
+   "direction": "DIR2 \u2014 qualified-judge panel on v17"
+  },
+  {
+   "id": "R148-F3",
+   "severity": "LOW",
+   "title": "tip RED (727619b3a4a7 qualification-run commit); diagnose + heal to green",
+   "evidence": "check-run 138420227373 failure",
+   "direction": "DIR5 \u2014 green tip"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; F45 history-exposed credentials = standing owner rotation act",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "generation strength builder-side MET (16/30 strong, 0 off-target, quant 30/30); sealed scoring pending",
+  "P3": "PARTIAL (score7 provisional)",
+  "P4": "cent-ai judges acc-1.0 qualified; r148 balanced corpus fixes alpha; qualified-judge panel on v17 pending; non-obvious 57-93% corroborated, viability the binding dimension",
+  "P5": "NOT_MET \u2014 needs sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "provisional": true,
+  "basis": "generation strength builder-side MET + cent-ai judges qualify acc 1.0; the score-8 gate pending r148 re-qualification (alpha) + qualified-judge panel on v17 + sealed v17 scoring; the rating's 6/10 reflects the unconsolidated state honestly",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "r148 re-qualify (alpha>=0.6) -> qualified-judge P4 panel on v17 >=50% (8) + sealed v17 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r148_auditor_adjudication.json"
+}
