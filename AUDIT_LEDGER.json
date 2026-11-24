@@ -2106,6 +2106,30 @@
    "title": "P4 rung PASS cherry-picked (9/13 subset + within-answer proxy); calibrated panel not run; full-set non-obviousness 6.7%",
    "evidence": "r144_p4_production_rung.json",
    "status": "OPEN"
+  },
+  {
+   "id": "R145-F1",
+   "round": "R145",
+   "severity": "MEDIUM",
+   "title": "v17 novelty strength 4/30=13% strong < the >=30% bar; the off-target gap is closed (0/30) but the mechanisms are sound-not-strong; the sealed mean is borderline ~3.1-3.3",
+   "evidence": "holdout_v17_sealed_generation + novelty gate 4 strong/26 marginal; auditor 10/30 read",
+   "status": "OPEN"
+  },
+  {
+   "id": "R145-F2",
+   "round": "R145",
+   "severity": "MEDIUM",
+   "title": "P4 panel rated the v16 (weak) candidates, not the v17 strengthened generation \u2014 re-run the calibrated panel on v17 for the true score-8 assessment",
+   "evidence": "r145_p4_panel/dsr1__v16-* file names",
+   "status": "OPEN"
+  },
+  {
+   "id": "R145-F3",
+   "round": "R145",
+   "severity": "MEDIUM",
+   "title": "Quant pint-computed coverage 21-25/30 post-hoc (quant_generic.py); full 30/30 needs the generation-time contract (the runner demanding the design point); 4 rows QUANT_TEST_MISSING",
+   "evidence": "r145s1b_quant_pass/SUMMARY; sealed screen QUANT_TEST_MISSING 4",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5219,6 +5243,20 @@
     "R144-F1",
     "R144-F2"
    ]
+  },
+  {
+   "id": "V112",
+   "round": "R145 audit: v17 sealed one-shot (off-target closed) + P4 panel-on-v16 finding + quant gap",
+   "commit": "babbaedd0cb576e07554f0d07bfbff7860834378",
+   "gate": "v17 IMPROVED (0 off-target, novelty 13%<30%, mean borderline) NOT_GRANTED yet; P4 panel rated v16 not v17; quant 21-25/30 post-hoc",
+   "score": 7,
+   "provisional": true,
+   "adjudication": "eval/r145_auditor_adjudication.json",
+   "findings": [
+    "R145-F1",
+    "R145-F2",
+    "R145-F3"
+   ]
   }
  ],
  "gold_set": {
@@ -5560,7 +5598,7 @@
    "burn_after": true
   }
  },
- "progress_note": "SCORE 7/10 PROVISIONAL. R144 generation-strength kit BUILT + DEV-VERIFIED (discovery_fabric/generation/: mechanism_map 10 failure classes, quant_test pint formulas, novelty_gate retiring blind operators, inspiration_retrieval); dev dry-run 0/8 off-target, 7 strong + 1 marginal (R143-F7 corrected) BUT quant predictions only 2/8 (R144-F1). v17 SEALED AUTHORED (delegated owner; 30 problems, 10 failure classes, private rubrics 1db1539e) \u2014 builder one-shot with the kit, auditor scores; bar mean>=3.3 + >=30% strong + 0 off-target. P4 rung REJECTED (R144-F2: cherry-picked 9/13 subset + within-answer proxy; full-set non-obviousness 6.7%; calibrated panel not run) \u2014 run the calibrated panel on the full set + external-prior-art non-obviousness. Yield 5/5 grounded 0 bad (best); wind broken. Tip red = P1.4/F77 byte-identity (plan reorder); fix 7438f8dd2 refreshes r52 (conscious re-freeze); verify green. Critical path: v17 one-shot -> >=3.3 + >=30% strong (consolidate 6/7) -> calibrated-panel P4 rung (8) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 PROVISIONAL. v17 sealed one-shot ran on the owner's 30 problems (strength kit wired): OFF-TARGET CLOSED (0/30, auditor read 10/10 on-physics + numeric; vs v16's 8 off-target) \u2014 the mechanism_map works. Novelty strength 4/30=13% strong < the >=30% bar; sealed mean borderline ~3.1-3.3; NOT_GRANTED yet (R145-F1). P4 calibrated-panel rung 25/30=83.3% (full set, blind+swapped, external prior art, EPO problem-solution, diff=0 two-lane verified) BUT rated the v16 WEAK candidates, not v17 \u2014 re-run on v17 (R145-F2). Quant pint-computed 21-25/30 post-hoc (quant_generic.py); full 30/30 needs generation-time contract (R145-F3). Yield 5/5, wind broken. Tip green. Critical path: v17 novelty >=30% strong + quant 30/30 -> sealed mean>=3.3 (consolidate 6/7) -> P4 panel on v17 >=50% (8) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
