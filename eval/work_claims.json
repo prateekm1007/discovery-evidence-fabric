@@ -6141,7 +6141,7 @@
       "claimed_at": "2026-11-24 (sandbox clock, TRUE UTC)",
       "lease_expiry": "2026-11-30T23:59:00Z",
       "title": "R147S1-C the r147 R-CAL qualification TAKEN OVER from c-0255 (the runner built, the run unlanded)",
-      "notes": "The c-0235/c-0234 TAKEN_OVER precedent: c-0255 (builder-r147s1-b) built and committed the qualification runner (scripts/r147_rcal_centai.py @ bc5dc487c) but no qualification results landed \u2014 the run died untracked in a sandbox recycle (the R146 83-leg pattern) or stalled; the tip stayed static ef2865fa8 for 35+ min after the runner commit while the A-lane's round-final commit types the gate credit-gated with no in-flight qualification referenced. The owner's R147 DIR-2 makes the qualification the TOP critical path (score-8 unblocked via the funded path + the fresh r147 corpus 543fc2f4cf450cd7). This session takes over the execution with THEIR committed runner byte-identical (no instrument change); the chain root stays c-0255, one generation per (judge, pair, order) leg, byte-resume, no re-roll (Art. 7). If the B-lane lands its own results, the registry dedups by sha and the byte-resume makes the legs reconcilable.",
+      "notes": "The c-0235/c-0234 TAKEN_OVER precedent: c-0255 (builder-r147s1-b) built and committed the qualification runner (scripts/r147_rcal_centai.py @ bc5dc487c) but no qualification results landed \u2014 the run died untracked in a sandbox recycle (the R146 83-leg pattern) or stalled; the tip stayed static ef2865fa8 for 35+ min after the runner commit while the A-lane's round-final commit types the gate credit-gated with no in-flight qualification referenced. The owner's R147 DIR-2 makes the qualification the TOP critical path (score-8 unblocked via the funded path + the fresh r147 corpus 543fc2f4cf450cd7). This session takes over the execution with THEIR committed runner byte-identical (no instrument change); the chain root stays c-0255, one generation per (judge, pair, order) leg, byte-resume, no re-roll (Art. 7). If the B-lane lands its own results, the registry dedups by sha and the byte-resume makes the legs reconcilable. || Terminal state typed by builder-r147s1-b (the tip heal): this lane's lease died at the window boundary (the launched qualified panel did not survive the sandbox); the owner's r148 order continues the judge-path work as the NEW work item r148-requal-qualified-panel (claim c-0257, no cross-work takeover per the Art. 29(b) same-work rule). The completed r147 qualification bytes (96 legs, ALPHA_DEGENERACY_FINDING) stand as this lane's delivered work.",
       "artifact_paths": [
         "eval/r147_rcal_centai/",
         "eval/r147_rcal_centai/QUALIFICATION.json",
@@ -6153,6 +6153,28 @@
         "scripts/r147s2_qualified_panel.py"
       ],
       "takes_over": "c-0255"
+    },
+    {
+      "work_id": "r148-requal-qualified-panel",
+      "claim_id": "c-0257",
+      "role": "EXECUTOR",
+      "session_id": "builder-r148s1-b",
+      "kind": "task",
+      "status": "OPEN",
+      "base_sha": "8729c5da8",
+      "lease_expiry": "2026-12-01T23:59:00Z",
+      "claimed_at": "2026-11-24 (sandbox clock)",
+      "registered_at": "2026-11-24 (sandbox clock)",
+      "artifact_paths": [
+        "eval/r148_rcal_centai/",
+        "eval/r148_rcal_centai/QUALIFICATION.json",
+        "eval/r148_p4_panel_centai/",
+        "eval/r148_p4_panel_centai/tally.json",
+        "scripts/r148_rcal_centai.py",
+        "scripts/r148_p4_panel_centai.py",
+        "scripts/r148_viability_investigation.py"
+      ],
+      "title": "R148S1-B EXECUTOR (claim c-0257, base 8729c5da8, takes_over c-0256 \u2014 the dead takeover lease, Art. 29(d)): DIR 2 (TOP) \u2014 (1) re-qualify the 4 cent-ai judges on the auditor's r148 balanced corpus (12 pairs, 6 a1 / 6 baseline labels, canonicalization sha c598682b56c9c33f verified per the in-file recipe; blind + sha-parity swap, AM47 sealed suffix; gate acc>=0.8, answered>=0.9, miss-bias<=1, alpha>=0.6, >=3 judges from >=2 non-agnes families); (2) with the qualified set, the P4 panel on the FULL v17 strengthened 30-candidate set (the EPO contract, byte-resume, one generation per leg, no re-roll Art. 7; majority rule on BOTH axes; >=50% bar) + the independent diff=0 recount; (3) the viability-dimension investigation: the unqualified panel's 23-40% viable vs 57-93% non-obvious \u2014 judge harshness or a real generation-feasibility gap, with the fix on the latter if real. DELETE LIST respected: unqualified-judge verdicts are not quality; all-a1 corpora retired."
     }
   ],
   "corrections": [
@@ -6704,6 +6726,11 @@
       "claimed_at": "2026-11-24 (sandbox clock)",
       "role": "builder",
       "note": "R147 takeover session (the c-0235 precedent: the abandoned executor lane builder-r147s1-b \u2014 its background run ended with the turn \u2014 was resumed): claim c-0256 = the takeover of c-0255. Completed the r147 R-CAL qualification run (96/96 legs VALID, 4/4 cent-ai judges acc 1.0, answered 1.0, miss-bias 0) and typed the ALPHA_DEGENERACY_FINDING (the all-a1 corpus makes the alpha>=0.6 clause unsatisfiable BY DESIGN \u2014 48/48 det votes unanimous), then launched the QUALIFIED panel (058c7951c) repointed at the sealed-set packs. Registered here forward-only by the tip heal (builder-r147s1-b) \u2014 the CI red on 727619b3a/c0b9b4085 was this missing Art. 29(a) registration, nothing else (typed from the API job log this window)."
+    },
+    "builder-r148s1-b": {
+      "claimed_at": "2026-11-24 (sandbox clock)",
+      "role": "builder",
+      "note": "R148 window: DIR 2 (TOP) \u2014 re-qualify the cent-ai judges on the auditor's balanced r148 corpus (6 a1/6 baseline, sha c598682b56c9c33f) so alpha is computable (the r147 degeneracy fix), then the QUALIFIED-judge P4 panel on the v17 strengthened 30-candidate set (>=50% viable+non-obvious bar) + the viability-dimension investigation (judge harshness vs a real generation-feasibility gap; the unqualified panel read 23-40% viable vs 57-93% non-obvious). Constitution bytes unchanged at the new pins (153ac62efca36c2d / 3775f869a1c19a96); V114 read; vault env-only; secret-grep 0 live."
     }
   },
   "trailer_violations": [
