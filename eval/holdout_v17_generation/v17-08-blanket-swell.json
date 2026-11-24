@@ -1,0 +1,94 @@
+{
+ "problem_id": "v17-08-blanket-swell",
+ "domain": "printing",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P3"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:c725ae867378": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:ae81fe8f7b29": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:2f346d8be277": "reject-duplicate"
+  },
+  "failure_physics": {
+   "family": null,
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": null,
+     "admitted": null,
+     "rank": 0,
+     "basis": "no failure-family detection — no reorder (the engine's own ordering stands)"
+    }
+   }
+  }
+ },
+ "generated_at": "2026-11-24T03:58:21Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.6,
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a MONITORING/INDICATION scheme using blanket thickness measurements as a leading indicator.  \nDeparture: In-situ blanket strain calculation via differential pressure across the blanket cylinder, derived from existing press sensors.  \nFailure-physics connection: Swelling increases internal stress, altering pressure distribution; strain correlates with registration drift before dimensional changes are detectable.  \n\nPHYSICS CHECK  \nGoverning relation: Strain (ε) = ΔP / (E * t), where ΔP is pressure differential, E is Young’s modulus (stated spec: 10 MPa), t is blanket thickness (stated spec: 1.6 mm).  \nMagnitude verification: For 5% swelling, ΔP = 0.05 * 10e6 Pa * 1.6e-3 m = 800 Pa (CALCULATED, from stated specs).  \n\nIMPLEMENTATION BILL  \n- Pressure transducers: Existing blanket cylinder pressure sensors (ALREADY-RECORDED, \"stated telemetry feed\").  \n- Strain calculation unit: Firmware update (existing press controller).  \n- Threshold: 0.5% strain (CALCULATED, from 800 Pa ΔP / (10e6 Pa * 1.6e-3 m)).  \n- Reference: Baseline ΔP from startup (ALREADY-RECORDED, \"stated log\").  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: Same as existing sensor integration (no new hardware).  \n- Operability: Automated calculation in existing HMI (no operator training).  \n- Maintenance: Zero additional burden (uses existing sensors).  \n- Cost class: Identical to standard practice (no new materials/services).  \n\nEXECUTABLE TEST  \nProtocol: Record ΔP during 10,000-sheet run; calculate strain every 1,000 sheets.  \nPass/fail: Threshold = 0.5% strain; fail if exceeded.  \nDuration: 1 job cycle.  \nKill criterion: Registration drift > 0.5mm (stated failure metric).  \nValidation: Against ALREADY-RECORDED data from prior runs (stated log).  \n\nCONSTRAINT BIND  \nPrimary indicator: Registration drift (defines failure per problem statement). Supplement: Strain (predictive, not replacement).  \n\nRISK: Pressure differential may not fully capture localized swelling; requires validation against historical failure data.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Pressure transducers: Existing blanket cylinder pressure sensors (ALREADY-RECORDED, \"sta",
+    "- Strain calculation unit: Firmware update (existing press controller).",
+    "- Threshold: 0.5% strain (CALCULATED, from 800 Pa ΔP / (10e6 Pa * 1.6e-3 m)).",
+    "- Reference: Baseline ΔP from startup (ALREADY-RECORDED, \"stated log\").",
+    "- Installability: Same as existing sensor integration (no new hardware).",
+    "- Operability: Automated calculation in existing HMI (no operator training).",
+    "- Maintenance: Zero additional burden (uses existing sensors).",
+    "- Cost class: Identical to standard practice (no new materials/services)."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_UNPROVEN": [
+    "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "af0e66a29b6c3571"
+}

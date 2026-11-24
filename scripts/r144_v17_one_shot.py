@@ -154,6 +154,38 @@ def main() -> int:
                     "cannot address it (their mechanisms act on "
                     "different physics)"),
             }
+        # the QUANTITATIVE TESTABILITY + NOVELTY STRENGTH binds ride
+        # the SAME typed_plan payload (the candidate run MEASURED the
+        # gap: worked-calculation surface 28/30 but kill conditions
+        # 2/30 without the bind — eval/holdout_v17_builder_screen.json;
+        # the bind is part of what the sealed rubric's 4 scores, so
+        # the SEALED instrument carries it; this run's bytes stand
+        # unchanged — no re-roll)
+        machine_prob["typed_plan"]["quantitative_testability_bind"] = {
+            "worked_calculation": (
+                "the invention MUST carry ONE worked numeric "
+                "calculation on its governing relation: inputs WITH "
+                "units (problem-stated, stock datasheet, or a TYPED "
+                "ASSUMPTION 'assumed: X because Y'), one substitution, "
+                "one numeric result WITH unit"),
+            "falsifiable_prediction": (
+                "the invention MUST carry ONE falsifiable numeric "
+                "prediction: the measurable quantity, its expected "
+                "direction and magnitude with units, and the "
+                "observation window"),
+            "kill_condition": (
+                "the invention MUST state its own KILL CONDITION "
+                "(Art. 12): 'the mechanism is falsified if <metric> "
+                "does not change by at least <N><unit> within "
+                "<window>'"),
+        }
+        machine_prob["typed_plan"]["novelty_strength_bind"] = (
+            "the departure from standard practice must be a NON-OBVIOUS "
+            "arrangement with a stated physical reason the obvious "
+            "knob fails here; the generic moves (increase/reduce flow, "
+            "modulate pressure, add monitoring, insulate more, add a "
+            "filter or a schedule) are NOT a mechanism when they are "
+            "the whole departure — put the novelty in the arrangement")
         trace = r97.v10m.engine_trace(prob, row_out, winner, wresult,
                                       rule)
         trace["failure_physics"] = {
