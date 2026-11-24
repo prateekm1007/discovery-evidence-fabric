@@ -191,6 +191,22 @@
       "violation": "the close commit accidentally carried a conflict-resolution artifact (rows_inspiration_arm/r144_v17_one_shot.py \u2014 a stray copy of the driver saved during the rebase sidecar split); the canonical driver is scripts/r144_v17_one_shot.py",
       "remediation": "the stray file is REMOVED in the immediately following commit (the deletion); the arm dirs contain only generation rows",
       "at": "2026-11-24 (sandbox clock)"
+    },
+    {
+      "sha": "170be8ab77a0",
+      "session": "builder-r145s1",
+      "work_id": "r145-generation-strength",
+      "violation": "the strengthened sealed one-shot commit carries the 31 canonical files under eval/holdout_v17_strengthened_generation/ with Work-Id r145-generation-strength, but no registry claim covers that work_id + path set (the r145 lane's claims ended at c-0249; c-0250 covers r146-v17-s2-strength with the eval/holdout_v17_s2_* paths)",
+      "remediation": "c-0250 artifact_paths extended with eval/holdout_v17_strengthened_generation/ so the strengthened run matches a live EXECUTOR claim going forward (the r95s1 c-0115 precedent \u2014 coverage real in substance per the commit message, absent in registry form at the immutable snapshot)",
+      "at": "2026-11-24 (sandbox clock)"
+    },
+    {
+      "sha": "1e9793a044c1",
+      "session": "builder-r146s1",
+      "work_id": "r146-v17-s2-strength",
+      "violation": "the dev-verify commit carries the 5 canonical files under eval/holdout_v17_s2_dev/ with a trailer block the parser only half-reads (the malformed double block), so the canonical-match step cannot pair the bytes with the c-0250 claim that covers them",
+      "remediation": "c-0250 artifact_paths already lists eval/holdout_v17_s2_dev/ \u2014 the coverage is REAL, the trailer format broke the pairing; registered here F36-style (forward-only) alongside the trailer-violation entry; the single-block convention typed in corrections[]",
+      "at": "2026-11-24 (sandbox clock)"
     }
   ],
   "claim_artifact_violations": [
@@ -5979,15 +5995,36 @@
       "claimed_at": "2026-11-24 (sandbox clock)",
       "registered_at": "2026-11-24 (sandbox clock)",
       "artifact_paths": [
-        "eval/r146_novelty/prior_art_packs.json",
-        "scripts/r146_prior_art_packs.py",
-        "scripts/r146_v17_s2_one_shot.py",
         "eval/holdout_v17_s2_dev/",
         "eval/holdout_v17_s2_generation/",
-        "eval/holdout_v17_s2_screen.json"
+        "eval/holdout_v17_s2_screen.json",
+        "eval/holdout_v17_strengthened_generation/",
+        "eval/r146_novelty/prior_art_packs.json",
+        "scripts/r146_prior_art_packs.py",
+        "scripts/r146_v17_s2_one_shot.py"
       ],
       "one_shot": true,
-      "title": "R146S1 EXECUTOR (claim c-0250, base e1f861a8): DIR-2 (TOP, R145-F1) + DIR-3 (R145-F3) \u2014 the novelty-STRENGTHENED instrument and the fresh sealed one-shot v17-s2. (1) the EPO problem-solution non-obviousness contract at GENERATION time: per sealed problem the top-3 SPECTER2-nearest EXTERNAL prior solutions (the standing AM48 corpus family, the presentation parity rotation) ride the prompt; the mechanism must state the closest art, 2+ distinguishing structural features, the objective technical problem, the obvious-knob rejection, and the cross-domain transfer \u2014 a mechanism the closest art's obvious adjustment reaches is NOT novel; (2) the quant design-point contract at generation time: the PHYSICS CHECK (inputs with units, the substitution, the numeric design point) and the EXECUTABLE TEST (number + unit + comparison threshold) \u2014 the exact shape the machine's scans parse and the generic pint layer computes from; typed assumptions only; (3) the dev arm verifies the surface BEFORE the sealed burn; the fresh sealed run (v17-s2) commits raw bytes; the scoring stays the AUDITOR's act (Art. 10/14); the first sealed run (c-0247) stands as the V112-scored evidence."
+      "title": "R146S1 EXECUTOR (claim c-0250, base e1f861a8): DIR-2 (TOP, R145-F1) + DIR-3 (R145-F3) \u2014 the novelty-STRENGTHENED instrument and the fresh sealed one-shot v17-s2. (1) the EPO problem-solution non-obviousness contract at GENERATION time: per sealed problem the top-3 SPECTER2-nearest EXTERNAL prior solutions (the standing AM48 corpus family, the presentation parity rotation) ride the prompt; the mechanism must state the closest art, 2+ distinguishing structural features, the objective technical problem, the obvious-knob rejection, and the cross-domain transfer \u2014 a mechanism the closest art's obvious adjustment reaches is NOT novel; (2) the quant design-point contract at generation time: the PHYSICS CHECK (inputs with units, the substitution, the numeric design point) and the EXECUTABLE TEST (number + unit + comparison threshold) \u2014 the exact shape the machine's scans parse and the generic pint layer computes from; typed assumptions only; (3) the dev arm verifies the surface BEFORE the sealed burn; the fresh sealed run (v17-s2) commits raw bytes; the scoring stays the AUDITOR's act (Art. 10/14); the first sealed run (c-0247) stands as the V112-scored evidence.",
+      "paths_note": "extended by the c-0251 chain-maintenance heal: the strengthened sealed run (170be8ab7) wrote eval/holdout_v17_strengthened_generation/ under the r145-generation-strength Work-Id; the lane continuation c-0250 (the same builder-r145s1/146s1 lineage, the strengthened-instrument work) now claims the path directly \u2014 one canonical dir per the Art. 16/29(e) discipline"
+    },
+    {
+      "work_id": "r146s1-tip-red-heal",
+      "claim_id": "c-0251",
+      "role": "EXECUTOR",
+      "session_id": "builder-r146s1-b",
+      "kind": "task",
+      "status": "DONE",
+      "base_sha": "d87a64758",
+      "lease_expiry": "2026-12-01T23:59:00Z",
+      "claimed_at": "2026-11-24 (sandbox clock)",
+      "registered_at": "2026-11-24 (sandbox clock)",
+      "artifact_paths": [
+        "eval/work_claims.json",
+        "eval/claim_next_id.txt",
+        "scripts/r146s1b_tip_red_heal.py"
+      ],
+      "title": "R146S1-B EXECUTOR (claim c-0251, base d87a64758): the R146 tip-red heal \u2014 CI run 138318767499 (surface | completed | failure, API-quoted) fails the Art. 29 tests, all F36 classes from the twin's strengthened-run commits: (1) the malformed DOUBLE trailer block on 1e9793a04 AND c9992c04e (blank line splits it; the parser misses Session:) \u2014 both registered in trailer_violations[] with the unambiguous attribution; (2) 170be8ab7's 31 canonical files under eval/holdout_v17_strengthened_generation/ with no covering claim (Work-Id r145-generation-strength, no claim matches) and 1e9793a04's 5 dev files (coverage real under c-0250, pairing broken by the trailer defect) \u2014 registered in canonical_claim_violations[] + c-0250 artifact_paths extended so the strengthened run matches a live claim. No history rewrite (Art. 4); the single-trailer-block convention typed in corrections[]. Local pre-push: test_article29 9/9 + the full CI selection green on this exact tree. Acceptance: tip check-run SUCCESS quoted from the API (D2).",
+      "notes": "Registry bytes only; no measurement re-run; the strengthened run's scoring remains the auditor's act."
     }
   ],
   "corrections": [
@@ -6027,6 +6064,15 @@
       "finding": "commit e80d601be (builder-r142s2, 'R143S3 DIR-3 CLAIM ... claim c-0236 takes_over c-0232, base 1d3a92130') declares a takeover claim on the R-CAL one-shot work \u2014 but the registry diff of that commit is a single trailing newline; the c-0232 takeover write NEVER LANDED in bytes. c-0232 (r143-rcal-oneshot-am47, builder-r121s1-3e8a41d7) remains OPEN with lease to 2026-12-07. The declared intent is NOT fabricated into the registry here.",
       "correction": "the R-CAL one-shot chain state is as the bytes show: root c-0232 OPEN under its original holder; the twin's declared DIR-3 takeover is void as a registry write (their commit message remains in history as the intent record). Any future takeover of c-0232 requires either the holder's own status typing or an expired lease (Art. 29(d)).",
       "unaffected": "the c-0236 id itself was lawfully consumed by r143s3-trailer-violation-c7096aa48 (834b92b68); no id collision results from this mismatch."
+    },
+    {
+      "id": "CORR-14",
+      "art": "Art. 4 (history & corrections) + Art. 5 (disclosure)",
+      "at": "2026-11-24 (sandbox clock)",
+      "by": "builder-r146s1-b (chain maintenance c-0251)",
+      "finding": "the R146S1 window's two tip-reds are both commit-formatting defects on real, substantive work: 1e9793a04 (the dev-verify) carries a malformed double trailer block; 170be8ab7 (the strengthened sealed one-shot) wrote a canonical dir outside any claim's artifact_paths",
+      "correction": "both registered F36-style (forward-only); c-0250 extended to cover the strengthened dir; the convention going forward: ONE trailer block per commit (never a blank line inside it), and a canonical dir is added to the covering claim's artifact_paths IN THE SAME WINDOW that first writes it",
+      "unaffected": "the strengthened run bytes, the dev-verify results (3/4 gate-strong), and the quant contract evidence are unaffected \u2014 this heal is registry/format only"
     }
   ],
   "findings": [
@@ -6506,6 +6552,11 @@
       "role": "builder",
       "note": "R146 session-1 (the v17-s2 novelty-strength lane): fetched state, FULL-read both constitutions (EPISTEMIC @ e1f861a8f, 153ac62efca36c2d; AUDITOR @ 6ab8ee17a, 3775f869a1c19a96) and the ACTUAL AUDIT_LEDGER.json (last V112: v17 IMPROVED NOT_GRANTED \u2014 off-target CLOSED 0/30, novelty strength 13%<30% R145-F1; P4-panel-on-v16 R145-F2; quant post-hoc R145-F3) before acting. Vault env-only digests-only; secret-grep = 0 live; CI on the tip SUCCESS from the API. Lane: the EPO prior-art packs (SPECTER2, the standing AM48 family) + the non-obviousness contract + the quant design-point contract at GENERATION time; dev-verify on a typed dev arm, then the fresh sealed one-shot v17-s2; the P4 panel re-run on the v17-s2 rows.",
       "registered_at": "2026-11-24 (sandbox clock)"
+    },
+    "builder-r146s1-b": {
+      "claimed_at": "2026-11-24 (sandbox clock)",
+      "role": "builder",
+      "note": "R146 second window: fresh sandbox continuation of the builder-r143s3-b lineage (constitutions full-read verified at the DIR-1 pins \u2014 EPISTEMIC v3.3.0 153ac62efca36c2d @e1f861a8fdf3, AUDITOR v1.3.0 3775f869a1c19a96 @6ab8ee17aa98, ledger V112). Executor of the R146S1 tip-red heal (the F36 classes: the malformed double trailer block + the canonical bytes outside the covering claim's paths)."
     }
   },
   "trailer_violations": [
@@ -6734,6 +6785,24 @@
       "typed": "the twin's close commit lacks the Art. 29(a) trailers; the attribution is unambiguous from the commit message body (their session + work id are NAMED in the message, just not in trailer format) \u2014 registered here per the F36 discipline rather than rewriting their landed history",
       "at": "2026-11-24 (sandbox clock)",
       "sha": "d28369d175d0"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (malformed double trailer block \u2014 a blank line splits the block and git's parser misses the first Session: line)",
+      "session_attribution": "builder-r146s1",
+      "work_id_attribution": "r146-v17-s2-strength (the c-0250 lane's the dev-verify commit)",
+      "registered_by": "builder-r146s1-b (the R146 tip-red heal, claim c-0251)",
+      "typed": "the commit message carries TWO trailer blocks (Session:/Work-Id: twice, separated by a blank line); the parser reads only the block after the blank line. Both blocks name builder-r146s1 / r146-v17-s2-strength \u2014 attribution unambiguous. Registered per F36 rather than rewriting landed history; the fix is the single-block convention (typed in corrections[])",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "1e9793a044c1"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (malformed double trailer block \u2014 a blank line splits the block and git's parser misses the first Session: line)",
+      "session_attribution": "builder-r146s1",
+      "work_id_attribution": "r146-v17-s2-strength (the c-0250 lane's the strength-lane setup commit)",
+      "registered_by": "builder-r146s1-b (the R146 tip-red heal, claim c-0251)",
+      "typed": "the commit message carries TWO trailer blocks (Session:/Work-Id: twice, separated by a blank line); the parser reads only the block after the blank line. Both blocks name builder-r146s1 / r146-v17-s2-strength \u2014 attribution unambiguous. Registered per F36 rather than rewriting landed history; the fix is the single-block convention (typed in corrections[])",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "c9992c04e1c2"
     }
   ],
   "claim_live_lease_violations": [
