@@ -48,13 +48,52 @@ from typing import List, Optional, Tuple
 # ---------------------------------------------------------------------------
 FAILURE_FAMILY_LEXICON: List[Tuple[str, re.Pattern, Tuple[str, ...],
                                   Tuple[str, ...]]] = [
+    # -- deposition / fouling / scaling (R144s1 extension: the fresh
+    #    v17 vocabulary — evap scale, slag shedding, EGR soot, MBR
+    #    fouling; BEFORE abrasion so the DEPOSITION CAUSE routes, not
+    #    the erosion SYMPTOM of the same row; chemistry admitted —
+    #    the AM63 elicitation semantics, typed here)
+    ("deposition_fouling",
+     re.compile(r"\bfoul\w*|\bscal(?:e|es|ing|ed)\b|\bdeposit\w*|"
+                r"\bbiofilm\w*|\bslag\w*|\bcoke(?:s|d|ing)?\b|"
+                r"\bsoot\b|\bplugg(?:ing|ed|es)?\b", re.I),
+     ("chemistry", "geometry", "configuration", "duty_cycle"),
+     ("control",)),
+    # -- mechanical clogging / blinding (R144s1 extension: sticky
+    #    fines, clay, kinked tubing occlusion — the DEBRIS is
+    #    mechanical, geometry leads, distinct from deposition
+    #    chemistry above)
+    ("mechanical_clogging",
+     re.compile(r"\bclog(?:s|ging|ged)?\b|\bblind(?:s|ing|ed)?\b|"
+                r"\bocclud\w*", re.I),
+     ("geometry", "configuration", "chemistry"),
+     ("control",)),
+    # -- electrochemical corrosion (R144s1 extension: the v16-19
+    #    pickling class had no family; corrode/corrosion verb+noun
+    #    forms; AFTER abrasion is not needed — abrasion sits above
+    #    via "fretting", the v16-18 shape)
+    ("electrochemical_corrosion",
+     re.compile(r"\bcorrod(?:e|es|ed|ing)\b|\bcorrosion\b|"
+                r"galvanic\w*|\boxidiz(?:e|es|ed|ing)\b|"
+                r"\brust(?:ing)?\b|\bover-?pickl\w*|\bsplash[- ]zone\b",
+                re.I),
+     ("chemistry", "material", "geometry"),
+     ("control",)),
     # -- mechanical removal of surface material (the v16-02 class:
-    #    chemical CP for abrasion — the anti-class)
+    #    chemical CP for abrasion — the anti-class). R144s1: the VERB
+    #    forms (erodes/erode — "eros" is not a substring of "erodes")
+    #    and the rolling-contact shapes (shelling, squatting, pitting)
+    #    join the detector.
     ("abrasion_erosion",
-     re.compile(r"\babras\w*|eros\w*|scour\w*|wear(?:ing)?\b|"
+     re.compile(r"\babras\w*|\berod(?:e|es|ed|ing)\b|\beros\w*|"
+                r"scour\w*|wear(?:ing)?\b|"
                 r"fretting|galling|scuffing|polishing\s+(?:of\s+)?"
                 r"(?:the\s+)?(?:bearing|surface)|tribolog\w*|"
-                r"third-body\s+particles?|grit\b", re.I),
+                r"third-body\s+particles?|grit\b|"
+                r"\bshelling\b|\bshells\b|"
+                r"\bsquat(?:s|ting|ted)?\b|"
+                r"\bpit(?:s|ted|ting)?\b|"
+                r"rolling\s+contact\s+fatigue", re.I),
      ("material", "geometry", "boundary", "configuration"),
      ("chemistry", "control")),
     # -- trapped foreign objects (the v16-03 class: flow-modulation
@@ -88,15 +127,37 @@ FAILURE_FAMILY_LEXICON: List[Tuple[str, re.Pattern, Tuple[str, ...],
      ("boundary", "duty_cycle", "geometry", "material"),
      ("chemistry", "control")),
     # -- hot-gas / thermal anchoring at a surface (the v16-23 class:
-    #    monitoring for a burn — the anti-class)
+    #    monitoring for a burn — the anti-class). R144s1: the thermal
+    #    dry-out shapes (electrolytic capacitors, grease depletion at
+    #    tilt temperature) join the detector.
     ("thermal_attack_surface",
      re.compile(r"burn(?:s|ing|ed|out)?\b|hot[- ]gas|recirculat\w+\s+"
                 r"(?:hot|combust)|flame\s+(?:hold|anchor|impinge)"
                 r"|thermal\s+(?:attack|soak|spike)|heat\s+flux\s+"
                 r"(?:to|on)\s+the\s+(?:face|wall|surface)|"
-                r"red-?hot", re.I),
+                r"red-?hot|"
+                r"\bdry(?:ing)?\s+out\b|\bdry-?out\b|"
+                r"\bbacklash\b|\bgrease\s+dri(?:es|ed|ing)\b|"
+                r"\btraveler\s+heat\b", re.I),
      ("boundary", "geometry", "configuration", "material",
       "duty_cycle"),
+     ("control",)),
+    # -- liquid slugging / carryover / oil return (R144s1 extension:
+    #    the v16-10 class and the fresh oil-logging vocabulary — the
+    #    physics is two-phase return management)
+    ("phase_carryover_liquid",
+     re.compile(r"\bslug(?:ging|ged|s)?\b|liquid\s+(?:floodback|"
+                r"carryover)|oil\s+logg(?:ing|ed)\b|oil\s+return\b|"
+                r"\bpriming\b", re.I),
+     ("geometry", "configuration", "boundary"),
+     ("control",)),
+    # -- seal / containment loss-of-condition (R144s1 extension: the
+    #    v16-15 dry-running class and leak vocabulary)
+    ("seal_leak_integrity",
+     re.compile(r"\bleak(?:s|ing|ed)?\b|seal(?:s)?\s+(?:fail|leak|"
+                r"degrad)|dry-?run\w*|loss\s+of\s+(?:seal|containment)",
+                re.I),
+     ("configuration", "geometry", "material"),
      ("control",)),
     # -- diffusion / intermetallic growth (the v16-25 class: the
     #    physics is diffusion-rate or interface-chemistry control)
@@ -123,21 +184,29 @@ FAILURE_FAMILY_LEXICON: List[Tuple[str, re.Pattern, Tuple[str, ...],
      ("geometry", "configuration", "duty_cycle", "boundary"),
      ("control",)),
     # -- fatigue cracking from thermal/mechanical cycling (the
-    #    v16-01 class, which scored 3 — the map must keep it sound)
+    #    v16-01 class, which scored 3 — the map must keep it sound).
+    #    R144s1: the crack-site vocabulary widens (bead/ligament/
+    #    seam/root/fillet) and heat-cycling joins the detector.
     ("thermal_fatigue_crack",
      re.compile(r"thermal\s+(?:fatigue|cycling|shock)|crack\w*\s+"
-                r"(?:at|from|near)\s+(?:clamp|weld|joint|notch)"
-                r"|cyclic\s+(?:thermal|stress)|low-?cycle\s+fatigue",
+                r"(?:at|from|near)\s+(?:clamp|weld|joint|notch|bead|"
+                r"ligament|seam|root|fillet|sheave)"
+                r"|cyclic\s+(?:thermal|stress)|low-?cycle\s+fatigue|"
+                r"\bheat\s+cycl\w*|thermal\s+cycling",
                 re.I),
      ("geometry", "material", "boundary", "duty_cycle",
       "configuration"),
      ()),
     # -- generic mechanical overload / tear / rip (the fallback
-    #    mechanical family)
+    #    mechanical family). R144s1: plain "fatigue", wire breaks and
+    #    friction slip join the fallback (checked AFTER the specific
+    #    families by list order).
     ("mechanical_overload",
      re.compile(r"\brip(?:s|ping|ped)?\b|\btear(?:s|ing|ing)?\b|"
                 r"overload|tensile\s+failure|impact\s+(?:damage|"
-                r"load)|mechanical\s+shock", re.I),
+                r"load)|mechanical\s+shock|"
+                r"\bbreak(?:s|age|ing)?\b|\bfatigue\b|"
+                r"\bslip(?:s|ping|ped)?\b", re.I),
      ("geometry", "material", "configuration", "control"),
      ()),
 ]
