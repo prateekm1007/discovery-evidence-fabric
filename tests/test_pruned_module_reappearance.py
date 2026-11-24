@@ -42,16 +42,20 @@ PRUNED_MODULES = [
     # not exist. Resurrected twice by stale-tree closes before this
     # guard existed (R139S3-F1 / R140-F1).
     ("discovery_fabric/engine/causal_correctness.py", "d86f59aec"),
-    # 71de1c870 (R145S1, DIR-8, claim c-0243 lineage): the
-    # zero-importer census at the tip found ONE dead module — the
-    # V3.9 calibration pipeline (303 lines, last touched 806c4112b
-    # in the V3.9 era; zero .py importers; zero json/yml/md
-    # consumers; no CI step; no script execs it by path). Pruned
-    # with import-graph evidence; the prior_art_v2 family's LIVE
-    # members (calibration_v3, claim_identity, elite_v3,
-    # prior_art_v2_bridge) are untouched.
+    # the R145S1 DIR-8 prune (claim c-0243 lineage): the zero-importer
+    # census found ONE dead module — the V3.9 calibration pipeline
+    # (303 lines, last touched 806c4112b in the V3.9 era; zero .py
+    # importers; zero json/yml/md consumers; no CI step; no script
+    # execs it by path). Pruned with import-graph evidence; the
+    # prior_art_v2 family's LIVE members (calibration_v3,
+    # claim_identity, elite_v3, prior_art_v2_bridge) are untouched.
+    # Epoch repair (typed, Art. 4/Art. 1): the first registration
+    # referenced 71de1c870 — a census commit that was NEVER PUSHED
+    # (it exists only in the registering sandbox; unpushed evidence
+    # does not count). The epoch is the REACHABLE prune deletion
+    # commit 28820e3a1 (the commit that removed the 303 lines).
     ("discovery_fabric/prior_art_v2/calibration_v3_9.py",
-     "71de1c870"),
+     "28820e3a1"),
 ]
 
 
