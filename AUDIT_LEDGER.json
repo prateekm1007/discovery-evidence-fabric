@@ -2074,6 +2074,22 @@
    "title": "Wind synthesis starves at 0 candidates across runs \u2014 the synthesis-stage complement did not unstarve it; the open engine capability item",
    "evidence": "r143_yield_confirm wind 0",
    "status": "OPEN"
+  },
+  {
+   "id": "R143-F6",
+   "round": "R143S5",
+   "severity": "HIGH",
+   "title": "Generation strength is the binding capability constraint: v16 problem-only mean 2.7/4 (22 sound, 8 off-target, 0 strong). The engine applies generic TRIZ operators without problem-aware mechanism selection or quantitative testability; v15's 3.9 not reproduced on fresh inputs.",
+   "evidence": "eval/v16_auditor_scoring.json (per-problem scores, mean 2.73, CI [2.57,2.89])",
+   "status": "OPEN"
+  },
+  {
+   "id": "R143-F7",
+   "round": "R143S5",
+   "severity": "MEDIUM",
+   "title": "8/30 v16 inventions are off-target (chemical CP for abrasion, flow-modulation for tramp metal, passive insulation for nucleation, monitoring for mitigation) \u2014 the operator-to-problem mapping is mismatched",
+   "evidence": "v16-02/03/05/07/13/23/25/27",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5161,6 +5177,19 @@
     "R143-F2",
     "R142-F8"
    ]
+  },
+  {
+   "id": "V110",
+   "round": "R143S5 delegated-owner v16 scoring + generation-strength finding",
+   "commit": "4398144d11dc9e5e319cea93b729477616bbda97",
+   "gate": "v16 NOT_GRANTED (mean 2.73, CI[2.57,2.89], 0/0/0); generation-strength gap R143-F6 HIGH; R-CAL calibration MET (V109)",
+   "score": 7,
+   "provisional": true,
+   "adjudication": "eval/r143s5_auditor_adjudication.json",
+   "findings": [
+    "R143-F6",
+    "R143-F7"
+   ]
   }
  ],
  "gold_set": {
@@ -5477,7 +5506,7 @@
    "digest_canonicalization": "sha256 over json.dumps(corpus with BOTH selection_sha256 AND digest_canonicalization fields REMOVED, indent=1, sort_keys=True). Verified recomputes to the recorded selection_sha256."
   },
   "holdout_v16": {
-   "status": "SEALED_ONE_SHOT",
+   "status": "BURNED_NOT_GRANTED",
    "n": 30,
    "author": "delegated owner/auditor",
    "rubric_custody": "PRIVATE def-rubric-custody (unauth 404)",
@@ -5485,10 +5514,12 @@
    "bar": "mean>=3.3, CI lower>3.0, 0/0/0",
    "problems_path": "eval/holdout_v16/problems.json",
    "one_shot": true,
-   "burn_after": true
+   "burn_after": true,
+   "score_mean": 2.733,
+   "acceptance": "NOT_GRANTED (mean 2.73<3.3, CI lower 2.57<3.0; 0/0/0 hard clauses pass)"
   }
  },
- "progress_note": "SCORE 7/10 (carried). SCORE-8 R-CAL PANEL CALIBRATION GATE MET (VERIFIED independent recompute): 3 judges qualify (qwen235b acc1.0, dsv32 0.917, qw32b 0.917; answered 1.0; miss-based bias<=1) from 2 non-agnes families; inter-judge kappa 0.668>=0.6. AM47 viability-necessity calibration WORKED (acc 0.75->0.833-1.0). AM49 clarifies the bias gate is MISS-based novelty-deviation (well-posed); the all-pairs 6-9 imbalance was ill-posed (corpus 10/12 less-novel-prefer skew). dsr1 acc0.833 miss-bias2 marginal (not needed); hy4f transport-dead. Corpus burned. v16 30/30 GENERATED (problem-only, agnes pinned, rubrics never read) \u2014 auditor scoring vs sealed rubrics NEXT (consolidates score-7). Yield clean re-run 2/5 confirmed (R143-F1 closed); wind synthesis 0 open (R143-F5). Green tip 2c0191653. R143-F1/F2 + R142-F8 CLOSED. Critical path: v16 scoring -> P4 production rung (>=50% viable+non-obvious) + AM48 AUC>=0.8 (8) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 PROVISIONAL (NOT consolidated). R-CAL panel calibration gate MET (V109: 3 judges acc>=0.8, kappa 0.668, AM47/AM49). BUT delegated-owner v16 scoring: NOT_GRANTED \u2014 mean 2.73, CI[2.57,2.89], 0/0/0 hard clauses pass; 22 sound / 8 off-target / 0 strong. GENERATION STRENGTH is the binding capability constraint (R143-F6 HIGH): the engine applies generic TRIZ operators (DIRECT_TRANSFER P5, flow/pressure modulation) without problem-aware mechanism selection or quantitative testability; v15's 3.9 NOT reproduced on fresh problem-only v16 (~2.7). 8/30 off-target (R143-F7). Score-7 two-consecutive FAILS (v15 3.9, v16 2.7); the fresh-input generation capability is ~2.7/4, below the score-6 bar \u2014 the prior v15-based 6/7 overstates fresh-input capability. Critical path: generation strength (problem-aware mechanisms + quantitative testability + novelty) -> fresh sealed set >=3.3 -> P4 production rung (8) -> P5 (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

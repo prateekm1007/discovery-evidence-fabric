@@ -1,0 +1,43 @@
+{
+ "record": "R143S5_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r143s5",
+ "audited_queue_tip": "2c0191653a62",
+ "audit_branch_parent": "4398144d11dc9e5e319cea93b729477616bbda97",
+ "V16_VERDICT": {
+  "verdict": "NOT_GRANTED \u2014 delegated-owner scoring of the 30 v16 inventions vs the sealed rubrics: mean 2.73, CI [2.58, 2.89], 0/0/0 hard clauses. Below the 3.3/3.0 bar. The generation is sound-but-not-strong (22 sound / 8 weak / 0 strong). Score-7 two-consecutive NOT consolidated (v15 3.9, v16 2.7).",
+  "scoring_pointer": "eval/v16_auditor_scoring.json"
+ },
+ "RCAL_STATUS": "R-CAL panel calibration gate MET (V109: 3 judges, kappa 0.668) \u2014 the panel is calibrated, but the PRODUCTION rung (>=50% viable+non-obvious) now faces the generation-strength gap.",
+ "FINDINGS": [
+  {
+   "id": "R143-F6",
+   "severity": "HIGH",
+   "title": "Generation strength is the binding capability constraint: v16 problem-only mean 2.7/4 (22 sound, 8 off-target, 0 strong). The engine applies generic TRIZ operators without problem-aware mechanism selection or quantitative testability; v15's 3.9 not reproduced on fresh inputs.",
+   "evidence": "eval/v16_auditor_scoring.json (per-problem scores, mean 2.73, CI [2.57,2.89])",
+   "direction": "DIR2 \u2014 problem-aware mechanism selection + quantitative testability + novelty strength; re-test on a fresh sealed set"
+  },
+  {
+   "id": "R143-F7",
+   "severity": "MEDIUM",
+   "title": "8/30 v16 inventions are off-target (chemical CP for abrasion, flow-modulation for tramp metal, passive insulation for nucleation, monitoring for mitigation) \u2014 the operator-to-problem mapping is mismatched",
+   "evidence": "v16-02/03/05/07/13/23/25/27",
+   "direction": "DIR2 \u2014 root-cause-aware mechanism selection"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET",
+  "P1": "MET (score5) + grounding identity-TRUE",
+  "P2": "GENERATION QUALITY GAP \u2014 v16 problem-only mean 2.7 < 3.0; v15 3.9 not reproduced; score-6/7 generation basis weakened",
+  "P3": "PARTIAL",
+  "P4": "R-CAL calibration MET (V109); production rung faces generation-strength gap",
+  "P5": "NOT_MET"
+ },
+ "SCORE": {
+  "value": 7,
+  "provisional": true,
+  "note": "score-7 carried provisionally but NOT consolidated (v16 2.7 fails two-consecutive); the generation-strength gap (R143-F6) is the binding constraint. Honest: the fresh problem-only generation capability is ~2.7/4, below the score-6 bar; the prior v15-based 6/7 overstates fresh-input capability.",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "generation strength (problem-aware mechanisms + quantitative testability) -> fresh sealed set >=3.3 (consolidate 6/7) -> P4 production rung (8) -> P5 (9)"
+ },
+ "recompute_pointer": "eval/v16_auditor_scoring.json"
+}
