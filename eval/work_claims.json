@@ -207,6 +207,14 @@
       "violation": "the dev-verify commit carries the 5 canonical files under eval/holdout_v17_s2_dev/ with a trailer block the parser only half-reads (the malformed double block), so the canonical-match step cannot pair the bytes with the c-0250 claim that covers them",
       "remediation": "c-0250 artifact_paths already lists eval/holdout_v17_s2_dev/ \u2014 the coverage is REAL, the trailer format broke the pairing; registered here F36-style (forward-only) alongside the trailer-violation entry; the single-block convention typed in corrections[]",
       "at": "2026-11-24 (sandbox clock)"
+    },
+    {
+      "sha": "ba0797606bcd",
+      "session": "builder-r146s1",
+      "work_id": "r146-v17-s2-strength",
+      "violation": "the r146 strength one-shot commit carries 31 canonical files under eval/holdout_v17_generation_r146/ \u2014 outside every claim's artifact_paths at that snapshot (c-0250 lists the s2/strengthened dirs, not this one)",
+      "remediation": "c-0250 artifact_paths extended with eval/holdout_v17_generation_r146/ (the same-lane second run; one canonical dir per the Art. 16/29(e) discipline \u2014 the r95s1 c-0115 precedent)",
+      "at": "2026-11-24 (sandbox clock)"
     }
   ],
   "claim_artifact_violations": [
@@ -5995,6 +6003,7 @@
       "claimed_at": "2026-11-24 (sandbox clock)",
       "registered_at": "2026-11-24 (sandbox clock)",
       "artifact_paths": [
+        "eval/holdout_v17_generation_r146/",
         "eval/holdout_v17_s2_dev/",
         "eval/holdout_v17_s2_generation/",
         "eval/holdout_v17_s2_screen.json",
@@ -6042,7 +6051,17 @@
         "scripts/r146s1b_register_p4_claim.py"
       ],
       "title": "R146S1-B EXECUTOR (claim c-0252, base 560c55a37): DIR-4 \u2014 the calibrated P4 panel on the v17 STRENGTHENED full set (the score-8 gate re-run, R145-F2): the V109-qualified 4-judge panel (dsr1/qw32b/qwen235b/dsv32, 2 non-agnes families) blind + sha-parity rotated on the 30 committed packs (eval/r146_p4_panel/packs.json \u2014 the strengthened v17 candidates vs their top-3 SPECTER2-nearest EXTERNAL prior arts, 120-doc corpus), the EPO problem-solution ruling (closest art -> distinguishing features -> objective technical problem -> viable/non_obvious), AM47 viability-necessity verbatim, ONE generation per (judge, candidate) \u2014 no re-roll regardless of outcome (Art. 7); byte-resume continues the same run. Driver: the twin's committed scripts/r146_p4_panel_oneshot.py unchanged. Acceptance (the owner's DIR-4): >=50% viable+non-obvious on the FULL set; recompute diff=0; no subsets. The tally + the independent recompute commit with the raw legs.",
-      "notes": "The packs carry the strengthened generation's candidate_text (the 170be8ab7 run, quant 30/30, 16 strong/14 marginal builder-screen); the panel ruling is the independent non-obviousness measure against EXTERNAL prior art."
+      "notes": "The packs carry the strengthened generation's candidate_text (the 170be8ab7 run, quant 30/30, 16 strong/14 marginal builder-screen); the panel ruling is the independent non-obviousness measure against EXTERNAL prior art.",
+      "infra_state": {
+        "state": "INFRA_BLOCKED_PAYMENT_REQUIRED (HTTP 402, HF credits)",
+        "at": "2026-11-24 (sandbox clock)",
+        "legs": "120/120 written (byte-resume set complete; every (judge, candidate) attempted exactly once \u2014 the one-shot discipline intact, no re-roll)",
+        "valid": "dsr1 10/30 (all 10 viable+non_obvious); qw32b/qwen235b/dsv32 0/30 (all 402)",
+        "acceptance": "UNRESOLVED on infrastructure (Art. 15 \u2014 never a scientific result); 20/30 candidates have zero votes; the >=50% bar is neither met nor adjudicated-not-met",
+        "resume": "the claim lease stays live to 2026-12-01; on credit restore the SHARED corrected driver (the twin's 3306c30c1 fix: resume skips only VALID legs) continues the same generation",
+        "reconciliation_note": "the twin's builder_side legs (18, over the holdout_v17_generation_r146 rows) stay in eval/r146_p4_panel_builder_side/ \u2014 a different candidate set; this lane's legs are over the STRENGTHENED rows (eval/holdout_v17_strengthened_generation/); no cross-candidate inheritance (their hand-off move honored)",
+        "driver_defect_typed": "the tally step crashed on an r145 field residue (KeyError r144_within_answer_novel); the raw legs are intact; the independent recompute (PARTIAL_RECOMPUTE.json) stands in"
+      }
     },
     {
       "artifact_paths": [
@@ -6114,6 +6133,11 @@
       "finding": "the R146S1 window's two tip-reds are both commit-formatting defects on real, substantive work: 1e9793a04 (the dev-verify) carries a malformed double trailer block; 170be8ab7 (the strengthened sealed one-shot) wrote a canonical dir outside any claim's artifact_paths",
       "correction": "both registered F36-style (forward-only); c-0250 extended to cover the strengthened dir; the convention going forward: ONE trailer block per commit (never a blank line inside it), and a canonical dir is added to the covering claim's artifact_paths IN THE SAME WINDOW that first writes it",
       "unaffected": "the strengthened run bytes, the dev-verify results (3/4 gate-strong), and the quant contract evidence are unaffected \u2014 this heal is registry/format only"
+    },
+    {
+      "at": "2026-11-23 (sandbox clock)",
+      "correction": "the c-0234 counter collision and the f58c46a63 stale-base clobber are typed here (Art. 4 memory artifact): (a) builder-r143s3 pushed claim c-0234 at 98e6876c8 (the counter's then-current value); builder-r121s1-3e8a41d7 independently allocated the same id from the stale counter and registered c-0234 AND c-0235 for r143-v16-one-shot in f58c46a63 (double root \u2014 one_shot work needs exactly one chain root); (b) that same write restored an older registry copy, silently un-registering builder-r143s3's session + claim and reverting c-0233 to OPEN AFTER 3008e7170 had typed the close (builder-r142s2's DIR-4 acceptance MET \u2014 the re-close belongs to the owning lane with its verifier record; this lane does NOT re-type another lane's claim state); (c) the double root is healed as the Art. 29(d) chain it factually was: c-0234 typed TAKEN_OVER, c-0235 takes_over c-0234 (the re-derived id continues the same single generation; the validator requires the taken-over predecessor's lease to be dead \u2014 takeover of a live lease is invalid); (d) this lane's claim re-derived to c-0236 (counter c-0237) per the claim guard's own non-FF protocol); (e) the trailer-disclosure half of the original red set was healed remotely at dfbc4a1a3 by builder-r142s2 (the c7096aa488ea + f58c46a63 registrations with the author attribution + the c-0233 re-assert) \u2014 this lane's violation-registration script was superseded before landing (never pushed) and is dropped from this claim's artifact_paths",
+      "also_typed": "the 62-file CI enforcement selection re-run locally at the corrective tip before push; the acceptance is the API-quoted check-run conclusion on the pushed sha (D2), not the local run"
     }
   ],
   "findings": [
@@ -6853,6 +6877,51 @@
       "typed": "Registered per F36 rather than rewriting landed history (pushed history is never rewritten; remediation is forward). The CI trailer guard named the commit; this entry closes the gap the guard measured. The commits AFTER it (the R146S1 CLOSE, 7920f38da lineage) carry both trailers.",
       "sha": "1d5954da3",
       "detected_at": "2026-11-24 (sandbox clock, TRUE UTC)"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (ZERO trailers \u2014 no trailer block at all in the message)",
+      "session_attribution": "builder-r146s1 (the c-0250 strength lane; the message body names the lane's work throughout \u2014 'the r146 novelty-strength one-shot')",
+      "work_id_attribution": "r146-v17-s2-strength (the c-0250 lane's second one-shot run)",
+      "registered_by": "builder-r146s1-b (the rebase-lane heal, appended to the c-0252 partial-run close)",
+      "typed": "the commit carries the 31 canonical r146 strength rows (eval/holdout_v17_generation_r146/) with NO trailers whatever \u2014 the F36 class in its zero-trailer form; registered forward-only (Art. 4), the single-block convention stands (CORR-14)",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "ba0797606bcd"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (malformed double trailer block \u2014 a blank line splits it; the parser misses the first Session: line)",
+      "session_attribution": "builder-r146s1",
+      "work_id_attribution": "r146-v17-novelty-strength (the window close commit)",
+      "registered_by": "builder-r146s1-b (the rebase-lane heal)",
+      "typed": "same defect class as 1e9793a04/c9992c04e (CORR-14): two trailer blocks separated by a blank line; both name builder-r146s1 / r146-v17-novelty-strength \u2014 attribution unambiguous; registered forward-only",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "1d5954da35a8"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (zero trailers (no block at all))",
+      "session_attribution": "builder-r146s1",
+      "work_id_attribution": "r146-v17-s2-strength (the verifier close + the c-0250 re-register)",
+      "registered_by": "builder-r146s1-b (the rebase-lane heal)",
+      "typed": "the R146S1 window-close burst (3306c30c1/4019345e5/f5e21933d/1d5954da3) shipped without parseable trailers \u2014 the same CORR-14 class (single-block convention); attribution unambiguous from the message bodies; registered forward-only (Art. 4)",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "3306c30c1"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (zero trailers (no block at all))",
+      "session_attribution": "builder-r146s1",
+      "work_id_attribution": "r146-p4-panel (the BLOCKED-TRANSPORT typing; shared-lane work, the c-0252 panel)",
+      "registered_by": "builder-r146s1-b (the rebase-lane heal)",
+      "typed": "the R146S1 window-close burst (3306c30c1/4019345e5/f5e21933d/1d5954da3) shipped without parseable trailers \u2014 the same CORR-14 class (single-block convention); attribution unambiguous from the message bodies; registered forward-only (Art. 4)",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "4019345e5"
+    },
+    {
+      "violation": "missing Session:/Work-Id: trailers (zero trailers (no block at all))",
+      "session_attribution": "builder-r146s1",
+      "work_id_attribution": "r146-p4-panel (the hand-off typing; shared-lane work)",
+      "registered_by": "builder-r146s1-b (the rebase-lane heal)",
+      "typed": "the R146S1 window-close burst (3306c30c1/4019345e5/f5e21933d/1d5954da3) shipped without parseable trailers \u2014 the same CORR-14 class (single-block convention); attribution unambiguous from the message bodies; registered forward-only (Art. 4)",
+      "at": "2026-11-24 (sandbox clock)",
+      "sha": "f5e21933d"
     }
   ],
   "claim_live_lease_violations": [
