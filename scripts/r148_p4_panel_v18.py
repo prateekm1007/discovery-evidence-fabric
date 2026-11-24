@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """r148_p4_panel_centai.py — DIR-2 (TOP, second half): the P4 panel on
-the FULL v17 strengthened 30-candidate set with the r147-QUALIFIED
+the FULL v18 physics-correct 30-candidate set with the r148-QUALIFIED
 cent-ai judges (the GATE-VALID instrument — the twin's c-0254 caveat
 panel runs unqualified judges and is INPUT evidence by auditor Art. 3;
 this lane's tally is the >=50% GATE evidence).
@@ -11,7 +11,7 @@ rotation, AM47 viability-necessity verbatim, strict 7-key JSON,
 budget escalation + backoffs) — the packs are the committed
 eval/r146_p4_panel/packs_sealed_set.json (the SEALED v17 set — the rail-shelling packs.json is a STALE pre-strengthening bundle typed out of the target); only the judge roster + transport
 change (the owner-designated cent-ai path, qualified via the
-auditor's r147 gate this window).
+auditor's r148 gate this window).
 
 Byte-resume: skips ONLY outcome==VALID legs (the R146 fix). One
 generation per (judge, candidate); NO re-roll (Art. 7).
@@ -91,7 +91,7 @@ REQUIRED_KEYS = {"closest_prior_art", "distinguishing_features",
                  "non_obvious_reason"}
 
 # cent-ai judge roster (transport + model ids); the QUALIFIED set is
-# resolved from the r147 record at run start (the gate is enforced:
+# resolved from the r148 record at run start (the gate is enforced:
 # the driver refuses to run on <3 qualified judges from <2 families)
 CENT_ROSTER = {
     "dsv4f": {"model": "deepseek-v4-flash", "family": "deepseek",
@@ -110,7 +110,7 @@ CENT_ROSTER = {
 
 
 def load_qualified() -> list:
-    """The qualified judge set from the r147 record (snapshot committed
+    """The qualified judge set from the r148 record (snapshot committed
     alongside the legs). Refuses to run unqualified (<3 judges or <2
     families or alpha<0.6) — the gate is enforced, not advisory."""
     src = REPO / "eval" / "r148_rcal_centai" / "QUALIFICATION.json"
@@ -118,7 +118,7 @@ def load_qualified() -> list:
     gate = d.get("gate", {})
     if not gate.get("pass"):
         raise SystemExit(
-            "the r147 gate did not pass "
+            "the r148 gate did not pass "
             f"(n_qualified={gate.get('n_qualified')}, "
             f"alpha={gate.get('alpha')}) — the GATE-VALID panel "
             "cannot run; typed refusal (auditor Art. 3)")
@@ -321,14 +321,14 @@ def main() -> int:
     pct = round(100.0 * n_pass / max(1, len(tally_rows)), 1)
     tally = {
         "record": "R148_P4_PANEL_V18/1.0.0 — the GATE-VALID panel: "
-                  "the r147-qualified cent-ai judges, blind (neutral "
+                  "the r148-qualified cent-ai judges, blind (neutral "
                   "sha-derived index) + swapped (the prior-art "
                   "sha-parity rotation), on the FULL v18 physics-correct "
                   "30-candidate set; majority of the votes cast on "
                   "BOTH axes; the >=50% bar",
         "instrument": {
             "judges": [j["tag"] for j in judges],
-            "qualification": "r147 gate (auditor corpus, "
+            "qualification": "r148 gate (auditor corpus, "
                              "acc>=0.8/answered>=0.9/bias<=1, "
                              "alpha>=0.6) — QUALIFICATION_SNAPSHOT.json "
                              "rides this run",
