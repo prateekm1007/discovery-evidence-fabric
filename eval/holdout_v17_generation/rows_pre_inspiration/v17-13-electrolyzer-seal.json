@@ -1,0 +1,119 @@
+{
+ "problem_id": "v17-13-electrolyzer-seal",
+ "domain": "hydrogen-production",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:4ff2286bd654": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:c95ace580b0a": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:2ba0a59becce": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "seal_leak_integrity",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "seal_leak_integrity",
+     "admitted": true,
+     "rank": 0,
+     "basis": "configuration is admitted class #1 for the seal_leak_integrity failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:10:53Z",
+ "attempts_n": 1,
+ "row_wall_s": 21.6,
+ "a1_answer": "**NOVELTY STATEMENT**\n**Standard Practice:** Prevents seal leak by applying static clamping force to a compressible elastomeric ring to exceed the internal gas pressure (mechanism: elastic preload vs. pressure delta).\n**Mechanism Departure:** Prevents seal leak by introducing a passive, mechanical \"pressure-follow\" geometric configuration (a spring-energized lip or bellows) where the sealing contact force increases proportionally with internal gas pressure, inverting the standard \"preload > pressure\" limit into \"contact force = k * P_gas\" (mechanism: geometric conversion of pressure to normal load).\n**Failure-Physics Connection:** Standard static seals fail because the pressure differential $\\Delta P$ grows faster than the elastic recovery of the elastomer during cycling, leading to loss of contact pressure. The pressure-follow mechanism couples the sealing normal force directly to the operating pressure via physical geometry, ensuring that as the driving leak force (pressure) increases, the restraining force (contact) increases in tandem, maintaining a constant sealing margin independent of the pressure transient.\n\n**PHYSICS CHECK**\nGoverning relation: The sealing integrity requires that the specific contact pressure $p_c$ exceeds the critical leak threshold $p_{leak}$ by a safety margin $M$.\nStandard: $p_c = \\frac{F_{preload}}{A_{seal}}$. Failure occurs when $\\Delta P > p_c$.\nNovelty: For a pressure-follow lip, $F_{contact} = F_{spring} + C_{mech} \\cdot V_{displacement}$. The displacement $V$ is driven by $\\Delta P$ acting on an effective piston area $A_{eff}$.\n$V = \\Delta P \\cdot A_{eff} / K_{stiffness}$.\nThus, $F_{contact} \\propto \\Delta P$.\nMagnitude verification: If $\\Delta P$ cycles 0–100 bar, a standard 1.5 mm EPDM ring (E≈1 MPa) undergoes ~30% strain; stress relaxation reduces holding force. A spring-energized lip (e.g., 316L wire or shaped polymer) with a mechanical advantage lever $L$ converts 100 bar on 100 mm$^2$ ($1000$ N) into a normal clamping force that scales linearly. The physics holds because the leak rate $Q$ is proportional to $\\exp(-\\alpha p_c)$; keeping $p_c$ proportional to $\\Delta P$ keeps the exponent's deviation from the design point bounded, whereas standard seals see $p_c$ constant while $\\Delta P$ varies.\n\n**IMPLEMENTATION BILL**\n*   **Component:** Replace the flat, solid elastomeric O-ring stack seals with **Spring-Energized Pressure-Following Lips**.\n*   **Configuration:** The seal consists of a rigid metal spring ring (316L) and an elastomeric lip (FKM or EPDM) shaped such that the lip's back-bore area faces the high-pressure side.\n*   **Material:** Spring: 316L Stainless Steel (already used in stack hardware). Lip: FKM (already used in electrolyzer seals for chemical compatibility).\n*   **Input Streams:**\n    *   **Pressure:** ALREADY-RECORDED via existing stack manifold pressure transducers (stated in problem context as part of normal electrolyzer monitoring). No new sensors required.\n    *   **Flow Rate:** ALREADY-RECORDED via existing differential pressure flow meters across the stack.\n*   **Reference/Threshold:**\n    *   **Seal Design Pressure:** DERIVED from stated stack nameplate rating (e.g., 50–100 bar).\n    *   **Leak Threshold:** DERIVED from hydrogen safety standards (ASME B31.3 or EN 17776) stating maximum allowable leak rate for hydrogen service.\n    *   **Calibration:** Not required as a field program. The mechanical gain $C_{mech}$ is a fixed geometric property defined at manufacturing. The system is \"trust-by-construction\": the physical linkage ensures the force follows the pressure. No baseline recording of \"healthy signatures\" is needed because the mechanism is deterministic, not inferential.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:** **Same.** Requires swapping one ring for another in the same gland. Fits existing stack interfaces.\n*   **Operability:** **Same.** No active parts, no power, no control valves. Passive response is instant (<1 ms), faster than any control system.\n*   **Maintenance:** **Same/Lower.** Standard elastomer replacement intervals apply. The metal spring is passive and non-wearing; inspection is visual/magnetic particle, same as other stack components.\n*   **Cost:** **Comparable.** Spring-energized seals are a commodity item in high-pressure hydrogen service. The cost is similar to high-quality multi-layer ring stacks, which are also an alternative to standard O-rings.\n*   **Feasibility:** High. This is a known configuration in pump and valve seals (e.g., \"pressure-energized\" O-rings) but not typically standard in *electrolyzer stack* inter-cell seals due to the need for compactness. The innovation is adapting this geometry to the thin, multi-cell stack environment.\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  Fabricate a test rig with a single seal interface using the standard O-ring and the proposed Spring-Energized Pressure-Following Lip.\n    2.  Connect to a pressurized nitrogen loop (inert surrogate for hydrogen) with a leak detector (helium mass spec or calibrated flow meter).\n    3.  Cycle pressure from 0 to 110% of nameplate rating (e.g., 0–110 bar) at a rate matching the electrolyzer startup/shutdown profile.\n    4.  Measure leak rate ($L$) at steady state at 10%, 50%, and 100% of peak pressure for both seals.\n*   **Instruments:** Existing pressure transducer, flow meter, helium leak detector.\n*   **Pass/Fail Thresholds:**\n    *   **Standard Seal:** Leak rate increases monotonically with pressure; at 100% pressure, leak is at threshold $L_{max}$.\n    *   **Novelty Seal:** Leak rate remains flat or decreases slightly as pressure increases (or increases much less than standard). Specifically, at 100% pressure, $L_{novelty} < 0.5 \\cdot L_{max}$.\n    *   **Cycling Fatigue:** After 500 cycles, the novelty seal's leak rate at 50% pressure must not exceed its initial value by more than 10%.\n*   **Duration:** 1 week (fabrication + testing).\n*   **Kill Criterion:** If the spring-energized seal exhibits chattering or instability at low pressures (<10 bar) due to insufficient pre-load, the mechanism fails the \"no-leak-at-standstill\" requirement.\n\n**CONSTRAINT BIND**\n*   **Primary Indicator:** The problem states \"leak hydrogen.\" The primary indicator is **Leak Rate** (or equivalently, differential pressure across a vent line). The proposal monitors/ensures integrity via the mechanical configuration, but the *validation* relies on the already-recorded pressure and flow data to confirm the expected behavior. The *prevention* is the physical seal change.\n*   **Secondary Indicator:** Pressure cycling profile. This supplements the primary indicator by confirming the mechanism was exercised.\n*   **Compliance:** The mechanism acts on the \"seal_leak_integrity\" family via \"configuration\" (geometric pressure-following). It does not use \"control\" (excluded class). It does not require new sensors. It does not require a validation program to build trust; trust is derived from the deterministic physics of the spring-lip interaction.\n\n**RISK**\n*   **Manufacturing Tolerance:** The geometric gain $C_{mech}$ is sensitive to the spring's initial tension. Variation could lead to uneven loading on the cell stack. Mitigation: Use high-precision spring manufacturing and verify initial seating force at production.\n*   **Elastomer Wear:** The lip slides against the counterface. Long-term wear may reduce $A_{eff}$ or $K_{stiffness}$. Mitigation: Use FKM material with high wear resistance, consistent with existing seal material class.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component:** Replace the flat, solid elastomeric O-ring stack seals with **Spring-En",
+    "*   **Configuration:** The seal consists of a rigid metal spring ring (316L) and an elasto",
+    "*   **Material:** Spring: 316L Stainless Steel (already used in stack hardware). Lip: FKM ",
+    "*   **Input Streams:**",
+    "*   **Pressure:** ALREADY-RECORDED via existing stack manifold pressure transducers (state",
+    "*   **Flow Rate:** ALREADY-RECORDED via existing differential pressure flow meters across ",
+    "*   **Reference/Threshold:**",
+    "*   **Seal Design Pressure:** DERIVED from stated stack nameplate rating (e.g., 50–100 bar",
+    "*   **Leak Threshold:** DERIVED from hydrogen safety standards (ASME B31.3 or EN 17776) st",
+    "*   **Calibration:** Not required as a field program. The mechanical gain $C_{mech}$ is a ",
+    "*   **Installability:** **Same.** Requires swapping one ring for another in the same gland",
+    "*   **Operability:** **Same.** No active parts, no power, no control valves. Passive respo",
+    "*   **Maintenance:** **Same/Lower.** Standard elastomer replacement intervals apply. The m",
+    "*   **Cost:** **Comparable.** Spring-energized seals are a commodity item in high-pressure",
+    "*   **Feasibility:** High. This is a known configuration in pump and valve seals (e.g., \"p",
+    "*   **Protocol:**",
+    "1.  Fabricate a test rig with a single seal interface using the standard O-ring and the pr",
+    "2.  Connect to a pressurized nitrogen loop (inert surrogate for hydrogen) with a leak dete",
+    "3.  Cycle pressure from 0 to 110% of nameplate rating (e.g., 0–110 bar) at a rate matching",
+    "4.  Measure leak rate ($L$) at steady state at 10%, 50%, and 100% of peak pressure for bot",
+    "*   **Instruments:** Existing pressure transducer, flow meter, helium leak detector.",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Standard Seal:** Leak rate increases monotonically with pressure; at 100% pressure, ",
+    "*   **Novelty Seal:** Leak rate remains flat or decreases slightly as pressure increases (",
+    "*   **Cycling Fatigue:** After 500 cycles, the novelty seal's leak rate at 50% pressure mu",
+    "*   **Duration:** 1 week (fabrication + testing).",
+    "*   **Kill Criterion:** If the spring-energized seal exhibits chattering or instability at",
+    "*   **Primary Indicator:** The problem states \"leak hydrogen.\" The primary indicator is **",
+    "*   **Secondary Indicator:** Pressure cycling profile. This supplements the primary indica",
+    "*   **Compliance:** The mechanism acts on the \"seal_leak_integrity\" family via \"configurat",
+    "*   **Manufacturing Tolerance:** The geometric gain $C_{mech}$ is sensitive to the spring'",
+    "*   **Elastomer Wear:** The lip slides against the counterface. Long-term wear may reduce "
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'cycling' and the stated failure driver 'cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "48f014f99e1428fe"
+}

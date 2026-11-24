@@ -1,0 +1,102 @@
+{
+ "problem_id": "v17-29-tubesheet-crack",
+ "domain": "fire-tube-boilers",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P1",
+   "P5",
+   "P18"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "GEOMETRIC_TRANSFORMATION",
+   "principle_id": "P1",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:afd77eeb8f05": "novel",
+   "cand:MS:DIRECT_TRANSFER:7e71ebec8f9d": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:c16f6a4cfc10": "reject-duplicate"
+  },
+  "failure_physics": {
+   "family": "thermal_fatigue_crack",
+   "winner_measure_class": "geometry",
+   "winner_principle_id": "P1",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_fatigue_crack",
+     "admitted": true,
+     "rank": 0,
+     "basis": "geometry is admitted class #1 for the thermal_fatigue_crack failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:14:30Z",
+ "attempts_n": 1,
+ "row_wall_s": 10.3,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a design change via increased ligament thickness (local material addition) to reduce stress concentration and improve thermal mass. The novelty lies in a geometric transformation (Principle P1) that redistributes the cross-section of the existing ligament area into a high-aspect-ratio micro-channel array, creating a thermal short-circuit without altering the total metal volume or external geometry. The failure-physics connection is that by replacing the solid ligament block with a dense array of thin, parallel fins perpendicular to the heat flow, the thermal diffusion length is reduced from the ligament thickness to the fin thickness, drastically lowering the peak thermal gradient $\\Delta T$ across the ligament volume during rapid cycling.\n\nPHYSICS CHECK\nGoverning relation: Transient thermal stress $\\sigma \\propto E \\alpha \\Delta T_{local}$. For a solid ligament of thickness $t_s$, the maximum temperature difference across the section during a rapid heat flux change $q''$ is roughly $\\Delta T \\approx q'' t_s / (2k)$ (one-dimensional semi-infinite solid approximation for short times). For a fin array of thickness $t_f \\ll t_s$, the diffusion time scale $\\tau_f = t_f^2 / (4\\alpha_{th})$ becomes negligible compared to the duty cycle time $T_{cycle}$. Therefore, $\\Delta T_{fin} \\approx 0$ across the fin thickness, while the solid $\\Delta T_{solid}$ remains significant.\nMagnitude verification: Assuming ASSUMPTION ligament thickness $t_s = 20$ mm, fin thickness $t_f = 2$ mm, and ASSUMPTION thermal diffusivity $\\alpha_{th} = 1.0 \\times 10^{-5} \\text{ m}^2/\\text{s}$. $\\tau_{solid} \\approx (0.02)^2 / (4 \\cdot 10^{-5}) = 100$ s. $\\tau_{fin} \\approx (0.002)^2 / (4 \\cdot 10^{-5}) = 1$ s. If the boiler cycling period is $\\geq 10$ s (typical for start-up/load changes), the solid ligament experiences a transient gradient, while the fin array equilibrates thermally almost instantaneously. The stress reduction factor is proportional to the ratio of temperature gradients, $\\Delta T_{fin} / \\Delta T_{solid} \\approx \\tau_{fin} / \\tau_{solid} \\approx 0.01$, representing a 99% reduction in thermal shock stress at the ligament root.\n\nIMPLEMENTATION BILL\nComponents:\n1. Modified Tubesheets: USER CONSTRAINT stated device is \"fire-tube boiler tubesheets.\" The modification involves machining a pattern of micro-channels/fins within the ligament area between the tube holes, or casting/welding a finned insert into the ligament volume.\n2. Material: Same base material as the original tubesheet (to maintain corrosion compatibility and strength). ASSUMPTION: Carbon steel or stainless steel typical for fire-tube boilers.\n3. Instruments/Procedure: No new sensors. Visual inspection and pressure testing (USER CONSTRAINT stated signals).\n\nInput Streams:\n- ALREADY-RECORDED: Visual inspection records of existing cracks at ligaments (stated in problem failure mode).\n- ALREADY-RECORDED: Pressure test logs (stated in problem signals).\n- DERIVED: Thermal diffusivity $\\alpha_{th}$ from stated material specs (ASSUMPTION based on standard boiler steel).\n- DERIVED: Geometric dimensions $t_s$ (ligament thickness) and $t_f$ (fin thickness) from stated boiler geometry/specs.\n\nReference/Threshold:\n- DERIVED: Crack initiation threshold is defined by the existing visual inspection criteria for \"crack at ligament.\" The new design aims to prevent reaching this threshold.\n- The success criterion is the absence of new crack initiation on the micro-channel ligaments during subsequent pressure and visual inspections, compared against the historical record of solid ligament failures.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: SAME class. Both require replacement or retrofit of the tubesheet. The micro-channel version requires higher precision manufacturing (EDM or precision casting/welding) but does not change the installation footprint.\nOperability: SAME. No change in fluid dynamics (channels are filled with the boiler water/steam or are sealed voids if cast; if open, they must be oriented to avoid erosion/corrosion, but for thermal short-circuiting, they are typically filled with the same metal or high-conductivity solid if solid fins, or if they are channels, they must be part of the fluid path. Wait, if they are channels, they alter flow. Let's refine: The mechanism is a *geometric transformation* of the solid ligament. It is a high-density finned metal structure filling the ligament volume. It is not a flow channel, but a solid high-aspect-ratio metal matrix. Thus, it adds no flow resistance. It is a solid block of fins. This maintains the same operational fluid dynamics as the original solid block, just with different thermal properties.\nMaintenance: SAME. No additional maintenance.\nRough Cost Class: HIGHER manufacturing cost due to complex geometry (EDM/CNC vs simple rolling/casting). This is the \"heavier\" aspect. However, it prevents catastrophic failure (boiler explosion/costly downtime), which justifies the cost premium for high-cycling applications.\nConclusion: SAME burden class for operation/maintenance, HIGHER burden for capital manufacturing, justified by reliability gain.\n\nEXECUTABLE TEST\nProtocol:\n1. Take two test sections of tubesheet material: one with standard solid ligaments, one with the proposed micro-finned ligaments.\n2. Subject both to a rapid thermal cycle (e.g., quench from operating temperature $T_{hot}$ to ambient $T_{cold}$ over a short duration $\\Delta t$ that is critical for the solid ligament diffusion time).\n3. Measure the temperature gradient across the ligament thickness using embedded thermocouples (if available) or infer from surface temperature response using a stated physics relation (Fourier's law for transient conduction).\n4. Pass/Fail: The micro-finned specimen must show a temperature differential $\\Delta T_{fin}$ that is less than 10% of the $\\Delta T_{solid}$ measured in the control specimen at the time of maximum thermal shock.\n5. Kill Criterion: If the micro-finned specimen shows any thermal gradient difference greater than the solid specimen, or if manufacturing defects (micro-cracks at fin roots) initiate during the test, the mechanism is invalid.\n6. Validation against Already-Recorded Data: The thermal properties and initial conditions are derived from stated specs and known physics. The test does not require a long-term failure dataset; it requires a single transient thermal experiment comparing the two geometries under identical boundary conditions.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: \"Visual inspection\" for crack presence. The mechanism prevents the formation of the crack, thereby keeping the visual inspection status at \"no crack.\"\nSecondary Stated Indicator: \"Pressure.\" The mechanism does not significantly alter pressure containment capability, as the finned structure maintains the required thickness and strength for pressure (stress concentration at fin roots must be checked, but with high aspect ratio, the stress is distributed). Pressure test ensures structural integrity is maintained.\nExplicit Statement: The PRIMARY indicator is visual inspection because the failure mode is \"crack at ligaments.\" The mechanism works by reducing the thermal stress that causes the crack. The SECONDARY indicator is pressure, which confirms that the geometric change has not compromised the pressure boundary integrity. The proposal never replaces the visual inspection check; it aims to make the result of that check permanently \"pass.\"",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Modified Tubesheets: USER CONSTRAINT stated device is \"fire-tube boiler tubesheets.\" Th",
+    "2. Material: Same base material as the original tubesheet (to maintain corrosion compatibi",
+    "3. Instruments/Procedure: No new sensors. Visual inspection and pressure testing (USER CON",
+    "- ALREADY-RECORDED: Visual inspection records of existing cracks at ligaments (stated in p",
+    "- ALREADY-RECORDED: Pressure test logs (stated in problem signals).",
+    "- DERIVED: Thermal diffusivity $\\alpha_{th}$ from stated material specs (ASSUMPTION based ",
+    "- DERIVED: Geometric dimensions $t_s$ (ligament thickness) and $t_f$ (fin thickness) from ",
+    "- DERIVED: Crack initiation threshold is defined by the existing visual inspection criteri",
+    "- The success criterion is the absence of new crack initiation on the micro-channel ligame"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, if they are channels, they alter flow. Let's refine: The mechanism is a *geometric transformation* of the solid ligamen"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'cycling' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "26ce1577f7c2a628"
+}

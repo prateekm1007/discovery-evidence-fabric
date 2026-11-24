@@ -1,0 +1,100 @@
+{
+ "problem_id": "v17-20-tbm-clog",
+ "domain": "tunneling",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P3",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P3",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:b3ffcfabcb16": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:de58e79b7a7d": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "mechanical_clogging",
+   "winner_measure_class": "geometry",
+   "winner_principle_id": "P3",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "mechanical_clogging",
+     "admitted": true,
+     "rank": 0,
+     "basis": "geometry is admitted class #1 for the mechanical_clogging failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:24:17Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.1,
+ "a1_answer": "NOVELTY STATEMENT\n**Standard Practice Delivery:** The field-standard practice for TBM clay clogging delivers a **DESIGN CHANGE** via mechanical **geometry** (e.g., increasing the spoke width or adjusting the cut diameter) to physically restrict clay entry and reduce deposition.\n**Novelty Departure:** The proposed mechanism delivers the same outcome class (geometric prevention of clogging) via a **passive mechanical self-clearing geometry**: a hinged \"gate-spoke\" with an integrated counterweight and a friction-limiting stop, which actively reconfigures the opening area in response to local hydraulic pressure differentials.\n**Failure-Physics Connection:** Clogging occurs when static clay accumulates in the gaps between spokes. The governing physics is the balance between the hydraulic pressure head exerted by the unconfined clay and the gravitational/frictional force on the gate. By allowing the gate to pivot open under sufficient pressure, the mechanism physically flushes the accumulated material, preventing the static accumulation that leads to full clogging.\n\nPHYSICS CHECK\n**Governing Relation:** The torque $\\tau$ on the hinged spoke must exceed the static friction threshold $\\tau_{f}$ to clear the clay. $\\tau = P \\cdot A_{eff} \\cdot L_{arm} - W_{cg} \\cdot L_{cg} \\cos(\\theta)$.\n**Magnitude Verification:** For a typical TBM spoke gap pressure differential $P$ of ~50 kPa (calculated from 5 m head of clay), and an effective lever arm area $A_{eff} \\cdot L_{arm}$ of 0.5 m², the hydraulic torque is ~25 kNm. This must be greater than the gate's weight moment plus friction. Designing the gate weight such that the closing torque is ~15 kNm ensures operation at 50 kPa while remaining latched at <30 kPa, allowing it to open only when pressure indicates significant flow/clogging potential.\n\nIMPLEMENTATION BILL\n*   **Component:** Replace standard fixed radial spokes with **Hinged Gate-Spokes**.\n*   **Material:** High-strength steel (S355) with bronze bushings for low-friction pivoting.\n*   **Instrument/Service:** No new sensors. Uses existing **visual_inspection** records to verify gate position during scheduled stops and **pressure** readings from the existing tail-seal pressure gauges (ALREADY-RECORDED) to correlate gate opening with flow rates.\n*   **Reference/Threshold:** The friction threshold and required opening pressure are **DERIVED** from the stated tail-seal pressure specs and the geometric moment of inertia of the hinged assembly (CALCULATED from geometry).\n*   **Procedure:** During installation of new segments, swap fixed spokes for hinged variants. No commissioning calibration required; the physics of the counterweight and pressure head dictates the setpoint automatically.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Hinged spokes require one-time assembly at the factory; field installation burden is identical to standard spokes (bolt-on).\n*   **Operability:** Passive system; no power, control loops, or maintenance of moving parts required beyond standard visual checks.\n*   **Maintenance:** Lower than active hydraulic clearing systems because there are no seals, pumps, or valves to maintain. The only maintenance is visual inspection of the hinge pins.\n*   **Cost Class:** SAME class as standard geometric design changes (moderate material cost increase for steel and hinges), avoiding the high operational cost and schedule delays of conventional active clogging mitigation (like chemical washers or frequent manual clearing stops).\n*   **Parity Conclusion:** Same burden class (passive mechanical design), different mechanism (active geometric reconfiguration via pressure-driven hinging rather than static geometry).\n\nEXECUTABLE TEST\n*   **Protocol:** Install a scaled model of the hinged gate-spoke in a laboratory pressure chamber filled with clay slurry matching the site's plasticity index.\n*   **Instruments:** Pressure transducer (ALREADY-RECORDED data type), high-speed camera for visual inspection of gate angle.\n*   **Pass/Fail Threshold:** The gate must remain closed at 30 kPa (latched against flow) and fully open at 60 kPa (clearing the channel).\n*   **Duration:** 48-hour continuous cycling test to verify fatigue and seal integrity at the hinge.\n*   **Kill Criterion:** If the gate fails to close at 30 kPa due to excessive friction or weight imbalance, or if it jams open during a pressure drop cycle, the design is rejected.\n*   **Validation:** Verified against ALREADY-RECORDED tail-seal pressure logs from previous TBM runs, ensuring the 30-60 kPa operating window aligns with observed clogging events in historical data.\n\nCONSTRAINT BIND\n*   **Primary Indicator:** **Pressure** (specifically, the differential pressure across the cutterhead/tail seals). The gate's operation is governed by this physical variable; the \"clogging\" state is inferred from sustained high pressure that triggers the gate opening.\n*   **Secondary Indicator:** **Visual_inspection** is used only to verify the mechanical integrity and position of the gate during scheduled maintenance stops. It does not control the gate; it supplements the pressure-based physics by confirming the mechanism is not physically obstructed or broken.\n*   **Reasoning:** The problem states the failure is clogging, which manifests physically as a blockage of flow and a resulting pressure buildup. The mechanism acts directly on this pressure variable. Visual inspection is a static check, whereas pressure is the dynamic driving force for the passive geometry.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component:** Replace standard fixed radial spokes with **Hinged Gate-Spokes**.",
+    "*   **Material:** High-strength steel (S355) with bronze bushings for low-friction pivotin",
+    "*   **Instrument/Service:** No new sensors. Uses existing **visual_inspection** records to",
+    "*   **Reference/Threshold:** The friction threshold and required opening pressure are **DE",
+    "*   **Procedure:** During installation of new segments, swap fixed spokes for hinged varia",
+    "*   **Installability:** Hinged spokes require one-time assembly at the factory; field inst",
+    "*   **Operability:** Passive system; no power, control loops, or maintenance of moving par",
+    "*   **Maintenance:** Lower than active hydraulic clearing systems because there are no sea",
+    "*   **Cost Class:** SAME class as standard geometric design changes (moderate material cos",
+    "*   **Parity Conclusion:** Same burden class (passive mechanical design), different mechan"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "QUANT_TEST_MISSING": [
+    "the EXECUTABLE TEST section has no NUMERIC pass/fail threshold with units — state the falsifiable quantity, its unit, and the comparison (e.g. '>= 45:1 dilution', '< 0.2 mm wear depth per 1000 h'); a qualitative 'the failure rate drops' is not a falsifier"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: The established physical driver of TBM clogging in soft ground is the accumulation of cohesive clay particles in the annular gap, which occurs when the "
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "eeb65c7a0acd9abd"
+}

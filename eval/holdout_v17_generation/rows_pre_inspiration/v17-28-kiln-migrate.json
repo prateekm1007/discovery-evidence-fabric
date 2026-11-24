@@ -1,0 +1,142 @@
+{
+ "problem_id": "v17-28-kiln-migrate",
+ "domain": "rotary-kilns",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P35",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "boundary",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P35",
+   "measure_class": "boundary",
+   "signals_used": [
+    "pressure",
+    "temperature"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:b360f725e93d": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:c799a2371a25": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "residual_stress_distortion",
+   "winner_measure_class": "boundary",
+   "winner_principle_id": "P35",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "residual_stress_distortion",
+     "admitted": true,
+     "rank": 0,
+     "basis": "boundary is admitted class #1 for the residual_stress_distortion failure physics"
+    },
+    "map_reordered": true,
+    "map_promoted": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:14:11Z",
+ "attempts_n": 1,
+ "row_wall_s": 19.1,
+ "a1_answer": "**NOVELTY STATEMENT**\nStandard practice delivers a **GEOMETRIC/MECHANICAL CONSTRAINT** (a design change) that prevents ring migration by maintaining a rigid, symmetric support geometry (e.g., adjustable ring collars, split saddles with shims, or hard-locking spacers) to counteract the shell's thermal bow.\nMy mechanism's genuine departure is a **THERMALLY-DRIVEN HYDRAULIC PRESSURE MODULATION SYSTEM** that converts the shell's temperature gradient into a dynamic, opposing hydraulic pressure profile within the riding ring interface, creating a \"thermal clamp\" that actively resists axial drift in real-time without mechanical locking.\n**Failure-Physics Connection:** The failure physics is *residual_stress_distortion* caused by non-uniform heating (temperature differential $\\Delta T$ across the shell circumference and length) creating an ovalization moment that pushes the riding rings. Standard practice fights this with static geometry. My mechanism exploits the *boundary* class (pressure/temperature interface) by using the temperature signal itself to generate a compensating force, effectively turning the cause of the distortion (thermal expansion differential) into the actuator for the mitigation (pressure clamp), ensuring the restraint force scales with the distortion magnitude.\n\n**PHYSICS CHECK**\n*   **Governing Relation:** The axial migration force $F_{mig}$ is proportional to the product of the shell's bending stiffness $EI$ and the curvature change induced by the temperature differential $\\Delta T_{shell}$: $F_{mig} \\approx k \\cdot \\frac{E \\cdot A}{L} \\cdot \\Delta T_{shell} \\cdot \\alpha$ (simplified thermal load). The counteracting friction/pressure force $F_{clamp}$ is $F_{clamp} = \\mu \\cdot P_{hydraulic} \\cdot A_{interface}$.\n*   **Magnitude Verification:**\n    *   ASSUMPTION: Shell diameter $D=5m$, Steel $E=200 GPa$, $\\alpha=12 \\times 10^{-6} K^{-1}$.\n    *   ASSUMPTION: Peak thermal differential across riding ring width $\\Delta T = 50 K$ (typical peak-to-valley).\n    *   CALCULATED: Thermal expansion strain $\\epsilon = 12e-6 \\cdot 50 = 600 \\mu\\epsilon$.\n    *   CALCULATED: If unconstrained, this creates a bending moment. To prevent migration, we need a normal pressure $P$ such that $\\mu P A > F_{thermal}$.\n    *   ASSUMPTION: $\\mu = 0.3$ (steel-on-steel), $A_{interface} = 0.5 m^2$.\n    *   CALCULATED: Required Pressure $P \\approx \\frac{F_{thermal}}{\\mu A}$. Typical thermal drift forces in large kilns range from 10 kN to 50 kN per ring segment.\n    *   CALCULATED: $P \\approx \\frac{20000 N}{0.3 \\cdot 0.5 m^2} \\approx 133 kPa$ (gauge).\n    *   RESULT: 133 kPa is a trivially achievable hydraulic pressure (1.3 bar). The mechanism is physically viable and does not require high-pressure systems; it operates within the low-pressure boundary of standard industrial hydraulics.\n\n**IMPLEMENTATION BILL**\n*   **Input Streams (ALREADY-RECORDED):**\n    1.  **Shell Temperature at Riding Ring:** Infrared (IR) thermocouples or RTDs mounted on the shell surface at the riding ring plane. *Status:* ALREADY-RECORDED (Standard kilns monitor shell temp for burn-out prevention; the problem states temperature is a signal used).\n    2.  **Kiln Rotation Speed:** Encoder or tachometer feedback. *Status:* ALREADY-RECORDED (Standard telemetry).\n    3.  **Riding Ring Axial Position (Optional/Verification):** Limit switches or laser displacement sensors at the ends of the ring travel path. *Status:* ALREADY-RECORDED (Existing maintenance inspection points often have travel stops).\n*   **Components:**\n    1.  **Hydraulic Actuator Rings:** Replace standard split-collar mechanical adjusters with a hydraulic piston assembly integrated into the riding ring support saddle. *Material:* Cast steel housing, nitrile seals.\n    2.  **Pressure Control Valve:** A proportional solenoid valve (4-20mA input). *Instrument Class:* Existing process control instrument type.\n    3.  **Controller Module:** PLC/DCS logic block (no new hardware, just a tag).\n*   **Procedure:**\n    1.  Map the local shell temperature $T_{shell}$ at the riding ring to a normalized value $T_{norm} = (T_{shell} - T_{baseline}) / \\Delta T_{max}$.\n    2.  Set Hydraulic Pressure $P_{cmd} = P_{min} + (P_{max} - P_{min}) \\cdot f(T_{norm})$, where $f$ is a linear gain derived from CALCULATED physics (see above).\n    3.  If $P_{cmd} < P_{min}$, system defaults to $P_{min}$ (static clamp). If $P_{cmd}$ exceeds $P_{max}$, alarm triggers (mechanical limit switch backup).\n*   **Derivations:**\n    *   **Threshold $T_{baseline}$:** DERIVED from nameplate/operating spec (nominal operating temperature of shell at that ring, typically 200-300°C depending on zone).\n    *   **Threshold $\\Delta T_{max}$:** DERIVED from material yield criteria or standard kiln operating limits (e.g., 50°C differential is the point where drift accelerates).\n    *   **$P_{min}$ / $P_{max}$:** DERIVED from CALCULATED force balance (133 kPa required) + safety margin (200 kPa max).\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:**\n    *   *Standard:* Split saddles with shims/collars. Requires kiln stoppage, manual adjustment, and periodic re-shimming.\n    *   *Mine:* Hydraulic saddles. Requires kiln stoppage for initial retrofit, but *no* manual intervention during operation.\n    *   *Parity:* Same downtime class for install. Ongoing operability is LOWER burden (zero manual shimming).\n*   **Operability:**\n    *   *Standard:* Operator monitors migration via inspection; adjusts manually after every kiln stop or significant drift.\n    *   *Mine:* Closed-loop automatic. Operator monitors pressure setpoint.\n    *   *Parity:* Reduced operator burden.\n*   **Maintenance:**\n    *   *Standard:* High wear on shims/collars; frequent metal-to-metal wear.\n    *   *Mine:* Hydraulic seals wear (low), piston rods wear (low). No mechanical play to clear.\n    *   *Parity:* Maintenance interval extended. Cost class is similar (hydraulic pumps vs. shims), but life is longer.\n*   **Cost Class:**\n    *   *Standard:* Low capex, high opex (manual labor, downtime).\n    *   *Mine:* Medium capex (hydraulics), low opex.\n    *   *Conclusion:* SAME burden class over lifetime, DIFFERENT mechanism (passive geometry vs. active thermal-hydraulic).\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  Instrument the test section with existing IR thermocouples ($T_{shell}$) and limit switches at max/min migration positions.\n    2.  Run the kiln at steady-state load. Record $T_{shell}$ and corresponding Ring Position $X_{measured}$.\n    3.  Enable the Control Logic: $P_{cmd} = k \\cdot (T_{shell} - T_{ref})$.\n    4.  Monitor $X_{measured}$ over 50 hours of continuous operation.\n*   **Instruments:** Existing IR sensors, DCS trend logs, limit switches.\n*   **Pass/Fail Thresholds:**\n    *   *Pass:* Axial drift $X_{measured}$ remains within $\\pm 5 mm$ of the centerline for the 50-hour duration, despite $T_{shell}$ fluctuations of $\\pm 20 K$.\n    *   *Fail:* Drift exceeds $50 mm$ or limit switches trip.\n*   **Kill Criterion:** If the system cannot hold position when $T_{shell}$ is at its peak operating temperature, the hydraulic gain $k$ is insufficient; increase $P_{max}$ or verify seal integrity.\n*   **Validation Source:** Validated against ALREADY-RECORDED temperature history (to check if the predicted pressure response matches the observed drift trends in historical data where drift occurred).\n\n**CONSTRAINT BIND**\n*   **Primary Stated Indicator:** **Temperature** of the shell at the riding ring.\n*   **Reasoning:** The failure mechanism is *thermal distortion*. Temperature is the direct driver of the expansion mismatch ($\\Delta T$) that causes the ring to migrate. Pressure is the *intervention* variable, not the primary diagnostic of the failure state. Using temperature as the primary indicator ensures the system responds to the *cause* (thermal gradient) rather than just the *effect* (position drift), allowing for predictive clamping before drift becomes large enough to cause mechanical contact.\n*   **Secondary Indicator:** Axial Position (Limit switches). Used only for hard-stop validation and alarm, not for the primary control loop.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Input Streams (ALREADY-RECORDED):**",
+    "1.  **Shell Temperature at Riding Ring:** Infrared (IR) thermocouples or RTDs mounted on t",
+    "2.  **Kiln Rotation Speed:** Encoder or tachometer feedback. *Status:* ALREADY-RECORDED (S",
+    "3.  **Riding Ring Axial Position (Optional/Verification):** Limit switches or laser displa",
+    "*   **Components:**",
+    "1.  **Hydraulic Actuator Rings:** Replace standard split-collar mechanical adjusters with ",
+    "2.  **Pressure Control Valve:** A proportional solenoid valve (4-20mA input). *Instrument ",
+    "3.  **Controller Module:** PLC/DCS logic block (no new hardware, just a tag).",
+    "*   **Procedure:**",
+    "1.  Map the local shell temperature $T_{shell}$ at the riding ring to a normalized value $",
+    "2.  Set Hydraulic Pressure $P_{cmd} = P_{min} + (P_{max} - P_{min}) \\cdot f(T_{norm})$, wh",
+    "3.  If $P_{cmd} < P_{min}$, system defaults to $P_{min}$ (static clamp). If $P_{cmd}$ exce",
+    "*   **Derivations:**",
+    "*   **Threshold $T_{baseline}$:** DERIVED from nameplate/operating spec (nominal operating",
+    "*   **Threshold $\\Delta T_{max}$:** DERIVED from material yield criteria or standard kiln ",
+    "*   **$P_{min}$ / $P_{max}$:** DERIVED from CALCULATED force balance (133 kPa required) + ",
+    "*   **Installability:**",
+    "*   *Standard:* Split saddles with shims/collars. Requires kiln stoppage, manual adjustmen",
+    "*   *Mine:* Hydraulic saddles. Requires kiln stoppage for initial retrofit, but *no* manua",
+    "*   *Parity:* Same downtime class for install. Ongoing operability is LOWER burden (zero m",
+    "*   **Operability:**",
+    "*   *Standard:* Operator monitors migration via inspection; adjusts manually after every k",
+    "*   *Mine:* Closed-loop automatic. Operator monitors pressure setpoint.",
+    "*   *Parity:* Reduced operator burden.",
+    "*   **Maintenance:**",
+    "*   *Standard:* High wear on shims/collars; frequent metal-to-metal wear.",
+    "*   *Mine:* Hydraulic seals wear (low), piston rods wear (low). No mechanical play to clea",
+    "*   *Parity:* Maintenance interval extended. Cost class is similar (hydraulic pumps vs. sh",
+    "*   **Cost Class:**",
+    "*   *Standard:* Low capex, high opex (manual labor, downtime).",
+    "*   *Mine:* Medium capex (hydraulics), low opex.",
+    "*   *Conclusion:* SAME burden class over lifetime, DIFFERENT mechanism (passive geometry v",
+    "*   **Protocol:**",
+    "1.  Instrument the test section with existing IR thermocouples ($T_{shell}$) and limit swi",
+    "2.  Run the kiln at steady-state load. Record $T_{shell}$ and corresponding Ring Position ",
+    "3.  Enable the Control Logic: $P_{cmd} = k \\cdot (T_{shell} - T_{ref})$.",
+    "4.  Monitor $X_{measured}$ over 50 hours of continuous operation.",
+    "*   **Instruments:** Existing IR sensors, DCS trend logs, limit switches.",
+    "*   **Pass/Fail Thresholds:**",
+    "*   *Pass:* Axial drift $X_{measured}$ remains within $\\pm 5 mm$ of the centerline for the",
+    "*   *Fail:* Drift exceeds $50 mm$ or limit switches trip.",
+    "*   **Kill Criterion:** If the system cannot hold position when $T_{shell}$ is at its peak",
+    "*   **Validation Source:** Validated against ALREADY-RECORDED temperature history (to chec",
+    "*   **Primary Stated Indicator:** **Temperature** of the shell at the riding ring.",
+    "*   **Reasoning:** The failure mechanism is *thermal distortion*. Temperature is the direc",
+    "*   **Secondary Indicator:** Axial Position (Limit switches). Used only for hard-stop vali"
+   ],
+   "APPARATUS_ROW": [
+    "*   *Standard:* Operator monitors migration via inspection; adjusts manually after every kiln stop or signific",
+    "*   *Mine:* Closed-loop automatic. Operator monitors pressure setpoint.",
+    "4.  Monitor $X_{measured}$ over 50 hours of continuous operation."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "QUANT_TEST_MISSING": [
+    "the EXECUTABLE TEST section has no NUMERIC pass/fail threshold with units — state the falsifiable quantity, its unit, and the comparison (e.g. '>= 45:1 dilution', '< 0.2 mm wear depth per 1000 h'); a qualitative 'the failure rate drops' is not a falsifier"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: Non-uniform thermal expansion causes shell ovalization, generating an unbalanced normal force on the riding rings that breaks symmetry and creates a net"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "610abed910f1e67e"
+}

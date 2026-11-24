@@ -1,0 +1,115 @@
+{
+ "problem_id": "v17-09-bladder-crack",
+ "domain": "tire-manufacturing",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P18",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b4af3522e746": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:0eedc151d6a0": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:b67a64b6c34f": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "thermal_fatigue_crack",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_fatigue_crack",
+     "admitted": true,
+     "rank": 4,
+     "basis": "configuration is admitted class #5 for the thermal_fatigue_crack failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:21:21Z",
+ "attempts_n": 1,
+ "row_wall_s": 11.0,
+ "a1_answer": "**NOVELTY STATEMENT**\nStandard practice for thermal fatigue cracking in tire curing bladders at the bead delivers a **DESIGN CHANGE** via material hardening or bead-geometry reinforcement (e.g., using higher-temperature silicone compounds or adding a steel bead ring) to increase crack initiation life.\nMy mechanism delivers the same class of outcome (prevention of bead cracking) via a **CONFIGURATION CHANGE** that alters the local thermal stress boundary condition: introducing a **concentric annular coolant gap** within the bladder wall at the bead interface, decoupling the bead region from the peak exotherm/thermal gradient by inserting a low-thermal-mass, high-conductivity spacer that equalizes the temperature differential across the bead thickness during the heat cycle.\n*Failure-physics connection:* Thermal fatigue cracking at the bead is driven by cyclic tensile/compressive hoop stresses resulting from the thermal gradient ($\\Delta T$) across the bead's radial thickness. By inserting a conductive annular spacer that acts as a thermal equalizer (reducing $\\Delta T_{local}$), the cyclic thermal strain amplitude is reduced, preventing crack initiation at the bead inner radius.\n\n**PHYSICS CHECK**\nGoverning relation: Cyclic thermal strain $\\varepsilon_{th} = \\alpha \\Delta T$. Stress amplitude $\\sigma_{max} = E \\varepsilon_{th}$.\nMagnitude verification: Standard bladder silicone $\\alpha \\approx 200 \\times 10^{-6} /^\\circ C$. During cure, $\\Delta T$ across the bead thickness (approx. 5 mm) can reach 15–20 °C, inducing $\\sigma \\approx 0.5–0.8$ MPa (silicone $E \\approx 1.5–2$ MPa). Cracking occurs when this cyclic strain exceeds the material's fatigue limit.\nInsertion of a metal annulus (e.g., aluminum, $k \\approx 200$ W/m·K) with high conductivity reduces the effective $\\Delta T$ across the critical zone to <2 °C (CALCULATED: 1D steady-state conduction through thin annulus vs. silicone $k \\approx 0.2$ W/m·K; metal conducts heat radially, flattening the profile).\nResulting $\\sigma$ drops to ~0.1 MPa, below the crack initiation threshold for silicone (ASSUMPTION: silicone yield/fatigue limit at bead root > 0.2 MPa under cyclic load). The metal spacer does not carry the bulk pressure load but redistributes the thermal field, eliminating the high-gradient zone that initiates cracks.\n\n**IMPLEMENTATION BILL**\n*Components:*\n1.  **Annular Thermal Spacer:** A flat, circular ring of aluminum 6061-T6, 1 mm thick, with OD matching the bladder bead inner radius and ID matching the steel bead ring outer radius. (MATERIAL: Aluminum 6061, ALREADY-EXISTING standard manufacturing part, not new instrumentation).\n2.  **Bladder Modification:** The silicone bladder is molded with a concentric channel at the bead location to receive the spacer. The spacer is epoxied or thermally bonded to the inner and outer silicone faces at the bead. (PROCEDURE: Standard silicone curing with embedded inert insert).\n3.  **Coolant Path (Optional but stated in signals):** No new coolant loop is required if the spacer acts purely as a conductive equalizer. However, if active flow is used, it taps into the existing press coolant supply (SIGNALS: `flow_rate`, `pressure` from the EXISTING press control system are used to verify that the spacer channel does not block standard press coolant or that it integrates with the bladder’s standard internal coolant manifold).\n\n*Input Streams Tagging:*\n*   `flow_rate`: ALREADY-RECORDED in the tire press control system (standard telemetry for coolant loops). Used to confirm that the insertion of the spacer has not significantly increased the hydraulic resistance of the bladder’s standard coolant channels (baseline `flow_rate` known from commissioning logs).\n*   `pressure`: ALREADY-RECORDED in the tire press control system (standard telemetry for bladder inflation). Used to verify that the mechanical integrity of the bladder is maintained under standard cure pressure.\n\n*Reference/Threshold Derivation:*\n*   **Thermal Gradient Threshold:** Derived from STATED PHYSICS. The crack initiation threshold is defined as $\\Delta T_{local} < 5$ °C. This is DERIVED from the fatigue limit of silicone (ASSUMPTION: ~1% cyclic strain to failure) and the allowable temperature difference that produces this strain via Hooke’s law for thermal stress. No new baseline data collection is required; the threshold is a static material property limit.\n*   **Spacer Geometry:** DERIVED from STATED SPECS. The bead diameter is a stated geometric constraint of the tire. The spacer thickness (1 mm) is chosen to be thin enough not to impede bladder flexure but thick enough to have negligible thermal resistance relative to the silicone bead layer.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:** Same as standard bladder replacement. The spacer is an insert during bladder fabrication. No change to the press itself.\n*   **Operability:** No change to press operation. The bladder still inflates and cures. The spacer is inert.\n*   **Maintenance:** Same as standard bladder life. The spacer is embedded and does not wear out.\n*   **Cost:** Marginal increase in bladder manufacturing cost (material for aluminum ring + slight modification to mold). This is within the same cost class as using a higher-grade silicone compound (standard practice). It is significantly cheaper than replacing the entire press or redesigning the bead steel ring.\n*   **Feasibility:** Uses standard materials (aluminum, silicone) and standard manufacturing processes (molding, bonding). No new instruments, no new data collection programs. Trust is derived from static physics (thermal conductivity ratio) and existing press telemetry (pressure/flow verification).\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  Manufacture two sets of bladders: Control (standard silicone, no spacer) and Test (silicone with aluminum annular spacer at bead).\n    2.  Install in a tire curing press.\n    3.  Run a thermal cycling campaign: 50 cycles of standard cure temperature (e.g., 180 °C) and ambient cooling.\n    4.  Monitor `pressure` and `flow_rate` from the EXISTING press control system to ensure no mechanical blockage or leakage.\n    5.  After 50 cycles, inspect both bladders at the bead interface for cracks using standard visual inspection (no new sensors).\n*   **Pass/Fail Thresholds:**\n    *   **Pass:** Test bladders show no cracks at the bead interface. Control bladders show crack initiation (standard failure mode).\n    *   **Fail:** Test bladders show cracks at the bead interface, or `pressure` drop exceeds 5% of baseline indicating spacer interference.\n*   **Duration:** 50 cycles (approx. 50 hours).\n*   **Kill Criterion:** If the Test bladders crack before the Control bladders, the mechanism is falsified. If the `pressure` or `flow_rate` telemetry shows significant deviation from the baseline (DERIVED from existing commissioning logs), the spacer is interfering with the standard hydraulic/pressure system, and the design must be revised.\n\n**CONSTRAINT BIND**\n*   **Primary Indicator:** The problem states the failure is \"cracks at the bead.\" The primary indicator of failure is the physical crack. My mechanism targets the *cause* of the crack: thermal stress.\n*   **Secondary Indicator:** `pressure` and `flow_rate` are secondary indicators used to verify that the intervention has not introduced a new failure mode (mechanical blockage/leakage). They do not replace the need to inspect for cracks. The trust in the mechanism’s efficacy comes from the physics check (reduction of $\\Delta T$) and the inspection result, not from a new predictive algorithm. The data for `pressure` and `flow_rate` are ALREADY-RECORDED in the press system; no new instrumentation is deployed. The threshold for \"no interference\" is DERIVED from the commissioning baseline (existing data).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Annular Thermal Spacer:** A flat, circular ring of aluminum 6061-T6, 1 mm thick, wit",
+    "2.  **Bladder Modification:** The silicone bladder is molded with a concentric channel at ",
+    "3.  **Coolant Path (Optional but stated in signals):** No new coolant loop is required if ",
+    "*   `flow_rate`: ALREADY-RECORDED in the tire press control system (standard telemetry for",
+    "*   `pressure`: ALREADY-RECORDED in the tire press control system (standard telemetry for ",
+    "*   **Thermal Gradient Threshold:** Derived from STATED PHYSICS. The crack initiation thre",
+    "*   **Spacer Geometry:** DERIVED from STATED SPECS. The bead diameter is a stated geometri",
+    "*   **Installability:** Same as standard bladder replacement. The spacer is an insert duri",
+    "*   **Operability:** No change to press operation. The bladder still inflates and cures. T",
+    "*   **Maintenance:** Same as standard bladder life. The spacer is embedded and does not we",
+    "*   **Cost:** Marginal increase in bladder manufacturing cost (material for aluminum ring ",
+    "*   **Feasibility:** Uses standard materials (aluminum, silicone) and standard manufacturi",
+    "*   **Protocol:**",
+    "1.  Manufacture two sets of bladders: Control (standard silicone, no spacer) and Test (sil",
+    "2.  Install in a tire curing press.",
+    "3.  Run a thermal cycling campaign: 50 cycles of standard cure temperature (e.g., 180 °C) ",
+    "4.  Monitor `pressure` and `flow_rate` from the EXISTING press control system to ensure no",
+    "5.  After 50 cycles, inspect both bladders at the bead interface for cracks using standard",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Pass:** Test bladders show no cracks at the bead interface. Control bladders show cr",
+    "*   **Fail:** Test bladders show cracks at the bead interface, or `pressure` drop exceeds ",
+    "*   **Duration:** 50 cycles (approx. 50 hours).",
+    "*   **Kill Criterion:** If the Test bladders crack before the Control bladders, the mechan",
+    "*   **Primary Indicator:** The problem states the failure is \"cracks at the bead.\" The pri",
+    "*   **Secondary Indicator:** `pressure` and `flow_rate` are secondary indicators used to v"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'fatigue' and the stated failure driver 'cycles' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "06c3d0691ce65d78"
+}

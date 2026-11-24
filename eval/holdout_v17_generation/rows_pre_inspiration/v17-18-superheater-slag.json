@@ -1,0 +1,98 @@
+{
+ "problem_id": "v17-18-superheater-slag",
+ "domain": "biomass-power",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P3",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:31665355983c": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:4f21d1515667": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:358f97541a14": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "deposition_fouling",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "deposition_fouling",
+     "admitted": true,
+     "rank": 2,
+     "basis": "configuration is admitted class #3 for the deposition_fouling failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:12:17Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.3,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a **MAINTENANCE INTERVENTION** (operational procedure to increase soot-blowing frequency or physical cleaning to remove existing slag). My proposal delivers a **DESIGN CHANGE** (geometric configuration modification of the tube bundle layout to prevent slag accumulation and subsequent shedding). The genuine departure is shifting from reactive removal of deposited material to proactive geometric redirection of flow and ash particle trajectories using existing tube geometry principles, rather than adding active blowing mechanisms.\n\nPHYSICS CHECK\nGoverning relation: The slag accumulation occurs when ash particles lose kinetic energy and deposit on tube surfaces, followed by thermal stress cycling causing spalling/shedding. The mechanism relies on **FLOW GEOMETRY** to increase local gas velocity in the lower superheater pass and create turbulent eddies that inhibit laminar deposition layers.\nMagnitude verification: Slag spalling occurs when the thermal stress gradient exceeds the cohesive strength of the molten ash layer. By increasing the gas mass flux in the lower zone by 15-20% (achievable via tube spacing reduction or baffle reconfiguration), the shear stress on the nascent ash film increases. When wall shear stress $\\tau_w$ exceeds the critical detachment threshold $\\tau_{crit}$ of the softening ash phase, the ash is swept away before it can solidify into a rigid slag block. Typical ash softening temperatures for biomass are 800-1000°C; maintaining a thin, un-solidified layer via enhanced sweep gas prevents the thick, rigid layer that spalls.\n\nIMPLEMENTATION BILL\nComponents:\n1.  **Reconfigured Lower Superheater Baffles:** ALREADY-EXISTING baffle plates in the lower superheater section are modified (cut and re-welded) to reduce the open flow area by 15% and increase local gas velocity.\n2.  **Tube Spacing Adjustment:** ALREADY-EXISTING superheater tubes in the lowest pass are mechanically re-spaced to tighten the pitch, further increasing local velocity and reducing the \"dead zone\" behind tubes where ash settles.\n3.  **Erosion-Resistant Cladding:** ALREADY-EXISTING tube material is verified; if not, a local weld-on cladding of a stated existing inventory material (e.g., high-chromium steel already present in the boiler for wear areas) is applied to the lowermost row of tubes to mitigate initial erosion before slag shedding ceases.\n\nINPUTS:\n-   **flow_rate:** ALREADY-RECORDED in the existing boiler performance logs (gas flow rates through superheater sections). Used to calculate the new local velocity after geometric change.\n-   **pressure:** ALREADY-RECORDED in the existing differential pressure transducers across the superheater section. Used to verify the change in flow resistance matches the calculated geometric restriction.\n\nREFERENCES/THRESHOLDS:\n-   **Target Local Velocity Increase:** DERIVED from ALREADY-RECORDED flow_rate data and geometric calculation of the new cross-sectional area. Target: +20% local gas velocity in the lower third of the superheater.\n-   **Ash Softening Temperature:** DERIVED from STATED biomass fuel specifications (standard for the plant).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice (increased soot blowing) requires additional steam energy, increased thermal cycling (which can itself cause tube fatigue), and labor for monitoring.\nMy approach (geometric modification) requires:\n-   **Installability:** Moderate. Requires boiler downtime for baffle modification and tube re-spacing. No new instruments, valves, or steam lines needed.\n-   **Operability:** No change to normal operation. No new controls, no additional steam consumption.\n-   **Maintenance:** Reduced. Eliminates the need for frequent soot blowing of the slagged area.\n-   **Cost Class:** SAME class as standard practice (mechanical modification during planned outage). The material (baffles, cladding) is sourced from existing inventory or standard boiler stock.\n\nEXECUTABLE TEST\nProtocol:\n1.  **Pre-Modification Baseline:** From ALREADY-RECORDED plant data, identify the period of highest slag shedding (maximum lower superheater tube wall temperature variance and maximum gas differential pressure drop).\n2.  **Simulation/Calculation:** Using the ALREADY-RECORDED gas flow rates and the proposed geometric changes (reduced baffle open area, tighter tube pitch), calculate the new local gas velocity and wall shear stress in the lower superheater pass.\n3.  **Pass/Fail Threshold:** The calculated local gas velocity in the lower pass must be >120% of the pre-modification velocity. The calculated shear stress must exceed the critical detachment stress of the ash (derived from the fuel's ash softening temperature and standard rheology of molten biomass ash).\n4.  **Kill Criterion:** If the calculated pressure drop increase exceeds 10% of the total boiler fuel gas blowdown power limit, the configuration is rejected as it will cause excessive fan power consumption.\n\nCONSTRAINT BIND\nThe monitored indicator is the **gas differential pressure** across the superheater section, which is the PRIMARY stated indicator of flow restriction and indirect measure of local velocity/erosion potential. The **flow_rate** (gas mass flow) is the secondary indicator used to calculate local velocity. The design change directly addresses the **deposition_fouling** physics by increasing sweep gas velocity (geometry/configuration class), preventing the formation of rigid slag layers that lead to shedding. No new sensors are installed; the test relies on calculating the new aerodynamic profile using existing flow and pressure data.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Reconfigured Lower Superheater Baffles:** ALREADY-EXISTING baffle plates in the lowe",
+    "2.  **Tube Spacing Adjustment:** ALREADY-EXISTING superheater tubes in the lowest pass are",
+    "3.  **Erosion-Resistant Cladding:** ALREADY-EXISTING tube material is verified; if not, a ",
+    "-   **flow_rate:** ALREADY-RECORDED in the existing boiler performance logs (gas flow rate",
+    "-   **pressure:** ALREADY-RECORDED in the existing differential pressure transducers acros",
+    "-   **Target Local Velocity Increase:** DERIVED from ALREADY-RECORDED flow_rate data and g",
+    "-   **Ash Softening Temperature:** DERIVED from STATED biomass fuel specifications (standa",
+    "-   **Installability:** Moderate. Requires boiler downtime for baffle modification and tub",
+    "-   **Operability:** No change to normal operation. No new controls, no additional steam c",
+    "-   **Maintenance:** Reduced. Eliminates the need for frequent soot blowing of the slagged",
+    "-   **Cost Class:** SAME class as standard practice (mechanical modification during planne"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: High-velocity flue gas carrying solid ash particles impacts and mechanically abrades the lower superheater tubes, causing erosive wear. | ingredient: Th"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "ab8997068841e70b"
+}

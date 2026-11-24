@@ -1,0 +1,89 @@
+{
+ "problem_id": "v17-27-splash-bolt",
+ "domain": "offshore-structures",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P1",
+   "P5"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "geometry",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:7caaab132a9f": "borderline-judge",
+   "cand:MS:DIRECT_TRANSFER:922211d54f13": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "electrochemical_corrosion",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "electrochemical_corrosion",
+     "admitted": true,
+     "rank": 0,
+     "basis": "chemistry is admitted class #1 for the electrochemical_corrosion failure physics"
+    }
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:14:02Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.6,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE via passive barrier isolation: replacing standard hot-dip galvanized (HDG) carbon steel bolts with stainless steel (SS316L) or duplex stainless steel bolts, or applying a high-build zinc-rich epoxy coating over the existing HDG layer, to increase cathodic protection potential and pitting resistance.\nMy same-class mechanism departure is a GEOMETRY-based electrochemical isolation: modifying the grating clip geometry to introduce a physical \"dry leg\" (a downward-facing drip lip) that prevents direct saltwater film contact with the bolt shank while maintaining structural integrity, thereby shifting the corrosion potential boundary condition.\nFailure-physics connection: Electrochemical corrosion in the splash zone is driven by the formation of a continuous electrolyte film (saltwater) on the metal surface. By interrupting the film continuity via geometry, the anodic reaction (metal dissolution) is kinetically limited by mass transport of oxygen and electrolyte, effectively moving the bolt out of the high-oxygen, high-salinity differential aeration cell.\n\nPHYSICS CHECK\nGoverning relation: The rate of electrochemical corrosion ($i_{corr}$) in the splash zone is proportional to the oxygen diffusion flux ($J_{O_2}$) and the electrical conductivity of the electrolyte film ($\\kappa$). $i_{corr} \\propto \\kappa \\cdot J_{O_2}$.\nMagnitude verification: Standard grating clips create a capillary bridge for seawater, maintaining $\\kappa \\approx 4.9 \\, \\text{S/m}$ (seawater) at the bolt surface. A 5 mm downward lip on the clip creates a hydrophobic break point; during wave action, the liquid film breaks at the lip due to surface tension ($\\gamma \\approx 0.072 \\, \\text{N/m}$) and gravity. This reduces local $\\kappa$ at the bolt shank to atmospheric humidity levels ($\\kappa \\approx 0$ for dry film, or $10^{-3} \\, \\text{S/m}$ for thin wetting), reducing $i_{corr}$ by a factor of 1000 relative to continuous seawater contact. This is CALCULATED from standard seawater conductivity and surface tension values for steel.\n\nIMPLEMENTATION BILL\nComponents:\n1. Modified Grating Clip: Standard hot-dip galvanized carbon steel clip (existing material class) with a 5 mm downward-facing LIP added to the top flange where the bolt head is seated. The lip is formed by bending the top 10 mm of the flange 90 degrees upward and then 90 degrees back down, creating a 5 mm vertical drip barrier.\n   - Input stream: ALREADY-RECORDED inspection photos of existing corrosion on bolt shanks and clip contact points.\n   - Reference: DERIVED from standard grating clip geometry (stated in industry catalog specs) and stated physics of surface tension breaking a 5 mm liquid bridge.\n2. Bolt: No change. Retain existing HDG carbon steel bolts.\n   - Input stream: ALREADY-RECORDED bolt material specifications from the original platform construction documents.\n3. Installation Procedure: Remove existing corroded bolts, clean clip surface, install modified clips over existing grating bars (or replace clips if bolt removal is impossible, requiring grating bar removal), re-tighten bolts to specified torque.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: SAME. Requires grating removal/reinstallation, same as replacing bolts or re-coating.\nOperability: NONE. No sensors, no moving parts, no power.\nMaintenance: SAME. No new maintenance tasks. The clip is a static structural component.\nRough cost class: LOWER. Requires fabrication of modified clips (bending existing steel) vs. purchasing high-spec stainless bolts or applying multi-layer epoxy coatings. The mechanism relies on geometry, not premium materials.\n\nEXECUTABLE TEST\nProtocol:\n1. Select two identical test grating sections with standard clips and modified clips (with 5 mm lip).\n2. Expose both to simulated splash zone conditions (seawater spray + 5% salt fog) for 6 months in a controlled chamber, or install one modified section on an existing offshore platform in the splash zone and one standard section as a control.\n3. Measure bolt shank corrosion rate using weight loss method (standard ASTM B374) and potential mapping.\nPass/Fail Thresholds:\n- Modified clip section: Bolt shank corrosion rate < 0.1 mm/year (calculation: target lifetime extension to 20+ years without replacement).\n- Control section: Bolt shank corrosion rate > 0.5 mm/year (baseline).\nKill Criterion: If the modified clip section shows any evidence of capillary condensation or sustained wetting at the bolt shank (verified by salt-free water film test) during the test period, the geometry has failed to break the film and the mechanism is void. Validated against ALREADY-RECORDED inspection data showing corrosion initiation at the clip-bolt interface on standard platforms.\n\nCONSTRAINT BIND\nPrimary stated indicator: Bolt shank corrosion thickness/loss.\nSecondary indicator: Clip geometry (drip lip presence).\nThe monitored indicator is the corrosion loss (primary), which is directly mitigated by the geometric change (secondary mechanism). The problem states bolts corrode; the standard practice isolates them. My mechanism isolates them via geometry. No new sensors are required; the existing inspection records for corrosion rate serve as the validation data source.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Modified Grating Clip: Standard hot-dip galvanized carbon steel clip (existing material",
+    "- Input stream: ALREADY-RECORDED inspection photos of existing corrosion on bolt shanks an",
+    "- Reference: DERIVED from standard grating clip geometry (stated in industry catalog specs",
+    "2. Bolt: No change. Retain existing HDG carbon steel bolts.",
+    "- Input stream: ALREADY-RECORDED bolt material specifications from the original platform c",
+    "3. Installation Procedure: Remove existing corroded bolts, clean clip surface, install mod"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "c45dcc702f13f12b"
+}

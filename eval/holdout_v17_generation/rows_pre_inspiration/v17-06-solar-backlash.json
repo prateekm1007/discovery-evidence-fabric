@@ -1,0 +1,114 @@
+{
+ "problem_id": "v17-06-solar-backlash",
+ "domain": "solar-tracking",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P31",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "chemistry",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:6c8887ac34df": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:8cf2fbb16921": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "thermal_attack_surface",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_attack_surface",
+     "admitted": true,
+     "rank": 2,
+     "basis": "configuration is admitted class #3 for the thermal_attack_surface failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:09:07Z",
+ "attempts_n": 1,
+ "row_wall_s": 10.5,
+ "a1_answer": "**NOVELTY STATEMENT**\nThe field-standard practice delivers a **DESIGN CHANGE (material/geometric)**: replacing standard grease with high-temperature solid lubricants or applying geometric preload (spring-loaded anti-backlash gears) to eliminate the clearance caused by grease drying.\nMy mechanism’s genuine departure is a **CONFIGURATION (P5 Direct Transfer/Thermal Actuation)** that uses the **existing solar tracker position feedback loop** to infer a dynamic temperature-compensated backlash offset, converting the thermal expansion state of the drive train into a real-time control bias without new hardware.\nThe failure-physics connection is that grease drying creates a *temperature-dependent* kinematic gap; because the gap scales with the coefficient of thermal expansion of the structural members and the viscosity-temperature relationship of the residual grease film, the \"dried\" state acts as a low-stiffness spring that yields under thermal load. The standard practice treats the gap as a static geometric defect; this mechanism treats it as a dynamic, thermally-driven compliance that can be cancelled by the inverse of the thermal signal.\n\n**PHYSICS CHECK**\nThe governing relation is the thermal expansion-induced change in backlash: $\\Delta L_{thermal} = \\alpha \\cdot L \\cdot \\Delta T$. For a typical solar tracker drive assembly, the linear travel associated with backlash due to thermal bow in the structural yoke and gear casing is on the order of $\\alpha_{steel} \\approx 12 \\, \\mu m/m/K$. For a 2m structural member, a 30°C swing (day/night cycle at high tilt) yields $\\Delta L \\approx 0.72 \\, mm$. This magnitude is comparable to typical dry-gear backlash (0.5–2.0 mm).\nThe mechanism works because the temperature $T$ is not directly measured by a new sensor but is **inferred** from the existing **flow_rate** and **pressure** signals of the hydraulic or electric drive system, which are ALREADY-RECORDED in the controller logs. The pressure drop $\\Delta P$ across the drive motor under a known load is proportional to the torque required to overcome the friction/backlash combination; as grease dries, static friction increases, requiring higher pressure to initiate motion. By correlating the **pressure** spike at direction reversal (stick-slip) with the **flow_rate** displacement error over time, the controller calculates the current thermal-expansion state. The physics holds because the pressure signal is a direct proxy for the mechanical resistance caused by the dried grease boundary layer, which is thermally correlated.\n\n**IMPLEMENTATION BILL**\n*   **Components/Software:** Firmware update to the existing Solar Tracker Controller (STC). No new hardware, sensors, or actuators.\n*   **Input Streams (ALREADY-RECORDED):**\n    1.  **Drive Pressure:** The hydraulic pressure telemetry or electric motor current (proxy for torque) logs that are standard in all tracked solar arrays. Tag: `ALREADY-RECORDED` (standard telemetry).\n    2.  **Drive Flow/Position:** The flow meter reading or encoder position feedback. Tag: `ALREADY-RECORDED` (standard telemetry).\n    3.  **Tilt Angle:** The current angle of the tracker. Tag: `ALREADY-RECORDED` (standard state variable).\n*   **Reference/Threshold (DERIVED):**\n    1.  **Baseline Friction Coefficient ($\\mu_{base}$):** Derived from the system’s **stated specs** (nameplate rated torque at 25°C) and the **stated physical relation** of viscous flow $Q = C \\cdot \\Delta P$ for the pump/motor.\n    2.  **Thermal Backlash Coefficient ($\\beta_{thermal}$):** Derived from **stated geometry** (length of the drive yoke $L$ from installation drawings) and **stated material spec** (steel/Al alloy CTE $\\alpha$). Formula: $Backlash_{thermal}(T) = \\alpha \\cdot L_{yoke} \\cdot (T - 25^\\circ C)$.\n    3.  **Decision Rule:** The STC calculates the instantaneous thermal backlash offset $B_{comp}(t)$ by integrating the pressure deviation from the theoretical no-loss value, scaled by the derived $\\beta_{thermal}$.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:** Standard practice requires mechanical re-work (gear replacement or grease flush) on every unit. This solution requires a firmware flash over the existing communication bus (Ethernet/Modbus). **Same class burden (low), different mechanism (digital vs. mechanical).**\n*   **Operability:** Standard practice is passive; this is active compensation. However, it operates within the existing control loop cycle (typically 100ms–1s), adding negligible computational load to the existing PLC/Controller.\n*   **Maintenance:** Eliminates the need for high-temperature grease top-ups or gear inspections for backlash. **Reduces burden.**\n*   **Cost Class:** Near-zero hardware cost. Software engineering cost is fixed. Per-unit deployment cost is marginal. **Same or lower cost class.**\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  Retrieve **ALREADY-RECORDED** telemetry from a tracker unit operating in a high-tilt, high-temperature environment (e.g., Arizona summer, tilt > 20°).\n    2.  Identify a 24-hour window where the ambient temperature exceeded 40°C.\n    3.  Extract **Pressure** (or Motor Current) and **Position/Flow** data.\n    4.  Calculate the \"Static Pressure Deviation\" $\\Delta P_{static}$ as the difference between the measured pressure at direction reversal and the pressure required for the same velocity at 25°C (derived from baseline specs).\n    5.  Calculate the \"Position Error\" $\\Delta Pos$ as the difference between commanded flow/angle and actual encoder/flow position during the initial 10% of the slew.\n    6.  Apply the firmware patch that injects $B_{comp}(t)$ into the position setpoint.\n    7.  Run the simulation on the historical data to predict the residual $\\Delta Pos$ after compensation.\n*   **Pass/Fail Threshold:**\n    *   **Pass:** The predicted residual position error is reduced by >50% compared to the uncompensated historical data, AND the predicted pressure spikes at reversal are smoothed by >20% (indicating reduced stick-slip).\n    *   **Kill Criterion:** If the correlation between $\\Delta P_{static}$ and thermal expansion is < 0.7 (R-squared) over the temperature range, the physics assumption fails, and the mechanism is not viable for this specific drive train geometry.\n*   **Duration:** 1 hour of computational time to process 24 hours of historical logs for validation.\n\n**CONSTRAINT BIND (predictor)**\n*   **Primary Stated Indicator:** The problem states the failure is \"backlash.\" In control systems, backlash manifests as **position error** (the deviation between commanded tilt and actual tilt) during low-speed or direction-reversal phases. The **Flow Rate** (or position velocity) is the **PRIMARY STATED INDICATOR** of the drive’s motion state. The test uses the **Flow Rate** deviation from the theoretical curve as the primary indicator of the failure (kinematic lag due to backlash).\n*   **Why:** The **Pressure** signal is a **SECONDARY** indicator (a force proxy). It is used to *infer* the state of the grease/dryness (the cause), but the **Flow Rate/Position** is the indicator of the *failure symptom* (backlash error). The mechanism never replaces the primary indicator; it uses the secondary signal (pressure) to compensate the primary signal’s error. The constraint \"prevent or mitigate\" is met by actively reducing the Flow Rate/Position error.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Components/Software:** Firmware update to the existing Solar Tracker Controller (STC",
+    "*   **Input Streams (ALREADY-RECORDED):**",
+    "1.  **Drive Pressure:** The hydraulic pressure telemetry or electric motor current (proxy ",
+    "2.  **Drive Flow/Position:** The flow meter reading or encoder position feedback. Tag: `AL",
+    "3.  **Tilt Angle:** The current angle of the tracker. Tag: `ALREADY-RECORDED` (standard st",
+    "*   **Reference/Threshold (DERIVED):**",
+    "1.  **Baseline Friction Coefficient ($\\mu_{base}$):** Derived from the system’s **stated s",
+    "2.  **Thermal Backlash Coefficient ($\\beta_{thermal}$):** Derived from **stated geometry**",
+    "3.  **Decision Rule:** The STC calculates the instantaneous thermal backlash offset $B_{co",
+    "*   **Installability:** Standard practice requires mechanical re-work (gear replacement or",
+    "*   **Operability:** Standard practice is passive; this is active compensation. However, i",
+    "*   **Maintenance:** Eliminates the need for high-temperature grease top-ups or gear inspe",
+    "*   **Cost Class:** Near-zero hardware cost. Software engineering cost is fixed. Per-unit ",
+    "*   **Protocol:**",
+    "1.  Retrieve **ALREADY-RECORDED** telemetry from a tracker unit operating in a high-tilt, ",
+    "2.  Identify a 24-hour window where the ambient temperature exceeded 40°C.",
+    "3.  Extract **Pressure** (or Motor Current) and **Position/Flow** data.",
+    "4.  Calculate the \"Static Pressure Deviation\" $\\Delta P_{static}$ as the difference betwee",
+    "5.  Calculate the \"Position Error\" $\\Delta Pos$ as the difference between commanded flow/a",
+    "6.  Apply the firmware patch that injects $B_{comp}(t)$ into the position setpoint.",
+    "7.  Run the simulation on the historical data to predict the residual $\\Delta Pos$ after c",
+    "*   **Pass/Fail Threshold:**",
+    "*   **Pass:** The predicted residual position error is reduced by >50% compared to the unc",
+    "*   **Kill Criterion:** If the correlation between $\\Delta P_{static}$ and thermal expansi",
+    "*   **Duration:** 1 hour of computational time to process 24 hours of historical logs for ",
+    "*   **Primary Stated Indicator:** The problem states the failure is \"backlash.\" In control",
+    "*   **Why:** The **Pressure** signal is a **SECONDARY** indicator (a force proxy). It is u"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_UNPROVEN": [
+    "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "bb8381e023484a09"
+}

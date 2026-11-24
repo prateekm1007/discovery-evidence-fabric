@@ -404,6 +404,34 @@ class A2RetrievalAdapter(BaseAdapter):
         # branch push allowlist). The envelope's provenance is the
         # single durable authority (Art. X).
         _retr_attr = report.get("retrieval_attribution") or {}
+        # R145 DIR-4 (claim c-0243 lineage): the MATH-PAPER FILTER at
+        # the retrieval boundary — pure-mathematics records (the
+        # measured wind failure class: 'Asymptotic Properties of
+        # Hilbert Geometry' et al. served for an engineering problem)
+        # are excluded from the evidence pool with a TYPED reason;
+        # the exclusions ride the provenance (never silent drops;
+        # custody preserved in the report). Fires only for
+        # engineering-problem text (the same guard as the re-query's
+        # exclusion — a math problem never triggers it).
+        _math_filter = None
+        try:
+            from .domain_requery import exclude_math
+            _kept, _exc = exclude_math(items, env.problem or {})
+            if _exc:
+                _math_filter = {
+                    "typed": "RETRIEVE_MATH_EXCLUDED",
+                    "excluded": [{"id": e["id"], "title": e["title"],
+                                  "reason": e["reason"]}
+                                 for e in _exc],
+                    "note": ("pure-mathematics records excluded at the "
+                             "retrieval boundary for an engineering "
+                             "problem (the R145 DIR-4 acceptance: 0 "
+                             "math-paper retrievals); the exclusion "
+                             "is typed in the provenance, never a "
+                             "silent drop")}
+                items = _kept
+        except Exception:  # noqa: BLE001 — the filter is additive
+            pass
         return _engine_result(
             {"evidence": items,
              "evidence_ids": [i.get("id", "") for i in items],
@@ -411,6 +439,7 @@ class A2RetrievalAdapter(BaseAdapter):
                             "retrieval_fabric": {
                                 "version": report.get("fabric_version"),
                                 "primary_query": report.get("primary_query"),
+                                "math_exclusion": _math_filter,
                                 "query_variant_count": len(
                                     report.get("query_variants", [])),
                                 "sources_attempted": stats.get(
@@ -1460,6 +1489,60 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     by_id = {str(it.get("id")): it for it in (env.evidence or [])}
     _clk.mark("verified_evidence_collection",
               {"n_verified_items_examined": len(verified)})
+    # R145 DIR-4 (claim c-0243 lineage): the domain-anchored RE-QUERY
+    # on ZERO support — the measured wind root cause (the primary
+    # retrieval served arxiv mathematics papers for an engineering
+    # problem; 0 DIRECT/PARTIAL -> NO_EVIDENCE -> 0 candidates, and
+    # the R143-F5 synthesis complement sits downstream of the break).
+    # ONE typed second retrieval with the failure family's domain
+    # anchors forced; the SAME classifier admits fresh records (no
+    # invented support); everything recorded on the env. Runs at
+    # most ONCE per run (the env flag).
+    requery_record = None
+    if not verified and not getattr(env, "domain_requery_ran", False):
+        env.domain_requery_ran = True
+        try:
+            from .domain_requery import zero_support_requery
+            from .failure_mechanism_map import detect_failure_family
+            _fam = detect_failure_family(problem)
+            requery_record = zero_support_requery(env, problem, _fam)
+            if (requery_record or {}).get("state") == "RUN":
+                # the fresh supported records ride the SAME joined
+                # build: append the fresh evidence + merge the fresh
+                # classification items (the ids the joined loop reads)
+                fresh_ev = requery_record.get("fresh_evidence") or []
+                env.evidence = list(env.evidence or []) + [
+                    {**r, "domain_requery_promoted": True}
+                    for r in fresh_ev]
+                by_id.update({str(r.get("id")): r for r in fresh_ev})
+                ec = env.evidence_classification or {}
+                if isinstance(ec, dict):
+                    ec_items = list(ec.get("items") or [])
+                    fitems = list((requery_record.get(
+                        "fresh_classification") or {}).get("items")
+                        or [])
+                    seen_src = {it.get("source_id")
+                                for it in ec_items}
+                    ec_items += [it for it in fitems
+                                 if it.get("source_id") not in seen_src]
+                    ec["items"] = ec_items
+                    for k, v in (requery_record.get("fresh_counts")
+                                 or {}).items():
+                        ec.setdefault("counts", {})[k] = (
+                            (ec.get("counts") or {}).get(k, 0)) + v
+                    env.evidence_classification = ec
+                # rebuild the verified list over the merged env
+                verified = stage_entry.verified_evidence_items(env)
+                requery_record["n_promoted_joined"] = len(verified)
+                _clk.mark("domain_requery",
+                          {"family": requery_record.get("family"),
+                           "n_fresh": requery_record.get(
+                               "n_fresh_records"),
+                           "n_promoted_joined": len(verified)})
+        except Exception as e:  # noqa: BLE001 — typed degradation
+            requery_record = {"state": "REQUERY_ERROR",
+                              "error": f"{type(e).__name__}: "
+                                       f"{str(e)[:200]}"}
     items: List[Dict[str, Any]] = []
     for cls_item in verified:
         rec = by_id.get(str(cls_item.get("source_id"))) or {}
@@ -1529,6 +1612,10 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         "problem_id": problem.get("problem_id", ""),
         "operator_ids": [],
         "n_structured_items": len(items),
+        # R145 DIR-4: the domain-anchored re-query record rides the
+        # space (typed: the query, the anchors, the math exclusions,
+        # the fresh counts, the promoted ids — never silent)
+        "domain_requery": requery_record,
     }
     if not items:
         space.update({

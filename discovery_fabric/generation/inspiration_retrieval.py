@@ -66,6 +66,64 @@ CROSS_DOMAIN_ANALOGIES = {
          "transfer": ("continuous screen cleaning prevents the "
                       "clog-death spiral")},
     ],
+    # R145S1 (DIR-6, the twin's extended families — the additive
+    # extension: 12/30 v17 rows sat in the 5 new families the c-0243
+    # lexicon extension added; without entries the inspiration lever
+    # was inert on them. Same shape: real, checkable precedents.)
+    "deposition_fouling": [
+        {"from_domain": "membrane technology", "precedent": (
+            "periodic osmotic backwash on RO trains"),
+         "transfer": ("a short reverse-flux pulse lifts the "
+                      "deposited layer without a full cleaning "
+                      "shutdown")},
+        {"from_domain": "power-plant chemistry", "precedent": (
+            "condenser sponge-ball online cleaning"),
+         "transfer": ("a circulating cleaning body continuously "
+                      "sweeps the deposit-forming surface")},
+    ],
+    "mechanical_clogging": [
+        {"from_domain": "wastewater screening", "precedent": (
+            "self-cleaning step screens with upstream rake timing"),
+         "transfer": ("the screen clears itself on a schedule "
+                      "matched to the capture rate, before the "
+                      "compaction threshold")},
+        {"from_domain": "mining", "precedent": (
+            "chute liners with vibration-assisted discharge"),
+         "transfer": ("low-amplitude wall excitation keeps the "
+                      "arched material flowing")},
+    ],
+    "electrochemical_corrosion": [
+        {"from_domain": "marine engineering", "precedent": (
+            "ICCP anode arrays zoned to current demand"),
+         "transfer": ("distributed active potential control beats a "
+                      "single bulk setting")},
+        {"from_domain": "water treatment", "precedent": (
+            "phosphate film-forming dosing at ppm levels"),
+         "transfer": ("a nanoscale barrier film cuts the corrodant "
+                      "flux at the surface")},
+    ],
+    "seal_leak_integrity": [
+        {"from_domain": "hydraulics", "precedent": (
+            "redundant O-ring stacks with a drain groove between"),
+         "transfer": ("two cheap barriers in series with a tell-tale "
+                      "path between them beat one premium barrier")},
+        {"from_domain": "rotating machinery", "precedent": (
+            "dry-gas seal separation pressure control"),
+         "transfer": ("a clean buffer medium held slightly above "
+                      "the process pressure keeps the contaminant "
+                      "out of the seal faces")},
+    ],
+    "phase_carryover_liquid": [
+        {"from_domain": "steam systems", "precedent": (
+            "demister pads + swirl-vane separators in series"),
+         "transfer": ("inertial separation staged after capture "
+                      "removes the droplets gravity alone misses")},
+        {"from_domain": "HVAC", "precedent": (
+            "suction-line accumulators on refrigeration returns"),
+         "transfer": ("a low-velocity sump gives the entrained "
+                      "liquid a place to drop out before the "
+                      "sensitive component")},
+    ],
     "corrosion_chemical": [
         {"from_domain": "offshore energy", "precedent": ("ICCP systems "
          "with distributed anodes sized to current demand"),

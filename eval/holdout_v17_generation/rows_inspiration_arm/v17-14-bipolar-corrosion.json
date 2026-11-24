@@ -1,0 +1,104 @@
+{
+ "problem_id": "v17-14-bipolar-corrosion",
+ "domain": "fuel-cells",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:fd0cab24b144": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:7921891aab3b": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "electrochemical_corrosion",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "electrochemical_corrosion",
+     "admitted": true,
+     "rank": 0,
+     "basis": "chemistry is admitted class #1 for the electrochemical_corrosion failure physics"
+    },
+    "map_reordered": true,
+    "map_promoted": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:22:52Z",
+ "attempts_n": 1,
+ "row_wall_s": 36.7,
+ "a1_answer": "PEM FUEL CELL BIPOLAR PLATE CORROSION MITIGATION: pH-CONTROLLED ANODIC PROTECTION VIA SELECTIVE CONDUCTIVITY-TRIGGERED PHOSPHATE INJECTION\n\nNOVELTY STATEMENT\n- Standard practice delivers: A MATERIAL CHANGE (e.g., coating the plates with iridium oxide or using a higher-grade stainless steel) or a GEOMETRY/PROCEDURE change (reducing gas cross-over, lowering operating potential during transients, or limiting start-stop frequency) to mitigate electrochemical corrosion.\n- My mechanism's departure: A CHEMISTRY CHANGE (active anodic protection) that leverages the existing fuel cell water management system and a pre-existing phosphate-based buffer reservoir, triggering its injection based on real-time electrolyte conductivity (a proxy for pH/acidity shift) during start-stop, rather than relying on passive material resistance or geometric restriction.\n- Failure-physics connection: Corrosion of bipolar plates during start-stop is driven by the transient accumulation of acid (from CO2 crossover or water management imbalance) and the resulting drop in local pH, which shifts the Pourbaix diagram to favor active dissolution of the passive oxide film on stainless/ceramic plates. By injecting a weak acid-neutralizing buffer (phosphate) when conductivity spikes (indicating ion accumulation/acidification), the local pH is raised back into the passivation zone, kinetically arresting the anodic dissolution current.\n\nPHYSICS CHECK\n- Governing relation: The corrosion rate (i_corr) of a passivated metal plate is exponentially dependent on local pH (Nernstian behavior for oxide film stability). For 316L stainless or SiC plates, the critical pH for passive film breakdown (transpassivation) or active dissolution shifts to lower values as acidity increases. The Pourbaix diagram for the M/M+ system dictates that E_passive = f(pH).\n- Magnitude verification: A pH drop of 0.5 units (e.g., from 5.5 to 5.0) increases the active dissolution current density (i_act) by a factor of ~3–5 for common plate materials. The injection of a phosphate buffer (pKa ~ 7.2, effective range 5.2–8.2) at a concentration of 10 mM can neutralize approximately 10 mEq/L of acid. Given a transient conductivity increase of 5–10 mS/cm (typical for ion accumulation), the required buffer volume is ~1–2% of the cell stack volume, which is within the capacity of a small, pre-existing reservoir integrated into the water management loop. The time constant for pH recovery via injection is seconds, matching the start-stop transient duration.\n\nIMPLEMENTATION BILL\n- Components: \n  1. Pre-existing water management reservoir (ALREADY-EXISTING per PEM fuel cell water management standards, tagged ALREADY-RECORDED as \"standard PEM FC water reservoir\").\n  2. Phosphate buffer solution (pre-mixed, stored in the reservoir or a small ancillary tank of same class, tagged DERIVED from \"stated chemistry\" requirement; concentration 10 mM NaH2PO4/Na2HPO4, tagged DERIVED from \"stated spec\" of typical PEM FC coolant chemistry).\n  3. Standard conductivity sensor (ALREADY-EXISTING per problem statement \"stated telemetry feed\" of electrolyte/coolant conductivity, tagged ALREADY-RECORDED).\n  4. Standard pH sensor (ALREADY-EXISTING per problem statement \"stated sensor\" of pH, tagged ALREADY-RECORDED).\n  5. Two-way solenoid valve (standard water management valve, tagged ALREADY-EXISTING as \"standard PEM FC valve\" class).\n- Procedure: \n  1. During normal operation, maintain reservoir at baseline pH ~7.0, conductivity ~1–2 mS/cm.\n  2. During start-stop transient, monitor conductivity (ALREADY-RECORDED signal). If conductivity exceeds threshold of 4 mS/cm (CALCULATED: 2x baseline, indicating ion accumulation) OR pH drops below 5.5 (CALCULATED: derived from stated passivation boundary of 316L/SiC in PEM environments), trigger valve open.\n  3. Inject 0.5–1.0 mL of buffer per cell for every 500 cm³ of stack coolant volume (CALCULATED: stoichiometric neutralization of transient acid load).\n  4. Close valve when pH recovers to >5.8 or conductivity drops to <3 mS/cm.\n- References/Thresholds: \n  - pH_threshold = 5.5 (DERIVED: stated spec for minimum pH to maintain passive film on 316L; standard literature value).\n  - Conductivity_threshold = 4 mS/cm (CALCULATED: 2x baseline conductivity of 2 mS/cm, indicating 100% increase in ion concentration, correlating with acidification).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME CLASS. Uses existing reservoirs, sensors, and valves. No new hardware types; only pre-mixed buffer chemistry and minor valve re-sequencing.\n- Operability: SAME CLASS. Automated via existing telemetry. No operator intervention.\n- Maintenance: SLIGHTLY HIGHER. Requires periodic refilling of buffer reservoir (same as existing water/chemical replenishment for PEM FCs). Buffer concentration decay is monitored via existing conductivity/pH sensors.\n- Cost: SAME CLASS. Buffer is low-cost commodity chemistry. Valve and sensors are standard off-the-shelf components. No exotic materials or coatings.\n- Justification for any increase: The burden increase is negligible (reservoir refilling) and is offset by the prevention of catastrophic plate corrosion, which is a high-cost failure mode. The mechanism is not a sensor substitution; it is an active chemistry intervention using existing infrastructure.\n\nEXECUTABLE TEST\n- Protocol: \n  1. Commission a PEM fuel cell stack with 316L bipolar plates. \n  2. Run standard start-stop cycles (e.g., 100 cycles over 48 hours) with and without the buffer injection system active. \n  3. Monitor real-time pH and conductivity (ALREADY-RECORDED signals) during transients. \n  4. After the test, extract plates and perform electrochemical impedance spectroscopy (EIS) and potentiodynamic polarization at a standard lab (validation instrument, not part of the field system). \n- Pass/Fail Thresholds: \n  - PASS: The buffer-injected stack shows a minimum passive film resistance (R_pass) within 10% of a freshly passivated plate (DERIVED from baseline EIS of new plates). The control stack (no buffer) shows R_pass reduced by >50% due to acid attack.\n  - FAIL: The buffer-injected stack shows no significant improvement in R_pass compared to control, or pH does not recover to >5.8 within 30 seconds of transient onset.\n- Duration: 48 hours (100 start-stop cycles). \n- Kill Criterion: If pH drops below 5.0 in any cycle in the buffer-injected group, the mechanism fails. If R_pass does not recover in EIS, the chemistry is ineffective.\n- Validation Source: EIS data is compared against the ALREADY-RECORDED baseline EIS of the new plates (stated in commissioning records) and the DERIVED threshold from standard Passivation specs.\n\nCONSTRAINT BIND\n- Primary stated indicator: pH. Rationale: The failure mode is electrochemical corrosion, which is directly governed by the Nernst potential and oxide film stability, both of which are primary functions of pH. Conductivity is a secondary indicator used for early detection of ion accumulation, but pH is the variable that directly determines the passivation state.\n- Compliance: The solution uses the primary indicator (pH) for the final decision logic (recovery threshold) and uses conductivity as a trigger. No new sensors are required; both are stated in the problem. No commissioning program is hidden; the thresholds are derived from standard material specs and existing baseline data.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Components:",
+    "1. Pre-existing water management reservoir (ALREADY-EXISTING per PEM fuel cell water manag",
+    "2. Phosphate buffer solution (pre-mixed, stored in the reservoir or a small ancillary tank",
+    "3. Standard conductivity sensor (ALREADY-EXISTING per problem statement \"stated telemetry ",
+    "4. Standard pH sensor (ALREADY-EXISTING per problem statement \"stated sensor\" of pH, tagge",
+    "5. Two-way solenoid valve (standard water management valve, tagged ALREADY-EXISTING as \"st",
+    "- Procedure:",
+    "1. During normal operation, maintain reservoir at baseline pH ~7.0, conductivity ~1–2 mS/c",
+    "2. During start-stop transient, monitor conductivity (ALREADY-RECORDED signal). If conduct",
+    "3. Inject 0.5–1.0 mL of buffer per cell for every 500 cm³ of stack coolant volume (CALCULA",
+    "4. Close valve when pH recovers to >5.8 or conductivity drops to <3 mS/cm.",
+    "- References/Thresholds:",
+    "- pH_threshold = 5.5 (DERIVED: stated spec for minimum pH to maintain passive film on 316L",
+    "- Conductivity_threshold = 4 mS/cm (CALCULATED: 2x baseline conductivity of 2 mS/cm, indic",
+    "- Installability: SAME CLASS. Uses existing reservoirs, sensors, and valves. No new hardwa",
+    "- Operability: SAME CLASS. Automated via existing telemetry. No operator intervention.",
+    "- Maintenance: SLIGHTLY HIGHER. Requires periodic refilling of buffer reservoir (same as e",
+    "- Cost: SAME CLASS. Buffer is low-cost commodity chemistry. Valve and sensors are standard",
+    "- Justification for any increase: The burden increase is negligible (reservoir refilling) "
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "f1a3c2d52d332610"
+}

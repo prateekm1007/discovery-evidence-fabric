@@ -1,0 +1,105 @@
+{
+ "problem_id": "v17-12-die-galling",
+ "domain": "forging",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P31",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "chemistry",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b9867d6d1842": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:d42cdc0f03cb": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "abrasion_erosion",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "abrasion_erosion",
+     "admitted": true,
+     "rank": 3,
+     "basis": "configuration is admitted class #4 for the abrasion_erosion failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:22:03Z",
+ "attempts_n": 1,
+ "row_wall_s": 41.4,
+ "a1_answer": "# NOVELTY STATEMENT\n\n**Standard Practice:** The field-standard practice for preventing die flash land galling under hot billets delivers a **DESIGN CHANGE** via **material substitution** (e.g., hardfacing the die steel with cobalt-chrome carbide overlays) or **geometric modification** (increasing land radius to reduce contact pressure), relying on higher hardness or reduced stress to resist adhesive wear.\n\n**Novelty Departure:** My proposal delivers the same outcome class (prevention of galling) but uses a **CONFIGURATION MECHANISM** grounded in **TRIZ P5 (Screwing/Conversion)** and **P2 (Extraction)**: Instead of hardening the static interface, it **decouples the wear mechanism from the bulk die structure** by converting the static \"flash land\" into a **dynamic, sacrificial, replaceable boundary layer** via **geometric segmentation and rotational displacement**. Specifically, the flash land is replaced by a series of **interlocking, rotatable tungsten carbide segments** that are driven by the die pressure to rotate slightly during the forming stroke, smearing the galling shear zone across a moving circumference rather than a fixed spot. This is a \"sacrificial boundary\" approach, transferring the wear to a renewable element (from mineral processing inspiration) while using the pressure-driven rotation (TRIZ P5) to continuously expose fresh, clean surface area to the flash, preventing the accumulation of adhesive transfer films that cause galling.\n\n**Failure Physics Connection:** Galling in die flashes is an **adhesive wear** mechanism driven by high local pressure and shear, leading to cold welding and tearing of asperities. By introducing controlled micro-rotation into the boundary, the shear stress is distributed over time and space, preventing the localized temperature and plastic deformation buildup that initiates cold welding. The mechanism acts on the **adhesion/abrasion family** by altering the **contact configuration** (from static to quasi-dynamic), which is an admitted mechanism class.\n\n# PHYSICS CHECK\n\n**Governing Relation:** The anti-galling effect relies on reducing the **local cumulative shear work** at any single point on the interface. The standard static die accumulates shear work $W_{static} = \\int \\tau \\cdot \\gamma \\, dV$ over the entire stroke. The segmented rotating die limits the exposure of any single material point to a fraction $\\alpha$ of the total stroke length, where $\\alpha = \\theta / 2\\pi$ and $\\theta$ is the rotation angle per stroke.\n\n**Magnitude Verification:**\n*   **ASSUMPTION:** Typical flash land width $w = 5$ mm, stroke length $L = 100$ mm, rotation per stroke $\\theta = 5^\\circ$ (0.09 rad).\n*   **CALCULATED:** The effective wear life factor is improved by $2\\pi / \\theta \\approx 69$ times relative to static wear at a single point, provided the segments are sufficiently hard to withstand the reduced local load.\n*   **Verification:** The required torque to rotate the segments against friction must be less than the normal force times the coefficient of friction. For a tungsten carbide segment with a radius $r = 2.5$ mm, normal pressure $P = 500$ MPa, and friction $\\mu = 0.1$, the shear stress $\\tau = 50$ MPa. The segment must be keyed or driven such that the interlocking geometry provides a shear resistance $> \\tau$. This is mechanically feasible with standard carbide segment interlocks.\n\n# IMPLEMENTATION BILL\n\n**Components:**\n1.  **Die Body:** Modified with segmented slots instead of a solid flash land.\n2.  **Segments:** 12–24 interlocking, rotatable segments made of **Tungsten Carbide (WC-Co)** with cobalt binder for toughness.\n    *   *Material Class:* Hard metallic alloy (same class as standard hardfacing or overlay materials).\n3.  **Drive Mechanism:** Spring-loaded or gravity-driven interlocks that allow slight rotational freedom under pressure but prevent full disengagement. No external power required.\n4.  **Backfill:** Sintered iron or steel matrix to hold the segments in position during non-rotational phases.\n\n**Input Streams:**\n*   **ALREADY-RECORDED:** The problem states the failure occurs under \"hot billets\" and involves \"die flash lands.\" The **pressure** and **flow rate** (material volume) are implied by the forging process parameters. The mechanism does not require new sensors; it relies on the **existing process variables** (ram pressure, billet temperature) which are standard in forging press control. The rotation is a mechanical response to these existing forces.\n*   **DERIVED (Reference/Threshold):**\n    *   **Segment Rotation Angle ($\\theta$):** DERIVED from **stated geometry** (segment width) and **stated process stroke length** to ensure $\\theta < 10^\\circ$ for stability.\n    *   **Interlock Force:** DERIVED from **stated physics** of the forging pressure (assumed known from press specs) to size the springs/keys. No new baseline data collection is required; the trust in the mechanism comes from the **existing knowledge of material flow** in forging (stated by the problem context as a standard process).\n\n**Procedure:**\n*   Modify die cavity design to accommodate rotating segments.\n*   Install segments with clearance fits.\n*   Standard maintenance: Inspect segments for wear after every N cycles (N is higher than standard dies). Replace entire segment set (renewable element).\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n\n| Aspect | Standard Practice (Hardfacing/Geometry) | Proposed Mechanism (Rotating Segments) | Comparison |\n| :--- | :--- | :--- | :--- |\n| **Installability** | Standard die machining + welding/hardfacing. High cost, low frequency. | Die machining + segment assembly. Moderate cost, modular. | **SAME CLASS:** Both require custom die fabrication. Segment assembly adds labor but is modular. |\n| **Operability** | Static die. No moving parts. | Quasi-static rotation. No external power. | **SAME CLASS:** Both operate under the same press cycle. No new controls. |\n| **Maintenance** | Hardfacing is difficult to repair in-situ; often requires offsite grinding/replacement. | Segments are pre-manufactured. Replacement is a \"swap-out\" of the flash land area. | **BETTER:** Modular replacement is faster and more predictable than re-hardfacing. |\n| **Cost Class** | High (hardfacing gas, post-weld heat treatment, die repair downtime). | Medium-High (carbide segment cost, die design). | **SAME CLASS:** Both are premium die modifications. The cost shifts from service/labor to consumable segments. |\n| **Burden Verdict** | | | **SAME BURDEN CLASS, DIFFERENT MECHANISM.** The proposed mechanism is not heavier; it is more maintainable. |\n\n# EXECUTABLE TEST\n\n**Protocol:**\n1.  **Test Artifact:** Fabricate a half-die mock-up with rotating carbide segments.\n2.  **Instrumentation:** Use standard high-speed cameras and pressure transducers **already present** in the test press (stated as standard in forging labs). No new sensors are added to the die itself.\n3.  **Procedure:** Run 100 forging cycles with hot billets at the stated process temperature.\n4.  **Pass/Fail Thresholds:**\n    *   **Galling Check:** Visual inspection of flash scale after 50 cycles. **PASS** if no cold-welded material is adhered to the segments.\n    *   **Rotation Check:** Mark the segments before testing. **PASS** if segments show evidence of slight relative rotation (smearing marks) rather than fixed-point gouging.\n    *   **Wear Rate:** Measure segment height loss. **PASS** if wear rate is $< 50\\%$ of that observed in a standard hardfaced die control.\n5.  **Duration:** 100 cycles (~2-4 hours).\n6.  **Kill Criterion:** If segments seize (rotation $< 1^\\circ$) or break, the mechanism is infeasible.\n\n**Validation:** This test validates the mechanism against **ALREADY-RECORDED** process data (press tonnage, temperature) and **stated physics** (wear mechanics). No long-term baseline campaign is required; the 100-cycle test is sufficient to distinguish between static galling and rotating smearing.\n\n# CONSTRAINT BIND\n\n**Primary Stated Indicator:** The problem states the failure is \"galling and wear.\" The **primary indicator** is **galling** (adhesive transfer), as this is the distinct failure mode differentiating it from simple abrasive wear.\n**Why:** The rotating segment mechanism directly targets the adhesive mechanism by preventing the stationary contact that allows cold welding. Wear is a secondary consequence; if galling is prevented, the abrasive wear rate will be governed by the sliding of fresh carbide surfaces, which is predictable. The test protocol prioritizes checking for galling (adhesion) over simple volume loss.\n**Secondary Indicator:** Wear depth. It **supplements** the primary indicator by ensuring the sacrificial nature of the segments is sustainable. It does **not replace** the galling check.\n\n**Deliverable Class:** This is a **Design Change** (hardware modification) delivering a **Configuration-based** anti-galling mechanism. It does not introduce new monitoring sensors; it leverages existing mechanical forces to alter the boundary condition.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Die Body:** Modified with segmented slots instead of a solid flash land.",
+    "2.  **Segments:** 12–24 interlocking, rotatable segments made of **Tungsten Carbide (WC-Co",
+    "*   *Material Class:* Hard metallic alloy (same class as standard hardfacing or overlay ma",
+    "3.  **Drive Mechanism:** Spring-loaded or gravity-driven interlocks that allow slight rota",
+    "4.  **Backfill:** Sintered iron or steel matrix to hold the segments in position during no",
+    "*   **ALREADY-RECORDED:** The problem states the failure occurs under \"hot billets\" and in",
+    "*   **DERIVED (Reference/Threshold):**",
+    "*   **Segment Rotation Angle ($\\theta$):** DERIVED from **stated geometry** (segment width",
+    "*   **Interlock Force:** DERIVED from **stated physics** of the forging pressure (assumed ",
+    "*   Modify die cavity design to accommodate rotating segments.",
+    "*   Install segments with clearance fits.",
+    "*   Standard maintenance: Inspect segments for wear after every N cycles (N is higher than",
+    "1.  **Test Artifact:** Fabricate a half-die mock-up with rotating carbide segments.",
+    "2.  **Instrumentation:** Use standard high-speed cameras and pressure transducers **alread",
+    "3.  **Procedure:** Run 100 forging cycles with hot billets at the stated process temperatu",
+    "4.  **Pass/Fail Thresholds:**",
+    "*   **Galling Check:** Visual inspection of flash scale after 50 cycles. **PASS** if no co",
+    "*   **Rotation Check:** Mark the segments before testing. **PASS** if segments show eviden",
+    "*   **Wear Rate:** Measure segment height loss. **PASS** if wear rate is $< 50\\%$ of that ",
+    "5.  **Duration:** 100 cycles (~2-4 hours).",
+    "6.  **Kill Criterion:** If segments seize (rotation $< 1^\\circ$) or break, the mechanism i"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "bc085066e5547270"
+}

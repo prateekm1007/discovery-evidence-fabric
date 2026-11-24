@@ -1,0 +1,110 @@
+{
+ "problem_id": "v17-26-busbar-fret",
+ "domain": "ev-powertrain",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P3",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:449d24d22095": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:fd6311882d9f": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:64877697d99e": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "thermal_fatigue_crack",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_fatigue_crack",
+     "admitted": true,
+     "rank": 4,
+     "basis": "configuration is admitted class #5 for the thermal_fatigue_crack failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:13:48Z",
+ "attempts_n": 1,
+ "row_wall_s": 14.0,
+ "a1_answer": "# NOVELTY STATEMENT\n**Standard Practice Delivery:** A **DESIGN CHANGE** that prevents fretting and loosening at busbar joints by increasing clamping force margin or using dissimilar material pairs to reduce galling (e.g., spring washers, torque management, or Ni-coated copper).\n**Mechanism Departure:** Implements a **geometric self-locking \"Wedge-Preload\" configuration** that converts thermal expansion delta-temperature into a net-increasing axial clamping force, rather than a force-degrading shear strain.\n**Failure-Physics Connection:** Standard joints suffer *fretting* because thermal cycling induces differential expansion, breaking static friction. This mechanism inverts the physics: the \"Wedge-Preload\" geometry is designed so that the dominant thermal gradient (battery cell-to-air cooling interface) creates an expansion mismatch that mechanically wedges the joint tighter, creating a **positive feedback loop for clamping force** that counteracts cyclic shear.\n\n# PHYSICS CHECK\n**Governing Relation:** The net change in clamping force $\\Delta F_{clamp}$ due to thermal expansion $\\Delta L$ is governed by the effective thermal strain $\\epsilon_{th}$ and the geometric lever ratio $R$ of the wedge mechanism:\n$$ \\Delta F_{clamp} = R \\cdot \\frac{E A \\epsilon_{th}}{L_{eff}} $$\n**Magnitude Verification:**\nFor a typical EV busbar (Aluminum, $E=70$ GPa, $\\alpha=23 \\times 10^{-6}/K$) vs. Copper terminal ($\\alpha=17 \\times 10^{-6}/K$):\n$\\Delta T = 40 K$ (USER CONSTRAINT: typical thermal cycle amplitude).\nDifferential strain $\\epsilon_{diff} = (23-17)\\times 10^{-6} \\times 40 = 240 \\times 10^{-6}$ (CALCULATED).\nWith a geometric lever ratio $R=5$ (ASSUMPTION: standard wedge taper geometry), the induced tightening strain is amplified to $1200 \\times 10^{-6}$. This exceeds the yield strain of standard fastener preloads in many relaxed states, ensuring the joint remains in high-friction lock without requiring infinite bolt stiffness.\n\n# IMPLEMENTATION BILL\n| Component / Element | Spec / Material | Input Stream / Data Source | Tag |\n| :--- | :--- | :--- | :--- |\n| **Wedge-Preload Busbar End** | Aluminum 6061-T6, machined 3° included angle taper on contact face | **Geometry** (Stated Spec: Taper angle $\\theta$) | DERIVED |\n| **Counter-Wedge Plate** | Copper (match busbar CTE or higher) or Stainless Steel (lower CTE) | **Material Selection** (Stated Spec: CTE mismatch) | DERIVED |\n| **Friction Surface Coating** | Dry-film PTFE or Nickel Electroplate (Stated Spec: Coefficient of Friction $\\mu$) | **Stated Property** | ALREADY-RECORDED |\n| **Fastener Hardware** | Standard M8/M10 Hex Bolts (Stated Spec: Grade 8.8/10.9) | **Stated Spec** | ALREADY-RECORDED |\n| **Preload Sensor (Verification)** | Existing strain gauges or torque logs from assembly | **Stated Telemetry/Log** | ALREADY-RECORDED |\n\n*Feasibility Note:* This design replaces standard flat-to-flat busbar lugs with a machined wedge interface. No new electronics, no new wiring, no additional sensors. It uses standard machining processes.\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** **SAME CLASS.** Requires changing the busbar manufacturing process from stamping flat lugs to CNC machining a 3° taper. This is a minor tooling change, not a new factory.\n*   **Operability:** **LOWER BURDEN.** Removes need for periodic torque re-checks. The joint self-tightens; no operator intervention required for maintenance.\n*   **Maintenance:** **ZERO.** No lubricants, no springs, no washers to replace.\n*   **Cost Class:** **SAME.** Additional machining cost (~$0.50/part) is offset by the removal of complex spring washers, special torque drivers, and routine maintenance labor.\n*   **Feasibility Verdict:** The burden is shifted from *maintenance labor* to *manufacturing precision*, which is standard in EV pack assembly.\n\n# EXECUTABLE TEST\n**Protocol:**\n1.  Fabricate 10 sample wedge-preload joints and 10 standard flat-lug joints (control).\n2.  Subject both groups to thermal cycling: $-40^{\\circ}C$ to $+85^{\\circ}C$, 1000 cycles.\n3.  **Instrumentation:** Use high-resolution load cells integrated into the test fixture to measure net axial force at $-40^{\\circ}C$ and $+85^{\\circ}C$ endpoints.\n4.  **Falsification Metric:** Measure fretting displacement via laser Doppler vibrometer or surface roughness change (profilometry) after 500 cycles.\n\n**Pass/Fail Thresholds:**\n*   **PASS:** Wedge joints show $\\le 1\\%$ increase in clamping force at $+85^{\\circ}C$ vs. initial preload, and $\\le 2 \\mu m$ total fretting displacement over 1000 cycles.\n*   **FAIL:** Wedge joints show clamping force drop $> 5\\%$ at any temperature, or fretting displacement $> 10 \\mu m$.\n\n**Kill Criterion:** If the geometric lever ratio $R$ causes the clamping force to exceed the yield strength of the busbar material at peak temperature, the design is rejected for that material combination.\n\n# CONSTRAINT BIND (PREDICTOR)\nThe monitored indicator is the **net axial clamping force** at the joint. This is the **PRIMARY** indicator because the failure mechanism is *fretting looseness*, which is directly governed by the frictional hold-down force ($F_{friction} = \\mu F_{clamp}$). If $F_{clamp}$ remains constant or increases, fretting is mitigated. A secondary indicator (fretting displacement) supplements the primary one by directly measuring the damage outcome, but the design intervention targets the *cause* (clamping force stability), not the *symptom* (displacement).\n\n# RISK / TENSION FIELD\n*   **Risk:** The 3° taper requires high-precision alignment during assembly. If the initial alignment is off by $> 0.5$ mm, the wedge may not engage symmetrically, leading to stress concentration.\n*   **Mitigation:** Use guide pins in the mating flanges (standard practice for high-torque joints) to ensure concentricity.\n*   **Tension:** The mechanism relies on CTE mismatch. If the materials are identical (e.g., Al-to-Al), the differential expansion $\\epsilon_{diff}$ approaches zero, and the self-locking effect vanishes. The design **MUST** be paired with a CTE-mismatched counter-wedge plate (e.g., Al busbar to SS plate) to function.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Installability:** **SAME CLASS.** Requires changing the busbar manufacturing process",
+    "*   **Operability:** **LOWER BURDEN.** Removes need for periodic torque re-checks. The joi",
+    "*   **Maintenance:** **ZERO.** No lubricants, no springs, no washers to replace.",
+    "*   **Cost Class:** **SAME.** Additional machining cost (~$0.50/part) is offset by the rem",
+    "*   **Feasibility Verdict:** The burden is shifted from *maintenance labor* to *manufactur",
+    "1.  Fabricate 10 sample wedge-preload joints and 10 standard flat-lug joints (control).",
+    "2.  Subject both groups to thermal cycling: $-40^{\\circ}C$ to $+85^{\\circ}C$, 1000 cycles.",
+    "3.  **Instrumentation:** Use high-resolution load cells integrated into the test fixture t",
+    "4.  **Falsification Metric:** Measure fretting displacement via laser Doppler vibrometer o",
+    "*   **PASS:** Wedge joints show $\\le 1\\%$ increase in clamping force at $+85^{\\circ}C$ vs.",
+    "*   **FAIL:** Wedge joints show clamping force drop $> 5\\%$ at any temperature, or frettin",
+    "*   **Risk:** The 3° taper requires high-precision alignment during assembly. If the initi",
+    "*   **Mitigation:** Use guide pins in the mating flanges (standard practice for high-torqu",
+    "*   **Tension:** The mechanism relies on CTE mismatch. If the materials are identical (e.g"
+   ],
+   "APPARATUS_ROW": [
+    "3.  **Instrumentation:** Use high-resolution load cells integrated into the test fixture to measure net axial "
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'thermal cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'thermal cycling' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "abab81922f8f50df"
+}

@@ -263,6 +263,31 @@ def challenger_prob(prob: dict, winner: dict, rule: str) -> dict:
                     "cannot address it (their mechanisms act on "
                     "different physics)"),
             }
+            # R145 DIR-6 (claim c-0243 lineage): the MOOSE-Chem-style
+            # inspiration retrieval INTEGRATED into the LIVE machine
+            # path (import-graph evidence: this module IS the live
+            # generation conditioning — r60_v9_one_shot feeds
+            # machine_generate_v79's prompt through json.dumps(prob)).
+            # Cross-domain analogies + hash-verified evidence spans
+            # for the detected family ride the same typed_plan, so
+            # the selection is precedent-grounded (the dev dry-run's
+            # measured strong-novelty shape; the v17 measurement is
+            # the owner's sealed set — requested).
+            try:
+                from discovery_fabric.generation import (
+                    inspiration_retrieval as _ir)
+                _insp = _ir.retrieve_inspiration(fam)
+                if _insp.get("analogies") or _insp.get("evidence_spans"):
+                    p["typed_plan"]["inspiration"] = {
+                        "block": _ir.inspiration_prompt_block(_insp),
+                        "n_analogies": len(
+                            _insp.get("analogies") or []),
+                        "n_evidence_spans": len(
+                            _insp.get("evidence_spans") or []),
+                        "typed": _insp.get("typed"),
+                    }
+            except Exception:  # noqa: BLE001 — additive conditioning
+                pass
     except Exception:  # noqa: BLE001 — conditioning is additive
         pass
     return p

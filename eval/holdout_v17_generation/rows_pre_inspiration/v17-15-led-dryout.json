@@ -1,0 +1,118 @@
+{
+ "problem_id": "v17-15-led-dryout",
+ "domain": "outdoor-lighting",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:d0c14eae6590": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:fb4a59352adf": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:574f91e89397": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "thermal_attack_surface",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_attack_surface",
+     "admitted": true,
+     "rank": 2,
+     "basis": "configuration is admitted class #3 for the thermal_attack_surface failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:11:24Z",
+ "attempts_n": 1,
+ "row_wall_s": 30.2,
+ "a1_answer": "**NOVELTY STATEMENT**\nStandard practice delivers a **DESIGN CHANGE** (thermal geometry modification) to reduce steady-state thermal attack on the capacitor.\nDeparture: Instead of increasing enclosure volume or adding passive heat dissipation area (geometry), this mechanism uses **configuration** (internal airflow routing) to create a localized high-velocity air stream that directly convects heat away from the capacitor body, using the existing thermal gradient of the LED module as the driving potential.\nPhysics connection: Electrolytic capacitor life follows the Arrhenius rule; reducing junction temperature ($T_{cap}$) by even 5°C doubles life. The driver and LED module are the primary heat sources in a sealed enclosure. Standard practice often treats the enclosure as a static thermal mass. This mechanism actively utilizes the temperature difference between the hot LED junction and the relatively cooler air near the capacitor to drive flow without external energy, breaking the thermal standoff layer.\n\n**PHYSICS CHECK**\nGoverning relation: Newton's Law of Cooling / Forced Convection Heat Transfer.\n$$q = h A (T_{cap} - T_{air})$$\nWhere $h$ is the convective heat transfer coefficient. For natural convection in a sealed enclosure, $h \\approx 5-10 \\, \\text{W/m}^2\\text{K}$. For forced convection with low-velocity airflow ($v < 0.5 \\, \\text{m/s}$), $h$ increases to $20-30 \\, \\text{W/m^2K}$.\nMagnitude verification: A typical 100W LED driver generates ~5W of waste heat from its own electronics plus absorbs heat from the enclosure. If the LED module (100W) is maintained at 120°C and the capacitor is at 80°C, the natural convection path is inefficient due to thermal stratification. By creating a physical channel that directs ambient air from the cooler capacitor region toward the hotter LED region, we establish a thermosyphon-like flow. Calculated $\\Delta T$ reduction: Increasing $h$ from 10 to 25 $W/m^2K$ reduces the thermal resistance. For a 10g capacitor with 5W total thermal load (driver self-heating + radiation), a 50% increase in $h$ yields a temperature drop of $\\Delta T = P/H_{old} - P/H_{new}$. If $P_{thermal\\_loss} \\approx 0.5W$ (convection/radiation limit), $\\Delta T \\approx 0.5/10 - 0.5/25 = 0.05 - 0.02 = 0.03K$? No, that's too small.\n*Correction*: The dominant heat source is the enclosure ambient. If the enclosure wall is at 70°C, the air inside stratifies. The capacitor is typically mounted on a PCB near the driver. The \"heat\" it experiences is the hot air rising from the LED. The mechanism is **flow restriction/acceleration**. By placing a baffle that forces air from the top of the enclosure (where it is hottest from LED) to bypass the capacitor and exit through a low-point, or conversely, to draw cooler air from the bottom up past the cap.\nActually, in sealed enclosures, the LED is usually at the top (heat rises) or side-mounted. The driver is internal. The critical failure is that the air surrounding the capacitor becomes stagnant and hot.\n*Revised Physics Check*: The mechanism is **Geometric Flow Focusing**. By installing a baffle that creates a constriction (Venturi effect) between the main enclosure volume and the driver/PCB compartment, the airflow driven by natural convection (stack effect) or forced convection from external wind (if applicable, but assume sealed/still air) is accelerated through the narrow gap immediately adjacent to the capacitor.\nCalculation: Continuity equation $A_1 v_1 = A_2 v_2$. If the cross-section $A_2$ (gap around cap) is reduced to 1/3 of the open volume $A_1$, the local velocity $v_2$ triples. For laminar flow ($Re < 4000$), heat transfer coefficient $h \\propto v^{0.5}$. Tripling velocity increases $h$ by $\\sqrt{3} \\approx 1.73$. This is a significant, calculable improvement without new energy input.\n\n**IMPLEMENTATION BILL**\n*   **Component**: Internal Baffle/Radiator Plate (1 piece).\n*   **Material**: Anodized Aluminum or High-Density Polyethylene (HDPE) (thermally non-conductive preferred if separating, but aluminum preferred for structural rigidity and slight heat dissipation). *Constraint*: Must be compatible with existing enclosure IP rating (no new penetrations).\n*   **Instrument**: None. The mechanism is passive.\n*   **Input Streams**:\n    *   **ALREADY-RECORDED**: Enclosure interior temperature profile (stated in standard thermal analysis logs for LED streetlights).\n    *   **ALREADY-RECORDED**: LED Junction Temperature ($T_j$) telemetry (stated in driver specs/telemetry feeds).\n    *   **ALREADY-RECORDED**: Ambient outdoor temperature (stated in weather data/logs).\n*   **References/Thresholds**:\n    *   **DERIVED**: Target Capacitor Temperature ($T_{cap}$). *Derivation*: From capacitor datasheet (stated spec) max operating temp 105°C or 125°C. *Threshold*: $T_{cap} < 0.8 \\times T_{max}$ (e.g., 84°C for 105°C class) to ensure 10-year life.\n    *   **DERIVED**: Baffle Gap Width. *Derivation*: From stated PCB geometry (stated spec) and capacitor package dimensions (stated spec). The gap is sized to restrict airflow area by 50-60% to maximize local velocity while minimizing pressure drop to maintain natural convection.\n*   **Procedure**:\n    1.  Mount baffle inside enclosure, separating the main volume (LED side) from the driver volume.\n    2.  Ensure the baffle creates a narrow channel that forces circulating air to pass directly over the capacitor can.\n    3.  No new sensors. No new calibration.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice**: Increase enclosure size (material cost increase, structural support increase) or add external finned heatsink (material cost, increased wind load).\n*   **Proposed Mechanism**: Add internal baffle.\n    *   **Installability**: Low. Drilled into existing enclosure wall or mounted via internal standoffs. Same class of fabrication as adding a heatsink tab.\n    *   **Operability**: Passive. No moving parts. No control electronics. Same as standard passive cooling.\n    *   **Maintenance**: Zero. Sealed enclosure.\n    *   **Cost**: Negligible addition to unit cost (<$0.50). Comparable to standard heatsink material.\n*   **Conclusion**: SAME burden class (passive structural/thermal modification), DIFFERENT mechanism (internal flow configuration vs. external area increase).\n\n**EXECUTABLE TEST**\n*   **Protocol**: Thermal simulation (CFD) + Physical Thermocouple verification.\n*   **Instruments**: Infrared camera (for surface mapping), Thermocouples on capacitor leads, Power supply for LED module.\n*   **Pass/Fail Thresholds**:\n    1.  Simulate baseline (no baffle) and modified (with baffle) configurations.\n    2.  Measure steady-state capacitor temperature ($T_{cap\\_old}$ vs $T_{cap\\_new}$).\n    3.  **Pass Criterion**: $T_{cap\\_new} \\le T_{cap\\_old} - 5^\\circ\\text{C}$.\n    4.  **Kill Criterion**: If pressure drop across the baffle stops natural convection (airflow stagnation), or if $T_{cap\\_new}$ does not improve by >3°C.\n*   **Validation**: Compare simulated velocity profiles in the capacitor zone to predicted $h$ coefficient. Verify that the baffle does not obstruct other components' thermal paths.\n\n**CONSTRAINT BIND**\n*   **Primary Stated Indicator**: Capacitor End-of-Life Time (or equivalently, Capacitor Body Temperature as the leading indicator of dryout).\n*   **Secondary Indicator**: LED Junction Temperature (supplementary context for thermal load).\n*   **Justification**: The question asks to prevent/malfunction electrolytic dryout. Dryout is driven by temperature. The \"primary\" indicator that defines the failure threshold is the capacitor temperature exceeding its rated thermal limit. The mechanism acts directly on this variable. No new instrumentation is required; the verification uses standard thermal profiling methods already employed in design validation.\n\n**RISK / TENSION FIELD**\n*   **Tension**: The \"sealed\" constraint limits external airflow. The mechanism relies on *internal* natural convection. If the enclosure is very large, natural convection may be too weak.\n*   **Mitigation**: The baffle is designed to *focus* the existing internal flow. It does not require new airflow; it optimizes the distribution of the existing thermal energy gradient. If the internal air is truly stagnant (pure conduction), this mechanism has low efficacy. However, in sealed LED streetlights, natural convection loops are standard thermal models. The \"Novelty\" is in the **configuration** (baffle/guide) rather than adding a fan (excluded class: control/active energy).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component**: Internal Baffle/Radiator Plate (1 piece).",
+    "*   **Material**: Anodized Aluminum or High-Density Polyethylene (HDPE) (thermally non-con",
+    "*   **Instrument**: None. The mechanism is passive.",
+    "*   **Input Streams**:",
+    "*   **ALREADY-RECORDED**: Enclosure interior temperature profile (stated in standard therm",
+    "*   **ALREADY-RECORDED**: LED Junction Temperature ($T_j$) telemetry (stated in driver spe",
+    "*   **ALREADY-RECORDED**: Ambient outdoor temperature (stated in weather data/logs).",
+    "*   **References/Thresholds**:",
+    "*   **DERIVED**: Target Capacitor Temperature ($T_{cap}$). *Derivation*: From capacitor da",
+    "*   **DERIVED**: Baffle Gap Width. *Derivation*: From stated PCB geometry (stated spec) an",
+    "*   **Procedure**:",
+    "1.  Mount baffle inside enclosure, separating the main volume (LED side) from the driver v",
+    "2.  Ensure the baffle creates a narrow channel that forces circulating air to pass directl",
+    "3.  No new sensors. No new calibration.",
+    "*   **Standard Practice**: Increase enclosure size (material cost increase, structural sup",
+    "*   **Proposed Mechanism**: Add internal baffle.",
+    "*   **Installability**: Low. Drilled into existing enclosure wall or mounted via internal ",
+    "*   **Operability**: Passive. No moving parts. No control electronics. Same as standard pa",
+    "*   **Maintenance**: Zero. Sealed enclosure.",
+    "*   **Cost**: Negligible addition to unit cost (<$0.50). Comparable to standard heatsink m",
+    "*   **Conclusion**: SAME burden class (passive structural/thermal modification), DIFFERENT",
+    "*   **Protocol**: Thermal simulation (CFD) + Physical Thermocouple verification.",
+    "*   **Instruments**: Infrared camera (for surface mapping), Thermocouples on capacitor lea",
+    "*   **Pass/Fail Thresholds**:",
+    "1.  Simulate baseline (no baffle) and modified (with baffle) configurations.",
+    "2.  Measure steady-state capacitor temperature ($T_{cap\\_old}$ vs $T_{cap\\_new}$).",
+    "3.  **Pass Criterion**: $T_{cap\\_new} \\le T_{cap\\_old} - 5^\\circ\\text{C}$.",
+    "4.  **Kill Criterion**: If pressure drop across the baffle stops natural convection (airfl",
+    "*   **Validation**: Compare simulated velocity profiles in the capacitor zone to predicted",
+    "*   **Primary Stated Indicator**: Capacitor End-of-Life Time (or equivalently, Capacitor B",
+    "*   **Secondary Indicator**: LED Junction Temperature (supplementary context for thermal l",
+    "*   **Justification**: The question asks to prevent/malfunction electrolytic dryout. Dryou",
+    "*   **Tension**: The \"sealed\" constraint limits external airflow. The mechanism relies on ",
+    "*   **Mitigation**: The baffle is designed to *focus* the existing internal flow. It does "
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "959067a2cd86d625"
+}
