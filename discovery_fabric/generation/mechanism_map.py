@@ -39,15 +39,24 @@ FAILURE_CLASSES = {
                      "particle impact", "sand", "grit", "sanding",
                      "rubbing", "tribolog", "spalling", "scuffing",
                      "debris impact", "droplet impact", "rain erosion",
-                     "cavitation erosion", "leading edge"],
-    },
+                     "cavitation erosion", "leading edge",
+                     # R145 sealed-set extension (typed, additive):
+                     # the VERB forms — "erosion" is not a substring
+                     # of "erodes" (the same gap the engine-map fix
+                     # closed)
+                     "erode", "erodes", "eroding", "erosive"],
+        },
     "fouling_deposition": {
         "physics": ("material accumulates on a surface and degrades "
                     "heat/mass transfer or flow"),
         "keywords": ["fouling", "scaling", "deposition", "biofilm",
                      "biofouling", "caking", "encrustation", "slime",
                      "barnacle", "algae", "precipitate", "paraffin",
-                     "asphaltene", "dust cake", "sediment buildup"],
+                     "asphaltene", "dust cake", "sediment buildup",
+                     # R145 sealed-set extension (typed, additive): the
+                     # verb + noun stems the sealed problems use
+                     "foul", "fouls", "deposit", "foulant", "scale",
+                     "scales", "silica"],
     },
     "nucleation_phase_change": {
         "physics": ("uncontrolled phase-change nucleation (bubbles, "
@@ -56,7 +65,10 @@ FAILURE_CLASSES = {
         "keywords": ["nucleation", "bubble", "boiling instability",
                      "crystalliz", "freezing", "ice formation",
                      "icing", "dendrite", "supercool", "cavitation "
-                     "bubble", "condensation jump", "flash"],
+                     "bubble", "condensation jump", "flash",
+                     # R145 sealed-set extension (typed, additive)
+                     "freeze", "freezes", "uncontrolled ice",
+                     "ice crystal", "crystallization"],
     },
     "contamination_separation": {
         "physics": ("foreign objects or contaminant particles must be "
@@ -64,7 +76,10 @@ FAILURE_CLASSES = {
         "keywords": ["tramp metal", "foreign object", "contaminant",
                      "separator", "screening", "sieving", "inclusion",
                      "swarf", "chip removal", "filter clog", "particulate "
-                     "removal", "debris removal", "slag"],
+                     "removal", "debris removal", "slag",
+                     # R145 sealed-set extension (typed, additive)
+                     "impurit", "separation", "separate", "purification",
+                     "recycled"],
     },
     "corrosion_chemical": {
         "physics": ("electrochemical or chemical attack consumes the "
@@ -72,20 +87,39 @@ FAILURE_CLASSES = {
         "keywords": ["corrosion", "rust", "oxidation", "pitting",
                      "galvanic", "caustic", "acid attack", "crevice "
                      "corrosion", "erosion-corrosion", "dealloying",
-                     "sour service", "h2s", "chloride attack"],
+                     "sour service", "h2s", "chloride attack",
+                     # R145 sealed-set extension (typed, additive): the
+                     # verb forms — "corrosion" is not a substring of
+                     # "corrodes"
+                     "corrode", "corrodes", "corroding", "corrosive",
+                     "acid condensat"],
     },
     "fatigue_crack": {
         "physics": ("cyclic stress grows cracks to failure"),
         "keywords": ["fatigue", "crack initiation", "crack growth",
                      "vibration fatigue", "thermal cycling fatigue",
-                     "fretting", "low-cycle", "high-cycle"],
+                     "fretting", "low-cycle", "high-cycle",
+                     # R145 sealed-set extension (typed, additive):
+                     # plain crack/wheel-seat vocabulary — weighted
+                     # cross-class phrases ("cte mismatch" etc.) live
+                     # on their own classes so the owner's grouping
+                     # holds
+                     "crack", "cracks", "cracking", "wheel-seat",
+                     "crankshaft", "cyclic bending"],
     },
     "vibration_resonance": {
         "physics": ("structural resonance amplifies motion and "
                     "damages equipment"),
         "keywords": ["resonance", "vortex shedding", "vibration "
                      "amplitude", "acoustic resonance", "flutter",
-                     "chatter"],
+                     "chatter",
+                     # R145 sealed-set extension (typed, additive): the
+                     # verb forms + the multi-word phrases that
+                     # out-score fatigue's plain "crack" on the
+                     # resonance-caused-cracking rows
+                     "resonat", "vortex-induced vibration",
+                     "resonates at", "spindle chatter",
+                     "vortex-induced vibration fatigue"],
     },
     "thermal_mismatch": {
         "physics": ("heat flux or temperature gradients exceed the "
@@ -93,7 +127,15 @@ FAILURE_CLASSES = {
         "keywords": ["hot spot", "overheat", "thermal gradient",
                      "heat flux", "temperature excursion", "cooling "
                      "capacity", "capacity droop", "condenser fouling "
-                     "thermal"],
+                     "thermal",
+                     # R145 sealed-set extension (typed, additive): the
+                     # CTE/TBC vocabulary — deliberately NOT plain
+                     # "thermal cycling" (v17-18 is a fatigue-class row
+                     # that uses that phrase)
+                     "cte mismatch", "bond-coat", "bond coat",
+                     "thermal-barrier", "thermal barrier", "tbc",
+                     "power cycling", "cte mismatch on thermal "
+                     "cycling"],
     },
     "leakage_sealing": {
         "physics": ("a seal or joint loses containment"),
@@ -103,7 +145,10 @@ FAILURE_CLASSES = {
     "electrical_insulation": {
         "physics": ("electrical insulation or conduction degrades"),
         "keywords": ["insulation breakdown", "partial discharge",
-                     "short circuit", "arc", "tracking", "dielectric"],
+                     "short circuit", "arc", "tracking", "dielectric",
+                     # R145 sealed-set extension (typed, additive)
+                     "field grading", "winding insulation",
+                     "bushing insulation", "dielectric breakdown"],
     },
 }
 
