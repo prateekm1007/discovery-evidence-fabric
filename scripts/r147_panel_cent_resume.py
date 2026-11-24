@@ -50,17 +50,23 @@ import r146_p4_panel_oneshot as p146  # the validated instrument
 
 OUT_DIR = REPO / "eval" / "r146_p4_panel"  # the c-0252 lane's dir
 
-# the OWNER-DESIGNATED FALLBACK JUDGES (R147 DIR 2) — cent-ai
+# the OWNER-DESIGNATED FALLBACK JUDGES (R147 DIR 2) — cent-ai.
+# qw38 (qwen3.8-flash) was DROPPED: its legs TRANSPORT_FAILED at
+# ~360s under the full 15K-char panel prompt (4 attempts timing out;
+# the short-prompt probe did not transfer — the R64s4 lesson) —
+# typed in the lane record, not silently substituted; minimax-m3.1-
+# flash probed VALID on the full prompt (1315 chars, finish=stop,
+# 14.5s) and takes the third seat with a distinct family.
 JUDGES_CENT = [
     {"model": "hy4-flash:free", "family": "hy4", "tag": "hy4flash",
-     "transport": "cent-ai", "pace": 6,
-     "budgets": [3000, 5000, 7000], "timeout_s": 120},
-    {"model": "deepseek-v4.1-flash", "family": "deepseek",
-     "tag": "dsv41", "transport": "cent-ai", "pace": 6,
-     "budgets": [4000, 7000, 10000], "timeout_s": 120},
-    {"model": "qwen3.8-flash", "family": "qwen", "tag": "qw38",
-     "transport": "cent-ai", "pace": 6,
+     "transport": "cent-ai", "pace": 4,
      "budgets": [3000, 5000, 7000], "timeout_s": 150},
+    {"model": "deepseek-v4.1-flash", "family": "deepseek",
+     "tag": "dsv41", "transport": "cent-ai", "pace": 4,
+     "budgets": [4000, 7000, 10000], "timeout_s": 120},
+    {"model": "minimax-m3.1-flash", "family": "minimax",
+     "tag": "mm31", "transport": "cent-ai", "pace": 4,
+     "budgets": [4000, 6000, 8000], "timeout_s": 150},
 ]
 CALIBRATION_NOTE = ("OWNER-DESIGNATED FALLBACK JUDGE (R147 DIR 2) "
                     "— NOT V109-qualified (acc/kappa vs the "
@@ -157,9 +163,13 @@ def sealed_problems() -> dict:
 
 
 def main() -> int:
-    packs_doc = json.loads((OUT_DIR / "packs.json").read_text())
+    packs_path = Path(os.environ.get(
+        "R147_PACKS", str(OUT_DIR / "packs.json")))
+    packs_doc = json.loads(packs_path.read_text())
     packs = packs_doc["packs"]
     problems = sealed_problems()
+    print(f"packs: {packs_path.name} | n: {len(packs)} | "
+          f"first pid: {packs[0]['problem_id']}", flush=True)
     only = os.environ.get("R147_JUDGE", "").strip()
     judges = ([j for j in JUDGES_CENT if j["tag"] == only] if only
               else JUDGES_CENT)
