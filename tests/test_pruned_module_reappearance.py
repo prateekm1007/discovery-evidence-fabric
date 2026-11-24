@@ -28,21 +28,30 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 
 # The pruned-module registry (retirement ledger guard line, Art. 16).
-# Every entry: pruned with zero-importer import-graph evidence.
+# Every entry: (path, prune_epoch_commit) — pruned with zero-importer
+# import-graph evidence; the epoch is the commit that performed the
+# prune (commits touching the path AT/BEFORE its own epoch are the
+# module's legitimate history; anything AFTER is a resurrection).
+# R145S1: the registry moved from a single global epoch (d86f59aec)
+# to per-path epochs — a SECOND prune (the DIR-8 census) made the
+# single-epoch shape false by construction (its own deletion commit
+# postdates the first epoch and was flagged as a resurrection).
 PRUNED_MODULES = [
     # d86f59aec (R141S1): zero .py importers re-verified at the tip;
     # the R455 record's claimed consumer tests/test_e21_series.py does
     # not exist. Resurrected twice by stale-tree closes before this
     # guard existed (R139S3-F1 / R140-F1).
-    "discovery_fabric/engine/causal_correctness.py",
-    # R145S1 (DIR-8, claim c-0243 lineage): the zero-importer census
-    # at the tip found ONE dead module — the V3.9 calibration
-    # pipeline (303 lines, last touched 806c4112b in the V3.9 era;
-    # zero .py importers; zero json/yml/md consumers; no CI step; no
-    # script execs it by path). Pruned with import-graph evidence;
-    # the prior_art_v2 family's LIVE members (calibration_v3,
-    # claim_identity, elite_v3, prior_art_v2_bridge) are untouched.
-    "discovery_fabric/prior_art_v2/calibration_v3_9.py",
+    ("discovery_fabric/engine/causal_correctness.py", "d86f59aec"),
+    # 71de1c870 (R145S1, DIR-8, claim c-0243 lineage): the
+    # zero-importer census at the tip found ONE dead module — the
+    # V3.9 calibration pipeline (303 lines, last touched 806c4112b
+    # in the V3.9 era; zero .py importers; zero json/yml/md
+    # consumers; no CI step; no script execs it by path). Pruned
+    # with import-graph evidence; the prior_art_v2 family's LIVE
+    # members (calibration_v3, claim_identity, elite_v3,
+    # prior_art_v2_bridge) are untouched.
+    ("discovery_fabric/prior_art_v2/calibration_v3_9.py",
+     "71de1c870"),
 ]
 
 
@@ -56,7 +65,7 @@ def _git(*args: str, cwd: Path = REPO) -> str:
 
 def test_01_pruned_modules_absent_at_head() -> None:
     """Every registry path must be absent from HEAD's tree."""
-    for path in PRUNED_MODULES:
+    for path, _epoch in PRUNED_MODULES:
         # cat-file -e exits 0 when the path EXISTS in HEAD's tree
         rc = subprocess.run(
             ["git", "cat-file", "-e", f"HEAD:{path}"],
@@ -72,15 +81,16 @@ def test_01_pruned_modules_absent_at_head() -> None:
 def test_02_pruned_modules_absent_across_recent_history() -> None:
     """No commit in the last 200 may re-add a pruned path after the
     prune commit that removed it (the silent-resurrection detector)."""
-    for path in PRUNED_MODULES:
+    for path, epoch_sha in PRUNED_MODULES:
         log = _git("log", "-200", "--format=%H", "--", path)
         shas = [s for s in log.split() if s]
-        # commits touching the path must all PREDATE the prune epoch
-        # (d86f59aec, 2026-11-23). Any newer commit touching it is a
-        # resurrection — findable even if a later commit re-pruned it.
+        # commits touching the path must all PREDATE the path's OWN
+        # prune epoch (the per-path registry commit). Any newer
+        # commit touching it is a resurrection — findable even if a
+        # later commit re-pruned it.
         if not shas:
             continue
-        epoch = _git("rev-parse", "d86f59aec").strip()
+        epoch = _git("rev-parse", epoch_sha).strip()
         newer = []
         for sha in shas:
             # is sha an ancestor of the prune commit? (older/equal)
@@ -128,7 +138,11 @@ def test_04_registry_is_json_serializable_and_documented() -> None:
     """The guard registry itself must stay well-formed (CI wiring)."""
     blob = json.dumps(PRUNED_MODULES)
     assert isinstance(json.loads(blob), list)
-    assert all(isinstance(p, str) and p.endswith(".py") for p in PRUNED_MODULES)
+    # R145S1: the registry entries are (path, prune_epoch) pairs
+    assert all(isinstance(p, tuple) and len(p) == 2
+               and isinstance(p[0], str) and p[0].endswith(".py")
+               and isinstance(p[1], str) and len(p[1]) >= 7
+               for p in PRUNED_MODULES)
     assert len(PRUNED_MODULES) >= 1, (
         "the reappearance registry is empty — a prune without a guard "
         "line is how R139S3-F1 happened; add the pruned path here")
