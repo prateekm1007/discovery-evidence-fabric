@@ -35,6 +35,14 @@ PRUNED_MODULES = [
     # not exist. Resurrected twice by stale-tree closes before this
     # guard existed (R139S3-F1 / R140-F1).
     "discovery_fabric/engine/causal_correctness.py",
+    # R145S1 (DIR-8, claim c-0243 lineage): the zero-importer census
+    # at the tip found ONE dead module — the V3.9 calibration
+    # pipeline (303 lines, last touched 806c4112b in the V3.9 era;
+    # zero .py importers; zero json/yml/md consumers; no CI step; no
+    # script execs it by path). Pruned with import-graph evidence;
+    # the prior_art_v2 family's LIVE members (calibration_v3,
+    # claim_identity, elite_v3, prior_art_v2_bridge) are untouched.
+    "discovery_fabric/prior_art_v2/calibration_v3_9.py",
 ]
 
 
