@@ -44,7 +44,10 @@ FAILURE_CLASSES = {
                      # the VERB forms — "erosion" is not a substring
                      # of "erodes" (the same gap the engine-map fix
                      # closed)
-                     "erode", "erodes", "eroding", "erosive"],
+                     "erode", "erodes", "eroding", "erosive", "galling",
+                     "adhesive wear",
+                     "grinding wear",
+                     "surface fatigue"],
         },
     "fouling_deposition": {
         "physics": ("material accumulates on a surface and degrades "
@@ -56,7 +59,12 @@ FAILURE_CLASSES = {
                      # R145 sealed-set extension (typed, additive): the
                      # verb + noun stems the sealed problems use
                      "foul", "fouls", "deposit", "foulant", "scale",
-                     "scales", "silica"],
+                     "scales", "silica", "swell",
+                     "blanket",
+                     "gum",
+                     "varnish",
+                     "print blanket",
+                     "coating buildup"],
     },
     "nucleation_phase_change": {
         "physics": ("uncontrolled phase-change nucleation (bubbles, "
@@ -68,7 +76,9 @@ FAILURE_CLASSES = {
                      "bubble", "condensation jump", "flash",
                      # R145 sealed-set extension (typed, additive)
                      "freeze", "freezes", "uncontrolled ice",
-                     "ice crystal", "crystallization"],
+                     "ice crystal", "crystallization", "blister",
+                     "blistering",
+                     "outgassing"],
     },
     "contamination_separation": {
         "physics": ("foreign objects or contaminant particles must be "
@@ -79,7 +89,11 @@ FAILURE_CLASSES = {
                      "removal", "debris removal", "slag",
                      # R145 sealed-set extension (typed, additive)
                      "impurit", "separation", "separate", "purification",
-                     "recycled"],
+                     "recycled", "backlash",
+                     "jam",
+                     "foreign material",
+                     "wandering",
+                     "slip"],
     },
     "corrosion_chemical": {
         "physics": ("electrochemical or chemical attack consumes the "
@@ -105,7 +119,14 @@ FAILURE_CLASSES = {
                      # on their own classes so the owner's grouping
                      # holds
                      "crack", "cracks", "cracking", "wheel-seat",
-                     "crankshaft", "cyclic bending"],
+                     "crankshaft", "cyclic bending", "shelling",
+                     "spalling",
+                     "contact fatigue",
+                     "rolling contact",
+                     "strand break",
+                     "rope",
+                     "gear tooth",
+                     "pitting fatigue"],
     },
     "vibration_resonance": {
         "physics": ("structural resonance amplifies motion and "
@@ -119,7 +140,10 @@ FAILURE_CLASSES = {
                      # resonance-caused-cracking rows
                      "resonat", "vortex-induced vibration",
                      "resonates at", "spindle chatter",
-                     "vortex-induced vibration fatigue"],
+                     "vortex-induced vibration fatigue", "rattle",
+                     "whine",
+                     "hum",
+                     "oscillation"],
     },
     "thermal_mismatch": {
         "physics": ("heat flux or temperature gradients exceed the "
@@ -135,12 +159,18 @@ FAILURE_CLASSES = {
                      "cte mismatch", "bond-coat", "bond coat",
                      "thermal-barrier", "thermal barrier", "tbc",
                      "power cycling", "cte mismatch on thermal "
-                     "cycling"],
+                     "cycling", "warp",
+                     "distortion",
+                     "sag",
+                     "thermal drift"],
     },
     "leakage_sealing": {
         "physics": ("a seal or joint loses containment"),
         "keywords": ["leak", "seal failure", "gasket", "blow-by",
-                     "containment loss", "emission leak"],
+                     "containment loss", "emission leak", "weep",
+                     "seep",
+                     "drip",
+                     "permeation"],
     },
     "electrical_insulation": {
         "physics": ("electrical insulation or conduction degrades"),
