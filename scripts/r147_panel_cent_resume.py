@@ -51,25 +51,33 @@ import r146_p4_panel_oneshot as p146  # the validated instrument
 OUT_DIR = REPO / "eval" / "r146_p4_panel"  # the c-0252 lane's dir
 
 # the OWNER-DESIGNATED FALLBACK JUDGES (R147 DIR 2) — cent-ai.
-# qw38 (qwen3.8-flash) was DROPPED: its legs TRANSPORT_FAILED at
-# ~360s under the full 15K-char panel prompt (4 attempts timing out;
-# the short-prompt probe did not transfer — the R64s4 lesson) —
-# typed in the lane record, not silently substituted; minimax-m3.1-
-# flash probed VALID on the full prompt (1315 chars, finish=stop,
-# 14.5s) and takes the third seat with a distinct family.
+# R147s2: the transport is now the ENGINE REGISTRY's cent_ai_chat
+# (discovery_fabric/engine/route_adapter.py, the twin lane's DIR-2a
+# wiring) with stream=True — the measured gateway-wall class (the
+# non-streaming free-lane 503 at ~90s) is bypassed by SSE bytes
+# flowing. qw38 (qwen3.8-flash, killed in the first launch by the
+# NON-streaming timeout class) and glm53 (glm-5.3-flash, the PAID
+# non-:free lane per the owner order) re-entered on the registry
+# transport. One generation per (judge, candidate) — no re-roll.
 JUDGES_CENT = [
     {"model": "hy4-flash:free", "family": "hy4", "tag": "hy4flash",
      "transport": "cent-ai", "pace": 4,
-     "budgets": [3000, 5000, 7000], "timeout_s": 150},
+     "budgets": [3000, 5000, 7000], "timeout_s": 200},
     {"model": "deepseek-v4.1-flash", "family": "deepseek",
      "tag": "dsv41", "transport": "cent-ai", "pace": 4,
-     "budgets": [4000, 7000, 10000], "timeout_s": 120},
+     "budgets": [4000, 7000, 10000], "timeout_s": 150},
     {"model": "minimax-m3.1-flash", "family": "minimax",
      "tag": "mm31", "transport": "cent-ai", "pace": 4,
      "budgets": [4000, 6000, 8000], "timeout_s": 150},
     {"model": "deepseek-v4-flash", "family": "deepseek",
      "tag": "dsv4f", "transport": "cent-ai", "pace": 4,
-     "budgets": [4000, 6000, 8000], "timeout_s": 120},
+     "budgets": [4000, 6000, 8000], "timeout_s": 150},
+    {"model": "qwen3.8-flash", "family": "qwen", "tag": "qw38",
+     "transport": "cent-ai", "pace": 4,
+     "budgets": [3000, 5000, 7000], "timeout_s": 240},
+    {"model": "glm-5.3-flash", "family": "glm", "tag": "glm53",
+     "transport": "cent-ai", "pace": 4,
+     "budgets": [4000, 6000, 8000], "timeout_s": 240},
 ]
 CALIBRATION_NOTE = ("OWNER-DESIGNATED FALLBACK JUDGE (R147 DIR 2) "
                     "— NOT V109-qualified (acc/kappa vs the "
@@ -94,22 +102,25 @@ def _cent_key() -> tuple:
 
 def _cent_chat(messages: list, model: str, max_tokens: int,
                timeout_s: float) -> dict:
-    import urllib.request
-    base, key = _cent_key()
-    body = {"model": model, "messages": messages,
-            "max_tokens": max_tokens}
-    req = urllib.request.Request(
-        base + "/chat/completions", data=json.dumps(body).encode(),
-        headers={"Authorization": f"Bearer {key}",
-                 "Content-Type": "application/json"})
+    # the ENGINE REGISTRY transport (DIR-2a, the twin lane's wiring):
+    # stream=True bypasses the measured gateway-wall class (the
+    # non-streaming free-lane 503 at ~90s); the typed-refusal
+    # contract (missing_key / rate_limited / upstream_timeout /
+    # length_no_content / http_<code>) is identical.
+    from discovery_fabric.engine.route_adapter import cent_ai_chat
     try:
-        r = json.load(urllib.request.urlopen(req, timeout=timeout_s))
-        ch = (r.get("choices") or [{}])[0]
-        return {"content": (ch.get("message") or {}).get("content"),
-                "finish": ch.get("finish_reason"), "error": None}
+        r = cent_ai_chat(messages, model=model, max_tokens=max_tokens,
+                         timeout_s=timeout_s, stream=True)
+        return {"content": r.get("content"),
+                "finish": r.get("finish_reason") or r.get("finish"),
+                "error": r.get("error")}
     except Exception as e:  # noqa: BLE001 — typed degradation
-        return {"content": None, "finish": None,
-                "error": f"{type(e).__name__}: {str(e)[:160]}"}
+        name = type(e).__name__
+        msg = str(e)[:160]
+        err = f"{name}: {msg}"
+        if "429" in msg or "Rate" in msg or "rate_limited" in msg:
+            err = "429 rate_limited"
+        return {"content": None, "finish": None, "error": err}
 
 
 def _leg_cent(judge: dict, prompt: str) -> dict:
