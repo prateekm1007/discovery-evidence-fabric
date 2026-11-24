@@ -301,6 +301,14 @@ def main() -> int:
     qualified = [fam for fam, q in qual.items() if q["qualified"]]
     fams_only = {f.split(":")[0] for f in qualified}
     alpha = interjudge_alpha(judge_rows)
+    # the c-0256 takeover fix (typed): interjudge_alpha wraps
+    # krippendorff_alpha's {"alpha": float} in another {"alpha": ...}
+    # — unwrap for the gate comparison (a shape bug, never a
+    # protocol change)
+    _a = alpha.get("alpha")
+    if isinstance(_a, dict):
+        alpha["alpha"] = _a.get("alpha")
+        alpha["krippendorff_detail"] = _a
 
     record = {
         "record": "R147_RCAL_CENTAI_QUALIFICATION/1.0.0",
