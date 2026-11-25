@@ -1,0 +1,46 @@
+{
+ "record": "R156_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r156s1",
+ "audited_queue_tip": "4297b4b1d19d (llmtr custody side-lane; tip green)",
+ "audit_branch_parent": "b178f2120ff8b58ab174e3b8f0fa9690b02a222d",
+ "CORRECTION_ART9": {
+  "withdraws": "V121's claim 'the xkiro daily free-quota reset (00:00 UTC) HAS PASSED'",
+  "correction": "WRONG. The xkiro daily quota was BURNED on Nov 25 (the triple-burn qualification runs); it resets 00:00 UTC Nov 26, NOT Nov 25. The r153s3 verifier confirmed the quota DEAD until 00:00 UTC 2026-11-26 from two independent probes (0c7e6d28ed3e). At the current ~11:13 UTC Nov 25 the reset is ~13h out. The panel resume fires AFTER 00:00 UTC Nov 26 \u2014 the panel is STILL gated, not resumable now. V121's 'resume now' direction is withdrawn; the serving gate (V120) stands."
+ },
+ "LLMTR_SIDELANE_VERIFIED": {
+  "verdict": "the owner's llmtr.com judge-path ask is custodied + instrumented but BLOCKED twice (measured, no workaround): (1) sandbox egress firewalls llmtr.com (DNS resolves 154.53.164.130, TCP 443 times out while github/xkiro connect \u2014 selective egress); (2) the site went dark mid-window (times out from the harness fetcher that read it 30 min earlier). 0 requests reached llmtr, 0 tokens, 0 models judged. The key is in vault custody (digest 999c1f0560a9, env-only, never committed) \u2014 now history-exposed (F45 rotation list). The scan instrument scripts/r156s1_llmtr_scan.py persisted (lists /v1/models, filters pricing==0, probes every free model). Captured pre-dark: OpenAI-compatible, 180+ models, 18 free (Nemotron-3-Ultra-550B/Auto-Code/Auto-Router/+15), $0 but quota-limited (xkiro-class).",
+  "role": "AUXILIARY only \u2014 the V120 serving set (snlite+mst14b+hy4f, alpha 0.945) is FROZEN, no mid-gate judge swap. An llmtr free model would be a 4th-judge candidate (beside kept-aside msm2603), a P5 retrieval lane, or transport backup \u2014 and needs its own r148 R-CAL qualification before counting as a judge. NOT the score-8 path."
+ },
+ "FINDINGS": [
+  {
+   "id": "R156-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel resume is gated until 00:00 UTC 2026-11-26 (xkiro quota burned Nov 25, verifier-confirmed dead); V121 'reset passed' CORRECTED \u2014 the panel is NOT resumable now",
+   "evidence": "r153s3 verifier two-probe quota-dead confirmation; current 11:13 UTC Nov 25",
+   "direction": "DIR2 \u2014 panel resume after Nov 26 00:00 reset (byte-resume snlite 19 + mst14b 30)"
+  },
+  {
+   "id": "R156-F2",
+   "severity": "LOW",
+   "title": "llmtr judge path doubly blocked (sandbox selective egress firewall + site outage); auxiliary only, needs r148 R-CAL if it returns; key history-exposed (F45)",
+   "evidence": "llmtr TCP443 timeout + site dark; custody digest 999c1f0560a9",
+   "direction": "DIR8 \u2014 llmtr auxiliary census when reachable; F45 rotation list += llmtr key"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; F45 standing owner rotation (GH_PAT/HF/cent-ai/xkiro/llmtr all history-exposed)",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (V120, alpha 0.945); panel legs quota-gated until Nov 26 00:00; >=50% verdict post-reset",
+  "P5": "NOT_MET \u2014 needs sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120 stands; serving panel calibrated; score-8 panel verdict gated until Nov 26 00:00 UTC xkiro reset (V121 quota-passed claim CORRECTED)",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "Nov 26 00:00 UTC xkiro reset -> panel resume (snlite 19 + mst14b 30) -> 3-judge tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r156_auditor_adjudication.json"
+}
