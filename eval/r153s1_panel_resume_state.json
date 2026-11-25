@@ -1,0 +1,34 @@
+{
+ "record": "R153S1_PANEL_RESUME_STATE/1.0.0",
+ "session": "builder-r153s1 (continuation window, 2026-11-25)",
+ "work_id": "r153-xkiro-qualify-panel-v18",
+ "claim": "c-0264",
+ "serving_set": {
+  "judges": ["snlite", "mst14b", "hy4f"],
+  "families": ["sensenova", "mistral", "hy4"],
+  "non_generator": true,
+  "generator": "agnes-3.0-flash",
+  "serving_alpha": 0.945046,
+  "alpha_source": "recomputed from the committed rcal leg bytes (eval/r148_p4_panel_v18/SERVING_SNAPSHOT_r153.json is the runner's own snapshot of the same)"
+ },
+ "panel_state": {
+  "packs": "eval/r149_v18_panel/packs_sealed_set.json (30 candidates)",
+  "hy4f": "30/30 VALID (15 r148-era legs stand + 15 fresh legs this window, bytes committed)",
+  "snlite": "0/30 — xkiro daily free-token quota exhausted ~08:45 UTC 2026-11-25 (HTTP 429 typed, resets 00:00 UTC 2026-11-26); pre-first-leg class, NOT judged misses, no legfiles landed",
+  "mst14b": "0/30 — same quota death",
+  "tally": "NOT STANDING — the only tally.json on disk is the hy4f-only partial (6/30, 1 judge voting) written by the transport-scoped run; it is intentionally NOT committed; the full 3-judge majority tally overwrites it in the completing window"
+ },
+ "resume_command": "cd /home/z/my-project/discovery-evidence-fabric && set -a && . ./.env.keys && set +a && V18_PACKS=eval/r149_v18_panel/packs_sealed_set.json python3 scripts/r153_p4_panel_v18.py && python3 scripts/r153s1_tally_recompute.py",
+ "resume_steps": [
+  "1. after the 00:00 UTC quota reset (fresh xkiro free pool), run the resume_command: byte-resume skips hy4f's 30 VALID legs, generates snlite 30 + mst14b 30 (~60 legs, pace 6s, budget ladder 4000/8000/12000)",
+  "2. the runner enforces the serving gate (>=3 judges, >=2 non-generator families, serving alpha >= 0.6 recomputed from leg bytes) and writes the FULL tally.json",
+  "3. python3 scripts/r153s1_tally_recompute.py — the Art. 13 standalone recompute from raw leg bytes; the driver-vs-recompute diff MUST be 0",
+  "4. accept: >=50% of the FULL 30 viable AND non-obvious by majority -> score-8 evidence; commit via close_window.sh (single Session/Work-Id trailer block), push",
+  "5. if the quota dies mid-run again: byte-resume holds; the cent-ai top-up remains the owner-act fallback"
+ ],
+ "disclosures": [
+  "the 2026-11-25 double-burn: three concurrent qualification lanes consumed the shared daily quota before the panel legs; typed in eval/r153s1_duplicate_run_aside/ATTEMPT_RECORD.json + eval/r153s2_duplicate_run_aside/ (the s2 lane's own record)",
+  "this window's pkill of the in-flight runners killed the hy4f relaunch mid-flight too (0 bytes written); it was relaunched clean and completed 30/30 — no generation was lost or duplicated",
+  "the cent-ai transport census change (glm-5.3-flash:free removed 404; deepseek-v4.1-flash:free added, pool dead; hy4-flash:free alive) is the s2 verifier's finding, re-confirmed here by the healthy hy4f leg completions"
+ ]
+}

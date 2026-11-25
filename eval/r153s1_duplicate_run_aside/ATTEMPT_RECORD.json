@@ -1,0 +1,31 @@
+{
+ "record": "R153S1_DUPLICATE_RUN_ASIDE/1.0.0",
+ "session": "builder-r153s1 (the third lane of the 2026-11-25 double-burn)",
+ "at": "2026-11-25 ~08:00-08:45 UTC",
+ "what": "THIS window (the r153s1 continuation after the sandbox recycle) read the same 'Next window: tayae legs -> panel' heartbeat as a handoff and ran the qualification plan CONCURRENTLY with two sibling lanes: the r153s1 window that pushed first (296cc1e76, the CANONICAL qualification) and the r153s2 verifier window (whose aside bytes live at eval/r153s2_duplicate_run_aside/ per its own Art. 5 disclosure). 72 one-shot leg bytes were generated here, were refused at push (non-FF against 296cc1e76), and are MOVED ASIDE per Art. 29e (never rebase a duplicate; remote bytes canonical). No canonical path was ever touched by these bytes; the local commit 1d628bb06 was discarded (recoverable in reflog).",
+ "runs": {
+  "tayae (cohere/tiny-aya-earth)": {
+   "legs": 24, "valid": 24, "answered_rate": 1.0,
+   "det_acc_vs_labels": 0.833, "swap_instability": 0.417,
+   "am47_bias": {"over_novel": 1, "over_cons": 1, "imbalance": 0},
+   "would_have_qualified": true,
+   "note": "INDEPENDENT CORROBORATION of the s2 run-dependence finding: this run PASSES every bar while the canonical run (acc 0.75, bias 3) FAILS miss-bias — the third same-instrument run of the same judge/corpus/prompt, flipping the same direction as the s2 aside run. The canonical verdict governs (first pushed)."
+  },
+  "mst3b (mistralai/ministral-3b)": {
+   "legs": 24, "valid": 17, "answered_rate": 0.708,
+   "det_acc_vs_labels_on_valid": 0.667,
+   "note": "FAILS answered + acc bars, consistent with the canonical run's typed miss (answered 0.625, 9 parse-fails — invented contract shapes). No flip: a real capability miss, final, no re-roll."
+  },
+  "msm2603 (mistralai/mistral-small-2603)": {
+   "legs": 24, "valid": 24, "answered_rate": 1.0,
+   "det_acc_vs_labels": 0.917, "swap_instability": null,
+   "am47_bias": {"over_novel": 0, "over_cons": 0, "imbalance": 0},
+   "would_have_qualified": true,
+   "note": "A 4th-judge candidate that passed every bar (24/24, det 11/12) — KEPT ASIDE, not added to the serving set (instrument non-churn mid-gate: the canonical serving set {snlite, mst14b, hy4f} was locked at 296cc1e76 with alpha 0.945 before this lane finished). Available evidence if a future gate ever needs a 4th judge; NOT serving."
+  }
+ },
+ "quota_consequence": "THE DOUBLE-BURN'S MEASURABLE COST: three concurrent qualification lanes (s1-twin 48+ legs incl. mst14b, s2 aside 48 legs, this aside 72 legs) drew on the SAME xkiro account daily free-token quota. The quota was exhausted at ~08:45 UTC 2026-11-25 (HTTP 429 typed, resets 00:00 UTC) BEFORE the panel's snlite+mst14b legs could start: 0 panel legfiles for those judges (the pre-first-leg class — NOT judged misses; no RATE_LIMITED legfiles landed, the in-flight runner was killed before any leg resolved). The panel therefore awaits the 00:00 UTC reset: ~60 xkiro legs (snlite 30 + mst14b 30), byte-resume.",
+ "deleted": false,
+ "canonical_paths_touched": [],
+ "see_also": ["eval/r153s2_duplicate_run_aside/", "296cc1e76 (canonical qualification)", "03acfe417 (s2 verifier record)"]
+}
