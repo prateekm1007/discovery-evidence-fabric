@@ -2260,6 +2260,22 @@
    "status": "CLOSED",
    "resolved_by": "tip c9dd5b4d7237 surface SUCCESS (138790254975) \u2014 the stage-heartbeat CI completed green",
    "closed_round": "R153S2"
+  },
+  {
+   "id": "R154-F1",
+   "round": "R154",
+   "severity": "MEDIUM",
+   "title": "P4 panel legs incomplete (hy4f 30, snlite 11, mst14b 0) \u2014 xkiro daily quota exhausted; post-00:00-UTC byte-resume generates snlite 30 + mst14b 30 -> full 3-judge majority tally >=50% = score 8",
+   "evidence": "panel leg census; TALLY empty; resume_state serving_alpha 0.945",
+   "status": "OPEN"
+  },
+  {
+   "id": "R154-F2",
+   "round": "R154",
+   "severity": "MEDIUM",
+   "title": "TRIPLE concurrent qualification burn (twin canonical + verifier + executor lanes) exhausted the shared xkiro daily quota before panel legs \u2014 Art.29e coordination failure; the claim-before-work mutex must serialize ONE qualification run per corpus",
+   "evidence": "r153s1_duplicate_run_aside (72 dup legs); builder disclosed",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5480,6 +5496,19 @@
     "R153-F1",
     "R153-F2"
    ]
+  },
+  {
+   "id": "V120",
+   "round": "R154 audit: serving panel calibrated (3 judges alpha 0.945, mst14b verified) + panel legs quota-blocked + triple-burn finding",
+   "commit": "58b54eeff058d2f8a1a406021848cff219677e52",
+   "gate": "serving calibration MET (snlite+mst14b+hy4f, 3 families, alpha 0.945); panel legs incomplete (quota); score-8 post-reset; triple-burn Art.29e finding",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r154_auditor_adjudication.json",
+   "findings": [
+    "R154-F1",
+    "R154-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -5868,7 +5897,7 @@
    "note": "xkiro free-plan path; snlite+hy4f serving panel; 3rd qualifier post 00:00 UTC reset"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED (V119 stands; state unchanged, tip healed GREEN c9dd5b4d7237). TRANSPORT SOLVED via xkiro free plan (no owner payment): sensenova:snlite QUALIFIED (acc 1.0, bias 0), hy4f qualified (cent-ai free, r148); serving panel 2/3 (pairwise alpha 1.0). mistral:mst8b failed miss-bias 2, cohere:cmdr7b failed acc 0.75+bias 3 (final). big-pickle/tiny-aya hit the account-wide daily free-token quota (resets 00:00 UTC). v18 P4 panel: hy4f 15/30 VALID legs stand; ONE more qualifier (tayae/big-pickle/ministral-3b) post-reset completes the >=3-judge serving panel on the full 30-candidate set -> >=50% viable+non-obvious = score 8. R153-F2 (tip red) CLOSED \u2014 tip green. Critical path: post-00:00-UTC 3rd judge qualifier -> full v18 P4 panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run. F45 standing owner rotation.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. SERVING-PANEL CALIBRATION GATE MET (independent recompute): mst14b acc 0.917 miss-bias 1 QUALIFIED + snlite acc 1.0 + hy4f (r148) = 3 judges, 3 NON-GENERATOR families (sensenova/mistral/hunyuan), serving alpha 0.945, self-cert NONE. The >=3-judge >=2-family P4 prerequisite is SATISFIED. Panel legs: hy4f 30/30 VALID, snlite 11/30, mst14b 0/30 \u2014 INCOMPLETE (xkiro daily free-token quota exhausted, resets 00:00 UTC); TALLY not computed. The score-8 >=50% verdict needs the full 3-judge panel post-reset (byte-resume skips hy4f 30, generates snlite 30 + mst14b 30). TRIPLE-BURN finding (R154-F2): twin+verifier+executor lanes ran 3 concurrent qualifications off ONE daily quota, exhausting it before panel legs \u2014 Art.29e; the claim mutex must serialize ONE qualification run per corpus. msm2603 (acc 0.917) kept aside as a 4th-judge candidate (instrument non-churn). Critical path: post-00:00-UTC full v18 panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run. F45 standing owner rotation.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

@@ -1,0 +1,42 @@
+{
+ "record": "R154_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r154s1",
+ "audited_queue_tip": "739d97f0d9a7 (serving panel qualified; panel legs quota-blocked)",
+ "audit_branch_parent": "58b54eeff058d2f8a1a406021848cff219677e52",
+ "SERVING_GATE_VERIFIED": {
+  "verdict": "the serving-panel CALIBRATION gate is MET \u2014 independent recompute confirms mst14b acc 11/12=0.917, miss-bias 1 (<=1), QUALIFIED; snlite acc 1.0 (V119); hy4f r148-qualified. Serving set = snlite (sensenova) + mst14b (mistral) + hy4f (hunyuan) \u2014 3 judges, 3 NON-GENERATOR families (generator agnes), serving alpha 0.945 (>=0.6), self-certification NONE. The >=3-judge >=2-family calibration prerequisite for the P4 panel is SATISFIED.",
+  "panel_legs": "hy4f 30/30 VALID committed; snlite 11/30; mst14b 0/30 \u2014 the panel is INCOMPLETE (xkiro daily free-token quota exhausted, resets 00:00 UTC). TALLY not computed. The score-8 >=50% verdict needs the full 3-judge panel post-reset."
+ },
+ "FINDINGS": [
+  {
+   "id": "R154-F1",
+   "severity": "MEDIUM",
+   "title": "P4 panel legs incomplete (hy4f 30, snlite 11, mst14b 0) \u2014 xkiro daily quota exhausted; post-00:00-UTC byte-resume generates snlite 30 + mst14b 30 -> full 3-judge majority tally >=50% = score 8",
+   "evidence": "panel leg census; TALLY empty; resume_state serving_alpha 0.945",
+   "direction": "DIR2 \u2014 post-reset full panel, ONE run (no re-burn)"
+  },
+  {
+   "id": "R154-F2",
+   "severity": "MEDIUM",
+   "title": "TRIPLE concurrent qualification burn (twin canonical + verifier + executor lanes) exhausted the shared xkiro daily quota before panel legs \u2014 Art.29e coordination failure; the claim-before-work mutex must serialize ONE qualification run per corpus",
+   "evidence": "r153s1_duplicate_run_aside (72 dup legs); builder disclosed",
+   "direction": "DIR7 \u2014 one qualification run per corpus; the mutex prevents concurrent re-burn"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; F45 standing owner rotation",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving-panel calibration gate MET (3 judges, alpha 0.945); panel legs quota-blocked; >=50% verdict post-reset",
+  "P5": "NOT_MET \u2014 needs sealed post-cutoff corpus"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "v18 GRANTED generation strength; serving panel calibrated (3 judges alpha 0.945); score-8 >=50% panel verdict pending the post-reset full panel",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "post-00:00-UTC full v18 panel (snlite+mst14b+hy4f) >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r154_auditor_adjudication.json"
+}
