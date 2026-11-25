@@ -65,6 +65,19 @@ JUDGES = [
     {"model": "cohere/tiny-aya-earth", "family": "cohere",
      "tag": "tayae", "pace": 6, "budgets": [4000, 8000, 12000],
      "timeout_s": 240.0},
+    # the R154 fallback (the owner's DIR-2 named fallback; tayae
+    # failed the bars 2026-11-25: acc 0.75, bias 3, swap 0.5)
+    {"model": "mistralai/ministral-3b", "family": "mistral",
+     "tag": "mst3b", "pace": 6, "budgets": [4000, 8000, 12000],
+     "timeout_s": 240.0},
+    # the R154 second-wave candidates (mst3b failed the answered bar
+    # 0.625 — 9 parse-fails): the strongest free lanes left
+    {"model": "mistralai/ministral-14b", "family": "mistral",
+     "tag": "mst14b", "pace": 6, "budgets": [4000, 8000, 12000],
+     "timeout_s": 240.0},
+    {"model": "cohere/aya-expanse-32b", "family": "cohere",
+     "tag": "aya32b", "pace": 6, "budgets": [4000, 8000, 12000],
+     "timeout_s": 240.0},
 ]
 
 SYSTEM = ("You are a strict blind rubric judge. English only. "

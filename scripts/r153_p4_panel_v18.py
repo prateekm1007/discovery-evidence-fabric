@@ -114,6 +114,12 @@ XKIRO_ROSTER = {
     "tayae": {"model": "cohere/tiny-aya-earth", "family": "cohere",
               "transport": "xkiro", "pace": 6,
               "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+    "mst3b": {"model": "mistralai/ministral-3b", "family": "mistral",
+              "transport": "xkiro", "pace": 6,
+              "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+    "mst14b": {"model": "mistralai/ministral-14b", "family": "mistral",
+               "transport": "xkiro", "pace": 6,
+               "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
 }
 CENT_ROSTER = {
     "hy4f": {"model": "hy4-flash:free", "family": "hy4",
