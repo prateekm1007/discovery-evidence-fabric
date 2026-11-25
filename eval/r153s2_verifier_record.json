@@ -1,0 +1,116 @@
+{
+ "record": "R153S2_VERIFIER_RECORD/1.0.0",
+ "claim": "c-0264",
+ "work_id": "r153-xkiro-qualify-panel-v18",
+ "session": "builder-r153s2 (VERIFIER — stood down per Art. 29e)",
+ "at": "2026-11-25 (sandbox clock)",
+ "verified_tip": "296cc1e76",
+ "art13_recompute": {
+  "diff_vs_canonical_record": 0,
+  "per_judge": {
+   "mistral:mst8b": {
+    "acc": 0.833,
+    "answered": 1.0,
+    "bias": 2,
+    "swap": 0.25,
+    "qualified": false
+   },
+   "cohere:cmdr7b": {
+    "acc": 0.75,
+    "answered": 1.0,
+    "bias": 3,
+    "swap": 0.333,
+    "qualified": false
+   },
+   "sensenova:snlite": {
+    "acc": 1.0,
+    "answered": 1.0,
+    "bias": 0,
+    "swap": 0.083,
+    "qualified": true
+   },
+   "stealth:bpickl": {
+    "acc": 1.0,
+    "answered": 0.375,
+    "bias": 0,
+    "swap": 0.0,
+    "qualified": false
+   },
+   "cohere:tayae": {
+    "acc": 0.75,
+    "answered": 1.0,
+    "bias": 3,
+    "swap": 0.5,
+    "qualified": false
+   },
+   "mistral:mst3b": {
+    "acc": 0.889,
+    "answered": 0.625,
+    "bias": 1,
+    "swap": 0.222,
+    "qualified": false
+   },
+   "mistral:mst14b": {
+    "acc": 0.917,
+    "answered": 1.0,
+    "bias": 1,
+    "swap": 0.167,
+    "qualified": true
+   },
+   "cohere:aya32b": {
+    "acc": 0.0,
+    "answered": 0.0,
+    "bias": 0,
+    "swap": null,
+    "qualified": false
+   }
+  },
+  "verdict": "diff = 0 — the r153s1 record reproduces byte-for-byte: snlite + mst14b QUALIFIED, tayae/mst3b/bpickl/mst8b/cmdr7b/aya32b not (theanswered/miss-bias bars)"
+ },
+ "serving_gate_verified": {
+  "serving_set": [
+   "snlite",
+   "mst14b",
+   "hy4f"
+  ],
+  "families": [
+   "sensenova",
+   "mistral",
+   "hy4"
+  ],
+  "n_qualified": 3,
+  "alpha_recomputed": 0.945046,
+  "d_o": 0.027778,
+  "n_units": 24,
+  "pairwise": {
+   "snlite+mst14b": 0.945046,
+   "mst14b+hy4f": 0.918261,
+   "snlite+hy4f": 1.0
+  },
+  "gate_ge_0_6": true,
+  "panel_cleared": "the r153s1 next step (the v18 P4 panel, byte-resume, hy4f's 15 VALID legs standing) is UNBLOCKED on the verified bytes — the one-shot belongs to the r153s1 executor; this verifier did NOT run it (Art. 29c, no double-burn)"
+ },
+ "the_double_burn_disclosure": {
+  "what": "builder-r153s2 read the r153s1 heartbeat ('Next window: tayae legs -> panel') as a handoff and ran tayae + mst3b qualifications concurrently with the still-alive r153s1 window (both post-reset, both through the same committed instrument); r153s1 pushed first (296cc1e76)",
+  "disposition": "the s2 run's 48 leg bytes MOVED ASIDE (eval/r153s2_duplicate_run_aside/ + ATTEMPT_RECORD.json) — never committed over the canonical set, never deleted (Art. 5 disclosure; the bytes are evidence of the run-dependence finding below); no canonical path was touched",
+  "root_cause": "the heartbeat-as-handoff reading of a live lease; the push-as-mutex caught it at commit time (the s2 close REFUSED on the moved tip before any canonical collision)"
+ },
+ "the_run_dependence_finding": {
+  "what": "tayae's qualification is RUN-DEPENDENT: two same-instrument runs (same corpus digest c598682b56c9c33f, same sealed AM47 prompt, same budget ladder, one generation per leg) landed DIFFERENT verdicts — s1 canonical: acc 0.75, bias 3, swap 0.5 (FAILS the bias bar); s2 aside: acc 0.833, bias 0, swap 0.417 (would PASS all bars)",
+  "mst3b": "both runs FAILED (answered 0.625 s1 / 0.75 s2 < 0.9) — the disposition is stable here",
+  "why_it_matters": "a per-judge qualification on a non-deterministic small judge is not reproducible run-to-run; under the s2 run the serving set would have deadlocked (alpha pinned 0.561 with tayae in any set — measured with up to 6 judges incl. the paid consensus pair), under the canonical s1 run mst14b completes it at alpha 0.945",
+  "typed_for": "the auditor: consider a qualification reproducibility rule (e.g. the det-vote margin or a second-run spot-check) for small free-lane judges whose swap instability exceeds ~0.2",
+  "governing": "the CANONICAL s1 record governs (first pushed, Art. 29e); the s2 run is non-counting evidence"
+ },
+ "transport_census_2026_11_25_post_reset": {
+  "xkiro_free": "ALIVE — quota fresh; the day's lane history: snlite + mst14b qualified; tayae/mst3b failed; bpickl typed OUT (owner DELETE LIST, 0 re-run legs); aya32b never fired (mst14b qualified first)",
+  "cent_ai_free": "CHANGED this window: glm-5.3-flash:free REMOVED (HTTP 404 model_not_found — the r151s1 alive-post-reset typing is stale); deepseek-v4.1-flash:free ADDED (the fresh catalog: 50 models, free-tagged hy4-flash:free + deepseek-v4.1-flash:free)",
+  "dsv41f": "roster entry typed in r148_rcal_centai.py; the qualification was KILLED BEFORE ITS FIRST LEG LANDED — the fresh free pool was already exhausted (HTTP 429 'Today's free pool ... is used up; resets 00:00 UTC'); 0 legfiles = the tayae-yesterday class (quota died pre-first-leg = NOT a judged miss); dsv41f stays eligible post-reset",
+  "hy4f": "ALIVE (PROBE-OK, served hy4-flash:free)"
+ },
+ "raw_bytes": {
+  "aside": "eval/r153s2_duplicate_run_aside/ (48 legs + ATTEMPT_RECORD.json — the s2 duplicate run)",
+  "canonical": "eval/r153_rcal_xkiro/ at 296cc1e76 (the s1 legs + record)",
+  "this_record": "eval/r153s2_verifier_record.json"
+ }
+}

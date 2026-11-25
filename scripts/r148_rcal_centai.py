@@ -57,6 +57,18 @@ JUDGES = [
     {"model": "glm-5.3-flash:free", "family": "glm", "tag": "glm53ff",
      "transport": "cent", "pace": 6, "budgets": [4000, 8000, 12000],
      "timeout_s": 240.0},
+    # the r153s2 continuation: the cent-ai FREE TIER CHANGED this
+    # window (fresh census: glm-5.3-flash:free REMOVED — HTTP 404
+    # model_not_found on chat; deepseek-v4.1-flash:free ADDED).
+    # dsv41f = the new free lane's qualification — pre-staged for the
+    # post-reset window; its first attempt was KILLED BEFORE ITS
+    # FIRST LEG LANDED (the fresh free pool was already exhausted:
+    # HTTP 429 'Today's free pool ... is used up; resets 00:00 UTC' —
+    # the tayae-yesterday class: quota died pre-first-leg = NOT a
+    # judged miss; dsv41f stays eligible).
+    {"model": "deepseek-v4.1-flash:free", "family": "deepseek",
+     "tag": "dsv41f", "transport": "cent", "pace": 6,
+     "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
 ]
 
 SYSTEM = ("You are a strict blind rubric judge. English only. "
