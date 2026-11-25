@@ -1,0 +1,27 @@
+{
+ "record": "R159S1_PANEL_RUNBOOK/1.0.0",
+ "for": "the first window after 00:00 UTC 2026-11-26 (xkiro reset)",
+ "session_author": "builder-r159s1",
+ "at": "2026-11-25 ~17:0x UTC",
+ "the_gate_sequence": [
+  "1. VAULT CHECK FIRST: XKIRO_API_KEY must resolve from .env.keys (route_adapter resolve_vault_key). STATUS NOW: LOST in the Nov-25 recycle; HF master token EXPIRED (whoami 401) so r77_vault_restore is DEAD. The panel is KEY-BLOCKED until the owner re-delivers the xkiro vault key (in-channel delivery is the sanctioned path, CORR-3 convention).",
+  "2. QUOTA PROBE (only if the key is present): ONE 16-token completion on the vault key against a serving-set model (e.g. sensenova/sensenova-6.8-flash-lite). 200 = fire; 429 = still dead, stand down, type it, wait for the next window. NEVER trust /models 200 as quota evidence.",
+  "3. THE RUN (only on probe 200): exactly ONE unfiltered run: V18_PACKS=eval/holdout_v18_physics_generation/packs_v18.json python3 scripts/r153_p4_panel_v18.py — byte-resume skips hy4f 30 + snlite 8 VALID; fires snlite 22 (19 unwritten + 3 RATE_LIMITED) + mst14b 30 = 52 legs, ~260K tokens.",
+  "4. THE TALLY: python3 scripts/r153s1_tally_recompute.py — diff must be 0. Accept: full 3-judge two-axis majority >=50% viable+non-obvious on the 30-candidate set -> score 8.",
+  "5. DISCIPLINE: no re-qualification; no mid-gate judge swap (the V120 serving set is frozen: snlite + mst14b + hy4f, alpha 0.945); one run per corpus (Art. 29c); raw leg bytes commit WITH the tally (DIR-7 early custody)."
+ ],
+ "byte_resume_manifest": {
+  "recomputed_from": "tip f312db48e tree bytes (this window)",
+  "hy4f": "30 committed legs, all VALID — skip base",
+  "snlite": "8 VALID (skip) + 3 RATE_LIMITED (regen) + 19 unwritten = 22 to fire",
+  "mst14b": "30 to fire (none written)",
+  "total_legs": 52,
+  "token_estimate": "~260K vs the ~200K daily pool — the shortfall risk is real; a late-pool death computes the tally over votes cast with the shortfall disclosed, never papered"
+ },
+ "blockers_typed": {
+  "xkiro_key": "OWNER ACTION REQUIRED: re-deliver the xkiro vault key (lost to the recycle; the F45 rotation list makes this re-delivery routine)",
+  "hf_master": "OWNER ACTION: the HF master token (digest 33bc7af22c62) is EXPIRED (401 'expired' — verified this window); the r77 vault restore path is dead until re-delivery; this also blocks future recycle recoveries of every key",
+  "f45_list_now": "GH_PAT (live) / HF master (EXPIRED) / cent-ai (restored+verified this window, a5beece70d05) / xkiro (LOST) / llmtr (LOST) / tokenrouter (LOST)"
+ },
+ "the_accept": "3-judge two-axis majority tally >=50% viable+non-obvious on the 30-candidate set + r153s1_tally_recompute diff=0 -> SCORE 8 lands"
+}

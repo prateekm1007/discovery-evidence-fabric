@@ -1,0 +1,35 @@
+{
+ "record": "R159S1_P5_CLOSE/1.0.0",
+ "claim": "c-0264 (the P5 side; the panel lane untouched)",
+ "work_id": "r158-p5-tokenrouter-rediscovery (close-out window)",
+ "session": "builder-r159s1",
+ "at": "2026-11-25 16:5x UTC",
+ "the_verdict": {
+  "dir4_p5_first_attempt": "NOT_MET",
+  "recovery_rate": 0.2069,
+  "bar": 0.4,
+  "min_hits": 12,
+  "recovered": 6,
+  "n_items": 29,
+  "seal": "6 RECOVERED + max 1 (pc-30) = 7/30 = 23.3% < 40% — the bar is unreachable regardless of pc-30",
+  "canary_gate": "PASSED (0 hits / 29 — the contamination guard held)",
+  "t1_tier": "29/29 valid falsifiers",
+  "t2_tier": "0/29 (the deterministic resolver rejected every citation as non-supporting — strict by design)",
+  "interventions": 0,
+  "recompute_diff": 0
+ },
+ "vote_splits_partial_items": {
+  "J1=PARTIAL/J2=PARTIAL": 8,
+  "J1=PARTIAL/J2=None": 6,
+  "J1=NOT_RECOVERED/J2=PARTIAL": 5,
+  "J1=PARTIAL/J2=RECOVERED": 4
+ },
+ "pc30_state": "UNRECORDED — the tokenrouter lane 401s in this window (TOKENROUTER_API_KEY lost to the sandbox recycle; the HF master token is expired so the r77 vault restore cannot refetch it; egress OPEN, auth gate). 3 attempts, unrecorded per the runner's transient-lane-death rule. The acceptance seal is unaffected: 6 RECOVERED + max 1 from pc-30 = 7/30 = 23.3% < the 40% bar — NOT_MET either way.",
+ "next_lever_typing": {
+  "the_binding_constraint": "the GENERATOR seat, not the judges: even a perfect J2 recovery (budget fix 2500->4000) caps at ~10/30 = 33% < 40% because J1=PARTIAL dominates the split items",
+  "j2_budget_note": "hy4-flash reasoning burns the 2500-token budget (5 empty-content deaths measured) — a FUTURE run's prereg should set 4000; this run's seats are frozen (no mid-run edits)",
+  "the_lever": "a stronger G0 seat (deepseek free undershot the rediscovery bar) or a T2-aware generation prompt; NOT a judge swap",
+  "owner_act": "none for this attempt — the P5 lane is delegated (DIR 4); the next attempt needs a live tokenrouter key (re-delivery; the key was lost to the sandbox recycle and the HF vault master token is expired)"
+ },
+ "raw_bytes": "eval/r158_p5_tokenrouter_run.json + eval/r158_p5_checkpoint.json (unchanged, the run's own bytes)"
+}
