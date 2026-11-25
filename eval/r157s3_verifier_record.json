@@ -1,0 +1,71 @@
+{
+ "record": "R157S3_VERIFIER_RECORD/1.0.0",
+ "claim": "c-0264",
+ "work_id": "r153-xkiro-qualify-panel-v18",
+ "session": "builder-r153s3",
+ "role": "VERIFIER (Art. 29c: recompute from bytes, never re-generate)",
+ "at": "2026-11-25 10:47 UTC",
+ "verifies": "eval/r156s1_quota_custody.json @ c0222d021 (the concurrent EXECUTOR custody for this window)",
+ "the_quota_probe": {
+  "method": "ONE minimal xkiro chat completion (mistralai/ministral-3b, max_tokens 16) via the engine xkiro_chat on the VAULT key f6c09bee9bde (digests-only custody; the directions' sk-xt-c3643f key is 401-dead per R155 and never used)",
+  "result": "RouteRefused [rate_limited] xkiro: HTTP 429: \"You've reached today's free-model token quota. Your plan's paid allowance is separate — switch to a paid model to keep going, or wait for...\"",
+  "probe_time": "2026-11-25 ~10:56 UTC (this window, independent of the r156s1 probe at 10:36)",
+  "the_models_200_distinction": "the /models endpoint returns 200 UNGATED — listing is NOT quota evidence; the completion endpoint is the gated surface (this window's earlier models-200 probe does not contradict the 429)",
+  "verdict": "VERIFIED — the daily free-token pool is dead until 00:00 UTC 2026-11-26; the panel cannot run this window (the typed refusal stands)"
+ },
+ "the_leg_census_recompute": {
+  "source": "committed leg bytes eval/r148_p4_panel_v18/ @ c0222d021",
+  "hy4f": {
+   "legs": 30,
+   "outcomes": {
+    "VALID": 30
+   }
+  },
+  "snlite": {
+   "legs": 11,
+   "outcomes": {
+    "VALID": 8,
+    "RATE_LIMITED": 3
+   }
+  },
+  "mst14b": {
+   "legs": 0,
+   "outcomes": {}
+  },
+  "verdict": "VERIFIED — matches the r156s1 custody and the resume state (hy4f 30/30 VALID; snlite 11 = 8 VALID + 3 RATE_LIMITED; mst14b 0)"
+ },
+ "the_serving_alpha_recompute": {
+  "method": "the panel runner's own _serving_alpha over the committed rcal leg bytes (zero LLM calls)",
+  "tags": [
+   "snlite",
+   "mst14b",
+   "hy4f"
+  ],
+  "alpha": 0.945046,
+  "n_units": 24,
+  "gate": "PASS (>=3 judges, >=2 non-generator families, alpha >= 0.6; 3 families: mistral/sensenova/hy4)",
+  "verdict": "VERIFIED — 0.945046, the V120 frozen serving set intact"
+ },
+ "dir6_rerun": {
+  "physics_battery": "73 passed (checks + magnitudes + r54 + guards) — re-run locally this window; pint installed to match the CI surface",
+  "v18_row_regression": "20 passed (tests/test_f80_onrow_physics.py) — re-run locally",
+  "import_graph": "scripts/r149_v18_physics_one_shot.py:56 -> from discovery_fabric.generation import physics_truth as pt  # noqa: E402 (confirmed unchanged)",
+  "verdict": "VERIFIED — 93/93, the validated v18 instrument intact (DIR 6)"
+ },
+ "the_rate_limited_correction": {
+  "the_r153s2_claim": "RATE_LIMITED panel legs are FINAL under the no-re-roll rule",
+  "the_code": "scripts/r153_p4_panel_v18.py:358 — only outcome == 'VALID' legs skip (the R146 fix); RATE_LIMITED legs RETRY on the next run",
+  "verdict": "VERIFIED — the r156s1 correction is right (re-read against the runner bytes this window); the legs are recoverable, not final; the refusal itself still stands on the wasted-window rationale"
+ },
+ "the_arithmetic_correction": {
+  "to": "the 'snlite 19' figure (the directions, the resume state, and the r156s1 custody)",
+  "truth": "the byte-resume generates 22 snlite legs (19 unwritten + 3 RATE_LIMITED retries that carry NO parsed judgment — no re-roll of any vote) + 30 mst14b = 52 legs, ~260K tokens at the budget ladder vs the ~200K daily pool estimate",
+  "consequence": "the next executor probes FIRST; if the pool dies late, the tally computes over votes cast and the shortfall is disclosed, never papered"
+ },
+ "the_resume": {
+  "when": "the first window after 00:00 UTC 2026-11-26",
+  "how": "probe the completion endpoint (NOT /models); then ONE unfiltered scripts/r153_p4_panel_v18.py run (byte-resume: skips hy4f 30 + snlite 8 VALID; generates snlite 22 + mst14b 30); NO re-qualification (the serving set is frozen at V120)",
+  "then": "the 3-judge two-axis majority tally on the FULL 30-candidate set; scripts/r153s1_tally_recompute.py diff=0; the >=50% viable+non-obvious bar -> the score-8 gate"
+ },
+ "raw_bytes": "eval/r157s3_verifier_record.json (this file); the deterministic recomputes re-executed by scripts/r157s3_verifier_record.py at write time"
+}
