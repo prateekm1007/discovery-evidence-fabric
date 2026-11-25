@@ -1,0 +1,38 @@
+{
+ "record": "R155_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r155s1",
+ "audited_queue_tip": "739d97f0d9a7 (unchanged since V120; builder sandbox DOWN this window)",
+ "audit_branch_parent": "76838168693d9e047fb08e78239931aaf285881a",
+ "STATE_VERIFIED": {
+  "serving_gate": "MET (V120): snlite 1.0 + mst14b 0.917 + hy4f, 3 non-generator families, alpha 0.945 \u2014 frozen, no re-qualification",
+  "panel_legs": "hy4f 30/30, snlite 11/30, mst14b 0/30 \u2014 UNCHANGED (the builder sandbox is down; the nohup panel process did not survive the recycle)",
+  "quota_reset": "the xkiro daily free-quota reset (00:00 UTC) HAS PASSED (queue commits dated 2026-11-25T09:45Z; now past reset) \u2014 the panel CAN resume on the vault xkiro free-plan key",
+  "xkiro_key_custody": "the DIRECTIONS' xkiro key sk-xt-c3643f... is 401 INVALID/DISABLED (probed); the WORKING free-plan key is the DIFFERENT one in the session vault (the builder restored it). Use the VAULT key, not the directions' dead key.",
+  "transport": "cent-ai hy4-flash:free ALIVE (hy4f lane); xkiro free-plan (vault key) post-reset alive"
+ },
+ "VERDICT": "V120 stands (score 7 consolidated; serving panel calibrated). The score-8 panel verdict is PENDING only on the builder resuming the panel run (sandbox down this window). The quota reset has passed; the vault xkiro key works. NO owner payment needed. The builder resumes: byte-resume the panel (skips hy4f 30 + snlite 11), generates snlite 19 + mst14b 30, computes the 3-judge two-axis majority tally >=50% = score 8.",
+ "FINDINGS": [
+  {
+   "id": "R155-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel verdict pending the builder resume (sandbox down); quota reset passed, vault xkiro key alive \u2014 byte-resume completes snlite 19 + mst14b 30 legs -> 3-judge tally >=50%",
+   "evidence": "panel legs unchanged; queue commits 09:45Z past 00:00 reset; xkiro directions-key 401, vault key free-plan",
+   "direction": "DIR2 \u2014 resume the panel post-reset (vault key), one run"
+  },
+  {
+   "id": "R155-F2",
+   "severity": "LOW",
+   "title": "the directions' xkiro key (sk-xt-c3643f) is 401-dead; the working free-plan key is the different vault key \u2014 custody note: use the vault key",
+   "evidence": "xkiro probe 401 on directions key",
+   "direction": "DIR1 \u2014 vault key custody (the directions' xkiro value is stale)"
+  }
+ ],
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120 stands; serving panel calibrated; score-8 panel verdict pending builder resume (quota reset passed)",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "builder resumes panel (vault xkiro key, post-reset) -> 3-judge tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 rediscovery + unattended (9)"
+ },
+ "recompute_pointer": "eval/r155_auditor_adjudication.json"
+}
