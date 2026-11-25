@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""r153s2_quota_block.py — the DIR-2 panel QUOTA-BLOCK record +
+the DIR-5 red-sha forward-only registration (builder-r153s2, claim
+c-0264 continuation, EXECUTOR for the panel stage).
+
+Everything typed from this window's probes and the committed bytes;
+no inference results asserted beyond the probes themselves.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+
+
+def panel_state() -> dict:
+    d = REPO / "eval" / "r148_p4_panel_v18"
+    per = {}
+    for tag in ("snlite", "mst14b", "hy4f"):
+        valid = 0
+        for lf in d.glob(f"{tag}__*.json"):
+            try:
+                r = json.loads(lf.read_text())
+            except Exception:
+                continue
+            if r.get("outcome") == "VALID":
+                valid += 1
+        per[tag] = valid
+    return per
+
+
+def main() -> int:
+    per = panel_state()
+    rec = {
+        "record": "R153S2_PANEL_QUOTA_BLOCK/1.0.0",
+        "claim": "c-0264",
+        "work_id": "r153-xkiro-qualify-panel-v18",
+        "session": "builder-r153s2 (EXECUTOR continuation for the "
+                   "panel stage — the owner's DIR-2 locked order "
+                   "assigns the panel fire to this window)",
+        "at": "2026-11-25 ~09:20-09:45 UTC",
+        "the_block": {
+            "what": ("the xkiro FREE-plan DAILY token quota is "
+                     "EXHAUSTED again — probe at ~09:20 UTC: HTTP 429 "
+                     "'You've reached today's free-model token quota. "
+                     "Your plan's paid allowance is separate — switch "
+                     "to a paid model to keep going, or wait for "
+                     "[reset]' (account-wide, all free lanes)"),
+            "causal_chain": ("the 00:00 UTC reset's quota was consumed "
+                             "BEFORE the panel could fire by this "
+                             "morning's DOUBLE-BURNED qualification "
+                             "runs: the r153s1 window (tayae 24 + "
+                             "mst3b 24 + mst14b 24 = 72 legs) and the "
+                             "r153s2 window (tayae 24 + mst3b 24 = 48 "
+                             "legs) ran the SAME next-window plan "
+                             "concurrently — the push-as-mutex caught "
+                             "the duplicate at commit time, but the "
+                             "TOKENS were already spent"),
+            "the_typed_refusal": ("the FULL panel was NOT fired: with "
+                                  "the xkiro lanes dead, snlite's and "
+                                  "mst14b's panel legs would land "
+                                  "RATE_LIMITED = FINAL under the "
+                                  "no-re-roll rule (byte-resume skips "
+                                  "any existing legfile), permanently "
+                                  "wounding the serving panel (Art. 3 "
+                                  "— no irreversible action on "
+                                  "unresolved evidence)"),
+        },
+        "the_safe_partial": {
+            "what": ("the panel fired NARROWED to hy4f only "
+                     "(R153_PANEL_JUDGES=hy4f — the driver's committed "
+                     "narrowing): the cent-ai free lane is ALIVE "
+                     "(PROBE-OK) and byte-resume skips hy4f's 15 VALID "
+                     "legs, generating ONLY its 15 missing legs"),
+            "panel_valid_legs_after": per,
+            "full_set_when_complete": ("30 legs x 3 judges = 90; "
+                                       "hy4f 30/30 after this run; "
+                                       "snlite 30 + mst14b 30 fresh "
+                                       "post-reset"),
+        },
+        "post_reset_plan": ("next window (after 00:00 UTC 2026-11-26): "
+                            "probe the xkiro quota; fire the FULL "
+                            "panel WITHOUT R153_PANEL_JUDGES "
+                            "(byte-resume: hy4f's 30 VALID legs skip, "
+                            "snlite + mst14b generate 60 legs); tally "
+                            "+ scripts/r153s1_tally_recompute.py "
+                            "diff=0; the >=50% viable+non-obvious bar "
+                            "on the FULL 30 -> score-8 evidence. The "
+                            "serving gate is ALREADY OPEN and "
+                            "verified (alpha 0.945, 3 judges, 3 "
+                            "families — eval/r153s2_verifier_record.json)"),
+        "dir5_red_sha_registration": {
+            "the_red_sha": ("ae3241308 (R153S2 verifier record, first "
+                            "push): surface CI FAILURE — the trailer "
+                            "block was glued to the body paragraph "
+                            "(no separating blank line), "
+                            "%(trailers) parsed nothing"),
+            "the_heal": ("03acfe417 (the current tip, surface "
+                         "success): a MESSAGE-ONLY amend of my OWN "
+                         "commit inserting the separating blank line "
+                         "— F42-class history rewrite of one own "
+                         "commit, disclosed forward-only in the "
+                         "commit message itself; the tree is "
+                         "byte-identical"),
+            "the_sha_correction": ("the auditor's R153-F2 references "
+                                   "'c9dd5b4d7397' — no such commit "
+                                   "exists (rev-parse fails); the real "
+                                   "red sha is ae3241308; the real "
+                                   "c9dd5b4d7 (c9dd5b4d72373a34...) has "
+                                   "surface=success"),
+            "tip_state": ("03acfe417 surface=completed success; "
+                          "trailers parse (Session/Work-Id/Claim)"),
+        },
+        "raw_bytes": ("eval/r148_p4_panel_v18/hy4f__*.json (the 15 "
+                      "newly landed legs ride this commit)"),
+    }
+    out = REPO / "eval" / "r153s2_panel_quota_block.json"
+    out.write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+    print("written:", out)
+    print("panel VALID legs:", json.dumps(per))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
