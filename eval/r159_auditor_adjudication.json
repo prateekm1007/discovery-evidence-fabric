@@ -1,0 +1,46 @@
+{
+ "record": "R159_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r159s1",
+ "audited_queue_tip": "65b9f1de57d3 (P5 close-out + trailer heal; tip green)",
+ "audit_branch_parent": "818e0b518b230861ec342c3531dc200a7750309b",
+ "P5_FIRST_ATTEMPT_VERIFIED": {
+  "verdict": "NOT_MET \u2014 verified from bytes (r159s1_p5_close.json): recovery 6/29=20.7% vs >=40% bar (min 12 hits); sealed (6+max1 pc-30=7/30=23.3%<40%). Canary gate PASSED (0/29), T1 29/29 valid falsifiers, T2 0/29 (deterministic resolver rejected every citation), 0 interventions, recompute diff=0. The binding constraint is the GENERATOR seat (undershot the rediscovery), not the judges; even fixing J2's token budget caps ~33%.",
+  "auditor_note": "T2 0/29 is a flag: the deterministic citation resolver rejected EVERY citation \u2014 verify it is not a false-negative-everything miscalibration (the SPECTER2-gate class) before concluding the generator alone undershot. The P5 score-9 path needs a stronger rediscovery generator AND a T2-resolver calibration check."
+ },
+ "SCORE8_PANEL_BLOCKER": {
+  "verdict": "the score-8 panel is now KEY-BLOCKED past the quota reset: the vault lost XKIRO_API_KEY (the working free-plan key, snlite/mst14b transport) in the recycle, and the HF master token is EXPIRED (whoami 401) so the r77 vault-restore path is DEAD. The directions' xkiro key sk-xt-c3643f is 401-dead. The quota reset (00:00 UTC Nov 26) alone does NOT unblock the panel \u2014 the owner must RE-DELIVER the working xkiro free-plan key (and a valid HF master token for future recycle recovery).",
+  "hf_token_probe": "probe-timeout"
+ },
+ "FINDINGS": [
+  {
+   "id": "R159-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel key-blocked: working xkiro free-plan key lost in recycle + HF master token EXPIRED (vault restore dead); owner must re-deliver the xkiro key + a valid HF token; quota reset alone insufficient",
+   "evidence": "r159s1_panel_runbook; HF whoami 401; directions xkiro key 401",
+   "direction": "DIR2 \u2014 owner re-deliver xkiro key + HF token; then post-reset panel"
+  },
+  {
+   "id": "R159-F2",
+   "severity": "MEDIUM",
+   "title": "P5 first attempt NOT_MET (20.7% recovery, generator undershot); T2 resolver 0/29 needs a calibration check (false-negative-everything risk); score-9 needs a stronger rediscovery generator",
+   "evidence": "r159s1_p5_close 6/29, T2 0/29",
+   "direction": "DIR4 \u2014 stronger P5 generator + T2 resolver calibration check; fresh sealed re-run"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; F45 standing owner rotation; HF master token EXPIRED (recovery path dead)",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (V120 alpha 0.945); panel KEY-BLOCKED (xkiro key lost + HF expired) past the Nov 26 00:00 quota reset",
+  "P5": "FIRST ATTEMPT NOT_MET (20.7% recovery, generator undershot, T2 0/29); score-9 needs stronger generator"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120/V122 stand; P5 first attempt NOT_MET (capability gap, not a score drop \u2014 score-9 was never met); score-8 panel key-blocked (owner re-deliver xkiro+HF)",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "owner re-deliver xkiro key + HF token -> Nov 26 00:00 reset -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> stronger P5 generator + T2 check -> P5 >=40% + unattended (9)"
+ },
+ "recompute_pointer": "eval/r159_auditor_adjudication.json"
+}

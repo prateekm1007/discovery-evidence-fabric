@@ -2308,6 +2308,22 @@
    "title": "llmtr judge path doubly blocked (sandbox selective egress firewall + site outage); auxiliary only, needs r148 R-CAL if it returns; key history-exposed (F45)",
    "evidence": "llmtr TCP443 timeout + site dark; custody digest 999c1f0560a9",
    "status": "OPEN"
+  },
+  {
+   "id": "R159-F1",
+   "round": "R159",
+   "severity": "MEDIUM",
+   "title": "score-8 panel key-blocked: working xkiro free-plan key lost in recycle + HF master token EXPIRED (vault restore dead); owner must re-deliver the xkiro key + a valid HF token; quota reset alone insufficient",
+   "evidence": "r159s1_panel_runbook; HF whoami 401; directions xkiro key 401",
+   "status": "OPEN"
+  },
+  {
+   "id": "R159-F2",
+   "round": "R159",
+   "severity": "MEDIUM",
+   "title": "P5 first attempt NOT_MET (20.7% recovery, generator undershot); T2 resolver 0/29 needs a calibration check (false-negative-everything risk); score-9 needs a stronger rediscovery generator",
+   "evidence": "r159s1_p5_close 6/29, T2 0/29",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5570,6 +5586,19 @@
    "corrections": [
     "CORR-R156-1"
    ]
+  },
+  {
+   "id": "V123",
+   "round": "R159 audit: P5 first attempt NOT_MET (20.7%, generator undershot, T2 0/29) + score-8 panel key-blocked (xkiro lost, HF expired)",
+   "commit": "818e0b518b230861ec342c3531dc200a7750309b",
+   "gate": "P5 NOT_MET verified (6/29, canary 0, T1 29/29, T2 0/29, diff=0); score-8 panel key-blocked (owner re-deliver xkiro+HF); score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r159_auditor_adjudication.json",
+   "findings": [
+    "R159-F1",
+    "R159-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -5956,9 +5985,21 @@
     "tiny-aya"
    ],
    "note": "xkiro free-plan path; snlite+hy4f serving panel; 3rd qualifier post 00:00 UTC reset"
+  },
+  "p5_tokenrouter_r158": {
+   "status": "BURNED_NOT_MET",
+   "n": 29,
+   "recovered": 6,
+   "recovery_rate": 0.2069,
+   "bar": 0.4,
+   "canary_hits": 0,
+   "t1": "29/29",
+   "t2": "0/29",
+   "interventions": 0,
+   "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED (V120 stands). CORRECTION (Art.9): V121's 'xkiro quota reset passed' was WRONG \u2014 the quota was BURNED Nov 25 (triple-burn qualification), resets 00:00 UTC Nov 26 (r153s3 verifier two-probe confirmed DEAD). At ~11:13 UTC Nov 25 the reset is ~13h out; the panel is STILL gated, NOT resumable now. Serving panel CALIBRATED + FROZEN (snlite 1.0 + mst14b 0.917 + hy4f, 3 non-generator families, alpha 0.945). Panel legs hy4f 30, snlite 11, mst14b 0. The score-8 panel resume (byte-resume snlite 19 + mst14b 30, ~52 legs ~260K tokens) fires AFTER 00:00 UTC Nov 26 -> 3-judge two-axis majority tally >=50% = score 8 -> auditor sealed v18 >=3.3 (consolidate 6/7). LLMTR side-lane (owner ask): custodied (digest 999c1f0560a9, history-exposed F45) + instrumented (r156s1_llmtr_scan.py) but DOUBLY BLOCKED (sandbox selective egress firewall llmtr.com TCP443 + site outage); 0 requests/0 tokens; AUXILIARY only (4th-judge candidate/P5 retrieval/transport backup, needs r148 R-CAL), NOT the score-8 path; serving set frozen no mid-gate swap. F45 rotation list: GH_PAT/HF/cent-ai/xkiro/llmtr. Critical path: Nov 26 00:00 reset -> panel >=50% (8) -> sealed v18 >=3.3 -> P5 rediscovery + unattended (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED (V120/V122 stand). P5 FIRST ATTEMPT NOT_MET (verified): recovery 6/29=20.7% vs >=40% (sealed max 7/30=23.3%); canary PASSED 0/29, T1 29/29, T2 0/29 (deterministic resolver rejected every citation \u2014 calibration check needed, false-negative-everything risk), 0 interventions, diff=0. Binding constraint = the GENERATOR seat undershot the rediscovery (not the judges); score-9 needs a stronger P5 generator + T2 resolver check. SCORE-8 PANEL KEY-BLOCKED past the quota reset: the vault lost the working XKIRO free-plan key (snlite/mst14b transport) in the recycle, and the HF master token is EXPIRED (whoami 401) so the r77 vault-restore is DEAD; the directions' xkiro key sk-xt-c3643f is 401-dead. The Nov 26 00:00 quota reset alone does NOT unblock \u2014 OWNER must RE-DELIVER the working xkiro free-plan key + a valid HF master token. Serving panel calibrated+frozen (snlite+mst14b+hy4f alpha 0.945); hy4f 30 legs committed; 52-leg runbook ready. DIR1 verified, tip green (65b9f1de5), DIR6 93/93. F45 rotation list: GH_PAT/HF/cent-ai/xkiro/llmtr/tokenrouter. Critical path: owner re-deliver xkiro+HF -> Nov 26 reset -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> stronger P5 generator + T2 check -> P5 >=40% + unattended (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
