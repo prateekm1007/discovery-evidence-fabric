@@ -2442,6 +2442,14 @@
    "title": "post-reset execution: panel cron (00:05) fires the 35-leg byte-resume -> tally >=50% = score 8; P5 v2 counting cron (01:30) fires on hy4 recovery (still 503) -> >=40% = score-9 path; verify both fired (run_count) post-reset",
    "evidence": "cron 550235/550250 active run_count 0; hy4 503; xkiro quota reset Nov 27 00:00",
    "status": "OPEN"
+  },
+  {
+   "id": "R167-F1",
+   "round": "R167",
+   "severity": "LOW",
+   "title": "recurring vault-recycle friction: TOKENROUTER_API_KEY is NOT vault-managed (and the HF master is inherently directions-delivered), so every recycle needs manual re-patching of those two while r77 restores the other 8 \u2014 vault-manage TOKENROUTER to make recycle recovery one-command",
+   "evidence": "builder re-patched TOKENROUTER (c148574f6215) + HF (0af8db243dee) from directions after r77 restored 8",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5830,6 +5838,18 @@
     "R165-F1",
     "R165-F3"
    ]
+  },
+  {
+   "id": "V131",
+   "round": "R167 consistency: state holds pre-reset (V130 stands); vault-recycle friction (vault-manage TOKENROUTER)",
+   "commit": "ea2484d4439922e1c4f272b5f41370abf6eb8c40",
+   "gate": "state unchanged (loop armed, crons platform-side, hy4 503); vault-manage TOKENROUTER recommendation; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r167_auditor_adjudication.json",
+   "findings": [
+    "R167-F1"
+   ]
   }
  ],
  "gold_set": {
@@ -6230,7 +6250,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. CRON DURABILITY CONFIRMED (V129 R165-F1 closed): the scheduled jobs live PLATFORM-SIDE (cronjob-gateway), survived the recycle \u2014 job 550235 (panel byte-resume Nov 27 00:05 UTC c-0268) + job 550250 (P5 v2 counting run 01:30 UTC c-0269), active run_count 0; the unattended end-to-end loop is DURABLE (in-repo resume state fallback). RED TIP HEALED (R165-F3 closed): the builder's Art.29(a) miss (session builder-r165s1 unregistered) + takes_over prose + work_id suffix healed forward-only; Art.29 9/9, tip ebd966f6a CI success. REMAINING: P5 v2 J2 hy4-flash:free 503-upstream ~6h (auditor probe confirms); the 01:30 counting cron two-seat-gate fires on hy4 recovery (G0 tokenrouter alive); panel (00:05) quota-gated only (xkiro auth-valid, resets Nov 27 00:00). Critical path: Nov 27 reset -> panel cron 35-leg byte-resume -> tally >=50% (8) + auditor sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron on hy4 recovery -> counting >=40% (9). Verify both crons fired (run_count) post-reset. Goal 9/10 fully agent-run. Owner acts: none confirmed-blocking.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED (V130 stands; pre-reset holding window). Queue tip ebd966f6a unchanged, CI success; both platform-side crons armed (550235 panel Nov 27 00:05 c-0268, 550250 P5 v2 01:30 c-0269, run_count 0); hy4-flash:free 503 ~6.2h (auditor confirms). Builder's correct pre-reset pass: vault re-restored after recycle (r77 restored 8 keys; TOKENROUTER c148574f6215 + HF 0af8db243dee re-patched from directions), crons re-verified, hy4 monitored. RECURRING FRICTION (R167-F1): TOKENROUTER not vault-managed + HF master inherently directions-delivered -> manual re-patch every recycle; RECOMMEND add TOKENROUTER_API_KEY to prateekm1/operator-keys-vault so r77 restores it (HF master stays directions-delivered \u2014 it unlocks the vault). Critical path: Nov 27 00:00 reset -> panel cron 35-leg byte-resume -> tally >=50% (8) + auditor sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron on hy4 recovery -> counting >=40% (9). Next window first act: verify both crons fired (run_count) + tallies diff=0. Goal 9/10 fully agent-run. Owner acts: none confirmed-blocking.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

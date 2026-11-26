@@ -1,0 +1,32 @@
+{
+ "record": "R167_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r167s1",
+ "audited_queue_tip": "ebd966f6a57a (unchanged; pre-reset holding window; tip green)",
+ "audit_branch_parent": "ea2484d4439922e1c4f272b5f41370abf6eb8c40",
+ "STATE_HOLDS": "V130 stands \u2014 queue tip ebd966f6a unchanged, CI success; both platform-side crons armed (550235 panel Nov 27 00:05 c-0268, 550250 P5 v2 01:30 c-0269, run_count 0 pre-fire); hy4-flash:free still 503-upstream (~6.2h, auditor probe confirms). The builder's window was a correct pre-reset holding pass: vault re-restored after the recycle, crons re-verified, hy4 monitored. No new measurement; no score change.",
+ "FINDINGS": [
+  {
+   "id": "R167-F1",
+   "severity": "LOW",
+   "title": "recurring vault-recycle friction: TOKENROUTER_API_KEY is NOT vault-managed (and the HF master is inherently directions-delivered), so every recycle needs manual re-patching of those two while r77 restores the other 8 \u2014 vault-manage TOKENROUTER to make recycle recovery one-command",
+   "evidence": "builder re-patched TOKENROUTER (c148574f6215) + HF (0af8db243dee) from directions after r77 restored 8",
+   "direction": "DIR1/8 \u2014 add TOKENROUTER_API_KEY to prateekm1/operator-keys-vault so r77_vault_restore restores it; HF master stays directions-delivered (it unlocks the vault, cannot be inside it)"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; vault-restore alive (8 keys); TOKENROUTER/HF re-patched per recycle",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel cron armed (00:05); >=50% on firing",
+  "P5": "v2 design validated; counting cron armed (01:30) pending hy4 recovery (503)"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V130 stands; state holds pre-reset; loop armed + durable; vault-recycle friction noted (vault-manage TOKENROUTER)",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "Nov 27 00:00 reset -> panel cron tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron on hy4 recovery >=40% (9)"
+ },
+ "recompute_pointer": "eval/r167_auditor_adjudication.json"
+}
