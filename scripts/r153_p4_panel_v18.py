@@ -125,6 +125,17 @@ XKIRO_ROSTER = {
     "mst14b": {"model": "mistralai/ministral-14b", "family": "mistral",
                "transport": "xkiro", "pace": 6,
                "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+    # AM51 (V132): the mst14b-delisting substitution candidate —
+    # cohere/aya-expanse-32b, the FIRST UNSPENT in-roster calibration
+    # candidate (legs=0 in eval/r153_rcal_xkiro; tiny-aya's shot is
+    # spent+failed: acc 0.75, bias 3 — no re-roll per Art. 7).
+    # INERT until QUALIFICATION.json's qualified_tags carries aya32b
+    # (the AM51 seal writes it only on a passed substitution:
+    # acc>=0.8, answered>=0.9, bias<=1, serving alpha>=0.6) — the
+    # runner's own gate stays the enforcer.
+    "aya32b": {"model": "cohere/aya-expanse-32b", "family": "cohere",
+               "transport": "xkiro", "pace": 6,
+               "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
 }
 CENT_ROSTER = {
     "hy4f": {"model": "hy4-flash:free", "family": "hy4",

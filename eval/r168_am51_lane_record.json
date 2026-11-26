@@ -1,0 +1,22 @@
+{
+ "record": "R168S1_AM51_LANE_RECORD/1.0.0",
+ "session": "builder-r168s1",
+ "claim": "c-0270",
+ "at": "2026-11-26T18:15:00Z",
+ "the_am51_candidate_resolution": {
+   "tiny_aya_ineligible": "tayae's qualification is SPENT (24 legs 2026-11-25: acc 0.75 < 0.8, AM47 bias 3 > 1, swap 0.5) — AM51's parenthetical 'first qualification, not a re-roll' was factually wrong about tiny-aya's history; re-rolling a failed candidate violates Art. 7 one-shot and AM51's own integrity clause ('not tuning for a desired verdict')",
+   "msm2603_unavailable": "tokenrouter 403 paid — needs owner funding (kept-aside acc 0.917)",
+   "aya32b_selected": "cohere/aya-expanse-32b — the FIRST UNSPENT in-roster candidate (legs=0 in eval/r153_rcal_xkiro; the R154 second wave named it 'the strongest free lanes left'); catalog-verified present 18:05Z (the completion probe 429s = the pool is dead until 00:00, NOT a 404 delisting — the pool-wait stage handles it)",
+   "free_pool_exhaustion_note": "if aya32b fails the bars the xkiro free pool has NO unspent judge candidates left (bpickl answered 0.375, mst8b bias 2, mst3b answered 0.625, cmdr7b/tayae acc 0.75) — the msm2603 owner-funding fallback is then the only path"
+ },
+ "the_wrapper": {
+   "script": "scripts/r168_am51_substitution_panel.py",
+   "stages": "pool-wait (snlite probe, RouteRefused-typed: auth -> vault re-restore hint; rate_limited -> wait; 12x300s max) -> qualify (R153_JUDGE=aya32b via the UNMODIFIED instrument, 24 legs, byte-resume) -> bars (THE ENGINE'S OWN rcal_qualification + am47_bias — dry-checked byte-faithful: reproduces snlite's recorded acc 1.0 / answered 1.0 / bias 0/0) + the serving alpha recomputed from snlite+aya32b+hy4f leg bytes (the panel runner's own computation) -> on PASS seal (QUALIFICATION.json mst14b->aya32b forward-only + SUBSTITUTION_SEALED.json) -> panel (the UNMODIFIED runner; its own gate enforces >=3 judges/>=2 families/alpha>=0.6 on the amended set) -> tally recompute (diff=0 expected)",
+   "markers": "eval/r168_am51_seal/.stage_*.done — byte-resumable across interruptions",
+   "on_fail": "TYPED EXIT, no seal, no panel firing; the fired window commits the evidence + the typed hold"
+ },
+ "the_roster_entry": "aya32b added to scripts/r153_p4_panel_v18.py XKIRO_ROSTER — INERT until QUALIFICATION.json's qualified_tags carries aya32b (the AM51 seal writes it only on a passed substitution); the runner's gate stays the enforcer",
+ "the_cron": "job 550235 (the dead-mst14b payload) DELETED; job 550745 created: am51-substitution-panel-c0270, one_time 2026-11-27 08:05:00 Asia/Shanghai = 00:05 UTC Nov 27 (the same fire time), priority 10; the payload runs the wrapper + the commit + the tip verification; job 550250 (P5 v2 seat-gated, 01:30 UTC) unchanged",
+ "registry": "session builder-r168s1 registered (Art. 29(a) BEFORE push); claim c-0270 filed (kind measurement, work_id r153-xkiro-qualify-panel-v18, takes_over c-0268, lease to 2026-11-27T12:00Z); c-0268 -> TAKEN_OVER (its 'no qualifications' direct-panel plan is superseded by AM51, which REQUIRES the qualification first)",
+ "instrument_integrity": "the v18 candidate set FROZEN; the qualification + panel runners UNMODIFIED (only the inert roster entry + the record amendment by the sealed wrapper); the snlite 12000-budget fix intact; no seat swaps; no re-rolls"
+}

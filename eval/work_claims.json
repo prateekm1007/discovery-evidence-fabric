@@ -6411,7 +6411,7 @@
    "claim_id": "c-0268",
    "work_id": "r153-xkiro-qualify-panel-v18",
    "role": "EXECUTOR",
-   "status": "OPEN",
+   "status": "TAKEN_OVER",
    "kind": "measurement",
    "session_id": "builder-r165s1",
    "claimed_at": "2026-11-26T13:45:00Z",
@@ -6425,7 +6425,7 @@
     "eval/r149_v18_panel/packs_sealed_set.json",
     "eval/r153s1_panel_resume_state.json"
    ],
-   "note": "FRESH claim (claim-before-work, DIR 7): the ONE post-reset xkiro run = the panel byte-resume (5 snlite + 30 mst14b; hy4f 30/30 + snlite 25/30 stand, byte-resume skips them). The fresh daily free pool belongs to THIS run first — no qualifications, no seal builds, no concurrent xkiro lanes before it completes (the c-0265 disclosure: the 2026-11-25 double-burn was three concurrent lanes sharing the pool). The xkiro vault key f6c09bee9bde AUTH-VALID on api.xkiro.com (429 quota 13:41Z, not 401 — the .ai-TLD probe error corrected per V128). Accept: the full 3-judge two-axis majority tally >=50% viable+non-obvious on the 30 candidates + r153s1_tally_recompute.py diff=0 -> score-8 evidence. TAKES-OVER CONTEXT (moved out of the schema field per the Art. 29 CI schema, forward-only): c-0265's lease dies 2026-11-26T20:00Z, before the reset; the prior takes_over value was prose — this window's schema fix."
+   "note": "FRESH claim (claim-before-work, DIR 7): the ONE post-reset xkiro run = the panel byte-resume (5 snlite + 30 mst14b; hy4f 30/30 + snlite 25/30 stand, byte-resume skips them). The fresh daily free pool belongs to THIS run first — no qualifications, no seal builds, no concurrent xkiro lanes before it completes (the c-0265 disclosure: the 2026-11-25 double-burn was three concurrent lanes sharing the pool). The xkiro vault key f6c09bee9bde AUTH-VALID on api.xkiro.com (429 quota 13:41Z, not 401 — the .ai-TLD probe error corrected per V128). Accept: the full 3-judge two-axis majority tally >=50% viable+non-obvious on the 30 candidates + r153s1_tally_recompute.py diff=0 -> score-8 evidence. TAKES-OVER CONTEXT (moved out of the schema field per the Art. 29 CI schema, forward-only): c-0265's lease dies 2026-11-26T20:00Z, before the reset; the prior takes_over value was prose — this window's schema fix.STATUS TRANSITION (forward-only, AM51): the direct-panel firing plan ('no qualifications; 5 snlite + 30 mst14b') is superseded — mst14b is DELISTED provider-side (xkiro catalog has no mistral family, byte-verified Nov 26) and AM51 (V132) authorizes the sealed substitution FIRST. Taken over by c-0270 (the AM51 sequence: qualify aya32b -> seal -> amended panel). The panel byte-resume legs (snlite 23 VALID + 2 RATE_LIMITED; hy4f 30 VALID) carry forward unchanged into the amended run."
   },
   {
    "claim_id": "c-0269",
@@ -6448,6 +6448,27 @@
     "eval/r159_p5_v2_infra_terminal/"
    ],
    "note": "ONE firing plan for the P5 v2 lane (the hy4-recovery trigger): the V127 FRESH counting run — all 30 items of the sealed corpus c9670d8dd4b55c0c under live seats (G0 tokenrouter deepseek + J1 z-ai glm + J2 cent-ai hy4 budget 4000 + Jt2 z-ai glm), via the two-seat-live-gated wrapper. The 21/30 infra-terminal is archived (eval/r159_p5_v2_infra_terminal/), never overwritten — forward-only. NO seat swaps (V128: a live qualified J2 = hy4 when it serves; no unilateral judge changes). Accept per the prereg: >=40% RECOVERED (min 12/30), 0 canary, >=1 T1, >=1 T2, 0 interventions, byte-resume across windows. TAKES-OVER CONTEXT (moved out of the schema field per the Art. 29 CI schema, forward-only): takes over c-0267 (builder-r160s1) with the firing plan CORRECTED to the V127 fresh counting run; the prior takes_over value was prose — this window's schema fix.WORK-ID ALIGNMENT (forward-only schema fix): the fresh counting run is the SAME work r159-p5-rediscovery-v2 as c-0267 (the takeover chain must stay within one work_id per the Art. 29 CI); the \"-counting\" suffix was this window's naming error and is corrected here — the counting semantics live in the note and the prereg, not in the id."
+  },
+  {
+   "claim_id": "c-0270",
+   "work_id": "r153-xkiro-qualify-panel-v18",
+   "role": "EXECUTOR",
+   "status": "OPEN",
+   "kind": "measurement",
+   "session_id": "builder-r168s1",
+   "claimed_at": "2026-11-26T18:10:00Z",
+   "lease_expiry": "2026-11-27T12:00:00Z",
+   "takes_over": "c-0268",
+   "base_sha": "74ff2f6fc (the queue tip at filing)",
+   "artifact_paths": [
+    "scripts/r168_am51_substitution_panel.py",
+    "scripts/r153_rcal_xkiro.py",
+    "scripts/r153_p4_panel_v18.py",
+    "eval/r168_am51_seal/",
+    "eval/r153_rcal_xkiro/",
+    "eval/r148_p4_panel_v18/"
+   ],
+   "note": "ONE firing plan for the panel lane under AM51: the 00:05Z Nov 27 platform cron fires scripts/r168_am51_substitution_panel.py, which (1) waits for the free pool (post-00:00 reset), (2) qualifies aya32b on the r148 balanced corpus via the UNMODIFIED instrument (R153_JUDGE=aya32b, 24 legs, byte-resume), (3) checks the bars (acc>=0.8, answered>=0.9 of EXPECTED 24, AM47 bias<=1) AND the serving alpha>=0.6 recomputed from snlite+aya32b+hy4f leg bytes, (4) on PASS seals the amended set (QUALIFICATION.json qualified_tags mst14b->aya32b forward-only; the aya32b roster entry is pre-committed inert) and runs the UNMODIFIED panel runner on the SAME frozen v18 candidates (snlite 7 remaining + aya32b 30; hy4f 30 skipped VALID), (5) tallies + recomputes (diff=0). On any bar FAIL: typed exit, NO panel firing (the xkiro free pool has no unspent candidates left — bpickl 0.375 answered, mst8b bias 2, mst3b 0.625 answered, cmdr7b/tayae acc 0.75, aya32b then spent) and the msm2603 owner-funding fallback is the only path. tiny-aya is NOT eligible (spent + failed; no re-roll per Art. 7). The v18 candidate set stays FROZEN (AM51 integrity)."
   }
  ],
  "corrections": [
@@ -7063,6 +7084,12 @@
    "registered": "2026-11-26 (sandbox clock, TRUE UTC ~17:05Z)",
    "base_sha": "f027299e7 (the r166s1 preflight record)",
    "note": "DIR 1 verified at the pinned tips (EPISTEMIC 153ac62efca36c2d @ queue tip full read; AUDITOR 3775f869a1c19a96 @ audit tip full read; ledger V131 actual-read; vault 9/9 restored from scratch incl. the newly vault-managed TOKENROUTER; secret-grep 0; tip surface success). The window typed its commit (2df7e8b9d) under this session BEFORE registering it — the same Art. 29(a) omission class healed at ebd966f6a; registered here immediately (the CI surface passed only because no new claim entered the registry with this session; the constitutional rule is identity-on-first-push regardless). The lane's claims c-0268/c-0269 (panel + P5 v2 counting run, both platform-cron-armed) remain this conversation-lane's claims — the session succession r165s1->r167s1 is the same builder lane, new work round (R167)."
+  },
+  "builder-r168s1": {
+   "role": "EXECUTOR (the AM51 serving-set substitution lane: qualify aya32b on the r148 corpus, seal the amended set, run the amended panel; the r165s1 conversation-lane continuation answering V132/AM51)",
+   "registered": "2026-11-26 (sandbox clock, TRUE UTC ~18:10Z)",
+   "base_sha": "74ff2f6fc (the R167 window's close)",
+   "note": "DIR 1 verified at the pinned tips (EPISTEMIC 153ac62efca36c2d @ queue tip 74ff2f6fc full read; AUDITOR 3775f869a1c19a96 @ audit tip 945662720 full read; ledger V132 + AM51 actual-read; vault 9/9 restored from scratch; secret-grep 0 live; tip surface success). AM51 FACTS TYPED: tiny-aya (tayae) CANNOT be the substitute — its qualification is SPENT (24 legs 2026-11-25, acc 0.75 < 0.8, AM47 bias 3 > 1, swap 0.5; re-rolling a failed candidate violates Art. 7 one-shot and AM51's own integrity clause 'not tuning for a desired verdict'); msm2603 needs owner funding (403 paid). The FIRST UNSPENT in-roster candidate is aya32b (cohere/aya-expanse-32b — legs=0 in eval/r153_rcal_xkiro, named 'the strongest free lanes left' by the R154 second wave; catalog-verified present Nov 26 18:05Z). The AM51 path: qualify aya32b post-reset -> bars (acc>=0.8, answered>=0.9, bias<=1) + serving alpha>=0.6 (snlite+aya32b+hy4f) -> seal the amended set (mst14b->aya32b, forward-only) -> the amended panel on the SAME frozen v18 candidates."
   }
  },
  "trailer_violations": [
