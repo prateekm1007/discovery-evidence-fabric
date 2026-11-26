@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""r165_p5_v2_counting_run.py — the P5 v2 FRESH counting-run wrapper.
+"""r165_p5_v2_counting_run.py — the P5 v2 FRESH counting-run wrapper (claim c-0269).
 
 V127 re-authorization: "run the same sealed corpus with live seats
 for a counting verdict (the 21/30 was infra)". This wrapper:
