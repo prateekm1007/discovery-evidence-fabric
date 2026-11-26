@@ -2342,6 +2342,22 @@
    "title": "P5 v2: T2-resolver calibration repair in progress (the 0/29 false-negative-everything flag); then a stronger rediscovery generator + fresh sealed unattended re-run >=40%",
    "evidence": "83a72c3aa7b1 T2 calibration; r159s1_p5_close 6/29",
    "status": "OPEN"
+  },
+  {
+   "id": "R161-F1",
+   "round": "R161",
+   "severity": "MEDIUM",
+   "title": "score-8 panel running (snlite 23/30, mst14b 0/30); the snlite length-retry ladder (~19min/leg) is the speed bottleneck \u2014 set budget 12000 upfront; complete snlite 7 + mst14b 30 -> tally >=50%",
+   "evidence": "panel census; heartbeat 4; length-retry ladder bytes",
+   "status": "OPEN"
+  },
+  {
+   "id": "R161-F2",
+   "round": "R161",
+   "severity": "MEDIUM",
+   "title": "P5 v2: T2 redesigned (AM50 approved); needs the seal (non-circular known-item registry) + stronger G0 generator + ONE unattended run >=40%; first attempt 20.0% (generator under-cites too)",
+   "evidence": "r159_p5_v2_run.py; r159s2 P5 close 6/30",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -3803,6 +3819,15 @@
    "data_grounding": "The r143 corpus is novelty-direction-skewed (10/12 pairs prefer the LESS-novel viable arm \u2014 viability-necessity by design). An all-pairs novelty-direction counter (the R143S1 Chinese-session computation, imbalance 6-9) reflects the CORPUS structure, not judge bias, and is ill-posed. The CORRECT counter is MISS-based: over_novel = on a miss, the judge picked the higher-novelty-score arm; over_cons = picked the lower. At acc=1.0 there are no misses -> 0/0. Independent auditor recompute (miss-based): dsr1 |imb|=2, dsv32=0, qw32b=1, qwen235b=0; inter-judge kappa 0.668.",
    "amendment": "The AM47 |over_novel-over_cons|<=1 gate is computed on MISSES (novelty-score-relative deviation), NOT all-pairs. This is well-posed independent of corpus novelty-skew. The acc>=0.8 AND answered>=0.9 bars are UNCHANGED. Future R-CAL corpora SHOULD balance novelty-direction (half prefer-more-novel, half prefer-less) so the corpus is not one-directional; the r143 skew is a design note, not a gate invalidation.",
    "ruling": "R-CAL gate MET: qwen235b (acc1.0,|imb|0), dsv32 (0.917,0), qw32b (0.917,1) qualify (>=3) from 2 non-agnes families (qwen, deepseek); kappa 0.668>=0.6. dsr1 (acc0.833,|imb|2) marginally fails the bias gate but is not needed for >=3. hy4f transport-dead (typed). The AM47 viability-necessity calibration WORKED (acc lifted from r142's 0.75 cap to 0.833-1.0)."
+  },
+  {
+   "id": "AM50",
+   "date": "2026-11-26",
+   "authority": "DELEGATED OWNER",
+   "title": "P5 T2 citation-support tier RE-DESIGNED \u2014 the deterministic keyword-coverage bar RETIRED (proven false-negative-everything)",
+   "data_grounding": "r160s1 ground-truth calibration: the frozen v1 keyword resolver accepts 0/18 of the corpus's genuinely-supporting prior-art papers (incl. the target's own referenced work); the v2 normalization repair also 0/18; term-source diagnostic shows generator-paraphrase terms false-negative everything (vocabulary mismatch), corpus-text terms 15/15 but circular; Crossref abstract availability 46.7% (title-only blobs). The keyword-coverage bar CANNOT validly measure citation support.",
+   "amendment": "T2 = TWO independent sub-tiers (r159_p5_v2_run.py): (a) KNOWN-ITEM tier \u2014 DOI resolves via Crossref AND title fuzzy-matches (SequenceMatcher>=0.82) a REGISTERED prior-art title from the SEAL-TIME known-item registry (pre-registered ground truth, NOT served to the generator \u2014 non-circular); (b) SUPPORT-RATING tier \u2014 DOI resolves AND an independent judge (z-ai glm) rates title+abstract as SUPPORTING the generated key_mechanism; generator is tokenrouter deepseek (judge!=generator, F2-clean). Item passes iff EVERY citation resolves AND >=1 sub-tier passes.",
+   "caveat": "the known-item registry MUST be sealed ground truth NOT served to the generator (else the tier is tautological); the support-rating judge MUST be != generator and R-CAL-qualified for the support task; positive/negative controls pre-registered. Forward-only; the keyword bar is retired with this dated reason (Art.8)."
   }
  ],
  "audit_mistakes": [
@@ -5633,6 +5658,19 @@
    "closed": [
     "R159-F1"
    ]
+  },
+  {
+   "id": "V125",
+   "round": "R161 audit: panel running (snlite 23) + T2 keyword bar retired (AM50, redesigned) + P5 v2 instrument approved",
+   "commit": "f61a057534101aa86c1e4e06c28e97bfd7a6c7c4",
+   "gate": "panel running post-reset; T2 false-negative-everything confirmed -> AM50 redesign (known-item + independent-judge support); P5 v2 seal+run pending; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r161_auditor_adjudication.json",
+   "findings": [
+    "R161-F1",
+    "R161-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -6033,7 +6071,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. KEY-BLOCKER RESOLVED (V123 R159-F1 closed): owner delivered a GENUINE HF rotation (digest 0af8db243dee, whoami 200 prateekm1); r77 vault-restore ALIVE (8 keys fail-closed, XKIRO f6c09bee9bde COMMITTED_RECORD_MATCH recoverable in any sandbox); MASTER_TOKEN_DIGEST updated; custody 91d0c398f CI green. Quota reset (00:00 UTC Nov 26) PASSED (now 09:02 UTC Nov 26); the score-8 panel is RUNNING (r160s1 lane c-0265): snlite 19/30 (8 fresh post-reset), hy4f 30/30, mst14b 0/30 pending; 52-leg byte-resume progressing; TALLY pending completion. Serving set frozen (snlite+mst14b+hy4f alpha 0.945). P5 v2 lane: T2-resolver calibration repair in progress (83a72c3aa7b1, the 0/29 false-negative flag) + stronger rediscovery generator + fresh sealed unattended re-run. Critical path: panel completes (snlite 30 + mst14b 30) -> 3-judge tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 >=40% + unattended (9). Goal 9/10 fully agent-run. F45 rotation list standing (GH_PAT/cent-ai/xkiro/llmtr/tokenrouter; HF rotated).",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. Panel RUNNING post-reset (snlite 23/30 all VALID, hy4f 30/30, mst14b 0/30 queued); slow legs = snlite LENGTH-RETRY ladder (budgets 4000->8000->12000, ~19min/leg) NOT 429s \u2014 SPEED FIX set snlite budget 12000 upfront. TALLY pending (snlite 7 + mst14b 30). T2 FLAG CONFIRMED DECISIVE (V123 R159-F2): the deterministic keyword-coverage bar is false-negative-everything on ground truth (0/18), normalization fails (vocabulary mismatch), Crossref abstract availability 46.7%. AM50 (delegated owner): T2 RE-DESIGNED into known-item tier (DOI resolves + title fuzzy-match >=0.82 a SEAL-TIME registered prior-art title, NON-circular) + support-rating tier (independent judge z-ai glm != tokenrouter deepseek generator, F2-clean); keyword bar RETIRED. P5 v2 instrument landed (r159_p5_v2_run.py); first attempt sealed 30/30 NOT_MET (6/30=20.0%, resolver over-rejects AND generator under-cites 28/44 stem-unrelated); v2 needs the seal (non-circular registry) + stronger G0 generator + ONE unattended run >=40%. HF rotation landed (vault-restore alive), owner acts none. Critical path: panel completes (budget 12000) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 (AM50 T2 + stronger G0) >=40% + unattended (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

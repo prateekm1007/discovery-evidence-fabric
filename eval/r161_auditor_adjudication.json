@@ -1,0 +1,43 @@
+{
+ "record": "R161_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r161s1",
+ "audited_queue_tip": "75a1bf393897 (P5 v2 instrument landed; panel heartbeat 4; tip green)",
+ "audit_branch_parent": "f61a057534101aa86c1e4e06c28e97bfd7a6c7c4",
+ "PANEL_STATE": "RUNNING post-reset: snlite 23/30 (all VALID), hy4f 30/30, mst14b 0/30 queued. The slow legs are the snlite LENGTH-RETRY ladder (empty content finish=length, budgets 4000->8000->12000, ~19min/leg) NOT 429s (the builder's mid-window 'pool death' typing was corrected by bytes). SPEED FIX: set the snlite judge budget to 12000 upfront to skip the ladder. TALLY pending (snlite 7 + mst14b 30 remain).",
+ "T2_VERDICT": {
+  "verdict": "the V123 R159-F2 T2 flag is CONFIRMED DECISIVE: the deterministic keyword-coverage bar is false-negative-everything on ground truth (0/18), normalization does not fix it (vocabulary mismatch). The P5 v2 instrument (75a1bf393897) RE-DESIGNS T2 into known-item + independent-judge support-rating sub-tiers (judge z-ai glm != tokenrouter deepseek generator, F2-clean). APPROVED as delegated owner via AM50, with the non-circularity caveat (the known-item registry is sealed ground truth, NOT served to the generator).",
+  "p5_first_attempt": "sealed 30/30 NOT_MET (6/30=20.0%); BOTH resolver over-rejects AND generator under-cites (28/44 citations stem-unrelated). The v2 needs the stronger generator (G0) + the redesigned T2 + a fresh seal + ONE unattended run."
+ },
+ "FINDINGS": [
+  {
+   "id": "R161-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel running (snlite 23/30, mst14b 0/30); the snlite length-retry ladder (~19min/leg) is the speed bottleneck \u2014 set budget 12000 upfront; complete snlite 7 + mst14b 30 -> tally >=50%",
+   "evidence": "panel census; heartbeat 4; length-retry ladder bytes",
+   "direction": "DIR2 \u2014 snlite budget 12000; complete the panel; tally diff=0"
+  },
+  {
+   "id": "R161-F2",
+   "severity": "MEDIUM",
+   "title": "P5 v2: T2 redesigned (AM50 approved); needs the seal (non-circular known-item registry) + stronger G0 generator + ONE unattended run >=40%; first attempt 20.0% (generator under-cites too)",
+   "evidence": "r159_p5_v2_run.py; r159s2 P5 close 6/30",
+   "direction": "DIR4 \u2014 P5 v2 seal + stronger generator + unattended run"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; HF rotation landed, vault-restore alive; owner acts none",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel RUNNING (snlite 23, mst14b 0, hy4f 30); >=50% on completion",
+  "P5": "first attempt NOT_MET (20.0%); T2 redesigned (AM50); v2 seal + stronger generator + unattended run pending"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120-V124 stand; panel running post-reset; T2 redesigned (AM50); score-8 on panel completion, score-9 on P5 v2",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "panel completes (snlite 30 + mst14b 30, budget 12000) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 (AM50 T2 + stronger G0) >=40% + unattended (9)"
+ },
+ "recompute_pointer": "eval/r161_auditor_adjudication.json"
+}
