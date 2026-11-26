@@ -2450,6 +2450,22 @@
    "title": "recurring vault-recycle friction: TOKENROUTER_API_KEY is NOT vault-managed (and the HF master is inherently directions-delivered), so every recycle needs manual re-patching of those two while r77 restores the other 8 \u2014 vault-manage TOKENROUTER to make recycle recovery one-command",
    "evidence": "builder re-patched TOKENROUTER (c148574f6215) + HF (0af8db243dee) from directions after r77 restored 8",
    "status": "OPEN"
+  },
+  {
+   "id": "R168-F1",
+   "round": "R168",
+   "severity": "MEDIUM",
+   "title": "score-8 panel needs the AM51 serving-set substitution (mst14b delisted): post-Nov-27-reset re-qualify tiny-aya (xkiro free) on r148 + alpha>=0.6 with snlite/hy4f, seal the amended set, run snlite+substitute+hy4f -> >=50%; OR fund tokenrouter for msm2603",
+   "evidence": "xkiro catalog no mistral; tokenrouter mst14b 404 msm2603 403; AM51",
+   "status": "OPEN"
+  },
+  {
+   "id": "R168-F2",
+   "round": "R168",
+   "severity": "MEDIUM",
+   "title": "P5 v2 counting run still waits on hy4-flash:free 503 (~7h); the 01:30 cron two-seat-gate fires on recovery; G0 tokenrouter alive",
+   "evidence": "cent-ai hy4 503; P5 v2 hold 21/30",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -3920,6 +3936,15 @@
    "data_grounding": "r160s1 ground-truth calibration: the frozen v1 keyword resolver accepts 0/18 of the corpus's genuinely-supporting prior-art papers (incl. the target's own referenced work); the v2 normalization repair also 0/18; term-source diagnostic shows generator-paraphrase terms false-negative everything (vocabulary mismatch), corpus-text terms 15/15 but circular; Crossref abstract availability 46.7% (title-only blobs). The keyword-coverage bar CANNOT validly measure citation support.",
    "amendment": "T2 = TWO independent sub-tiers (r159_p5_v2_run.py): (a) KNOWN-ITEM tier \u2014 DOI resolves via Crossref AND title fuzzy-matches (SequenceMatcher>=0.82) a REGISTERED prior-art title from the SEAL-TIME known-item registry (pre-registered ground truth, NOT served to the generator \u2014 non-circular); (b) SUPPORT-RATING tier \u2014 DOI resolves AND an independent judge (z-ai glm) rates title+abstract as SUPPORTING the generated key_mechanism; generator is tokenrouter deepseek (judge!=generator, F2-clean). Item passes iff EVERY citation resolves AND >=1 sub-tier passes.",
    "caveat": "the known-item registry MUST be sealed ground truth NOT served to the generator (else the tier is tautological); the support-rating judge MUST be != generator and R-CAL-qualified for the support task; positive/negative controls pre-registered. Forward-only; the keyword bar is retired with this dated reason (Art.8)."
+  },
+  {
+   "id": "AM51",
+   "date": "2026-11-26",
+   "authority": "DELEGATED OWNER",
+   "title": "Serving-set substitution authorized \u2014 mst14b DELISTED provider-side (verified), replace with a re-qualified live judge (sealed, forward-only)",
+   "data_grounding": "mst14b (ministral-14b) is REMOVED from the xkiro catalog (62 models, NO mistral family \u2014 auditor-confirmed from /v1/models bytes) and 404 on tokenrouter; the frozen serving set (snlite+mst14b+hy4f) is broken \u2014 the 00:05 panel cron would land snlite legs but all 30 mst14b legs 404, degenerating to 2 judges (<3). No counting verdict was ever produced (mst14b 0 legs), so this is a NECESSARY availability substitution, NOT a mid-gate tuning swap.",
+   "amendment": "Authorize a SEALED serving-set substitution: mst14b -> a LIVE judge re-qualified on the r148 balanced corpus (acc>=0.8, answered>=0.9, miss-bias<=1) AND inter-judge alpha>=0.6 with snlite+hy4f. Candidate order: (1) tiny-aya (xkiro free, re-qualify post Nov-27 00:00 reset \u2014 first qualification, not a re-roll); (2) msm2603 (mistral-small-2603, tokenrouter, kept-aside acc 0.917 \u2014 currently 403 paid, needs owner funding); (3) another live qualified judge != generator. The amended 3-judge set is sealed forward-only; the panel re-runs snlite + substitute + hy4f on the SAME v18 candidates (the candidate generation is unchanged; only the unavailable judge is replaced).",
+   "integrity": "the substitute is qualified on the SAME r148 corpus + agreement-checked (alpha>=0.6) before serving; the v18 candidate set is frozen (no re-generation); this replaces an UNAVAILABLE judge, not tuning for a desired verdict. Art.3/7/8 respected."
   }
  ],
  "audit_mistakes": [
@@ -5850,6 +5875,19 @@
    "findings": [
     "R167-F1"
    ]
+  },
+  {
+   "id": "V132",
+   "round": "R168 audit: mst14b delisting confirmed + AM51 serving-set substitution authorized + R167-F1 vault + stale-replay self-correction",
+   "commit": "8acbd1222f66fd6e3b49f288871b601339986ba0",
+   "gate": "mst14b delisted (verified); AM51 substitution authorized (tiny-aya/msm2603 re-qualify r148 + alpha>=0.6); tokenrouter vault-managed; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r168_auditor_adjudication.json",
+   "findings": [
+    "R168-F1",
+    "R168-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -6250,7 +6288,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED (V130 stands; pre-reset holding window). Queue tip ebd966f6a unchanged, CI success; both platform-side crons armed (550235 panel Nov 27 00:05 c-0268, 550250 P5 v2 01:30 c-0269, run_count 0); hy4-flash:free 503 ~6.2h (auditor confirms). Builder's correct pre-reset pass: vault re-restored after recycle (r77 restored 8 keys; TOKENROUTER c148574f6215 + HF 0af8db243dee re-patched from directions), crons re-verified, hy4 monitored. RECURRING FRICTION (R167-F1): TOKENROUTER not vault-managed + HF master inherently directions-delivered -> manual re-patch every recycle; RECOMMEND add TOKENROUTER_API_KEY to prateekm1/operator-keys-vault so r77 restores it (HF master stays directions-delivered \u2014 it unlocks the vault). Critical path: Nov 27 00:00 reset -> panel cron 35-leg byte-resume -> tally >=50% (8) + auditor sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron on hy4 recovery -> counting >=40% (9). Next window first act: verify both crons fired (run_count) + tallies diff=0. Goal 9/10 fully agent-run. Owner acts: none confirmed-blocking.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. SELF-CORRECTION: the prior auditor turn output a stale V122-era replay; corrected to the actual V131 state. MST14B DELISTING CONFIRMED (auditor /v1/models): xkiro 62-model catalog has NO mistral family (mst14b removed provider-side), snlite present; tokenrouter mst14b 404, msm2603 403 paid. The frozen serving set (snlite+mst14b+hy4f) is broken (2 live judges); the 00:05 panel cron would degenerate to 2 judges. AM51 (delegated owner) AUTHORIZES a SEALED serving-set substitution: mst14b -> a LIVE judge re-qualified on r148 (acc>=0.8, bias<=1) + alpha>=0.6 with snlite+hy4f; candidates tiny-aya (xkiro free, re-qualify post Nov-27 reset) / msm2603 (tokenrouter 403, needs funding) / another live qualified judge != generator; the v18 candidate set stays frozen (only the unavailable judge replaced \u2014 necessary availability substitution, NOT mid-gate tuning; no counting verdict was produced). R167-F1 VERIFIED: TOKENROUTER vault-managed (c148574f6215), r77 restores 9/9. P5 v2 counting run still waits hy4 503 (~7h); 01:30 cron fires on recovery. Critical path: Nov 27 reset -> re-qualify substitute -> AM51 sealed set -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 >=40% (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
