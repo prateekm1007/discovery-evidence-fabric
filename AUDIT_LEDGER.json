@@ -2358,6 +2358,22 @@
    "title": "P5 v2: T2 redesigned (AM50 approved); needs the seal (non-circular known-item registry) + stronger G0 generator + ONE unattended run >=40%; first attempt 20.0% (generator under-cites too)",
    "evidence": "r159_p5_v2_run.py; r159s2 P5 close 6/30",
    "status": "OPEN"
+  },
+  {
+   "id": "R162-F1",
+   "round": "R162",
+   "severity": "MEDIUM",
+   "title": "score-8 panel quota-bottlenecked: xkiro free daily pool too small for the full panel + activity; 12000-budget snlite token-hungry; completes over ~2-3 daily resets (byte-resume) OR owner funds the xkiro plan/cent-ai (one window)",
+   "evidence": "panel snlite 25/mst14b 0; RATE_LIMITED 480s; daily pool re-drawn",
+   "status": "OPEN"
+  },
+  {
+   "id": "R162-F2",
+   "round": "R162",
+   "severity": "MEDIUM",
+   "title": "P5 v2 ONE unattended run pending (AM50 T2 + fresh seal landed); needs the stronger G0 generator (first attempt under-cited 28/44); >=40% recovery + 0 canary + 0 interventions",
+   "evidence": "r159_p5_v2_prereg; first attempt 6/30",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5671,6 +5687,19 @@
     "R161-F1",
     "R161-F2"
    ]
+  },
+  {
+   "id": "V126",
+   "round": "R162 audit: panel quota-bottlenecked (snlite 25, mst14b 0) + 12000 budget fix + P5 v2 seal landed (AM50)",
+   "commit": "40535a55d5400944919070ed5d95be092f035ff2",
+   "gate": "panel quota-bottlenecked (xkiro daily pool); 12000 budget set; remaining 5 snlite + 30 mst14b post Nov 27 reset or funding; P5 v2 seal+prereg landed, unattended run pending; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r162_auditor_adjudication.json",
+   "findings": [
+    "R162-F1",
+    "R162-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -6071,7 +6100,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. Panel RUNNING post-reset (snlite 23/30 all VALID, hy4f 30/30, mst14b 0/30 queued); slow legs = snlite LENGTH-RETRY ladder (budgets 4000->8000->12000, ~19min/leg) NOT 429s \u2014 SPEED FIX set snlite budget 12000 upfront. TALLY pending (snlite 7 + mst14b 30). T2 FLAG CONFIRMED DECISIVE (V123 R159-F2): the deterministic keyword-coverage bar is false-negative-everything on ground truth (0/18), normalization fails (vocabulary mismatch), Crossref abstract availability 46.7%. AM50 (delegated owner): T2 RE-DESIGNED into known-item tier (DOI resolves + title fuzzy-match >=0.82 a SEAL-TIME registered prior-art title, NON-circular) + support-rating tier (independent judge z-ai glm != tokenrouter deepseek generator, F2-clean); keyword bar RETIRED. P5 v2 instrument landed (r159_p5_v2_run.py); first attempt sealed 30/30 NOT_MET (6/30=20.0%, resolver over-rejects AND generator under-cites 28/44 stem-unrelated); v2 needs the seal (non-circular registry) + stronger G0 generator + ONE unattended run >=40%. HF rotation landed (vault-restore alive), owner acts none. Critical path: panel completes (budget 12000) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 (AM50 T2 + stronger G0) >=40% + unattended (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. Panel: snlite 25/30 (23 VALID + 2 RATE_LIMITED), mst14b 0/30, hy4f 30/30; owner-directed snlite budget [12000] upfront landed (bf6da6e32, ladder retired). Resume hit the xkiro daily pool HARD rate-limit (the morning's 12000-budget legs + peer seal-building re-drew the quota); runner stopped typed (98c399b8f). STRUCTURAL BOTTLENECK: the xkiro FREE daily token quota (~260K) is too small for the full 52-leg panel + 83-leg qualification + peer activity in one day; the 12000-budget snlite reasoning legs are token-hungry. Panel completes via byte-resume over ~2-3 daily resets (remaining 5 snlite + 30 mst14b after 00:00 UTC Nov 27) OR owner FUNDS the judge-queue (xkiro plan / cent-ai top-up \u2014 allowed under 'no rented compute') for one-window completion. P5 v2: AM50 T2 redesign + FRESH SEAL + prereg landed (d675cf4a0; known-item registry 7/34, 30 canaries, F2-clean seats); the ONE unattended run pending (peer lane); first attempt 20.0% NOT_MET, v2 needs stronger G0 generator. HF rotation landed, vault-restore alive. Critical path: panel completes (fund for speed OR multi-day resume) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 unattended >=40% (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

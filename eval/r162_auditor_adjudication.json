@@ -1,0 +1,41 @@
+{
+ "record": "R162_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r162s1",
+ "audited_queue_tip": "98c399b8f34d (panel resume + 12000 budget fix; P5 v2 seal; tip green)",
+ "audit_branch_parent": "40535a55d5400944919070ed5d95be092f035ff2",
+ "PANEL_STATE": "snlite 25/30 (23 VALID + 2 RATE_LIMITED judgment-free retries), mst14b 0/30, hy4f 30/30. The owner-directed snlite budget [12000] upfront landed (bf6da6e32, ladder retired). The resume hit the xkiro daily pool HARD rate-limit again (leg 1 RATE_LIMITED 480s) \u2014 this morning's 12000-budget legs + the peer's seal-building re-drew the daily quota. Runner stopped typed (98c399b8f). Remaining 5 snlite + 30 mst14b fires after 00:00 UTC Nov 27.",
+ "STRUCTURAL_BOTTLENECK": "the xkiro FREE-plan daily token quota is too small to fit the full 52-leg panel + the 83-leg qualification + peer activity in one day; the 12000-budget snlite reasoning legs are token-hungry (~360K tokens for snlite alone vs the ~260K/day pool). The panel WILL complete via byte-resume but spread over ~2-3 daily resets (slow). FAST PATH (owner act, judge-queue funding is allowed under 'no rented compute'): fund the xkiro plan (removes the daily quota) OR a cent-ai top-up \u2014 completes the panel in one window. FREE PATH: multi-day byte-resume (only VALID legs skip; the 12000 budget + tally/recompute chain are in the tree).",
+ "P5_V2_STATE": "the AM50 v2 instrument + FRESH SEAL + prereg landed (d675cf4a0, r159_p5_v2_prereg.json): known-item registry 7/34 mapped, 30 canaries, seats F2-clean (generator tokenrouter deepseek, support-judge z-ai glm). The ONE unattended run is the peer's lane (builder stood down, no duplicate). First attempt was 20.0% NOT_MET; v2 needs the stronger G0 generator + the redesigned T2.",
+ "FINDINGS": [
+  {
+   "id": "R162-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel quota-bottlenecked: xkiro free daily pool too small for the full panel + activity; 12000-budget snlite token-hungry; completes over ~2-3 daily resets (byte-resume) OR owner funds the xkiro plan/cent-ai (one window)",
+   "evidence": "panel snlite 25/mst14b 0; RATE_LIMITED 480s; daily pool re-drawn",
+   "direction": "DIR2 \u2014 owner fund judge-queue (fast) OR multi-day byte-resume (free); remaining 5 snlite + 30 mst14b"
+  },
+  {
+   "id": "R162-F2",
+   "severity": "MEDIUM",
+   "title": "P5 v2 ONE unattended run pending (AM50 T2 + fresh seal landed); needs the stronger G0 generator (first attempt under-cited 28/44); >=40% recovery + 0 canary + 0 interventions",
+   "evidence": "r159_p5_v2_prereg; first attempt 6/30",
+   "direction": "DIR4 \u2014 P5 v2 unattended run"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; HF rotation landed, vault-restore alive",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel quota-bottlenecked (snlite 25, mst14b 0, hy4f 30); >=50% on completion",
+  "P5": "first attempt NOT_MET (20.0%); AM50 T2 redesign + fresh seal landed; v2 unattended run pending"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120-V125 stand; panel quota-bottlenecked (completes via byte-resume or funding); P5 v2 seal landed; score-8 on panel completion, score-9 on P5 v2",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "panel completes (5 snlite + 30 mst14b; fund judge-queue for speed OR multi-day resume) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 unattended >=40% (9)"
+ },
+ "recompute_pointer": "eval/r162_auditor_adjudication.json"
+}
