@@ -1,0 +1,27 @@
+{
+ "record": "R167S1_VAULT_ACT_RECORD/1.0.0",
+ "session": "builder-r167s1",
+ "work_id": "r167-vault-manage-tokenrouter",
+ "at": "2026-11-26T16:50:00Z",
+ "stale_directions_discrepancy": {
+   "typed": "this window's directions describe the V122-era clock (~13:30Z Nov 25: 'quota resets 00:00 UTC Nov 26 ~10.6h out; snlite 19 + mst14b 30 = 52 legs'); the ACTUAL state at window open was 2026-11-26T16:28Z, ledger V131, queue tip f027299e7 (green), snlite 23 VALID + 2 RATE_LIMITED (7 legs to generate) + mst14b 0/30, hy4f 30/30 — the directions' reset target PASSED ~16h prior and the Nov 26 00:00-08:45 window already consumed it (the double-burn lesson of r153s1/s2)",
+   "action": "continued the ACTUAL state's plan (V131/R167): both platform-side crons armed (550235 panel Nov 27 00:05 c-0268; 550250 P5 v2 01:30 c-0269); no early firing (the free pool is dead until the Nov 27 00:00 reset)"
+ },
+ "mst14b_delisting_confirmed": {
+   "probe": "GET https://api.xkiro.com/v1/models (zero-burn), HTTP 200, catalog 62 models",
+   "finding": "NO mistral-family models in the catalog (mistralai/ministral-14b 404-class 'Model does not exist'); sensenova/sensenova-6.8-flash-lite PRESENT — independently confirms the r166s1 preflight finding",
+   "implication": "the 00:05Z panel cron lands the 7 snlite legs (real progress) and the 30 mst14b legs land TRANSPORT_FAILED (404, zero quota burn, retriable legfiles); the tally degenerates to 2 judges — the score-8 full-3-judge bar is blocked on an owner/auditor act (re-listing wait / owner-sealed substitute / owner-sealed transport change + re-qualification), NEVER a builder mid-gate swap (V128)",
+   "byte_counts": "snlite 23 VALID + 2 RATE_LIMITED (the 2 retry per the R146 fix: only VALID legs skip) -> 7 to generate; mst14b 0/30; hy4f 30/30 VALID"
+ },
+ "r167_f1_vault_act": {
+   "act": "TOKENROUTER_API_KEY added to prateekm1/operator-keys-vault (operator_keys.json) as {b64, sha256_12: c148574f6215} — same schema as the other 8; uploaded via huggingface_hub upload_file (digest-only commit message)",
+   "verify": "rm .env.keys -> r77_vault_restore.py restored 9/9 vault-managed keys from scratch (incl. TOKENROUTER c148574f6215); HF master stays directions-delivered by design (it unlocks the vault — cannot live inside it)",
+   "friction_removed": "the R167-F1 recurring recycle friction (TOKENROUTER empty + HF stale each recycle) is now one command"
+ },
+ "transports_now": {
+   "xkiro": "vault key f6c09bee9bde auth-valid; free pool dead until Nov 27 00:00Z; mistral-family delisted",
+   "cent_ai": "key valid; hy4-flash:free still 503 upstream (~7h) at last probe",
+   "tokenrouter": "G0 alive (200)"
+ },
+ "no_acts": "no panel firing (pre-reset); no P5 v2 firing (J2 still down; the 01:30 gate exits honestly); no seat swaps"
+}
