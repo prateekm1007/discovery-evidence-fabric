@@ -1,0 +1,18 @@
+{
+ "record": "R159S2_HF_REKEY_EVENT/1.0.0",
+ "session": "builder-r159s2",
+ "at": "2026-11-26 ~09:1x UTC",
+ "event": "owner HF-token re-delivery PROBED AND TYPED DEAD-ON-ARRIVAL",
+ "custody": {
+  "delivered_digest": "33bc7af22c62",
+  "vault_digest": "33bc7af22c62",
+  "byte_identical_to_expired_r77_token": true,
+  "vault_write": "NONE NEEDED — the delivered bytes are already in both vault files; digests-only here, zero key bytes committed (Art. 17)"
+ },
+ "probe": {
+  "endpoint": "https://huggingface.co/api/whoami-v2",
+  "result": "401 {\"error\":\"User Access Token \\\"Prateek Misra\\\" is expired\"}"
+ },
+ "typed_conclusion": "The re-delivery is a RE-PASTE of the expired token, not a rotation — the r77 vault-restore path REMAINS DEAD. The standing recycle-recovery path is NOT restored by this event. Owner act remains open: issue a NEW HF access token (a rotation with a DIFFERENT digest — anything with digest 33bc7af22c62 is pre-known-dead). No other lane is blocked: the score-8 panel is running on the r160s1 sandbox's persistent-disk xkiro key (c-0265), and the P5 v2 lane needs no HF token.",
+ "impacted_dirs": ["DIR 8 (F45: HF re-delivery stays OPEN until a rotation with a new digest lands)"]
+}
