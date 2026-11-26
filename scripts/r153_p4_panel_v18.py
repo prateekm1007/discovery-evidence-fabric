@@ -107,7 +107,12 @@ XKIRO_ROSTER = {
                "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
     "snlite": {"model": "sensenova/sensenova-6.8-flash-lite",
                "family": "sensenova", "transport": "xkiro", "pace": 6,
-               "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+               # R160 owner directive (DIR 2, DELETE LIST): the snlite
+               # length-retry ladder is retired — snlite reasoning burns
+               # the 4000/8000 budgets (empty content, finish=length,
+               # measured ~19 min/leg); 12000 upfront. Judging semantics
+               # (prompt, parse, tally) untouched — transport only.
+               "budgets": [12000], "timeout_s": 240.0},
     "bpickl": {"model": "stealth/big-pickle", "family": "stealth",
                "transport": "xkiro", "pace": 6,
                "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
