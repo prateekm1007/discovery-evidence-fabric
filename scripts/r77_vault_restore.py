@@ -58,7 +58,12 @@ VAULT_REPO = "prateekm1/operator-keys-vault"
 VAULT_FILE = "operator_keys.json"
 ENV_KEYS = REPO / ".env.keys"
 COMMITTED_RECORD = REPO / "eval" / "r59_credential_custody_r59s1.json"
-MASTER_TOKEN_DIGEST = "33bc7af22c62"  # Art. 17 v3.3.0 typed state
+MASTER_TOKEN_DIGEST = "0af8db243dee"  # Art. 17 v3.3.0 typed state
+# (R159S2 ROTATION TO DISCLOSE: the prior master 33bc7af22c62 was
+# reported EXPIRED by the owner and re-delivered dead-on-arrival
+# (eval/r159s2_hf_rekey_event.json); the owner then delivered the
+# ROTATED token whose whoami-v2 probe returned 200; the digest above
+# is the post-rotation typed state — eval/r159s2_hf_rotation_restore.json)
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
