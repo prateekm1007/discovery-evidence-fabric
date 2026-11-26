@@ -2406,6 +2406,30 @@
    "title": "P5 v2 counting run needs a live J2 (cent-ai hy4 503 model-down ~4.5h); G0 tokenrouter alive; wait for hy4 recovery OR seat a live qualified J2 != generator; fresh run re-authorized (V127)",
    "evidence": "cent-ai 503; tokenrouter 200; v2 hold 21/30",
    "status": "OPEN"
+  },
+  {
+   "id": "R165-F1",
+   "round": "R165",
+   "severity": "MEDIUM",
+   "title": "cron-scheduled unattended runs may NOT survive the sandbox recycle (the recurring recycle problem); the durable path is the in-repo resume state + a follow-up message \u2014 verify the cron fired post-reset OR resume manually; do not rely solely on sandbox-local cron",
+   "evidence": "cron 550235/550250 registered; prior 'cron tool unavailable' + recycle history",
+   "status": "OPEN"
+  },
+  {
+   "id": "R165-F2",
+   "round": "R165",
+   "severity": "MEDIUM",
+   "title": "P5 v2 counting run J2 seat (hy4-flash:free) 503-upstream ~5.5h; the 01:30 cron two-seat-gate exits harmlessly if hy4 still down; seat a live qualified J2 != G0 or wait for hy4 recovery",
+   "evidence": "cent-ai hy4 503 11 probes; P5 v2 hold 21/30",
+   "status": "OPEN"
+  },
+  {
+   "id": "R165-F3",
+   "round": "R165",
+   "severity": "LOW",
+   "title": "tip RED (b03a5a835985, run 139955580318) \u2014 recurring trailer/registry class; heal forward-only",
+   "evidence": "check-run failure",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5764,6 +5788,20 @@
    "corrections": [
     "CORR-R164-1"
    ]
+  },
+  {
+   "id": "V129",
+   "round": "R165 audit: end-to-end loop scheduled unattended (panel c-0268 + P5 v2 c-0269 crons); false alarms corrected (empty-key probes); cron-durability caveat",
+   "commit": "ca8a351b7ce578555585b6464a2c737fe69139a5",
+   "gate": "loop scheduled post-reset (panel 00:05, P5 v2 01:30); xkiro auth-valid quota-only; mutex resolved; cron-durability caveat; tip red; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r165_auditor_adjudication.json",
+   "findings": [
+    "R165-F1",
+    "R165-F2",
+    "R165-F3"
+   ]
   }
  ],
  "gold_set": {
@@ -6164,7 +6202,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. CORRECTION (Art.9, CORR-R164-1): the builder's 'xkiro domain DNS-dead (api.xkiro.ai), provider outage, panel hard-blocked' is a WRONG-TLD PROBE ERROR \u2014 api.xkiro.com RESOLVES (104.18.11.239 Cloudflare), api.xkiro.ai is NXDOMAIN. The xkiro endpoint is REACHABLE; the panel is NOT DNS-blocked. Resume needs the VAULT key f6c09bee9bde auth probe on api.xkiro.com + the quota reset (00:00 UTC Nov 27), NOT a provider fix. Transport verified: tokenrouter 200 ALIVE (P5 G0), cent-ai 503 upstream (hy4 model-down ~4.5h, KEY VALID), GH_PAT/HF alive. P5 v2 hold 21/30 (9 remaining unrecorded for true dual-judge adjudication; 21 PARTIAL-final seal NOT_MET max 9/30=30%<40% as INFRA); the counting run (V127 re-authorized) needs a LIVE J2 seat (cent-ai hy4 recovery OR another live qualified judge != tokenrouter generator). J1 raw preserved (6 REC/12 PART/3 NR, canary 0, T1 21/21, 0 interventions); v2 design validated. Score-8 panel: snlite 25/30, hy4f 30/30, mst14b 0/30; 12000 budget set; resume 5 snlite + 30 mst14b post vault-key-probe + reset. Critical path: xkiro vault-key probe (api.xkiro.com) -> panel >=50% (8); P5 v2 live-J2 counting run >=40% (9); sealed v18 >=3.3 (consolidate 6/7). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. END-TO-END LOOP SCHEDULED UNATTENDED: cron 550235 (Nov 27 00:05 UTC) panel byte-resume claim c-0268 (5 snlite + 30 mst14b, 12000 budget, tally + recompute diff=0 -> score-8 evidence); cron 550250 (Nov 27 01:30 UTC) P5 v2 fresh counting run claim c-0269 (two-seat-live-gate, archives 21/30 infra-terminal, unmodified runner on sealed corpus c9670d8dd4b55c0c -> counting >=40%). Claims c-0268/c-0269 registered. Mutex conflict (r164s1 9-item-tail vs V127 fresh-run) RESOLVED, one firing plan. FALSE ALARMS ROOT CAUSE: xkiro vault key AUTH-VALID on api.xkiro.com (429 daily quota, NOT 401); the '401 revocations/F45 sweep' were EMPTY-KEY probes from the recycle-rolled-back .env.keys; panel never auth-blocked, only quota-blocked (resets Nov 27 00:00). CAVEAT (R165-F1): sandbox-local cron may not survive the recycle \u2014 the durable path is the in-repo resume state + follow-up message; verify the cron fired post-reset OR resume manually. P5 v2 J2 (hy4-flash:free) 503 ~5.5h; the 01:30 cron exits harmlessly if hy4 down; seat a live J2 != G0 or wait. Tip RED (b03a5a835985) heal. Critical path: Nov 27 reset -> panel tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 counting >=40% (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

@@ -1,0 +1,49 @@
+{
+ "record": "R165_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r165s1",
+ "audited_queue_tip": "b03a5a835985 (both lanes scheduled; tip RED)",
+ "audit_branch_parent": "ca8a351b7ce578555585b6464a2c737fe69139a5",
+ "LOOP_SCHEDULED_VERIFIED": {
+  "verdict": "the end-to-end loop is set for unattended post-reset execution: cron 550235 (Nov 27 00:05 UTC) panel byte-resume under claim c-0268 (5 snlite + 30 mst14b, 12000 budget, tally + recompute diff=0 -> score-8 evidence); cron 550250 (Nov 27 01:30 UTC) P5 v2 fresh counting run under claim c-0269 (two-seat-live-gate G0+J2, archives the 21/30 infra-terminal, unmodified runner on sealed corpus c9670d8dd4b55c0c -> counting >=40%). Claims c-0268/c-0269 registered (263 claims). The mutex conflict (r164s1 '9-item tail' vs V127 fresh-run) RESOLVED \u2014 one firing plan, the tail plan retired.",
+  "false_alarms_root_cause": "the xkiro vault key is AUTH-VALID on api.xkiro.com (HTTP 429 = daily free quota exhausted, NOT 401). The '401 revocations' / 'F45 sweep' were EMPTY-KEY probes from the recycle-rolled-back .env.keys. The panel was never auth-blocked, only daily-quota-blocked (resets Nov 27 00:00)."
+ },
+ "FINDINGS": [
+  {
+   "id": "R165-F1",
+   "severity": "MEDIUM",
+   "title": "cron-scheduled unattended runs may NOT survive the sandbox recycle (the recurring recycle problem); the durable path is the in-repo resume state + a follow-up message \u2014 verify the cron fired post-reset OR resume manually; do not rely solely on sandbox-local cron",
+   "evidence": "cron 550235/550250 registered; prior 'cron tool unavailable' + recycle history",
+   "direction": "DIR2/7 \u2014 post-reset verify cron fired; durable in-repo resume fallback"
+  },
+  {
+   "id": "R165-F2",
+   "severity": "MEDIUM",
+   "title": "P5 v2 counting run J2 seat (hy4-flash:free) 503-upstream ~5.5h; the 01:30 cron two-seat-gate exits harmlessly if hy4 still down; seat a live qualified J2 != G0 or wait for hy4 recovery",
+   "evidence": "cent-ai hy4 503 11 probes; P5 v2 hold 21/30",
+   "direction": "DIR4 \u2014 live J2 for the counting run"
+  },
+  {
+   "id": "R165-F3",
+   "severity": "LOW",
+   "title": "tip RED (b03a5a835985, run 139955580318) \u2014 recurring trailer/registry class; heal forward-only",
+   "evidence": "check-run failure",
+   "direction": "DIR5 \u2014 heal green"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; GH_PAT/HF alive; xkiro auth-valid (quota only); cent-ai hy4 503 transient; tokenrouter alive",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel scheduled unattended post-reset (c-0268); >=50% on completion",
+  "P5": "v2 design validated; counting run scheduled (c-0269) pending live J2 (hy4 503)"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120-V128 stand; loop scheduled unattended post-reset; false alarms corrected (empty-key probes); panel + P5 v2 fire on reset/recovery",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "Nov 27 00:00 reset -> panel cron (c-0268) tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron (c-0269) live-J2 counting >=40% (9)"
+ },
+ "recompute_pointer": "eval/r165_auditor_adjudication.json"
+}
