@@ -1,0 +1,32 @@
+{
+ "record": "R159S2_P5_V2_PREREG_DRAFT/1.0.0",
+ "claim": "c-0264 (the P5 side; the panel lane untouched)",
+ "work_id": "r159-p5-rediscovery-v2 (draft; fires only after the fresh seal build + the resolver repair lands)",
+ "session": "builder-r159s2",
+ "at": "2026-11-26 ~08:3x UTC",
+ "the_measured_inputs": {
+  "first_attempt": "30/30 NOT_MET: 6 RECOVERED = 20.0% (bar >=40%, min 12); canary 0/30 PASSED; T1 30/30; T2 0/30; 0 interventions",
+  "t2_calibration": "the resolver over-rejects (MORPH 5, title-only 21) but the BINDING class is the generator: 28/44 citations have ZERO stem-level content match (unrelated papers cited); per-item flip analysis: only 2/30 items would flip under a stem-match proxy -> a resolver fix alone cannot pass T2",
+  "j2_budget": "hy4-flash reasoning burned the 2500 budget (6 empty-content judge deaths incl. pc-30's J2=None that cost the run its 7th RECOVERED)"
+ },
+ "seat_plan_v2": {
+  "G0_stronger_generator": "z-ai glm-4-plus (free, sandbox-configured, the strongest available seat — the free DeepSeek lane measured 20.0% and is RETAINED only as transport backup; glm-4-plus was retired as a JUDGE (level), never as a generator — the P5 generator seat is the agent under test, no self-judging arises)",
+  "J1": "cent-ai dsv4f (r148-qualified, deepseek family)",
+  "J2": "cent-ai hy4f (r148-qualified, hy family, budget 2500->4000 pre-registered — the measured reasoning burn fix)",
+  "F2_check": "generator glm; judges dsv4f (deepseek) + hy4f (hy) + the fresh corpus authoring seat z-ai is REPLACED for authoring by a NON-glm seat to keep the corpus author independent of the generator (dsv4f authors the item fields); ZERO judge seat equals the generator family"
+ },
+ "resolver_repair_prereg": [
+  "stem matching: a term matches if the term OR its 6-char stem appears in title+abstract (repairs the measured MORPH class of 5 false rejections)",
+  "abstract handling: when the Crossref record carries no abstract, the support verdict is computed on the title PLUS a typed NO_ABSTRACT flag and the item's t2 verdict requires at least one citation with an abstract-backed support (repairs the measured title-only class of 21)",
+  "alphanumeric terms: the term regex accepts [A-Za-z0-9\\-]{4,} so cas9/co2-class mechanism terms are not silently dropped",
+  "the repair lands in a COMMITTED runner (scripts/r159_p5_v2_run.py, derived from r158) BEFORE the prereg fires — pre-registered, never mid-run"
+ ],
+ "fresh_seal_build": {
+  "corpus": "Crossref works API re-sample (chemistry, journal-article, has-abstract, from-pub-date 2025-10-15, NEW seed -> 30 NEW items; the r105s2 method), item fields authored by dsv4f (non-glm author seat)",
+  "canary": "30 NEW lures, one per item, an 8-word span from each ground_truth.main_hypothesis, ASSERTED absent from the served block, sha256-sealed in the prereg",
+  "cutoff_risk": "typed as in r158: the corpus is post-cutoff but the generator's own cutoff is UNVERIFIED - the canary scan is the contamination guard"
+ },
+ "acceptance_unchanged": ">=40% RECOVERED (min 12/30), 0 canary, >=1 T1 + >=1 T2 valid under the repaired resolver, 0 interventions, ONE unattended run with byte-resume checkpoint",
+ "the_one_command": "python3 scripts/r159_p5_v2_run.py  (after eval/r159_p5_v2_prereg.json is sealed)",
+ "honest_risk": "glm-4-plus is UNTESTED as a rediscovery agent — the 20.0% baseline is the free DeepSeek; the upgrade is the strongest available free seat, not a guarantee; the run measures it honestly either way"
+}
