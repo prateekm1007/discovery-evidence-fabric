@@ -1,0 +1,17 @@
+{"record": "R164S1_TRANSPORT_PROBES/1.0.0",
+ "at": "2026-11-26T13:55:00Z",
+ "session": "builder-r160s1",
+ "context": "DIR 1 hygiene after the R163S1 false-alarm corrections (V127 CORR + V128 CORR-R164-1). ROOT CAUSE FOUND WITH BYTES: the sandbox recycle rolled the checkout AND the gitignored .env.keys back to the pre-R160S1 snapshot (bfaab8511-era, 3 keys only) — the R163S1 401s were EMPTY-KEY probes (sha256 of the 'missing' key values = e3b0c44298fc = empty-string digest), not provider revocations. Vault re-custodied from the directions' current keys this window; digests verified; file still gitignored.",
+ "probe_table": [
+  {"seat": "tokenrouter G0 (deepseek-v4.1-flash-1017-free)", "host": "api.tokenrouter.com", "probe": "chat/completions max_tokens=16", "result": "HTTP 200, finish=stop, usage 35+12 tokens", "verdict": "ALIVE — matches V127 (the R163S1 '401 revoked' typing was the stale vault)"},
+  {"seat": "cent-ai KEY", "host": "api.cent-ai.dev", "probe": "GET /v1/models", "result": "HTTP 200, 50 models", "verdict": "KEY VALID — matches V127 ('invalid_api_key' was the stale vault)"},
+  {"seat": "cent-ai hy4-flash:free (v2 J2)", "host": "api.cent-ai.dev", "probe": "chat/completions max_tokens=64", "result": "HTTP 503 upstream_unavailable (since ~09:32Z, ~4.2h)", "verdict": "MODEL OUTAGE persists — the v2 tail byte-resume (9 items) stays pending on this seat; no unilateral judge swap (DELETE LIST)"},
+  {"seat": "xkiro VAULT KEY (digest f6c09bee9bde)", "host": "api.xkiro.com (V128 canonical)", "probe": "chat/completions max_tokens=8", "result": "HTTP 429 rate_limit_exceeded: 'today's free-model token quota... wait for the daily reset'", "verdict": "AUTH VALID, daily quota spent — the post-reset (00:00 UTC Nov 27) panel byte-resume is OPEN on this host"},
+  {"seat": "xkiro same key (cross-check)", "host": "llm.chutes.ai", "probe": "chat/completions max_tokens=8", "result": "HTTP 401 Invalid token", "verdict": "HOST-DEAD for this key — the provider migrated surfaces; corrects the R162/R163 'xkiro 401 auth-dead' typing (that was a wrong-HOST probe; the panel transport was never pointed here — route_adapter.py:339 uses api.xkiro.com/v1)"}],
+ "corrections_typed": [
+  "R163S1 'F45 sweep, three keys revoked' — WRONG: stale-vault empty-key artifact; V127 CORR accepted, no keys need rotation for tokenrouter/cent-ai",
+  "R162S1/R163S1 'xkiro 401 auth-dead on llm.chutes.ai' — WRONG HOST: the canonical transport is api.xkiro.com/v1 (V128); auth there is VALID (429 quota only)",
+  "'xkiro DNS-dead api.xkiro.ai' (r163's alarm) — WRONG TLD, corrected by V128; .com resolves and serves"],
+ "panel_state": "snlite 25/30 (23 VALID + 2 RATE_LIMITED) + mst14b 0/30 + hy4f 30/30; byte-resume OPEN post-reset on api.xkiro.com; budget 12000-snlite in tree; serving set frozen (alpha 0.945046)",
+ "v2_state": "21/30 terminal INFRA record (c04b405e7); G0 alive; J2 waits on hy4 upstream; counting-run re-authorization = auditor's act (V127); claims c-0265/c-0267 hold the lanes",
+ "owner_acts": "NONE confirmed-blocking (V128): optional funded xkiro path (the 429 message confirms a separate paid allowance would bypass the free-pool wall); rotate only confirmed-revoked keys (none found this window)"}
