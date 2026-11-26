@@ -2413,7 +2413,9 @@
    "severity": "MEDIUM",
    "title": "cron-scheduled unattended runs may NOT survive the sandbox recycle (the recurring recycle problem); the durable path is the in-repo resume state + a follow-up message \u2014 verify the cron fired post-reset OR resume manually; do not rely solely on sandbox-local cron",
    "evidence": "cron 550235/550250 registered; prior 'cron tool unavailable' + recycle history",
-   "status": "OPEN"
+   "status": "CLOSED",
+   "closed_round": "R166",
+   "resolved_by": "crons platform-side (cronjob-gateway), survived recycle, active run_count 0"
   },
   {
    "id": "R165-F2",
@@ -2429,6 +2431,16 @@
    "severity": "LOW",
    "title": "tip RED (b03a5a835985, run 139955580318) \u2014 recurring trailer/registry class; heal forward-only",
    "evidence": "check-run failure",
+   "status": "CLOSED",
+   "closed_round": "R166",
+   "resolved_by": "red-tip heal ebd966f6a (session registered + takeover schema), Art.29 9/9, CI success"
+  },
+  {
+   "id": "R166-F1",
+   "round": "R166",
+   "severity": "MEDIUM",
+   "title": "post-reset execution: panel cron (00:05) fires the 35-leg byte-resume -> tally >=50% = score 8; P5 v2 counting cron (01:30) fires on hy4 recovery (still 503) -> >=40% = score-9 path; verify both fired (run_count) post-reset",
+   "evidence": "cron 550235/550250 active run_count 0; hy4 503; xkiro quota reset Nov 27 00:00",
    "status": "OPEN"
   }
  ],
@@ -5802,6 +5814,22 @@
     "R165-F2",
     "R165-F3"
    ]
+  },
+  {
+   "id": "V130",
+   "round": "R166 audit: cron durability CONFIRMED (platform-side) + red tip healed; loop durable + scheduled",
+   "commit": "b4afa8a22edafae82be6415c9cf8fc4244d7d8d9",
+   "gate": "crons platform-side durable (R165-F1 closed); red tip healed (R165-F3 closed); panel 00:05 + P5 v2 01:30 scheduled; hy4 503 pending; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r166_auditor_adjudication.json",
+   "findings": [
+    "R166-F1"
+   ],
+   "closed": [
+    "R165-F1",
+    "R165-F3"
+   ]
   }
  ],
  "gold_set": {
@@ -6202,7 +6230,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. END-TO-END LOOP SCHEDULED UNATTENDED: cron 550235 (Nov 27 00:05 UTC) panel byte-resume claim c-0268 (5 snlite + 30 mst14b, 12000 budget, tally + recompute diff=0 -> score-8 evidence); cron 550250 (Nov 27 01:30 UTC) P5 v2 fresh counting run claim c-0269 (two-seat-live-gate, archives 21/30 infra-terminal, unmodified runner on sealed corpus c9670d8dd4b55c0c -> counting >=40%). Claims c-0268/c-0269 registered. Mutex conflict (r164s1 9-item-tail vs V127 fresh-run) RESOLVED, one firing plan. FALSE ALARMS ROOT CAUSE: xkiro vault key AUTH-VALID on api.xkiro.com (429 daily quota, NOT 401); the '401 revocations/F45 sweep' were EMPTY-KEY probes from the recycle-rolled-back .env.keys; panel never auth-blocked, only quota-blocked (resets Nov 27 00:00). CAVEAT (R165-F1): sandbox-local cron may not survive the recycle \u2014 the durable path is the in-repo resume state + follow-up message; verify the cron fired post-reset OR resume manually. P5 v2 J2 (hy4-flash:free) 503 ~5.5h; the 01:30 cron exits harmlessly if hy4 down; seat a live J2 != G0 or wait. Tip RED (b03a5a835985) heal. Critical path: Nov 27 reset -> panel tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 counting >=40% (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. CRON DURABILITY CONFIRMED (V129 R165-F1 closed): the scheduled jobs live PLATFORM-SIDE (cronjob-gateway), survived the recycle \u2014 job 550235 (panel byte-resume Nov 27 00:05 UTC c-0268) + job 550250 (P5 v2 counting run 01:30 UTC c-0269), active run_count 0; the unattended end-to-end loop is DURABLE (in-repo resume state fallback). RED TIP HEALED (R165-F3 closed): the builder's Art.29(a) miss (session builder-r165s1 unregistered) + takes_over prose + work_id suffix healed forward-only; Art.29 9/9, tip ebd966f6a CI success. REMAINING: P5 v2 J2 hy4-flash:free 503-upstream ~6h (auditor probe confirms); the 01:30 counting cron two-seat-gate fires on hy4 recovery (G0 tokenrouter alive); panel (00:05) quota-gated only (xkiro auth-valid, resets Nov 27 00:00). Critical path: Nov 27 reset -> panel cron 35-leg byte-resume -> tally >=50% (8) + auditor sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron on hy4 recovery -> counting >=40% (9). Verify both crons fired (run_count) post-reset. Goal 9/10 fully agent-run. Owner acts: none confirmed-blocking.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",

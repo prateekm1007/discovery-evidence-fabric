@@ -1,0 +1,36 @@
+{
+ "record": "R166_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r166s1",
+ "audited_queue_tip": "ebd966f6a57a (red-tip heal; tip GREEN)",
+ "audit_branch_parent": "b4afa8a22edafae82be6415c9cf8fc4244d7d8d9",
+ "RESOLVED": {
+  "cron_durability": "V129 R165-F1 RESOLVED \u2014 the two scheduled jobs live PLATFORM-SIDE (cronjob-gateway), NOT sandbox-local: job 550235 (panel byte-resume, Nov 27 00:05 UTC, c-0268) + job 550250 (P5 v2 counting run, 01:30 UTC, c-0269) both SURVIVED the recycle, active, run_count 0. The unattended end-to-end loop is DURABLE; the in-repo resume state remains the documented fallback.",
+  "red_tip": "V129 R165-F3 RESOLVED \u2014 the red was the builder's own Art.29(a) miss (session builder-r165s1 unregistered) + takes_over prose + work_id suffix; healed forward-only (session registered, bare-id takes_over, c-0265/c-0267 -> TAKEN_OVER per the owners' typed yields, work_id aligned). Art.29 9/9, tip ebd966f6a surface SUCCESS."
+ },
+ "REMAINING": "P5 v2 J2 seat hy4-flash:free still 503-upstream (~6h, 13 probes; auditor probe confirms 503). The 01:30 counting-run cron two-seat-gate fires on hy4 recovery (or any live window earlier); G0 tokenrouter alive. The panel (00:05) is quota-gated only (xkiro auth-valid, resets Nov 27 00:00).",
+ "FINDINGS": [
+  {
+   "id": "R166-F1",
+   "severity": "MEDIUM",
+   "title": "post-reset execution: panel cron (00:05) fires the 35-leg byte-resume -> tally >=50% = score 8; P5 v2 counting cron (01:30) fires on hy4 recovery (still 503) -> >=40% = score-9 path; verify both fired (run_count) post-reset",
+   "evidence": "cron 550235/550250 active run_count 0; hy4 503; xkiro quota reset Nov 27 00:00",
+   "direction": "DIR2/4 \u2014 verify cron firing post-reset; sealed v18 scoring after panel"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; vault-restore alive; xkiro auth-valid quota-only; cent-ai hy4 503 transient; tokenrouter alive",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel cron durable + scheduled (00:05); >=50% on firing",
+  "P5": "v2 design validated; counting cron durable + scheduled (01:30) pending hy4 recovery"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120-V129 stand; cron durability confirmed (platform-side); red tip healed; loop durable + scheduled; panel + P5 v2 fire post-reset/recovery",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "Nov 27 00:00 reset -> panel cron tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 cron on hy4 recovery >=40% (9)"
+ },
+ "recompute_pointer": "eval/r166_auditor_adjudication.json"
+}
