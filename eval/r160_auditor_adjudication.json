@@ -1,0 +1,45 @@
+{
+ "record": "R160_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r160s1",
+ "audited_queue_tip": "7d62dd297f7d (panel heartbeat 3; tip green; Nov 26 09:02 UTC \u2014 past quota reset)",
+ "audit_branch_parent": "1e7cd5ace9f3698aa4b70090bc2d563377c5b3ec",
+ "KEY_BLOCKER_RESOLVED": {
+  "verdict": "V123 R159-F1 RESOLVED. The owner delivered a GENUINE HF rotation (hf_uPpcqXQl\u2026, digest 0af8db243dee, whoami 200 user prateekm1 fineGrained \u2014 different bytes from the expired 33bc7af22c62). The r77 vault-restore path is ALIVE again: exit 0, 8 vault-managed keys restored fail-closed; XKIRO_API_KEY f6c09bee9bde [COMMITTED_RECORD_MATCH] \u2014 the working free-plan xkiro key is now recoverable in ANY sandbox via prateekm1/operator-keys-vault. MASTER_TOKEN_DIGEST updated forward-only; custody record 91d0c398f committed, CI green. The score-8 panel key-blocker is cleared."
+ },
+ "PANEL_RUNNING": {
+  "verdict": "the quota reset (00:00 UTC Nov 26) has PASSED (now 09:02 UTC Nov 26); the panel is RUNNING on the r160s1 lane (claim c-0265): snlite 19/30 (8 fresh legs landed post-reset), hy4f 30/30, mst14b 0/30 pending. The 52-leg byte-resume is progressing. TALLY not yet computed (panel incomplete). The score-8 >=50% verdict lands when snlite 30 + mst14b 30 complete.",
+  "t2_calibration": "the V123 R159-F2 T2-resolver flag is being addressed (83a72c3aa7b1 'DIR-4 T2 CALIBRATION \u2014 THE VERIFIER-CLASS COMPLEMENT') \u2014 the P5 v2 lane (fresh seal -> resolver repair -> unattended run)."
+ },
+ "FINDINGS": [
+  {
+   "id": "R160-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel running post-reset (snlite 19/30, mst14b 0/30, hy4f 30/30); completes when snlite 30 + mst14b 30 land -> 3-judge tally >=50% = score 8",
+   "evidence": "panel leg census; r160s1 heartbeats; quota reset passed",
+   "direction": "DIR2 \u2014 let the panel byte-resume complete; tally + recompute diff=0"
+  },
+  {
+   "id": "R160-F2",
+   "severity": "MEDIUM",
+   "title": "P5 v2: T2-resolver calibration repair in progress (the 0/29 false-negative-everything flag); then a stronger rediscovery generator + fresh sealed unattended re-run >=40%",
+   "evidence": "83a72c3aa7b1 T2 calibration; r159s1_p5_close 6/29",
+   "direction": "DIR4 \u2014 T2 repair + stronger P5 generator + fresh seal re-run"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; HF rotation landed, vault-restore alive; F45 rotation list standing",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel RUNNING post-reset (snlite 19, mst14b 0, hy4f 30); >=50% verdict on completion",
+  "P5": "first attempt NOT_MET (20.7%); T2 calibration repair + stronger generator in progress (v2 lane)"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120/V122/V123 stand; key-blocker resolved (HF rotation); panel running post-reset; score-8 >=50% verdict on panel completion",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "panel completes (snlite 30 + mst14b 30) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 (T2 repair + stronger generator) >=40% + unattended (9)"
+ },
+ "recompute_pointer": "eval/r160_auditor_adjudication.json"
+}

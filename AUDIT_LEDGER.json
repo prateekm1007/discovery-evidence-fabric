@@ -2315,7 +2315,9 @@
    "severity": "MEDIUM",
    "title": "score-8 panel key-blocked: working xkiro free-plan key lost in recycle + HF master token EXPIRED (vault restore dead); owner must re-deliver the xkiro key + a valid HF token; quota reset alone insufficient",
    "evidence": "r159s1_panel_runbook; HF whoami 401; directions xkiro key 401",
-   "status": "OPEN"
+   "status": "CLOSED",
+   "resolved_by": "HF genuine rotation (0af8db243dee) + r77 vault-restore alive; xkiro key f6c09bee9bde recoverable; panel running post-reset",
+   "closed_round": "R160"
   },
   {
    "id": "R159-F2",
@@ -2323,6 +2325,22 @@
    "severity": "MEDIUM",
    "title": "P5 first attempt NOT_MET (20.7% recovery, generator undershot); T2 resolver 0/29 needs a calibration check (false-negative-everything risk); score-9 needs a stronger rediscovery generator",
    "evidence": "r159s1_p5_close 6/29, T2 0/29",
+   "status": "OPEN"
+  },
+  {
+   "id": "R160-F1",
+   "round": "R160",
+   "severity": "MEDIUM",
+   "title": "score-8 panel running post-reset (snlite 19/30, mst14b 0/30, hy4f 30/30); completes when snlite 30 + mst14b 30 land -> 3-judge tally >=50% = score 8",
+   "evidence": "panel leg census; r160s1 heartbeats; quota reset passed",
+   "status": "OPEN"
+  },
+  {
+   "id": "R160-F2",
+   "round": "R160",
+   "severity": "MEDIUM",
+   "title": "P5 v2: T2-resolver calibration repair in progress (the 0/29 false-negative-everything flag); then a stronger rediscovery generator + fresh sealed unattended re-run >=40%",
+   "evidence": "83a72c3aa7b1 T2 calibration; r159s1_p5_close 6/29",
    "status": "OPEN"
   }
  ],
@@ -5599,6 +5617,22 @@
     "R159-F1",
     "R159-F2"
    ]
+  },
+  {
+   "id": "V124",
+   "round": "R160 audit: HF rotation resolved the key-blocker; panel running post-reset; T2 calibration in progress",
+   "commit": "1e7cd5ace9f3698aa4b70090bc2d563377c5b3ec",
+   "gate": "R159-F1 key-blocker RESOLVED (HF rotation, xkiro recoverable); panel running (snlite 19, mst14b 0, hy4f 30); score-8 on completion; P5 v2 T2 repair",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r160_auditor_adjudication.json",
+   "findings": [
+    "R160-F1",
+    "R160-F2"
+   ],
+   "closed": [
+    "R159-F1"
+   ]
   }
  ],
  "gold_set": {
@@ -5999,7 +6033,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED (V120/V122 stand). P5 FIRST ATTEMPT NOT_MET (verified): recovery 6/29=20.7% vs >=40% (sealed max 7/30=23.3%); canary PASSED 0/29, T1 29/29, T2 0/29 (deterministic resolver rejected every citation \u2014 calibration check needed, false-negative-everything risk), 0 interventions, diff=0. Binding constraint = the GENERATOR seat undershot the rediscovery (not the judges); score-9 needs a stronger P5 generator + T2 resolver check. SCORE-8 PANEL KEY-BLOCKED past the quota reset: the vault lost the working XKIRO free-plan key (snlite/mst14b transport) in the recycle, and the HF master token is EXPIRED (whoami 401) so the r77 vault-restore is DEAD; the directions' xkiro key sk-xt-c3643f is 401-dead. The Nov 26 00:00 quota reset alone does NOT unblock \u2014 OWNER must RE-DELIVER the working xkiro free-plan key + a valid HF master token. Serving panel calibrated+frozen (snlite+mst14b+hy4f alpha 0.945); hy4f 30 legs committed; 52-leg runbook ready. DIR1 verified, tip green (65b9f1de5), DIR6 93/93. F45 rotation list: GH_PAT/HF/cent-ai/xkiro/llmtr/tokenrouter. Critical path: owner re-deliver xkiro+HF -> Nov 26 reset -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> stronger P5 generator + T2 check -> P5 >=40% + unattended (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. KEY-BLOCKER RESOLVED (V123 R159-F1 closed): owner delivered a GENUINE HF rotation (digest 0af8db243dee, whoami 200 prateekm1); r77 vault-restore ALIVE (8 keys fail-closed, XKIRO f6c09bee9bde COMMITTED_RECORD_MATCH recoverable in any sandbox); MASTER_TOKEN_DIGEST updated; custody 91d0c398f CI green. Quota reset (00:00 UTC Nov 26) PASSED (now 09:02 UTC Nov 26); the score-8 panel is RUNNING (r160s1 lane c-0265): snlite 19/30 (8 fresh post-reset), hy4f 30/30, mst14b 0/30 pending; 52-leg byte-resume progressing; TALLY pending completion. Serving set frozen (snlite+mst14b+hy4f alpha 0.945). P5 v2 lane: T2-resolver calibration repair in progress (83a72c3aa7b1, the 0/29 false-negative flag) + stronger rediscovery generator + fresh sealed unattended re-run. Critical path: panel completes (snlite 30 + mst14b 30) -> 3-judge tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 >=40% + unattended (9). Goal 9/10 fully agent-run. F45 rotation list standing (GH_PAT/cent-ai/xkiro/llmtr/tokenrouter; HF rotated).",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
