@@ -1,0 +1,50 @@
+{
+ "record": "R164_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r164s1",
+ "audited_queue_tip": "815e03c74ddf / 686264047 (lane-state addendum; P5 v2 hold 21/30)",
+ "audit_branch_parent": "274b1e6c7a2921cffe7938410b84f986ce85a0f7",
+ "CORRECTION_ART9": {
+  "withdraws": "the builder's 'xkiro domain DNS-dead (api.xkiro.ai), provider-side outage, panel hard-blocked until owner/provider fix'",
+  "correction": "PROBE ERROR (wrong TLD). The correct endpoint api.xkiro.com RESOLVES FINE (DNS -> 104.18.11.239, Cloudflare); api.xkiro.ai is a NONEXISTENT TLD (the builder probed .ai instead of .com). The xkiro endpoint is REACHABLE \u2014 the panel is NOT DNS-blocked. It needs the VAULT key (f6c09bee9bde) auth probe on api.xkiro.com + the quota reset (00:00 UTC Nov 27), NOT a provider DNS fix. The route_adapter's registered base_url is https://api.xkiro.com/v1.",
+  "implication": "the score-8 panel is NOT hard-blocked on a provider outage; resume path is open once the vault key auth-probes VALID post-reset. Do not escalate a provider-DNS owner act for a wrong-TLD probe."
+ },
+ "TRANSPORT_STATE_VERIFIED": {
+  "tokenrouter": "200 ALIVE (P5 G0 generator works)",
+  "cent_ai": "503 upstream_unavailable (hy4-flash:free model-down ~4.5h, KEY VALID \u2014 not revoked)",
+  "xkiro": "api.xkiro.com DNS resolves; vault-key auth probe pending (builder)",
+  "gh_pat_hf": "alive"
+ },
+ "P5_V2_STATE": "hold 21/30 (9 remaining unrecorded for true dual-judge adjudication per prereg); G0 tokenrouter alive, J2 cent-ai hy4 503 model-down. The 21 PARTIAL-final seal the run NOT_MET (max 9/30=30%<40%) as INFRA; the fresh counting run (V127 re-authorization) needs a live J2 seat. J1 raw signal preserved (6 REC/12 PART/3 NR, canary 0, T1 21/21, 0 interventions); v2 design validated.",
+ "FINDINGS": [
+  {
+   "id": "R164-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel NOT DNS-blocked (xkiro .com resolves; builder probed wrong .ai TLD); resume needs vault-key auth probe on api.xkiro.com + quota reset, not a provider fix",
+   "evidence": "api.xkiro.com DNS 104.18.11.239; api.xkiro.ai NXDOMAIN",
+   "direction": "DIR2 \u2014 probe api.xkiro.com vault key post-reset; resume panel"
+  },
+  {
+   "id": "R164-F2",
+   "severity": "MEDIUM",
+   "title": "P5 v2 counting run needs a live J2 (cent-ai hy4 503 model-down ~4.5h); G0 tokenrouter alive; wait for hy4 recovery OR seat a live qualified J2 != generator; fresh run re-authorized (V127)",
+   "evidence": "cent-ai 503; tokenrouter 200; v2 hold 21/30",
+   "direction": "DIR4 \u2014 live J2 + fresh v2 counting run >=40%"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; GH_PAT/HF alive; cent-ai 503 transient, tokenrouter alive, xkiro reachable",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "serving calibration MET (alpha 0.945); panel reachable (xkiro .com resolves), needs vault-key probe + quota reset",
+  "P5": "v2 design validated; 21/30 infra hold; counting run needs live J2 (re-authorized V127)"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120-V127 stand; xkiro DNS-dead premise corrected (wrong TLD); panel reachable; P5 v2 counting run needs live J2",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "xkiro vault-key probe (api.xkiro.com) post-reset -> panel resume -> tally >=50% (8); P5 v2 live-J2 counting run >=40% (9); sealed v18 >=3.3 (consolidate 6/7)"
+ },
+ "recompute_pointer": "eval/r164_auditor_adjudication.json"
+}
