@@ -2374,6 +2374,22 @@
    "title": "P5 v2 ONE unattended run pending (AM50 T2 + fresh seal landed); needs the stronger G0 generator (first attempt under-cited 28/44); >=40% recovery + 0 canary + 0 interventions",
    "evidence": "r159_p5_v2_prereg; first attempt 6/30",
    "status": "OPEN"
+  },
+  {
+   "id": "R163-F1",
+   "round": "R163",
+   "severity": "MEDIUM",
+   "title": "P5 v2 fresh run RE-AUTHORIZED (delegated owner): tokenrouter G0 ALIVE, cent-ai 503 transient (not revoked); run the same sealed corpus with live seats for a counting verdict (the 21/30 was infra, not measurement)",
+   "evidence": "auditor probes tokenrouter 200, cent-ai 503; v2 terminal infra",
+   "status": "OPEN"
+  },
+  {
+   "id": "R163-F2",
+   "round": "R163",
+   "severity": "MEDIUM",
+   "title": "score-8 panel: probe the xkiro VAULT key (f6c09bee9bde) fresh before assuming revocation; if VALID post-reset, resume the panel (5 snlite + 30 mst14b); only escalate owner re-delivery for a CONFIRMED 401 on the vault key",
+   "evidence": "builder xkiro-401 claim unverified against the vault key; tokenrouter/cent-ai not revoked",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5700,6 +5716,22 @@
     "R162-F1",
     "R162-F2"
    ]
+  },
+  {
+   "id": "V127",
+   "round": "R163 audit: 'all keys revoked' CORRECTED (tokenrouter alive, cent-ai 503 transient); P5 v2 fresh run re-authorized; panel needs fresh vault-key probe",
+   "commit": "0f6537c508bf91cff2f3cd94482ee4ad3ce2cea6",
+   "gate": "F45-sweep premise corrected (not a full revocation); P5 v2 re-authorized on live seats; panel fresh vault-key probe; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r163_auditor_adjudication.json",
+   "findings": [
+    "R163-F1",
+    "R163-F2"
+   ],
+   "corrections": [
+    "CORR-R163-1"
+   ]
   }
  ],
  "gold_set": {
@@ -6100,7 +6132,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. Panel: snlite 25/30 (23 VALID + 2 RATE_LIMITED), mst14b 0/30, hy4f 30/30; owner-directed snlite budget [12000] upfront landed (bf6da6e32, ladder retired). Resume hit the xkiro daily pool HARD rate-limit (the morning's 12000-budget legs + peer seal-building re-drew the quota); runner stopped typed (98c399b8f). STRUCTURAL BOTTLENECK: the xkiro FREE daily token quota (~260K) is too small for the full 52-leg panel + 83-leg qualification + peer activity in one day; the 12000-budget snlite reasoning legs are token-hungry. Panel completes via byte-resume over ~2-3 daily resets (remaining 5 snlite + 30 mst14b after 00:00 UTC Nov 27) OR owner FUNDS the judge-queue (xkiro plan / cent-ai top-up \u2014 allowed under 'no rented compute') for one-window completion. P5 v2: AM50 T2 redesign + FRESH SEAL + prereg landed (d675cf4a0; known-item registry 7/34, 30 canaries, F2-clean seats); the ONE unattended run pending (peer lane); first attempt 20.0% NOT_MET, v2 needs stronger G0 generator. HF rotation landed, vault-restore alive. Critical path: panel completes (fund for speed OR multi-day resume) -> tally >=50% (8) + sealed v18 >=3.3 (consolidate 6/7) -> P5 v2 unattended >=40% (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. CORRECTION (Art.9, CORR-R163-1): the builder's 'F45 rotation sweep \u2014 three keys revoked, all lanes hard-blocked on owner delivery' is CONTRADICTED by fresh auditor probes: TOKENROUTER deepseek-free 200 ALIVE (P5 G0 generator works), CENT-AI hy4-flash:free 503 upstream_unavailable (MODEL-UPSTREAM outage, NOT 401 key-revocation; key valid), GH_PAT alive. Transient upstream/rate errors, NOT a coordinated revocation. The xkiro VAULT key f6c09bee9bde needs a fresh builder probe (auditor sandbox can't reach HF); do NOT assume revocation from transient 401/429. The loop is NOT fully blocked. P5 v2: the 21/30 terminal was INFRA (cent-ai J2 503 burn; all PARTIAL-final, max 9/30=30%<40%, canary 0, T1 21/21, 0 interventions); the v2 DESIGN validated (AM50 T2, F2-clean seats). DELEGATED OWNER RE-AUTHORIZES a fresh v2 run on the SAME sealed corpus with LIVE seats (tokenrouter G0 alive; J2 live \u2014 cent-ai recovers or another live judge) for a counting verdict; the infra termination produced no counting verdict so the sealed corpus is not measurement-burned. Score-8 panel: probe the xkiro vault key fresh; if VALID post-reset resume (5 snlite + 30 mst14b); escalate owner re-delivery ONLY for a CONFIRMED 401 on the vault key. Critical path: fresh vault-key probe -> panel >=50% (8); P5 v2 fresh run live seats >=40% (9); sealed v18 >=3.3 (consolidate 6/7). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -6258,6 +6290,14 @@
    "withdraws": "V121 'xkiro quota reset passed'",
    "correction": "quota burned Nov 25, resets 00:00 UTC Nov 26 (verifier two-probe confirmed); panel gated until then",
    "authority": "Auditor Art.9"
+  },
+  {
+   "id": "CORR-R163-1",
+   "round": "R163",
+   "date": "2026-11-26",
+   "withdraws": "R163 'F45 sweep three keys revoked, all lanes blocked'",
+   "correction": "fresh probes: tokenrouter 200 ALIVE, cent-ai 503 upstream (model-down, key valid), GH_PAT alive \u2014 transient upstream/rate errors, not coordinated revocation; xkiro vault key needs fresh probe",
+   "authority": "Auditor Art.9/Art.1"
   }
  ],
  "rulings": [
