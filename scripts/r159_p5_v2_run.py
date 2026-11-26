@@ -302,7 +302,13 @@ def resolve_citation_v2(cit: str, km: str, item_id: str) -> dict:
     rec["resolver"] = "crossref:200"
     # (a) known-item tier: registered prior-art title match
     best = 0.0
-    for reg_title in known_item_registry_for(item_id):
+    for reg_entry in known_item_registry_for(item_id):
+        # registry entries are dicts: the MAPPED entry's matched_title
+        # is the canonical Crossref form; served_title is the fallback
+        reg_title = (reg_entry.get("matched_title")
+                     if isinstance(reg_entry, dict) else None) \
+            or (reg_entry.get("served_title")
+                if isinstance(reg_entry, dict) else reg_entry) or ""
         best = max(best, title_ratio(title, reg_title))
     rec["known_item_title_ratio"] = round(best, 3)
     if best >= TITLE_MATCH_BAR:
