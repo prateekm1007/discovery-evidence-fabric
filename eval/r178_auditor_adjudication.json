@@ -1,0 +1,50 @@
+{
+ "record": "R178_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r178s1",
+ "audited_queue_tip": "ce16b31c6abe (CTAI strip + DIR-3 kill + DIR-8 scrub + DIR-4 harness + DIR-2 invention corpus in flight)",
+ "audit_branch_parent": "8413e1ad0f42d8804ff9404d132e23333b3bf4ff",
+ "CTAI_BURN_CONFIRMED": "the live CTAI_API_KEY (ctai_dm38\u2026) was committed in scripts/r169s1_vault_manage_ctai.py at public queue tip c1dbd0cf2c3e \u2014 BURNED (Art.12, public ref). Builder stripped it forward-only (1b5e930b5, env-lookup; tip tree verified clean). The owner re-delivered the SAME burned key this turn \u2014 it MUST be rotated (the value is public in history). The vault HF_TOKEN is one rotation stale (delivered 0af8db243dee works).",
+ "DIR3_KILL_VERIFIED": "mitigation kill criterion delivered (r177s1_dir3_keep_retire, byte-recomputed): genuine novel-candidate value-add 1/12=8.3%, departure 0/12, dominance ties 7/12 -> RETIRE the multi-stage pipeline for MITIGATION; ship best-of-4+critique+revise+verifier. Invention decision deferred to the AM53 gate (DIR-2 run).",
+ "DIR2_INVENTION_INFLIGHT": "the 24-item invention-shaped corpus (r176_invention_corpus/items.jsonl) + prereg (AM53 exclusion taxonomy, gate_score4) + instrument landed (c0bee964a, builder-r176s1, prereg sealed pre-run); the judged run is IN FLIGHT (no result yet). This is the AM53 genuine-novel-win test (score-4 gate).",
+ "DIR8_HONEST_NEGATIVE": "tranche 1: 12 R-dirs archived (zero functional refs, zero constitution-custody), root 225->213; archive tag pushed before scrub. The '~30 root' target is NOT reference-safely reachable \u2014 108 dirs are wired into the live engine/tests/workflows; reaching ~30 needs an engine-side resolver refactor (owner authorization).",
+ "P5_LEASE_CORRECTION": "the direction's 'P5 lease expired, takeover lawful' was WRONG (Art.7 bytes win): c-0275 re-claimed today, lease LIVE to 2026-11-28T00:00Z, seal committed, run not executed. No takeover before expiry. Builder caught it (Art.9).",
+ "FINDINGS": [
+  {
+   "id": "R178-F1",
+   "severity": "HIGH",
+   "title": "CTAI_API_KEY burned (public commit c1dbd0cf2c3e); stripped forward-only, tip clean; owner MUST rotate (re-delivered key is the burned one)",
+   "evidence": "scripts/r169s1_vault_manage_ctai.py history; tip strip verified",
+   "direction": "owner rotate CTAI; builder use the rotated key env-only"
+  },
+  {
+   "id": "R178-F2",
+   "severity": "MEDIUM",
+   "title": "score-4 invention gate pending: the 24-item invention corpus + AM53 prereg landed, run in flight; the pipeline's OWN novel candidates must win >=50% (not dominance ties)",
+   "evidence": "r176_invention_corpus + prereg gate_score4; run in flight",
+   "direction": "DIR2 \u2014 complete the invention run, judge blind, genuine-win tally"
+  },
+  {
+   "id": "R178-F3",
+   "severity": "LOW",
+   "title": "DIR-8 ~30-root target not reference-safely reachable (108 dirs wired); needs an engine resolver refactor (owner authorization); 12 archived honestly",
+   "evidence": "r177s1 reference scan 115 hard keeps",
+   "direction": "DIR8 \u2014 owner authorize resolver refactor OR accept ~213 root"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET (honest infra); CTAI burned->stripped, owner rotate",
+  "P1": "grounding identity-TRUE + physics-correct",
+  "P2": "mitigation kill criterion DELIVERED (RETIRE multi-stage, ship best-of-N+verifier); invention test in flight",
+  "P3": "rediscovery pending (P5 lease live)",
+  "P4": "panel 10% non-obvious",
+  "P5": "v2 lease live, run not executed"
+ },
+ "SCORE": {
+  "value": 3,
+  "capability_first": true,
+  "basis": "AM52/AM53: mitigation pipeline RETIRED (8.3% value-add); the invention-shaped genuine-win test (score-4 gate) in flight, no result yet; no genuine invention win demonstrated",
+  "goal": "9/10 via capability-first phases",
+  "critical_path": "invention run genuine-win >=50% (4) -> holdout CI>50% (6) -> rediscovery >=30% (7) -> validation+external (8->9)"
+ },
+ "recompute_pointer": "eval/r178_auditor_adjudication.json"
+}
