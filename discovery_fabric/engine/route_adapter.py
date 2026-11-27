@@ -743,6 +743,93 @@ def cent_ai_chat(messages: List[dict], model: str = "hy4-flash:free",
             "raw": data}
 
 
+def ctai_chat(messages: List[dict], model: str = "openai/gpt-6-luna",
+              max_tokens: int = 4000, timeout_s: float = 240.0,
+              api_key: Optional[str] = None,
+              api_base: Optional[str] = None,
+              temperature: float = 0.0) -> Dict[str, Any]:
+    """One cantrustai call (the R169 owner delivery: 'use it for
+    judges'). OpenAI-compatible chat/completions on
+    api.cantrustai.xyz (the vault's CTAI_BASE_URL is the API base,
+    /v1 included; the ctai_ key is vault-managed, digest 3779a467bb9a).
+    Typed refusals: missing_key, degenerate_input, auth, rate_limited,
+    model_not_allowed (the allowlist class — bare names like
+    'gpt-6-luna' 500 with 'model not in allowlist'; the ids are
+    transport-prefixed, e.g. openai/gpt-6-luna, from the site's own
+    frontend bundle), http_<code>, transport, malformed_response,
+    length_no_content, empty_content."""
+    key = api_key if api_key is not None else \
+        resolve_vault_key("CTAI_API_KEY")
+    if not key:
+        raise RouteRefused("missing_key", "ctai",
+                           "no CTAI_API_KEY in the vault (env-only, "
+                           "digests-only — Art. 17 custody)")
+    if not messages:
+        raise RouteRefused("degenerate_input", "ctai",
+                           "empty messages (typed refusal, F67)")
+    base = (api_base if api_base is not None else
+            resolve_vault_key("CTAI_BASE_URL")
+            or "https://api.cantrustai.xyz/v1").rstrip("/")
+    body = json.dumps({"model": model, "messages": messages,
+                       "max_tokens": max_tokens,
+                       "temperature": temperature}).encode("utf-8")
+    req = urllib.request.Request(
+        f"{base}/chat/completions", data=body, method="POST",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json",
+                 "User-Agent": BROWSER_UA})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout_s) as r:
+            data = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = e.read().decode("utf-8")[:180]
+        except Exception:  # noqa: BLE001
+            pass
+        if "allowlist" in detail:
+            raise RouteRefused(
+                "model_not_allowed", "ctai",
+                f"HTTP {e.code}: {detail} — the ctai model ids are "
+                "transport-prefixed (openai/gpt-6-luna, openai/"
+                "gpt-6-astra, openai/gpt-6.1-sol; the site's frontend "
+                "bundle is the source of the ids — no listing "
+                "endpoint)") from e
+        kind = {401: "auth", 403: "auth",
+                429: "rate_limited"}.get(e.code, f"http_{e.code}")
+        raise RouteRefused(kind, "ctai",
+                           f"HTTP {e.code}: {detail}") from e
+    except Exception as e:  # noqa: BLE001
+        raise RouteRefused("transport", "ctai",
+                           f"{type(e).__name__}: {str(e)[:140]}") from e
+    try:
+        choice = data["choices"][0]
+        message = choice.get("message") or {}
+        text = str(message.get("content") or "")
+        usage = data.get("usage") or {}
+    except (KeyError, IndexError, TypeError) as e:
+        raise RouteRefused("malformed_response", "ctai",
+                           f"missing {e} in the envelope") from e
+    if not text.strip():
+        finish = choice.get("finish_reason")
+        if finish == "length" or (usage.get("completion_tokens") or 0) \
+                >= max_tokens:
+            raise RouteRefused(
+                "length_no_content", "ctai",
+                f"reasoning burned the budget (completion="
+                f"{usage.get('completion_tokens')} >= max_tokens="
+                f"{max_tokens}) — retry with a larger budget")
+        raise RouteRefused("empty_content", "ctai",
+                           f"finish={finish} with empty content")
+    return {"content": text,
+            "model": data.get("model", model),
+            "finish_reason": choice.get("finish_reason"),
+            "usage": {"prompt_tokens": usage.get("prompt_tokens"),
+                      "completion_tokens":
+                          usage.get("completion_tokens")},
+            "raw": data}
+
+
 def require_registered_model(model: str) -> None:
     """Typed guard: a generation ledger that claims the registered
     route must carry the registered id (never a silently swapped

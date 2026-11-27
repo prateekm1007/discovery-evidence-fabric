@@ -151,12 +151,33 @@ CENT_ROSTER = {
                "transport": "cent", "pace": 6,
                "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
 }
+# The R169 owner delivery ('use it for judges'): the cantrustai judges
+# (api.cantrustai.xyz — vault CTAI_API_KEY 3779a467bb9a). INERT until a
+# qualification record carries the tag (the AM51 seal writes the
+# r169_rcal_ctai legs + the record amendment; this roster only maps
+# transport config — the gate stays the enforcer). The ids are
+# transport-prefixed (the site's frontend bundle is the source — no
+# listing endpoint; bare names fail the typed allowlist class).
+CTAI_ROSTER = {
+    "gpt6luna": {"model": "openai/gpt-6-luna", "family": "openai",
+                 "transport": "ctai", "pace": 6,
+                 "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+    "gpt6astra": {"model": "openai/gpt-6-astra", "family": "openai",
+                  "transport": "ctai", "pace": 6,
+                  "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+    "gpt6sol": {"model": "openai/gpt-6.1-sol", "family": "openai",
+                "transport": "ctai", "pace": 6,
+                "budgets": [4000, 8000, 12000], "timeout_s": 240.0},
+}
 
 
 def _transport(judge: dict):
     if judge.get("transport") == "xkiro":
         from discovery_fabric.engine.route_adapter import xkiro_chat
         return xkiro_chat
+    if judge.get("transport") == "ctai":
+        from discovery_fabric.engine.route_adapter import ctai_chat
+        return ctai_chat
     from discovery_fabric.engine.route_adapter import cent_ai_chat
     return cent_ai_chat
 
@@ -171,7 +192,11 @@ def _serving_alpha(serving_tags: list, labels: dict) -> dict:
     units: dict = {}
     dirs = {"hy4f": REPO / "eval" / "r148_rcal_centai"}
     for tag in serving_tags:
-        if tag != "hy4f":
+        if tag in CTAI_ROSTER:
+            # the R169 owner-delivered ctai judges: their r148-corpus
+            # legs live in the ctai qualification record dir
+            dirs[tag] = REPO / "eval" / "r169_rcal_ctai"
+        elif tag != "hy4f":
             dirs[tag] = REPO / "eval" / "r153_rcal_xkiro"
     for tag, d in dirs.items():
         for lf in sorted(d.glob(f"{tag}__*__*.json")):
@@ -226,7 +251,8 @@ def load_serving() -> list:
             "GATE-VALID panel cannot run; typed refusal (auditor Art. 3)")
     judges = []
     for tag in serving_tags:
-        cfg = dict(XKIRO_ROSTER.get(tag) or CENT_ROSTER[tag])
+        cfg = dict(XKIRO_ROSTER.get(tag) or CTAI_ROSTER.get(tag)
+                   or CENT_ROSTER[tag])
         cfg["tag"] = tag
         judges.append(cfg)
     (OUT_DIR / "SERVING_SNAPSHOT_r153.json").write_text(json.dumps({
@@ -329,7 +355,11 @@ def _leg(judge: dict, prompt: str) -> dict:
             outcome = "RATE_LIMITED"
             time.sleep(120)
         elif err and ("503" in str(err) or "timeout" in str(err)
-                      or "upstream" in str(err)):
+                      or "upstream" in str(err)
+                      or "502" in str(err) or "Bad Gateway" in str(err)):
+            # the ctai seam: 502 Bad Gateway is the observed TRANSIENT
+            # congestion class (recovers ~90s; measured this window —
+            # the r135 transport-patience lesson, not a semantic change)
             time.sleep(30)
     return {"outcome": outcome, "parsed": parsed,
             "raw_tail": (raw or "")[-900:] if raw else None,

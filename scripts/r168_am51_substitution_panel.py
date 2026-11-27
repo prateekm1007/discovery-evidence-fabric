@@ -9,15 +9,17 @@ judge on the r148 balanced corpus (acc>=0.8, answered>=0.9,
 miss-bias<=1) AND inter-judge alpha>=0.6 with snlite+hy4f; seal the
 amended set; run the panel on the SAME frozen v18 candidates.
 
-CANDIDATE RESOLUTION (bytes, not hearsay): tiny-aya (tayae) is
-INELIGIBLE — its qualification is spent (24 legs 2026-11-25: acc
-0.75 < 0.8, AM47 bias 3 > 1); a re-roll violates Art. 7 one-shot and
-AM51's own integrity clause. msm2603 needs owner funding (403).
-The FIRST UNSPENT in-roster candidate is aya32b (cohere/
-aya-expanse-32b, legs=0, catalog-verified present). This wrapper
-qualifies aya32b; on any bar FAIL it exits typed WITHOUT firing the
-panel (no free-pool candidates remain — the msm2603 owner-funding
-fallback is the only path then).
+CANDIDATE RESOLUTION (bytes, not hearsay; the R169 update): tiny-aya
+(tayae) is INELIGIBLE — its qualification is spent (24 legs
+2026-11-25: acc 0.75 < 0.8, AM47 bias 3 > 1); a re-roll violates
+Art. 7 one-shot and AM51's own integrity clause. msm2603 needs owner
+funding (403). The R169 owner delivery ('use it for judges') supplies
+the substitute: openai/gpt-6-luna on cantrustai (the owner's named
+model, probe-verified 200 — 502s are transient congestion); aya32b
+stays the UNSPENT xkiro fallback. This wrapper qualifies gpt6luna
+via the ctai instrument (scripts/r169_rcal_ctai.py, R169_JUDGE); on
+any bar FAIL it exits typed WITHOUT firing the panel (astra/sol are
+the unspent same-transport fallbacks; aya32b the xkiro one).
 
 Stages (marker files in eval/r168_am51_seal/; byte-resumable):
   0  pool-wait       — probe snlite until HTTP 200 (post-00:00 reset)
@@ -47,9 +49,10 @@ sys.path.insert(0, str(REPO / "scripts"))
 
 SEAL = REPO / "eval" / "r168_am51_seal"
 SEAL.mkdir(exist_ok=True)
-RCAL = REPO / "eval" / "r153_rcal_xkiro"
-RCAL_CENT = REPO / "eval" / "r148_rcal_centai"
-SUB_TAG = "aya32b"
+RCAL = REPO / "eval" / "r169_rcal_ctai"   # the substitute legs (the R169 ctai instrument)
+RCAL_XK = REPO / "eval" / "r153_rcal_xkiro"  # snlite legs
+RCAL_CENT = REPO / "eval" / "r148_rcal_centai"  # hy4f legs
+SUB_TAG = "gpt6luna"
 BARS = {"acc": 0.8, "answered": 0.9, "bias": 1, "alpha": 0.6}
 
 
@@ -126,11 +129,12 @@ def stage_qualify() -> None:
     if stage_done("qualify"):
         return
     env = dict(os.environ)
-    env["R153_JUDGE"] = SUB_TAG
-    _log(f"qualifying {SUB_TAG} via the UNMODIFIED instrument "
-         f"(R153_JUDGE={SUB_TAG}, 24 legs, byte-resume)")
+    env["R169_JUDGE"] = SUB_TAG
+    _log(f"qualifying {SUB_TAG} via the ctai instrument "
+         f"(R169_JUDGE={SUB_TAG}, 24 legs, byte-resume; the owner's "
+         f"R169 'use it for judges' delivery)")
     r = subprocess.run(
-        [sys.executable, str(REPO / "scripts" / "r153_rcal_xkiro.py")],
+        [sys.executable, str(REPO / "scripts" / "r169_rcal_ctai.py")],
         env=env, cwd=str(REPO))
     if r.returncode != 0:
         raise SystemExit(
@@ -223,7 +227,7 @@ def stage_bars() -> None:
     imbalance = b["imbalance"]
 
     alpha = _alpha_from_legs(
-        {"snlite": RCAL, SUB_TAG: RCAL, "hy4f": RCAL_CENT}, labels)
+        {"snlite": RCAL_XK, SUB_TAG: RCAL, "hy4f": RCAL_CENT}, labels)
 
     ok_acc = acc >= BARS["acc"]
     ok_ans = answered >= BARS["answered"]
@@ -246,26 +250,31 @@ def stage_bars() -> None:
          f"{'PASS' if bars['pass'] else 'FAIL'}")
     if not bars["pass"]:
         raise SystemExit(
-            "TYPED EXIT (bars): the aya32b substitution FAILED the AM51 "
-            "bars — NO seal, NO panel firing. The xkiro free pool now "
-            f"has NO unspent judge candidates; the msm2603 "
-            "owner-funding fallback (tokenrouter) is the only path "
-            "(audit decision, never a builder swap). The v18 candidates "
-            "stay frozen; c-0268's resume legs carry forward.")
+            "TYPED EXIT (bars): the gpt6luna substitution FAILED the "
+            "AM51 bars — NO seal, NO panel firing. The unspent "
+            "fallbacks: gpt6astra + gpt6sol (same ctai transport; the "
+            "owner's delivery) then aya32b (xkiro, legs=0); the "
+            "msm2603 owner-funding fallback (tokenrouter 403) beyond "
+            "them. The v18 candidates stay frozen; the snlite/hy4f "
+            "resume legs carry forward.")
     mark_stage("bars")
 
 
 def stage_seal() -> None:
     if stage_done("seal"):
         return
-    qual_path = RCAL / "QUALIFICATION.json"
+    # the RUNNER's serving record (eval/r153_rcal_xkiro/
+    # QUALIFICATION.json — the file load_serving reads at run start);
+    # the substitute's leg evidence lives in eval/r169_rcal_ctai/
+    qual_path = RCAL_XK / "QUALIFICATION.json"
     q = json.loads(qual_path.read_text())
     bars = json.loads((SEAL / "BARS.json").read_text())
     tags = [t for t in (q.get("qualified_tags") or []) if t != "mst14b"]
     if SUB_TAG not in tags:
         tags.append(SUB_TAG)
-    fams = sorted({("cohere" if t == SUB_TAG else
-                    ("sensenova" if t == "snlite" else "hy4"))
+    fams = sorted({("openai" if t in ("gpt6luna", "gpt6astra",
+                                      "gpt6sol")
+                    else ("sensenova" if t == "snlite" else "hy4"))
                    for t in tags})
     q["qualified_tags"] = tags
     q["qualified_families"] = fams
@@ -274,23 +283,26 @@ def stage_seal() -> None:
     eng = dict(bars.get("engine_qualification") or {})
     eng["am51_note"] = (
         "the AM51 substitution qualification: computed by the engine's "
-        "own rcal_qualification + am47_bias from the aya32b leg bytes "
-        "(eval/r153_rcal_xkiro/aya32b__*.json, the UNMODIFIED "
-        "instrument's R153_JUDGE=aya32b run)")
-    q["qualification"][f"cohere:{SUB_TAG}"] = eng
+        "own rcal_qualification + am47_bias from the gpt6luna leg bytes "
+        "(eval/r169_rcal_ctai/gpt6luna__*.json, the ctai instrument's "
+        "R169_JUDGE=gpt6luna run — the owner's 'use it for judges' "
+        "delivery, claim c-0270)")
+    q["qualification"][f"openai:{SUB_TAG}"] = eng
     q["am51_substitution"] = {
         "amendment": "AM51 (V132, 2026-11-26): mst14b DELISTED "
                      "provider-side (xkiro catalog has no mistral "
                      "family — byte-verified); sealed availability "
                      "substitution mst14b->aya32b.",
-        "substitute": f"cohere/{SUB_TAG} (cohere/aya-expanse-32b)",
+        "substitute": "openai/gpt-6-luna (cantrustai, the R169 "
+                      "owner delivery — 'use it for judges')",
         "substitution_bars": bars,
         "candidate_resolution": "tiny-aya INELIGIBLE (qualification "
                                "spent 2026-11-25: acc 0.75, bias 3 — "
                                "no re-roll per Art. 7); msm2603 needs "
-                               "owner funding (403); aya32b was the "
-                               "first UNSPENT in-roster candidate "
-                               "(legs=0)",
+                               "owner funding (403); the R169 owner "
+                               "delivery supplies openai/gpt-6-luna "
+                               "(probe-verified; aya32b stays the "
+                               "unspent xkiro fallback)",
         "sealed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "sealed_by": "builder-r168s1 wrapper (claim c-0270)",
         "v18_candidate_set": "FROZEN — unchanged (AM51 integrity)",
