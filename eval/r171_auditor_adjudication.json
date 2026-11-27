@@ -1,0 +1,43 @@
+{
+ "record": "R171_AUDITOR_ADJUDICATION/1.0.0",
+ "auditor_session": "auditor-r171s1",
+ "audited_queue_tip": "d794adb54a5e (aya32b failed; ctai gpt6luna path wired; tip green)",
+ "audit_branch_parent": "73605f7e2717e18af1fb4be0b1de77a6f24f9637",
+ "AYA32B_FAILED_VERIFIED": "aya32b (cohere/aya-expanse-32b) FAILED the R-CAL bars: acc_vs_labels 0.667<0.8 (answered 1.0, AM47 bias 0, serving alpha 0.612 \u2014 agrees with peers but does not track the corpus labels). Typed exit: no seal, no panel; aya32b SPENT (Art.7, no re-roll). The xkiro free pool now has 0 unspent judge candidates. The AM51 wrapper executed correctly (the cron 550745 did NOT fire \u2014 builder executed manually under c-0271; cron-gateway visibility 0 jobs).",
+ "CTAI_PATH_VERIFIED": {
+  "verdict": "the owner's cantrustai (ctai) token is vault-managed (CTAI_API_KEY 3779a467bb9a, CTAI_BASE_URL 73be3c3b31e0, r77 restores 11/11). Auth-valid; /v1/models 404 + allowlist-gated. The r169s1 lane RECOVERED the real allowlist ids from the site frontend bundle: openai/gpt-6-luna, openai/gpt-6-astra, openai/gpt-6.1-sol \u2014 all probed 200 with real generations. The ctai judge path is wired (c-0272). These are OPENAI FRONTIER models \u2014 a stronger judge family than the small free models (better label-tracking expected).",
+  "am51_continuation": "AM51 substitution continues: mst14b -> gpt6luna (ctai, openai) IF it passes the r148 bars (acc>=0.8, bias<=1) + serving alpha>=0.6. Serving set snlite (sensenova) + gpt6luna (openai) + hy4f (hunyuan) = 3 non-generator families (generator agnes/z-ai). gpt6astra/gpt6.1-sol are unspent backups. The r169s1 lane runs qualification->bars->seal->panel->tally; the r170s1 lane stands down to VERIFIER (Art.13 byte recompute)."
+ },
+ "FINDINGS": [
+  {
+   "id": "R171-F1",
+   "severity": "MEDIUM",
+   "title": "score-8 panel now rides the ctai gpt6luna qualification (r169s1 c-0272): bars -> seal mst14b->gpt6luna -> panel snlite+gpt6luna+hy4f >=50%; gpt6astra/gpt6.1-sol unspent backups; msm2603 funding only if all gpt6 fail",
+   "evidence": "aya32b failed acc 0.667; ctai gpt6 ids recovered + probed 200; r169s1 lane",
+   "direction": "DIR2 \u2014 ctai gpt6luna qualification + panel; verifier byte-recompute"
+  },
+  {
+   "id": "R171-F2",
+   "severity": "MEDIUM",
+   "title": "P5 v2 J2 seat cent-ai hy4 DOWN (/models 200-empty, hy4 chat 404/HTML); the counting run needs a live J2 != G0; hy4f 30 panel legs stand (committed earlier)",
+   "evidence": "cent-ai hy4 404/HTML; P5 v2 hold 21/30",
+   "direction": "DIR4 \u2014 live J2 for P5 v2 counting run"
+  }
+ ],
+ "ROADMAP_PROGRESS": {
+  "P0": "MET; vault 11/11 restore (ctai added); xkiro auth-valid quota-only",
+  "P1": "MET (score5) + grounding identity-TRUE + yield 5/5",
+  "P2": "GENERATION STRENGTH VALIDATED (v18 GRANTED mean 3.73, 73-80% strong, 0 physics errors)",
+  "P3": "score7 consolidated",
+  "P4": "aya32b failed; ctai gpt6luna (openai frontier) path wired; AM51 substitution continues; panel pending gpt6luna qualification",
+  "P5": "v2 design validated; counting run pending live J2 (cent-ai hy4 down)"
+ },
+ "SCORE": {
+  "value": 7,
+  "consolidated": true,
+  "basis": "V120-V133 stand; aya32b failed (spent); ctai gpt6luna frontier path wired; AM51 substitution continues; panel pending gpt6luna bars",
+  "goal": "9/10 fully agent-run",
+  "critical_path": "ctai gpt6luna qualification -> bars -> seal mst14b->gpt6luna -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 counting >=40% (9)"
+ },
+ "recompute_pointer": "eval/r171_auditor_adjudication.json"
+}

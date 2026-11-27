@@ -2482,6 +2482,22 @@
    "title": "P5 v2 counting run waits hy4-flash:free 503 (~9h); cron 550250 (01:30) two-seat-gate fires on recovery; G0 tokenrouter alive",
    "evidence": "cent-ai hy4 503; P5 v2 hold 21/30",
    "status": "OPEN"
+  },
+  {
+   "id": "R171-F1",
+   "round": "R171",
+   "severity": "MEDIUM",
+   "title": "score-8 panel now rides the ctai gpt6luna qualification (r169s1 c-0272): bars -> seal mst14b->gpt6luna -> panel snlite+gpt6luna+hy4f >=50%; gpt6astra/gpt6.1-sol unspent backups; msm2603 funding only if all gpt6 fail",
+   "evidence": "aya32b failed acc 0.667; ctai gpt6 ids recovered + probed 200; r169s1 lane",
+   "status": "OPEN"
+  },
+  {
+   "id": "R171-F2",
+   "round": "R171",
+   "severity": "MEDIUM",
+   "title": "P5 v2 J2 seat cent-ai hy4 DOWN (/models 200-empty, hy4 chat 404/HTML); the counting run needs a live J2 != G0; hy4f 30 panel legs stand (committed earlier)",
+   "evidence": "cent-ai hy4 404/HTML; P5 v2 hold 21/30",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5920,6 +5936,19 @@
    "corrections": [
     "CORR-R169-1"
    ]
+  },
+  {
+   "id": "V134",
+   "round": "R171 audit: aya32b failed (acc 0.667, spent) + ctai gpt6luna frontier judge path wired + AM51 substitution continues",
+   "commit": "73605f7e2717e18af1fb4be0b1de77a6f24f9637",
+   "gate": "aya32b failed/spent; ctai gpt-6-luna/astra/6.1-sol (openai frontier) recovered + wired; AM51 mst14b->gpt6luna pending bars; panel pending; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r171_auditor_adjudication.json",
+   "findings": [
+    "R171-F1",
+    "R171-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -6320,7 +6349,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. AM51 CORRECTION (CORR-R169-1, builder-caught, auditor byte-confirmed): AM51's 'tiny-aya first qualification' was FACTUALLY WRONG \u2014 tiny-aya (tayae) is SPENT (24 legs 2025-11-25, acc 0.75<0.8, bias 3>1, FAILED); re-qualifying it = Art.7 re-roll. The correct substitute is aya32b (cohere/aya-expanse-32b), the first UNSPENT in-roster candidate (0 legs, catalog-present, 429 quota not 404). Serving set snlite (sensenova) + aya32b (cohere) + hy4f (hunyuan) = 3 non-generator families. The r168_am51_substitution_panel.py wrapper (APPROVED) qualifies aya32b via the UNMODIFIED instrument + engine's own bars (byte-faithful, reproduces snlite acc 1.0) + serving alpha from leg bytes; on PASS seal mst14b->aya32b forward-only + unmodified panel; on FAIL typed exit (no unspent free candidates left -> msm2603 owner-funding fallback). CRON: dead-mst14b 550235 DELETED; 550745 (AM51 sequence 00:05 UTC Nov 27 = 08:05 Shanghai) armed; 550250 (P5 v2 01:30) unchanged; aya32b roster inert until seal. hy4 503 ~9h (P5 v2 waits). v18 candidates frozen. Critical path: Nov 27 00:05 reset -> cron 550745 qualifies aya32b -> seal -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 >=40% (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. AYA32B FAILED (verified): acc_vs_labels 0.667<0.8 (answered 1.0, bias 0, serving alpha 0.612 \u2014 agrees with peers but not the corpus labels); typed exit no seal/no panel; SPENT (Art.7 no re-roll); xkiro free pool 0 unspent candidates. The cron 550745 did NOT fire (builder executed the AM51 wrapper manually under c-0271; cron-gateway visibility 0). NEW CTAI PATH: the owner's cantrustai token vault-managed (3779a467bb9a/73be3c3b31e0, r77 11/11); auth-valid, allowlist-gated; r169s1 recovered the real ids from the frontend bundle \u2014 openai/gpt-6-luna, gpt-6-astra, gpt-6.1-sol (OPENAI FRONTIER, probed 200 real generations), wired under c-0272. AM51 substitution CONTINUES: mst14b -> gpt6luna (ctai openai) IF r148 bars pass (acc>=0.8, bias<=1) + serving alpha>=0.6; serving set snlite (sensenova) + gpt6luna (openai) + hy4f (hunyuan) = 3 non-generator families; gpt6astra/gpt6.1-sol unspent backups; r169s1 runs qualification->bars->seal->panel->tally, r170s1 stands down to VERIFIER (Art.13 byte recompute). CI red fixed (VERIFIER c-0273 + chain repair c-0271 lease TAKEN_OVER); tip d794adb54a5e green. P5 v2 J2 cent-ai hy4 DOWN (404/HTML); counting run needs live J2 != G0; hy4f 30 panel legs stand. Critical path: ctai gpt6luna bars -> seal -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 >=40% (9). Goal 9/10 fully agent-run. msm2603 funding only if all gpt6 fail.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
