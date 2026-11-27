@@ -62,11 +62,14 @@ def _log(msg: str) -> None:
 
 
 def stage_done(name: str) -> bool:
-    return (SEAL / f".stage_{name}.done").exists()
+    # candidate-scoped (the R170S1 lesson: the aya32b run's committed
+    # markers must not gate a different substitute's run — one
+    # marker namespace per candidate)
+    return (SEAL / f".stage_{name}.{SUB_TAG}.done").exists()
 
 
 def mark_stage(name: str) -> None:
-    (SEAL / f".stage_{name}.done").write_text(
+    (SEAL / f".stage_{name}.{SUB_TAG}.done").write_text(
         f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n")
 
 
@@ -243,7 +246,7 @@ def stage_bars() -> None:
                  "bias": ok_bias, "alpha": ok_alpha},
         "pass": bool(ok_acc and ok_ans and ok_bias and ok_alpha),
     }
-    (SEAL / "BARS.json").write_text(
+    (SEAL / f"BARS_{SUB_TAG}.json").write_text(
         json.dumps(bars, indent=1, ensure_ascii=False) + "\n")
     _log(f"BARS: acc={acc} answered={answered} "
          f"bias={imbalance} alpha={a} -> "
@@ -268,7 +271,7 @@ def stage_seal() -> None:
     # the substitute's leg evidence lives in eval/r169_rcal_ctai/
     qual_path = RCAL_XK / "QUALIFICATION.json"
     q = json.loads(qual_path.read_text())
-    bars = json.loads((SEAL / "BARS.json").read_text())
+    bars = json.loads((SEAL / f"BARS_{SUB_TAG}.json").read_text())
     tags = [t for t in (q.get("qualified_tags") or []) if t != "mst14b"]
     if SUB_TAG not in tags:
         tags.append(SUB_TAG)
