@@ -2084,6 +2084,33 @@ class EngineRun:
             _grid_status: Optional[str] = None
             _cctx.set_stage("POST_RANK_GRID")
             _pra_start("GRID")
+            # R178 DIR-3 SHIP: the problem-class route split. The
+            # typed router decides from the problem's OWN declared
+            # question_type (never re-derived here): mitigation
+            # problems (intervention-proposal) take the CHEAP arm —
+            # the exploration grid is DISABLED with a typed, persisted
+            # record carrying the measured basis (the r177s1 DIR-3
+            # recompute); invention-shaped problems (novel-mechanism)
+            # and unclassified problems run the full architecture
+            # unchanged (the conservative default loses nothing).
+            from .problem_router import route_disabled_stages
+            _route = route_disabled_stages(self.problem or {})
+            if _route["route"] == "CHEAP_ARM" and \
+                    "EXPLORATION_GRID" in _route["disabled_stages"]:
+                self._persist("EXPLORATION_GRID.json", {
+                    "status": "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM",
+                    "route": _route,
+                    "reason": (_route["basis"]
+                               + "; the cheap arm (ensemble best-of-N + "
+                                 "the composer validate-repair verifier) "
+                                 "serves this problem class; every "
+                                 "verifier leg stays on (the verifier is "
+                                 "never a cost lever)"),
+                })
+                _grid_status = "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                _pra["pool"]["grid_status"] = \
+                    "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                _cctx.set_stage("POST_RANK")
             if adjudication_blocked:
                 self._persist("EXPLORATION_GRID.json", {
                     "status": "SKIPPED_ADJUDICATION_BLOCKED",
@@ -2095,7 +2122,10 @@ class EngineRun:
                                "Re-run the loop when transport recovers."),
                 })
                 _grid_status = "SKIPPED_ADJUDICATION_BLOCKED"
-            if not self._naive_survivor and not adjudication_blocked:
+            if not self._naive_survivor and not adjudication_blocked \
+                    and not (_route["route"] == "CHEAP_ARM" and
+                             "EXPLORATION_GRID" in
+                             _route["disabled_stages"]):
                 # R399 W2.3 (the directive's exact gate): the diversity
                 # grid is expensive candidate generation — it requires
                 # >= 1 VERIFIED_EVIDENCE_ITEM. A run that died of
