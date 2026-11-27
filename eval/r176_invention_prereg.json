@@ -1,0 +1,73 @@
+{
+ "record": "R176_INVENTION_PREREG/1.0.0",
+ "claim": "c-0283",
+ "work_id": "r176-invention-shaped-dev24",
+ "session": "builder-r176s1",
+ "kind": "measurement",
+ "authored_at": "2026-11-27 (sandbox clock; TRUE UTC ~17:5xZ)",
+ "base_sha": "218a308e0 (claim pushed before any generation byte)",
+ "authority": "owner DIR 2 (AM53; ledger V137; R176-F1 'invention-shaped corpus + genuine-novel-candidate win gate (AM53)' + R176-F2 'the f31e DEV corpus is mitigation-correctness shape, not invention shape — the wrong test for an invention engine')",
+ "question": "On an INVENTION-SHAPED DEV corpus (24 novel-discovery problems where STANDARD PRACTICE IS INSUFFICIENT — each item carries the standard-practice plateau, why it is fundamental, the capability target, and hard constraints), does the pipeline deliver GENUINE novel-candidate wins over a compute-matched single-shot baseline — where a genuine win means the CHAMPION's origin is a novel strategy (departure / contradiction / relaxation) AND the blind two-pass judge says WIN?",
+ "corpus": {
+  "file": "eval/r176_invention_corpus/items.jsonl",
+  "n_items": 24,
+  "shape": "invention-shaped: the standard-practice plateau + the fundamental reason it cannot be closed by better engineering of the same mechanism + a quantified capability target + hard constraints that EXCLUDE the incumbent workarounds",
+  "authorship": "builder-authored DEV (the f31e precedent — DEV is the tuning split; the SEALED invention-shaped holdout for DIR 5 is auditor-authored per Art. 7/29)",
+  "coverage": "24 distinct mechanism domains (electrochemical, thermoelectric, water, battery, solar, wind, thermal, metallurgy, cement, electrical, RF, automation, machining, tribology, civil, biomedical x2, aerospace x2, chemical, process, EMI materials, robotics, NDE)",
+  "plateaus": "qualitative/roughly-quantified standard-practice plateaus (no invented precision); every constraint names the incumbent workaround it EXCLUDES so a mitigation-style or workaround answer is constraint-violating by construction"
+ },
+ "exclusion_taxonomy_per_AM53": {
+  "dominance_tie": "champion == baseline (the pipeline emits the baseline's own answer) — EXCLUDED from genuine wins, reported separately (the vacuous class that made DIR-3's 0.92)",
+  "plain_best_of_n": "champion == plain (a single-shot-equivalent answer the baseline arm could and did produce) — EXCLUDED from genuine wins, reported separately",
+  "genuine_novel_candidate": "champion in {departure, contradiction, relaxation} (the pipeline's OWN novel strategies) AND the blind two-pass judge says WIN",
+  "why": "AM53: 'the pipeline's OWN novel candidates (departure/cross-domain/contradiction) must win, not tie via dominance'"
+ },
+ "arms": {
+  "generator_both_arms": "the m77 gateway transport (the same generator for both arms — compute-matched on the generator, the r175s3 instrument)",
+  "baseline": "4 plain single-shot draws on the invention question + critique + revise (6 calls; the strongest single-shot recipe carried over from the r175 lanes, prompt-adapted to the novel-mechanism question)",
+  "pipeline": "4 strategy draws (plain reuses baseline draw 1 + departure contract + contradiction mapping + relaxation) + obviousness subtraction (near-duplicate collapse, Jaccard > 0.6 on mechanism noun-phrases, deterministic keep by strategy order) + the cheap-judge pairwise TOURNAMENT (order-randomized pairs, gpt-6-luna, max_tokens 200) with the baseline answer IN the pool (dominance-by-construction retained — the selector stays honest)",
+  "compute_match": "baseline 6 generator calls; pipeline 3 fresh strategy draws + ~4-6 cheap tournament judge calls (max_tokens 200) + 2 blind passes — the r175s3 compute-matched shape, unchanged"
+ },
+ "invention_adaptations_vs_r175s3": {
+  "dated": "2026-11-27, before any measured byte (the r175s3 instrument is mitigation-framed; this is the invention-shaped instrument)",
+  "prompts": "the strategy prompts ask for a NOVEL MECHANISM + its falsification test (the corpus item's question text rides in every prompt); the critique/revise prompts say 'novel-mechanism proposal' not 'engineering mitigation'",
+  "judge_criteria": "the blind judge and the tournament cheap-judge criteria include 'genuine mechanism novelty (a new physical principle vs standard practice)' alongside physical soundness, constraint fit, and actionability — an invention test is judged on invention (the r175s3 criteria were mitigation criteria: physical correctness/constraint fit/completeness/actionability)",
+  "selector_NOT_tuned": "the champion tie-break toward the baseline is RETAINED (no selector tuning to manufacture wins; if the novel candidates cannot win the tournament honestly the gate fails honestly — the DIR-4 selector lever is where selector improvements belong)"
+ },
+ "judging": {
+  "seat": "ctai openai/gpt-6-luna is the preregistered seat; snlite (sensenova/sensenova-6.8-flash-lite via xkiro, the AM51 qualified serving judge) is the TYPED AVAILABILITY SUBSTITUTE (the AM52-RESEAT precedent) when ctai's quota window is exhausted — MEASURED in the wiring smoke: the ctai probe itself 429'd after the smoke's burst; AVAILABILITY-ONLY, NOT tuning: same prompts, same bars, same budget; the substitute family (sensenova) != the generator family (glm-class via the m77 gateway); the seat is selected ONCE per run by a live probe and recorded per pair; fail-closed if NO seat is live",
+  "blind_two_pass": "the DIR-2 blind instrument: the pair (pipeline champion text, baseline final) judged twice, order-swapped; WIN only on both-pass agreement for the pipeline; parse failures typed and re-presented within the leg (max_tokens 700); a transport-dead pass -> the pair resumes (byte-resume) — never re-rolled",
+  "machine_vs_gate": "the machine judgments are INPUT (Art. 14); the GATE is the auditor's blind judgment from the committed pair records (which carry both answer texts + the A/B-agnostic provenance key separately)",
+  "seat_probe_note": "the smoke's measured transport facts: judge legs are ~3x heavier than the r175s3 prompts (the invention corpus is wordy), so all judge legs are PACED (10 s) and backoff-wrapped (4 x 120 s, auth fails immediately) — every judge call site rides the same wrapper"
+ },
+ "gate_score4": {
+  "primary": "genuine novel-candidate WIN share >= 50% at n=24 AND the Wilson 95% CI lower bound of the genuine win share > 50%",
+  "power_note": "at n=24 the Wilson lower bound exceeds 0.50 only at >= 17/24 genuine wins (70.8%) — pre-registered as computed, not negotiated after the run",
+  "secondary": "genuine wins+ties share with Wilson CI (comparable with DIR 5's acceptance); the exclusion classes (dominance ties, plain wins) reported with counts; per-item champion + tournament table committed"
+ },
+ "kill_criterion_predeclared": "on MITIGATION-shaped problems the multi-stage pipeline is RETIRED in favor of best-of-N + verifier (DIR 3, typed this round from the f31e evidence: the pipeline emits the baseline answer 7/12 on mitigation); the multi-stage architecture is kept ONLY where a genuine invention value-add is measured (this lane's corpus)",
+ "one_shot_integrity": "one run per item; byte-resume per item (completed items never re-run); typed failures recorded, never re-rolled; no judge re-rolls; the corpus items are DEV (tuning split) — the sealed invention holdout is DIR 5",
+ "artifacts": [
+  "eval/r176_invention_corpus/items.jsonl",
+  "eval/r176_invention_run/pair_{pid}.json",
+  "eval/r176_invention_run/SUMMARY.json",
+  "scripts/r176_invention_run.py",
+  "scripts/r176_invention_tally.py"
+ ],
+ "amendments": [
+  {
+   "id": "R176I-1",
+   "dated": "2026-11-27, before any measured byte ran",
+   "change": "the judge-seat availability substitution (ctai -> snlite on a dead ctai probe) + the paced backoff-wrapped judge transport",
+   "reason": "measured in the wiring smoke: back-to-back ctai legs rate-limited within seconds and the ctai probe itself later 429'd",
+   "integrity": "same prompts, same bars, same budget; the substitute family != the generator family; the seat recorded per pair"
+  },
+  {
+   "id": "R176I-2",
+   "dated": "2026-11-27, before any measured pair byte ran (0 pairs complete)",
+   "change": "snlite ALWAYS judges at 12000 max_tokens upfront (the r160 owner directive: snlite reasoning burns small budgets — empty content, finish_reason=length — re-MEASURED in the wiring smoke at max_tokens=200); the ctai probe is ONE attempt (a 429 probe = the quota window is down; the drive wrapper re-probes on every relaunch so a recovered ctai window is picked up at the next boundary); the judge seat may therefore VARY ACROSS ITEMS by availability window — the seat is recorded PER PAIR and the tally reports the per-seat split (a typed mixed-seat disclosure; if the seat split correlates with outcomes it is disclosed, never silently pooled)",
+   "reason": "measured in the wiring smoke: the ctai quota window 429'd; snlite at 200 tokens returned empty content with finish_reason=length",
+   "integrity": "same prompts, same bars, both judge families (openai/sensenova) != the generator family (glm-class via the m77 gateway); the seat recorded per pair"
+  }
+ ]
+}
