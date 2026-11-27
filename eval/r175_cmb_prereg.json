@@ -1,0 +1,66 @@
+{
+ "record": "R175_CMB_PREREG/1.0.0",
+ "claim": "c-0276",
+ "work_id": "r175-compute-matched-baseline-dev12",
+ "session": "builder-r175s1",
+ "kind": "measurement",
+ "authored_at": "2026-11-27 (sandbox clock; TRUE UTC ~16:0xZ)",
+ "base_sha": "a8cc8e802",
+ "authority": "owner DIR 2 (the AM52 capability-first scoreboard; ledger V136; R174-F1: 'DIR2 - compute-matched baseline gate (auditor-judged); dominance-by-construction; kill criterion') + adjudication eval/r174_auditor_adjudication.json; the score moves ONLY on a measured win over a compute-matched single-shot baseline (AM52), never on the rubric (retired, CORR-R174-1)",
+ "question": "On the 12-item DEV corpus (eval/problems_dev12.json, split=DEV - the TUNING split, disclosed; the sealed fresh test is DIR 5), does the multi-stage pipeline deliver a BETTER engineering answer than a compute-matched single-shot baseline (best-of-N + one critique, SAME call budget, SAME frozen evidence packet), judged blind (randomized A/B, two passes order-swapped)?",
+ "corpus": {
+  "file": "eval/problems_dev12.json",
+  "n_items": 12,
+  "split": "DEV",
+  "disclosure": "DEV is the tuning split (Art. 13/auditor Art. 6): this measurement is the DEV-stage gate on the AM52 path; it is NOT a fresh-problem claim"
+ },
+ "shared_infrastructure": {
+  "generator_both_arms": "agnes-3.0-flash (the registered default; 2-key rotation, transport backoff 4 x 120 s on rate_limited/transport ONLY; auth fails immediately; parse failures NEVER retried - typed)",
+  "evidence_packet": "the pipeline run's OWN frozen evidence (candidate_envelope.json evidence field, the same packet the engine's composer consumed) - the baseline arm receives THE SAME packet inline in every draw; the judge sees the same packet",
+  "cache": "off (the engine's LLM_ECONOMY cache_mode=off; no stage memo; every call fresh; byte-resume reuses only completed persisted items, never re-makes a call whose bytes are already on disk)"
+ },
+ "arm_pipeline": {
+  "name": "PIPELINE (compute-matched arm)",
+  "stages": "EngineRun end-to-end (the 15 canonical linear stages + post-rank IMPROVE when kill evidence exists; cache off; governor healthy_call_cap 12) with run_id r175-cmb-pipe-{pid}, session_id builder-r175s1",
+  "budget_count_K_i": "the pipeline's own recorded LLM call count for item i = max(LLM_ECONOMY.governor.healthy_calls + LLM_ECONOMY.governor.retry_attempts, routing-ledger RUN_OWNED rows for run_id i) - computed from committed run bytes, never hand-typed",
+  "dominance_by_construction": "the baseline arm's best answer (baseline_best) ENTERS the pipeline arm's final selection pool: compose_answer(problem, packet=the same frozen packet, candidates=ANSWER_COMPOSED.admitted_candidates + [baseline_best as {candidate_id: r175-baseline-best-{pid}, attack_verdict: null, hypothesis: baseline_best_text}], verification=rebuilt from final_state, question_type) - the composer IS the engine's selector; the pipeline can only lose if its final selection is worse than baseline_best",
+  "delivered": "the dominance-composed answer text (state COMPOSED_*; COMPOSE_TRUNCATED/FAILED_TRANSPORT are typed states, recorded, never silently replaced)"
+ },
+ "arm_baseline": {
+  "name": "BASELINE (single-shot family, strongest single-shot)",
+  "draws": "N_i = K_i INDEPENDENT single-shot author draws on the SAME frozen evidence packet: the frozen r118 AUTHORING_DIRECTIVE bytes + problem + question + the packet in the composer's own _packet_block format (byte-identical prompt template across draws; provider-side sampling gives distinct candidates - the F31e draw mechanics)",
+  "critique": "ONE critique call: sees the problem + the packet + all N_i candidate answers (labeled Candidate 1..N) and selects the best (strict JSON {best: <k>, reason}); a parse-failed critique falls back to the DETERMINISTIC selection rule (0 extra calls)",
+  "deterministic_selection_rule": "fewest bill_defect_classes(prob, answer) wins (the canonical r121 defect metric on the delivered bytes); tie (incl. 0-0) -> draw 1; a typed-failed draw scores +inf in selection and is NEVER silently dropped (both fail -> item TYPED_CALL_FAIL, excluded from the tally, counted in the record)",
+  "delivered": "the critique's pick (deterministic backup rule when the critique is typed-invalid)",
+  "compute_match": "baseline calls = N_i draws + 1 critique; pipeline calls = K_i + dominance-compose (1 call + the composer's typed contract-repair retries, per-item disclosed). STRICT-BUDGET SENSITIVITY: the win-rate restricted to items where the pipeline's total calls <= the baseline's total calls is reported as a typed secondary (an over-budget pipeline win is disclosed, never counted silently)"
+ },
+ "blind_judging": {
+  "assignment": "per pair, ANSWER A / ANSWER B assigned by a seeded shuffle at packet-build time (seed generated from os.urandom BEFORE any judging, committed in the run record; the judge prompt carries only ANSWER A/ANSWER B - no arm labels, no provenance)",
+  "two_passes": "pass 1 presents (A, B); pass 2 presents (B, A) - order-swapped, same judge, same prompt bytes otherwise",
+  "judge_task": "given the problem + the frozen evidence packet + both answers, return strict JSON {winner: A|B|TIE, novelty: A|B|EVEN (non-obvious inventive step beyond the packet's own teachings and routine engineering), feasibility: A|B|EVEN (physically sound, respects the stated constraint, concrete parameter values), grounding: A|B|EVEN (cites the packet's evidence items honestly, no fabricated numbers), rationale: one sentence}",
+  "machine_panel": "the qualified serving judges availability-probed at run start: snlite (sensenova/sensenova-6.8-flash-lite via xkiro) + gpt6luna (openai/gpt-6-luna via ctai) + hy4f (cent, only if probed live) - >=2 non-agnes families required for a machine-panel claim, else the machine judgment is typed DEGRADED_PANEL and the reviewer's blind judgment alone decides; judge != every generator family (agnes holds no seat - Art. 26/blind_panel)",
+  "leg_validity": "a leg is VALID only on a parseable strict-JSON verdict; parse-fail legs are typed INVALID_LEG, recorded, NEVER re-rolled (the v18-era one-shot rule; a fresh pair set is a fresh generation, not a re-roll)",
+  "pair_outcome_rule": "both passes agree on the same winner -> that arm WINS; any disagreement, or both passes TIE -> TIE (typed position_disagreement recorded); the per-pair machine outcome = the majority over judges of the per-judge pass-consistent outcomes; judge disagreement -> that judge abstains (typed), a pair needs >=1 judge with consistent passes",
+  "machine_vs_gate": "machine panel judgments are INPUT (Art. 14: machine scores are inputs, never the verdict); the GATE is the reviewer's blind judgment from the committed review packets (AM52: 'auditor-judged'); this run delivers both"
+ },
+ "tally_and_ci": {
+  "primary": "P(wins + ties) over the 12 items, Wilson 95% CI (item-clustered: one outcome per item, never per-leg - the r128 lesson)",
+  "secondary": "tie-credit rate (wins + 0.5*ties)/12 with Wilson 95%; per-axis majorities (novelty/feasibility/grounding); strict-budget-sensitivity win-rate; per-item call counts committed",
+  "independent_recompute": "the tally is recomputed from the raw judgment bytes by a standalone script (scripts/r175_cmb_tally.py; auditor Art. 13/19) - the producing driver's own summary is never the tally of record"
+ },
+ "acceptance_for_this_run": "12/12 complete pairs (both arms delivered non-typed-failed answers on every item) + the machine panel judgment set (VALID or typed DEGRADED_PANEL) + the blind review packets committed; the TRUE win-rate with CIs lands with the reviewer's blind judgment (the gate)",
+ "dev_gate": "AM52 DIR 3 bar: the pipeline must reach >=50% wins+ties on DEV before the sealed holdout (DIR 5); KILL (pre-declared): if the DEV wins+ties stays <50% after DIR 3's levers (diverse generation + obviousness subtraction + stronger selection), the multi-stage architecture is RETIRED in favor of best-of-N + a verifier - the owner's kill criterion, never re-litigated by the builder",
+ "one_shot_integrity": "one measurement pass per item per arm; byte-resume on transport interruption only (completed persisted items are never re-run); typed failures recorded, never re-rolled; the wiring smoke runs on ONE SYNTHETIC problem (not in the 12) and its bytes are archived as wiring-validation, excluded from the tally",
+ "artifacts": [
+  "eval/r175_cmb_run/{pid}_pipeline.json",
+  "eval/r175_cmb_run/{pid}_baseline.json",
+  "eval/r175_cmb_run/pair_{pid}.json",
+  "eval/r175_cmb_run/judgment_{judge}_{pid}_pass{1,2}.json",
+  "eval/r175_cmb_run/review_packet_{pid}.json",
+  "eval/r175_cmb_run/ab_map.json",
+  "eval/r175_cmb_run/tally.json",
+  "scripts/r175_cmb_run.py",
+  "scripts/r175_cmb_tally.py",
+  "scripts/r175_cmb_smoke.json (wiring-validation, synthetic problem)"
+ ]
+}
