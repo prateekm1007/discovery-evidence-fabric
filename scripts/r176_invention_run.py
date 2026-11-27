@@ -155,7 +155,34 @@ SEATS = {
     "snlite": {"kind": "xkiro",
                "model": "sensenova/sensenova-6.8-flash-lite",
                "family": "sensenova"},
+    # THIRD fallback (the P5 lane's free transport, measured shape):
+    # the free deepseek reasoning model — needs the 12000 budget (its
+    # reasoning runs ~3-8K tokens BEFORE content; 200/4000-budget
+    # responses come back EMPTY with finish=length — the r158
+    # measurement). Family deepseek != the generator glm-class.
+    "tr-deepseek": {"kind": "tr",
+                    "model": "deepseek/deepseek-v4.1-flash-1017-free",
+                    "family": "deepseek"},
 }
+
+
+def _http_json(base: str, key: str, body: dict,
+               timeout: float = 240.0) -> tuple:
+    req = urllib.request.Request(
+        base.rstrip("/") + "/chat/completions",
+        data=json.dumps(body).encode(), method="POST",
+        headers={"Authorization": f"Bearer {key}",
+                 "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.status, json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        try:
+            return e.code, json.loads(e.read().decode())
+        except Exception:  # noqa: BLE001
+            return e.code, {}
+    except Exception as e:  # noqa: BLE001
+        return -1, {"error": f"{type(e).__name__}: {str(e)[:100]}"}
 
 
 def seat_call(seat_tag: str, prompt: str, keys: dict,
@@ -170,6 +197,8 @@ def seat_call(seat_tag: str, prompt: str, keys: dict,
     seat = SEATS[seat_tag]
     if seat["kind"] == "xkiro":
         max_tokens = max(max_tokens, 12000)
+    if seat["kind"] == "tr":
+        max_tokens = 12000
     last: Exception | None = None
     for attempt in range(1, attempts + 1):
         try:
@@ -179,6 +208,25 @@ def seat_call(seat_tag: str, prompt: str, keys: dict,
                                           "https://api.cantrustai.xyz"
                                           "/v1"),
                                  max_tokens=min(max_tokens, 700))
+            if seat["kind"] == "tr":
+                st, resp = _http_json(
+                    "https://api.tokenrouter.com/v1",
+                    keys.get("TOKENROUTER_API_KEY", ""),
+                    {"model": seat["model"],
+                     "max_tokens": max_tokens,
+                     "include_reasoning": False,
+                     "messages": [{"role": "user",
+                                  "content": prompt}]}, 600.0)
+                if st != 200:
+                    raise RuntimeError(
+                        f"tr HTTP{st}: {json.dumps(resp.get('error') or
+                                                   resp)[:120]}")
+                ch = (resp.get("choices") or [{}])[0]
+                txt = (ch.get("message") or {}).get("content") or ""
+                if not txt.strip():
+                    raise RuntimeError(
+                        f"tr EMPTY: finish={ch.get('finish_reason')}")
+                return txt
             r = ra.xkiro_chat(
                 [{"role": "user", "content": prompt}],
                 model=seat["model"],
@@ -226,12 +274,21 @@ def probe_seats(keys: dict) -> str | None:
               f"({type(e).__name__}: {str(e)[:100]})", flush=True)
     try:
         r = seat_call("snlite", "Reply with exactly: OK", keys,
-                      max_tokens=64, what="probe snlite", attempts=2)
+                      max_tokens=64, what="probe snlite", attempts=1)
         if "OK" in (r or "").upper():
             print("judge seat snlite LIVE", flush=True)
             return "snlite"
     except Exception as e:  # noqa: BLE001
         print(f"judge seat snlite DOWN "
+              f"({type(e).__name__}: {str(e)[:100]})", flush=True)
+    try:
+        r = seat_call("tr-deepseek", "Reply with exactly: OK", keys,
+                      max_tokens=64, what="probe tr", attempts=2)
+        if "OK" in (r or "").upper():
+            print("judge seat tr-deepseek LIVE", flush=True)
+            return "tr-deepseek"
+    except Exception as e:  # noqa: BLE001
+        print(f"judge seat tr-deepseek DOWN "
               f"({type(e).__name__}: {str(e)[:100]})", flush=True)
     return None
 
@@ -329,46 +386,71 @@ def main() -> int:
         t0 = time.time()
         packet = packet_of(prob)
         task = task_of(prob)
+        # GENERATION CHECKPOINT (the stall never re-burns the ~10
+        # generator calls: a relaunch resumes from the checkpoint and
+        # goes straight to the judge legs)
+        genp = OUT / f"gen_{pid}.json"
+        g = (json.loads(genp.read_text(encoding="utf-8"))
+             if genp.exists() else {})
 
         print(f"=== {pid} ({i}/{len(rows)}) baseline arm ...",
               flush=True)
-        # ---- BASELINE ARM: 4 plain draws + critique + revise -------
-        draws = [agnes(strat_prompts(prob)["plain"]) for _ in
-                 range(4)]
-        draws = [d for d in draws if d.strip()]
-        if not draws:
-            row = {"problem_id": pid, "status": "GEN_FAIL"}
-            outp.write_text(json.dumps(row, indent=1))
-            results.append(row)
-            continue
-        base_sel = max(draws, key=len)
-        critique = agnes(
-            "You are a strict reviewer. List the 3 most important "
-            "defects of this novel-mechanism proposal (wrong "
-            "physics, constraint violation, insufficient novelty or "
-            "testability). Be terse.\n\nPROBLEM:\n" + packet
-            + "\n\nPROPOSAL:\n" + base_sel)
-        revised = agnes(
-            "Revise this novel-mechanism proposal to fix the listed "
-            "defects. Keep the same format and length; keep every "
-            "stated constraint.\n\nPROPOSAL:\n" + base_sel
-            + "\n\nDEFECTS:\n" + critique
-            + "\n\nOutput ONLY the revised proposal.")
-        baseline_final = revised if revised.strip() else base_sel
+        if "baseline_final" in g:
+            baseline_final = g["baseline_final"]
+            draws = g.get("draws") or []
+            print("    baseline resumed from the generation "
+                  "checkpoint", flush=True)
+        else:
+            draws = [agnes(strat_prompts(prob)["plain"]) for _ in
+                     range(4)]
+            draws = [d for d in draws if d.strip()]
+            if not draws:
+                row = {"problem_id": pid, "status": "GEN_FAIL"}
+                outp.write_text(json.dumps(row, indent=1))
+                results.append(row)
+                continue
+            base_sel = max(draws, key=len)
+            critique = agnes(
+                "You are a strict reviewer. List the 3 most important "
+                "defects of this novel-mechanism proposal (wrong "
+                "physics, constraint violation, insufficient novelty or "
+                "testability). Be terse.\n\nPROBLEM:\n" + packet
+                + "\n\nPROPOSAL:\n" + base_sel)
+            revised = agnes(
+                "Revise this novel-mechanism proposal to fix the listed "
+                "defects. Keep the same format and length; keep every "
+                "stated constraint.\n\nPROPOSAL:\n" + base_sel
+                + "\n\nDEFECTS:\n" + critique
+                + "\n\nOutput ONLY the revised proposal.")
+            baseline_final = revised if revised.strip() else base_sel
+            g.update({"baseline_final": baseline_final,
+                      "draws": draws})
+            genp.write_text(json.dumps(g, indent=1,
+                                       ensure_ascii=False) + "\n",
+                            encoding="utf-8")
 
         # ---- PIPELINE ARM: strategy draws + subtraction ----------
         print(f"    pipeline arm (4 strategies) ...", flush=True)
-        cands = {}
-        for name, pr in strat_prompts(prob).items():
-            if name == "plain":
-                cands[name] = draws[0]
-                continue
-            try:
-                cands[name] = agnes(pr)
-            except Exception as e:  # noqa: BLE001
-                print(f"    {name} failed {type(e).__name__}",
-                      flush=True)
-        cands = {k: v for k, v in cands.items() if v.strip()}
+        if "cands" in g:
+            cands = g["cands"]
+            print("    strategies resumed from the generation "
+                  "checkpoint", flush=True)
+        else:
+            cands = {}
+            for name, pr in strat_prompts(prob).items():
+                if name == "plain":
+                    cands[name] = draws[0]
+                    continue
+                try:
+                    cands[name] = agnes(pr)
+                except Exception as e:  # noqa: BLE001
+                    print(f"    {name} failed {type(e).__name__}",
+                          flush=True)
+            cands = {k: v for k, v in cands.items() if v.strip()}
+            g.update({"cands": cands})
+            genp.write_text(json.dumps(g, indent=1,
+                                       ensure_ascii=False) + "\n",
+                            encoding="utf-8")
 
         kept, dropped, seen = [], [], []
         for name in ("plain", "departure", "contradiction",
@@ -422,11 +504,24 @@ def main() -> int:
             return "A" if win == "X" else "B"
 
         wins = {n: 0 for n, _ in pool}
+        leg_ok = 0
+        leg_fail = 0
         for a in range(len(pool)):
             for b in range(a + 1, len(pool)):
                 try:
                     w = judge_pair(pool[a][1], pool[b][1])
+                    leg_ok += 1
                 except Exception as e:  # noqa: BLE001
+                    leg_fail += 1
+                    # SEAT-DOWN EARLY ABORT: a seat that fails the
+                    # first two legs with zero successes is DOWN —
+                    # never burn 4x120s backoffs on every remaining
+                    # leg; exit so the wrapper waits + re-probes
+                    if leg_ok == 0 and leg_fail >= 2:
+                        print("    SEAT_DOWN_EARLY_ABORT (0 successful"
+                              " legs) — wrapper waits + re-probes",
+                              flush=True)
+                        return 3
                     print(f"    judge leg failed "
                           f"{type(e).__name__}", flush=True)
                     w = "TIE"
