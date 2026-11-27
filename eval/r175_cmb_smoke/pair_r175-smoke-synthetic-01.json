@@ -1,0 +1,38 @@
+{
+ "pid": "r175-smoke-synthetic-01",
+ "state": "OK",
+ "dominance_pool_ids": [
+  "cand:MS:DOMAIN_KNOWLEDGE_FIRST:dde099048ae2",
+  "r175-baseline-best-r175-smoke-synthetic-01"
+ ],
+ "baseline_best_in_pool": true,
+ "pipeline_answer": "Increase tube-side fluid velocity from 0.6 m/s to 1.8 m/s to transition flow from laminar to turbulent regime, thereby increasing wall shear stress and reducing mineral scale deposition rates. This mechanical intervention avoids chemical agents and fits within the 30-minute monthly downtime window for pump speed adjustment or impeller swap.\n\nPARAMETER: target_tube_side_velocity — 1.8 m/s — ASSUMPTION\nPARAMETER: flow_regime_transition_threshold — Re > 4000 — ASSUMPTION (value not stated in the cited record)\nPARAMETER: heat_transfer_model — k-omega turbulence model — EVIDENCE-BACKED [doi:10.48550/arxiv.2310.17257]\nPARAMETER: cleaning_agent_restriction — none permitted — ASSUMPTION (User Constraint; the user's own stated value, not evidence)\n\nThe current velocity of 0.6 m/s maintains laminar flow, which promotes boundary layer thickening and accelerates fouling. Increasing velocity to 1.8 m/s induces turbulence, enhancing convective heat transfer coefficients and scouring the tube walls mechanically. The k-omega turbulence model is identified as providing better convergence and accuracy for heat transfer rate predictions in shell-and-tube geometries compared to k-epsilon models, supporting the reliability of this hydraulic change [doi:10.48550/arxiv.2310.17257]. While the provided evidence on NaOCl backwashing highlights chemical constraints in food-grade or sensitive duties, it reinforces the necessity of non-chemical alternatives like hydraulic control when chemical cleaning is prohibited [doi:10.6084/m9.figshare.34878835].\n\nExpected effect: Reduction in thermal resistance due to fouling by at least 20% within the first month, maintaining outlet temperature within 63.0 +/- 0.5 C. The increased shear stress prevents the initial adhesion of mineral crystals, extending the operational cycle between required maintenance events.\n\nFalsification test:\n1. Test temperature: 63.0 C (outlet specification target)\n2. Duration: 30 days (one full monthly cycle)\n3. Sample size: n = 1 (single heat exchanger unit monitored continuously)\n4. Pass/fail criteria: Outlet temperature remains within 63.0 +/- 0.5 C for the entire 30-day period without exceeding the 30-minute monthly downtime limit for any corrective action. If temperature drops below 62.5 C, the intervention fails.\n\nThis proposal respects C1 by using only hydraulic changes, not chemical agents. It respects C2 by actively changing the velocity from the stated 0.6 m/s. It respects C3 by targeting the specified outlet temperature range. It respects C4 by requiring only pump adjustment, which takes less than 30 minutes.\n\nUNVERIFIED and needs the stated test.",
+ "composer_state": "COMPOSED_CONTRACT_DOWNGRADED",
+ "compose_error": null,
+ "compose_n_llm_calls": 3,
+ "compose_generator": {
+  "model": "qwen/qwen3.5-plus:free",
+  "provider_route": [
+   {
+    "provider": "xkiro",
+    "provider_attempted": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "status": "OK",
+    "attempts": 1,
+    "retry_count": 0,
+    "latency_ms": 31864,
+    "ttfb_s": 31.864,
+    "gateway_hang": false,
+    "failure_type": null,
+    "fallback_provider": null
+   }
+  ]
+ },
+ "pipeline_answer_internal_no_dominance": "",
+ "call_accounting": {
+  "pipeline_total_calls": 5,
+  "baseline_total_calls": 2,
+  "pipeline_strict_within_budget": false
+ },
+ "wall_s": 46.2
+}
