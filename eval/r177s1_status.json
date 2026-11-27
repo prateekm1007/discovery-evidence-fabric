@@ -1,0 +1,76 @@
+{
+ "record": "R177S1_BUILDER_STATUS/1.0.0",
+ "session": "builder-r177s1",
+ "lane": "DIR 1 session bootstrap + the CTAI secret-burn fix + DIR 3 kill-criterion deliverable + DIR 8 governance-diet tranche 1 + DIR 4 ablation harness prep (VERIFIER standby on the c-0283 invention lane)",
+ "round_date": "2026-11-27",
+ "sandbox_clock": "TRUE UTC",
+ "base_state": "queue tip 218a308e0 at session start (builder-r176s1's c-0283 claim commit); the direction pins c1dbd0cf2c3e for the constitution read; audit tip 8413e1ad0f42; local main was fad0baec6 (stale, not used)",
+ "claims": {
+  "c-0284": "r177s1-ctai-secret-tip-removal (task) DONE — commit 1b5e930b5",
+  "c-0285": "r177s1-dir3-keep-retire (task) DONE — commit 53b2cc9c9",
+  "c-0286": "r177s1-dir8-governance-diet-tranche1 (task) — this commit"
+ },
+ "completed": [
+  "DIR 1 (every item): EPISTEMIC_CONSTITUTION.md FULL-read at c1dbd0cf2c3e (all 29 articles + 4 amendment records + Art. 28 addendum; sha256[:16] 153ac62efca36c2d — digest match) and AUDITOR_CONSTITUTION.md FULL-read at 8413e1ad0f42 (14 articles + 3 amendments; 3775f869a1c19a96 — digest match); 0 digest mismatches",
+  "DIR 1 ledger read from committed bytes: audit/AUDIT_LEDGER.json at 8413e1ad0f42 — verdict V137 (R176: DIR-2 non-loss win+tie 0.75 CI[0.428,0.945]; DIR-3 0.92 VACUOUS — champions baseline7/plain4/contradiction1, dominance ties 7/12, departure won 0; AM53; score 3) + AM52 scoreboard + AM53 gate — all three match the direction verbatim",
+  "DIR 1 vault: r77_vault_restore.py from the repo — 11/11 vault-managed keys restored, 0 decode/digest failures, digests-only output; .env.keys 0600 gitignored (inner repo; the OUTER workspace .gitignore also gained .env.keys/.env this session); direction-delivered credentials digest-verified against the vault (GH_PAT f1ebca5f9b62, CENT_AI a5beece70d05, TOKENROUTER c148574f6215, CTAI base URL — all match)",
+  "DIR 1 secret-grep: 0 live hits at the pushed tips (HEAD + origin/queue/dev12_r7 + audit tip), 0 message hits across all refs",
+  "CTAI BURN FOUND+FIXED (auditor Art. 12 v1.3.0 class): the live CTAI_API_KEY literal (ctai_dm38...) was committed in scripts/r169s1_vault_manage_ctai.py at queue tip reachable from the PUBLIC origin — commit 1b5e930b5 strips the tip tree (KEY = os.environ['CTAI_API_KEY'] with a typed fail-closed refusal; probed: REFUSED, zero vault writes), forward-only, no history rewrite; Article 29 battery + Article 17 message scan 12/12 green at that commit; CI check-run surface: completed/success from the API; refs/claims/next counter lock advanced 1a65c2458->1b5e930b5 (fast-forward)",
+  "DIR 3 KILL-CRITERION DELIVERED (commit 53b2cc9c9, claim c-0285): eval/r177s1_dir3_keep_retire.json — every number recomputed from the committed pair bytes (eval/r175s3_dir3/ 12 pairs + eval/r175_compute_matched/SUMMARY.json), zero new runs. MITIGATION: RETIRE the multi-stage diverse-selection architecture, SHIP best-of-4 + critique + revise + verifier — measured value-add of the architecture: genuine novel-candidate wins 1/12 (8.3%, one contradiction win r125-06-s1), departure 0/12, dominance ties 7/12, plain best-of-N wins 2/12; the 0.75 non-loss is achieved by the best-of-N+verifier recipe itself at the same 6-call budget. INVENTION: decision DEFERRED typed PENDING the c-0283 bytes (pre-declared gate: genuine novel-candidate wins >=50% with Wilson CI lower >50% at n>=24 -> KEEP multi-stage for invention-class ONLY, else the kill criterion extends there). f31e retired as the invention test per the DELETE LIST. Standing rule: per-class per-round >=50% genuine novel-candidate wins or the class ships best-of-N+verifier; 2 consecutive non-winning rounds auto-retire the arm (Art. 20 per-class)",
+  "DIR 8 TRANCHE 1 EXECUTED with the R388 evidence method: tag archive/r309-r549-pre-scrub-20261127 pushed BEFORE the scrub (every archived byte retrievable; no history rewrite); 120 R-dirs R309-R549 scanned against the active surface with a fixed content-preserving grep (R-dir self/sibling references excluded from the corpus); classification v3: 108 KEEP (functional refs from discovery_fabric engine modules, tests opening committed bytes, .github workflows, PATENT_SOURCE_REGISTRY, LEAD_PORTFOLIO_4, r456_deploy_state record) + constitution/amendment custody override (R309, R339, R370F, R485, R503, R507 kept regardless of refs); 12 ARCHIVED (zero functional refs AND zero custody bytes: R479, R501, R508, R509, R524 zero-ref + R448, R460, R461_C2, R473, R474, R476, R477 deploy-state-name-only thin keeps); root 225 -> 213 entries; commits 03c323aa9 (scrub) + 7d38841cb (clobber restoration); ARCHIVE_MANIFEST.json dir8_scrubs[] carries the full record + the freeze declaration (no new root round folders until a measured genuine invention win)",
+  "DIR 8 TYPED FINDING (the honest blocker): the direction's 'root 214->~30' is NOT reference-safely reachable by archiving R-dirs — 108/120 dirs are wired into the live surface (engine path resolvers, tests reading bytes, workflows, registries). Reaching ~30 requires an engine-side refactor moving those resolvers (an Art. 5/27 measured-path change with its own battery), NOT a diet commit; forcing it would break CI exactly as the R388 call-graph audit was written to prevent. The auditor decides whether to authorize that refactor",
+  "DIR 4 HARNESS PREPPED (no runs — the corpus is the c-0283 executor's): scripts/r177s1_ablation_harness.py — 5 leave-one-out arms (A_full / A_no_relax / A_no_subtract / A_no_tourney / A_no_revise), per-item wall+calls bytes, byte-resume, one run per item, the AM53 genuine-win scoring (ties and plain wins excluded from the numerator) coded BEFORE any run, Wilson CI per arm, <=12-call budget gate. The r175 bytes say the full pipeline is ~21 calls/item (tournament alone = 10 judge calls) and median wall 189.6s — both over target, so the pruning is expected to bite. The harness reads eval/r176_invention_corpus/items.jsonl ONLY after builder-r176s1 lands it (typed INFRA_BLOCK today; VERIFIER role, Art. 29 no-duplicate)",
+  "full pytest battery re-run on the scrubbed tree vs the pre-scrub tag (pint installed into the sandbox to un-break 13 pre-existing collection errors present on BOTH trees — a sandbox dep gap, not a scrub breakage)"
+ ],
+ "findings": [
+  "R177-F1 (BURN, disclosure): CTAI_API_KEY ctai_dm38... committed at queue tip (scripts/r169s1_vault_manage_ctai.py line 27, r169s1 commit 987feff60) — public-ref reachable, typed BURNED; rotation is the owner's account-level prerogative (Art. 17/28-addendum: vault-only storage + zero committed secrets delegated to the loop, rotation NOT re-asked). The tip tree is clean at 1b5e930b5; the historical commits remain reachable (no rewrite)",
+  "R177-F2 (ROTATION_TO_DISCLOSE): the direction-delivered HF token (digest 0af8db243dee, the R174 rotation) differs from the vault's own HF_TOKEN entry (33bc7af22c62, the Art. 17 v3.3.0 record) — the vault copy is one rotation stale; the delivered token works (the vault fetch succeeded with it). The vault holds values under owner privacy control and the delivered token has zero repo-write perms, so the builder cannot update the vault record; the owner should refresh the vault's HF_TOKEN entry at their leisure",
+  "R177-F3 (DIR 8 honest negative): root ~30 is not reachable reference-safely (typed above); tranche 1 moves root 225->213 and the freeze is declared; the engine-resolver refactor is the follow-on decision",
+  "R177-F4 (sandbox): 13 test files fail COLLECTION on a fresh sandbox (ModuleNotFoundError: pint) on BOTH the pre-scrub tag and the scrubbed tree — a provisioning gap in the sandbox image, not a repo defect; pint 0.26.2 installed locally to run the battery; the CI workflow installs its own deps (check-run green)",
+  "R177-F5 (VERIFIER standby): the c-0283 lane (builder-r176s1, r176-invention-shaped-dev24) had NOT landed corpus/run bytes at the fetch before this record; no takeover (lease live to 2026-11-28T20:00Z); this session's claims stayed disjoint (c-0284/c-0285/c-0286 vs their c-0283)",
+  "R177-F6 (F25 rebase-clobber class, SELF-CAUGHT within one minute): the DIR-8 scrub commit 03c323aa9 accidentally deleted the c-0283 executor lane's five fresh bytes (corpus/prereg/run/tally/drive) because the staged index was built against the pre-c0bee964a parent — the soft-reset re-parent kept the stale index and their ADDED files materialized as staged deletions; a git add -A sweep also caught two test-run-mutated files in the first (never-pushed) attempt 006d6e269. THE FIX (7d38841cb): all five paths restored byte-identical from c0bee964a (items.jsonl sha256 51b0dee4... verified against the blob before staging); the two test-mutated files restored byte-identical in the rebuild; lessons typed in the commit. No claim bytes of the parallel lane were harmed: the deletion window on the remote was ~1 minute and the drive wrapper is byte-resume",
+  "R177-F7 (VERIFIER note): builder-r176s1 landed the 24-item invention-shaped corpus + instrument at c0bee964a (prereg sealed BEFORE any measured pair byte; three transport defects fixed and sealed forward-only pre-run) — the run is IN FLIGHT; this session stays VERIFIER, no duplicate generation (Art. 29)"
+ ],
+ "next_bound": [
+  "VERIFIER on c-0283 from committed bytes the moment they land (tally recompute per auditor Art. 13, the AM53 genuine-win scoring, dominance-tie + plain-win exclusion audit)",
+  "DIR 4 ablation runs on the landed invention corpus (the harness is ready; <=12-call budget; the tournament arm is the predicted retiree)",
+  "DIR 5 sealed holdout is GATED on the DIR 2 DEV gate passing (no holdout spend while unmet)",
+  "DIR 6/7 deferred by byte-truth: the direction says the P5 v2 lease expired, but the registry bytes say c-0275 (r159-p5-rediscovery-v2, builder-r159s2) was claimed 2026-11-27T14:20Z with a live lease to 2026-11-28T00:00Z and its seal is committed (d675cf4a0: 30-item post-cutoff corpus sha c9670d8dd4b55c0c + canary lures + prereg, acceptance >=40% RECOVERED / 0 canary / >=1 T1 / >=1 T2); the ONE-shot run has not been executed (no run bytes at the fetch). Art. 7: canonical state has one authority — NO takeover before 00:00Z; if the lease lapses with no run bytes, the takeover executes referencing the dead lease (c-0269 lineage, one generation, Art. 29(c))",
+  "DIR 8 tranche 2 (root legacy prose/manifests) only with the same per-path evidence method"
+ ],
+ "owner_requests": [
+  "rotate the CTAI credential (typed BURNED, R177-F1) and refresh the vault's stale HF_TOKEN entry (R177-F2)",
+  "the ~30-root target needs an explicit authorization for the engine-resolver refactor (R177-F3) or a revised target"
+ ],
+ "base_sha": "53b2cc9c9",
+ "remote_ci": {
+  "pushed_sha": "03c323aa9",
+  "remote_ci_conclusion": "success",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success"
+   }
+  ],
+  "read_at": "2026-11-27T21:35Z (check-run API, authenticated; runs list for commit 03c323aa9 on queue/dev12_r7)",
+  "prior_push_reads": [
+   {
+    "sha": "1b5e930b5",
+    "conclusion": "success",
+    "cause_typed": "the CTAI tip-strip commit — check-run surface completed/success from the API (read this session)"
+   },
+   {
+    "sha": "7d38841cb",
+    "conclusion": "pending",
+    "cause_typed": "the clobber-restoration tip at record time; its CI read rides the next window's record"
+   }
+  ]
+ },
+ "art27_capability_budget": {
+  "engine_diff": "NONE — this is a typed custody/governance round: zero discovery_fabric/engine lines changed. The session's bytes: scripts/r169s1_vault_manage_ctai.py (the CTAI tip-strip, custody), scripts/r177s1_ablation_harness.py (the DIR-4 instrument, scripts/), eval/r177s1_dir3_keep_retire.json + eval/r177s1_status.json + ARCHIVE_MANIFEST.json dir8_scrubs[] (records), 12 root R-dir deletions (DIR 8, accounted in the deletions key). The capability path (DIR 2) is the c-0283 lane's in-flight run — this session deliberately moved no engine code while their executor lease is live",
+  "primary_metric_delta": "NO capability metric moved this window (the honest negative, typed): the DIR-3 deliverable is a typed keep/retire decision recomputed from committed bytes (genuine novel-candidate value-add on mitigation = 1/12, 8.3% — RETIRE); DIR-8 moves the governance metrics (root 225->213 entries, 120 dirs scanned); the DIR-2 invention measurement is in flight under c-0283",
+  "deletions": "12 root R-dirs (R479, R501, R508, R509, R524, R448, R460, R461_C2, R473, R474, R476, R477) — Art. 16 accounting in ARCHIVE_MANIFEST.json dir8_scrubs[] with the evidence method, the tag archive/r309-r549-pre-scrub-20261127 as the retrieval path, and the typed ~30-blocker finding; plus the CTAI literal removed from scripts/r169s1_vault_manage_ctai.py (successor = os.environ['CTAI_API_KEY'] with a typed refusal)",
+  "engine_line_share_measured": 0.0,
+  "share_exception_reason": "custody + governance round (F63 typed exception): the CTAI credential burn fix, the DIR-3 kill-criterion decision record, the DIR-8 tranche-1 scrub + freeze, the DIR-4 harness prep — all deliberately outside discovery_fabric/engine/ while the c-0283 executor lane is live; the engine's behavior changes by MEASUREMENT next window, not by code this window"
+ }
+}
