@@ -2122,10 +2122,7 @@ class EngineRun:
                                "Re-run the loop when transport recovers."),
                 })
                 _grid_status = "SKIPPED_ADJUDICATION_BLOCKED"
-            if not self._naive_survivor and not adjudication_blocked \
-                    and not (_route["route"] == "CHEAP_ARM" and
-                             "EXPLORATION_GRID" in
-                             _route["disabled_stages"]):
+            if not self._naive_survivor and not adjudication_blocked:
                 # R399 W2.3 (the directive's exact gate): the diversity
                 # grid is expensive candidate generation — it requires
                 # >= 1 VERIFIED_EVIDENCE_ITEM. A run that died of
@@ -2135,10 +2132,25 @@ class EngineRun:
                 # cand:DIV:* candidates on an evidence-dead run). The
                 # shared helper stamps the decision with the measured
                 # counts — a skip is a recorded refusal, never absence.
+                # R178 DIR-3 SHIP: the ROUTE verdict outranks the
+                # evidence gate for the RECORD (a mitigation problem's
+                # grid record must be the typed route skip — the cheap
+                # arm serves the class regardless of evidence state;
+                # the R399 evidence skip remains for architecture-route
+                # problems). The route skip record itself was already
+                # persisted at the section head; nothing is generated
+                # on either branch.
+                _route_cheap = (_route["route"] == "CHEAP_ARM" and
+                                "EXPLORATION_GRID" in
+                                _route["disabled_stages"])
+                if _route_cheap:
+                    pass  # typed record already persisted above
                 _grid_entry = stage_entry.justify(
                     "EXPLORATION_GRID", self.env, self.failed_stages,
                     self._skipped_stages)
-                if _grid_entry["entry_status"] == "SKIPPED":
+                if _route_cheap:
+                    _grid_status = "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                elif _grid_entry["entry_status"] == "SKIPPED":
                     self._persist("EXPLORATION_GRID.json", {
                         "status": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
                         "entry": _grid_entry,
@@ -2149,6 +2161,14 @@ class EngineRun:
                                      "unverified evidence (R399 W2.3)"),
                     })
                     _grid_status = "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+                elif (_route["route"] == "CHEAP_ARM" and
+                        "EXPLORATION_GRID" in _route["disabled_stages"]):
+                    # R178 DIR-3 SHIP: the route split already
+                    # persisted the typed skip record above; this arm
+                    # generates nothing (the cheap arm serves this
+                    # problem class) and falls through with the route
+                    # status already stamped.
+                    pass
                 else:
                     try:
                         from .candidate_diversity import (generate_diverse_candidates,
