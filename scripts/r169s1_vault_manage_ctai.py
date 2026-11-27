@@ -24,7 +24,7 @@ VAULT_FILE = "operator_keys.json"
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
-KEY = "ctai_dm38kvAO_SRCGj9MjmfBE6QH2UWLlgQgMb6QYwkzb"
+KEY = os.environ.get("CTAI_API_KEY", "").strip()  # vault-managed (r77_vault_restore.py); never committed (r177s1 strip — the historical literal is BURNED, auditor Art.12 v1.3.0)
 BASE = "https://api.cantrustai.xyz/v1"
 
 
@@ -45,6 +45,9 @@ def fetch_vault(token: str) -> dict:
 
 
 def main() -> int:
+    if not KEY:
+        print("REFUSED: CTAI_API_KEY missing — vault-managed (r77_vault_restore.py); never committed (r177s1)")
+        return 3
     token = os.environ.get("HF_TOKEN", "").strip()
     if not token:
         print("REFUSED: HF_TOKEN (the master) missing — it is "
