@@ -83,6 +83,33 @@ WORK_ID = "r175-compute-matched-baseline-dev12"
 CORPUS = REPO / "eval" / "problems_dev12.json"
 PACE_S = 8.0
 
+# MEASURED on live item 1 (2026-11-27, before any measured byte was
+# kept): the registered route (qwen via xkiro) returned BYTE-IDENTICAL
+# answers for BYTE-IDENTICAL prompts (7 identical 5547-char draws) —
+# provider-side sampling does NOT diversify identical prompts on this
+# route, so best-of-N on one prompt is degenerate. The baseline draws
+# are therefore STRATEGY-TAGGED: the same single-shot prompt + ONE
+# rotating angle line per draw (each draw still one independent
+# single-shot answer on the same evidence packet; the rotation is the
+# standard diverse best-of-N, and it also matches DIR 3's philosophy
+# for the arm).
+DRAW_STRATEGIES = [
+    "prioritize the cheapest intervention that still solves it",
+    "prioritize the most reversible / least invasive intervention",
+    "prioritize the highest-mechanism-novelty intervention",
+    "prioritize the most directly testable intervention",
+    "prioritize the longest-service-life intervention",
+    "prioritize the intervention with the least downtime",
+    "prioritize the most robust-to-operating-variability intervention",
+    "prioritize the most energy-efficient intervention",
+    "prioritize the intervention that best uses the packet's OWN evidence items",
+    "prioritize the intervention with the fewest moving parts",
+    "prioritize the most conservative proven-engineering intervention",
+    "prioritize the most aggressive but still physically sound intervention",
+    "prioritize the intervention that best handles the stated worst case",
+    "prioritize the easiest-to-retrofit intervention",
+]
+
 # the qualified serving seats (availability-probed at --phase probe;
 # hy4f joins only if probed live — the cent-ai outage is measured,
 # not assumed). agnes holds NO seat (generator isolation, Art. 26).
@@ -440,6 +467,7 @@ def phase_baseline(prob: dict, pipe_rec: dict) -> dict:
     # draw loop is exactly N draws + 1 critique, recorded per item.
     from discovery_fabric.engine import llm_economy as _econ
     os.environ["FABRIC_PROBLEM_CALL_CAP"] = "0"
+    os.environ["FABRIC_PROBLEM_RETRY_CAP"] = "0"
     _econ.reset_governor(f"r175-cmb-baseline-{pid}")
     out_dir = SCRATCH / f"pipe_{pid}"
     ce = _read(out_dir / "candidate_envelope.json")
@@ -452,15 +480,19 @@ def phase_baseline(prob: dict, pipe_rec: dict) -> dict:
     for k in range(1, n_draws + 1):
         attempts: list = []
         t0 = time.monotonic()
+        strategy = DRAW_STRATEGIES[(k - 1) % len(DRAW_STRATEGIES)]
+        draw_prompt = (prompt + f"\n\nDRAW ANGLE (independent draw {k} "
+                                 f"of {n_draws}): {strategy}.")
         try:
             raw, meta = engine_call(
-                prompt, system=_COMPOSER_SYSTEM, target=1400,
+                draw_prompt, system=_COMPOSER_SYSTEM, target=1400,
                 what=f"{pid} draw {k}",
                 purpose=f"r175_cmb_baseline_draw")
             answer, _ = strip_constraint_check(raw.strip())
             defects = bill_defect_classes(prob, answer)
             draws.append({"draw": k, "state": "OK", "answer": answer,
                           "defect_classes": defects,
+                          "draw_strategy": strategy,
                           "transport_attempts": attempts,
                           "generator": {"model": meta.get("model"),
                                         "provider_route":
@@ -488,7 +520,9 @@ def phase_baseline(prob: dict, pipe_rec: dict) -> dict:
         return rec
 
     numbered = "\n\n".join(
-        f"CANDIDATE {d['draw']}:\n{d['answer']}" for d in ok_draws)
+        f"CANDIDATE {d['draw']} (draw angle: "
+        f"{d.get('draw_strategy', 'unspecified')}):\n{d['answer']}"
+        for d in ok_draws)
     cp = CRITIQUE_TASK.format(
         n=len(ok_draws), device=prob.get("device", ""),
         failure=prob.get("failure", ""),
@@ -530,6 +564,10 @@ def phase_baseline(prob: dict, pipe_rec: dict) -> dict:
     rec = {
         "pid": pid, "state": "OK", "N_draws": n_draws,
         "draws": draws, "draw_fails": fails,
+        "distinct_answers": len({d["answer"] for d in ok_draws}),
+        "duplicate_answer_draws": sorted(
+            {d["draw"] for d in ok_draws
+             if sum(1 for x in ok_draws if x["answer"] == d["answer"]) > 1}),
         "critique": critique, "critique_attempts": crit_attempts,
         "selection_rule_applied": rule,
         "baseline_best": pick["answer"],
