@@ -2498,6 +2498,22 @@
    "title": "P5 v2 J2 seat cent-ai hy4 DOWN (/models 200-empty, hy4 chat 404/HTML); the counting run needs a live J2 != G0; hy4f 30 panel legs stand (committed earlier)",
    "evidence": "cent-ai hy4 404/HTML; P5 v2 hold 21/30",
    "status": "OPEN"
+  },
+  {
+   "id": "R173-F1",
+   "round": "R173",
+   "severity": "HIGH",
+   "title": "NON-OBVIOUSNESS binding gap: panel 10% vs rubric 73% strong; generate genuinely non-obvious inventions (cross-domain inspiration, beyond standard practice) then re-panel >=50% for score 8",
+   "evidence": "panel 3/30 byte-verified 2 lanes; rubric divergence",
+   "status": "OPEN"
+  },
+  {
+   "id": "R173-F2",
+   "round": "R173",
+   "severity": "MEDIUM",
+   "title": "P5 v2 counting run unblocked by AM52 J2 re-seat (hy4->ctai gpt-6-astra); run the frozen corpus with G0 tokenrouter + J2 ctai >=40%",
+   "evidence": "hy4 403 day-2; ctai gpt-6-astra 200 unspent; AM52",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -3977,6 +3993,15 @@
    "data_grounding": "mst14b (ministral-14b) is REMOVED from the xkiro catalog (62 models, NO mistral family \u2014 auditor-confirmed from /v1/models bytes) and 404 on tokenrouter; the frozen serving set (snlite+mst14b+hy4f) is broken \u2014 the 00:05 panel cron would land snlite legs but all 30 mst14b legs 404, degenerating to 2 judges (<3). No counting verdict was ever produced (mst14b 0 legs), so this is a NECESSARY availability substitution, NOT a mid-gate tuning swap.",
    "amendment": "Authorize a SEALED serving-set substitution: mst14b -> a LIVE judge re-qualified on the r148 balanced corpus (acc>=0.8, answered>=0.9, miss-bias<=1) AND inter-judge alpha>=0.6 with snlite+hy4f. Candidate order: (1) tiny-aya (xkiro free, re-qualify post Nov-27 00:00 reset \u2014 first qualification, not a re-roll); (2) msm2603 (mistral-small-2603, tokenrouter, kept-aside acc 0.917 \u2014 currently 403 paid, needs owner funding); (3) another live qualified judge != generator. The amended 3-judge set is sealed forward-only; the panel re-runs snlite + substitute + hy4f on the SAME v18 candidates (the candidate generation is unchanged; only the unavailable judge is replaced).",
    "integrity": "the substitute is qualified on the SAME r148 corpus + agreement-checked (alpha>=0.6) before serving; the v18 candidate set is frozen (no re-generation); this replaces an UNAVAILABLE judge, not tuning for a desired verdict. Art.3/7/8 respected."
+  },
+  {
+   "id": "AM52",
+   "date": "2026-11-27",
+   "authority": "DELEGATED OWNER",
+   "title": "P5 v2 J2 seat availability re-seat authorized \u2014 hy4 down day-2 (403), substitute a live ctai judge (sealed, forward-only)",
+   "data_grounding": "the P5 v2 prereg pins J2=hy4-flash:free (cent-ai); hy4 is 403 Forbidden day-2 (deepening outage, auditor-confirmed prior 503). G0 tokenrouter 200 LIVE. The ctai backups openai/gpt-6-astra + openai/gpt-6.1-sol probe 200 and are UNSPENT. V128 forbade UNILATERAL builder re-seat; this is the OWNER authorization.",
+   "amendment": "Authorize a SEALED J2 availability re-seat: hy4 -> a LIVE ctai judge (gpt-6-astra preferred, unspent), qualified for the P5 support-rating task (judge != G0 tokenrouter generator, F2-clean). The re-seat is forward-only sealed (the prereg J2 field amended with the dated reason); the P5 v2 counting run proceeds G0 tokenrouter + J2 ctai on the SAME sealed corpus c9670d8dd4b55c0c. The 21/30 infra-terminal stays archived (not overwritten).",
+   "integrity": "availability substitution only (hy4 unavailable), NOT tuning; the substitute judge qualified for the task; the corpus + candidates frozen; Art.3/7/8 respected."
   }
  ],
  "audit_mistakes": [
@@ -5949,6 +5974,23 @@
     "R171-F1",
     "R171-F2"
    ]
+  },
+  {
+   "id": "V135",
+   "round": "R173 audit: panel verdict 10% NOT MET (byte-verified 2 lanes) + divergence adjudication + AM52 P5 J2 re-seat authorized",
+   "commit": "94a6a74b584195daf120d351079e534e38991b2b",
+   "gate": "panel 3/30=10% NOT MET (>=50%), byte-verified 2 lanes; gpt6luna sealed alpha 0.888; CORR-R172-1 novelty downgrade; AM52 P5 J2 hy4->ctai re-seat authorized; score 7 stands score 8 NOT met",
+   "score": 7,
+   "consolidated": true,
+   "score8": "NOT_MET",
+   "adjudication": "eval/r173_auditor_adjudication.json",
+   "findings": [
+    "R173-F1",
+    "R173-F2"
+   ],
+   "corrections": [
+    "CORR-R172-1"
+   ]
   }
  ],
  "gold_set": {
@@ -6349,7 +6391,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. AYA32B FAILED (verified): acc_vs_labels 0.667<0.8 (answered 1.0, bias 0, serving alpha 0.612 \u2014 agrees with peers but not the corpus labels); typed exit no seal/no panel; SPENT (Art.7 no re-roll); xkiro free pool 0 unspent candidates. The cron 550745 did NOT fire (builder executed the AM51 wrapper manually under c-0271; cron-gateway visibility 0). NEW CTAI PATH: the owner's cantrustai token vault-managed (3779a467bb9a/73be3c3b31e0, r77 11/11); auth-valid, allowlist-gated; r169s1 recovered the real ids from the frontend bundle \u2014 openai/gpt-6-luna, gpt-6-astra, gpt-6.1-sol (OPENAI FRONTIER, probed 200 real generations), wired under c-0272. AM51 substitution CONTINUES: mst14b -> gpt6luna (ctai openai) IF r148 bars pass (acc>=0.8, bias<=1) + serving alpha>=0.6; serving set snlite (sensenova) + gpt6luna (openai) + hy4f (hunyuan) = 3 non-generator families; gpt6astra/gpt6.1-sol unspent backups; r169s1 runs qualification->bars->seal->panel->tally, r170s1 stands down to VERIFIER (Art.13 byte recompute). CI red fixed (VERIFIER c-0273 + chain repair c-0271 lease TAKEN_OVER); tip d794adb54a5e green. P5 v2 J2 cent-ai hy4 DOWN (404/HTML); counting run needs live J2 != G0; hy4f 30 panel legs stand. Critical path: ctai gpt6luna bars -> seal -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 >=40% (9). Goal 9/10 fully agent-run. msm2603 funding only if all gpt6 fail.",
+ "progress_note": "SCORE 7/10 (score-8 NOT MET). PANEL VERDICT BYTE-VERIFIED 2 LANES (r169s1 c-0272 + r170s2 c-0274 zero-LLM Art.13): full 3-judge panel (snlite+gpt6luna+hy4f, 90/90 VALID) two-axis majority 3/30=10.0% viable+non-obvious, row_diff 0, serving alpha 0.888277==committed, diff=0; gpt6luna QUALIFIED acc 0.917 alpha 0.888, AM51 seal mst14b->gpt6luna, v18 frozen; winners slurry-pump/freeze-concentration/hydrogen-valve; NON-OBVIOUS axis killer (modal 0-1/3), viability lenient. score-8 NOT MET (10%<50%). DIVERGENCE ADJUDICATION CORR-R172-1: rubric 73% strong (V116) OVER-COUNTED novelty; calibrated frontier panel (10% non-obvious vs external prior art) authoritative; v18 feasible+physics-correct but mostly OBVIOUS standard engineering; strong-novelty DOWNGRADED; NON-OBVIOUSNESS binding gap (R173-F1 HIGH); score-7 stands. Builder correctly held bar/set/tune (AM51 integrity). AM52 AUTHORIZED (delegated owner): P5 v2 J2 hy4 (403 day-2) re-seats to LIVE ctai gpt-6-astra (unspent, probe 200), qualified for P5 support-rating (judge != G0 tokenrouter); forward-only sealed; counting run proceeds on frozen corpus c9670d8dd4b55c0c (21/30 infra-terminal archived); P5 score-9 path UNBLOCKED (G0 live). Critical path: non-obvious generation -> re-panel >=50% (8); P5 v2 counting (AM52 J2) >=40% + unattended (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -6530,6 +6572,14 @@
    "date": "2026-11-26",
    "withdraws": "AM51 'tiny-aya first qualification'",
    "correction": "tiny-aya (tayae) spent/failed (24 legs 2025-11-25 acc 0.75 bias 3); substitute is aya32b (unspent, 0 legs); re-rolling tiny-aya would violate Art.7",
+   "authority": "Auditor Art.9/Art.1"
+  },
+  {
+   "id": "CORR-R172-1",
+   "round": "R173",
+   "date": "2026-11-27",
+   "withdraws": "v18 '73% strong' novelty as score-8 evidence",
+   "correction": "calibrated panel 10% viable+non-obvious (3/30, 90/90 VALID, byte-verified 2 lanes diff=0); rubric over-counted novelty; v18 mostly OBVIOUS; score-8 NOT MET; non-obviousness binding gap",
    "authority": "Auditor Art.9/Art.1"
   }
  ],
