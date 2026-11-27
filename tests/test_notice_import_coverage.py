@@ -50,7 +50,13 @@ IMPORT_TO_NOTICE = {
 # inside try/except blocks), so no upstream code can be depended on.
 # TYPED and closed — grows only with a finding.
 PHANTOM_LOCAL = {"TOSCANINI", "eval", "r447_deploy_upload",
-                 "r447_hf_deploy", "r491_space_deploy"}
+                 "r447_hf_deploy", "r491_space_deploy",
+                 # p3s2/p3s1: runtime-registered stage modules of the
+                 # r105 P3 walk (r105s2_p3_stage3.py materializes them
+                 # via spec_from_file_location + sys.modules["p3s2"] =
+                 # ...); NOT third-party packages (the R112 raw import
+                 # rides that registration)
+                 "p3s2", "p3s1"}
 
 LOCAL_ROOTS = {"discovery_fabric", "aide", "dspy", "scripts", "tests"}
 
