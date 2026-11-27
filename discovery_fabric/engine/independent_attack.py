@@ -844,6 +844,7 @@ def independent_attack(candidate: Dict[str, Any],
                   "(fresh adversarial conversation, generator reasoning "
                   "never shown; no alternative provider credentialed — "
                   "disclosed, never claimed as provider separation)")),
+        "calibration": _calibration_attestation(),
         "prompt_hash": meta.get("prompt_hash"),
         "output_hash": meta.get("output_hash"),
         "llm_status": meta.get("status"),
@@ -932,6 +933,44 @@ def independent_attack(candidate: Dict[str, Any],
 # provider separation).
 ATTACK_BATCH_VERSION = "independent_attack_batch/1.0.0"
 
+
+def _calibration_attestation() -> Dict[str, Any]:
+    """Art. L/owner audit 2026-11-13: the attack record carries the
+    DERIVED calibration state for ITS OWN instrument version. Fail-closed:
+    an unmeasured instrument records UNKNOWN_NOT_CALIBRATED (never an
+    implied clean bill). The yield instrument consumes this block — it
+    never grants attack survival without CALIBRATED."""
+    try:
+        from .attacker_calibration import resolve_state
+        st = resolve_state(instrument_version=ATTACK_VERSION)
+    except Exception as exc:  # noqa: BLE001 — fail closed, typed
+        return {"instrument": ATTACK_VERSION,
+                "state": "UNKNOWN_NOT_CALIBRATED",
+                "terminal_kill_admissible": False,
+                "error": f"{type(exc).__name__}: {exc}"[:200]}
+    measured = st.get("measured") or {}
+    return {
+        "instrument": ATTACK_VERSION,
+        "gate_version": st.get("gate_version"),
+        "state": st.get("state") or "UNKNOWN_NOT_CALIBRATED",
+        "terminal_kill_admissible": bool(
+            st.get("terminal_kill_admissible")),
+        "n_cases": measured.get("n_cases_attacked"),
+        "attacker_ring": measured.get("attacker_ring"),
+        "measurement_path": st.get("measurement_path"),
+        "measurement_sha256": st.get("measurement_sha256"),
+        "reason": st.get("reason"),
+    }
+
+
+def _independence_for(generator_provider: Optional[str],
+                      attacker_provider: Optional[str]) -> str:
+    if generator_provider and attacker_provider:
+        return ("SEPARATE_PROVIDER"
+                if generator_provider != attacker_provider
+                else "SEPARATE_CONTEXT")
+    return "UNAVAILABLE"
+
 _ATTACK_BATCH_HEADER = """You are a hostile independent reviewer attacking {n} engineering invention candidates. You did NOT propose any of them and you owe them nothing. Find the strongest reasons EACH fails.
 
 Attack EACH candidate independently below, in order. For candidate i, output the section header
@@ -966,6 +1005,7 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
                              generator_provider: Optional[str],
                              attack_purpose: str = "independent_attack",
                              llm_generate=None,
+                             generator_providers: Optional[Dict[str, str]] = None,
                              ) -> Dict[str, Any]:
     """ONE adversarial call for ALL candidates (directive 3).
 
@@ -985,6 +1025,20 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
         from .mechanism_space import llm_generate as _lg
     else:
         _lg = llm_generate
+    # OWNER AUDIT 2026-11-13: each candidate's OWN generator provider
+    # (not the first candidate's, the old `_gens[0]` bug) governs its
+    # independence verdict. The batch call excludes every listed
+    # generator provider; the per-candidate mode is computed from the
+    # candidate's own generator vs the ACTUALLY SERVED attacker.
+    _gen_map = {str(k): str(v) for k, v in
+                (generator_providers or {}).items() if v}
+
+    def _gen_for(cid: str) -> Optional[str]:
+        return _gen_map.get(cid) or generator_provider
+
+    _all_gens = sorted({g for g in _gen_map.values() if g} |
+                       ({generator_provider} if generator_provider
+                        else set()))
     ev_lines = []
     for e in (evidence or [])[:5]:
         ev_lines.append(
@@ -1015,9 +1069,14 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
                "cite a specific concrete basis and bind it (GROUNDED_"
                "IN: evidence id, quoted record span, the numbers, or "
                "the violated boundary clause).",
-        purpose=attack_purpose, exclude_providers=[generator_provider]
-        if generator_provider else None,
+        purpose=attack_purpose, exclude_providers=_all_gens or None,
         max_tokens=min(1600 * max(1, len(candidates)), 4000))
+    _attacker_provider = meta.get("provider")
+    _independence_by_candidate = {
+        str(c.get("candidate_id") or i): _independence_for(
+            _gen_for(str(c.get("candidate_id") or i)),
+            _attacker_provider)
+        for i, c in enumerate(candidates, 1)}
     transport = {
         "batch_version": ATTACK_BATCH_VERSION,
         "n_candidates": len(candidates),
@@ -1026,11 +1085,18 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
         "prompt_hash": meta.get("prompt_hash"),
         "output_hash": meta.get("output_hash"),
         "llm_status": meta.get("status"),
+        "generator_providers_excluded": _all_gens,
+        "independence_by_candidate": _independence_by_candidate,
+        # Global (conservative) summary only: SEPARATE_PROVIDER iff every
+        # candidate has a distinct generator; never implied from one
+        # candidate's identity (the audited `_gens[0]` defect).
         "independence_mode": (
             "SEPARATE_PROVIDER"
-            if (generator_provider and meta.get("provider")
-                and meta.get("provider") != generator_provider)
+            if _independence_by_candidate and all(
+                v == "SEPARATE_PROVIDER"
+                for v in _independence_by_candidate.values())
             else "SEPARATE_CONTEXT"),
+        "calibration": _calibration_attestation(),
         "attacked_at": utc_now(),
     }
     out: Dict[str, Any] = {"batch": True, "batch_version":
@@ -1047,10 +1113,12 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
                                  "transport": transport},
                 "attack_purpose": attack_purpose,
                 "candidate_id": cid,
-                "generator_provider": generator_provider,
+                "generator_provider": _gen_for(cid),
                 "attacker_provider": transport["attacker_provider"],
                 "attacker_model": transport["attacker_model"],
-                "independence_mode": transport["independence_mode"],
+                "independence_mode": _independence_by_candidate.get(
+                    cid, transport["independence_mode"]),
+                "calibration": transport["calibration"],
                 "llm_status": transport["llm_status"],
                 "state": "ATTACK_INCOMPLETE",
                 "items": [], "overall": "ATTACK_INCOMPLETE",
@@ -1089,10 +1157,12 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
                                  "transport": transport},
                 "attack_purpose": attack_purpose,
                 "candidate_id": cid,
-                "generator_provider": generator_provider,
+                "generator_provider": _gen_for(cid),
                 "attacker_provider": transport["attacker_provider"],
                 "attacker_model": transport["attacker_model"],
-                "independence_mode": transport["independence_mode"],
+                "independence_mode": _independence_by_candidate.get(
+                    cid, transport["independence_mode"]),
+                "calibration": transport["calibration"],
                 "llm_status": transport["llm_status"],
                 "state": "ATTACK_INCOMPLETE",
                 "items": [], "overall": "ATTACK_INCOMPLETE",
@@ -1116,17 +1186,21 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
                              "transport": transport},
             "attack_purpose": attack_purpose,
             "candidate_id": cid,
-            "generator_provider": generator_provider,
+            "generator_provider": _gen_for(cid),
             "attacker_provider": transport["attacker_provider"],
             "attacker_model": transport["attacker_model"],
-            "independence_mode": transport["independence_mode"],
+            "independence_mode": _independence_by_candidate.get(
+                cid, transport["independence_mode"]),
+            "calibration": transport["calibration"],
             "independence_note": (
-                "the batched attacker ran in an independent reasoning "
-                "context (fresh adversarial conversation, generator "
-                "reasoning never shown)" if
-                transport["independence_mode"] == "SEPARATE_CONTEXT"
-                else "the attacker ran on a different provider than "
-                     "the candidate's generator"),
+                "the batched attacker ran on a different provider than "
+                "THIS candidate's generator"
+                if _independence_by_candidate.get(cid) ==
+                "SEPARATE_PROVIDER"
+                else "the batched attacker ran in an independent "
+                     "reasoning context on the SAME provider as this "
+                     "candidate's generator (SEPARATE_CONTEXT_ONLY — "
+                     "never independent provider validation)"),
             "prompt_hash": transport["prompt_hash"],
             "output_hash": transport["output_hash"],
             "llm_status": transport["llm_status"],

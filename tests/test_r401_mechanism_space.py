@@ -436,7 +436,12 @@ class TestOperatorsAndDistinctness:
                                 PROBLEM)
         cand = res["candidates"][0]
         assert cand["span_binding"]["verbatim_in_record"] is False
-        assert cand["candidate_state"] == "NOT_A_CANDIDATE_SPAN_NOT_VERBATIM"
+        # Owner audit 2026-11-13 (Art. LXXX): a missing/fabricated span
+        # is UNGROUNDED_SYNTHESIS — an epistemic UNKNOWN, never a
+        # scientific rejection.
+        assert cand["candidate_state"] == "UNGROUNDED_SYNTHESIS"
+        assert cand["epistemic_class"] == "UNKNOWN"
+        assert cand["not_a_scientific_rejection"] is True
 
     def test_candidate_carries_nine_required_fields(self, monkeypatch,
                                                     medical_item):

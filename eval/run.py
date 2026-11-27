@@ -56,14 +56,19 @@ sys.path.insert(0, str(REPO))
 # AFTER the sys.path insert (the direct-invocation entry point).
 from discovery_fabric.engine.answer_composer import HYPOTHESIS_CAVEAT_LINE
 
-# DIRECTIVE 2 (owner audit round 2026-11-12): the composer states that
-# DELIVER text (each with at most one plain-language caveat). Every
-# other state is the typed no-answer — the delivery rate counts the
-# ratio of these states (+ the flagged-hypothesis deliveries) over all
-# problems (target >= 90%).
+# DIRECTIVE 1 (owner directive, 2026-11-12): the composer states that
+# DELIVER text (each with at most one caveat; the invalid-delivered
+# class carries a SPECIFIC caveat bound to the open violations).
+# Every other state is the typed no-answer — the delivery rate counts
+# the ratio of these states over all problems (target >= 90%).
+# INVALID_DELIVERED is delivered text; it is NEVER counted as a win,
+# tie, or loss by any superiority instrument — the scoring gate
+# (answer_contract.valid is True in build_score_table) excludes it by
+# construction; the delivery harness reports it as its own class.
 _COMPOSED_DELIVERED_STATES = frozenset({
     "COMPOSED_CONTRACT_VALID",
     "COMPOSED_CONTRACT_DOWNGRADED",
+    "COMPOSED_CONTRACT_INVALID_DELIVERED",
     "COMPOSED_TRUNCATED_DELIVERED",
 })
 
@@ -75,6 +80,7 @@ def delivery_rate_from_dirs(pipeline_dirs):
     refusals, transport failure) counts as NOT delivered — directive 2
     keeps the number honest, never gamed (Art. XIX)."""
     delivered = total = 0
+    classes: Dict[str, int] = {}
     for d in pipeline_dirs:
         total += 1
         p = Path(d) / "ANSWER_COMPOSED.json"
@@ -84,12 +90,22 @@ def delivery_rate_from_dirs(pipeline_dirs):
             rec = json.loads(p.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001
             continue
+        state = str(rec.get("state") or "")
+        classes[state] = classes.get(state, 0) + 1
         ans = rec.get("answer")
         if isinstance(ans, str) and ans.strip() \
-                and rec.get("state") in _COMPOSED_DELIVERED_STATES:
+                and state in _COMPOSED_DELIVERED_STATES:
             delivered += 1
     return {"delivered": delivered, "total": total,
-            "rate": round(delivered / total, 4) if total else None}
+            "rate": round(delivered / total, 4) if total else None,
+            # directive 1: the states are DISTINGUIShED — invalid-
+            # delivered text is counted separately so no superiority
+            # score can quietly credit an unvalidated delivery
+            "delivery_classes": classes,
+            "n_invalid_delivered":
+                classes.get("COMPOSED_CONTRACT_INVALID_DELIVERED", 0),
+            "n_downgraded":
+                classes.get("COMPOSED_CONTRACT_DOWNGRADED", 0)}
 
 
 def _answer_contract(answer, question_type, packet=None,
@@ -1786,6 +1802,384 @@ def _funnel_row(problem_dir: Path) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# R6 owner audit round 2026-11-13 (P1 delivery accounting): the durable
+# five-level separation. "Delivered" is NOT "valid", "valid" is NOT
+# "evidence-supported", and an evidence-bound answer is NOT an
+# engineering-validated discovery survivor. Each level is read from the
+# run's own committed bytes; a missing source is UNKNOWN (None), never
+# silently False and never rounded up (Art. XXV/LXI).
+# ---------------------------------------------------------------------------
+def _file_sha(path: Path) -> Optional[str]:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _json_record(path: Path) -> Optional[Dict[str, Any]]:
+    try:
+        if not path.exists():
+            return None
+        rec = json.loads(path.read_text(encoding="utf-8"))
+        return rec if isinstance(rec, dict) else None
+    except Exception:  # noqa: BLE001 — unreadable is UNKNOWN
+        return None
+
+
+def _tri_and(*vals: Optional[bool]) -> Optional[bool]:
+    """Three-valued conjunction: any False => False, else any None =>
+    None, else True. A stronger level is never True on an unknown
+    weaker level."""
+    if any(v is False for v in vals):
+        return False
+    if any(v is None for v in vals):
+        return None
+    return True
+
+
+def delivery_funnel(problem_dir: Path,
+                    pipe: Optional[Dict[str, Any]] = None,
+                    composed: Optional[Dict[str, Any]] = None,
+                    delivery_class: Optional[str] = None,
+                    answer_contract: Optional[Dict[str, Any]] = None,
+                    ) -> Dict[str, Any]:
+    """Durable delivered / contract-valid / evidence-supported /
+    engineering-validated / discovery-survivor separation.
+
+    Sources (exact bytes, hashed):
+      delivered            pipeline/ANSWER_COMPOSED.json state is one of
+                           _COMPOSED_DELIVERED_STATES AND the answer is
+                           non-empty;
+      contract_valid       the SAME record's `contract.valid` is True
+                           (the composer revalidated the delivered text
+                           after any downgrade);
+      evidence_supported   contract_valid AND the completion contract's
+                           `components.evidence.complete` (custodied
+                           evidence + the mechanism's supporting span for
+                           every displayed survivor);
+      engineering_validated evidence_supported AND
+                           `components.engineering_model.complete`
+                           (engineering definition + critical parameters +
+                           explicit model class);
+      discovery_survivor   `preconditions.AT_LEAST_ONE_ADMISSIBLE_SURVIVOR`
+                           from the same durable completion contract.
+
+    A level is `True`/`False` only when its source bytes decide it;
+    otherwise `None` (UNKNOWN). `source_sha256` binds each decision to
+    the exact record.
+    """
+    d = Path(problem_dir)
+    pipe = pipe or {}
+    composed = composed or {}
+    answer_contract = answer_contract or {}
+    comp_path = d / "pipeline" / "ANSWER_COMPOSED.json"
+    cc_path = d / "pipeline" / "COMPLETION_CONTRACT.json"
+    answer = composed.get("answer")
+    delivered = bool(
+        delivery_class in _COMPOSED_DELIVERED_STATES
+        and isinstance(answer, str) and answer.strip())
+    composer_contract = composed.get("contract")
+    composer_valid = (composer_contract.get("valid")
+                      if isinstance(composer_contract, dict) else None)
+    if not isinstance(composer_valid, bool):
+        composer_valid = None
+    contract_valid = _tri_and(delivered, composer_valid)
+    cc = _json_record(cc_path)
+    pre = (cc or {}).get("preconditions")
+    comps = (cc or {}).get("components")
+    ev_complete = ((comps.get("evidence") or {}).get("complete")
+                   if isinstance(comps, dict) else None)
+    eng_complete = ((comps.get("engineering_model") or {}).get("complete")
+                    if isinstance(comps, dict) else None)
+    survivor = (pre.get("AT_LEAST_ONE_ADMISSIBLE_SURVIVOR")
+                if isinstance(pre, dict) else None)
+    ev_complete = ev_complete if isinstance(ev_complete, bool) else None
+    eng_complete = (eng_complete if isinstance(eng_complete, bool) else None)
+    survivor = survivor if isinstance(survivor, bool) else None
+    evidence_supported = _tri_and(contract_valid, ev_complete)
+    engineering_validated = _tri_and(evidence_supported, eng_complete)
+    levels = {
+        "delivered": {
+            "state": delivered,
+            "source": "pipeline/ANSWER_COMPOSED.json",
+            "rule": "composer state in delivered states + non-empty text",
+        },
+        "contract_valid": {
+            "state": contract_valid,
+            "source": "pipeline/ANSWER_COMPOSED.json#contract.valid",
+            "rule": "delivered AND the composer's revalidated contract "
+                    "for the delivered text is valid",
+        },
+        "evidence_supported": {
+            "state": evidence_supported,
+            "source": "pipeline/COMPLETION_CONTRACT.json#components."
+                      "evidence.complete",
+            "rule": "contract_valid AND custodied evidence + mechanism "
+                    "supporting span bound for every displayed survivor",
+        },
+        "engineering_validated": {
+            "state": engineering_validated,
+            "source": "pipeline/COMPLETION_CONTRACT.json#components."
+                      "engineering_model.complete",
+            "rule": "evidence_supported AND engineering definition + "
+                    "critical parameters + explicit model class complete",
+        },
+        "discovery_survivor": {
+            "state": survivor,
+            "source": "pipeline/COMPLETION_CONTRACT.json#preconditions."
+                      "AT_LEAST_ONE_ADMISSIBLE_SURVIVOR",
+            "rule": "at least one authoritative ADMISSIBLE ranked "
+                    "survivor exists (SURVIVED disposition)",
+        },
+    }
+    # cross-check only: the eval harness revalidates the same text; an
+    # agreement flag makes a divergence visible, never authoritative
+    eval_valid = answer_contract.get("valid")
+    levels["contract_valid"]["eval_cross_check"] = (
+        eval_valid if isinstance(eval_valid, bool) else None)
+    levels["contract_valid"]["agrees_with_eval_validator"] = (
+        None if (contract_valid is None
+                 or not isinstance(eval_valid, bool))
+        else contract_valid == eval_valid)
+    return {
+        "schema": "r6_delivery_funnel/1.0.0",
+        "problem_id": (composed.get("problem_id")
+                       or pipe.get("problem_id") or ""),
+        "levels": levels,
+        "strongest_level": next(
+            (lvl for lvl in ("discovery_survivor", "engineering_validated",
+                             "evidence_supported", "contract_valid",
+                             "delivered")
+             if levels[lvl]["state"] is True), None),
+        "source_sha256": {
+            "ANSWER_COMPOSED.json": _file_sha(comp_path),
+            "COMPLETION_CONTRACT.json": _file_sha(cc_path),
+        },
+        "note": ("each level is independently recorded; a level is None "
+                 "(UNKNOWN) when its durable source is absent or "
+                 "unreadable — never silently False, never rounded up"),
+    }
+
+
+def provider_instrumentation(problem_dir: Path) -> Dict[str, Any]:
+    """Durable LLM/provider accounting for one problem.
+
+    Reads pipeline/ROUTING_LEDGER_RUN.json (the run's append-only
+    routing-ledger slice) and reports: logical calls, provider
+    attempts, retries, token usage (only when the provider reported
+    it), transport failures + their typed classes, fallbacks, provider
+    mix, and per-engine-stage LLM wall time (generate spans).
+
+    No record -> NOT_INSTRUMENTED with None values (honest absence);
+    a record with zero lines -> EMPTY_LEDGER. No estimate is ever
+    substituted for an unreported token count (Art. XXV).
+    """
+    d = Path(problem_dir)
+    p = d / "pipeline" / "ROUTING_LEDGER_RUN.json"
+    rec = _json_record(p)
+    if rec is None:
+        return {
+            "state": "NOT_INSTRUMENTED",
+            "source": "pipeline/ROUTING_LEDGER_RUN.json",
+            "source_sha256": _file_sha(p),
+            "n_logical_calls": None, "n_provider_attempts": None,
+            "n_retries": None, "n_fallbacks": None,
+            "tokens": {"state": "NOT_REPORTED", "prompt": None,
+                       "completion": None, "total": None,
+                       "n_lines_reported": None},
+            "transport_failures": None, "failure_classes": None,
+            "status_counts": None, "providers": None,
+            "per_stage_llm_wall_s": None,
+        }
+    lines = [ln for ln in (rec.get("lines") or []) if isinstance(ln, dict)]
+    attempts = 0
+    retries = 0
+    fallbacks = 0
+    failures = 0
+    failure_classes: Dict[str, int] = {}
+    status_counts: Dict[str, int] = {}
+    providers: Dict[str, int] = {}
+    per_stage: Dict[str, float] = {}
+    tok = {"prompt": 0, "completion": 0, "total": 0}
+    tok_lines = 0
+    for ln in lines:
+        spans = ln.get("generate_spans") or {}
+        n_att = 0
+        for rung in (spans.get("rungs") or []):
+            if isinstance(rung, dict):
+                n_att += len([a for a in (rung.get("attempts") or [])
+                              if isinstance(a, dict)])
+        if n_att == 0:
+            try:
+                n_att = max(1, int(ln.get("attempt") or 1))
+            except (TypeError, ValueError):
+                n_att = 1
+        attempts += n_att
+        retries += max(0, n_att - 1)
+        if ln.get("fallback_to"):
+            fallbacks += 1
+        ok = ln.get("ok")
+        fcls = ln.get("failure_class")
+        if ok is False or (fcls not in (None, "")):
+            failures += 1
+            key = str(fcls or ln.get("status") or "UNKNOWN")
+            failure_classes[key] = failure_classes.get(key, 0) + 1
+        status = str(ln.get("status") or "UNKNOWN")
+        status_counts[status] = status_counts.get(status, 0) + 1
+        prov = str(ln.get("provider") or "UNKNOWN")
+        providers[prov] = providers.get(prov, 0) + 1
+        stage = str(ln.get("engine_stage") or ln.get("stage") or "UNKNOWN")
+        elapsed = spans.get("generate_elapsed_s")
+        if isinstance(elapsed, (int, float)):
+            per_stage[stage] = round(per_stage.get(stage, 0.0)
+                                     + float(elapsed), 3)
+        toks = ln.get("tokens")
+        if isinstance(toks, dict):
+            tok_lines += 1
+            for src, dst in (("prompt_tokens", "prompt"),
+                             ("completion_tokens", "completion"),
+                             ("total_tokens", "total")):
+                v = toks.get(src)
+                if isinstance(v, (int, float)):
+                    tok[dst] += int(v)
+    state = "INSTRUMENTED" if lines else "EMPTY_LEDGER"
+    return {
+        "state": state,
+        "source": "pipeline/ROUTING_LEDGER_RUN.json",
+        "source_sha256": _file_sha(p),
+        "n_logical_calls": len(lines),
+        "n_provider_attempts": attempts,
+        "n_retries": retries,
+        "n_fallbacks": fallbacks,
+        "tokens": ({
+            "state": "REPORTED",
+            "prompt": tok["prompt"],
+            "completion": tok["completion"],
+            "total": tok["total"],
+            "n_lines_reported": tok_lines,
+            "n_lines_missing": max(0, len(lines) - tok_lines),
+        } if tok_lines else {
+            "state": "NOT_REPORTED",
+            "prompt": None, "completion": None, "total": None,
+            "n_lines_reported": 0,
+            "n_lines_missing": len(lines),
+            "note": ("the provider exposes no usage block on these "
+                     "calls; no token count is estimated (Art. XXV)"),
+        }),
+        "transport_failures": failures,
+        "failure_classes": failure_classes,
+        "status_counts": status_counts,
+        "providers": providers,
+        "per_stage_llm_wall_s": dict(sorted(per_stage.items())),
+    }
+
+
+def _delivery_funnel_summary(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    levels = ("delivered", "contract_valid", "evidence_supported",
+              "engineering_validated", "discovery_survivor")
+    counts = {lvl: 0 for lvl in levels}
+    unknown = {lvl: 0 for lvl in levels}
+    n_with_funnel = 0
+    for r in rows:
+        funnel = r.get("delivery_funnel")
+        if not isinstance(funnel, dict):
+            # a row with no funnel record is not counted as an
+            # UNKNOWN level for every level (that would inflate the
+            # unknown bucket with rows the instrument never saw)
+            continue
+        n_with_funnel += 1
+        lv = funnel.get("levels") or {}
+        for lvl in levels:
+            st = (lv.get(lvl) or {}).get("state")
+            if st is True:
+                counts[lvl] += 1
+            elif st is None:
+                unknown[lvl] += 1
+    return {
+        "schema": "r6_delivery_funnel_summary/1.0.0",
+        "levels": list(levels),
+        "counts": counts,
+        "unknown": unknown,
+        "n": len(rows),
+        "n_with_funnel": n_with_funnel,
+        "note": ("counts are runs whose durable source decides True; "
+                 "unknown counts runs whose source is absent/unreadable "
+                 "— the two are never merged; rows without a funnel "
+                 "record are excluded from both"),
+    }
+
+
+def _provider_instrumentation_summary(rows: List[Dict[str, Any]]
+                                      ) -> Dict[str, Any]:
+    states: Dict[str, int] = {}
+    attempts = retries = failures = fallbacks = 0
+    tokens = {"prompt": 0, "completion": 0, "total": 0}
+    tok_reported = 0
+    failure_classes: Dict[str, int] = {}
+    providers: Dict[str, int] = {}
+    per_stage: Dict[str, float] = {}
+    n_with_instrumentation = 0
+    for r in rows:
+        inst = r.get("provider_instrumentation")
+        if not isinstance(inst, dict):
+            continue
+        n_with_instrumentation += 1
+        states[str(inst.get("state") or "UNKNOWN")] = \
+            states.get(str(inst.get("state") or "UNKNOWN"), 0) + 1
+        for key, acc in (("n_provider_attempts", "attempts"),
+                         ("n_retries", "retries"),
+                         ("transport_failures", "failures"),
+                         ("n_fallbacks", "fallbacks")):
+            v = inst.get(key)
+            if isinstance(v, (int, float)):
+                if acc == "attempts":
+                    attempts += int(v)
+                elif acc == "retries":
+                    retries += int(v)
+                elif acc == "failures":
+                    failures += int(v)
+                else:
+                    fallbacks += int(v)
+        tk = inst.get("tokens") or {}
+        if tk.get("state") == "REPORTED":
+            tok_reported += 1
+            for k in tokens:
+                v = tk.get(k)
+                if isinstance(v, (int, float)):
+                    tokens[k] += int(v)
+        for k, v in (inst.get("failure_classes") or {}).items():
+            failure_classes[k] = failure_classes.get(k, 0) + int(v)
+        for k, v in (inst.get("providers") or {}).items():
+            providers[k] = providers.get(k, 0) + int(v)
+        for k, v in (inst.get("per_stage_llm_wall_s") or {}).items():
+            if isinstance(v, (int, float)):
+                per_stage[k] = round(per_stage.get(k, 0.0) + float(v), 3)
+    return {
+        "schema": "r6_provider_instrumentation_summary/1.0.0",
+        "states": states,
+        "n_with_instrumentation": n_with_instrumentation,
+        "n_provider_attempts": attempts,
+        "n_retries": retries,
+        "n_fallbacks": fallbacks,
+        "transport_failures": failures,
+        "failure_classes": failure_classes,
+        "providers": providers,
+        "tokens": ({
+            "state": "REPORTED",
+            "n_problems_reported": tok_reported,
+            "prompt": tokens["prompt"],
+            "completion": tokens["completion"],
+            "total": tokens["total"],
+        } if tok_reported else {
+            "state": "NOT_REPORTED",
+            "n_problems_reported": 0,
+            "note": "no provider reported a usage block; never estimated",
+        }),
+        "per_stage_llm_wall_s": dict(sorted(per_stage.items())),
+    }
+
+
+# ---------------------------------------------------------------------------
 # scoring table
 # ---------------------------------------------------------------------------
 def run_two_turn_problem(problem: Dict[str, Any], out_dir: Path,
@@ -1979,6 +2373,20 @@ def build_score_table(route_rec: Dict[str, Any],
         pipe = _rec(d, "pipeline_record.json")
         base = _rec(d, "baseline_record.json")
         judge = _rec(d, "judge_record.json")
+        # DIRECTIVE 1 (owner round 2026-11-12): the composer's typed
+        # delivery state rides the row. COMPOSED_CONTRACT_INVALID_
+        # DELIVERED answers are delivered text with a specific caveat;
+        # they are contestable (judged) but NEVER full_scoreable
+        # (answer_contract.valid is False for them) and never counted
+        # as a win, tie, or loss — the superiority instrument reports
+        # the count instead.
+        try:
+            _comp = json.loads((d / "pipeline" / "ANSWER_COMPOSED.json")
+                               .read_text(encoding="utf-8"))
+            delivered_class = _comp.get("state")
+        except Exception:  # noqa: BLE001
+            _comp = {}
+            delivered_class = None
         snap_hash = (pipe.get("same_evidence") or {}).get("hash")
         # audit P0-8: a judgment is only scoreable when it binds to the
         # exact inputs it was made under (answer hashes, evidence hash,
@@ -2052,6 +2460,10 @@ def build_score_table(route_rec: Dict[str, Any],
             "problem_id": p["problem_id"],
             "question_type": p["question_type"],
             "contamination_tag": p.get("contamination_tag"),
+            "delivery_class": delivered_class,
+            "delivery_funnel": delivery_funnel(
+                d, pipe, _comp, delivered_class, answer_contract),
+            "provider_instrumentation": provider_instrumentation(d),
             "has_clarification": bool(p.get("clarification_answer")),
             "answer_contract": answer_contract,
             "baseline_answer_contract": baseline_answer_contract,
@@ -2295,6 +2707,21 @@ def build_score_table(route_rec: Dict[str, Any],
         "n_completed_pipeline": n_completed,
         "n_usable_pairs": usable,
         "full_scoreable_pairs": sum(1 for r in rows if r.get("full_scoreable")),
+        # directive 1 (owner round): invalid-delivered answers are
+        # delivered (counted in the delivery rate) but NEVER scored —
+        # the contract gate refuses them; the count is surfaced so
+        # the exclusion is visible, never silent
+        "n_invalid_delivered": sum(
+            1 for r in rows
+            if r.get("delivery_class")
+            == "COMPOSED_CONTRACT_INVALID_DELIVERED"),
+        "n_downgraded_delivered": sum(
+            1 for r in rows
+            if r.get("delivery_class") == "COMPOSED_CONTRACT_DOWNGRADED"),
+        # R6 P1 delivery accounting: the five levels are separately
+        # counted, with UNKNOWN kept apart from False
+        "delivery_funnel": _delivery_funnel_summary(rows),
+        "provider_instrumentation": _provider_instrumentation_summary(rows),
         "n_numbers_unverified": sum(1 for r in rows
                                      if r.get("n_numbers_unverified")),
         "n_numbers_unverified_baseline": sum(

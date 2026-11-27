@@ -1,0 +1,377 @@
+{
+  "benchmark_id": "r6_retrieval_relevance_benchmark",
+  "benchmark_version": "1.0.0",
+  "authored_at": "2026-11-13",
+  "authoring_provenance": "AI_AUTHORED_BY_THE_MAINTAINING_AGENT",
+  "independence_state": "NOT_INDEPENDENT",
+  "independence_note": "The labeled pool was authored by the same agent that maintains the reranker. It is a pre-registered, frozen evaluation set for dev measurement and regression detection, NOT independent validation. Label definitions are stated below and applied per record; a separately authored set is required before any generalization claim.",
+  "instrument_under_test": "mechanism_signal_rerank/1.1.0",
+  "baseline_instrument": "mechanism_signal_rerank/1.0.0 (density + 0.5 per shared problem-fact term)",
+  "label_dimensions": ["failure", "causal", "boundary", "evidence", "transfer"],
+  "label_definitions": {
+    "failure": "the record explicitly addresses the problem's failure mode or device failure (1) or does not (0)",
+    "causal": "the record states a causal relation (cause/lead to/mechanism/because/results from) about a device-failure-relevant system (1) or not (0)",
+    "boundary": "the record states an operating boundary condition (flow/pressure/temperature/load/speed/sampling interval) relevant to the problem (1) or not (0)",
+    "evidence": "the record reports a measured or quantitatively observed effect (1) or not (0)",
+    "transfer": "the record describes an intervention or mechanism that could transfer to the problem's device class and shares at least two problem-fact terms (1) or not (0)"
+  },
+  "core_relevance_rule": "failure == 1 AND (causal == 1 OR evidence == 1)",
+  "depths": [3, 5, 8],
+  "problems": [
+    {
+      "problem_id": "ret-catheter-thrombosis",
+      "problem": {
+        "device": "tunneled hemodialysis catheter",
+        "failure": "thrombotic occlusion of the catheter lumen under low flow",
+        "failure_mode": "thrombosis",
+        "constraint": "maintain drainage above 0.05 mL/min at venous pressure"
+      },
+      "records": [
+        {
+          "id": "ret-c1",
+          "title": "Heparin-bonded catheter lumens reduce thrombus formation under low flow",
+          "abstract": "In a bench study, heparin bonding of the catheter lumen inhibited clotting cascade activation at the luminal surface. At a flow rate of 50 mL/min, thrombus area was reduced by 50 percent versus untreated polyurethane controls, and drainage remained above 0.05 mL/min.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-c2",
+          "title": "Mechanical aspiration clears catheter lumen thrombus",
+          "abstract": "Aspiration removed organized thrombus from occluded dialysis catheter lumens. The mechanism is mechanical extraction of the clot; flow rate recovered above 0.05 mL/min in 8 of 10 cases. Bench testing measured a 60 percent reduction in thrombus burden.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-c3",
+          "title": "Surface roughness promotes fibrin deposition in central venous catheters",
+          "abstract": "Rough luminal surfaces cause fibrin deposition because platelets adhere to microdefects. Under low flow, stasis accelerates clotting; smoother surfaces reduced deposit thickness by 35 percent.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-c4",
+          "title": "Low-flow stasis leads to fibrin sleeve formation",
+          "abstract": "Venous stasis results in fibrin sleeve formation around catheter tips. The mechanism is flow-dependent: below 0.05 mL/min, clotting cascade activation outpaces fibrinolysis. Pressure and flow boundary conditions determine occlusion risk.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 0, "transfer": 1}
+        },
+        {
+          "id": "ret-c5",
+          "title": "Complications of tunneled hemodialysis catheters: a review",
+          "abstract": "This review summarizes infectious and thrombotic complications of tunneled catheters, including occlusion and thrombosis.",
+          "relevance": {"failure": 1, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-c6",
+          "title": "Heparin pharmacokinetics after intravenous bolus",
+          "abstract": "Heparin clearance follows saturable kinetics; anticoagulant effect depends on plasma concentration.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-c7",
+          "title": "Interlaminar stress in composite beams",
+          "abstract": "The governing role of interlaminar stress in determining structural performance and failure; fatigue crack growth, delamination, stress distribution, fracture, load transfer, stiffness degradation.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-c8",
+          "title": "Thermal runaway in lithium battery separators",
+          "abstract": "Separator shutdown causes thermal runaway; temperature and pressure boundary conditions drive cell failure.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-c9",
+          "title": "Catheter materials and biocompatibility review",
+          "abstract": "Silicone and polyurethane catheters differ in surface energy, radiopacity, and biocompatibility; catheter lumen surface treatment also affects stiffness and kink resistance.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-c10",
+          "title": "Central venous pressure monitoring practice",
+          "abstract": "Central venous pressure is monitored through the catheter lumen; transducer level and waveform interpretation affect reading accuracy.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        }
+      ]
+    },
+    {
+      "problem_id": "ret-bearing-spalling",
+      "problem": {
+        "device": "rolling-element bearing in a 350 kW industrial fan drive",
+        "failure": "inner-race spalling progresses for weeks before the vibration alarm trips",
+        "failure_mode": "bearing spalling",
+        "constraint": "predictor must use the existing 1 kHz vibration sensor"
+      },
+      "records": [
+        {
+          "id": "ret-b1",
+          "title": "Vibration envelope analysis detects inner-race bearing spalling",
+          "abstract": "Envelope demodulation of the 1 kHz vibration sensor signal detects inner-race spalling weeks before the alarm trips. The mechanism is impact excitation at the spall edge; measured detection lead time was 21 days.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-b2",
+          "title": "Acoustic emission tracks subsurface crack growth in rolling bearings",
+          "abstract": "Acoustic emission correlates with subsurface crack growth because crack faces rub under load. Bearing spalling onset was detected at 1 kHz sampling; measured emission energy rose 3-fold before visible damage.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-b3",
+          "title": "Lubricant film breakdown leads to asperity contact and spalling",
+          "abstract": "Oil film collapse causes asperity contact, which initiates fatigue cracks and spalling on the inner race. At 3000 rpm and high load, film thickness fell below 0.1 micron.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-b4",
+          "title": "Speed-dependent resonance amplifies spall impacts",
+          "abstract": "Inner-race spall impacts excite a resonance whose amplitude increases with shaft speed. The mechanism explains why vibration alarm thresholds fail under variable speed; measured amplitude doubled at 1800 rpm.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-b5",
+          "title": "Bearing load ratings and fatigue life catalog",
+          "abstract": "Catalog load ratings predict bearing fatigue life but do not describe spalling progression.",
+          "relevance": {"failure": 1, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-b6",
+          "title": "Interlaminar stress in composite beams",
+          "abstract": "The governing role of interlaminar stress in determining structural performance and failure; fatigue crack growth, delamination, stress distribution, fracture, load transfer, stiffness degradation.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-b7",
+          "title": "Gearbox tooth root crack detection using vibration",
+          "abstract": "Vibration monitoring detects gear tooth root cracks; the mechanism is mesh stiffness variation.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-b8",
+          "title": "Wind turbine blade erosion under rain impact",
+          "abstract": "Rain droplet impact causes leading-edge erosion; coating hardness and impact speed control material loss.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-b9",
+          "title": "Rolling-element bearing geometry and tolerance standards",
+          "abstract": "This standard defines rolling-element bearing dimensions, internal clearance, tolerances, and mounting practice for industrial fan drives.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-b10",
+          "title": "Vibration sensor mounting for industrial machinery",
+          "abstract": "Accelerometer mounting stiffness and cable routing affect the measured vibration spectrum on industrial fan drives.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        }
+      ]
+    },
+    {
+      "problem_id": "ret-battery-quiescent-drain",
+      "problem": {
+        "device": "12 V lead-acid battery in a parked vehicle",
+        "failure": "quiescent current drain flattens the battery after 12 hours parked",
+        "failure_mode": "parasitic current drain",
+        "constraint": "sleep current must stay below 10 mA without disabling wake"
+      },
+      "records": [
+        {
+          "id": "ret-e1",
+          "title": "Sleep-state scheduler reduces quiescent current in parked vehicles",
+          "abstract": "A sleep-state scheduler gates idle modules and reduces parasitic load. Measured quiescent current fell below 10 mA after 12 hours parked while wake latency stayed under 50 ms.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-e2",
+          "title": "Relay isolation disconnects parasitic load circuits",
+          "abstract": "A relay isolates the offending circuit because standby modules draw current even when the vehicle is parked. Bench measurement showed quiescent drain dropped from 45 mA to 8 mA.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-e3",
+          "title": "Dark current measurement identifies the parasitic drain offender",
+          "abstract": "Fuse-by-fuse current measurement locates the module causing quiescent drain. The method measures voltage drop across fuses; a 12-hour parked test identified the offender.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-e4",
+          "title": "Low-power wake controller cuts standby draw",
+          "abstract": "A wake controller with a low-power comparator reduces standby current; the mechanism is duty-cycled sensing. Quiescent current measured 6 mA, below the 10 mA constraint.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-e5",
+          "title": "Lead-acid battery self-discharge and sulfation review",
+          "abstract": "Self-discharge and sulfation degrade lead-acid batteries during long storage.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-e6",
+          "title": "Thermal derating of inverter modules under overload",
+          "abstract": "Thermal derating limits junction temperature under overload; the mechanism is temperature-dependent current limiting.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-e7",
+          "title": "CAN bus transceiver standby current and wake behavior",
+          "abstract": "CAN transceivers draw standby current and wake on bus activity; the mechanism is a low-power receiver. Parked vehicles measured 4 mA standby current.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-e8",
+          "title": "Maximum power point tracking for solar panels",
+          "abstract": "Maximum power point tracking adjusts converter duty cycle; the mechanism is impedance matching.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-e9",
+          "title": "12 V vehicle electrical system architecture review",
+          "abstract": "The 12 V battery distribution architecture feeds body, chassis, and infotainment domains; fuse and harness topology determine service access in the vehicle.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-e10",
+          "title": "Lead-acid battery charging profile and alternator voltage",
+          "abstract": "Alternator voltage regulation and temperature compensation set the lead-acid battery charging profile; battery state of charge is estimated from open-circuit voltage.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        }
+      ]
+    },
+    {
+      "problem_id": "ret-bridge-corrosion",
+      "problem": {
+        "device": "reinforced concrete bridge deck",
+        "failure": "chloride ingress initiates rebar corrosion and spalling",
+        "failure_mode": "chloride-induced corrosion",
+        "constraint": "inspection interval 24 months; no full deck replacement"
+      },
+      "records": [
+        {
+          "id": "ret-d1",
+          "title": "Impressed current cathodic protection suppresses rebar corrosion",
+          "abstract": "An impressed current system suppresses steel corrosion because the rebar is polarized cathodically. Current density was measured at 20 mA/m2; corrosion rate fell below 1 micron per year.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-d2",
+          "title": "Epoxy barrier coating excludes chloride moisture",
+          "abstract": "Epoxy coating forms a barrier that excludes moisture and chloride ions; diffusion through the coating controls initiation. Coating thickness of 300 microns reduced chloride ingress by 80 percent.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-d3",
+          "title": "Chloride diffusion model predicts corrosion initiation",
+          "abstract": "A diffusion model predicts when chloride concentration at the rebar reaches the threshold for corrosion initiation. The mechanism is Fickian transport; measured profiles matched the model at 24 months.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-d4",
+          "title": "Corrosion potential mapping locates active zones",
+          "abstract": "Half-cell potential mapping locates active corrosion zones because potential shifts indicate anodic activity. Survey spacing was 0.5 m and the 24-month inspection found two active zones.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-d5",
+          "title": "Concrete mix design for bridge decks: a review",
+          "abstract": "Mix design, water-cement ratio, and curing affect concrete durability and chloride ingress.",
+          "relevance": {"failure": 1, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-d6",
+          "title": "Bearing lubrication and film thickness",
+          "abstract": "Oil viscosity maintains a hydrodynamic film between bearing surfaces; the mechanism is viscous shear.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-d7",
+          "title": "Cathodic protection of buried pipelines",
+          "abstract": "Impressed current cathodic protection suppresses external corrosion of buried steel pipelines; current density and soil resistivity control protection.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-d8",
+          "title": "Thermal imaging of electrical panels",
+          "abstract": "Infrared thermography detects loose connections because resistance heating raises terminal temperature.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-d9",
+          "title": "Bridge deck inspection manual",
+          "abstract": "Routine inspection of bridge decks records cracking, delamination, and drainage condition at a 24-month interval; inspectors classify severity by visual rating.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-d10",
+          "title": "Reinforced concrete construction practice",
+          "abstract": "Reinforced concrete deck construction controls cover depth, curing, and concrete placement; quality records are retained for the owner.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        }
+      ]
+    },
+    {
+      "problem_id": "ret-transformer-hotspot",
+      "problem": {
+        "device": "oil-immersed power transformer",
+        "failure": "winding hotspot develops during cyclic overload and degrades insulation",
+        "failure_mode": "thermal insulation aging",
+        "constraint": "sampling interval 5 minutes on existing sensors"
+      },
+      "records": [
+        {
+          "id": "ret-t1",
+          "title": "Thermal model predicts transformer winding hotspot from load history",
+          "abstract": "A thermal model predicts hotspot temperature from load history because winding losses heat the insulation. At a 5-minute sampling interval, predicted hotspot led failure by 48 hours.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-t2",
+          "title": "Dissolved gas analysis detects transformer arc discharge",
+          "abstract": "Dissolved gas rate thresholds detect arc discharge because fault gases form during arcing. The monitor samples at 5-minute intervals and flagged discharge within one interval.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-t3",
+          "title": "Fiber optic sensors measure winding hotspot temperature",
+          "abstract": "Fiber Bragg sensors measure winding hotspot temperature directly; the mechanism is temperature-dependent refractive index shift. Measured hotspot was 120 C at overload.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-t4",
+          "title": "Loading guide calculates insulation aging under cyclic overload",
+          "abstract": "The loading guide calculates insulation aging from winding temperature because thermal stress degrades paper insulation. Cyclic overload at 5-minute sampling predicted a 2-fold aging rate.",
+          "relevance": {"failure": 1, "causal": 1, "boundary": 1, "evidence": 1, "transfer": 1}
+        },
+        {
+          "id": "ret-t5",
+          "title": "Transformer oil testing schedule: a review",
+          "abstract": "Oil testing schedules cover dielectric strength, moisture, and dissolved gas analysis.",
+          "relevance": {"failure": 1, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-t6",
+          "title": "Lithium battery thermal runaway propagation",
+          "abstract": "Cell-to-cell thermal runaway propagation is driven by heat transfer through the module.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-t7",
+          "title": "Motor stator winding thermal model",
+          "abstract": "A thermal model predicts stator winding temperature from current; the mechanism is copper loss.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-t8",
+          "title": "Pipeline corrosion monitoring with coupons",
+          "abstract": "Corrosion coupons measure metal loss; the mechanism is electrochemical oxidation.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-t9",
+          "title": "Power transformer nameplate and oil volume data",
+          "abstract": "The nameplate lists power rating, voltage ratio, impedance, and oil volume; oil volume is needed for dissolved-gas sampling calculations.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        },
+        {
+          "id": "ret-t10",
+          "title": "Substation sensor network installation",
+          "abstract": "Current and temperature sensors are installed on substation equipment; sampling interval and transducer calibration are recorded in the commissioning file.",
+          "relevance": {"failure": 0, "causal": 0, "boundary": 0, "evidence": 0, "transfer": 0}
+        }
+      ]
+    }
+  ]
+}

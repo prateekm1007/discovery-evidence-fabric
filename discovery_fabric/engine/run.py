@@ -1834,11 +1834,18 @@ class EngineRun:
                             independent_attack_batch,
                             POST_RANK_ATTACK_PURPOSE as _BATCH_PURPOSE)
                         _gens = []
+                        _gen_by_cid = {}
                         for _c, _mc in _batch_pending:
                             _gp = (((_c.get("mechanism_space_candidate")
                                      or {}).get("derivation_trace") or {})
                                    .get("llm_provider")
+                                   or (_c.get("mechanism_space_candidate")
+                                       or {}).get("generator_provider")
                                    or _c.get("exploration_provider"))
+                            _cid = str((_mc or {}).get("candidate_id")
+                                       or _c.get("candidate_id") or "")
+                            if _gp and _cid:
+                                _gen_by_cid[_cid] = _gp
                             if _gp and _gp not in _gens:
                                 _gens.append(_gp)
                         _t0b = _ptime.perf_counter()
@@ -1846,7 +1853,8 @@ class EngineRun:
                             [_mc for _c, _mc in _batch_pending],
                             self.problem, self.env.evidence or [],
                             _gens[0] if _gens else None,
-                            attack_purpose=_BATCH_PURPOSE)
+                            attack_purpose=_BATCH_PURPOSE,
+                            generator_providers=_gen_by_cid)
                         for _c, _mc in _batch_pending:
                             _rec = (_batch.get("records") or {}).get(
                                 str(_c["candidate_id"]))

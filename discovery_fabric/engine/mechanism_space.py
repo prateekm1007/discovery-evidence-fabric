@@ -601,14 +601,109 @@ def _problem_relevance_terms(problem: Optional[Dict[str, Any]]
     device + failure + failure_mode + constraint — as lowercase whole
     tokens (the query_expansion whole-token discipline). Deterministic,
     zero LLM, problem facts only (Art. XLIII). Empty when no problem is
-    given (the rerank keeps its pure density semantics)."""
+    given (the rerank keeps its pure density semantics).
+
+    R6 P1 (owner audit 2026-11-13, measured): the old form sorted the
+    term set alphabetically and capped at 14, which silently DROPPED
+    device-critical terms whose initial letters sort late (measured:
+    'transformer' fell outside the cap for a transformer-hotspot
+    problem, so a dissolved-gas record shared only one term). Terms are
+    now emitted in FIELD PRIORITY order — failure_mode, failure, device,
+    constraint — preserving first occurrence inside each field; the cap
+    is 20. The frozen 1.0.0 baseline in the benchmark keeps the old
+    sorted-14 extraction byte-for-byte as the comparator."""
     if not problem:
         return []
     from ..retrieval_fabric.query_expansion import _content_terms
-    text = " ".join(str(problem.get(k) or "") for k in
-                    ("device", "failure", "failure_mode", "constraint"))
-    terms = _content_terms(text)
-    return sorted(set(terms))[:14]
+    out: List[str] = []
+    for field in ("failure_mode", "failure", "device", "constraint"):
+        for t in _content_terms(str(problem.get(field) or "")):
+            if t not in out:
+                out.append(t)
+    return out[:20]
+
+
+# ---------------------------------------------------------------------------
+# R6 P1 retrieval relevance (owner audit round 2026-11-13): the reranker
+# is measured against five labeled relevance dimensions — failure,
+# causal, boundary, evidence, transfer — at depth. Density alone rewards
+# mechanism-vocabulary-heavy off-problem records (the measured A4
+# starvation defect); the improved score keeps density but adds an
+# explicit, recorded alignment term per dimension and a penalty for a
+# record with NO problem-fact term at all. Deterministic, zero LLM,
+# problem facts only (Art. XLIII); never a relevance verdict on its own
+# (Art. XXI).
+# ---------------------------------------------------------------------------
+RETRIEVAL_RELEVANCE_VERSION = "retrieval_relevance/1.0.0"
+RETRIEVAL_RELEVANCE_DIMENSIONS = (
+    "failure", "causal", "boundary", "evidence", "transfer")
+RETRIEVAL_DIMENSION_BONUS = 0.5
+RETRIEVAL_NO_ALIGNMENT_PENALTY = 1.0
+
+
+def _problem_field_terms(problem: Dict[str, Any],
+                         fields: Tuple[str, ...]) -> List[str]:
+    from ..retrieval_fabric.query_expansion import _content_terms
+    text = " ".join(str(problem.get(k) or "") for k in fields)
+    return sorted(set(_content_terms(text)))
+
+
+def retrieval_relevance_score(problem: Dict[str, Any],
+                              record: Dict[str, Any]) -> Dict[str, Any]:
+    """Per-dimension retrieval relevance basis for one record.
+
+    Each dimension is a RECORDED predicate over the record's own text and
+    the problem's own facts:
+      failure  — shares a failure/failure_mode content term;
+      causal   — carries causal vocabulary AND shares a problem term;
+      boundary — carries boundary vocabulary AND shares a problem term;
+      evidence — carries effect vocabulary, a numeric observation AND
+                 shares a problem term;
+      transfer — carries intervention/causal vocabulary AND shares at
+                 least two problem terms (a mechanism transferable to
+                 this problem, not merely off-domain mechanism prose).
+    """
+    text = " ".join(str(record.get(k) or "") for k in
+                    ("title", "abstract", "snippet")).lower()
+    signal = mechanism_signal_score(record)
+    hits = signal["class_hits"]
+    rel_terms = _problem_relevance_terms(problem)
+    shared = sorted(t for t in rel_terms if t in text)
+    fail_terms = _problem_field_terms(problem, ("failure", "failure_mode"))
+    fail_shared = sorted(t for t in fail_terms if t in text)
+    has_number = bool(re.search(r"\d", text))
+    dims = {
+        # A causal/effect record that shares at least two of the
+        # problem's OWN facts addresses the problem even when it names
+        # the failure by a synonym outside the failure-field vocabulary
+        # (measured: dissolved-gas analysis shares transformer + sampling
+        # but says 'discharge', not 'hotspot'). The fallback requires
+        # genuine multi-term alignment, not mere mechanism prose.
+        "failure": bool(fail_shared) or (
+            len(shared) >= 2
+            and bool(hits.get("causal") or hits.get("effect"))),
+        "causal": bool(hits.get("causal")) and bool(shared),
+        "boundary": bool(hits.get("boundary")) and bool(shared),
+        "evidence": (bool(hits.get("effect")) and has_number
+                     and bool(shared)),
+        "transfer": (bool(hits.get("intervention") or hits.get("causal"))
+                     and len(shared) >= 2),
+    }
+    aligned = [d for d in RETRIEVAL_RELEVANCE_DIMENSIONS if dims[d]]
+    score = (signal["score"] + 0.5 * len(shared)
+             + RETRIEVAL_DIMENSION_BONUS * len(aligned)
+             - (RETRIEVAL_NO_ALIGNMENT_PENALTY if not shared else 0.0))
+    return {
+        "instrument_version": RETRIEVAL_RELEVANCE_VERSION,
+        "base_signal_score": signal["score"],
+        "shared_problem_terms": shared[:12],
+        "n_shared_problem_terms": len(shared),
+        "failure_shared_terms": fail_shared[:10],
+        "dimension_basis": dims,
+        "aligned_dimensions": aligned,
+        "n_aligned_dimensions": len(aligned),
+        "score": round(score, 2),
+    }
 
 
 def mechanism_signal_rerank(records: List[Dict[str, Any]],
@@ -634,7 +729,15 @@ def mechanism_signal_rerank(records: List[Dict[str, Any]],
     0.75, committed retrieval JSON), and the round directive is to
     revert until the instrument matches the legacy control. The
     problem-fact lexical relevance component stays unchanged; bm25.py
-    remains available as a disclosed non-decisional metric only."""
+    remains available as a disclosed non-decisional metric only.
+
+    R6 P1 (owner audit round 2026-11-13): the relevance component is
+    now DIMENSION-AWARE (retrieval_relevance/1.0.0): density + 0.5 per
+    shared problem term + 0.5 per aligned relevance dimension (failure /
+    causal / boundary / evidence / transfer) - 1.0 when the record
+    shares NO problem term. Measured baseline-vs-improved at depth on
+    R6/RETRIEVAL_RELEVANCE_BENCHMARK.json; the instrument is still a
+    lexical screen, not a relevance verdict (Art. XXI)."""
     rel_terms = _problem_relevance_terms(problem)
     scored = []
     for i, r in enumerate(records):
@@ -642,19 +745,24 @@ def mechanism_signal_rerank(records: List[Dict[str, Any]],
         s["record_id"] = r.get("id") or r.get("record_id") or ""
         s["title"] = (r.get("title") or "")[:120]
         if rel_terms:
-            text = " ".join(str(r.get(k) or "") for k in
-                            ("title", "abstract", "snippet")).lower()
-            rel_hits = sorted(t for t in rel_terms if t in text)
-            s["relevance_hits"] = rel_hits[:10]
-            s["n_relevance_hits"] = len(rel_hits)
-            s["score"] = round(s["score"] + 0.5 * len(rel_hits), 2)
+            rel = retrieval_relevance_score(problem, r)
+            s["relevance_hits"] = rel["shared_problem_terms"]
+            s["n_relevance_hits"] = rel["n_shared_problem_terms"]
+            s["dimension_basis"] = rel["dimension_basis"]
+            s["aligned_dimensions"] = rel["aligned_dimensions"]
+            s["n_aligned_dimensions"] = rel["n_aligned_dimensions"]
+            s["base_signal_score"] = rel["base_signal_score"]
+            s["score"] = rel["score"]
         scored.append(s)
     order = sorted(range(len(records)),
                    key=lambda i: (-scored[i]["score"], scored[i].get(
                        "record_id") or ""))
     top = order[:max(0, top_k)]
     return {
-        "reranker_version": "mechanism_signal_rerank/1.0.0",
+        "reranker_version": ("mechanism_signal_rerank/1.1.0" if rel_terms
+                             else "mechanism_signal_rerank/1.0.0"),
+        "retrieval_relevance_version": (RETRIEVAL_RELEVANCE_VERSION
+                                        if rel_terms else None),
         "n_input": len(records), "top_k": top_k,
         "selected_indexes": top,
         "selected_ids": [scored[i].get("record_id") for i in top],
@@ -664,7 +772,11 @@ def mechanism_signal_rerank(records: List[Dict[str, Any]],
                    + (" + relevance component: 0.5/problem-fact term "
                       "(R6 A2 BM25 term REVERTED 2026-11-12: anchor-"
                       "domain match measured worse than the legacy "
-                      "control on the same packet, 0.666 vs 0.75)"
+                      "control on the same packet, 0.666 vs 0.75) "
+                      "+ R6 P1 dimension-aware alignment: 0.5 per "
+                      "aligned dimension (failure/causal/boundary/"
+                      "evidence/transfer) and -1.0 when no problem "
+                      "term is shared; lexical screening only"
                       if rel_terms else "")),
     }
 
@@ -1707,12 +1819,13 @@ def apply_operator(op: Dict[str, Any],
         # REQUIRED semantic change, one retry tells the model the exact
         # defect and how to correct it.
         _first_fields = _parse_candidate_fields(meta["content"] or "")
+        _is_kf = op["operator_id"] == "DOMAIN_KNOWLEDGE_FIRST"
         _first_span = str(_first_fields.get("mechanism_source_span")
-                          or "").strip().strip("\"'").strip()
-        _first_ok_span = _first_span and (
-            _first_span in _item_abstract(item)
-            or re.sub(r"\s+", " ", _first_span).lower() in re.sub(
-                r"\s+", " ", _item_abstract(item)).lower())
+                          or "")
+        _first_binding = span_binding_check(
+            _first_span, _item_abstract(item), item,
+            exploratory=_is_kf)
+        _first_ok_span = _first_binding["grounded"] or _is_kf
         _pre_cand = assemble_candidate(op, item, _first_fields, problem,
                                        meta)
         _pre_sem = operator_semantic_check(op["operator_id"], item,
@@ -1723,8 +1836,9 @@ def apply_operator(op: Dict[str, Any],
             defects = []
             if not _first_ok_span:
                 defects.append(
-                    "your MECHANISM_SOURCE_SPAN was not a verbatim "
-                    "substring of RECORD TEXT — copy it EXACTLY from "
+                    "your MECHANISM_SOURCE_SPAN did not carry at least "
+                    f"{SPAN_MIN_WORDS} contiguous VERBATIM words from "
+                    "RECORD TEXT — copy a longer exact passage from "
                     "RECORD TEXT")
             if _pre_sem["semantic_verdict"] == "TEXTUAL_REWRITE":
                 defects.append(
@@ -1748,13 +1862,10 @@ def apply_operator(op: Dict[str, Any],
             if meta2.get("ok"):
                 _fields2 = _parse_candidate_fields(
                     meta2["content"] or "")
-                _improved = (
-                    str(_fields2.get("mechanism_source_span") or "")
-                    .strip().strip("\"'").strip())
-                _ok2 = _improved and (
-                    _improved in _item_abstract(item)
-                    or re.sub(r"\s+", " ", _improved).lower() in re.sub(
-                        r"\s+", " ", _item_abstract(item)).lower())
+                _binding2 = span_binding_check(
+                    str(_fields2.get("mechanism_source_span") or ""),
+                    _item_abstract(item), item, exploratory=_is_kf)
+                _ok2 = _binding2["grounded"] or _is_kf
                 _cand2 = assemble_candidate(op, item, _fields2, problem,
                                             meta2)
                 _sem2 = operator_semantic_check(op["operator_id"], item,
@@ -1768,22 +1879,17 @@ def apply_operator(op: Dict[str, Any],
                         "defects": defects,
                         "outcome": "RETRY_ADMITTED"})
         cand_fields = _parse_candidate_fields(meta["content"] or "")
-        # Art. II span binding — ONE authority, the a2/verify.py
-        # contract: verbatim (quote-stripped) in the record text, with
-        # case-insensitive/whitespace-normalized fallback (the SAME
-        # ladder the discovery loop's span verification uses; not a
-        # new weaker rule). A span that fails both modes is rejected —
-        # the model reworded or fabricated it.
-        span = cand_fields.get("mechanism_source_span", "")
-        record_text = _item_abstract(item)
-        span_clean = span.strip().strip('"\'').strip()
-        _norm = lambda s: re.sub(r"\s+", " ", s).lower().strip()  # noqa: E731
-        span_mode = None
-        if span_clean and span_clean in record_text:
-            span_mode = "VERBATIM"
-        elif span_clean and _norm(span_clean) in _norm(record_text):
-            span_mode = "CASE_INSENSITIVE_NORMALIZED"
-        span_ok = span_mode is not None
+        # Article LXXX span binding — deterministic: every mechanism
+        # carries >= 8 contiguous verbatim words from its OWN record,
+        # exactly identified by item + source/snapshot hashes. A missing
+        # or too-short quote is UNGROUNDED_SYNTHESIS (epistemic UNKNOWN),
+        # never a scientific rejection. DOMAIN_KNOWLEDGE_FIRST is
+        # exempt: its anchor is the user problem statement, which is not
+        # a frozen evidence record, and it stays exploratory.
+        span_binding = span_binding_check(
+            cand_fields.get("mechanism_source_span", ""),
+            _item_abstract(item), item, exploratory=_is_kf)
+        span_ok = span_binding["grounded"] or _is_kf
         cand = assemble_candidate(op, item, cand_fields, problem, meta)
         # R401B B4: the operator's OWN semantics are enforced on the
         # live path — invariant preserved + required structural change
@@ -1797,17 +1903,20 @@ def apply_operator(op: Dict[str, Any],
         elif semantic["semantic_verdict"] == "SEMANTIC_INVARIANT_BROKEN":
             cand["candidate_state"] = \
                 "NOT_A_CANDIDATE_OPERATOR_INVARIANT_BROKEN"
-        cand["span_binding"] = {
-            "mechanism_source_span": span[:300],
-            "verbatim_in_record": span_ok,
-            "match_mode": span_mode,
-            "contract": ("a2/verify.py ladder: verbatim -> case-"
-                         "insensitive normalized; anything else is a "
-                         "reworded/fabricated span and is rejected"),
-        }
+        cand["span_binding"] = span_binding
+        cand["evidence_class"] = (
+            "KNOWLEDGE_FIRST_EXPLORATORY" if _is_kf else
+            "FROZEN_RECORD_GROUNDED" if span_ok else
+            "UNGROUNDED_SYNTHESIS")
+        if _is_kf:
+            cand["discovery_credit"] = (
+                "EXPLORATORY_NOT_EVIDENCE_GROUNDED")
+        elif not span_ok:
+            cand["discovery_credit"] = "NONE_UNGROUNDED"
+            cand["epistemic_class"] = "UNKNOWN"
+            cand["not_a_scientific_rejection"] = True
         if not span_ok:
-            cand["candidate_state"] = (
-                "NOT_A_CANDIDATE_SPAN_NOT_VERBATIM")
+            cand["candidate_state"] = "UNGROUNDED_SYNTHESIS"
         result["candidates"].append(cand)
     n_valid = sum(1 for c in result["candidates"]
                   if c.get("candidate_state") == "CANDIDATE")
@@ -1823,6 +1932,127 @@ def _item_abstract(item: Dict[str, Any]) -> str:
     # ORIGINAL evidence item the space was built from — carried in
     # _record_text by build_structured_evidence
     return str(item.get("_record_text") or "")
+
+
+# Article LXXX (owner audit round 2026-11-13): every mechanism must carry
+# at least EIGHT contiguous verbatim words from ITS OWN frozen record, and
+# the binding must name the exact source + snapshot. A shorter quote (or a
+# fabricated/absent one) is UNGROUNDED_SYNTHESIS — an epistemic UNKNOWN,
+# never a scientific rejection.
+SPAN_MIN_WORDS = 8
+
+
+def _span_words(text: str) -> List[str]:
+    return [w for w in re.split(r"\s+", text or "") if w]
+
+
+def _norm_word(w: str) -> str:
+    return w.lower().strip("\"'`()[]{}.,;:!?")
+
+
+def _longest_common_word_run(span_words: List[str],
+                             record_words: List[str]) -> Tuple[int, str]:
+    """Longest contiguous run of span words that occurs contiguously in
+    the record (case/punctuation-normalized). Deterministic O(n*m*k),
+    bounded by the two inputs' length. Returns (n_words, span_text)."""
+    sw = [_norm_word(w) for w in span_words]
+    rw = [_norm_word(w) for w in record_words]
+    best_len, best_at = 0, 0
+    for i in range(len(sw)):
+        for j in range(len(rw)):
+            k = 0
+            while (i + k < len(sw) and j + k < len(rw)
+                   and sw[i + k] and sw[i + k] == rw[j + k]):
+                k += 1
+            if k > best_len:
+                best_len, best_at = k, i
+    text = " ".join(span_words[best_at:best_at + best_len]) \
+        if best_len else ""
+    return best_len, text
+
+
+def span_binding_check(span: str, record_text: str,
+                       item: Optional[Dict[str, Any]] = None,
+                       exploratory: bool = False) -> Dict[str, Any]:
+    """Article LXXX evidence binding — deterministic.
+
+    A mechanism is grounded only when:
+      1. its span carries >= SPAN_MIN_WORDS contiguous words that are
+         verbatim (or case/whitespace-normalized) in ITS OWN record;
+      2. the record is exactly identified: item id + structured hash +
+         record sha256, and (when the item came from a frozen/expansion
+         plane) the evidence snapshot id + hash are present.
+
+    `exploratory` is used ONLY for DOMAIN_KNOWLEDGE_FIRST: its anchor is
+    the user problem statement, which is NOT a frozen evidence record, so
+    the mechanism is recorded as KNOWLEDGE_FIRST_EXPLORATORY and is never
+    counted in the grounded rate.
+    """
+    span_clean = (span or "").strip().strip("\"'").strip()
+    record_text = record_text or ""
+    item = item or {}
+    span_words = _span_words(span_clean)
+    rec_words = _span_words(record_text)
+
+    def _norm(s: str) -> str:
+        return re.sub(r"\s+", " ", s).lower().strip()
+
+    span_mode = None
+    if span_clean and span_clean in record_text:
+        span_mode = "VERBATIM"
+    elif span_clean and _norm(span_clean) in _norm(record_text):
+        span_mode = "CASE_INSENSITIVE_NORMALIZED"
+
+    if span_mode:
+        run_len = len(span_words)
+        run_text = span_clean
+    else:
+        run_len, run_text = _longest_common_word_run(span_words, rec_words)
+
+    record_sha = hashlib.sha256(
+        record_text.encode("utf-8", "replace")).hexdigest()
+    source_binding = {
+        "item_id": item.get("item_id"),
+        "structured_hash": item.get("structured_hash"),
+        "record_sha256": record_sha,
+        "evidence_plane": item.get("_evidence_plane", ""),
+        "evidence_snapshot_id": item.get("_evidence_snapshot_id", ""),
+        "evidence_hash": item.get("_evidence_hash", ""),
+    }
+    snapshot_required = bool(
+        not exploratory and source_binding["evidence_plane"])
+    snapshot_bound = bool(source_binding["evidence_snapshot_id"]
+                          and source_binding["evidence_hash"])
+    source_bound = bool(source_binding["item_id"]
+                        and source_binding["structured_hash"]
+                        and record_sha)
+    record_bound = bool(source_bound
+                        and (snapshot_bound or not snapshot_required))
+    meets_words = run_len >= SPAN_MIN_WORDS
+    ok = bool(not exploratory and meets_words and record_bound)
+    return {
+        "mechanism_source_span": span[:300],
+        "admitted_span": run_text[:500],
+        "span_word_count": len(span_words),
+        "span_min_words": SPAN_MIN_WORDS,
+        "longest_verbatim_word_run": run_len,
+        "meets_min_verbatim_words": meets_words,
+        "verbatim_in_record": span_mode is not None,
+        "match_mode": span_mode or ("PARTIAL_WORD_RUN" if run_len else None),
+        "source_binding": source_binding,
+        "source_bound": source_bound,
+        "snapshot_required": snapshot_required,
+        "snapshot_bound": snapshot_bound if snapshot_required else None,
+        "record_bound": record_bound,
+        "exploratory_exempt": bool(exploratory),
+        "grounded": ok,
+        "span_state": (
+            "KNOWLEDGE_FIRST_EXPLORATORY" if exploratory else
+            "GROUNDED" if ok else "UNGROUNDED_SYNTHESIS"),
+        "contract": (f">= {SPAN_MIN_WORDS} contiguous verbatim words from "
+                     "the candidate's OWN record + exact source/snapshot "
+                     "binding (Art. LXXX)"),
+    }
 
 
 _CANDIDATE_FIELD_LINE_RE = re.compile(
@@ -3061,6 +3291,8 @@ def build_mechanism_space(problem: Dict[str, Any],
     if se["state"] != "BUILT":
         space["state"] = "NO_EVIDENCE"
         space["candidates"] = []
+        space["span_binding_summary"] = span_summary([])
+        space["n_ungrounded_synthesis"] = 0
         space["metrics"] = _metrics(space, [], [], [], 0)
         return space
     # the five operators
@@ -3125,6 +3357,16 @@ def build_mechanism_space(problem: Dict[str, Any],
     space["n_candidates_generated"] = len(all_candidates)
     space["n_candidates_retained"] = len(retained)
     space["min_candidates_required"] = min_candidates
+    # Article LXXX: the span-binding summary is computed over EVERY
+    # assembled mechanism (including the ungrounded ones that never
+    # became candidates) — the honest denominator for the grounded rate.
+    _all_assembled = [
+        c for r in operator_results
+        for c in (r.get("candidates") or [])
+        if isinstance(c, dict) and c.get("candidate_schema")]
+    space["span_binding_summary"] = span_summary(_all_assembled)
+    space["n_ungrounded_synthesis"] = space["span_binding_summary"][
+        "n_ungrounded_synthesis"]
     space["metrics"] = _metrics(space, all_candidates, retained,
                                  verifications, len(structured_items))
     return space
@@ -3150,7 +3392,7 @@ def _public_candidate(c: Dict[str, Any]) -> Dict[str, Any]:
         "derivation_trace", "falsification_test", "expected_effect",
         "mechanism_source_span", "span_binding", "extraction_confidence",
         "mechanism_support", "distinctness_verdict",
-        "distinctness_basis",
+        "distinctness_basis", "evidence_class", "discovery_credit",
         # R6 audit round 2026-11-12 (directive 3): the gimmick-anchor
         # instrument's typed verdict travels with the candidate — the
         # auditor reads the PUBLIC envelope, not just the full records
@@ -3164,6 +3406,37 @@ def _public_candidate(c: Dict[str, Any]) -> Dict[str, Any]:
 # 10. The R401 metrics (Phase 9 — to expose actual behavior, never to
 #     be optimized blindly)
 # ---------------------------------------------------------------------------
+def span_summary(candidates: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Article LXXX span-binding summary. DOMAIN_KNOWLEDGE_FIRST is
+    EXCLUDED from the rate: its anchor is the user's problem statement,
+    not a frozen evidence record. Every other assembled mechanism —
+    grounded or not — is in the denominator."""
+    n_grounded = n_ungrounded = n_exploratory = 0
+    for c in candidates:
+        b = (c or {}).get("span_binding") or {}
+        if b.get("exploratory_exempt"):
+            n_exploratory += 1
+            continue
+        if b.get("grounded"):
+            n_grounded += 1
+        else:
+            n_ungrounded += 1
+    n_checked = n_grounded + n_ungrounded
+    return {
+        "instrument": "mechanism_span_binding/1.0.0",
+        "span_min_words": SPAN_MIN_WORDS,
+        "n_spans_checked": n_checked,
+        "n_grounded": n_grounded,
+        "n_ungrounded_synthesis": n_ungrounded,
+        "n_exploratory_knowledge_first": n_exploratory,
+        "span_verbatim_rate": (round(n_grounded / n_checked, 3)
+                               if n_checked else None),
+        "denominator_note": (
+            "DOMAIN_KNOWLEDGE_FIRST excluded — the user problem "
+            "statement is not a frozen evidence record"),
+    }
+
+
 def _metrics(space: Dict[str, Any],
              generated: List[Dict[str, Any]],
              retained: List[Dict[str, Any]],
@@ -3211,10 +3484,23 @@ def _metrics(space: Dict[str, Any],
             "n_indeterminate": n_indeterminate,
             "n_equivalent_merged": n_equivalent,
             "instrument_version": DISTINCTNESS_INSTRUMENT_VERSION,
+            "evidence_class": "LEXICAL_SCREENING_HEURISTIC",
+            "discovery_credit": "NOT_ESTABLISHED_AS_CAUSAL_DISTINCTNESS",
             "note": ("MMD per Art. XLVIII: counts DISTINCT verdicts only "
                      "— EQUIVALENT merges and INDETERMINATE referrals "
                      "are reported but never counted as distinct "
-                     "mechanisms (Art. XLII/XXV)")},
+                     "mechanisms (Art. XLII/XXV); the instrument is a "
+                     "lexical screen until an independent benchmark "
+                     "earns structural authority")},
+        # Article LXXX: span facts ride EVERY mechanism-count summary.
+        "span_binding": span_summary(generated),
+        "span_verbatim_rate": span_summary(generated)["span_verbatim_rate"],
+        "n_ungrounded_synthesis": sum(
+            1 for c in generated
+            if c.get("candidate_state") == "UNGROUNDED_SYNTHESIS"),
+        "n_exploratory_knowledge_first": sum(
+            1 for c in generated
+            if c.get("evidence_class") == "KNOWLEDGE_FIRST_EXPLORATORY"),
         "evidence_mechanism_support_rate": (
             round(support_items / adjudicated, 3) if adjudicated
             else None),

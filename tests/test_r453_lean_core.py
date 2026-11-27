@@ -693,17 +693,29 @@ class TestDeletionAccounting(unittest.TestCase):
                     # never weakened: the rule ADDS a rejection class).
                     # Pinned by tests/test_r6_audit_round_clean_output.py.
                     "discovery_fabric/engine/answer_contract.py",
-                    # R6 OWNER AUDIT ROUND 2026-11-12 AMENDMENT
-                    # (disclosed, directive 2 downgrade-don't-discard):
-                    # the deterministic relabel/reduced-certainty
-                    # delivery pass lives in engine/answer_downgrade.py
-                    # (zero LLM; it only REMOVES unsupported certainty).
-                    # NOTE: this file shipped in that round without its
-                    # mandate entry — the omission is disclosed here and
-                    # corrected by this amendment (Art. LXIV: state what
-                    # happens to the accounting, silence is not a valid
-                    # answer).
+                    # R6 OWNER AUDIT ROUND 2026-11-13 AMENDMENT
+                    # (disclosed, directive 1: three delivery states):
+                    # the downgrade revalidation now keys its state off
+                    # record["downgrade"]["applied"] so a still-invalid
+                    # composed answer is COMPOSED_CONTRACT_INVALID_DELIVERED
+                    # (with a defect-specific caveat) instead of being
+                    # mislabelled downgraded. The module already existed
+                    # (7e057eb4a); only its state semantics changed. No
+                    # gate, threshold, probe, budget, or transport logic
+                    # touched. Pinned by tests/test_r6_answer_delivery_states.py.
                     "discovery_fabric/engine/answer_downgrade.py",
+                    # R6 OWNER AUDIT ROUND 2026-11-13 AMENDMENT
+                    # (disclosed, attacker provenance): every attack
+                    # record now carries the candidate's OWN generator
+                    # provider (the engine's `_gens[0]` labelled every
+                    # candidate with the first generator — a false
+                    # independence attestation) plus the DERIVED
+                    # calibration attestation for its instrument
+                    # version. No attack rule, prompt, corpus, or
+                    # threshold changed; only provenance/state
+                    # recording. Pinned by
+                    # tests/test_r6_attack_provenance.py.
+                    "discovery_fabric/engine/independent_attack.py",
                     # R7 OWNER AUDIT ROUND 2026-11-13 AMENDMENT
                     # (disclosed, directive 1): the ONE-primary-
                     # candidate design-consistency check lives in the

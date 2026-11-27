@@ -1704,6 +1704,11 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                       else "NO_CANDIDATES")
     space["n_candidates_generated"] = len(all_candidates)
     space["n_candidates_retained"] = len(retained)
+    # Article LXXX: span-binding facts over EVERY assembled mechanism
+    # (including ungrounded syntheses that never reached all_candidates).
+    space["span_binding_summary"] = _ms.span_summary(_assembled)
+    space["n_ungrounded_synthesis"] = space["span_binding_summary"][
+        "n_ungrounded_synthesis"]
     # R548: the Art. LXXXIV minimum is now enforced by the
     # distinctness instrument's own count — n_candidates_required
     # records the MINIMUM_DISTINCT_MECHANISMS bar (2), not the
@@ -1772,6 +1777,15 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             "support_state": (
                 (_ac.get("mechanism_support") or {})
                 .get("mechanism_support_state")),
+            # Article LXXX: per-hypothesis span facts (grounded words +
+            # exact record binding) ride the attribution record.
+            "span_grounded": (_ac.get("span_binding") or {}).get(
+                "grounded"),
+            "span_state": (_ac.get("span_binding") or {}).get(
+                "span_state"),
+            "span_longest_verbatim_word_run": (
+                _ac.get("span_binding") or {}).get(
+                    "longest_verbatim_word_run"),
         })
     _att_outcome = _ms_attempt_outcome(
         bool(matched),
@@ -1811,6 +1825,8 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                              if _att_cand_id else False),
         "distinctness_verdict": _att_dd.get("verdict"),
         "support_state": _att_sup.get("mechanism_support_state"),
+        "span_binding": (cand or {}).get("span_binding"),
+        "span_binding_summary": space.get("span_binding_summary"),
         "typed_outcome": _att_outcome.get("outcome"),
         "outcome_detail": {k: v for k, v in _att_outcome.items()
                            if k != "outcome"},
@@ -1867,6 +1883,7 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
          "distinctness": {
              "n_distinct": dedup.get("n_distinct"),
              "n_indeterminate": dedup.get("n_indeterminate")},
+         "span_summary": space.get("span_binding_summary"),
          "n_retained": len(retained),
          "terminal_reason": space["state"],
          # R532 §3: the typed instantiation attempts ride the
@@ -1938,6 +1955,19 @@ def _ms_attempt_outcome(
                 "note": ("response parsed but carries no mechanism "
                          "content (mechanism + intervention both "
                          "empty)")}
+
+    # Article LXXX (owner audit 2026-11-13): a mechanism whose span does
+    # not carry >= 8 contiguous verbatim words from its OWN frozen
+    # record is UNGROUNDED_SYNTHESIS — an epistemic UNKNOWN, never a
+    # scientific rejection and never a candidate.
+    if (candidate_state or "") == "UNGROUNDED_SYNTHESIS":
+        return {"outcome": "UNGROUNDED_SYNTHESIS",
+                "candidate_state": candidate_state,
+                "epistemic_class": "UNKNOWN",
+                "not_a_scientific_rejection": True,
+                "note": ("span binding failed: < 8 contiguous verbatim "
+                         "words from the candidate's own frozen record "
+                         "or exact source/snapshot binding missing")}
 
     # R536 Cliff 1 (audit CB-classifier): the cemetery check MUST
     # precede the candidate_state check, independently of it.  A

@@ -357,6 +357,12 @@ def test_mechanism_rerank_prefers_problem_relevant_records():
     # WORSE than the legacy control on the same packet, 0.666 vs 0.75 —
     # the round directive is revert-until-matched; the rerank pins the
     # reverted 1.0.0 semantics with the lexical relevance component).
-    assert "1.0.0" in with_rel["reranker_version"]
+    # R6 P1 (owner audit round 2026-11-13, measured): the problem-given
+    # path is now mechanism_signal_rerank/1.1.0 — density + 0.5 per
+    # shared problem term + 0.5 per aligned relevance dimension - 1.0
+    # for zero alignment. The bare-call 1.0.0 replay semantics are
+    # byte-unchanged (asserted above). Pinned by
+    # tests/test_r6_retrieval_relevance.py.
+    assert "1.1.0" in with_rel["reranker_version"]
     assert "reverted" in with_rel["policy"].lower()
     assert "relevance component" in with_rel["policy"].lower()

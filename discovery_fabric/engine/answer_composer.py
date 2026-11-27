@@ -119,6 +119,39 @@ HYPOTHESIS_CAVEAT_LINE = (
     "hypothesis — the retrieved record does not directly support it, "
     "so treat the stated falsification test as a precondition, not a "
     "validated recommendation.")
+# DIRECTIVE 1 (owner directive 12 closing round): the generic caveat
+# must never conceal a specific technical defect. The delivered-
+# invalid caveat carries the FIRST two violation strings (or the
+# first constraint-audit violation when the contract is valid but the
+# audit is dirty) verbatim — each trimmed to 160 chars — plus a count
+# of dropped invalid citations. The full violation list rides the
+# record metadata (Art. XXV); the caveat is ONE line, specific, and
+# never a banner.
+def _specific_caveat(contract_violations, audit_violations,
+                     citations_dropped) -> str:
+    parts: List[str] = []
+    for v in (contract_violations or [])[:2]:
+        snippet = " ".join(str(v).split())
+        if snippet:
+            parts.append(snippet[:160])
+    for v in (audit_violations or [])[:1]:
+        if isinstance(v, dict):
+            snippet = v.get("detail") or v.get("context") \
+                or v.get("text") or str(v)
+        else:
+            snippet = str(v)
+        snippet = " ".join(str(snippet).split())
+        if snippet and snippet[:160] not in parts:
+            parts.append(snippet[:160])
+    cites = len(citations_dropped or [])
+    body = "; ".join(parts) if parts else (
+        "technical content the deterministic contract cannot verify")
+    if cites:
+        body += f"; {cites} invalid citation(s) were dropped"
+    return ("Note: this answer still carries unverified content — "
+            + body
+            + ". Treat it as a flagged hypothesis, not a validated "
+            "recommendation; verify before relying on it.")
 
 _COMPOSER_SYSTEM = (
     "You write the final engineer-facing answer for an engineering "
@@ -914,10 +947,12 @@ def compose_answer(problem: Dict[str, Any],
                        "violations": contract.get("violations"),
                        "bindings": contract.get("bindings"),
                        "question_type": question_type}
-    # directive 2: the constraint audit's final state rides the record
-    # (typed metadata — the shipped text itself must be clean;
-    # constraint violations that survived every bounded repair are
-    # delivered with ONE plain-language caveat line by the harness)
+    # directive 1 (owner round, 2026-11-12): the constraint audit's
+    # final state rides the record (typed metadata — the shipped text
+    # itself must be clean; constraint violations that survived every
+    # bounded repair are delivered with ONE specific caveat line by
+    # the harness — the caveat names the first violation verbatim;
+    # a generic caveat must not conceal a specific technical defect)
     rec["constraint_audit"] = {"state": caudit.get("state"),
                                "n_violations": caudit.get("n_violations"),
                                "violations": caudit.get("violations")}
@@ -932,15 +967,46 @@ def compose_answer(problem: Dict[str, Any],
                                     cons_final.get("n_violations"),
                                 "violations":
                                     cons_final.get("violations")}
-    if contract.get("valid") is True:
-        rec["state"] = "COMPOSED_CONTRACT_VALID"
-    elif rec.get("downgrade", {}).get("applied"):
-        # delivered at the last complete sentence; the typed detail
-        # (open violations) rides rec["contract"], never a banner
+    # directive 1 (owner round, 2026-11-13): three DISTINCT delivery
+    # states. A downgrade pass that ran is not proof of repair: only
+    # valid_after_downgrade=True earns DOWNGRADED; a still-invalid
+    # delivery is typed INVALID_DELIVERED with a defect-specific caveat.
+    _downgrade = rec.get("downgrade") or {}
+    _dg_applied = bool(_downgrade.get("applied"))
+    _dg_valid = _downgrade.get("valid_after_downgrade") is True
+    if not _dg_applied:
+        if contract.get("valid") is True:
+            rec["state"] = "COMPOSED_CONTRACT_VALID"
+        else:
+            # defensive: unreachable — the downgrade pass always runs
+            # when the contract is invalid; kept as the fail-closed
+            # shape
+            rec["state"] = "COMPOSED_CONTRACT_INVALID"
+    elif _dg_valid:
         rec["state"] = "COMPOSED_CONTRACT_DOWNGRADED"
         _delivered_note = DOWNGRADE_CAVEAT_LINE
+        if (caudit.get("n_violations") or 0):
+            _delivered_note = _specific_caveat(
+                [], caudit.get("violations") or [], [])
     else:
-        rec["state"] = "COMPOSED_CONTRACT_INVALID"
+        # directive 1 (owner round): delivered under the owner's
+        # delivery policy but STILL invalid — never represented as
+        # valid; the open defects are named in the caveat and ride
+        # rec["contract"]
+        rec["state"] = "COMPOSED_CONTRACT_INVALID_DELIVERED"
+        _delivered_note = _specific_caveat(
+            contract.get("violations") or [],
+            caudit.get("violations") or [],
+            _downgrade.get("citations_dropped") or [])
+    # directive 1 (owner round): a VALID contract with a dirty
+    # constraint audit still never ships a bare answer — ONE specific
+    # caveat names the first surviving violation verbatim (never a
+    # generic line that conceals a specific technical defect).
+    if _delivered_note is None and (caudit.get("n_violations") or 0):
+        _delivered_note = _specific_caveat(
+            contract.get("violations") or [],
+            caudit.get("violations") or [],
+            [])
     # item 2: the deterministic tech-sanity record (typed detail;
     # NEVER a gate — the state above stays contract-only)
     _ts_final = (_tech_sanity_findings(

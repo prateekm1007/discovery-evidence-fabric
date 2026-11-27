@@ -30,6 +30,7 @@ sees (Art. XXIV).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from typing import Any, Dict, List, Optional
@@ -170,77 +171,190 @@ def _qty_overlap(tokens, src_tokens) -> bool:
     return False
 
 
+def _source_passages(source_seg: str) -> List[Dict[str, str]]:
+    """Split a source span into EXACT sentence-like passages. Each
+    passage is the smallest unit that may establish a quantitative
+    claim: a quantity in one sentence never licenses a value+unit in
+    another (owner audit 2026-11-13 P0). Offsets are retained so a
+    binding can name the exact passage it used (Art. II/XII)."""
+    out: List[Dict[str, str]] = []
+    text = source_seg or ""
+    # A period terminates a passage only when followed by whitespace or
+    # end — decimals ("4.5") and version-like tokens never split.
+    for m in re.finditer(r".+?(?:[.!?;](?=\s|$)|\n|$)", text):
+        raw = m.group(0)
+        passage = raw.strip()
+        if not passage:
+            continue
+        out.append({
+            "text": passage,
+            "start": m.start() + (len(raw) - len(raw.lstrip())),
+            "end": m.end() - (len(raw) - len(raw.rstrip())),
+            "sha256": hashlib.sha256(
+                passage.encode("utf-8")).hexdigest()[:16],
+        })
+    return out
+
+
+def _pair_occurrence(seg: str, pair: Dict[str, str]):
+    """The exact (value + unit) occurrence in the claim, if any."""
+    return re.search(
+        r"(?<!\d)" + re.escape(pair["value"]) + r"\s{0,4}"
+        + re.escape(pair["unit"]), (seg or "").lower())
+
+
+def _pair_context_quantities(claim_seg: str,
+                             pair: Dict[str, str]) -> set:
+    """Quantity words that sit in the SAME clause as the pair in the
+    claim — the quantity the value is actually attached to. A quantity
+    elsewhere on the line belongs to another parameter and may never
+    licence this pair (the sample-line trap)."""
+    m = _pair_occurrence(claim_seg, pair)
+    if not m:
+        return set()
+    s, e = claim_seg[:m.start()], claim_seg[m.end():]
+    left = max((s.rfind(c) for c in ".!?;:,\n"), default=-1) + 1
+    right = min([i for i, c in enumerate(e) if c in ".!?;:,\n"]
+                or [len(e)])
+    window = s[left:] + " " + m.group(0) + " " + e[:right]
+    return _quantity_tokens(window)
+
+
 def _joint_support(claim_seg: str, source_seg: str) -> Dict[str, Any]:
-    """P0-5: does the source span support the claim with quantity,
-    value AND unit jointly?
+    """P0-5 (tightened by the owner audit 2026-11-13): does the source
+    support EVERY quantitative pair in the claim, with the pair's
+    corresponding quantity, value AND unit in the SAME exact passage?
 
-      value_unit_supported — a claim value immediately followed by its
-          unit (<= 4 chars gap, digit-guarded on both sides) occurs in
-          the source span;
-      quantity_supported   — at least one of the claim's quantity
-          words occurs in the source span (stem relation admitted:
-          "cycle" <-> "cycles"/"cycling");
-      joint_supported      — both (or the claim's numbers are all
-          covered: every stated pair, a claim with no pair, or a
-          recorded conversion/derivation the claim itself names).
+      value_unit_supported — every claim pair's value+unit occurs
+          somewhere in the source (digit-guarded);
+      quantity_supported   — every claim pair finds its OWN clause
+          quantity in the passage that carries its value+unit (a
+          quantity in a different sentence does not count);
+      joint_supported      — every pair binds jointly. One supported
+          and one unsupported pair means NOT supported.
 
-    A number elsewhere in the source span (wrong quantity, wrong
-    unit, or a longer number it is a substring of) returns None of
-    these — that is the P0-5 adversarial class the check exists to
-    catch (Art. II/VI: exact evidence beats semantic plausibility;
-    never manufacture provenance)."""
+    Removed: the old "one supported pair wins" and the generic
+    recorded-conversion bypass. A derived/converted claim is recorded
+    (conversion_recorded/derived_quantity) but an unverified derivation
+    is an ASSUMPTION, never EVIDENCE-BACKED (Art. II/VI).
+
+    A number elsewhere in the source (wrong quantity, wrong unit, or a
+    substring of a longer number) never supports the claim."""
     pairs = _value_unit_pairs(claim_seg)
     qty = _quantity_tokens(claim_seg)
-    src_l = (source_seg or "").lower()
+    src = source_seg or ""
+    src_l = src.lower()
+    passages = _source_passages(src)
     res: Dict[str, Any] = {
         "pairs": pairs,
         "quantity": sorted(qty),
+        "passages": passages,
+        "pair_bindings": [],
+        "unsupported_pairs": [],
         "value_unit_supported": False,
         "quantity_supported": False,
         "joint_supported": False,
-        "conversion_recorded": False}
-    src_qty = _quantity_tokens(src_l)
+        "conversion_recorded": bool(_CONV_MARKER.search(claim_seg or "")),
+        "binding_rule": "per-pair quantity+value+unit in one passage",
+    }
     if not pairs:
-        # no value+unit pair in the claim. Either a purely qualitative
-        # claim (the quantity words alone carry the check) or a numeric
-        # claim whose unit is not in the word list — for the latter the
-        # stated value must still appear (digit-guarded) in the span,
-        # otherwise the span names the quantity but not THIS value
-        # (value_not_in_source). A qualitative claim with no number at
-        # all falls back to the quantity-word check.
-        res["quantity_supported"] = _qty_overlap(qty, src_qty)
+        # Qualitative claim: require ONE passage that names the claim's
+        # quantity (and, when the claim states a bare number, that same
+        # passage must carry the number).
         nums = _numbers(claim_seg)
+        best = None
+        for ps in passages:
+            ps_qty = _quantity_tokens(ps["text"])
+            q_ok = _qty_overlap(qty, ps_qty) if qty else True
+            if not q_ok:
+                continue
+            if nums:
+                pl = ps["text"].lower()
+                n_ok = all(re.search(r"(?<!\d)" + re.escape(n)
+                                     + r"(?!\d)", pl) for n in nums)
+                if not n_ok:
+                    continue
+            best = ps
+            break
+        res["quantity_supported"] = any(
+            _qty_overlap(qty, _quantity_tokens(ps["text"]))
+            for ps in passages) if qty else False
         if nums:
-            res["value_in_span"] = any(
+            res["value_in_span"] = all(
                 re.search(r"(?<!\d)" + re.escape(n) + r"(?!\d)", src_l)
                 for n in nums)
-            res["joint_supported"] = (res["quantity_supported"]
-                                      and res["value_in_span"])
-        else:
-            res["joint_supported"] = res["quantity_supported"]
+        res["joint_supported"] = best is not None
+        if best is not None:
+            res["pair_bindings"].append({
+                "kind": "qualitative",
+                "passage_index": passages.index(best),
+                "passage_sha256": best["sha256"]})
         return res
-    supported_pairs = 0
+
+    all_value_unit = True
+    all_qty = True
     for p in pairs:
-        # the value (digit-guarded: never a substring of a longer
-        # number) followed immediately (<= 4 chars) by its unit —
-        # the co-occurrence that says "this value of this quantity"
-        if re.search(r"(?<!\d)" + re.escape(p["value"])
-                     + r"\s{0,4}" + re.escape(p["unit"]), src_l):
-            supported_pairs += 1
-    res["value_unit_supported"] = supported_pairs > 0
-    res["quantity_supported"] = _qty_overlap(qty, src_qty)
-    res["conversion_recorded"] = bool(_CONV_MARKER.search(
-        claim_seg or ""))
-    if res["value_unit_supported"] and res["quantity_supported"]:
-        res["joint_supported"] = True
-    elif (res["conversion_recorded"] and res["quantity_supported"]
-          and supported_pairs == 0 and _NUM_WITH_UNIT.search(
-              source_seg or "")):
-        # the claim names its own conversion (the source carries the
-        # quantity and a number+unit, the claim records the
-        # derivation) — admitted, and the record says so (Art. XXVII)
-        res["joint_supported"] = True
-        res["by"] = "recorded_conversion"
+        ctx_qty = _pair_context_quantities(claim_seg, p) or qty
+        bound = None
+        failure = None
+        for idx, ps in enumerate(passages):
+            pl = ps["text"].lower()
+            if not _pair_occurrence(ps["text"], p):
+                continue
+            ps_qty = _quantity_tokens(ps["text"])
+            q_ok = (_qty_overlap(ctx_qty, ps_qty)
+                    if ctx_qty else True)
+            if q_ok:
+                bound = {
+                    "pair": p,
+                    "passage_index": idx,
+                    "passage_sha256": ps["sha256"],
+                    "passage": ps["text"][:240],
+                    "quantity_matched": sorted(ctx_qty),
+                }
+                break
+            failure = failure or "same_number_wrong_quantity"
+        if bound is not None:
+            res["pair_bindings"].append(bound)
+            continue
+        all_value_unit = False
+        all_qty = False
+        # classify the miss against the source as a whole (typed)
+        guarded = re.search(r"(?<!\d)" + re.escape(p["value"])
+                            + r"(?!\d)", src_l)
+        substring = p["value"] in src_l
+        unit_present = bool(re.search(re.escape(p["unit"]), src_l))
+        if failure:
+            cls = failure
+        elif guarded and unit_present:
+            cls = "same_number_wrong_quantity"
+        elif guarded:
+            cls = "wrong_unit"
+        elif substring:
+            cls = "substring_number"
+        elif _qty_overlap(qty, _quantity_tokens(src_l)):
+            cls = "value_not_in_source"
+        else:
+            cls = "unrelated_source"
+        res["unsupported_pairs"].append({"pair": p, "class": cls})
+    # value_unit presence (relaxed: pair exists somewhere)
+    res["value_unit_supported"] = all(
+        bool(_pair_occurrence(src, p)) for p in pairs)
+    res["quantity_supported"] = not res["unsupported_pairs"]
+    # every pair must bind; no partial-credit path
+    res["joint_supported"] = (
+        len(res["pair_bindings"]) == len(pairs)
+        and not res["unsupported_pairs"])
+    # every pair may bind to a different exact passage — record whether
+    # one passage carries the whole claim (strongest form)
+    idxs = {b.get("passage_index") for b in res["pair_bindings"]}
+    if res["joint_supported"]:
+        res["single_passage"] = len(idxs) == 1
+        res["by"] = "joint_pair_binding"
+    if res["conversion_recorded"] and not res["joint_supported"]:
+        # the claim names a derivation; without joint passage support it
+        # stays an ASSUMPTION-class statement, never evidence
+        res["derived_quantity"] = True
     return res
 
 
@@ -294,6 +408,12 @@ def _joint_violation_class(sup: Dict[str, Any], source: str) -> str:
     never mask a missing one (the same_number_wrong_quantity trap)."""
     src_l = (source or "").lower()
     pairs = sup.get("pairs") or []
+    # v2: the per-pair same-passage binding already typed every miss;
+    # report the FIRST unsupported pair's class (a supported pair can
+    # never mask an unsupported one — the multi-value trap).
+    unsupported = sup.get("unsupported_pairs") or []
+    if unsupported:
+        return unsupported[0].get("class") or "value_not_in_source"
     qty_supported = bool(sup.get("quantity_supported"))
     if not pairs:
         return ("value_not_in_source" if qty_supported
