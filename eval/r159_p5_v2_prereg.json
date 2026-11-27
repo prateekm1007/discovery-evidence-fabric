@@ -15,7 +15,7 @@
  "seats": {
   "G0_generator": "tokenrouter deepseek-v4.1-flash-1017-free (probe VALID this session)",
   "J1_recovery_judge": "z-ai glm (r158 seat, unchanged)",
-  "J2_recovery_judge": "cent-ai hy4-flash:free, budget 4000 (the measured reasoning-burn fix)",
+  "J2_recovery_judge": "ctai openai/gpt-6-astra (AM52 re-seat 2026-11-27; was cent-ai hy4-flash:free, 403 day-2; budget 4000; family openai != generator deepseek, F2-clean)",
   "Jt2_support_judge": "z-ai glm (SUPPORT-rating task — non-generator family; F2-clean: the generator is deepseek)",
   "author_seat": "z-ai glm (corpus authoring only)"
  },
@@ -28,5 +28,15 @@
  "g0_v2": "coverage-mandate addendum (r160s1 scaffold, verbatim): answer every background sub-question; each causal step names its measurable quantity",
  "acceptance": ">=40% RECOVERED (min 12/30), 0 canary hits, >=1 T1 valid, >=1 T2 valid, 0 interventions, ONE unattended run with byte-resume checkpoint",
  "fail_closed": "GEN_FAILED -> NOT_RECOVERED; judge failure -> PARTIAL; canary hit -> CONTAMINATED (excluded from the bar)",
- "resume_command": "cd /home/z/my-project/discovery-evidence-fabric && set -a && . ./.env.keys && set +a && python3 scripts/r159_p5_v2_run.py"
+ "resume_command": "cd /home/z/my-project/discovery-evidence-fabric && set -a && . ./.env.keys && set +a && python3 scripts/r159_p5_v2_run.py",
+ "amendments": [
+  {
+   "id": "AM52-RESEAT-1",
+   "date": "2026-11-27",
+   "authority": "AM52 (DELEGATED OWNER, ledger V135): 'Authorize a SEALED J2 availability re-seat: hy4 -> a LIVE ctai judge (gpt-6-astra preferred, unspent), qualified for the P5 support-rating task (judge != G0 tokenrouter generator, F2-clean)'",
+   "change": "seats.J2_recovery_judge: cent-ai hy4-flash:free (403 day-2) -> ctai openai/gpt-6-astra (probe 200 live this session, engine ctai_chat, budget 4000 unchanged)",
+   "reason": "availability only — hy4-flash:free is 403 Forbidden day-2 (auditor-confirmed); NOT tuning; the substitute judge family openai != the G0 generator family deepseek (F2-clean)",
+   "integrity": "corpus c9670d8dd4b55c0c FROZEN (unchanged); the 21/30 infra-terminal archived (never overwritten); bars unchanged; fail-closed rules unchanged; Art.3/7/8 respected"
+  }
+ ]
 }

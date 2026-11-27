@@ -59,6 +59,7 @@ from discovery_fabric.engine.rediscovery_protocol import (
     generator_prompt, judge_prompt, repair_prompt,
     parse_generator_output, parse_judge_output, adjudicate,
     acceptance, canary_scan, t1_valid, RECOVERY_CLASSES)
+from discovery_fabric.engine.route_adapter import ctai_chat
 
 REPO = Path(__file__).resolve().parent.parent
 CORPUS = REPO / "eval/r159_p5_v2_corpus/sampled_items.jsonl"
@@ -141,20 +142,25 @@ def j1_chat(prompt: str) -> tuple[str, str]:
 
 
 def j2_chat(prompt: str) -> tuple[str, str]:
-    """J2 (cent-ai hy4-flash:free), budget 4000 (the measured
-    reasoning-burn fix). 503 upstream-transient is typed and retried
-    once by the caller's ladder; persistent failure -> None (PARTIAL)."""
-    st, resp = http_json(CENT_BASE, CENT_KEY, {
-        "model": "hy4-flash:free", "max_tokens": 4000,
-        "messages": [{"role": "user", "content": prompt}]}, 300.0)
-    if st == 200:
-        c = ((resp.get("choices") or [{}])[0].get("message")
-             or {}).get("content") or ""
+    """J2: the AM52-authorized availability re-seat (2026-11-27) —
+    cent-ai hy4-flash:free (down day-2, 403) -> ctai openai/gpt-6-astra
+    (live, unspent; owner-authorized sealed substitution, availability
+    only, NOT tuning; the judge family is openai != the G0 generator
+    family deepseek — F2-clean). Budget 4000 kept. The ctai 502/408
+    transient classes retry via the caller's ladder; persistent
+    failure -> None (PARTIAL fail-closed, unchanged)."""
+    try:
+        out = ctai_chat(
+            [{"role": "user", "content": prompt}],
+            model="openai/gpt-6-astra", max_tokens=4000)
+        c = (out or {}).get("content") or "" if isinstance(out, dict) \
+            else str(out or "")
         if not c:
             return "", "EMPTY"
         USAGE["j2_calls"] += 1
         return c, "OK"
-    return "", f"HTTP{st}"
+    except Exception as e:
+        return "", f"{type(e).__name__}:{str(e)[:80]}"
 
 
 def jt2_chat(prompt: str) -> tuple[str, str]:
