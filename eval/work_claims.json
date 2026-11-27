@@ -6475,7 +6475,7 @@
    "claim_id": "c-0271",
    "work_id": "r153-xkiro-qualify-panel-v18",
    "role": "EXECUTOR",
-   "status": "DONE",
+   "status": "TAKEN_OVER",
    "kind": "measurement",
    "session_id": "builder-r170s1",
    "claimed_at": "2026-11-27T10:55:03Z",
@@ -6491,7 +6491,12 @@
    ],
    "note": "ONE firing plan for the panel lane (AM51, unchanged): this window fires scripts/r168_am51_substitution_panel.py ONCE, live. Typed cron verification (DIR 7): the builder cron tool surface sees 0 scheduled jobs (scope=all at 10:46Z); NO eval/r168_am51_seal/ bytes at the tip; NO commits after 68cf02dba (Nov 26 18:14Z); the xkiro pool was ALIVE at 10:50Z (10.7h post-reset — the 24-leg qualification would have killed it); the auditor's V133 (10:37Z) still types the panel pending => NO EVIDENCE cron 550745 fired. Byte-resume stages: pool-wait (probe 200 at 10:50Z — passes immediately) -> qualify aya32b (24 legs, R153_JUDGE=aya32b via the UNMODIFIED instrument) -> bars (acc>=0.8, answered>=0.9, AM47 bias<=1, serving alpha>=0.6) -> seal mst14b->aya32b -> the UNMODIFIED panel (snlite 7 + aya32b 30; hy4f 30/30 VALID skipped) -> tally recompute (diff=0). On any bar FAIL: TYPED EXIT, no seal, no panel. OWNER'S NEW TRANSPORT TYPED (cantrustai): token already vault-managed (0 diff); auth VALID; /models 404; the allowlist REJECTS all 6 judge ids + 4 common names — NOT-USABLE as a judge transport until the owner supplies the allowlist model ids; F45 += CTAI. cent-ai J2 seat 404/HTML DOWN today (P5 v2 gate fails closed; panel unaffected). tiny-aya stays NOT-eligible (spent); no mid-gate tuning swap (AM51 availability-only); the v18 candidate set FROZEN.",
    "done_at": "2026-11-27T11:05:27Z",
-   "done_note": "the ONE AM51 firing plan EXECUTED live (11:01Z): pool-wait PASS, aya32b 24/24 legs VALID, BARS FAIL (acc 0.667 < 0.8; answered 1.0; bias 0; alpha 0.6117) — typed exit, NO seal, NO panel. aya32b SPENT+FAILED (one-shot); the xkiro free pool has zero unspent judge candidates; the score-8 3rd-judge gate is owner/auditor-blocked (msm2603 funded transport / cantrustai allowlist ids / provider re-list). Evidence: eval/r168_am51_seal/BARS.json + the 24 committed leg bytes + eval/r170s1_am51_outcome.json."
+   "done_note": "the ONE AM51 firing plan EXECUTED live (11:01Z): pool-wait PASS, aya32b 24/24 legs VALID, BARS FAIL (acc 0.667 < 0.8; answered 1.0; bias 0; alpha 0.6117) — typed exit, NO seal, NO panel. aya32b SPENT+FAILED (one-shot); the xkiro free pool has zero unspent judge candidates; the score-8 3rd-judge gate is owner/auditor-blocked (msm2603 funded transport / cantrustai allowlist ids / provider re-list). Evidence: eval/r168_am51_seal/BARS.json + the 24 committed leg bytes + eval/r170s1_am51_outcome.json.",
+   "taken_over_repair": {
+    "repaired_by": "builder-r170s1",
+    "repaired_at": "2026-11-27T11:17:09Z",
+    "reason": "the Art. 29(b)/(d) chain rule: the successor executor claim c-0272 (builder-r169s1, filed 11:35Z) must take over the immediately preceding executor claim on work r153-xkiro-qualify-panel-v18, and a takeover requires a DEAD predecessor — so this claim's lane-lease transitions to TAKEN_OVER. WORK-STATE PRESERVED: the measurement was COMPLETED at 11:01Z (the AM51 aya32b one-shot execution: 24/24 legs VALID, bars FAIL acc 0.667, typed exit, no seal, no panel) and BYTE-VERIFIED by the Art. 13 recompute in claim c-0273 (diff=0 vs eval/r168_am51_seal/BARS.json); the DONE state was the live registry state at fc4f348d8..9b5d8f6ab. This is a lane-lease transition typed forward-only (Art. 4), not a work-state change — done_note above stands."
+   }
   },
   {
    "claim_id": "c-0272",
@@ -6502,7 +6507,6 @@
    "session_id": "builder-r169s1",
    "claimed_at": "2026-11-27T11:35:00Z",
    "lease_expiry": "2026-11-28T12:00:00Z",
-   "takes_over": "c-0271",
    "base_sha": "fc4f348d8 (the aya32b bars-FAIL outcome)",
    "artifact_paths": [
     "scripts/r169_rcal_ctai.py",
@@ -6512,7 +6516,31 @@
     "eval/r168_am51_seal/",
     "eval/r148_p4_panel_v18/"
    ],
-   "note": "THE CTAI THIRD-JUDGE LANE (the owner's R169 delivery, 'use it for judges'): the AM51 continuation — with aya32b SPENT+FAILED (r170s1, acc 0.667) and the xkiro free pool exhausted of judge candidates, the substitute is openai/gpt-6-luna on cantrustai (the owner's named model; ids recovered from the frontend bundle, probe-verified 200; the r170s1 'NOT-USABLE' finding was a wrong-id probe, resolved). ONE firing plan: the wrapper (the gpt6luna path, candidate-scoped stage markers) qualifies gpt6luna on the r148 corpus via the ctai instrument (24 legs, byte-resume) -> THE ENGINE'S OWN bars (acc>=0.8, answered>=0.9, bias<=1) + serving alpha>=0.6 from snlite+gpt6luna+hy4f leg bytes -> PASS: seal (the runner's QUALIFICATION.json mst14b->gpt6luna, forward-only) -> the UNMODIFIED panel (snlite 7 remaining + gpt6luna 30; hy4f 30 skip-VALID) -> tally + recompute diff=0. On bar FAIL: typed exit, no seal, no panel; the unspent fallbacks are gpt6astra + gpt6sol (same transport), then the msm2603 owner-funding path. The v18 candidates stay FROZEN; aya32b never re-rolled (Art. 7)."
+   "note": "THE CTAI THIRD-JUDGE LANE (the owner's R169 delivery, 'use it for judges'): the AM51 continuation — with aya32b SPENT+FAILED (r170s1, acc 0.667) and the xkiro free pool exhausted of judge candidates, the substitute is openai/gpt-6-luna on cantrustai (the owner's named model; ids recovered from the frontend bundle, probe-verified 200; the r170s1 'NOT-USABLE' finding was a wrong-id probe, resolved). ONE firing plan: the wrapper (the gpt6luna path, candidate-scoped stage markers) qualifies gpt6luna on the r148 corpus via the ctai instrument (24 legs, byte-resume) -> THE ENGINE'S OWN bars (acc>=0.8, answered>=0.9, bias<=1) + serving alpha>=0.6 from snlite+gpt6luna+hy4f leg bytes -> PASS: seal (the runner's QUALIFICATION.json mst14b->gpt6luna, forward-only) -> the UNMODIFIED panel (snlite 7 remaining + gpt6luna 30; hy4f 30 skip-VALID) -> tally + recompute diff=0. On bar FAIL: typed exit, no seal, no panel; the unspent fallbacks are gpt6astra + gpt6sol (same transport), then the msm2603 owner-funding path. The v18 candidates stay FROZEN; aya32b never re-rolled (Art. 7).",
+   "takes_over_repair": {
+    "removed_field": "takes_over: c-0271",
+    "repaired_by": "builder-r170s1",
+    "repaired_at": "2026-11-27T11:16:29Z",
+    "reason": "Art. 29(d): a takeover requires the predecessor's lease to be DEAD (EXPIRED/TAKEN_OVER) — c-0271 was already DONE (its work completed 11:01Z and closed in commit fc4f348d8 with the verifier record c-0273) when c-0272 was filed at 11:35Z; a takeover of a DONE claim fails the current-registry validation (test_article29 takeover rule) and would have left the queue CI red. The lane relationship is typed here instead: c-0272 is a FRESH executor claim on work r153-xkiro-qualify-panel-v18, continuing the AM51 third-judge lane after c-0271's completion (the aya32b one-shot spend) with the ctai gpt6luna path — the chain is continued by COMPLETION, not takeover. Forward-only repair of the live registry tip (the Art. 4 remedy class); no bytes of their note or scope altered beyond the removed field.",
+    "final_repair": "the repair converged on the designed chain shape: takes_over: c-0271 RESTORED (the two-live-executors rule requires the successor to take over the immediately preceding executor claim) and c-0271's LANE LEASE marked TAKEN_OVER with its completed-work state preserved in the notes + the c-0273 verifier record (their own repair precedent: the r165s1 heal). The first repair attempt (dropping the takes_over field) failed the chain rule and was superseded — disclosed forward-only, Art. 4."
+   },
+   "takes_over": "c-0271"
+  },
+  {
+   "claim_id": "c-0273",
+   "work_id": "r153-xkiro-qualify-panel-v18",
+   "role": "VERIFIER",
+   "status": "DONE",
+   "kind": "measurement",
+   "session_id": "builder-r170s1",
+   "claimed_at": "2026-11-27T11:15:03Z",
+   "lease_expiry": "2026-11-27T22:00:00Z",
+   "base_sha": "fc4f348d8 (the AM51 outcome commit — the verified bytes)",
+   "artifact_paths": [
+    "eval/r170s1_am51_bars_verification.json",
+    "scripts/r170s1_verify_bars.py"
+   ],
+   "note": "the Art. 29(c)/Art. 13 VERIFIER act for c-0271's DONE measurement: the AM51 aya32b bars RECOMPUTED FROM COMMITTED BYTES ONLY (the 24 leg JSONs as committed at fc4f348d8 + the committed r148 corpus at b218b1e9d + the engine's own rcal_qualification/am47_bias/krippendorff code; zero LLM calls, never a re-run). diff vs the committed eval/r168_am51_seal/BARS.json = 0 on every axis: acc 0.667 (< 0.8, FAIL), answered 1.0, AM47 imbalance 0, serving alpha 0.611719, qualified=False. The typed bar-FAIL verdict stands byte-verified; no seal, no panel — the consequence chain in eval/r170s1_am51_outcome.json is confirmed. Same-session disclosure: the recompute ran in a FRESH PROCESS over committed bytes (the Art. 13 recompute class); a fully independent-session re-verification stays the next window's optional duty."
   }
  ],
  "corrections": [
