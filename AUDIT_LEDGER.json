@@ -2466,6 +2466,22 @@
    "title": "P5 v2 counting run still waits on hy4-flash:free 503 (~7h); the 01:30 cron two-seat-gate fires on recovery; G0 tokenrouter alive",
    "evidence": "cent-ai hy4 503; P5 v2 hold 21/30",
    "status": "OPEN"
+  },
+  {
+   "id": "R169-F1",
+   "round": "R169",
+   "severity": "MEDIUM",
+   "title": "score-8 panel: post-reset cron 550745 qualifies aya32b (unspent) -> seal mst14b->aya32b -> panel snlite+aya32b+hy4f >=50%; on aya32b bar FAIL no unspent free candidates remain -> msm2603 owner-funding fallback",
+   "evidence": "tayae 24 legs spent/failed; aya32b 0 legs; wrapper + cron 550745",
+   "status": "OPEN"
+  },
+  {
+   "id": "R169-F2",
+   "round": "R169",
+   "severity": "MEDIUM",
+   "title": "P5 v2 counting run waits hy4-flash:free 503 (~9h); cron 550250 (01:30) two-seat-gate fires on recovery; G0 tokenrouter alive",
+   "evidence": "cent-ai hy4 503; P5 v2 hold 21/30",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -5888,6 +5904,22 @@
     "R168-F1",
     "R168-F2"
    ]
+  },
+  {
+   "id": "V133",
+   "round": "R169 audit: AM51 substitute corrected to aya32b (tiny-aya was spent) + wrapper/cron armed",
+   "commit": "9456627201f71550fab533625fc6259ed4935280",
+   "gate": "AM51 tiny-aya->aya32b correction (tiny-aya spent/failed, aya32b unspent); wrapper + cron 550745 armed (dead-mst14b 550235 deleted); panel post-reset; score 7 consolidated",
+   "score": 7,
+   "consolidated": true,
+   "adjudication": "eval/r169_auditor_adjudication.json",
+   "findings": [
+    "R169-F1",
+    "R169-F2"
+   ],
+   "corrections": [
+    "CORR-R169-1"
+   ]
   }
  ],
  "gold_set": {
@@ -6288,7 +6320,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 7/10 CONSOLIDATED. SELF-CORRECTION: the prior auditor turn output a stale V122-era replay; corrected to the actual V131 state. MST14B DELISTING CONFIRMED (auditor /v1/models): xkiro 62-model catalog has NO mistral family (mst14b removed provider-side), snlite present; tokenrouter mst14b 404, msm2603 403 paid. The frozen serving set (snlite+mst14b+hy4f) is broken (2 live judges); the 00:05 panel cron would degenerate to 2 judges. AM51 (delegated owner) AUTHORIZES a SEALED serving-set substitution: mst14b -> a LIVE judge re-qualified on r148 (acc>=0.8, bias<=1) + alpha>=0.6 with snlite+hy4f; candidates tiny-aya (xkiro free, re-qualify post Nov-27 reset) / msm2603 (tokenrouter 403, needs funding) / another live qualified judge != generator; the v18 candidate set stays frozen (only the unavailable judge replaced \u2014 necessary availability substitution, NOT mid-gate tuning; no counting verdict was produced). R167-F1 VERIFIED: TOKENROUTER vault-managed (c148574f6215), r77 restores 9/9. P5 v2 counting run still waits hy4 503 (~7h); 01:30 cron fires on recovery. Critical path: Nov 27 reset -> re-qualify substitute -> AM51 sealed set -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 >=40% (9). Goal 9/10 fully agent-run.",
+ "progress_note": "SCORE 7/10 CONSOLIDATED. AM51 CORRECTION (CORR-R169-1, builder-caught, auditor byte-confirmed): AM51's 'tiny-aya first qualification' was FACTUALLY WRONG \u2014 tiny-aya (tayae) is SPENT (24 legs 2025-11-25, acc 0.75<0.8, bias 3>1, FAILED); re-qualifying it = Art.7 re-roll. The correct substitute is aya32b (cohere/aya-expanse-32b), the first UNSPENT in-roster candidate (0 legs, catalog-present, 429 quota not 404). Serving set snlite (sensenova) + aya32b (cohere) + hy4f (hunyuan) = 3 non-generator families. The r168_am51_substitution_panel.py wrapper (APPROVED) qualifies aya32b via the UNMODIFIED instrument + engine's own bars (byte-faithful, reproduces snlite acc 1.0) + serving alpha from leg bytes; on PASS seal mst14b->aya32b forward-only + unmodified panel; on FAIL typed exit (no unspent free candidates left -> msm2603 owner-funding fallback). CRON: dead-mst14b 550235 DELETED; 550745 (AM51 sequence 00:05 UTC Nov 27 = 08:05 Shanghai) armed; 550250 (P5 v2 01:30) unchanged; aya32b roster inert until seal. hy4 503 ~9h (P5 v2 waits). v18 candidates frozen. Critical path: Nov 27 00:05 reset -> cron 550745 qualifies aya32b -> seal -> panel >=50% (8) + sealed v18 >=3.3 (consolidate 6/7); P5 v2 live-J2 >=40% (9). Goal 9/10 fully agent-run.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
@@ -6461,6 +6493,14 @@
    "date": "2026-11-26",
    "withdraws": "builder 'xkiro DNS-dead api.xkiro.ai provider outage'",
    "correction": "wrong TLD probe: api.xkiro.com resolves (104.18.11.239), api.xkiro.ai NXDOMAIN; endpoint reachable, panel not DNS-blocked; needs vault-key auth probe + quota reset",
+   "authority": "Auditor Art.9/Art.1"
+  },
+  {
+   "id": "CORR-R169-1",
+   "round": "R169",
+   "date": "2026-11-26",
+   "withdraws": "AM51 'tiny-aya first qualification'",
+   "correction": "tiny-aya (tayae) spent/failed (24 legs 2025-11-25 acc 0.75 bias 3); substitute is aya32b (unspent, 0 legs); re-rolling tiny-aya would violate Art.7",
    "authority": "Auditor Art.9/Art.1"
   }
  ],
