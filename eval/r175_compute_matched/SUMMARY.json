@@ -1,0 +1,255 @@
+{
+ "record": "R175_COMPUTE_MATCHED_BASELINE/1.0.0",
+ "prereg": {
+  "record": "R175_COMPUTE_MATCHED_PREREG/1.0.0",
+  "dev_pool": "eval/r125_f31e_set/items.jsonl (24 f31e DEV items; the r129 precedent's pool — NOT the sealed holdout)",
+  "dev_selection": "first 12 by problem_id, seed 175 for the judge-side randomization only (the item order is fixed by sort — no cherry-picking)",
+  "compute_match": "both arms exactly 6 generation calls per item, cache off",
+  "baseline": "best-of-4 draws of the r125 AUTHORING_DIRECTIVE (the incumbent that beat bon3, r129) + 1 critique + 1 revise; self-selection by fewest check-layer findings (tie -> first draw)",
+  "pipeline": "the staged engine path on the same packet: author -> check_layer binds -> reviewer-fix on findings -> the v19 departure conditioning; the candidate pool INCLUDES the baseline's final answer (dominance-by-construction)",
+  "judge": "openai/gpt-6-luna via ctai (judge family != generator family; F2-CLEAN), blind X/Y labels, randomized, each pair judged twice with order swapped; a pair counts WIN only if the pipeline side wins BOTH passes, TIE if split-or-tied both",
+  "accept": "12/12 complete judged pairs + the win/tie/loss count with an exact binomial CI"
+ },
+ "n_pairs": 12,
+ "n_judged": 12,
+ "wins": 3,
+ "ties": 6,
+ "losses": 3,
+ "win_tie_rate": 0.75,
+ "ci95": [
+  0.428,
+  0.945
+ ],
+ "dominance_check": "the pipeline pool included the baseline answer on every item (constructed)",
+ "accept_12_of_12": true,
+ "rows": [
+  {
+   "problem_id": "r125-01-s1",
+   "status": "JUDGED",
+   "baseline_chars": 5233,
+   "pipeline_chars": 5233,
+   "pipeline_pick": "TWO",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "TIE"
+    },
+    {
+     "pass": 2,
+     "pipeline": "TIE"
+    }
+   ],
+   "outcome": "TIE",
+   "wall_s": 88.1
+  },
+  {
+   "problem_id": "r125-01-s2",
+   "status": "JUDGED",
+   "baseline_chars": 6879,
+   "pipeline_chars": 2049,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "X"
+    },
+    {
+     "pass": 2,
+     "pipeline": "Y"
+    }
+   ],
+   "outcome": "TIE",
+   "wall_s": 101.6
+  },
+  {
+   "problem_id": "r125-02-s1",
+   "status": "JUDGED",
+   "baseline_chars": 4310,
+   "pipeline_chars": 3432,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "Y"
+    },
+    {
+     "pass": 2,
+     "pipeline": "Y"
+    }
+   ],
+   "outcome": "LOSS",
+   "wall_s": 80.8
+  },
+  {
+   "problem_id": "r125-02-s2",
+   "status": "JUDGED",
+   "baseline_chars": 5387,
+   "pipeline_chars": 5387,
+   "pipeline_pick": "TWO",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "TIE"
+    },
+    {
+     "pass": 2,
+     "pipeline": "TIE"
+    }
+   ],
+   "outcome": "TIE",
+   "wall_s": 321.7
+  },
+  {
+   "problem_id": "r125-03-s1",
+   "status": "JUDGED",
+   "baseline_chars": 3977,
+   "pipeline_chars": 3977,
+   "pipeline_pick": "TWO",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "TIE"
+    },
+    {
+     "pass": 2,
+     "pipeline": "TIE"
+    }
+   ],
+   "outcome": "TIE",
+   "wall_s": 113.6
+  },
+  {
+   "problem_id": "r125-03-s2",
+   "status": "JUDGED",
+   "baseline_chars": 6381,
+   "pipeline_chars": 4425,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "X"
+    },
+    {
+     "pass": 2,
+     "pipeline": "X"
+    }
+   ],
+   "outcome": "WIN",
+   "wall_s": 94.2
+  },
+  {
+   "problem_id": "r125-04-s1",
+   "status": "JUDGED",
+   "baseline_chars": 4050,
+   "pipeline_chars": 3225,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "Y"
+    },
+    {
+     "pass": 2,
+     "pipeline": "Y"
+    }
+   ],
+   "outcome": "LOSS",
+   "wall_s": 262.1
+  },
+  {
+   "problem_id": "r125-04-s2",
+   "status": "JUDGED",
+   "baseline_chars": 5707,
+   "pipeline_chars": 3246,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "X"
+    },
+    {
+     "pass": 2,
+     "pipeline": "X"
+    }
+   ],
+   "outcome": "WIN",
+   "wall_s": 156.7
+  },
+  {
+   "problem_id": "r125-05-s1",
+   "status": "JUDGED",
+   "baseline_chars": 4276,
+   "pipeline_chars": 4276,
+   "pipeline_pick": "TWO",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "TIE"
+    },
+    {
+     "pass": 2,
+     "pipeline": "TIE"
+    }
+   ],
+   "outcome": "TIE",
+   "wall_s": 101.8
+  },
+  {
+   "problem_id": "r125-05-s2",
+   "status": "JUDGED",
+   "baseline_chars": 5653,
+   "pipeline_chars": 5653,
+   "pipeline_pick": "TWO",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "TIE"
+    },
+    {
+     "pass": 2,
+     "pipeline": "TIE"
+    }
+   ],
+   "outcome": "TIE",
+   "wall_s": 91.3
+  },
+  {
+   "problem_id": "r125-06-s1",
+   "status": "JUDGED",
+   "baseline_chars": 3818,
+   "pipeline_chars": 4240,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "Y"
+    },
+    {
+     "pass": 2,
+     "pipeline": "Y"
+    }
+   ],
+   "outcome": "LOSS",
+   "wall_s": 402.1
+  },
+  {
+   "problem_id": "r125-06-s2",
+   "status": "JUDGED",
+   "baseline_chars": 5045,
+   "pipeline_chars": 2251,
+   "pipeline_pick": "ONE",
+   "judge_passes": [
+    {
+     "pass": 1,
+     "pipeline": "X"
+    },
+    {
+     "pass": 2,
+     "pipeline": "X"
+    }
+   ],
+   "outcome": "WIN",
+   "wall_s": 135.1
+  }
+ ]
+}

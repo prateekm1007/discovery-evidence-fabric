@@ -133,8 +133,20 @@ def main() -> int:
     gw, gw_key = m77.start_gateway()
 
     def agnes(prompt: str, contract: str = "", mt: int = 2600) -> str:
-        txt, _ = m77._gen_v77(prompt, contract, gw_key)
-        return txt or ""
+        # the r125 bare_call retry ladder (4 attempts, 120s spacing —
+        # the provider's transient 500/429 shape; typed re-raise after)
+        last = None
+        for attempt in (1, 2, 3, 4):
+            try:
+                txt, _ = m77._gen_v77(prompt, contract, gw_key)
+                return txt or ""
+            except Exception as e:  # noqa: BLE001
+                last = e
+                print(f"    agnes attempt {attempt} failed "
+                      f"{type(e).__name__}: {str(e)[:80]}", flush=True)
+                if attempt < 4:
+                    time.sleep(120)
+        raise last
 
     def authoring(p) -> str:
         return agnes(authoring_prompt(p))
