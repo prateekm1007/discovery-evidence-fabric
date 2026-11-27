@@ -2577,6 +2577,22 @@
    "title": "non-obviousness is the invention gap: the engine produces feasible physics-correct but obvious engineering; needs cross-domain inspiration + obviousness subtraction",
    "evidence": "V135 panel 10%; reviewer 'gates make answers safer not more inventive'",
    "status": "OPEN"
+  },
+  {
+   "id": "R176-F1",
+   "round": "R176",
+   "severity": "HIGH",
+   "title": "DIR-3 'gate MET' is VACUOUS: 7/12 pipeline outputs == baseline answer (dominance ties), 2 wins are plain best-of-N, departure invention strategy won 0; no genuine invention win on the mitigation corpus",
+   "evidence": "r175s3_dir3 SUMMARY champions baseline7/plain4/contradiction1; 7/12 chars identical",
+   "status": "OPEN"
+  },
+  {
+   "id": "R176-F2",
+   "round": "R176",
+   "severity": "MEDIUM",
+   "title": "the f31e DEV corpus is mitigation-correctness shape, not invention shape \u2014 the wrong test for an invention engine; the kill criterion applies for mitigation (ship best-of-N+verifier)",
+   "evidence": "builder honest note 'f31e mitigation-correctness not invention'; departure won 0",
+   "status": "OPEN"
   }
  ],
  "amendments": [
@@ -4074,6 +4090,15 @@
    "data_grounding": "the external review (commit 936a82d, main Nov 13) is 1016 commits STALE (queue/dev12_r7 is 1016 ahead), BUT its core capability critique is CONFIRMED by the current queue's OWN bytes: (1) r129_ablation_bon3 \u2014 best-of-3 LOSES to single-shot (2/24 vs 1/24 delivered defects) at 2.1x calls / 9x latency; (2) V135 panel verdict 3/30=10% non-obvious. The engine has NEVER demonstrated a measured capability win over a compute-matched baseline. The rubric 'mean 3.73 / 73% strong' measured feasible+physics-correct, NOT a win over the baseline nor non-obviousness.",
    "amendment": "ADOPT the capability-first scoreboard: 2=no valid win over single-shot; 4=ties/beats a COMPUTE-MATCHED baseline (best-of-N + critique, same call budget) on DEV n>=24 with >=90% completion; 6=sealed holdout CI lower>50%; 7=rediscovery >=30% vs <=15% baseline (N>=20); 8=>=3 proposals survive independent simulation + prior-art, 0 fabricated citations; 9=blind external panel prefers outputs + >=3 non-obvious+feasible + >=1 independently confirmed. The auditor-judged queue (the reviewer judges blind, randomized A/B, order-swapped) unblocks measurement. DOMINANCE BY CONSTRUCTION: the baseline answer enters the candidate pool. KILL CRITERION: if the pruned pipeline loses to best-of-N+verifier, ship best-of-N+verifier and retire the architecture.",
    "score_correction": "the rubric-based score-7 (V116-V135) is RETIRED as governance-heavy over-counting; the CAPABILITY-FIRST score is 3 (honest infrastructure + physics-correct generation + grounding identity, but NO measured win over a compute-matched baseline; bon3 loses to ss; 10% non-obvious)."
+  },
+  {
+   "id": "AM53",
+   "date": "2026-11-27",
+   "authority": "DELEGATED OWNER",
+   "title": "The score-4 gate must be a GENUINE invention win on an INVENTION-shaped corpus \u2014 vacuous dominance ties and plain best-of-N wins do NOT count",
+   "data_grounding": "DIR-3 (r175s3_dir3) byte-verified: win+tie 0.917 CI[0.615,0.998] 'gate_met' BUT champions = baseline 7 / plain 4 / contradiction 1; 7/12 rows pipeline_chars==baseline_chars (the pipeline EMITS the baseline answer = vacuous dominance TIE); the 3 wins = 2 plain (single-shot best-of-N behavior) + 1 contradiction; the DEPARTURE (cross-domain invention) strategy won 0. The f31e corpus is MITIGATION-correctness shape (builder's own honest note), not invention shape. So the 'gate MET' is mostly vacuous: the pipeline ties best-of-N by selecting the baseline answer; genuine invention value-add = 1 contradiction win.",
+   "amendment": "The score-4 capability gate requires: (1) an INVENTION-shaped corpus (novel-discovery / rediscovery problems, NOT mitigation-correctness), AND (2) the pipeline's OWN novel candidates (departure/cross-domain/contradiction) win >=50% \u2014 NOT vacuous dominance ties (pipeline==baseline) and NOT plain single-shot best-of-N wins. Dominance-by-construction guarantees non-loss but is NOT evidence of invention value. KILL CRITERION (reviewer): on mitigation, best-of-N+verifier ~= the pipeline; ship best-of-N+verifier for mitigation and focus the architecture on invention-shaped problems.",
+   "score": "stays 3 \u2014 no genuine invention win demonstrated; the DIR-3 'gate MET' is vacuous on mitigation; the invention test must move to an invention-shaped corpus (rediscovery P5 / novel-discovery DEV)."
   }
  ],
  "audit_mistakes": [
@@ -6099,6 +6124,19 @@
    "corrections": [
     "CORR-R174-1"
    ]
+  },
+  {
+   "id": "V137",
+   "round": "R176 audit: DIR-2 non-loss measured + DIR-3 gate VACUOUS (dominance ties, departure won 0) + AM53 genuine-invention-win gate",
+   "commit": "350283309eda0b155ad0cca793949ae2d233a38a",
+   "gate": "DIR-2 win+tie 0.75 CI[0.43,0.95] non-loss; DIR-3 0.92 VACUOUS (7/12 pipeline==baseline, departure won 0); AM53 invention-shaped corpus + genuine-novel-win required; score 3",
+   "score": 3,
+   "capability_first": true,
+   "adjudication": "eval/r176_auditor_adjudication.json",
+   "findings": [
+    "R176-F1",
+    "R176-F2"
+   ]
   }
  ],
  "gold_set": {
@@ -6499,7 +6537,7 @@
    "acceptance": "NOT_MET (20.7%<40%, sealed max 23.3%); generator undershot; T2 resolver 0/29 calibration check needed"
   }
  },
- "progress_note": "SCORE 3/10 CAPABILITY-FIRST (AM52; the rubric-7 RETIRED, CORR-R174-1). The external review (2/10) audited main 936a82d Nov 13 \u2014 1016 commits STALE vs queue/dev12_r7 (Nov 27) \u2014 BUT its core capability critique is CONFIRMED by the current queue's own bytes: r129_ablation_bon3 best-of-3 LOSES to single-shot (2/24 vs 1/24 defects, 2.1x calls, 9x latency); V135 panel 3/30=10% non-obvious. The engine has NEVER demonstrated a measured win over a COMPUTE-MATCHED baseline; the rubric 'mean 3.73/73% strong' measured feasible+physics-correct, not a capability win. The Art.20 ablation machinery (reviewer's 'cut stages') already exists + retired bon3. AM52 ADOPTS the reviewer's capability-first scoreboard: 2=no win; 4=ties/beats compute-matched baseline (best-of-N+critique, same budget) DEV n>=24 >=90% completion; 6=sealed holdout CI lower>50%; 7=rediscovery >=30% vs <=15% (N>=20); 8=>=3 proposals survive sim+prior-art 0 fabricated citations; 9=blind external panel + >=3 non-obvious+feasible + >=1 confirmed. The auditor-judged queue (reviewer judges blind randomized A/B order-swapped) unblocks measurement. DOMINANCE BY CONSTRUCTION (baseline answer in the pool); KILL CRITERION (if pruned pipeline loses to best-of-N+verifier, ship that + retire the architecture). Honest assets: provenance, typed unknowns, physics-correct generation, grounding identity, 0 fabricated citations. Critical path: auditor-judged compute-matched baseline (12 DEV pairs) -> dominance+diverse generation+obviousness subtraction -> >=50% wins+ties (4->6) -> rediscovery (7) -> validation+external (8->9). Goal 9/10.",
+ "progress_note": "SCORE 3/10 CAPABILITY-FIRST (AM52/AM53). DIR-2 compute-matched baseline MEASURED: 12/12 judged W3/T6/L3 win+tie 0.75 CI[0.428,0.945] \u2014 first NON-LOSS vs compute-matched (r129 bon3 had lost); CI lower 0.43<0.50 at n=12. DIR-3 'gate MET' (0.917 CI[0.615,0.998]) is VACUOUS (byte-verified): champions baseline 7 / plain 4 / contradiction 1; 7/12 rows pipeline_chars==baseline_chars (pipeline EMITS the baseline answer = dominance TIE); the 3 wins = 2 plain best-of-N + 1 contradiction; the DEPARTURE invention strategy won 0. The f31e corpus is MITIGATION-correctness shape (builder's honest note), not invention. AM53: the score-4 gate requires an INVENTION-shaped corpus + the pipeline's OWN novel candidates win >=50% (NOT vacuous dominance ties / plain best-of-N). KILL CRITERION: on mitigation best-of-N+verifier ~= pipeline; ship it for mitigation, focus the architecture on invention-shaped problems. Genuine invention value unproven; score stays 3. Critical path: invention-shaped corpus (rediscovery/novel-discovery) -> genuine novel-candidate wins >=50% (4) -> holdout CI>50% (6) -> rediscovery >=30% (7) -> validation+external (8->9). P5 v2 lease expired (takeover lawful). Goal 9/10.",
  "r15_status": {
   "date": "2026-11-15",
   "queue_tip": "a1b5259156d9c223c12259989f421cdfa8d2b02c",
