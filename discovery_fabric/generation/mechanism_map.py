@@ -78,7 +78,16 @@ FAILURE_CLASSES = {
                      "freeze", "freezes", "uncontrolled ice",
                      "ice crystal", "crystallization", "blister",
                      "blistering",
-                     "outgassing"],
+                     "outgassing",
+                     # R174 smoke-driven extension (typed, additive;
+                     # eval/r174_v19_smoke/s2+s4): the bare stem
+                     # "cavitates" hit nothing (only the compound
+                     # "cavitation erosion"/"cavitation bubble" did,
+                     # so a cavitation problem fell to corrosion_
+                     # chemical on "pitting"); hydrate formation is
+                     # phase-change nucleation and hit NOTHING
+                     "cavitat", "cavities collapse", "hydrate",
+                     "clathrate", "frost", "defrost"],
     },
     "contamination_separation": {
         "physics": ("foreign objects or contaminant particles must be "
@@ -106,7 +115,14 @@ FAILURE_CLASSES = {
                      # verb forms — "corrosion" is not a substring of
                      # "corrodes"
                      "corrode", "corrodes", "corroding", "corrosive",
-                     "acid condensat"],
+                     "acid condensat",
+                     # R174 smoke-driven DISAMBIGUATION: a problem that
+                     # names cavitation+pitting is MECHANICAL erosion
+                     # by collapsing bubbles, not electrochemical
+                     # attack — the cavitation stems now live on
+                     # nucleation_phase_change/abrasion_erosion and
+                     # outrank the bare "pitting" hit here
+                     ],
     },
     "fatigue_crack": {
         "physics": ("cyclic stress grows cracks to failure"),
