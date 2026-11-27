@@ -132,3 +132,16 @@ eval/holdout_runs/
 
 # R6 ablation space roots (arm records; regenerated per round)
 eval/runs_ablation/
+
+# AWS Agent Toolkit / login custody (2026-11 audit F89): the OAuth login
+# state holds the DPoP P-256 PRIVATE KEY, the PKCE verifier, and (in phase
+# 2) the refresh token plus minted credentials. The reconstructed CLI tree
+# is a local-only bridge. None of these may EVER be committable. The
+# durable canonical store is ~/.aws (outside every git tree); these repo
+# patterns are the belt-and-braces guard for any local bridge artifact.
+.aws_login_state/
+aws_login*
+awscli_tree*/
+.aws/
+*dpop*
+*pkce*
