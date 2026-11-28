@@ -66,7 +66,12 @@ JUDGES = {
         "key_env": "CENT_AI_API_KEY",
         "model": "hy4-flash:free",
         "family": "hunyuan",
-        "max_tokens": 2000,
+        # 4000 (the r135/r184 measured reasoning-burn fix): hy4 burns the
+        # whole 2000 budget on reasoning_content and returns 200-with-EMPTY
+        # content (finish=length) on ~15K-char pair prompts; at 4000 the
+        # same prompts parse cleanly (measured this session on the real
+        # item-2 pair: empty at 2000, VERDICT: X at 4000).
+        "max_tokens": 4000,
     },
     "qwen3.8-max-xkiro": {
         "base": "https://api.xkiro.com/v1",

@@ -1,0 +1,20 @@
+{
+ "record": "R186S1_ABLATION_STATUS/1.0.0",
+ "session": "builder-r159s2",
+ "date": "2026-11-28T12:4xZ",
+ "claim": "c-0299 (takes over c-0298; the r186s1 sandbox died with 0 measured bytes)",
+ "state": "IN-FLIGHT — 7/24 pair files complete, byte-resume from these bytes",
+ "interim_tally": {"items": 7, "WIN": 1, "TIE": 4, "LOSS": 1, "note": "the interim is NOT the ablation verdict — the pre-declared keep-rule applies at n=24 only"},
+ "transport_fixes_disclosed": [
+   "key_env CTAI spelling: CENTAI_API_KEY -> CENT_AI_API_KEY (the vault name; transport-only)",
+   "hy4 max_tokens 2000 -> 4000 (the r135/r184 measured reasoning-burn fix: at 2000 hy4 returns 200-with-EMPTY content, finish=length, on ~15K-char pair prompts; measured on the REAL item-2 pair this session: empty at 2000, VERDICT parsed at 4000)"
+ ],
+ "item2_repair": "the 8 consecutive empty-200 legs (typed TYPED_JUDGE_FAILURE TIEs) re-fired at budget 4000 via scripts/r186s1_ablation_repair.py (byte-identical blind_prompt + packet imported from the runner): REAL verdicts landed (XY: TIE, YX: X -> hy4 LOSS), panel outcome UNCHANGED (TIE with standing qwen TIE) — the pair file now carries real bytes + the repair disclosure",
+ "next_session_acts": [
+   "verify both judge seats probe 200 (hy4 cent-ai + qwen3.8 xkiro; agnes generator 2-key rotation)",
+   "re-fire scripts/r186s1_ablation_run.py — completed items SKIP via byte-resume; items 8-24 remain",
+   "at 24/24: tally + the pre-declared keep-rule (critique+revise KEPT only if FULL beats NO_CRITIQUE_REVISE on wins+ties with paired-delta Wilson 95% CI lower > 0, else PRUNED via problem_router 2.1.0: 6->4 calls/item)",
+   "targets: <=12 calls/problem (both arms comply: 6 and 4), median <=2 min, worst <=5 min"
+ ],
+ "integrity": "one run, no tuning, no re-rolls; the only re-fires are TYPED infra failures (the item-2 repair, disclosed); generation bytes never re-fired"
+}
