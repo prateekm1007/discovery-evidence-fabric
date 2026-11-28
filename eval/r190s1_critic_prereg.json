@@ -63,6 +63,14 @@
    "date": "2026-11-28T17:55:00Z",
    "change": "Art. 26 conformance pre-run: (a) byte-resume treats only status==OK rows as done — failures are never cached, a failed row is re-attempted on the next resume; (b) typed retry ladder per row (up to 4 attempts, backoff 2/5/10 s, first OK leg wins, never re-rolled) with every attempt's outcome recorded in attempts[]; (c) the tally dedupes to the LAST record per row so failed attempts never double-count",
    "registered_before_any_calibration_byte": true
+  },
+  {
+   "amendment": "AM-DIR3-4",
+   "date": "2026-11-28T18:12:00Z",
+   "change": "bounded 2-worker concurrency WITHIN a variant (rows independent: temperature 0, per-row prompts, per-row byte-resume records, lock-guarded jsonl append, per-row retry ladder unchanged) — wall-time only, no epistemic change; batched stays serial (shared item cache). 6 pre-restart checklist rows stand as landed bytes and are never re-rolled (byte-resume skips them)",
+   "registered_before_any_calibration_byte": false,
+   "registered_before_affected_rows": true,
+   "rows_already_landed_at_registration": 6
   }
  ]
 }

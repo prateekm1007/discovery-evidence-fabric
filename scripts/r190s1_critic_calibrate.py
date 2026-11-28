@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import sys
+import threading
 import time
 import urllib.request
 from pathlib import Path
@@ -113,6 +114,63 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple:
     return (max(0.0, (c - h) / d), p, min(1.0, (c + h) / d))
 
 
+_APPEND_LOCK = threading.Lock()
+_BATCHED_LOCK = threading.Lock()
+
+
+def _attempt_row(r, variant, texts, rows, keys, transport, outf,
+                 batched_cache):
+    """One row's full typed ladder (AM-DIR3-3) + one append (lock-
+    guarded, AM-DIR3-4). Thread-safe; the first OK leg wins."""
+    rid = r["row_id"]
+    problem, text = texts[rid]
+    pid_ = r["item_id"]
+    attempts = []
+    rec = None
+    for try_i in range(4):  # typed ladder, first OK wins
+        try:
+            if variant == "batched":
+                with _BATCHED_LOCK:
+                    if rid not in batched_cache:
+                        arms = [x for x in rows if x["item_id"] == pid_]
+                        seat = ec.SEATS["hy4-flash-centai"]
+                        per = ec.critic_batched(
+                            problem,
+                            [texts[x["row_id"]][1] for x in arms],
+                            transport, seat["base"],
+                            keys[seat["key_env"]], seat["model"],
+                            seat["max_tokens"])
+                        for x, fl in zip(arms, per):
+                            batched_cache[x["row_id"]] = fl
+                rec = {"variant": variant, "status": "OK",
+                       "family": "hunyuan",
+                       "flags": batched_cache.get(rid, [])}
+                rec["n_flags"] = len(rec["flags"])
+                rec["flag_classes"] = sorted(
+                    {f["class"] for f in rec["flags"]})
+                rec["serious"] = bool(rec["flags"])
+            else:
+                rec = ec.run_critic(variant, problem, text,
+                                    transport, keys)
+        except Exception as e_:  # noqa: BLE001
+            rec = {"variant": variant, "status": "TRANSPORT_FAILED",
+                   "reason": f"{type(e_).__name__}: {str(e_)[:160]}",
+                   "flags": [], "serious": False}
+        rec["row_id"] = rid
+        attempts.append({"attempt": try_i + 1,
+                         "status": rec.get("status"),
+                         "reason": (rec.get("reason") or "")[:120]})
+        if rec.get("status") == "OK":
+            break
+        time.sleep((2, 5, 10)[min(try_i, 2)])
+    rec["attempts"] = attempts
+    rec["label_serious"] = r["label"]["serious_error"]
+    with _APPEND_LOCK:
+        with outf.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    time.sleep(2)
+
+
 def main() -> int:
     label_doc = json.loads(LABELS.read_text(encoding="utf-8"))
     rows = label_doc["rows"]
@@ -148,57 +206,24 @@ def main() -> int:
             for rid_, d_ in last.items():
                 if d_.get("status") == "OK":
                     batched_cache[rid_] = d_.get("flags", [])
-        for r in rows:
-            rid = r["row_id"]
-            if rid in done:
-                continue
-            problem, text = texts[rid]
-            pid_ = r["item_id"]
-            attempts = []
-            rec = None
-            for try_i in range(4):  # typed ladder, first OK wins
-                try:
-                    if variant == "batched":
-                        if rid not in batched_cache:
-                            arms = [x for x in rows
-                                    if x["item_id"] == pid_]
-                            seat = ec.SEATS["hy4-flash-centai"]
-                            per = ec.critic_batched(
-                                problem,
-                                [texts[x["row_id"]][1] for x in arms],
-                                transport, seat["base"],
-                                keys[seat["key_env"]], seat["model"],
-                                seat["max_tokens"])
-                            for x, fl in zip(arms, per):
-                                batched_cache[x["row_id"]] = fl
-                        rec = {"variant": variant, "status": "OK",
-                               "family": "hunyuan",
-                               "flags": batched_cache.get(rid, [])}
-                        rec["n_flags"] = len(rec["flags"])
-                        rec["flag_classes"] = sorted(
-                            {f["class"] for f in rec["flags"]})
-                        rec["serious"] = bool(rec["flags"])
-                    else:
-                        rec = ec.run_critic(variant, problem, text,
-                                            transport, keys)
-                except Exception as e_:  # noqa: BLE001
-                    rec = {"variant": variant,
-                           "status": "TRANSPORT_FAILED",
-                           "reason": f"{type(e_).__name__}: "
-                                     f"{str(e_)[:160]}",
-                           "flags": [], "serious": False}
-                rec["row_id"] = rid
-                attempts.append({"attempt": try_i + 1,
-                                 "status": rec.get("status"),
-                                 "reason": (rec.get("reason") or "")[:120]})
-                if rec.get("status") == "OK":
-                    break
-                time.sleep((2, 5, 10)[min(try_i, 2)])
-            rec["attempts"] = attempts
-            rec["label_serious"] = r["label"]["serious_error"]
-            with outf.open("a", encoding="utf-8") as fh:
-                fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
-            time.sleep(2)
+        todo = [r for r in rows if r["row_id"] not in done]
+        if variant == "batched":
+            for r in todo:          # serial: the item cache is shared
+                _attempt_row(r, variant, texts, rows, keys, transport,
+                             outf, batched_cache)
+        else:
+            # AM-DIR3-4 (dated pre-restart amendment): BOUNDED 2-worker
+            # concurrency WITHIN a variant — rows are independent
+            # (temperature 0, per-row prompts, per-row byte-resume
+            # records); nothing about a row's measurement depends on
+            # any other row, so concurrency changes NO epistemics.
+            # The jsonl append is lock-guarded; the retry ladder is
+            # per-row and unchanged. Wall-time only.
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=2) as ex:
+                list(ex.map(lambda r: _attempt_row(
+                    r, variant, texts, rows, keys, transport, outf,
+                    batched_cache), todo))
         # tally the variant (LAST record per row — failed attempts do
         # not double-count; Art. 26)
         last_t = {}
