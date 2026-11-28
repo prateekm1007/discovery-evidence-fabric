@@ -1,0 +1,582 @@
+{
+  "benchmark_id": "r516_mechanism_distinctness_benchmark",
+  "benchmark_version": "1.0.0",
+  "authored_at": "2026-11-13",
+  "authoring_provenance": "AI_AUTHORED_BY_THE_MAINTAINING_AGENT",
+  "independence_state": "NOT_INDEPENDENT",
+  "independence_note": "The benchmark was authored by the same agent that maintains the instrument. It is a pre-registered held-out-style case set, NOT independent validation. The instrument remains a lexical screening heuristic until a separately authored/sealed benchmark earns structural authority.",
+  "instrument_under_test": "mechanism_distinctness/2.0.0",
+  "label_vocabulary": ["DISTINCT", "EQUIVALENT", "INDETERMINATE"],
+  "pairs": [
+    {
+      "pair_id": "D1-thrombosis-heparin-vs-aspiration",
+      "domain": "biomedical",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d1a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "heparin bonding inhibits clotting cascade activation at the luminal surface",
+        "intervention": "bond heparin to the catheter luminal surface",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["heparin", "bonding", "inhibits", "clotting", "cascade", "luminal", "surface"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "luminal heparin surface density",
+        "predicted_effect": "thrombus area reduced by at least 50 percent"
+      },
+      "b": {
+        "candidate_id": "d1b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "mechanical aspiration removes thrombus from the lumen",
+        "intervention": "apply mechanical aspiration to the catheter lumen",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["mechanical", "aspiration", "removes", "thrombus", "lumen", "catheter"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "aspiration cycle frequency",
+        "predicted_effect": "thrombus burden falls after each aspiration cycle"
+      }
+    },
+    {
+      "pair_id": "D2-bearing-oil-film-vs-magnetic",
+      "domain": "mechanical",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d2a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "oil viscosity maintains a hydrodynamic film between bearing surfaces",
+        "intervention": "select oil grade for hydrodynamic film thickness",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "maintains", "hydrodynamic", "film", "bearing", "surfaces"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "shaft speed 3000 rpm"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "wear rate falls below 0.1 mm per year"
+      },
+      "b": {
+        "candidate_id": "d2b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "magnetic bearing levitates the rotor and eliminates contact",
+        "intervention": "install active magnetic bearing coils around the rotor",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["magnetic", "bearing", "levitates", "rotor", "eliminates", "contact"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "shaft speed 3000 rpm"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "coil current gain",
+        "predicted_effect": "contact wear becomes zero"
+      }
+    },
+    {
+      "pair_id": "D3-battery-sleep-scheduler-vs-load-isolation",
+      "domain": "software",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d3a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "sleep state scheduler reduces parasitic load during idle",
+        "intervention": "gate idle modules behind a sleep state scheduler",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["sleep", "state", "scheduler", "reduces", "parasitic", "load", "idle"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "vehicle parked for 12 hours"},
+        "known_failure_modes": ["wake latency"],
+        "novel_design_variable": "sleep timeout",
+        "predicted_effect": "quiescent current falls below 10 mA"
+      },
+      "b": {
+        "candidate_id": "d3b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "isolating the parasitic load circuit disconnects the offender",
+        "intervention": "add a relay that disconnects the parasitic load module",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["isolating", "parasitic", "load", "circuit", "disconnects", "offender"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "vehicle parked for 12 hours"},
+        "known_failure_modes": ["wake latency"],
+        "novel_design_variable": "relay contact rating",
+        "predicted_effect": "quiescent current falls below 10 mA"
+      }
+    },
+    {
+      "pair_id": "D4-bridge-cathodic-vs-epoxy",
+      "domain": "civil",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d4a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "impressed cathodic protection current suppresses steel corrosion",
+        "intervention": "install impressed current anodes on the bridge deck",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["impressed", "cathodic", "protection", "current", "suppresses", "steel", "corrosion"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "chloride exposure class severe"},
+        "known_failure_modes": ["anode depletion"],
+        "novel_design_variable": "protection current density",
+        "predicted_effect": "corrosion rate falls below 1 micron per year"
+      },
+      "b": {
+        "candidate_id": "d4b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "epoxy coating forms a barrier that excludes moisture",
+        "intervention": "apply an epoxy barrier coating to the deck",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["epoxy", "coating", "barrier", "excludes", "moisture", "deck"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "chloride exposure class severe"},
+        "known_failure_modes": ["anode depletion"],
+        "novel_design_variable": "coating dry film thickness",
+        "predicted_effect": "moisture ingress drops sharply"
+      }
+    },
+    {
+      "pair_id": "D5-engine-fuel-regulator-vs-idle-air",
+      "domain": "mechanical",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d5a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "fuel pressure regulator maintains rail pressure during transients",
+        "intervention": "replace the fuel pressure regulator with a faster unit",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["fuel", "pressure", "regulator", "maintains", "rail", "transients"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "load step above 40 percent"},
+        "known_failure_modes": ["pressure droop"],
+        "novel_design_variable": "regulator response time",
+        "predicted_effect": "stall events fall to zero"
+      },
+      "b": {
+        "candidate_id": "d5b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "idle air control valve stabilizes airflow at low speed",
+        "intervention": "clean and recalibrate the idle air control valve",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["idle", "air", "control", "valve", "stabilizes", "airflow"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "load step above 40 percent"},
+        "known_failure_modes": ["pressure droop"],
+        "novel_design_variable": "valve step resolution",
+        "predicted_effect": "idle speed variation falls below 50 rpm"
+      }
+    },
+    {
+      "pair_id": "D6-inverter-derating-vs-dc-link",
+      "domain": "electrical",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d6a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "thermal derating limits junction temperature under overload",
+        "intervention": "enable dynamic thermal derating in the inverter firmware",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "derating", "limits", "junction", "temperature", "overload"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "ambient 45 C"},
+        "known_failure_modes": ["module overcurrent"],
+        "novel_design_variable": "derating slope",
+        "predicted_effect": "junction temperature stays below 150 C"
+      },
+      "b": {
+        "candidate_id": "d6b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "dc link capacitor redesign reduces ripple current stress",
+        "intervention": "replace the dc link capacitor bank with low esr units",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["dc", "link", "capacitor", "redesign", "reduces", "ripple", "current", "stress"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "ambient 45 C"},
+        "known_failure_modes": ["module overcurrent"],
+        "novel_design_variable": "capacitor esr rating",
+        "predicted_effect": "ripple current stress falls by half"
+      }
+    },
+    {
+      "pair_id": "D7-dga-thermal-model-vs-gas-rate",
+      "domain": "energy",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d7a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "thermal model predicts hotspot temperature from load history",
+        "intervention": "deploy a thermal hotspot model on the transformer",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "model", "predicts", "hotspot", "temperature", "load", "history"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "sampling interval 5 minutes"},
+        "known_failure_modes": ["sensor drift"],
+        "novel_design_variable": "model time constant",
+        "predicted_effect": "hotspot alarm leads failure by 48 hours"
+      },
+      "b": {
+        "candidate_id": "d7b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "dissolved gas rate thresholds detect arc discharge",
+        "intervention": "set dissolved gas rate thresholds in the monitor",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["dissolved", "gas", "rate", "thresholds", "detect", "arc", "discharge"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "sampling interval 5 minutes"},
+        "known_failure_modes": ["sensor drift"],
+        "novel_design_variable": "gas rate threshold",
+        "predicted_effect": "arc discharge is flagged within one sampling interval"
+      }
+    },
+    {
+      "pair_id": "D8-turbine-alloy-vs-cooling-geometry",
+      "domain": "energy",
+      "expected": "DISTINCT",
+      "a": {
+        "candidate_id": "d8a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "single crystal blade alloy resists creep at high temperature",
+        "intervention": "cast the blade from a single crystal nickel alloy",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["single", "crystal", "blade", "alloy", "resists", "creep", "temperature"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "inlet temperature 1500 C"},
+        "known_failure_modes": ["thermal barrier spallation"],
+        "novel_design_variable": "alloy rhenium fraction",
+        "predicted_effect": "creep life doubles"
+      },
+      "b": {
+        "candidate_id": "d8b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "cooling hole geometry reduces blade metal temperature",
+        "intervention": "redesign the blade cooling hole geometry",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["cooling", "hole", "geometry", "reduces", "blade", "metal", "temperature"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "inlet temperature 1500 C"},
+        "known_failure_modes": ["thermal barrier spallation"],
+        "novel_design_variable": "hole pitch",
+        "predicted_effect": "metal temperature falls by 80 C"
+      }
+    },
+    {
+      "pair_id": "E1-heparin-wording-only",
+      "domain": "biomedical",
+      "expected": "EQUIVALENT",
+      "a": {
+        "candidate_id": "e1a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "heparin bonding inhibits clotting cascade activation at the luminal surface",
+        "intervention": "bond heparin to the catheter luminal surface",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["heparin", "bonding", "inhibits", "clotting", "cascade", "luminal", "surface"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "luminal heparin surface density",
+        "predicted_effect": "thrombus area reduced by at least 50 percent"
+      },
+      "b": {
+        "candidate_id": "e1b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "bonded heparin on the lumen surface suppresses activation of the clotting cascade",
+        "intervention": "attach heparin onto the luminal catheter surface",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["heparin", "bonding", "inhibits", "clotting", "cascade", "luminal", "surface"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "luminal heparin surface density",
+        "predicted_effect": "thrombus area reduced by at least half"
+      }
+    },
+    {
+      "pair_id": "E2-design-knob-rename",
+      "domain": "biomedical",
+      "expected": "EQUIVALENT",
+      "a": {
+        "candidate_id": "e2a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "heparin bonding inhibits clotting cascade activation at the luminal surface",
+        "intervention": "bond heparin to the catheter luminal surface",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["heparin", "bonding", "inhibits", "clotting", "cascade", "luminal", "surface"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "luminal heparin surface density",
+        "predicted_effect": "thrombus area reduced by at least 50 percent"
+      },
+      "b": {
+        "candidate_id": "e2b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "heparin bonding inhibits clotting cascade activation at the luminal surface",
+        "intervention": "bond heparin to the catheter luminal surface",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["heparin", "bonding", "inhibits", "clotting", "cascade", "luminal", "surface"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "grafted heparin concentration",
+        "predicted_effect": "thrombus area reduced by at least 50 percent"
+      }
+    },
+    {
+      "pair_id": "E3-vibration-threshold-wording",
+      "domain": "mechanical",
+      "expected": "EQUIVALENT",
+      "a": {
+        "candidate_id": "e3a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "vibration threshold alarm detects incipient spalling",
+        "intervention": "set a vibration threshold alarm on the bearing",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["vibration", "threshold", "alarm", "detects", "incipient", "spalling"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "speed 1800 rpm"},
+        "known_failure_modes": ["false alarm"],
+        "novel_design_variable": "alarm threshold",
+        "predicted_effect": "spalling is detected before visible damage"
+      },
+      "b": {
+        "candidate_id": "e3b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "an alarm on the vibration threshold detects spalling at incipient stage",
+        "intervention": "configure the bearing vibration alarm threshold",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["vibration", "threshold", "alarm", "detects", "incipient", "spalling"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "speed 1800 rpm"},
+        "known_failure_modes": ["false alarm"],
+        "novel_design_variable": "alarm threshold",
+        "predicted_effect": "visible damage is preceded by the alarm"
+      }
+    },
+    {
+      "pair_id": "E4-oil-viscosity-wording",
+      "domain": "mechanical",
+      "expected": "EQUIVALENT",
+      "a": {
+        "candidate_id": "e4a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "oil viscosity maintains a hydrodynamic film between bearing surfaces",
+        "intervention": "select oil grade for hydrodynamic film thickness",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "maintains", "hydrodynamic", "film", "bearing", "surfaces"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "shaft speed 3000 rpm"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "wear rate falls below 0.1 mm per year"
+      },
+      "b": {
+        "candidate_id": "e4b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "the viscosity of the oil maintains hydrodynamic film between the bearing surfaces",
+        "intervention": "choose the oil grade to set hydrodynamic film thickness",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "maintains", "hydrodynamic", "film", "bearing", "surfaces"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "shaft speed 3000 rpm"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "yearly wear stays below 0.1 mm"
+      }
+    },
+    {
+      "pair_id": "E5-thermal-derating-wording",
+      "domain": "electrical",
+      "expected": "EQUIVALENT",
+      "a": {
+        "candidate_id": "e5a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "thermal derating limits junction temperature under overload",
+        "intervention": "enable dynamic thermal derating in the inverter firmware",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "derating", "limits", "junction", "temperature", "overload"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "ambient 45 C"},
+        "known_failure_modes": ["module overcurrent"],
+        "novel_design_variable": "derating slope",
+        "predicted_effect": "junction temperature stays below 150 C"
+      },
+      "b": {
+        "candidate_id": "e5b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "derating for thermal limits keeps the junction temperature bounded during overload",
+        "intervention": "turn on dynamic thermal derating in the inverter firmware",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "derating", "limits", "junction", "temperature", "overload"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "ambient 45 C"},
+        "known_failure_modes": ["module overcurrent"],
+        "novel_design_variable": "derating slope",
+        "predicted_effect": "the junction stays under 150 C"
+      }
+    },
+    {
+      "pair_id": "E6-cathodic-protection-wording",
+      "domain": "civil",
+      "expected": "EQUIVALENT",
+      "a": {
+        "candidate_id": "e6a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "impressed cathodic protection current suppresses steel corrosion",
+        "intervention": "install impressed current anodes on the bridge deck",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["impressed", "cathodic", "protection", "current", "suppresses", "steel", "corrosion"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "chloride exposure class severe"},
+        "known_failure_modes": ["anode depletion"],
+        "novel_design_variable": "protection current density",
+        "predicted_effect": "corrosion rate falls below 1 micron per year"
+      },
+      "b": {
+        "candidate_id": "e6b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "a cathodic protection current suppresses corrosion of the steel",
+        "intervention": "fit impressed current anodes to the bridge deck",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["impressed", "cathodic", "protection", "current", "suppresses", "steel", "corrosion"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "chloride exposure class severe"},
+        "known_failure_modes": ["anode depletion"],
+        "novel_design_variable": "protection current density",
+        "predicted_effect": "yearly corrosion stays under 1 micron"
+      }
+    },
+    {
+      "pair_id": "I1-identical-core-boundary-delta",
+      "domain": "mechanical",
+      "expected": "INDETERMINATE",
+      "a": {
+        "candidate_id": "i1a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "oil viscosity maintains a hydrodynamic film between bearing surfaces",
+        "intervention": "select oil grade for hydrodynamic film thickness",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "maintains", "hydrodynamic", "film", "bearing", "surfaces"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate below 5 mL/min"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "wear rate falls below 0.1 mm per year"
+      },
+      "b": {
+        "candidate_id": "i1b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "oil viscosity maintains a hydrodynamic film between bearing surfaces",
+        "intervention": "select oil grade for hydrodynamic film thickness",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "maintains", "hydrodynamic", "film", "bearing", "surfaces"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "turbulent regime above 80 mL/min"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "wear rate falls below 0.1 mm per year"
+      }
+    },
+    {
+      "pair_id": "I2-identical-core-failure-mode-delta",
+      "domain": "mechanical",
+      "expected": "INDETERMINATE",
+      "a": {
+        "candidate_id": "i2a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "single crystal blade alloy resists creep at high temperature",
+        "intervention": "cast the blade from a single crystal nickel alloy",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["single", "crystal", "blade", "alloy", "resists", "creep", "temperature"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "inlet temperature 1500 C"},
+        "known_failure_modes": ["fatigue cracking"],
+        "novel_design_variable": "alloy rhenium fraction",
+        "predicted_effect": "creep life doubles"
+      },
+      "b": {
+        "candidate_id": "i2b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "single crystal blade alloy resists creep at high temperature",
+        "intervention": "cast the blade from a single crystal nickel alloy",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["single", "crystal", "blade", "alloy", "resists", "creep", "temperature"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "inlet temperature 1500 C"},
+        "known_failure_modes": ["corrosion pitting"],
+        "novel_design_variable": "alloy rhenium fraction",
+        "predicted_effect": "creep life doubles"
+      }
+    },
+    {
+      "pair_id": "I3-ambiguous-core-band",
+      "domain": "energy",
+      "expected": "INDETERMINATE",
+      "a": {
+        "candidate_id": "i3a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "thermal model predicts hotspot temperature",
+        "intervention": "deploy a thermal hotspot model on the transformer",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "model", "predicts", "hotspot", "temperature"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "sampling interval 5 minutes"},
+        "known_failure_modes": ["sensor drift"],
+        "novel_design_variable": "model time constant",
+        "predicted_effect": "hotspot alarm leads failure by 48 hours"
+      },
+      "b": {
+        "candidate_id": "i3b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "thermal model predicts winding temperature",
+        "intervention": "deploy a thermal winding model on the transformer",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "model", "predicts", "winding", "temperature"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "sampling interval 5 minutes"},
+        "known_failure_modes": ["sensor drift"],
+        "novel_design_variable": "model time constant",
+        "predicted_effect": "winding alarm leads failure by 48 hours"
+      }
+    },
+    {
+      "pair_id": "I4-both-cores-empty",
+      "domain": "unclassified",
+      "expected": "INDETERMINATE",
+      "a": {
+        "candidate_id": "i4a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "",
+        "intervention": "",
+        "mechanism_graph": {"nodes": {}, "edges": []},
+        "constraint_set": {"boundary_conditions": ""},
+        "known_failure_modes": [],
+        "novel_design_variable": "",
+        "predicted_effect": ""
+      },
+      "b": {
+        "candidate_id": "i4b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "",
+        "intervention": "",
+        "mechanism_graph": {"nodes": {}, "edges": []},
+        "constraint_set": {"boundary_conditions": ""},
+        "known_failure_modes": [],
+        "novel_design_variable": "",
+        "predicted_effect": ""
+      }
+    },
+    {
+      "pair_id": "D9-polarity-blind-oil-viscosity",
+      "domain": "mechanical",
+      "expected": "DISTINCT",
+      "note": "Adversarial polarity probe: identical term sets, OPPOSITE physical action. A term-bag instrument cannot see 'increase' vs 'decrease'.",
+      "a": {
+        "candidate_id": "d9a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "increase oil viscosity to maintain a hydrodynamic film",
+        "intervention": "increase the oil viscosity grade",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "hydrodynamic", "film"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "shaft speed 3000 rpm"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "film thickness increases"
+      },
+      "b": {
+        "candidate_id": "d9b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "decrease oil viscosity to reduce hydrodynamic drag",
+        "intervention": "decrease the oil viscosity grade",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["oil", "viscosity", "hydrodynamic", "film"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "shaft speed 3000 rpm"},
+        "known_failure_modes": ["oil starvation"],
+        "novel_design_variable": "oil viscosity grade",
+        "predicted_effect": "drag torque decreases"
+      }
+    },
+    {
+      "pair_id": "E7-thermal-derating-paraphrase",
+      "domain": "electrical",
+      "expected": "EQUIVALENT",
+      "note": "Adversarial paraphrase probe: same mechanism family, near-disjoint vocabulary.",
+      "a": {
+        "candidate_id": "e7a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "thermal derating limits junction temperature under overload",
+        "intervention": "enable dynamic thermal derating in the inverter firmware",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["thermal", "derating", "limits", "junction", "temperature", "overload"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "ambient 45 C"},
+        "known_failure_modes": ["module overcurrent"],
+        "novel_design_variable": "derating slope",
+        "predicted_effect": "junction temperature stays below 150 C"
+      },
+      "b": {
+        "candidate_id": "e7b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "power throttling reduces current as the semiconductor junction heats",
+        "intervention": "throttle output power when the junction sensor heats",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["power", "throttling", "reduces", "current", "semiconductor", "junction", "heats"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "ambient 45 C"},
+        "known_failure_modes": ["module overcurrent"],
+        "novel_design_variable": "derating slope",
+        "predicted_effect": "junction temperature stays below 150 C"
+      }
+    },
+    {
+      "pair_id": "E8-heparin-paraphrase",
+      "domain": "biomedical",
+      "expected": "EQUIVALENT",
+      "note": "Adversarial paraphrase probe: same anticoagulant-surface mechanism family, surface-chemistry vocabulary.",
+      "a": {
+        "candidate_id": "e8a",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "heparin bonding inhibits clotting cascade activation at the luminal surface",
+        "intervention": "bond heparin to the catheter luminal surface",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["heparin", "bonding", "inhibits", "clotting", "cascade", "luminal", "surface"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "luminal heparin surface density",
+        "predicted_effect": "thrombus area reduced by at least 50 percent"
+      },
+      "b": {
+        "candidate_id": "e8b",
+        "candidate_state": "CANDIDATE",
+        "mechanism": "an anticoagulant surface treatment passivates the lumen against coagulation",
+        "intervention": "graft an anticoagulant layer onto the catheter lumen",
+        "mechanism_graph": {"nodes": {"mechanism": {"terms": ["anticoagulant", "surface", "treatment", "passivates", "lumen", "coagulation"]}}, "edges": []},
+        "constraint_set": {"boundary_conditions": "flow rate 50 mL/min"},
+        "known_failure_modes": ["heparin leaching"],
+        "novel_design_variable": "luminal heparin surface density",
+        "predicted_effect": "thrombus area reduced by at least 50 percent"
+      }
+    }
+  ]
+}

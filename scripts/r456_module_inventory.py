@@ -191,7 +191,7 @@ def production_closure() -> tuple[set[str], dict[str, set[str]]]:
     reached: set[str] = set()
     while queue:
         p = queue.pop()
-        key = str(p.relative_to(REPO))
+        key = p.relative_to(REPO).as_posix()
         if key in reached:
             continue
         reached.add(key)
@@ -199,7 +199,7 @@ def production_closure() -> tuple[set[str], dict[str, set[str]]]:
             tgt = _module_to_path(mod)
             if tgt is not None:
                 seen.setdefault(mod, set()).add(key)
-                if str(tgt.relative_to(REPO)) not in reached:
+                if tgt.relative_to(REPO).as_posix() not in reached:
                     queue.append(tgt)
             else:
                 seen.setdefault(mod, set()).add(key)
@@ -227,7 +227,7 @@ def scan_consumers(roots: tuple[str, ...]) -> tuple[dict[str, set[str]],
         if not base.is_dir():
             continue
         for p in base.rglob("*.py"):
-            rel = str(p.relative_to(REPO))
+            rel = p.relative_to(REPO).as_posix()
             for mod in _imports_of(p):
                 if mod.startswith("epistemic_integrity"):
                     out.setdefault(mod, set()).add(rel)
@@ -247,7 +247,7 @@ def ci_invoked() -> dict[str, set[str]]:
         r"python\s+-m\s+(epistemic_integrity\.[a-z_0-9]+)")
     for p in wf.glob("*.yml"):
         for m in pat.findall(p.read_text(errors="replace")):
-            out.setdefault(m, set()).add(str(p.relative_to(REPO)))
+            out.setdefault(m, set()).add(p.relative_to(REPO).as_posix())
     return out
 
 
@@ -256,7 +256,7 @@ def ep_internal_deps() -> dict[str, set[str]]:
     out: dict[str, set[str]] = {}
     base = REPO / "epistemic_integrity"
     for p in base.rglob("*.py"):
-        rel = str(p.relative_to(REPO))
+        rel = p.relative_to(REPO).as_posix()
         mod = rel[:-3].replace("/", ".")
         if rel == "__init__.py":
             mod = "epistemic_integrity"

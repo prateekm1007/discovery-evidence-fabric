@@ -139,3 +139,17 @@ eval/.r38_v6_oneshot.lock
 
 # holdout seal vault (R184-F1 fix: persistent-disk custody)
 .env.holdout
+
+# F89 custody patterns (main side, merged r191s2)
+# AWS Agent Toolkit / login custody (2026-11 audit F89): the OAuth login
+# state holds the DPoP P-256 PRIVATE KEY, the PKCE verifier, and (in phase
+# 2) the refresh token plus minted credentials. The reconstructed CLI tree
+# is a local-only bridge. None of these may EVER be committable. The
+# durable canonical store is ~/.aws (outside every git tree); these repo
+# patterns are the belt-and-braces guard for any local bridge artifact.
+.aws_login_state/
+aws_login*
+awscli_tree*/
+.aws/
+*dpop*
+*pkce*

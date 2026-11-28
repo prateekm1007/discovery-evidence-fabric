@@ -17,11 +17,16 @@ manufactures support, it only REMOVES unsupported certainty):
      relabeled ASSUMPTION and the invalid citation is dropped.
   2. Internal candidate ids ("[cand:...]") — pipeline jargon — are
      stripped from the delivered text (directive 1: clean output).
-  3. The result re-runs the deterministic contract. Fully valid after
-     the downgrade -> typed COMPOSED_CONTRACT_DOWNGRADED (delivered
-     with ONE plain caveat). Still partly invalid -> delivered anyway
-     with the same caveat, typed COMPOSED_CONTRACT_INVALID_DELIVERED;
-     the open violations ride the record metadata (Art. XXV), never a
+  3. The result re-runs the deterministic contract. The three
+     DISTINCT outcomes (owner directive, 2026-11-13):
+       - COMPOSED_CONTRACT_VALID      — valid, no downgrade needed;
+       - COMPOSED_CONTRACT_DOWNGRADED — revalidation SUCCEEDED;
+                                        delivered with ONE plain caveat;
+       - COMPOSED_CONTRACT_INVALID_DELIVERED — delivered under the owner
+                                        delivery policy but STILL invalid;
+                                        one SPECIFIC caveat naming the open
+                                        defects; never represented as valid.
+     The open violations ride the record metadata (Art. XXV), never a
      banner, never a blank.
 
 Typed no-answer stays ONLY for: transport failure, and the composer's

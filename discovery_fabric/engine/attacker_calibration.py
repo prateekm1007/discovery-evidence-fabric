@@ -260,6 +260,29 @@ INSTRUMENT_MEASUREMENTS = {
         "measurement": _pinned_path("a2_gauntlet_v4_measurement.json"),
         "seal": _pinned_path("a2_gauntlet_v4_seal.json"),
     },
+    # R6 OWNER AUDIT ROUND 2026-11-13 (Art. L): 2.1.0 is the v4.2
+    # ATTACKER-COMPUTES DEV iteration of the 2.0.0 rules (a2/
+    # adversarial.py::A2_GAUNTLET_VERSION). It adds rule 4.5 — the
+    # attacker may MEET the derivation burden by computing the relation
+    # from the record's own numbers — which is a VERDICT-LOGIC change,
+    # so it CANNOT inherit 2.0.0's measurement (the independent_attack
+    # 2.0.0->3.0.0 precedent, and the owner directive that 2.1.0 must
+    # earn its own calibration). The R505 strong-ring campaign measured
+    # it on four rings (xkiro, unorouter, apinex, rerun) and EVERY run
+    # failed the pre-registered bars (tpr_min / coverage /
+    # parse_completeness) with incomplete numbers on several cases —
+    # those are MEASUREMENT_RESULTS records, not the sealed
+    # MEASUREMENT.json + SEAL.json pair. No sealed record has shipped,
+    # so this entry resolves fail-closed TODAY: UNKNOWN_NOT_CALIBRATED,
+    # terminal_kill_admissible false. When a sealed measurement ships
+    # under these pinned names, resolve_state derives the state from
+    # ITS numbers against the sealed bars — never inherited, never
+    # asserted here.
+    "a2_adversarial_gauntlet/2.1.0": {
+        "measurement": _pinned_path(
+            "a2_gauntlet_v42_measurement.json"),
+        "seal": _pinned_path("a2_gauntlet_v42_seal.json"),
+    },
     # R6 P0-3 (owner directive 2026-11-11, item 3; Art. LXXXI): the
     # DETERMINISTIC INTERVENTION-GATE checks that a2/adversarial.py
     # runs as kill classes BEFORE the LLM gauntlet enter the SAME

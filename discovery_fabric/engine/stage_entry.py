@@ -198,11 +198,19 @@ def retained_candidate_facts(env: Optional[Candidate]) -> Dict[str, Any]:
     verified = bool(((env.adjudication or {})
                      .get("evidence_verification") or {})
                     .get("verified", False))
+    _span = (ms.get("span_binding_summary")
+             or ((ms.get("metrics") or {}).get("span_binding")) or {})
     return {
         "n_ms_retained": ms_retained,
         "primary_verified": verified,
         "retained": bool(ms_retained or verified),
         "ms_state": ms.get("state"),
+        # Article LXXX: the grounded-span facts ride the retention summary
+        "span_verbatim_rate": _span.get("span_verbatim_rate"),
+        "span_min_words": _span.get("span_min_words"),
+        "n_ungrounded_synthesis": _span.get("n_ungrounded_synthesis"),
+        "n_exploratory_knowledge_first": _span.get(
+            "n_exploratory_knowledge_first"),
         "basis": ("mechanism-space retained candidates OR the primary "
                   "candidate's evidence verification — either is "
                   "something to attack/rank; neither is a fabrication"),
@@ -247,9 +255,22 @@ def mechanism_diversity_facts(env: Optional[Candidate]) -> Dict[str, Any]:
         "n_distinct": n,
         "minimum_required": MINIMUM_DISTINCT_MECHANISMS,
         "instrument_version": dd.get("instrument_version"),
+        "evidence_class": dd.get(
+            "evidence_class", "LEXICAL_SCREENING_HEURISTIC"),
+        "discovery_credit": dd.get(
+            "discovery_credit",
+            "NOT_ESTABLISHED_AS_CAUSAL_DISTINCTNESS"),
+        "span_verbatim_rate": (
+            ((ms.get("span_binding_summary") or {})
+             .get("span_verbatim_rate"))),
+        "n_ungrounded_synthesis": (
+            (ms.get("span_binding_summary") or {})
+            .get("n_ungrounded_synthesis")),
         "ms_state": ms.get("state"),
         "basis": ("Art. XLII distinctness adjudication (INDETERMINATE "
-                  "never counted toward DISTINCT — Art. XLVIII)"),
+                  "never counted toward DISTINCT — Art. XLVIII); the "
+                  "instrument is a lexical screen until benchmark-"
+                  "calibrated"),
     }
 
 

@@ -232,7 +232,8 @@ class TestComposerTruncation(unittest.TestCase):
 
     def test_truncated_repair_is_never_adopted(self):
         # P0-4 preserved: the COMPLETE pre-repair draft stays the
-        # flagged delivery (COMPOSED_CONTRACT_INVALID); a truncated
+        # flagged delivery (COMPOSED_CONTRACT_INVALID_DELIVERED — typed
+        # delivery-policy answer, never fake-valid); a truncated
         # repair is never adopted even when it would reduce the
         # violation count
         llm, calls = _llm_factory([
@@ -243,9 +244,10 @@ class TestComposerTruncation(unittest.TestCase):
                              "predictor-design", llm_generate=llm)
         self.assertEqual(len(calls), 2)
         self.assertEqual(calls[1]["purpose"], "answer_composer_repair")
-        self.assertEqual(rec["state"], "COMPOSED_CONTRACT_DOWNGRADED",
-                         "DIRECTIVE 2: the flagged draft is downgraded "
-                         "and delivered, never blank")
+        self.assertEqual(rec["state"], "COMPOSED_CONTRACT_INVALID_DELIVERED",
+                         "DIRECTIVE 1: the flagged draft is delivered "
+                         "under the policy with its specific caveat, "
+                         "never blank")
         self.assertIn("Track the bearing", str(rec["answer"]),
                       "the downgraded complete draft, not the cut "
                       "repair")
@@ -261,13 +263,14 @@ class TestComposerTruncation(unittest.TestCase):
                          "repair was")
         caveats = " ".join(rec["caveats"])
         self.assertIn("repair attempt was also cut off", caveats)
-        # DIRECTIVE 2: the narration caveat ("did not fully pass the
+        # DIRECTIVE 1: the narration caveat ("did not fully pass the
         # deterministic format ... open violations") is RETIRED — the
-        # plain downgrade caveat line replaces it (the typed violations
-        # ride rec["contract"], never the delivered text)
+        # SPECIFIC caveat replaces it: it names the open defects
+        # verbatim (never a generic line that conceals one)
         self.assertNotIn("did not fully pass the deterministic format",
                          caveats)
-        self.assertIn("could not be verified", caveats)
+        self.assertIn("flagged hypothesis", caveats)
+        self.assertIn("THRESHOLD", caveats)
 
     def test_caveats_are_plain_language_states_are_typed(self):
         # Art. XXV split: typed states live in the record's typed
@@ -285,11 +288,11 @@ class TestComposerTruncation(unittest.TestCase):
                           "finish_reason", "length", "lxi"):
                 self.assertNotIn(token, c,
                                   f"caveat carries typed detail: {c!r}")
-        # and the version is the declared 1.5.0 (1.4.0 = the downgrade-
-        # don't-discard + fused constraint-check round; 1.5.0 = the
-        # owner audit round 2026-11-13: ONE primary candidate + the
-        # design-consistency check + the strict provenance downgrade —
-        # the truncation contract itself is unchanged)
+        # and the version is the declared 1.5.0 (1.5.0 adds the owner
+        # audit round 2026-11-13 features — ONE primary candidate,
+        # design-consistency, strict provenance — and the directive-1
+        # three distinct delivery outcomes; the truncation contract
+        # itself is unchanged)
         self.assertEqual(rec["composer_version"],
                          ANSWER_COMPOSER_VERSION)
         self.assertEqual(ANSWER_COMPOSER_VERSION,
