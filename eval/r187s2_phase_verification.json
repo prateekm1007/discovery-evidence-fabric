@@ -1,0 +1,64 @@
+{
+ "record": "R187S2_PHASE_VERIFICATION/1.0.0",
+ "session": "builder-r159s2",
+ "date": "2026-11-28T13:0xZ",
+ "work_id": "r186s1-ablation-shipped-recipe",
+ "claim": "c-0299",
+ "kind": "byte-verification record (auditor Art. 13 recompute class; zero LLM calls)",
+ "directions_state_note": "the directions cite ledger V116 / score 3 / holdout-not-run — 27 verdicts stale. The actual tip state: V143 score 4 (holdout gate MET and ratified). Every phase below is verified against the ACTUAL bytes; divergences from the directions' claims are typed as corrections, not silently accepted.",
+ "phase1_invention_run_from_bytes": {
+  "files_present": {"pair_files": 4, "gen_files": 24, "note": "judging stopped at n=4 when the kill decision fired; generation completed for all 24"},
+  "field_recipe_recompute": {
+   "rule": "genuine = champion in {departure, contradiction, relaxation, collision} AND genuine_win=True",
+   "genuine_wins": 1,
+   "genuine_pids": ["r176i-02-thermoelectric-zt"],
+   "dominance_ties": ["r176i-01-ironair-efficiency", "r176i-04-fastcharge-graphite"],
+   "plain_best_of_n": ["r176i-03-ro-desal-energy"],
+   "novel_not_won": []
+  },
+  "tally_script": "scripts/r176_invention_tally.py reproduces the same numbers from raw pair bytes: genuine 1/4, Wilson 95% CI [0.046, 0.25, 0.699], gate_point=False, gate_ci_lower=False (typed exit 2)",
+  "instrument_history": {
+   "original_instrument": "4/12 genuine at the r183 kill decision (eval/r183_kill_decision.json: n_judged 12, CI [0.138, 0.333, 0.609]; exclusions 4 dominance ties + 4 plain)",
+   "auditor_corrected_recompute": "0/12 genuine (eval/r185_judge_audit/correction.json @ 8f40f171f: full-text two-family, the single blind WIN r176i-03 was champion-class plain, excluded per AM53)"
+  },
+  "correction_of_the_claimed_figure": "the directions' '4/24 genuine wins (33.3%)' is BYTE-INACCURATE: it conflates the original instrument's 4-of-12 with the 24-item corpus. The pair-byte truth is 1/4 by the field recipe; the corrected two-family instrument says 0/12. Both readings fail the >=17/24 gate by a wide margin.",
+  "gate_application": {
+   "gate": ">=17/24 genuine AND Wilson CI lower > 0.50",
+   "verdict": "FAIL under every reading (1/4 point 0.25; 4/12 CI lower 0.138; 0/12 corrected)",
+   "kill_criterion": "CORRECTLY APPLIED — the multi-stage architecture is retired (eval/r183_kill_decision.json, problem_router/2.0.0), best-of-N+critique+revise+verifier shipped for all problem classes"
+  }
+ },
+ "phase2_shipped_recipe": {
+  "router": {
+   "version": "problem_router/2.0.0",
+   "known_routes": {"intervention-proposal": "CHEAP_ARM", "novel-mechanism": "CHEAP_ARM"},
+   "unclassified_fallback": "CHEAP_ARM with known=False (typed)",
+   "tests": "tests/test_r178_problem_router.py 9/9 green"
+  },
+  "latency_from_r184_holdout_bytes": {
+   "n_items": 24,
+   "calls_per_item": {"baseline": 6, "pipeline": 6, "total_ab_experiment": 12, "served_recipe": 6},
+   "calls_gate": "MET — served problem = 6 calls (<=12 with 2x headroom); the A/B experiment itself also 12 <= 12",
+   "wall_s": {"median": 132.1, "p95": 237.2, "mean": 145.9, "max": 239.8, "scope": "the WHOLE A/B item: 12 generator calls + 4 judge legs"},
+   "median_gate": "132.1s > 120s on the whole-A/B-item reading — the served recipe (6 calls, no judging) is strictly less than the A/B item; the exact per-problem serving number is measured by the in-flight ablation FULL arm",
+   "p95_gate": "MET — 237.2s <= 300s on a superset of serving"
+  }
+ },
+ "phase3_holdout_seal": {
+  "artifact": "eval/r184_sealed_holdout_PRIVATE.json (kind sealed-holdout-ciphertext, fernet-aes128-cbc-hmac-sha256, n_items 24, plaintext_bytes 23814)",
+  "integrity_chain_recomputed_now": {
+   "prereg_corpus_hash": "MATCH 8c1dffb4bf2c9e54... (concat of compact-canonical items)",
+   "prereg_item_hashes": "24/24 MATCH",
+   "sealed_record_item_hashes": "24/24 MATCH (default-canonical)"
+  },
+  "run_state": "COMPLETE 24/24 pair files; verdict SCORE_4_GATE_MET (wins+ties 22/24, Wilson CI lower 0.742 > 0.50, 0 fabricated, 0 fallbacks); V143 ratified score 4",
+  "one_shot_status": "SPENT — the plaintext is burned (vacuously satisfied post-recycle, prereg amendment 1.1.2); NOT re-run this session; any re-run would be a new generation and is forbidden (Art. 29c)",
+  "note_on_the_directions": "the directions say 'DO NOT run the holdout until the DEV gate passes' — the DEV gate FAILED (phase 1) and the holdout was then lawfully consumed under the r184 prereg's own terms (it gates the SHIPPED recipe, not the retired architecture); it is spent and ratified"
+ },
+ "phase4_ablation_state": {
+  "claim": "c-0299 (takes over c-0298)",
+  "pairs_complete": 8,
+  "resume": "items 9-24 fire next under the pre-declared design (FULL 6 calls vs NO_CRITIQUE_REVISE 4 calls, paired shared draws, 2-family blind panel hy4+qwen3.8, keep-rule: critique+revise kept only if FULL beats the arm on wins+ties with paired-delta Wilson CI lower > 0)",
+  "note": "this verification record rides the same commit; the ablation result + prune decision follow as their own commits"
+ }
+}
