@@ -100,6 +100,12 @@ QUANTITATIVE_THRESHOLDS: Dict[str, Dict[str, Any]] = {
 # own state does not declare the quantity; every use is logged; a declared
 # state value always wins)
 # ---------------------------------------------------------------------------
+# DIR-5 retirement (r191s2): the constants fallback is DISABLED by default
+# (state-declared values only; undeclared params -> typed UNKNOWN, flagged
+#  by the checker layer). The table stays as documentation of the retired
+#  values; flip STATE_DECLARED_FALLBACK_ENABLED only via a typed amendment.
+STATE_DECLARED_FALLBACK_ENABLED = False
+
 ENGINEERING_CONSTANTS: Dict[str, Dict[str, Any]] = {
     "viscosity": {
         "constant_id": "const:csf_viscosity",
@@ -1109,7 +1115,7 @@ def _resolve_input(role: str, params_list: List[Dict[str, Any]],
                     }
     if rec is None:
         ckey = rdef.get("constant")
-        if ckey:
+        if ckey and STATE_DECLARED_FALLBACK_ENABLED:
             c = ENGINEERING_CONSTANTS[ckey]
             cu = next((u for u in rdef["units"]
                        if units_compatible(c.get("unit"), u)), None)

@@ -78,6 +78,29 @@ def _packet_block(problem: Dict[str, Any]) -> str:
     )
 
 
+
+DEPARTURE_CONTRACT_RUBRIC = (
+    "Audit through the departure contract's four checks (the same "
+    "checks the departure strategy runs on itself):\n"
+    "1. DIRECTION: every claimed effect must point the right way "
+    "against the DRIVING GRADIENT (thermal, electrical, chemical, "
+    "stress) at the stated scale.\n"
+    "2. ENABLING CONDITIONS: the conditions the mechanism needs "
+    "(conductivity, temperature range, pressure, frequency band) must "
+    "hold inside the problem's stated operating envelope.\n"
+    "3. REGIME DOMINANCE: the claimed mechanism must DOMINATE the "
+    "competing mechanisms in the stated regime (e.g. eddy vs "
+    "hysteresis at 50 Hz; MHD needs a conducting fluid in an alkane).\n"
+    "4. STEELMAN: before flagging, state the strongest version of the "
+    "proposal; flag only if the strong version still fails.\n"
+    "Known failure shapes (from the labeled DEV items): oxidation on "
+    "the wrong side of a charging electrode; a backsheet facing the "
+    "ground instead of the sky; eddy-loss vs hysteresis-loss "
+    "dominance inverted at 50 Hz; MHD proposed in a non-conducting "
+    "alkane; emissivity switching inverted between day and night."
+)
+
+
 def _checklist_prompt(problem: Dict[str, Any], text: str) -> str:
     return (
         "You are a hostile engineering reviewer. Audit the PROPOSAL "
@@ -93,7 +116,8 @@ def _checklist_prompt(problem: Dict[str, Any], text: str) -> str:
         "falsification test, no stated prediction).\n"
         "Do NOT flag style, brevity, optimism or missing detail beyond "
         "those classes. A correct-but-unexciting proposal gets NO "
-        "flags.\n\n"
+        "flags.\n"
+        + DEPARTURE_CONTRACT_RUBRIC + "\n\n"
         f"PROBLEM PACKET:\n{_packet_block(problem)}\n\n"
         f"PROPOSAL:\n{text}\n\n"
         "Answer with ONLY this JSON (no prose):\n"
@@ -127,7 +151,8 @@ def _claim_flag_prompt(problem: Dict[str, Any], text: str,
         "causality.\n"
         "INCOMPLETE: the claim asserts a deliverable the proposal never "
         "actually provides.\n"
-        "No flag for style or optimism.\n\n"
+        "No flag for style or optimism.\n"
+        + DEPARTURE_CONTRACT_RUBRIC + "\n\n"
         f"PROBLEM PACKET:\n{_packet_block(problem)}\n\n"
         f"FULL PROPOSAL (context):\n{text}\n\n"
         f"CLAIM TO AUDIT: {claim}\n\n"

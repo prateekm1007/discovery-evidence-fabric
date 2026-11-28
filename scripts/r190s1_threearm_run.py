@@ -2,7 +2,7 @@
 """r190s1_threearm_run.py — DIR 4 (owner merged-and-locked): the
 three-arm pool + error-gated selection, TOURNAMENT BYPASSED.
 
-POOL (owner-fixed, NEVER tuned): relaxation -> plain -> departure
+POOL (owner-fixed, NEVER tuned; r191s2 re-lock): departure -> relaxation -> contradiction (plain deleted from the pool per DIR-5: never picked under the fixed order; the baseline arm already covers it)
   (the consultant's 7/8 error-free coverage vs plain alone 1/8).
   ONE draw per arm (3 generator calls; byte-faithful strategy prompts
   imported from scripts/r176_invention_run.py).
@@ -19,7 +19,7 @@ SELECTION (owner-fixed):
      engine's discovery_fabric/engine/error_critic.critic_batched —
      families distinct from the agnes generator);
   3. the FIRST candidate with zero serious flags in the owner's order
-     relaxation -> plain -> departure; if none clean, the FEWEST flags
+     departure -> relaxation -> contradiction; if none clean, the FEWEST flags
      (ties -> the owner's order). The order is a constant, never tuned.
 
 JUDGING: the selected novel candidate goes STRAIGHT to the blind
@@ -60,7 +60,7 @@ OUT.mkdir(exist_ok=True)
 CORPUS = REPO / "eval" / "r176_invention_corpus" / "items.jsonl"
 CALIB = REPO / "eval" / "r190s1_critic_calibration" / "summary.json"
 
-POOL_ORDER = ("relaxation", "plain", "departure")
+POOL_ORDER = ("departure", "relaxation", "contradiction")
 CRITIC_FAMILY = "hy4-flash-centai"   # the calibrated kept variant's seat
 
 
@@ -174,7 +174,8 @@ def run_one(prob: dict, keys: dict) -> dict:
                                 and not flags_by_arm.get(sel["arm"])),
         "judges": judge_meta, "votes": votes,
         "outcome": outcome,
-        "genuine_AM53": (sel["arm"] in ("relaxation", "departure")
+        "genuine_AM53": (sel["arm"] in ("departure", "relaxation",
+                                    "contradiction")
                          and outcome == "WIN"),
         "am53_class": ("plain_best_of_n" if sel["arm"] == "plain"
                        else "novel_strategy" if sel["arm"]
