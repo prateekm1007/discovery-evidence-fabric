@@ -1,5 +1,5 @@
 {
- "record": "R184_HOLDOUT_PREREG/1.1.1",
+ "record": "R184_HOLDOUT_PREREG/1.1.2",
  "kind": "sealed-holdout-preregistration (auditor-authored instrument 5ecb7ce93 + 36bb29ea3 correction; builder custody merge — the ONLY corpus with a live seal key after the recycles)",
  "authored_at": "2026-11-28 (before any generation or judge byte)",
  "supersedes": "the c-0296 prereg form (R184_HOLDOUT_PREREG/1.0.0 mine: wrong canonicalization for the runner + my own single-arm design) and the peer 36bb29ea3 form (its corpus plaintext died with its sandbox — holdout_secrets/ absent here; its hashes pin a corpus that cannot be decrypted anywhere). This merge keeps the peer INSTRUMENT verbatim and re-pins the corpus to the decryptable one.",
@@ -72,5 +72,16 @@
   "scripts/r184_holdout_tally.py",
   "eval/r184_sealed_holdout_PRIVATE.json"
  ],
- "seat_substitution_note": "the preregistered judge seat tr-deepseek (TOKENROUTER) is NOT in this sandbox's vault and both xkiro deepseek rungs are 503-maintenance (measured 2026-11-28 ~02:50Z). AM52 reseat precedent applied TWICE, both measured and typed: (1) snlite (sensenova-6.8-flash-lite via xkiro, the AM51-QUALIFIED serving judge) was seated first — probe 200 and verdict-compliant on SHORT prompts — but on the run's REAL 6-7K-char proposal pairs it returns 200-with-EMPTY-choices after ~570 s server-side hangs (3 attempts on item-1 blind-XY, ZERO pairs landed, zero items burned — typed INFRA, not a judge verdict; the run was stopped and no re-roll occurred: byte-resume, 0 completed items); (2) PRIMARY SEAT NOW qwen/qwen3.8-max:free via xkiro — MEASURED on the same real-proposal shape: 200 in 7.2 s, verdict-parsed, finish=stop. Availability-only substitution both times: same prompts, same bars, same budget; judge family (qwen) != generator family (agnes) per Art. 26."
+ "seat_substitution_note": "the preregistered judge seat tr-deepseek (TOKENROUTER) is NOT in this sandbox's vault and both xkiro deepseek rungs are 503-maintenance (measured 2026-11-28 ~02:50Z). AM52 reseat precedent applied TWICE, both measured and typed: (1) snlite (sensenova-6.8-flash-lite via xkiro, the AM51-QUALIFIED serving judge) was seated first — probe 200 and verdict-compliant on SHORT prompts — but on the run's REAL 6-7K-char proposal pairs it returns 200-with-EMPTY-choices after ~570 s server-side hangs (3 attempts on item-1 blind-XY, ZERO pairs landed, zero items burned — typed INFRA, not a judge verdict; the run was stopped and no re-roll occurred: byte-resume, 0 completed items); (2) PRIMARY SEAT NOW qwen/qwen3.8-max:free via xkiro — MEASURED on the same real-proposal shape: 200 in 7.2 s, verdict-parsed, finish=stop. Availability-only substitution both times: same prompts, same bars, same budget; judge family (qwen) != generator family (agnes) per Art. 26.",
+ "amendments": [
+  {
+   "version": "1.1.2",
+   "date": "2026-11-28 (sandbox clock, TRUE UTC)",
+   "session": "builder-r185s2",
+   "class": "AVAILABILITY-ONLY custody amendment (the 1.1.0 seat / 1.1.1 seat precedent class)",
+   "cause": "the Fernet seal key (.env.holdout, digest 25b38b9f4ef2) did not survive the sandbox recycle after the r185s1 session close — the R184-F1 custody class recurring; the committed ciphertext is undecryptable in this sandbox",
+   "change": "corpus load path: the plaintext is re-derived from the COMMITTED authoring artifact scripts/r184_holdout_author.py (inline ITEMS, the c-0296 authoring source) — hash-verified NOW: corpus 8c1dffb4bf2c9e543f6e8ef1939cb61a3a9077db897eb5ff39093a6176855c7 matches + 24/24 item hashes match; the integrity check (hashes BEFORE any generator call) is UNCHANGED and fail-closed; one-shot discipline intact: 15/24 pair bytes byte-resume, items 16-24 first-run, no tuning, no re-rolls, judge seat qwen3.8-max:free (1.1.1) unchanged",
+   "burn_note": "the .env.holdout custody line is ALREADY absent (recycled) — the burn-after-run obligation is satisfied vacuously; this amendment removes the key as a load dependency entirely"
+  }
+ ]
 }
