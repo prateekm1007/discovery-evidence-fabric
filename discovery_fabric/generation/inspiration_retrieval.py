@@ -196,3 +196,63 @@ def inspiration_prompt_block(inspiration: dict) -> str:
         lines.append("- (typed empty: no analogies for this failure "
                      "class; proceed on the mapped mechanism classes)")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# R190S1 DIR 8 (owner merged-and-locked): the SCORE-7 REDISCOVERY wiring.
+# The MOOSE-Chem-derived benchmark (eval/moose_chem/rediscovery_benchmark
+# .json; 51 post-cutoff items,2024-01-10..2024-09-13, xlsx sha256
+# 6ebd5c31...) + the typed PRE-DATE retrieval restriction. The rediscovery
+# run: given ONLY the item's background question/survey and the pre-date
+# evidence corpus, reproduce the paper's true hypothesis MECHANISM; the
+# gate is >=30% mechanism-level rediscovery vs <=15% for the no-evidence
+# baseline (blind panel distinct from the generator; never self-judged).
+# ---------------------------------------------------------------------------
+
+REDISCOVERY_BENCHMARK = (REPO / "eval" / "moose_chem" /
+                         "rediscovery_benchmark.json")
+
+
+def rediscovery_benchmark_items() -> list:
+    """The >=20 post-cutoff benchmark items, typed-loaded (a missing or
+    malformed benchmark is a typed failure, never an empty pass)."""
+    try:
+        doc = json.loads(
+            REDISCOVERY_BENCHMARK.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        raise RuntimeError(
+            "TYPED: the rediscovery benchmark is absent "
+            f"({REDISCOVERY_BENCHMARK}); build it with scripts/"
+            "r190s1_build_moose_benchmark.py")
+    items = doc.get("items") or []
+    if len(items) < 20:
+        raise RuntimeError(
+            f"TYPED: the rediscovery benchmark has {len(items)} items "
+            "< 20 (the Score-7 gate needs N >= 20)")
+    return items
+
+
+def pre_date_corpus_filter(evidence_items: list, cutoff_iso: str) -> dict:
+    """The typed pre-date restriction for one benchmark item: keep ONLY
+    evidence whose publication date is STRICTLY BEFORE the item's
+    public date. An item without a parseable date is EXCLUDED (fail
+    closed — an undated span is not proven pre-date)."""
+    from datetime import date
+    cutoff = date.fromisoformat(cutoff_iso)
+    kept, excluded = [], []
+    for it in evidence_items:
+        d = it.get("published") or it.get("date") or ""
+        try:
+            if date.fromisoformat(str(d)[:10]) < cutoff:
+                kept.append(it)
+            else:
+                excluded.append({"item": str(it.get("source_id", ""))[:40],
+                                 "why": f"post-cutoff {d}"})
+        except ValueError:
+            excluded.append({"item": str(it.get("source_id", ""))[:40],
+                             "why": f"unparseable date {d!r} -> excluded"})
+    return {"cutoff": cutoff_iso, "kept": len(kept),
+            "excluded": excluded, "corpus": kept,
+            "rule": ("retrieval restricted to literature STRICTLY "
+                     "before the item's public date; the item's own "
+                     "paper and anything citing it are excluded")}

@@ -1,0 +1,47 @@
+# github_scan_weekly.yml — the DIR-8 weekly GitHub target scan (cron).
+#
+# Owner direction (merged-and-locked DIR 8): "Commit github_scan.py,
+# weekly cron -> eval/github_scan_<date>.json". Vehicle: the SCHEDULED
+# GitHub Actions workflow (durable — lives with the repo, survives
+# sandbox recycles; the harness-cron service was tried first and
+# failed server-side on every schedule kind with
+# "TimeType value is invalid" — typed in eval/r190s1_status records).
+#
+# The scan runs UNAUTHENTICATED (public metadata; ~16 API calls —
+# well under the 60/h unauthenticated limit) and commits its output
+# with the built-in GITHUB_TOKEN (permissions: contents: write; no
+# PAT, no repo secrets — the vault discipline is untouched).
+name: weekly-github-scan
+on:
+  schedule:
+    - cron: "0 4 * * 1"   # Mondays 04:00 UTC
+  workflow_dispatch: {}     # manual trigger for the first run
+permissions:
+  contents: write
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: queue/dev12_r7
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run the scan
+        run: python3 scripts/github_scan.py
+      - name: Commit + push the scan output
+        run: |
+          set -e
+          git config user.name "github-scan-bot"
+          git config user.email "actions@github.com"
+          OUT="eval/github_scan_$(date -u +%F).json"
+          if git diff --quiet && [ -z "$(git status --porcelain "$OUT")" ]; then
+            echo "no scan changes"; exit 0
+          fi
+          git add "$OUT"
+          git commit -m "GITHUB_SCAN weekly auto-commit ($(date -u +%F))
+
+Session: github-scan-bot
+Work-Id: github-scan-weekly"
+          git push

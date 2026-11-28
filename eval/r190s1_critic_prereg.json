@@ -1,0 +1,56 @@
+{
+ "record": "R190S1_CRITIC_PREREG/1.0.0 (typed amendment — a new gate)",
+ "registered_by": "builder-r190s1 (claim c-0302 session)",
+ "registered_at": "2026-11-28T15:05:00Z",
+ "registered_before_any_calibration_byte": true,
+ "authority": "owner merged-and-locked direction DIR 3: 'Register this bar as a typed amendment before running; it is a new gate, not an existing one.'",
+ "gate_kind": "NEW GATE (not an existing article/gate): the DIR-3 LLM error critic's calibration bar on the committed label set (eval/auditor_error_labels_dev.json)",
+ "instrument": {
+  "module": "discovery_fabric/engine/error_critic.py",
+  "families": "hunyuan (hy4-flash via cent-ai) + qwen (qwen3.8-max via xkiro) — both distinct from the agnes generator (Art. 26 / AM54)",
+  "flag_taxonomy": [
+   "PHYS",
+   "CONSTR",
+   "LOGIC",
+   "INCOMPLETE"
+  ],
+  "variants": [
+   "checklist",
+   "decomposition",
+   "union",
+   "intersection",
+   "batched"
+  ]
+ },
+ "bar_predeclared": {
+  "recall_on_serious_errors_min": 0.6,
+  "false_flag_rate_on_clean_texts_max": 0.25,
+  "keep_rule": "keep the best variant by F1 on the label set",
+  "note": "F1 = 2PR/(P+R) over the serious-error rows; the false-flag rate is computed on the consultant-labeled clean rows only"
+ },
+ "label_set_dependency": {
+  "file": "eval/auditor_error_labels_dev.json",
+  "state_at_registration": "48 rows committed with labels typed MISSING_OWNER_INPUT (the consultant's per-text labels are not in any reachable byte; only the owner's aggregates are quoted there)",
+  "blocking_rule": "the calibration RUN refuses (exit 3, typed) while any label is MISSING_OWNER_INPUT — no calibration claim is valid before the labels land (owner DIR-1 rule)"
+ },
+ "downstream_consumers": {
+  "dir_4_selection": "the error-gated selection (structural gate, then first candidate with zero serious flags in the order relaxation -> plain -> departure; fewest flags if none clean) consumes the KEPT variant's flags",
+  "dir_5_layering": "the critic layers ON TOP of the cheap structural + unit/arithmetic layer; the hard-coded constants table class is explicitly NOT adopted (29% false-flag exhibit, audit-branch scripts/r186_claim_verifier.py PHYS table)"
+ },
+ "one_shot_integrity": "one calibration run per label-set version; byte-resume per (variant, row); no re-rolls; no tuning of prompts/variants on calibration outcomes",
+ "artifacts": [
+  "eval/r190s1_critic_prereg.json",
+  "discovery_fabric/engine/error_critic.py",
+  "scripts/r190s1_critic_calibrate.py",
+  "tests/test_error_critic.py"
+ ],
+ "amendments": [
+  {
+   "amendment": "AM-DIR3-1",
+   "date": "2026-11-28T15:35:00Z",
+   "change": "added the 'batched' variant (the DIR-4 selection critic: one call per item over the item's pool candidates, engine entry critic_batched) to the calibration set",
+   "basis": "the owner's DIR-4 budget fixes ONE batched critic call for selection; its flag quality must carry the same calibration bar before any selection run consumes it",
+   "registered_before_any_calibration_byte": true
+  }
+ ]
+}
