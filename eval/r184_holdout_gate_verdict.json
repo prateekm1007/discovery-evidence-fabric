@@ -1,0 +1,50 @@
+{
+ "record": "R184_HOLDOUT_GATE_VERDICT/1.0.0",
+ "session": "builder-r185s2",
+ "date": "2026-11-28 (sandbox clock, TRUE UTC)",
+ "work_id": "r184-holdout-one-shot",
+ "decision": "SCORE_4_GATE_MET",
+ "gate": "Wilson 95% CI LOWER BOUND of (wins+ties)/24 > 0.50 with 0 fabricated citations (prereg gate_score4, pre-registered before any generation byte)",
+ "measured": {
+  "n_judged": 24,
+  "wins": 13,
+  "ties": 9,
+  "losses": 2,
+  "wins_plus_ties": 22,
+  "wins_plus_ties_share": 0.9167,
+  "wilson_ci95": [
+   0.742,
+   0.917,
+   0.977
+  ],
+  "ci_lower": 0.742,
+  "threshold": 0.5,
+  "fabricated_citation_patterns": 0,
+  "verifier_fallbacks": 0
+ },
+ "clause_results": {
+  "n_power_preregistered_met": true,
+  "ci_lower_gt_50": true,
+  "zero_fabricated_citations": true
+ },
+ "instrument_provenance": {
+  "prereg": "eval/r184_holdout_prereg.json (record R184_HOLDOUT_PREREG/1.1.2; committed before any generation byte; amendments 1.1.0 seat / 1.1.1 seat / 1.1.2 custody, all availability-only, all typed)",
+  "corpus_hash_sha256": "8c1dffb4bf2c9e543f6e8ef1939cb61a3a9077dbf897eb5ff39093a6176855c7",
+  "n_items": 24,
+  "domain_disjointness": "24 domains DISJOINT from the 23 r176 DEV domains (verified programmatically at authoring)",
+  "arms": "SHIPPED recipe best-of-N + critique + revise + deterministic verifier (6 calls/item) vs COMPUTE-MATCHED single-shot baseline (6 calls/item), agnes-3.0-flash both arms",
+  "judge": "qwen/qwen3.8-max:free via xkiro (prereg 1.1.1 measured substitution; family != agnes generator per Art. 26); blind two-pass order-swapped XY/YX",
+  "integrity": "corpus + 24 item hashes verified BEFORE any generator call (runner fail-closed HOLDOUT_BURN); one-shot: 15/24 byte-resumed from a6df1ef91, items 16-24 first-run, no re-rolls, no tuning between items"
+ },
+ "evidence": {
+  "pair_bytes": "eval/r184_holdout_run/pair_*.json (24 files, committed at a6c607f4f)",
+  "independent_tally": "eval/r184_holdout_run/tally.json (scripts/r184_holdout_tally.py, Art. 13 independent recompute from raw pair bytes; re-verified in this record's own process)",
+  "run_log": "logs/r184_holdout_run_r185s2.log (workspace)"
+ },
+ "honest_notes": [
+  "the two LOSSes (r184h-11-soil-carbon, r184h-15-wifi-backscatter) are recorded as measured — the baseline beat the pipeline on both order-swapped passes",
+  "wins+ties (not wins alone) is the pre-registered gate clause; a TIE means the blind judge could not separate the arms on that item",
+  "machine judgments are the pre-registered instrument; the auditor's independent recompute from the same pair bytes is the Art. 13 control (this file recomputes the CI and the clause booleans independently of the tally script)",
+  "score-4 status is the AUDITOR's to ratify per the V-line ledger; this record is the builder's typed evidence submission"
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "record": "R185S2_BUILDER_STATUS/1.0.0",
+ "session": "builder-r185s2",
+ "lane": "DIR-2 completion: resume the holdout one-shot from the sandbox-recycled 15/24 state to 24/24, tally, gate verdict (the score-4 gate measurement)",
+ "round_date": "2026-11-28",
+ "sandbox_clock": "TRUE UTC",
+ "base_state": "queue tip a6df1ef91 at session start (15/24 pairs committed by builder-r185s1; the r185s1 background driver died with the sandbox recycle — 0 new pair bytes on disk, verified byte-identical to the commit)",
+ "completed": [
+  "DIR 1: EPISTEMIC_CONSTITUTION.md full-read at the tip (v3.3.0, 29 articles, sha256[:16] 153ac62efca36c2d VERIFIED); AUDITOR_CONSTITUTION.md full-read from origin/audit/r11-auditor-verdict-20261114 (v1.3.0, 14 articles, sha256[:16] 3775f869a1c19a96 VERIFIED); AUDIT_LEDGER.json read at the fetched tip: V142 latest, score 3, capability-first; AM52/AM53/AM54 + open findings (R179-F2, R180-F1, R181-F1/F2, R182-F1/F2) read. NOTE (typed, Art. 5 disclosure): the owner message said 'V139'; the fetched ledger tip is V142 (V139 exists in history) — no discrepancy in content, score 3 at both.",
+  "Vault: .env.keys survived with 3/3 digests OK (AGNES d0c666a3842f, GH_PAT f1ebca5f9b62, XKIRO f6c09bee9bde); AGNES_BASE_URL (e592ff32df1f) RE-DERIVED from committed custody records (eval/r57s2_probe.json base_url string, digest-verified) and restored to the vault — the runner requires it; no HF_TOKEN in this sandbox (the r77 vault-restore path is owner-gated, typed INFRA_CREDENTIAL_MISSING if attempted). .env.holdout (seal key 25b38b9f4ef2) DID NOT SURVIVE the recycle — see prereg 1.1.2.",
+  "Secret-grep: tracked-tree token-pattern scan = 0 live values (one sk- hit inside the committed Fernet ciphertext eval/r184_sealed_holdout_PRIVATE.json is a base64 false positive — the string is gAAAA-prefixed, 31,844 chars, not an API key; typed and disclosed).",
+  "Check-runs from the API at session start: queue tip a6df1ef91 = surface FAILURE — root-caused from the API job log (commit 36bb29ea3 lacks Art. 29 trailers and was unregistered in trailer_violations). HEALED at 8987623bc: ALL FOUR trailer-less commits in the window (36bb29ea3, 5ecb7ce93, 9d4d1ca9c, 8f7fb28f2 — the R183/R184 kill-ship + holdout-authoring lane) registered with session attribution, forward-only, no history rewrite; Art. 29 suite 9/9 GREEN locally; remote surface at 8987623bc = SUCCESS (API-verified).",
+  "PREREG 1.1.2 (typed availability-only custody amendment, the 1.1.0/1.1.1 precedent class): the seal key did not survive the recycle (R184-F1 recurring); corpus load falls back to the COMMITTED authoring source scripts/r184_holdout_author.py (inline ITEMS, the c-0296 authoring artifact, now committed) under the SAME fail-closed hash check — corpus 8c1dffb4... + 24/24 item hashes verified; integrity check still runs BEFORE any generator call; one-shot discipline intact (15/24 byte-resumed, 16-24 first-run, no tuning, no re-rolls).",
+  "DIR 2 COMPLETE: the one-shot holdout run finished 24/24 (items 16-24 landed this session: 16 WIN, 17 TIE, 18 TIE, 19 TIE, 20 WIN (one typed judge-unparseable retry inside the pre-declared 4-attempt backoff — no re-roll), 21 WIN, 22 WIN, 23 WIN, 24 TIE; all deterministic-verifier OK, 0 fallbacks, 0 citation patterns).",
+  "INDEPENDENT Art. 13 TALLY from raw pair bytes (scripts/r184_holdout_tally.py + re-verified in the verdict record's own process): 13W/9T/2L, wins+ties 22/24 = 0.917, Wilson 95% CI [0.742, 0.917, 0.977]; 0 fabricated citations; n=24 = the pre-registered power target. GATE_SCORE4: ci_lower 0.742 > 0.50 = TRUE, met = TRUE — the typed verdict record (eval/r184_holdout_gate_verdict.json) says SCORE_4_GATE_MET; score-4 ratification is the auditor's per the V-line ledger.",
+  "Art. 29(c) VERIFIER record filed (eval/r184_holdout_verifier_record.json): recompute from committed pair bytes at a6c607f4f, zero generator/judge calls, CI + clauses recomputed independently — VERIFIED; pair digests recorded."
+ ],
+ "honest_disclosures": [
+  "the owner message's interim figure '7W/4L' was the early-window snapshot; the byte-verified state at a6df1ef91 was 8W/5T/2L at 15/24 (the r185s1 handoff already corrected this)",
+  "the two LOSSes (r184h-11-soil-carbon, r184h-15-wifi-backscatter) are recorded as measured losses, not excluded",
+  "the judge seat is qwen3.8-max:free via xkiro — a 1.1.1 measured substitution (tr-deepseek key absent + 503; snlite empty-choices on real pairs), single-seat for this gate; the prereg's two-family ideal was not achievable in this sandbox's vault — typed in the prereg seat_substitution_note",
+  "the corpus plaintext is now recoverable from a COMMITTED file (scripts/r184_holdout_author.py) — post-run, this is equivalent to the burn-after-run obligation (the holdout is spent as a sealed instrument; a re-run would be a new run, not a re-seal)"
+ ],
+ "base_sha": "a6df1ef91 (queue tip at session start; 15/24 checkpoint)",
+ "art27_capability_budget": {
+  "engine_diff": "ZERO engine lines this round (measurement round; the shipped recipe was already in problem_router/2.0.0 from the R183 kill-ship) — custody + measurement closure, no engine capability logic",
+  "share_exception_reason": "CUSTODY/MEASUREMENT-CLOSURE round (the capability payload IS the score-4 gate measurement + its typed verdict evidence; the prereg 1.1.2 custody amendment heals the seal-key loss; Art. 27's own allowance for non-engine rounds)",
+  "primary_metric_delta": "SCORE-4 GATE MET (wins+ties 22/24, Wilson CI lower 0.742 > 0.50) — the first scoreboard metric event since the kill decision; auditor ratification pending",
+  "deletions": "ZERO article/round-folder/claim-kind deletions; zero engine deletions (governance freeze held; DIR-4 of the R184 directions)"
+ },
+ "remote_ci": {
+  "pushed_sha": "a6c607f4f",
+  "remote_ci_conclusion": "success",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success",
+    "check_run_id": 140940060188,
+    "note": "API-quoted at record time (the run-complete commit carrying all 24 pair bytes + the tally); the earlier heal commit 8987623bc = surface SUCCESS (API-verified)"
+   }
+  ]
+ },
+ "next_bound": [
+  "verify a6c607f4f surface SUCCESS from the API",
+  "auditor ratification of the score-4 gate (V-line ledger)",
+  "the r184 sealed-holdout instrument is SPENT (one-shot complete) — future gates need a fresh auditor-authored holdout"
+ ],
+ "owner_requests": [
+  "none human-required; the CTAI rotation note stands (R177-F1 class)"
+ ]
+}
