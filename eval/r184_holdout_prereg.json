@@ -8,7 +8,7 @@
  "corpus": {
   "n_items": 24,
   "plaintext_custody": "holdout_secrets/ OUTSIDE the repo, gitignored by location (session temp); only hashes are committed; the auditor custodies the plaintext and burns it after the run",
-  "corpus_hash_sha256": "f614c31dc97ca2772cdcc7952048bce0d9c476d70928c058cba2e0842fc42ac5",
+  "corpus_hash_sha256": "f824895c723cfbfe83e687e5c341cc74025428e2558db741eb1994cad60ea950",
   "item_hashes_sha256": [
    "c974f73ecd2b38c15c2c5a93cddbe2428bca7cebb3576f77f123bf8657bccca0",
    "0198eed4de643247efe2da9f931583570e702ef538ba83f9d70ef800a391f1bb",
@@ -37,7 +37,13 @@
   ],
   "canonicalization": "json.dumps(sort_keys=True,separators=(',',':'),ensure_ascii=False) per item; corpus = sha256 of the concatenation of canonical item bytes with no separator",
   "domain_disjointness": "24 domains disjoint from the r176 DEV corpus (batteries, thermoelectrics, desalination, PV, wind, data-centre cooling, steel, cement, transformers, antennas, robotics, machining, bearings, bridges, bone scaffolds, implant power, hypersonics, satellites, ammonia, lithium brine, EMI shields, soft actuators, NDE). New domains: photon sources, gravitational-wave coatings, neutrino scintillation, hydrothermal scale, ice nucleation, microbial electrosynthesis, stomata, insect muscle, coral, bone in microgravity, cardiac pacing, axons, Rubisco, nitrogenase, hydrides, transmons, topological insulators, MRAM, slow light, acoustic metamaterials, radiative textiles, E-jet printing, triboelectric generators, piezocatalysis.",
-  "integrity_check": "the runner recomputes corpus_hash and all 24 item hashes from the plaintext BEFORE any generation; any mismatch is a typed BURN (no run, no re-roll)"
+  "integrity_check": "the runner recomputes corpus_hash and all 24 item hashes from the plaintext BEFORE any generation; any mismatch is a typed BURN (no run, no re-roll)",
+  "corpus_hash_correction": {
+   "at": "2026-11-28, BEFORE any generation or judge byte (0 pair files verified)",
+   "withdrawn": "f614c31dc97ca2772cdcc7952048bce0d9c476d70928c058cba2e0842fc42ac5",
+   "corrected": "f824895c723cfbfe83e687e5c341cc74025428e2558db741eb1994cad60ea950",
+   "reason": "the authoring helper hashed canon(list-of-items) while this prereg declares sha256 of the concatenation of canonical per-item bytes; the runner recomputed the declared form and fail-closed with HOLDOUT_BURN before any spend. Correction is forward-only (Art. 4/9); item hashes were already correct and unchanged."
+  }
  },
  "question": "On a FRESH 24-item invention-shaped holdout, does the SHIPPED recipe (best-of-N + critique + revise + deterministic verifier) beat a COMPUTE-MATCHED single-shot baseline on wins+ties with a Wilson 95% CI LOWER BOUND > 50%?",
  "arms": {
