@@ -1,5 +1,19 @@
 # ACTIVE_PATH.md — The One Canonical Production Loop (R388)
 
+> **AUTHORITY STATUS (typed, r192s2 post-merge check):** this is a
+> HISTORICAL PROGRAM DOCUMENT of the R388-era Toscanini/portfolio
+> program, preserved unchanged. It is NOT the authoritative contract of
+> the current capability-first invention machine. The single
+> authoritative contract is `EPISTEMIC_CONSTITUTION.md` **v3.3.0** (the
+> 29-article owner-directed enforcement refactor — the "Constitution
+> v2.10.1 / Article XXXIX" references below are STALE pointers to the
+> superseded line). The current program of record: the Discovery
+> Imperative preamble of the constitution + the capability-first
+> scoreboard lane (`eval/work_claims.json`, the scored `eval/`
+> artifacts, AM52/V-latest). Do not read the portfolio-factory
+> two-repo contract as governing.
+
+
 > Distilled at R388 per the CEO directive (distill → verify → productize).
 > This file replaces the A2-era ACTIVE_PATH (preserved in git history and on
 > `archive/rounds-R309-R383`). It is the single authority for what the

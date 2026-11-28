@@ -33,12 +33,19 @@ CORPUS = REPO / "eval" / "r176_invention_corpus" / "items.jsonl"
 OUT = REPO / "eval" / "r190s1_critic_calibration"
 OUT.mkdir(exist_ok=True)
 
-VARIANTS = ("checklist", "decomposition", "union", "intersection",
+VARIANTS = ("checklist", "union", "intersection", "decomposition",
             "batched")
 # "batched" (the DIR-4 selection critic, added by dated amendment
 # before any calibration byte — see eval/r190s1_critic_prereg.json): one
 # call per ITEM over the item's 6 candidates; each row inherits its
 # arm's flags from that single call.
+# AM-DIR3-2 (dated pre-run amendment, registered in the prereg BEFORE
+# any calibration byte): the run order puts the owner's four named
+# variants first (single-pass, two-family union, two-family
+# intersection, per-claim) so a session time-cut cannot leave a named
+# variant unmeasured while the heavy per-claim variant (up to 13
+# calls/row) lands earlier. Per-row results are order-independent
+# (no tuning, no re-roll of an OK leg); "batched" runs last.
 
 
 def env_keys() -> dict:
@@ -125,54 +132,81 @@ def main() -> int:
     results = {}
     for variant in VARIANTS:
         outf = OUT / f"{variant}.jsonl"
-        done = set()
+        last = {}
         if outf.exists():
             for line in outf.read_text().splitlines():
                 if line.strip():
-                    done.add(json.loads(line)["row_id"])
-        # the batched variant: one call per ITEM, cached for its rows
-        batched_cache = {}
-        if variant == "batched" and outf.exists():
-            for line in outf.read_text().splitlines():
-                if line.strip():
                     d_ = json.loads(line)
-                    batched_cache[d_["row_id"]] = d_.get("flags", [])
+                    last[d_["row_id"]] = d_  # LAST record per row wins
+        # AM-DIR3-3 (Art. 26, failures never cached): only status=="OK"
+        # rows count as done; a failed row is re-attempted on resume.
+        done = {rid for rid, d_ in last.items()
+                if d_.get("status") == "OK"}
+        # the batched variant: one call per ITEM, cached for its rows
+        batched_cache = {}   # row_id -> flags (from OK records only)
+        if variant == "batched" and last:
+            for rid_, d_ in last.items():
+                if d_.get("status") == "OK":
+                    batched_cache[rid_] = d_.get("flags", [])
         for r in rows:
             rid = r["row_id"]
             if rid in done:
                 continue
             problem, text = texts[rid]
-            if variant == "batched":
-                pid_ = r["item_id"]
-                if pid_ not in batched_cache:
-                    arms = [x for x in rows if x["item_id"] == pid_]
-                    seat = ec.SEATS["hy4-flash-centai"]
-                    per = ec.critic_batched(
-                        problem, [texts[x["row_id"]][1] for x in arms],
-                        transport, seat["base"],
-                        keys[seat["key_env"]], seat["model"],
-                        seat["max_tokens"])
-                    for x, fl in zip(arms, per):
-                        batched_cache[x["row_id"]] = fl
-                rec = {"variant": variant, "status": "OK",
-                       "family": "hunyuan",
-                       "flags": batched_cache.get(rid, []),
-                       "row_id": rid}
-                rec["n_flags"] = len(rec["flags"])
-                rec["flag_classes"] = sorted(
-                    {f["class"] for f in rec["flags"]})
-                rec["serious"] = bool(rec["flags"])
-            else:
-                rec = ec.run_critic(variant, problem, text, transport,
-                                    keys)
+            pid_ = r["item_id"]
+            attempts = []
+            rec = None
+            for try_i in range(4):  # typed ladder, first OK wins
+                try:
+                    if variant == "batched":
+                        if rid not in batched_cache:
+                            arms = [x for x in rows
+                                    if x["item_id"] == pid_]
+                            seat = ec.SEATS["hy4-flash-centai"]
+                            per = ec.critic_batched(
+                                problem,
+                                [texts[x["row_id"]][1] for x in arms],
+                                transport, seat["base"],
+                                keys[seat["key_env"]], seat["model"],
+                                seat["max_tokens"])
+                            for x, fl in zip(arms, per):
+                                batched_cache[x["row_id"]] = fl
+                        rec = {"variant": variant, "status": "OK",
+                               "family": "hunyuan",
+                               "flags": batched_cache.get(rid, [])}
+                        rec["n_flags"] = len(rec["flags"])
+                        rec["flag_classes"] = sorted(
+                            {f["class"] for f in rec["flags"]})
+                        rec["serious"] = bool(rec["flags"])
+                    else:
+                        rec = ec.run_critic(variant, problem, text,
+                                            transport, keys)
+                except Exception as e_:  # noqa: BLE001
+                    rec = {"variant": variant,
+                           "status": "TRANSPORT_FAILED",
+                           "reason": f"{type(e_).__name__}: "
+                                     f"{str(e_)[:160]}",
+                           "flags": [], "serious": False}
                 rec["row_id"] = rid
+                attempts.append({"attempt": try_i + 1,
+                                 "status": rec.get("status"),
+                                 "reason": (rec.get("reason") or "")[:120]})
+                if rec.get("status") == "OK":
+                    break
+                time.sleep((2, 5, 10)[min(try_i, 2)])
+            rec["attempts"] = attempts
             rec["label_serious"] = r["label"]["serious_error"]
             with outf.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
             time.sleep(2)
-        # tally the variant
-        recs = [json.loads(l) for l in
-                outf.read_text().splitlines() if l.strip()]
+        # tally the variant (LAST record per row — failed attempts do
+        # not double-count; Art. 26)
+        last_t = {}
+        for line in outf.read_text().splitlines():
+            if line.strip():
+                d_ = json.loads(line)
+                last_t[d_["row_id"]] = d_
+        recs = list(last_t.values())
         tp = sum(1 for x in recs if x["label_serious"] and x["serious"])
         fn = sum(1 for x in recs if x["label_serious"] and not x["serious"])
         fp = sum(1 for x in recs if not x["label_serious"] and x["serious"])
