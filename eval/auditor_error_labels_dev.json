@@ -1,8 +1,8 @@
 {
- "record": "AUDITOR_ERROR_LABELS_DEV/0.1.0-scaffold",
+ "record": "AUDITOR_ERROR_LABELS_DEV/1.0.0",
  "kind": "error-label-set (DEV split; calibration ground truth)",
- "built_by": "builder-r190s1 (claim c-0302 session; DIR 1)",
- "built_at": "2026-11-28T14:40:00Z",
+ "built_by": "auditor-r192s1 (DELEGATED OWNER delivery; consultant labels transcribed verbatim)",
+ "built_at": "2026-11-28T16:53:10Z",
  "n_items": 8,
  "n_rows": 48,
  "arm_order": [
@@ -14,58 +14,65 @@
   "baseline"
  ],
  "text_provenance": {
-  "definition": "the 6-arm collider-pool proposal texts per DEV item: cands.{plain,departure,contradiction,relaxation} + collider.candidate + baseline_final from the byte-authoritative generation checkpoints",
-  "byte_authoritative_source": "eval/r183_collider_run/gen_* where present (items 06-08), else eval/r176_invention_run/gen_* (items 01-05)",
+  "definition": "6-arm texts: cands.{plain,departure,contradiction,relaxation} + collider.candidate + baseline_final",
+  "byte_authoritative_source": "per-item gen_file below (items 01-05 from r176_invention_run; 09/10/13 from r183_collider_run — the ONLY refs carrying all six arms for those items)",
   "per_item_sources": {
    "r176i-01-ironair-efficiency": {
-    "gen_file": "eval/r176_invention_run/gen_r176i-01-ironair-efficiency.json",
-    "last_commit_touching_gen": "45ecbb338a1fefcedcad2373ac8b109c61a1ebae"
+    "gen_file": "eval/r176_invention_run/gen_r176i-01-ironair-efficiency.json"
    },
    "r176i-02-thermoelectric-zt": {
-    "gen_file": "eval/r176_invention_run/gen_r176i-02-thermoelectric-zt.json",
-    "last_commit_touching_gen": "45ecbb338a1fefcedcad2373ac8b109c61a1ebae"
+    "gen_file": "eval/r176_invention_run/gen_r176i-02-thermoelectric-zt.json"
    },
    "r176i-03-ro-desal-energy": {
-    "gen_file": "eval/r176_invention_run/gen_r176i-03-ro-desal-energy.json",
-    "last_commit_touching_gen": "45ecbb338a1fefcedcad2373ac8b109c61a1ebae"
+    "gen_file": "eval/r176_invention_run/gen_r176i-03-ro-desal-energy.json"
    },
    "r176i-04-fastcharge-graphite": {
-    "gen_file": "eval/r176_invention_run/gen_r176i-04-fastcharge-graphite.json",
-    "last_commit_touching_gen": "9396536aafbe1f18afbf59c786d5d7332a0af1b5"
+    "gen_file": "eval/r176_invention_run/gen_r176i-04-fastcharge-graphite.json"
    },
    "r176i-05-pv-passive-cooling": {
-    "gen_file": "eval/r176_invention_run/gen_r176i-05-pv-passive-cooling.json",
-    "last_commit_touching_gen": "ce377bd3d0488859759deddf772df8107447f26f"
+    "gen_file": "eval/r176_invention_run/gen_r176i-05-pv-passive-cooling.json"
    },
-   "r176i-06-wind-drivetrain-fatigue": {
-    "gen_file": "eval/r183_collider_run/gen_r176i-06-wind-drivetrain-fatigue.json",
-    "last_commit_touching_gen": "2d5d10affd71d16d8b162dd7fda8da2dc4e91a19"
+   "r176i-09-cement-co2-calcination": {
+    "gen_file": "eval/r183_collider_run/gen_r176i-09-cement-co2-calcination.json"
    },
-   "r176i-07-immersion-dielectric": {
-    "gen_file": "eval/r183_collider_run/gen_r176i-07-immersion-dielectric.json",
-    "last_commit_touching_gen": "2d5d10affd71d16d8b162dd7fda8da2dc4e91a19"
+   "r176i-10-transformer-coreloss": {
+    "gen_file": "eval/r183_collider_run/gen_r176i-10-transformer-coreloss.json"
    },
-   "r176i-08-highstrength-steel-h": {
-    "gen_file": "eval/r183_collider_run/gen_r176i-08-highstrength-steel-h.json",
-    "last_commit_touching_gen": "2d5d10affd71d16d8b162dd7fda8da2dc4e91a19"
+   "r176i-13-chatter-mrr": {
+    "gen_file": "eval/r183_collider_run/gen_r176i-13-chatter-mrr.json"
    }
   },
-  "hash_rule": "sha256 over the exact UTF-8 text bytes as committed in the gen file (no normalization)"
+  "hash_rule": "sha256 over the exact UTF-8 text bytes as committed (no normalization)",
+  "item_set_correction": "the 0.1.0 scaffold used items 01-08; the consultant labeled 01,02,03,04,05,09,10,13. Rebuilt over the ACTUAL 8. Source per item resolved by byte inspection: r176 gen carries only 'collider' for 09/10/13, so their six-arm texts live in r183_collider_run."
  },
  "judge_identity": {
-  "role": "the owner's external consultant (single judge)",
-  "model_family": "UNKNOWN (not disclosed to the builder lane)",
-  "read_depth": "openings + falsification sections ONLY (per the owner's direction) -> the labels are a LOWER BOUND on the true serious-error rate"
+  "role": "external consultant, blind, arm order shuffled per item",
+  "model_family": "Claude (auditor-side)",
+  "read_depth": "opening 1.3-1.6k chars + falsification 0.8-0.9k chars per arm — LOWER BOUND on errors; single judge; n=8"
  },
- "labels_status": "MISSING_OWNER_INPUT — the consultant's per-text labels were never delivered to any reachable byte (searched: queue branch, all three audit branches, runtime-state branch, upload/, workspace, EXTERNAL_CONSULTANT_EVIDENCE/). The row schema is ready to receive them verbatim; NOTHING here is fabricated.",
+ "labels_status": "OWNER_DELIVERED — 48/48 per-text labels present; calibration UNBLOCKED",
  "owner_quoted_aggregates_unverified": {
-  "serious_error_rate": "71% (~34 of 48 texts)",
-  "mechanism_level_share": "23 of 34 flagged errors are mechanism-level (the class the deterministic tools cannot see)",
-  "error_free_pool_coverage": "pool {relaxation, plain, departure} covers 7/8 items with >=1 error-free candidate vs plain alone 1/8",
-  "note": "quoted from the owner's merged-and-locked direction; NOT independently verifiable from builder bytes until the per-text labels land"
+  "serious_error_rate": "34/48 = 70.8%",
+  "mechanism_level_share": "23/34 = 67.6%",
+  "note": "RECOMPUTED from the delivered rows — now byte-verified"
  },
- "calibration_gate": "No calibration claim is valid from this file in its current state (DIR 3's critic calibration on this set stays BLOCKED until the owner supplies the per-text labels; the accept bar 'recall >=60% serious, <=25% false flags on clean texts' is to be registered as a typed amendment before any calibration run).",
+ "calibration_gate": "UNBLOCKED. DIR 2 re-measure + DIR 3 calibration may proceed. Register the recall>=60% / FP<=25% bar as a typed amendment BEFORE the run.",
  "rows": [
+  {
+   "row_id": "r176i-01-ironair-efficiency::baseline",
+   "item_id": "r176i-01-ironair-efficiency",
+   "arm": "baseline",
+   "text_sha256": "d5cb7698a2ff5ce0bcb48fd787ae61e37ad6eb49a81f0a59272a3539ada8ee82",
+   "text_chars": 3175,
+   "label": {
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS+LOGIC",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS+LOGIC charge/discharge swapped; test self-contradictory",
+    "auditor_rank_of_6": 6
+   }
+  },
   {
    "row_id": "r176i-01-ironair-efficiency::plain",
    "item_id": "r176i-01-ironair-efficiency",
@@ -73,11 +80,12 @@
    "text_sha256": "c807be6ef986f090abdc2fd6a5ab57214ae9555177e05764d1defdd6aedb29d2",
    "text_chars": 2562,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS acid microenv raises HER & corrodes Fe (direction error)",
+    "auditor_rank_of_6": 5
    }
   },
   {
@@ -87,11 +95,12 @@
    "text_sha256": "1312d915e8979c8eb9ee375ef31e16e24872976cb5fa8d653e0be492f0bb4b5c",
    "text_chars": 5382,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "FEAS",
+    "mechanism_level": false,
+    "one_line_reason": "FEAS light-driven layer on opaque iron in grid battery",
+    "auditor_rank_of_6": 3
    }
   },
   {
@@ -101,11 +110,12 @@
    "text_sha256": "d3a319ae42e5f875135cee25221497b1d85f8ff046895383e5bd1ace922ed233",
    "text_chars": 6976,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS states Fe oxidation during charging (direction error)",
+    "auditor_rank_of_6": 2
    }
   },
   {
@@ -115,11 +125,12 @@
    "text_sha256": "9abe10d4f75fd6232bcd4f5ef5ccc6856b07007f01f44a3098aa49d505e9df82",
    "text_chars": 7818,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 1
    }
   },
   {
@@ -129,95 +140,12 @@
    "text_sha256": "45bf8ecf70e28f50938ec4eb2e655a5b4914b2d8acf70cdd994670a712d078ca",
    "text_chars": 2532,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
-   }
-  },
-  {
-   "row_id": "r176i-01-ironair-efficiency::baseline",
-   "item_id": "r176i-01-ironair-efficiency",
-   "arm": "baseline",
-   "text_sha256": "d5cb7698a2ff5ce0bcb48fd787ae61e37ad6eb49a81f0a59272a3539ada8ee82",
-   "text_chars": 3175,
-   "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
-   }
-  },
-  {
-   "row_id": "r176i-02-thermoelectric-zt::plain",
-   "item_id": "r176i-02-thermoelectric-zt",
-   "arm": "plain",
-   "text_sha256": "000ac1192693da83631905b6b2e2d19d9cf986338e269056ec80dc45305a5abc",
-   "text_chars": 7334,
-   "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
-   }
-  },
-  {
-   "row_id": "r176i-02-thermoelectric-zt::departure",
-   "item_id": "r176i-02-thermoelectric-zt",
-   "arm": "departure",
-   "text_sha256": "1560153d04ed07f8f3feeb548f9cbe40936a7fe2807f02b3a49d545a998e4924",
-   "text_chars": 3699,
-   "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
-   }
-  },
-  {
-   "row_id": "r176i-02-thermoelectric-zt::contradiction",
-   "item_id": "r176i-02-thermoelectric-zt",
-   "arm": "contradiction",
-   "text_sha256": "1a1fc6662fe522a2d9c68e0ff8685f3ffe0f8c867d40d0462db6d97f852dbfa2",
-   "text_chars": 3455,
-   "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
-   }
-  },
-  {
-   "row_id": "r176i-02-thermoelectric-zt::relaxation",
-   "item_id": "r176i-02-thermoelectric-zt",
-   "arm": "relaxation",
-   "text_sha256": "bb12f7ff0449efc777962213cf4d0376c6b2da3f4c1867746738a11db473f749",
-   "text_chars": 8118,
-   "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
-   }
-  },
-  {
-   "row_id": "r176i-02-thermoelectric-zt::collision",
-   "item_id": "r176i-02-thermoelectric-zt",
-   "arm": "collision",
-   "text_sha256": "6ce740cf107690f8aa4c77694c5c865db3a5f6a7c9c1d89f288b9cf38744c190",
-   "text_chars": 3193,
-   "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS carbon filaments add HER sites; claim wrong",
+    "auditor_rank_of_6": 4
    }
   },
   {
@@ -227,81 +155,87 @@
    "text_sha256": "b5cf8b9389747281626a4eebc9d14a3dab5601fa36c95db8481fbd91a9a80337",
    "text_chars": 7409,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS minor",
+    "auditor_rank_of_6": 3
    }
   },
   {
-   "row_id": "r176i-03-ro-desal-energy::plain",
-   "item_id": "r176i-03-ro-desal-energy",
+   "row_id": "r176i-02-thermoelectric-zt::plain",
+   "item_id": "r176i-02-thermoelectric-zt",
    "arm": "plain",
-   "text_sha256": "a27640184ae2769e48320fe3c91b435d02c72f28782e376163513a42051fd696",
-   "text_chars": 2595,
+   "text_sha256": "000ac1192693da83631905b6b2e2d19d9cf986338e269056ec80dc45305a5abc",
+   "text_chars": 7334,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS minor BiSb barrier claim dubious",
+    "auditor_rank_of_6": 2
    }
   },
   {
-   "row_id": "r176i-03-ro-desal-energy::departure",
-   "item_id": "r176i-03-ro-desal-energy",
+   "row_id": "r176i-02-thermoelectric-zt::departure",
+   "item_id": "r176i-02-thermoelectric-zt",
    "arm": "departure",
-   "text_sha256": "2f45951878cc8b29d54b047d5a2be7881c91e94af511ad9da584176ea656cad2",
-   "text_chars": 4275,
+   "text_sha256": "1560153d04ed07f8f3feeb548f9cbe40936a7fe2807f02b3a49d545a998e4924",
+   "text_chars": 3699,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 1
    }
   },
   {
-   "row_id": "r176i-03-ro-desal-energy::contradiction",
-   "item_id": "r176i-03-ro-desal-energy",
+   "row_id": "r176i-02-thermoelectric-zt::contradiction",
+   "item_id": "r176i-02-thermoelectric-zt",
    "arm": "contradiction",
-   "text_sha256": "6d4da398ef6c53c768ba24d717b78b10a5c35d742f79ef897942bd3bb0de114f",
-   "text_chars": 5966,
+   "text_sha256": "1a1fc6662fe522a2d9c68e0ff8685f3ffe0f8c867d40d0462db6d97f852dbfa2",
+   "text_chars": 3455,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC falsifier inverted (WF bypass test requires WF holds); speculative physics",
+    "auditor_rank_of_6": 5
    }
   },
   {
-   "row_id": "r176i-03-ro-desal-energy::relaxation",
-   "item_id": "r176i-03-ro-desal-energy",
+   "row_id": "r176i-02-thermoelectric-zt::relaxation",
+   "item_id": "r176i-02-thermoelectric-zt",
    "arm": "relaxation",
-   "text_sha256": "7a3ce6d0ac96b263709f628b46802c27366c12662ef034e654d65518cb64bf0f",
-   "text_chars": 9366,
+   "text_sha256": "bb12f7ff0449efc777962213cf4d0376c6b2da3f4c1867746738a11db473f749",
+   "text_chars": 8118,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 4
    }
   },
   {
-   "row_id": "r176i-03-ro-desal-energy::collision",
-   "item_id": "r176i-03-ro-desal-energy",
+   "row_id": "r176i-02-thermoelectric-zt::collision",
+   "item_id": "r176i-02-thermoelectric-zt",
    "arm": "collision",
-   "text_sha256": "69db1f82ddd03545acf6054b0a79d378519a0f9c0fcb503106b8b742add060f8",
-   "text_chars": 4077,
+   "text_sha256": "6ce740cf107690f8aa4c77694c5c865db3a5f6a7c9c1d89f288b9cf38744c190",
+   "text_chars": 3193,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "CONSTR",
+    "mechanism_level": false,
+    "one_line_reason": "CONSTR PVDF polymer incompatible with 250C/5000h",
+    "auditor_rank_of_6": 6
    }
   },
   {
@@ -311,81 +245,87 @@
    "text_sha256": "73984723312c4388c754bed22948c2bcf107362f03738e99e7ec257f18f7a199",
    "text_chars": 8260,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS mixing is not dominant ERD loss",
+    "auditor_rank_of_6": 4
    }
   },
   {
-   "row_id": "r176i-04-fastcharge-graphite::plain",
-   "item_id": "r176i-04-fastcharge-graphite",
+   "row_id": "r176i-03-ro-desal-energy::plain",
+   "item_id": "r176i-03-ro-desal-energy",
    "arm": "plain",
-   "text_sha256": "11d99e0a34a669868030990389b7225f4375bccf19e2e6f0e1db89e065721bcf",
-   "text_chars": 3151,
+   "text_sha256": "a27640184ae2769e48320fe3c91b435d02c72f28782e376163513a42051fd696",
+   "text_chars": 2595,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 1
    }
   },
   {
-   "row_id": "r176i-04-fastcharge-graphite::departure",
-   "item_id": "r176i-04-fastcharge-graphite",
+   "row_id": "r176i-03-ro-desal-energy::departure",
+   "item_id": "r176i-03-ro-desal-energy",
    "arm": "departure",
-   "text_sha256": "8f4a4ff679df8f378a534f2ad86b3f20d91f03c6d73f05566d700cf03dfb8a63",
-   "text_chars": 4307,
+   "text_sha256": "2f45951878cc8b29d54b047d5a2be7881c91e94af511ad9da584176ea656cad2",
+   "text_chars": 4275,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS implausible magnitude salinity-gradient harvest; near-thermal regen",
+    "auditor_rank_of_6": 5
    }
   },
   {
-   "row_id": "r176i-04-fastcharge-graphite::contradiction",
-   "item_id": "r176i-04-fastcharge-graphite",
+   "row_id": "r176i-03-ro-desal-energy::contradiction",
+   "item_id": "r176i-03-ro-desal-energy",
    "arm": "contradiction",
-   "text_sha256": "89f7fe06d7815551f8d6ee46c4ed1b918a0934aeed001f6154f310c3edbe4502",
-   "text_chars": 7663,
+   "text_sha256": "6d4da398ef6c53c768ba24d717b78b10a5c35d742f79ef897942bd3bb0de114f",
+   "text_chars": 5966,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 3
    }
   },
   {
-   "row_id": "r176i-04-fastcharge-graphite::relaxation",
-   "item_id": "r176i-04-fastcharge-graphite",
+   "row_id": "r176i-03-ro-desal-energy::relaxation",
+   "item_id": "r176i-03-ro-desal-energy",
    "arm": "relaxation",
-   "text_sha256": "96b5fae70f8c9cacbfdd785dbba1088f916c2c8decae89cb9527eedf9a9416b7",
-   "text_chars": 4922,
+   "text_sha256": "7a3ce6d0ac96b263709f628b46802c27366c12662ef034e654d65518cb64bf0f",
+   "text_chars": 9366,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC incoherent falsifier; permeate energy negligible",
+    "auditor_rank_of_6": 6
    }
   },
   {
-   "row_id": "r176i-04-fastcharge-graphite::collision",
-   "item_id": "r176i-04-fastcharge-graphite",
+   "row_id": "r176i-03-ro-desal-energy::collision",
+   "item_id": "r176i-03-ro-desal-energy",
    "arm": "collision",
-   "text_sha256": "f91fb70f2b50505929bff398e7ef617c26c515392cce84c8f1048f810f78611b",
-   "text_chars": 3531,
+   "text_sha256": "69db1f82ddd03545acf6054b0a79d378519a0f9c0fcb503106b8b742add060f8",
+   "text_chars": 4077,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS minor membrane 'creep' layering fluff (batch cycle is real)",
+    "auditor_rank_of_6": 2
    }
   },
   {
@@ -395,81 +335,87 @@
    "text_sha256": "3da6cdc2d932790445ca8823b05c5f1e9c68767e50acd67c3d7966bd53c49558",
    "text_chars": 5921,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 1
    }
   },
   {
-   "row_id": "r176i-05-pv-passive-cooling::plain",
-   "item_id": "r176i-05-pv-passive-cooling",
+   "row_id": "r176i-04-fastcharge-graphite::plain",
+   "item_id": "r176i-04-fastcharge-graphite",
    "arm": "plain",
-   "text_sha256": "48d599d6c13bac31946ddac1993ef0f589a2ec196d74bef3ab90bc119540aac8",
-   "text_chars": 7452,
+   "text_sha256": "11d99e0a34a669868030990389b7225f4375bccf19e2e6f0e1db89e065721bcf",
+   "text_chars": 3151,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS+LOGIC",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS+LOGIC repelling Li+ cannot raise charge flux; nonsense cation claim",
+    "auditor_rank_of_6": 6
    }
   },
   {
-   "row_id": "r176i-05-pv-passive-cooling::departure",
-   "item_id": "r176i-05-pv-passive-cooling",
+   "row_id": "r176i-04-fastcharge-graphite::departure",
+   "item_id": "r176i-04-fastcharge-graphite",
    "arm": "departure",
-   "text_sha256": "4c937b18c64859292d38050a6fff57f153ae6ca62c2f0b33682444545c0eb157",
-   "text_chars": 5110,
+   "text_sha256": "8f4a4ff679df8f378a534f2ad86b3f20d91f03c6d73f05566d700cf03dfb8a63",
+   "text_chars": 4307,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS Peltier precedent wrong; piezo layer mass/complexity",
+    "auditor_rank_of_6": 5
    }
   },
   {
-   "row_id": "r176i-05-pv-passive-cooling::contradiction",
-   "item_id": "r176i-05-pv-passive-cooling",
+   "row_id": "r176i-04-fastcharge-graphite::contradiction",
+   "item_id": "r176i-04-fastcharge-graphite",
    "arm": "contradiction",
-   "text_sha256": "694d1d0d4b12e9d61f3679e3b8f72919d52a2689648f054903c247c1198ca9d7",
-   "text_chars": 7238,
+   "text_sha256": "89f7fe06d7815551f8d6ee46c4ed1b918a0934aeed001f6154f310c3edbe4502",
+   "text_chars": 7663,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC falsifier tests structural damage not the mechanism claim",
+    "auditor_rank_of_6": 3
    }
   },
   {
-   "row_id": "r176i-05-pv-passive-cooling::relaxation",
-   "item_id": "r176i-05-pv-passive-cooling",
+   "row_id": "r176i-04-fastcharge-graphite::relaxation",
+   "item_id": "r176i-04-fastcharge-graphite",
    "arm": "relaxation",
-   "text_sha256": "096bb8d917032eacf736c504788cf27977e11a566466019c0c7ae078ecae5197",
-   "text_chars": 8592,
+   "text_sha256": "96b5fae70f8c9cacbfdd785dbba1088f916c2c8decae89cb9527eedf9a9416b7",
+   "text_chars": 4922,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "NOVEL-LOW",
+    "mechanism_level": false,
+    "one_line_reason": "NOVEL-LOW pulsed-charging protocol, not new physics",
+    "auditor_rank_of_6": 2
    }
   },
   {
-   "row_id": "r176i-05-pv-passive-cooling::collision",
-   "item_id": "r176i-05-pv-passive-cooling",
+   "row_id": "r176i-04-fastcharge-graphite::collision",
+   "item_id": "r176i-04-fastcharge-graphite",
    "arm": "collision",
-   "text_sha256": "187a8298b30dd43e5c78965834e1490f9297d2c9f7a76f509ff6b72d8f528dda",
-   "text_chars": 3849,
+   "text_sha256": "f91fb70f2b50505929bff398e7ef617c26c515392cce84c8f1048f810f78611b",
+   "text_chars": 3531,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS channels fix electrolyte transport not solid diffusion; separator unidirectional flow nonsense",
+    "auditor_rank_of_6": 4
    }
   },
   {
@@ -479,263 +425,357 @@
    "text_sha256": "5aab4969e4cb6ac3ab9d3fdb70eb7bf39933f8c2dd73eb823101e3fd7880dd35",
    "text_chars": 7493,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS backsheet faces ground not sky; dT>=15C unrealistic",
+    "auditor_rank_of_6": 3
    }
   },
   {
-   "row_id": "r176i-06-wind-drivetrain-fatigue::plain",
-   "item_id": "r176i-06-wind-drivetrain-fatigue",
+   "row_id": "r176i-05-pv-passive-cooling::plain",
+   "item_id": "r176i-05-pv-passive-cooling",
    "arm": "plain",
-   "text_sha256": "a91b54b930c778a2442ffde60916664e35a116f3264d419314260b6b06face12",
-   "text_chars": 4007,
+   "text_sha256": "48d599d6c13bac31946ddac1993ef0f589a2ec196d74bef3ab90bc119540aac8",
+   "text_chars": 7452,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS same as A",
+    "auditor_rank_of_6": 4
    }
   },
   {
-   "row_id": "r176i-06-wind-drivetrain-fatigue::departure",
-   "item_id": "r176i-06-wind-drivetrain-fatigue",
+   "row_id": "r176i-05-pv-passive-cooling::departure",
+   "item_id": "r176i-05-pv-passive-cooling",
    "arm": "departure",
-   "text_sha256": "9ec16a41cce2122e54960fca9b0a537d8ddb5b27be578ce4b30b77f47d84dc35",
-   "text_chars": 7096,
+   "text_sha256": "4c937b18c64859292d38050a6fff57f153ae6ca62c2f0b33682444545c0eb157",
+   "text_chars": 5110,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS expected 30-35C cell unrealistic",
+    "auditor_rank_of_6": 2
    }
   },
   {
-   "row_id": "r176i-06-wind-drivetrain-fatigue::contradiction",
-   "item_id": "r176i-06-wind-drivetrain-fatigue",
+   "row_id": "r176i-05-pv-passive-cooling::contradiction",
+   "item_id": "r176i-05-pv-passive-cooling",
    "arm": "contradiction",
-   "text_sha256": "647edea5800d7a5d1d82a769d86453470c4c19f808f5ec0ba6152e15535ffdbd",
-   "text_chars": 4634,
+   "text_sha256": "694d1d0d4b12e9d61f3679e3b8f72919d52a2689648f054903c247c1198ca9d7",
+   "text_chars": 7238,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC emissivity switching inverted (low emissivity when hot)",
+    "auditor_rank_of_6": 5
    }
   },
   {
-   "row_id": "r176i-06-wind-drivetrain-fatigue::relaxation",
-   "item_id": "r176i-06-wind-drivetrain-fatigue",
+   "row_id": "r176i-05-pv-passive-cooling::relaxation",
+   "item_id": "r176i-05-pv-passive-cooling",
    "arm": "relaxation",
-   "text_sha256": "3871492898fc963a56e8706d2c73cf9cdf98d6e1368b199702c6620b74d1e5bd",
-   "text_chars": 8712,
+   "text_sha256": "096bb8d917032eacf736c504788cf27977e11a566466019c0c7ae078ecae5197",
+   "text_chars": 8592,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "CONSTR",
+    "mechanism_level": false,
+    "one_line_reason": "CONSTR borderline 'no water' loophole (hydrogel evaporation)",
+    "auditor_rank_of_6": 1
    }
   },
   {
-   "row_id": "r176i-06-wind-drivetrain-fatigue::collision",
-   "item_id": "r176i-06-wind-drivetrain-fatigue",
+   "row_id": "r176i-05-pv-passive-cooling::collision",
+   "item_id": "r176i-05-pv-passive-cooling",
    "arm": "collision",
-   "text_sha256": "072a1a2f74926b5f82c48adc13aeeb010f940980e570aae8b2675cab7aa2b86d",
-   "text_chars": 3030,
+   "text_sha256": "187a8298b30dd43e5c78965834e1490f9297d2c9f7a76f509ff6b72d8f528dda",
+   "text_chars": 3849,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "CONSTR+PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "CONSTR+PHYS consumable sublimating PCM violates 25-year life; absurd",
+    "auditor_rank_of_6": 6
    }
   },
   {
-   "row_id": "r176i-06-wind-drivetrain-fatigue::baseline",
-   "item_id": "r176i-06-wind-drivetrain-fatigue",
+   "row_id": "r176i-09-cement-co2-calcination::baseline",
+   "item_id": "r176i-09-cement-co2-calcination",
    "arm": "baseline",
-   "text_sha256": "59359ed811ddc7bff2e809a64986a75f5d69289b96d4f04344b65595f758bc24",
-   "text_chars": 7992,
+   "text_sha256": "090cb01818fe08cce636d22a156df9157435efbd97af8412607eaf5ab4ed374d",
+   "text_chars": 5205,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "CONSTR",
+    "mechanism_level": false,
+    "one_line_reason": "CONSTR 1350C sintering + limestone violates <=900C and defeats purpose",
+    "auditor_rank_of_6": 6
    }
   },
   {
-   "row_id": "r176i-07-immersion-dielectric::plain",
-   "item_id": "r176i-07-immersion-dielectric",
+   "row_id": "r176i-09-cement-co2-calcination::plain",
+   "item_id": "r176i-09-cement-co2-calcination",
    "arm": "plain",
-   "text_sha256": "22ad886e7dc12fcfad69faca93101e7c07786a4647f138e3b2739a51be42b042",
-   "text_chars": 6187,
+   "text_sha256": "1fe5d1ff9565553bb80869c49d0e2e31e8c87bb6f94393e78a8c764c25e82a24",
+   "text_chars": 2613,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS activator CO2 ignored",
+    "auditor_rank_of_6": 2
    }
   },
   {
-   "row_id": "r176i-07-immersion-dielectric::departure",
-   "item_id": "r176i-07-immersion-dielectric",
+   "row_id": "r176i-09-cement-co2-calcination::departure",
+   "item_id": "r176i-09-cement-co2-calcination",
    "arm": "departure",
-   "text_sha256": "7dbf677312caad4818334580770c076ad3853f973d4cc8d766abd81523c0e802",
-   "text_chars": 7828,
+   "text_sha256": "9081bde27af6d4a418cb14b30b4b76c6d4d316b222637fee8d0ec8ab96b7b2a7",
+   "text_chars": 7401,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "FEAS",
+    "mechanism_level": false,
+    "one_line_reason": "FEAS sol-gel precursors not gigatonne scale; odd 1-day strength threshold",
+    "auditor_rank_of_6": 4
    }
   },
   {
-   "row_id": "r176i-07-immersion-dielectric::contradiction",
-   "item_id": "r176i-07-immersion-dielectric",
+   "row_id": "r176i-09-cement-co2-calcination::contradiction",
+   "item_id": "r176i-09-cement-co2-calcination",
    "arm": "contradiction",
-   "text_sha256": "dc8c7c92e34a928cf391239591d02d8c6d2166ae424fdf065c289a2a9f44003e",
-   "text_chars": 7342,
+   "text_sha256": "36c17b8700e55db33c4949992c50c24e095572e1765510d9d46de07aec3693ed",
+   "text_chars": 5644,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS dolomite calcination emits CO2; 'carbon-negative metakaolin' wrong; falsifier malformed",
+    "auditor_rank_of_6": 1
    }
   },
   {
-   "row_id": "r176i-07-immersion-dielectric::relaxation",
-   "item_id": "r176i-07-immersion-dielectric",
+   "row_id": "r176i-09-cement-co2-calcination::relaxation",
+   "item_id": "r176i-09-cement-co2-calcination",
    "arm": "relaxation",
-   "text_sha256": "58f46125d4fb62a1802374c9013b4cb3e1f29f1b7626d6c2797fe5de157aa764",
-   "text_chars": 9186,
+   "text_sha256": "38930da2d61305d6bcfb5af02e04287d3424effa6420e380448ae62818c7ff65",
+   "text_chars": 8674,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS w/b ratio ~2 and acid activation unrealistic",
+    "auditor_rank_of_6": 3
    }
   },
   {
-   "row_id": "r176i-07-immersion-dielectric::collision",
-   "item_id": "r176i-07-immersion-dielectric",
+   "row_id": "r176i-09-cement-co2-calcination::collision",
+   "item_id": "r176i-09-cement-co2-calcination",
    "arm": "collision",
-   "text_sha256": "099a5de1deef28739ba83ff167d6c96238fe9abbbd0ae33bbf3f2ec17836fa7e",
-   "text_chars": 2924,
+   "text_sha256": "5cfafd7535a09b00ef6f43fcb99871c50895fb16bce185884e19929bddf093aa",
+   "text_chars": 3155,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS precursor Ca(OH)2 needs calcination; falsifier thresholds inconsistent",
+    "auditor_rank_of_6": 5
    }
   },
   {
-   "row_id": "r176i-07-immersion-dielectric::baseline",
-   "item_id": "r176i-07-immersion-dielectric",
+   "row_id": "r176i-10-transformer-coreloss::baseline",
+   "item_id": "r176i-10-transformer-coreloss",
    "arm": "baseline",
-   "text_sha256": "b9f9a10d69a57a20c0e3c813d6edc1696b958d706284aea7d9331e5965964380",
-   "text_chars": 5299,
+   "text_sha256": "b32b8661af4598af28fc78f9ae552d8090394c81cacc786dc74f23cd8af15192",
+   "text_chars": 7039,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC abandons first mechanism mid-text ('Wait... pivot'); cryogenic SC vs constraints",
+    "auditor_rank_of_6": 5
    }
   },
   {
-   "row_id": "r176i-08-highstrength-steel-h::plain",
-   "item_id": "r176i-08-highstrength-steel-h",
+   "row_id": "r176i-10-transformer-coreloss::plain",
+   "item_id": "r176i-10-transformer-coreloss",
    "arm": "plain",
-   "text_sha256": "5f823d30152983a793f9b7998d34735b0d3d94470174f6a5113c6e2ea5b17e87",
-   "text_chars": 6180,
+   "text_sha256": "6bfa1d3f2c762f440c35f1b7f19800c9dff3d6d54b728278a96decfa86205739",
+   "text_chars": 5339,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS premise eddy-dominated (hysteresis dominates GOES at 50Hz); 'resonant barrier' gibberish",
+    "auditor_rank_of_6": 1
    }
   },
   {
-   "row_id": "r176i-08-highstrength-steel-h::departure",
-   "item_id": "r176i-08-highstrength-steel-h",
+   "row_id": "r176i-10-transformer-coreloss::departure",
+   "item_id": "r176i-10-transformer-coreloss",
    "arm": "departure",
-   "text_sha256": "c65ee7a7d78964b5d006fb6710fc21f1f08f20b8b4ba8a3926f02c330d0699bd",
-   "text_chars": 9519,
+   "text_sha256": "f49106f320db4f8ef3aa30366b44f1b355341bcedbdf59b1dd84418a36a0a899",
+   "text_chars": 10684,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "INCOMPLETE",
+    "mechanism_level": false,
+    "one_line_reason": "INCOMPLETE no falsification section; text unfinished",
+    "auditor_rank_of_6": 4
    }
   },
   {
-   "row_id": "r176i-08-highstrength-steel-h::contradiction",
-   "item_id": "r176i-08-highstrength-steel-h",
+   "row_id": "r176i-10-transformer-coreloss::contradiction",
+   "item_id": "r176i-10-transformer-coreloss",
    "arm": "contradiction",
-   "text_sha256": "91ff8d646f44832f96f9e43737d7ff4cc10356b7aefb4d976f13c55e6f6043ad",
-   "text_chars": 4213,
+   "text_sha256": "7db67694a5757589168efcd51e9a7780de2fd7565f9814b6e477aa3fbfbcd5ae",
+   "text_chars": 9187,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC falsifier threshold self-revised inside text",
+    "auditor_rank_of_6": 3
    }
   },
   {
-   "row_id": "r176i-08-highstrength-steel-h::relaxation",
-   "item_id": "r176i-08-highstrength-steel-h",
+   "row_id": "r176i-10-transformer-coreloss::relaxation",
+   "item_id": "r176i-10-transformer-coreloss",
    "arm": "relaxation",
-   "text_sha256": "7983f9b8d288417f7a70e37928dd1199c1daaf59f98b1f571bf043e77c58b8d9",
-   "text_chars": 9113,
+   "text_sha256": "33ddda2054fca03f65fd612c79b3406b6b95232fc8e5dbf34e25061fea551afe",
+   "text_chars": 9542,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "FEAS",
+    "mechanism_level": false,
+    "one_line_reason": "FEAS speculative magnetoelectric bias",
+    "auditor_rank_of_6": 2
    }
   },
   {
-   "row_id": "r176i-08-highstrength-steel-h::collision",
-   "item_id": "r176i-08-highstrength-steel-h",
+   "row_id": "r176i-10-transformer-coreloss::collision",
+   "item_id": "r176i-10-transformer-coreloss",
    "arm": "collision",
-   "text_sha256": "01e9319c8bbf70ce3be009fe4fada84612d21bad907ff4b98fc3b566d56f0210",
-   "text_chars": 4229,
+   "text_sha256": "00db2cbdeef39486cea3d3b93dc027a5541fbb5c7191b57e2737852cda990239",
+   "text_chars": 2444,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
-    "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS pseudoscience (radical pairs in steel core)",
+    "auditor_rank_of_6": 6
    }
   },
   {
-   "row_id": "r176i-08-highstrength-steel-h::baseline",
-   "item_id": "r176i-08-highstrength-steel-h",
+   "row_id": "r176i-13-chatter-mrr::baseline",
+   "item_id": "r176i-13-chatter-mrr",
    "arm": "baseline",
-   "text_sha256": "96a044a111e8de2609f639e4cbb1ce98bb8939c1cbc0563113a59faea6d54f72",
-   "text_chars": 6868,
+   "text_sha256": "a0d7d23314ce83b7ff344b9edd91a8b8b7cc0949e8d2b28d089d8c992220762c",
+   "text_chars": 6154,
    "label": {
-    "status": "MISSING_OWNER_INPUT",
-    "serious_error": null,
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "NOVEL-LOW",
+    "mechanism_level": false,
+    "one_line_reason": "NOVEL-LOW variable pitch known; title/test mismatch (holder)",
+    "auditor_rank_of_6": 4
+   }
+  },
+  {
+   "row_id": "r176i-13-chatter-mrr::plain",
+   "item_id": "r176i-13-chatter-mrr",
+   "arm": "plain",
+   "text_sha256": "572ab17030436f0bcb0c400eb7d68e00c68debc80b69aaf10826d58b6cfd90de",
+   "text_chars": 6787,
+   "label": {
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "LOGIC",
+    "mechanism_level": false,
+    "one_line_reason": "LOGIC title says dual-tool, test refers to high-frequency vibration",
+    "auditor_rank_of_6": 5
+   }
+  },
+  {
+   "row_id": "r176i-13-chatter-mrr::departure",
+   "item_id": "r176i-13-chatter-mrr",
+   "arm": "departure",
+   "text_sha256": "f1122f2af02e88ae4bcabb701543fd9d48bc8b370276d5f05e2f8b60b05728ee",
+   "text_chars": 10563,
+   "label": {
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
     "error_class": null,
-    "mechanism_level": null,
-    "one_line_reason": null
+    "mechanism_level": false,
+    "one_line_reason": "none seen",
+    "auditor_rank_of_6": 1
+   }
+  },
+  {
+   "row_id": "r176i-13-chatter-mrr::contradiction",
+   "item_id": "r176i-13-chatter-mrr",
+   "arm": "contradiction",
+   "text_sha256": "96391c43117735a7467c45bb0b9251f82afd3a7fc886b438e6135be898b252a8",
+   "text_chars": 5784,
+   "label": {
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "FEAS",
+    "mechanism_level": false,
+    "one_line_reason": "FEAS vague nonlinear phase mechanism",
+    "auditor_rank_of_6": 3
+   }
+  },
+  {
+   "row_id": "r176i-13-chatter-mrr::relaxation",
+   "item_id": "r176i-13-chatter-mrr",
+   "arm": "relaxation",
+   "text_sha256": "37ec38198f3f0f96a17a02f982f35e8a46003b5956409dbb269de6af989b565b",
+   "text_chars": 7418,
+   "label": {
+    "status": "OWNER_DELIVERED",
+    "serious_error": false,
+    "error_class": "NOVEL-LOW",
+    "mechanism_level": false,
+    "one_line_reason": "NOVEL-LOW spindle speed variation known",
+    "auditor_rank_of_6": 2
+   }
+  },
+  {
+   "row_id": "r176i-13-chatter-mrr::collision",
+   "item_id": "r176i-13-chatter-mrr",
+   "arm": "collision",
+   "text_sha256": "0e6b6ab9ebd49abdcdcaf608a4e884bd7b336841159fed16a42d87549ea89dbf",
+   "text_chars": 3567,
+   "label": {
+    "status": "OWNER_DELIVERED",
+    "serious_error": true,
+    "error_class": "PHYS",
+    "mechanism_level": true,
+    "one_line_reason": "PHYS gimmick avian vortex in chip; weak 3.2um Ra threshold",
+    "auditor_rank_of_6": 6
    }
   }
  ]

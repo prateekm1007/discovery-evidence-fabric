@@ -7005,6 +7005,21 @@
    "artifact_paths": [
     "eval/r186s1_ablation/"
    ]
+  },
+  {
+   "claim_id": "c-0303",
+   "work_id": "r192-owner-label-delivery",
+   "role": "EXECUTOR",
+   "kind": "task",
+   "status": "DONE",
+   "session_id": "auditor-r192s1",
+   "claimed_at": "2026-11-28T16:53:10Z",
+   "lease_expiry": "2026-11-29T20:00:00Z",
+   "base_sha": "49a9789dc",
+   "scope": "delegated-owner delivery of the consultant's 48 per-text error labels (DIR 1). Rebuilt over the consultant's ACTUAL 8 items with sha256 recomputed from the per-item gen bytes. Unblocks DIR 2 + DIR 3. No generation, no judging.",
+   "artifact_paths": [
+    "eval/auditor_error_labels_dev.json"
+   ]
   }
  ],
  "corrections": [
@@ -7058,6 +7073,14 @@
    "at": "2026-11-23 (sandbox clock)",
    "correction": "the c-0234 counter collision and the f58c46a63 stale-base clobber are typed here (Art. 4 memory artifact): (a) builder-r143s3 pushed claim c-0234 at 98e6876c8 (the counter's then-current value); builder-r121s1-3e8a41d7 independently allocated the same id from the stale counter and registered c-0234 AND c-0235 for r143-v16-one-shot in f58c46a63 (double root — one_shot work needs exactly one chain root); (b) that same write restored an older registry copy, silently un-registering builder-r143s3's session + claim and reverting c-0233 to OPEN AFTER 3008e7170 had typed the close (builder-r142s2's DIR-4 acceptance MET — the re-close belongs to the owning lane with its verifier record; this lane does NOT re-type another lane's claim state); (c) the double root is healed as the Art. 29(d) chain it factually was: c-0234 typed TAKEN_OVER, c-0235 takes_over c-0234 (the re-derived id continues the same single generation; the validator requires the taken-over predecessor's lease to be dead — takeover of a live lease is invalid); (d) this lane's claim re-derived to c-0236 (counter c-0237) per the claim guard's own non-FF protocol); (e) the trailer-disclosure half of the original red set was healed remotely at dfbc4a1a3 by builder-r142s2 (the c7096aa488ea + f58c46a63 registrations with the author attribution + the c-0233 re-assert) — this lane's violation-registration script was superseded before landing (never pushed) and is dropped from this claim's artifact_paths",
    "also_typed": "the 62-file CI enforcement selection re-run locally at the corrective tip before push; the acceptance is the API-quoted check-run conclusion on the pushed sha (D2), not the local run"
+  },
+  {
+   "id": "CORR-R192-1",
+   "round": "R192",
+   "date": "2026-11-28",
+   "withdraws": "the auditor's quoted 29% false-flag rate (4 FP / 14 clean)",
+   "correction": "transcribed from the consultant's partial read, NOT committed bytes. The coder's byte-measured 0/26 on the repo's clean controls stands. The 29% figure is WITHDRAWN as unverified; the constants-table deletion rests on the owner directive, not on a byte-verified FP number.",
+   "authority": "Auditor Art. 9"
   }
  ],
  "findings": [
@@ -7695,6 +7718,12 @@
    "registered_by": "builder-r159s2 (VERIFIER-side repair: the c-0302 claim was filed without the Art. 29(a) session registration; forward-only disclosure, no history rewrite)",
    "note": "the r190s1 lane's claims c-0302+ ride this registration",
    "role": "BUILDER"
+  },
+  "auditor-r192s1": {
+   "registered_at": "2026-11-28T16:53:10Z",
+   "registered_by": "auditor-r192s1 (delegated owner)",
+   "note": "DIR 1 label delivery + CORR-R192-1",
+   "role": "AUDITOR"
   }
  },
  "trailer_violations": [
