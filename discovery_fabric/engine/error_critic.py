@@ -281,3 +281,60 @@ def run_critic(variant: str, problem: Dict[str, Any], text: str,
         "flag_classes": sorted({f["class"] for f in flags}),
         "serious": bool(flags),
     }
+
+
+def _batched_prompt(problem: Dict[str, Any],
+                    candidates: List[str]) -> str:
+    """One batched audit call: every candidate in ONE prompt, blind to
+    the pool's arm names (Candidate 1..N in the FIXED pool order; the
+    selection order is owner-fixed and never tuned, so the mapping is
+    deterministic and recorded outside the model's view)."""
+    blocks = "\n\n".join(
+        f"CANDIDATE {i + 1}:\n{t}" for i, t in enumerate(candidates))
+    return (
+        "You are a hostile engineering reviewer. Audit EACH candidate "
+        "below against the PROBLEM PACKET. For each candidate, flag "
+        "ONLY serious, defensible errors — the classes:\n"
+        "PHYS: a mechanism or quantity claim contrary to physical law, "
+        "or materially wrong in direction/magnitude at the stated "
+        "scale.\n"
+        "CONSTR: violates the problem's own stated hard constraints.\n"
+        "LOGIC: internal contradiction, inverted causality, or a "
+        "falsification test that does not test the claimed mechanism.\n"
+        "INCOMPLETE: missing deliverable contract (no mechanism, no "
+        "falsification test, no stated prediction).\n"
+        "Do NOT flag style, brevity or optimism. A correct-but-"
+        "unexciting candidate gets NO flags.\n\n"
+        f"PROBLEM PACKET:\n{_packet_block(problem)}\n\n{blocks}\n\n"
+        "Answer with ONLY this JSON (no prose):\n"
+        '{"candidates": [{"n": 1, "flags": [{"class": "PHYS|CONSTR|'
+        'LOGIC|INCOMPLETE", "reason": "one line"}]}, {"n": 2, "flags": '
+        '[...]}, ...]}\n'
+        "List every candidate, in order, even with empty flags."
+    )
+
+
+def critic_batched(problem: Dict[str, Any], candidates: List[str],
+                    transport: Transport, base: str, key: str,
+                    model: str, max_tokens: int) -> List[List[Dict[str, str]]]:
+    """One call, flags per candidate (index-aligned with the input). A
+    transport failure raises (the caller owns the ladder); a parse that
+    misses a candidate yields [] for that candidate (typed EMPTY — the
+    selection treats it as unknown-flags, never as clean)."""
+    raw = transport(base + "/chat/completions", key, model,
+                    _batched_prompt(problem, candidates), max_tokens)
+    m = re.search(r"\{[\s\S]*\}", raw or "")
+    per: Dict[int, List[Dict[str, str]]] = {}
+    if m:
+        try:
+            doc = json.loads(m.group(0))
+            for entry in doc.get("candidates") or []:
+                if not isinstance(entry, dict):
+                    continue
+                n = entry.get("n")
+                if isinstance(n, int) and 1 <= n <= len(candidates):
+                    per[n] = _parse_flags(
+                        json.dumps({"flags": entry.get("flags") or []}))
+        except json.JSONDecodeError:
+            per = {}
+    return [per.get(i + 1, []) for i in range(len(candidates))]

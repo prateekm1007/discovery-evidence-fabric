@@ -78,3 +78,31 @@ def test_checklist_prompt_carries_packet_and_taxonomy():
                   "earth-abundant only", "the proposal body",
                   "PROBLEM PACKET", "PROPOSAL"):
         assert token in p, token
+
+
+def test_batched_prompt_and_parse_shape():
+    cands = ["proposal one body", "proposal two body",
+             "proposal three body"]
+    p = ec._batched_prompt(PROBLEM, cands)
+    for token in ("CANDIDATE 1", "CANDIDATE 2", "CANDIDATE 3",
+                  "PROBLEM PACKET", "PHYS", "INCOMPLETE"):
+        assert token in p, token
+
+    class _T:
+        def __call__(self, base, key, model, prompt, mt):
+            return ('{"candidates": [{"n": 1, "flags": [{"class": "PHYS", '
+                    '"reason": "bad sign"}]}, {"n": 2, "flags": []}, '
+                    '{"n": 3, "flags": [{"class": "STYLE", "reason": "x"}]}]}')
+
+    per = ec.critic_batched(PROBLEM, cands, _T(), "b", "k", "m", 100)
+    assert len(per) == 3
+    assert per[0][0]["class"] == "PHYS" and per[1] == [] and per[2] == []
+
+
+def test_batched_parse_tolerant_on_garbage():
+    class _T:
+        def __call__(self, *a):
+            return "not json"
+
+    per = ec.critic_batched(PROBLEM, ["a", "b"], _T(), "b", "k", "m", 10)
+    assert per == [[], []]  # index-aligned empties, never silent drops

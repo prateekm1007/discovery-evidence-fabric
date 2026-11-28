@@ -33,7 +33,12 @@ CORPUS = REPO / "eval" / "r176_invention_corpus" / "items.jsonl"
 OUT = REPO / "eval" / "r190s1_critic_calibration"
 OUT.mkdir(exist_ok=True)
 
-VARIANTS = ("checklist", "decomposition", "union", "intersection")
+VARIANTS = ("checklist", "decomposition", "union", "intersection",
+            "batched")
+# "batched" (the DIR-4 selection critic, added by dated amendment
+# before any calibration byte — see eval/r190s1_critic_prereg.json): one
+# call per ITEM over the item's 6 candidates; each row inherits its
+# arm's flags from that single call.
 
 
 def env_keys() -> dict:
@@ -125,14 +130,42 @@ def main() -> int:
             for line in outf.read_text().splitlines():
                 if line.strip():
                     done.add(json.loads(line)["row_id"])
+        # the batched variant: one call per ITEM, cached for its rows
+        batched_cache = {}
+        if variant == "batched" and outf.exists():
+            for line in outf.read_text().splitlines():
+                if line.strip():
+                    d_ = json.loads(line)
+                    batched_cache[d_["row_id"]] = d_.get("flags", [])
         for r in rows:
             rid = r["row_id"]
             if rid in done:
                 continue
             problem, text = texts[rid]
-            rec = ec.run_critic(variant, problem, text, transport,
-                                keys)
-            rec["row_id"] = rid
+            if variant == "batched":
+                pid_ = r["item_id"]
+                if pid_ not in batched_cache:
+                    arms = [x for x in rows if x["item_id"] == pid_]
+                    seat = ec.SEATS["hy4-flash-centai"]
+                    per = ec.critic_batched(
+                        problem, [texts[x["row_id"]][1] for x in arms],
+                        transport, seat["base"],
+                        keys[seat["key_env"]], seat["model"],
+                        seat["max_tokens"])
+                    for x, fl in zip(arms, per):
+                        batched_cache[x["row_id"]] = fl
+                rec = {"variant": variant, "status": "OK",
+                       "family": "hunyuan",
+                       "flags": batched_cache.get(rid, []),
+                       "row_id": rid}
+                rec["n_flags"] = len(rec["flags"])
+                rec["flag_classes"] = sorted(
+                    {f["class"] for f in rec["flags"]})
+                rec["serious"] = bool(rec["flags"])
+            else:
+                rec = ec.run_critic(variant, problem, text, transport,
+                                    keys)
+                rec["row_id"] = rid
             rec["label_serious"] = r["label"]["serious_error"]
             with outf.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
