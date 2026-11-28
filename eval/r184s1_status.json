@@ -1,0 +1,45 @@
+{
+ "record": "R184S1_BUILDER_STATUS/1.0.0",
+ "session": "builder-r184s1",
+ "lane": "DIR-2 kill-ship merge (c-0294 EXECUTOR + c-0295 VERIFIER) + DIR-4 freeze check + DIR-5 fresh-holdout re-scope",
+ "round_date": "2026-11-28",
+ "sandbox_clock": "TRUE UTC",
+ "base_state": "queue tip ce377bd3d at session start (R178S1 close; the R183 kill-ship 8f7fb28f2 sat unmerged on audit/r183-kill-ship-20261128 with parent == the queue tip — a fast-forward waiting to land)",
+ "claims": {
+  "c-0294": "r184-kill-ship-merge (task, DONE) — the kill-ship merge + registry closures (c-0291, c-0289)",
+  "c-0295": "r178s1-dir2-drive-invention-run-24 (measurement VERIFIER, DONE) — the Art. 13 recompute registration (eval/r184_verifier_record.json; recompute bytes = eval/r183_collider_run/tally.json)"
+ },
+ "base_sha": "1f6f83225",
+ "completed": [
+  "DIR 1: constitutions FULL-read at the session tips — EPISTEMIC at ce377bd3d/8f7fb28f2 (digest 153ac62efca36c2d verified from bytes) and AUDITOR (digest 3775f869a1c19a96 verified); ledger V141/V142 + AM52/AM53/AM54 read from the committed AUDIT_LEDGER.json (score 3, capability-first); vault 3/3 digests OK (GH_PAT f1ebca5f9b62, AGNES d0c666a3842f, XKIRO f6c09bee9bde); secret-grep 0 live (the .pytest_cache hits are the dummy ghp_Abc123 test fixture + test ids, gitignored); check-runs read from the API: queue tip ce377bd3d = R11 Queue Surface Check SUCCESS (run 14990854264)",
+  "DIR 2 (closure): the R183 KILL SHIP (8f7fb28f2) byte-verified and MERGED to the queue surface as 2d5d10aff (fast-forward + the registry/records) — genuine 4/12 (33.3%, Wilson CI lower 0.138), paired collider delta 0.0, 0 collision champions, gate 16/24<17 mathematically unreachable; the owner's 4/24 (16.7%) figure noted as the early-window snapshot — the byte-verified decision-time state is 4/12; both far below the gate, decision unchanged",
+  "DIR 3 (ship): problem_router/2.0.0 on the queue branch — every classified problem class -> CHEAP_ARM (best-of-N + critique + revise + verifier; the composer's deterministic verifier NEVER disabled); unclassified -> ARCHITECTURE conservative fallback; conductor wiring landed; tests/test_r178_problem_router.py 9/9 GREEN; tests/test_article29_parallel_coordination.py GREEN (trailer block + verifier-record fix)",
+  "DIR 4 (freeze): NO new constitution articles, NO new round folders, NO new claim kinds (c-0294 is kind 'task', c-0295 is the schema-required VERIFIER 'measurement'); stale OPEN claims closed — c-0291 (SUPERSEDED-BY the kill decision), c-0289 (r178h custody gap, below)",
+  "DIR 5 (re-scope, in flight): the r178h sealed holdout is UNCUSTODIED in this sandbox — the prereg's custody clause put plaintext+key in holdout_secrets/ (sandbox-persistent), which is ABSENT after the recycle; an undecryptable holdout is not a usable instrument (one-shot integrity fails closed). The committed ciphertext + item hashes stay as the Art. 4 record; a FRESH n=24 holdout is authored this session with custody in the SESSION VAULT (holdout_secrets/ re-created; the seal key digest recorded in the prereg; the plaintext never committed)"
+ ],
+ "findings": {
+  "R184-F1": "r178h sealed-holdout custody gap: holdout_secrets/ did not survive the sandbox recycle despite the 'sandbox-persistent' custody clause — the prereg's custody design did not survive the actual recycle path. Fix: the fresh holdout's key rides the SAME discipline as .env.keys (persistent-disk vault, digest-recorded, never committed) and the closure is typed on c-0289",
+  "R184-F2": "Art. 27 drift (self-caught, forward-fixed): the kill-ship merge added engine+script bytes to the r178 window, invalidating r178s1_status.json's hand-typed 48.6% (recompute 17.4%); this r184s1 record is now the latest round record with the share recomputed from the diff and the typed exception disclosed"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "MEASURED (numstat 1f6f83225..HEAD): engine +229/-1 (problem_router 2.0.0 +98, run.py conductor wiring +18, both landed by the kill-ship merge); other-code +1089/-2 (scripts/r183_collider_run.py 461, r183_collider_tally.py 148, the r183 eval bytes, the registry + the round records)",
+  "engine_line_share_measured": 17.4,
+  "share_basis": "numstat over 1f6f83225..HEAD: engine 230/1321 total changed code lines",
+  "share_exception_reason": "ENFORCEMENT + MEASUREMENT-CLOSURE round (governance/enforcement-typed: the R183 kill decision lands; the router 2.0.0 enforcement wiring carries the engine lines the verdict authored) — the capability payload of this round IS the engine routing change plus the retired architecture's Art. 16 accounting; no scoreboard metric moves until the DIR-5 fresh holdout runs (score 4 gate)",
+  "primary_metric_delta": "NO scoreboard metric moved (the honest typed negative): score stays 3 — the capability test CLOSED with the kill decision (genuine 4/12 = 33.3% << the 71% gate); the next metric event is the DIR-5 fresh-holdout run of the shipped best-of-N+verifier recipe (CI lower >50% vs compute-matched single-shot = score 4)",
+  "deletions": "ZERO article/round-folder/claim-kind deletions (DIR-4 freeze held); the multi-stage architecture's EXECUTED-role retirement is accounted in eval/retirement_ledger.json (Art. 16, the R183 entry — executed-role retirement, file bytes preserved as auditable assets)"
+ },
+ "next_bound": [
+  "DIR 5: author the fresh sealed n=24 invention-shaped holdout (best-of-N+verifier vs compute-matched single-shot baseline; Wilson CI lower >50% on wins+ties = score 4); claim BEFORE the run; one run, no tuning",
+  "push the merge + this record; verify the check-run SUCCESS from the API (DIR-5 gate order: tip green before the holdout run)",
+  "handoff: download/r184_handoff/ with the RESUME instructions + this status"
+ ],
+ "owner_requests": [
+  "none human-required this round; the burned CTAI key rotation note stands (R177-F1 class, unchanged)"
+ ],
+ "remote_ci": {
+  "pushed_sha": "2d5d10aff",
+  "remote_ci_conclusion": "pending",
+  "note": "the merge commit 2d5d10aff pushes with this record; the check-run verdict is read from the API after the push and the conclusion updated in the handoff record (a typed pending, never an asserted success)"
+ }
+}
