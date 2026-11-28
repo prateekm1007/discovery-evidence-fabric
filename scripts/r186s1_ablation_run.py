@@ -63,7 +63,7 @@ AG_MODEL = "agnes-3.0-flash"
 JUDGES = {
     "hy4-flash-centai": {
         "base": "https://api.cent-ai.dev/v1",
-        "key_env": "CENTAI_API_KEY",
+        "key_env": "CENT_AI_API_KEY",
         "model": "hy4-flash:free",
         "family": "hunyuan",
         "max_tokens": 2000,

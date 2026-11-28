@@ -6930,7 +6930,7 @@
    "role": "EXECUTOR",
    "session_id": "builder-r186s1",
    "kind": "measurement",
-   "status": "OPEN",
+   "status": "TAKEN_OVER",
    "claimed_at": "2026-11-28 (sandbox clock, TRUE UTC)",
    "lease_expiry": "2026-11-29T20:00:00Z",
    "base_sha": "4910345c3 (queue tip at session start)",
@@ -6939,7 +6939,25 @@
     "scripts/r186s1_ablation_tally.py",
     "eval/r186s1_ablation/"
    ],
-   "note": "DIR-3 (owner R186, rides the score-4 gate MET at a6c607f4f): leave-one-out ablation of the SHIPPED recipe on the 24 r176 DEV items (the holdout is spent one-shot; DEV is the lawful ablation surface). Arms: FULL (4 draws + critique + revise + verifier, 6 calls) vs NO_CRITIQUE_REVISE (4 draws + verifier, 4 calls) — the critique+revise stage is the only remaining prunable stage in the shipped recipe; the verifier is never a cost lever (never disabled). Judge panel: cent-ai hy4-flash:free + xkiro qwen3.8-max:free (two families != agnes generator, Art. 26; both measured live this session; tr-deepseek is the rate-limited tiebreak seat). PRE-DECLARED keep rule: critique+revise is KEPT only if FULL beats NO_CRITIQUE_REVISE on wins+ties with Wilson CI lower of the paired delta > 0; otherwise PRUNED (router 2.1.0, calls/item 6->4). Targets measured: calls/problem and median latency vs <=12 calls / <=2min. Byte-resumable per item; one run, no tuning."
+   "note": "DIR-3 (owner R186, rides the score-4 gate MET at a6c607f4f): leave-one-out ablation of the SHIPPED recipe on the 24 r176 DEV items (the holdout is spent one-shot; DEV is the lawful ablation surface). Arms: FULL (4 draws + critique + revise + verifier, 6 calls) vs NO_CRITIQUE_REVISE (4 draws + verifier, 4 calls) — the critique+revise stage is the only remaining prunable stage in the shipped recipe; the verifier is never a cost lever (never disabled). Judge panel: cent-ai hy4-flash:free + xkiro qwen3.8-max:free (two families != agnes generator, Art. 26; both measured live this session; tr-deepseek is the rate-limited tiebreak seat). PRE-DECLARED keep rule: critique+revise is KEPT only if FULL beats NO_CRITIQUE_REVISE on wins+ties with Wilson CI lower of the paired delta > 0; otherwise PRUNED (router 2.1.0, calls/item 6->4). Targets measured: calls/problem and median latency vs <=12 calls / <=2min. Byte-resumable per item; one run, no tuning.",
+   "taken_over_repair": "session builder-r186s1 sandbox-recycled with 0 measured bytes (the committed runner IS the instrument); taken over by builder-r159s2 at 2026-11-28T11:11Z — same work_id, same pre-declared arms/panel/keep-rule, no design change; the key_env seam fix CTAI naming is transport-only"
+  },
+  {
+   "claim_id": "c-0299",
+   "work_id": "r186s1-ablation-shipped-recipe",
+   "role": "EXECUTOR",
+   "status": "OPEN",
+   "session_id": "builder-r159s2",
+   "claimed_at": "2026-11-28T11:11:00Z",
+   "lease_expiry": "2026-11-29T20:00:00Z",
+   "base_sha": "65ad3a966",
+   "takes_over": "c-0298",
+   "artifact_paths": [
+    "eval/r186s1_ablation/",
+    "scripts/r186s1_ablation_run.py"
+   ],
+   "note": "the leave-one-out ablation fired by the successor session (c-0298's sandbox died before any measured byte); pre-declared design unchanged: FULL (6 calls) vs NO_CRITIQUE_REVISE (4 calls) on the 24 r176 DEV items, paired shared draws, 2-family blind panel (hy4 cent-ai + qwen3.8 xkiro, both probed 200 this session), keep-rule Wilson CI lower > 0; byte-resume per item; one run, no tuning",
+   "kind": "measurement"
   }
  ],
  "corrections": [
