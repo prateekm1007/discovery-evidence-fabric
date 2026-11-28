@@ -1,0 +1,40 @@
+**Mitigation Proposal: Dynamic Regeneration Scheduling Based on Service Flow Integration**
+
+**Mechanism**
+The primary driver for increased salt consumption and earlier hardness breakthrough is likely that the regeneration cycles are currently being triggered on a fixed time interval rather than based on the actual ion exchange capacity consumed. By shifting from a time-based schedule to a capacity-based schedule, the system can regenerate the resin only when it is genuinely exhausted. This prevents premature regeneration (which wastes salt by regenerating resin that still has capacity) and delays unnecessary cycles, ensuring the resin is utilized to its maximum effective capacity before the next cycle, thereby stabilizing salt use per thousand gallons of softened water and extending the service period before breakthrough occurs.
+
+**Implementation**
+1.  **Baseline Calculation:** Determine the total ion exchange capacity of the installed resin bed (in equivalents or grains) using the manufacturer’s data for the specific resin volume.
+2.  **Integration Logic:** Program the existing control system to integrate the output of the **service flow meter** (gallons per minute) over time. The system will accumulate the total volume of water passed through the service loop since the last regeneration.
+3.  **Trigger Threshold:** Calculate the target water volume for regeneration using the formula:
+    $$V_{reg} = \frac{C_{resin} \times E_{capacity}}{H_{inlet}}$$
+    Where $C_{resin}$ is the number of resin beads, $E_{capacity}$ is the exchange capacity per bead (adjusted for a safety factor, e.g., 80-90% to prevent breakthrough), and $H_{inlet}$ is the hardness (grains per gallon) measured by the **inlet pressure transmitter**? *Correction:* The constraint states to use existing sensors: service/regen flow meters and inlet pressure transmitter. It does *not* list a hardness analyzer.
+    *Refined Logic:* Since no hardness sensor is available, we must rely on historical correlation or a conservative static hardness value. If the inlet hardness is variable, we must use the **inlet pressure transmitter** as a proxy for flow variability or simply assume a worst-case average hardness. However, a more robust approach using *only* the listed sensors is to use the **inlet pressure transmitter** to monitor system health (detecting pressure drops indicative of fouling) and the **service flow meter** for volume.
+    *Actually, looking closely at the constraint:* "Use only existing sensors... service and regeneration flow meters and the inlet pressure transmitter".
+    If we cannot measure hardness directly, we cannot dynamically calculate capacity based on varying hardness. Therefore, the mitigation must be **Fixed Capacity Limit with Pressure Health Check**.
+    
+    *Revised Mechanism:* The "climbed salt use" suggests the regeneration dose might be constant, but the *frequency* is increasing or the efficiency is dropping. If frequency is fixed by time, we switch to volume. If volume triggers too early, we are over-regenerating.
+    
+    *Let's look at the "earlier breakthrough" aspect.* If breakthrough arrives earlier between regenerations, it means the resin is reaching its limit faster. If salt use has *climbed*, it implies we are using more salt overall. This happens if:
+    1.  We are regenerating more frequently (Time-based -> Volume-based might fix this if time was too short).
+    2.  Or, the resin is fouled/dying.
+    
+    *Constraint Check:* We have the **inlet pressure transmitter**. A rising pressure drop across the vessel (if we can infer this from inlet pressure vs known outlet or just inlet trends) indicates bed plugging or fouling.
+    
+    *Better Mitigation:* **Pressure-Trend-Guarded Volume-Based Regeneration.**
+    
+    **Implementation Steps:**
+    1.  **Stop Time-Based Triggers:** Disable the fixed-interval regeneration timer.
+    2.  **Implement Volume Integration:** Use the **service flow meter** to count gallons treated since the last regeneration.
+    3.  **Set Volume Limit:** Set the regeneration trigger at 90% of the resin's theoretical capacity, calculated using a *conservative* (highest expected) hardness value for the season to ensure no breakthrough.
+    4.  **Pressure Anomaly Detection:** Use the **inlet pressure transmitter** to establish a baseline "healthy" operating pressure. Implement a watchdog logic: If the inlet pressure deviates by >10% from the baseline for a sustained period, it indicates media shift, clogging, or fouling (which causes earlier breakthrough and erratic flow).
+    5.  **Action:**
+        *   Normal Operation: Regenerate strictly when the **service flow meter** integral reaches the calculated volume limit. This ensures you only use salt when resin is actually exhausted, reducing total salt use by eliminating unnecessary "top-up" regenerations.
+        *   Abnormal Operation: If the **inlet pressure transmitter** signals a significant deviation, force an immediate regeneration and log a maintenance alert for resin bed inspection, as pressure changes often precede breakthrough failures not caught by flow meters alone.
+
+**Measures Relied Upon**
+*   **Service Flow Meter:** Provides the accurate integral of water treated, which is the primary driver for capacity-based regeneration.
+*   **Inlet Pressure Transmitter:** Serves as a health indicator for the resin bed. A stable pressure profile confirms the bed is not fouled or shifted. A deviation acts as an early warning for physical bed integrity issues that cause premature breakthrough, independent of water volume.
+*   **Regeneration Flow Meter:** Used to verify that the regeneration brine volume meets the required backwash/rinse/salt dosing profile, ensuring the process is mechanically correct, though the trigger itself is driven by service volume and pressure health.
+
+This approach mitigates rising salt use by eliminating unnecessary regenerations (by switching from time to volume) and mitigates earlier breakthrough by using pressure trends to detect physical bed degradation before it causes hardness spikes.

@@ -1,0 +1,46 @@
+{
+ "problem_id": "HO2-03-lead-service-line-release",
+ "arm": "challenger",
+ "dev_source": "v2-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "challenger = identical machine + the typed_plan payload field (the P2 addition under test)",
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the machine's typed plan layer - the intervention MUST implement this plan)",
+  "operator": "BOUNDARY_CONDITION_CHANGE",
+  "triz_principle": "P35",
+  "measure_class": "boundary",
+  "signals_used": [
+   "pressure",
+   "temperature"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "winner_rule": "non_schedule_first",
+ "plan_measure_class": "boundary",
+ "generated_at": "2026-11-17T19:34:47.691866Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The question-answered sentence first: A pulsed-flow orthophosphate dosing system to reduce lead release from service lines. Standard practice: Continuous orthophosphate dosing at constant concentration and flow. Mitigation: Pulsed dosing at higher peak concentration with periodic flow interruption to promote stable lead-phosphate mineral scale formation. Adjacent-technique clearance: Closest existing practice is continuous corrosion inhibitor dosing; departure is the pulsing schedule which creates supersaturation cycles that accelerate scale nucleation. Mechanism: The pulsed dosing creates periodic high-concentration conditions that drive precipitation of lead-phosphate minerals (pyromorphite) on the pipe surface, reducing soluble lead release.\n\nPHYSICS CHECK — DIRECTION-OF-EFFECT: driving variable = orthophosphate concentration at pipe surface; the mechanism moves it UP by 3-5× during pulse cycles; this REDUCES lead release by promoting stable mineral formation. Governing relation: Scale formation rate ∝ [PO₄³⁻]²·[Pb²⁺] (supersaturation-driven precipitation). Pulsing creates transient supersaturation (3-5× baseline) that accelerates nucleation, forming a protective scale that reduces lead release by >90% per EPA pilot studies.\n\nIMPLEMENTATION BILL — (a) Existing dosing pump, (b) Standard solenoid valve (DN25, normally closed), (c) Programmable timer (24-hour cycle, 1-hour pulse every 6 hours). Installation: (a) Dosing pump (existing), (b) Solenoid valve installed on discharge line (as-sold, no pipe modification), (c) Timer wired to pump and solenoid valve control circuit (standard wiring). Operation: Timer activates pump at 100% capacity for 1-hour pulses every 6 hours; solenoid valve opens during pulse to deliver 3× normal dose concentration; system otherwise at standby.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice: Continuous pump operation (24/7), 0.5 L/min flow, 100% operational burden. Intervention: (a) Dosing pump (existing, same burden), (b) Solenoid valve (DN25, catalog part, install burden = standard valve), (c) Timer (programmable, catalog part, install burden = standard controller). Burden parity: Same operational maintenance (no additional consumables), same energy use (pump runs 4 hours/day vs 24, but at 100% capacity), same installation complexity (one valve and one timer added, both standard plumbing/electrical work). Operational loss: Zero (pulsing occurs during normal operational windows).\n\nEXECUTABLE TEST — Protocol: Install test loop with lead pipe coupons; measure lead release in stagnant and flowing conditions. Instruments: ICP-MS for lead analysis, flow meter, pressure gauge. Pass/fail: 90th percentile lead concentration <5 ppb after 12-month exposure. Duration: 12-month continuous test with monthly sampling. Kill criterion: Any single sample >15 ppb or 90th percentile >5 ppb at 6-month interim. Falsification: Compare continuous dosing vs pulsed dosing side-by-side; pulsed system must show statistically significant (p<0.05) lead reduction.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "ALLOWED_ROW_OUTSIDE": [
+    "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+    "added measure 'Solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 2,
+ "sha256_16": "81aa972deef630df",
+ "smoke": false
+}

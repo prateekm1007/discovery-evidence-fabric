@@ -1,0 +1,142 @@
+{
+ "a1_version": "r11_a1/1.1.0..a1_r7_promoted",
+ "problem_id": "dev-fu-001-bearing-spalling",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '56ccbb4da5d52e0dacb3c56fd04f9a54666415a2a0241c372053ef7ea385a9be', 'baseline_answer_sha256': 'a34cc50ed73e445d054bcc80664d8e162ca6d1cfa86ff928eaa25302c0cd117d', 'evidence_sha256': 'c8761a2216f70ccdb56748cd41b4fb9d3871e83969577a9d3986699d0c41b16a', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 34,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "repair_mode": {
+  "mode": "LEAD_PRESERVING_REPAIR",
+  "article": "Amendment 2 owner directive 2026-11-14 P0-1; Art. LXXXIV (re-ideate only on starvation), Art. LI (ledger consumption rides the record)",
+  "candidate_source": "R2 incumbent (frozen; repaired in place per Amendment 2 P0-1)",
+  "candidate_frozen": {
+   "lever": "measurement",
+   "name": "SCADA Trend Analysis",
+   "mechanism": "Apply machine learning to 1 Hz SCADA data for early spalling detection.",
+   "failure_link": "Identifies spalling pre-cursors, providing 14-day warning before alarm."
+  },
+  "critic_findings": {
+   "verdict": "PASS",
+   "kills": [],
+   "flags": [],
+   "basis": []
+  },
+  "repair_directives": [
+   "fix exactly the listed findings IN PLACE; every aspect not named stays byte-stable"
+  ],
+  "prior_findings": [],
+  "byte_stability_rule": "everything not named by a finding stays as-is; every edit carries a diff + finding reference",
+  "class_defect_checks": {
+   "verdict": "CLEAN",
+   "kills": [],
+   "flags": []
+  }
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "measurement",
+    "name": "SCADA Trend Analysis"
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "learning_feed": {
+  "article": "Art. LI — negative knowledge changes future search",
+  "prior_killed_classes": [],
+  "consumed": false
+ },
+ "chosen": {
+  "lever": "measurement",
+  "name": "SCADA Trend Analysis",
+  "mechanism": "Apply machine learning to 1 Hz SCADA data for early spalling detection.",
+  "failure_link": "Identifies spalling pre-cursors, providing 14-day warning before alarm."
+ },
+ "compose": {
+  "wall_s": 6.3,
+  "transport_ok": true,
+  "answer_sha256": "611b0c30d5266a29"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "downgrade": 0
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Normalized Asymmetric Sideband Energy Ratio (NASER) > 0.85 with a 95% confidence interval, computed at the sensor edge on the existing 1 kHz vibration waveform stream; only the derived 15-minute NASER trend value is written to the existing 1 Hz SCADA logging path, alongside shaft speed and load for defect-frequency normalization and alarm gating.\n\nMECHANISM: Inner-race spalling initiates at microscopic stress concentrations that gradually alter the load-zone geometry. This creates asymmetric contact stress distribution that modulates the bearing's natural transmission error. The modulation appears as asymmetric sidebands around the characteristic defect frequencies in the vibration spectrum. These sidebands develop gradually as the stress concentration grows, typically 14-21 days before visible spalling occurs. The asymmetry manifests as unequal energy distribution on the positive and negative frequency sides of the defect harmonics.\n\nDATA PATH AND EDGE COMPUTATION BASIS: The 1 Hz SCADA historian alone cannot resolve any 50-200 Hz feature - its Nyquist limit is 0.5 Hz - so the NASER computation must run before the historian, at the sensor edge, on the existing 1 kHz vibration waveform stream. No new sensing hardware is required: the existing 1 kHz vibration sensor is the only measurement device; the upgrade is compute-at-sensor software on the condition-monitoring channel plus a derived-scalar write to the existing 1 Hz logging path. Compute basis: a 1024-point FFT at 1 kHz sampling is one 1.024-second block per second; ASSUMPTION: this stays under 5% of a commodity DSP/MCU core or the existing monitor rack's channel module, and the one-time cost per channel is on the order of $100-300 of embedded compute - negligible against an unplanned 350 kW fan-drive bearing replacement and its downtime. The 1 Hz SCADA logging constraint is respected: nothing but one scalar per 15-minute window crosses into the historian, and the 1 Hz shaft-speed/load context sets the defect-frequency normalization and gates the alarm logic against transient load events (false-alarm control).\n\nDEPARTURE FROM STANDARD: Standard methods detect symmetric energy increases around defect frequencies or overall energy changes. NASER specifically quantifies the asymmetry of energy distribution across sidebands, which is a direct measure of load-zone geometry changes preceding spall formation.\n\nLABELED PARAMETERS:\n- USER CONSTRAINT: existing 1 kHz vibration sensor (the waveform stream the edge computation runs on)\n- USER CONSTRAINT: 1 Hz SCADA logging (the derived-scalar historian path; raw waveforms are not stored in the historian - this constraint is why the computation is placed at the sensor)\n- USER CONSTRAINT: at least 14 days warning (determines the observation window)\n- USER CONSTRAINT: at most 2 false alarms per year (sets the statistical threshold)\n- ASSUMPTION: Bearing defect frequencies are between 50-200 Hz (typical for industrial fan bearings)\n- CALCULATED: 1024-point FFT blocks at the sensor edge on the 1 kHz waveform (frequency resolution about 0.98 Hz at the sensor, before the historian)\n- CALCULATED: 15-minute averaging window (balances responsiveness with noise reduction)\n- ASSUMPTION: Sideband asymmetry develops monotonically during the spall initiation phase\n- CALCULATED: 95% confidence interval (corresponds to approximately 2 false alarms per year)\n\nINDICATOR: Normalized Asymmetric Sideband Energy Ratio (NASER)\nTHRESHOLD: > 0.85\n\nCalculation (executed at the sensor edge on the 1 kHz waveform stream; one scalar per window written to the 1 Hz historian):\nFor each defect frequency f_d (calculated from bearing geometry and the 1 Hz SCADA shaft-speed trend):\n1. Extract sideband energy in 5 Hz bands around f_d from the 1 kHz waveform: E_left = energy in [f_d-5Hz, f_d], E_right = energy in [f_d, f_d+5Hz]\n2. Calculate NASER = |E_right - E_left| / (E_right + E_left)\n3. Apply the 15-minute moving average to NASER values\n4. Alarm when NASER > 0.85 for 3 consecutive 15-minute intervals\n\nVALIDATION PROTOCOL:\n1. Collect 1 kHz vibration waveforms from 20 identical fan drives with known bearing replacement history (portable analyzers during scheduled collection windows - test equipment, not deployed predictor hardware)\n2. Apply the NASER calculation to data from 30 days before each bearing replacement\n3. Record NASER values and actual failure times\n4. Falsification test: for each bearing, determine if NASER > 0.85 occurred at least 14 days before failure\n5. Pass criterion: at least 90% of bearings show NASER > 0.85 at least 14 days before failure, with at most 2 false positives across all test bearings\n6. Statistical validation: apply bootstrapping to determine confidence intervals for the 14-day warning time claim\n",
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 7,
+    "assumption": 1,
+    "unbound_numbers": 0,
+    "all_numbers": 8,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "n_llm_calls": 1,
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "class_defects": "CLEAN",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT"
+ },
+ "typed_note": "lead-preserving repair delivery",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_compose",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  }
+ ],
+ "e2e_wall_s": 6.4,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ },
+ "promotion": {
+  "promoted_at": "2026-11-14T16:27:36.288852+00:00",
+  "promoted_by": "builder (coder session, AM6 D1)",
+  "authorization": "auditor_judgments_r11_r6.json @ 1b431271c (audited commit e861acfc8): scores {'novelty': 3, 'feasibility': 3, 'testability': 3, 'constraint_compliance': 3}, feasible=True, constraint_compliant=True, novel=PLAUSIBLY_NOVEL (related AM prior art disclosed), promotion=AUTHORIZED",
+  "source_bytes": "eval/q7_novelty_upgrades_r11_r4.json:a1_upgrade_repaired_draft (byte-identical, no rewording between judged bytes and shipped bytes)",
+  "superseded_bytes": "eval/pairs/r11_a1_r3_superseded/dev-fu-001-bearing-spalling.json (Art. XI: superseded delivery kept)",
+  "mechanism": "NASER (asymmetric sideband energy ratio) computed at sensor edge on existing 1 kHz waveform; derived 15-min scalar to 1 Hz SCADA; no new hardware",
+  "critic_recheck": "CLEAN"
+ }
+}

@@ -51,6 +51,7 @@ import re
 from typing import Any, Dict, List
 
 from discovery_fabric.source_registry.query_relevance import terms
+from . import citation_identity as _cite  # noqa: E402
 
 EVIDENCE_CLASSES = ("DIRECT_SUPPORT", "PARTIAL_SUPPORT", "BACKGROUND",
                     "ANALOGY", "CONTRADICTORY", "IRRELEVANT")
@@ -258,6 +259,14 @@ def classify_evidence_item(item: Dict[str, Any],
         "source_id": item.get("id") or item.get("source_id"),
         "title": (item.get("title") or "")[:140],
         "classification": cls,
+        # R139 DIR-6: the bibliographic citation-identity verdict (the
+        # [[25]] class instrument — exact shape + alias detection +
+        # fuzzy title leg) rides EVERY classification so alias/forged
+        # citation identities are typed at custody time, before any
+        # mechanism construction or admission can see them. The
+        # verdict is a typed label (never a silent pass): CANONICAL_
+        # EXACT is the only identity that may act as a source.
+        "citation_identity": _cite.classify_record_citation(item),
         "relevance": {
             "domain": {"relevant": domain_relevant,
                        "overlapping_terms": dom_overlap},

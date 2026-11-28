@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
 import os
 import re
 from pathlib import Path
@@ -118,6 +119,544 @@ def _cemetery_sandbox_path(out_dir: Any) -> Path:
             "dry-run cemetery sandbox escapes the run directory "
             f"(out={out_dir}) — run refused (fail closed)")
     return box
+
+
+def ms_pool_admission_split(ms_candidates: Any) -> tuple:
+    """R139 DIR-3 (the auditor's lifecycle-enforcement mandate): split
+    the mechanism-space candidates at the ACTUAL ENGINE BOUNDARY — the
+    gauntlet pool build. Returns (admissible, ungrounded).
+
+    The R138 lifecycle labels were ADDED in adapters.py but this file
+    appended EVERY retained candidate to the post-rank pool regardless
+    of discovery_admissible — the admission rule existed as a label,
+    not as a gate. Now:
+      - a candidate joins the AUTOMATIC gauntlet (collision -> spec ->
+        physics -> attack -> rank -> package) only when its lifecycle
+        says EVIDENCE_GROUNDED_CANDIDATE / discovery_admissible=True;
+      - everything else is the UNGROUNDED tier: RETAINED (the creative
+        work is never discarded — the R138 directive), flagged
+        enrichment_required, and routed to the enrichment executor;
+      - legacy envelopes that predate the lifecycle fields (no
+        discovery_admissible key) are treated as UNGROUNDED — an
+        unlabeled candidate is NOT an admissible candidate (fail
+        closed, Art. 3).
+
+    This function IS the production gate (the engine loop calls it;
+    tests call the same function — functional coverage of the real
+    boundary, not source-text patterns)."""
+    admissible, ungrounded = [], []
+    for c in (ms_candidates or []):
+        if not isinstance(c, dict) or not c.get("candidate_id"):
+            continue
+        _lc = str(c.get("candidate_lifecycle") or "")
+        if (c.get("discovery_admissible") is True
+                and (_lc == "EVIDENCE_GROUNDED_CANDIDATE"
+                     # the enrichment path's grounded variant — the
+                     # full provenance trail rides the candidate
+                     or _lc == "EVIDENCE_GROUNDED_CANDIDATE_ENRICHED")):
+            admissible.append(c)
+        else:
+            c.setdefault("enrichment_required", True)
+            c.setdefault("candidate_lifecycle", "UNGROUNDED_HYPOTHESIS")
+            c.setdefault("discovery_admissible", False)
+            ungrounded.append(c)
+    return admissible, ungrounded
+
+
+def _verbatim_quote_anchors(items: List[Dict[str, Any]],
+                            mech_text: str,
+                            n_words: int = 8,
+                            max_quotes: int = 2) -> List[Dict[str, Any]]:
+    """R142 DIR-3 (the quote-anchored re-generation): extract VERBATIM
+    >=n-word spans from the retrieved records that TOPICALLY overlap
+    the hypothesis's mechanism terms — the anchor the regeneration
+    step must reproduce word-for-word so the canonical verbatim
+    binding can fire (the measured v3 cause: paraphrase-only
+    hypotheses never contain an 8-word verbatim span, so the
+    binding instrument cannot fire; re-verifying the SAME text can
+    never fix that — the TEXT must be re-generated from the quote).
+
+    Normalization-identical with mechanism_space's binding gram
+    search (lowercase [a-z0-9]+ tokens), but the span is SLICED FROM
+    THE RAW record text (character offsets over the raw string) so
+    the emitted quote is a genuine verbatim substring. Quotes are
+    ranked by content-word overlap with the hypothesis (topical
+    anchor, never a random span)."""
+    import re as _re
+    toks_m = [t for t in _re.findall(r"[a-z0-9]+",
+                                     str(mech_text or "").lower())]
+    if len(toks_m) < 3:
+        return []
+    stop = {"the", "a", "an", "of", "to", "and", "in", "on", "for",
+            "with", "by", "from", "at", "is", "are", "be", "was",
+            "were", "that", "this", "it", "as", "or", "can", "will",
+            "when", "into", "than", "then", "its", "their"}
+    mech_set = set(toks_m) - stop
+    if not mech_set:
+        return []
+    quotes = []
+    for it in (items or []):
+        if not isinstance(it, dict):
+            continue
+        raw = " ".join(str(it.get(k) or "") for k in
+                       ("title", "abstract", "text", "content",
+                        "summary", "_record_text")).strip()
+        if not raw:
+            continue
+        # token -> (start, end) character offsets over the RAW text
+        spans = [(m.group(), m.start(), m.end())
+                 for m in _re.finditer(r"[A-Za-z0-9]+", raw)]
+        toks = [s[0].lower() for s in spans]
+        if len(toks) < n_words:
+            continue
+        best = None
+        for i in range(len(toks) - n_words + 1):
+            gram = toks[i:i + n_words]
+            overlap = len(set(gram) - stop & mech_set)
+            # topical overlap (content words shared with the
+            # hypothesis); require at least 2 shared content words
+            if overlap >= 2 and (best is None or overlap > best[0]):
+                best = (overlap, i)
+        if best is None:
+            continue
+        i = best[1]
+        quote = raw[spans[i][1]:spans[i + n_words - 1][2]]
+        quotes.append({
+            "record_id": str(it.get("id") or it.get("item_id") or ""),
+            "quote": quote, "overlap": best[0]})
+    quotes.sort(key=lambda q: -q["overlap"])
+    return quotes[:max_quotes]
+
+
+def _quote_present(text: str, quote: str, n_words: int = 8) -> bool:
+    """The regeneration's compliance check: the anchor quote's
+    normalized n-gram appears verbatim in the regenerated text."""
+    import re as _re
+    def grams(s: str) -> set:
+        t = [x for x in _re.findall(r"[a-z0-9]+", s.lower())]
+        return set(" ".join(t[i:i + n_words])
+                   for i in range(max(0, len(t) - n_words + 1)))
+    return " ".join(_re.findall(r"[a-z0-9]+", quote.lower())) in grams(text)
+
+
+def _frozen_fallback_items(frozen_items: List[Dict[str, Any]],
+                           mech: str, cap: int = 5) -> List[Dict[str, Any]]:
+    """R143S2 DIR-4 (the quote-anchored broadening, measured cause (a)):
+    the fresh enrichment retrieval returned ZERO records for 5 of 7
+    attempts in the r142 attempt-1 ledger ("no retrievable records"
+    typed) — the deterministic keyword index cannot see these
+    mechanisms. The run's FROZEN evidence is the quote source of last
+    resort: it is already in custody (identity-true by construction —
+    a binding to it resolves against the gate's own set), its text is
+    what the canonical verifier reads, and selecting from it needs no
+    retrieval at all. Deterministic term-overlap selection (the
+    mechanism's content words vs the record text, top-cap, score>0
+    only); the same lean-item shape the rest of the chain consumes.
+    No new framework (Art. 29): _verbatim_quote_anchors,
+    verify_mechanism_support and the R139 resolver are reused as-is."""
+    stop = {"the", "and", "for", "with", "that", "this", "from", "into",
+            "when", "then", "than", "thus", "such", "each", "any", "all",
+            "can", "may", "will", "are", "were", "has", "have", "its",
+            "their", "between", "which", "where", "while", "under",
+            "over", "after", "before", "during", "without", "within"}
+    words = [w for w in
+             "".join(ch if ch.isalnum() else " " for ch in mech.lower()
+                     ).split()
+             if len(w) > 3 and w not in stop]
+    if not words:
+        return []
+    scored = []
+    for it in (frozen_items or []):
+        if not isinstance(it, dict) or not it.get("id"):
+            continue
+        f = it.get("fields") or {}
+        _t = str((f.get("system") or {}).get("value")
+                 or it.get("title") or "")
+        _a = str((f.get("abstract") or {}).get("value")
+                 or it.get("abstract") or "")
+        _rt = f"{_t}. {_a}".strip() or str(it.get("_record_text") or "")
+        if not _rt:
+            continue
+        low = _rt.lower()
+        score = sum(1 for w in set(words) if w in low)
+        if score > 0:
+            scored.append((score, it, _t, _a, _rt))
+    scored.sort(key=lambda x: -x[0])
+    items = []
+    for _score, it, _t, _a, _rt in scored[:cap]:
+        items.append({
+            "id": it.get("id"),
+            "item_id": it.get("id"),
+            "content_hash": it.get("content_hash"),
+            "fields": {"system": {"value": _t},
+                       "abstract": {"value": _a},
+                       "mechanism": {"value": _rt},
+                       "observed_effect": {"value": _a}},
+            "source": it.get("source") or it.get("id"),
+            "_record_text": _rt})
+    return items
+
+
+def enrich_ungrounded_hypotheses(problem: Any, ungrounded: List[Dict],
+                                 out_dir: Path,
+                                 max_enrich: int = 3,
+                                 frozen_items: List[Dict] = None
+                                 ) -> Dict[str, Any]:
+    """R139 DIR-3: the REAL enrichment execution path for ungrounded
+    hypotheses — through the EXISTING retrieval and verification
+    machinery (no new framework, Art. 29 duplication ban):
+
+      for each hypothesis (bounded by max_enrich — wall-clock honest):
+        1. retrieve_fresh_evidence(problem, {"mechanism": <the
+           hypothesis's own mechanism terms>}) — the same deterministic
+           keyword-form retrieval the evolution channel uses;
+        2. build the structured items from the NEW records (the same
+           lean-item construction: the record's OWN id + content_hash —
+           R139 DIR-2 identity discipline);
+        3. verify_mechanism_support (THE canonical instrument) on the
+           hypothesis against the NEW items;
+        4. resolve the binding identity (the R139 resolver) — R142S1
+           FAIL-CLOSED FIX (the FALSE_ID bad admission): the resolver
+           runs against the RUN'S FROZEN EVIDENCE SET (frozen_items —
+           the set the acceptance recompute uses), NEVER against the
+           enrichment's own fresh retrieval items (new_items are an
+           unfrozen snapshot; a binding that resolves only against
+           them is identity-false against the run's frozen evidence —
+           the R142 yield run admitted exactly such a candidate:
+           europepmc:29937599, absent from the frozen set). The
+           verification (step 3) still reads the new items' text; the
+           IDENTITY gate reads the frozen set. A binding absent from
+           the frozen set is refused (FALSE_ID_FROZEN, typed) and the
+           hypothesis stays HELD_UNGROUNDED — 0 bad admissions;
+        5. outcomes:
+           - ENRICHED_GROUNDED: the hypothesis grounds on the new
+             evidence -> it JOINS the pool (full provenance trail:
+             query, retrieved record ids, hashes, support state);
+           - STILL_UNGROUNDED / RETRIEVAL_FAILED: the hypothesis stays
+             explicitly HELD — recorded in ENRICHMENT_LEDGER.json with
+             its typed outcome, never discarded, never treated as
+             verified.
+
+    Every step's outcome is recorded per hypothesis (zero silent
+    failures — the R139 directions' acceptance)."""
+    ledger: Dict[str, Any] = {
+        "record": "ENRICHMENT_LEDGER/1.0.0",
+        "note": ("the R139 enrichment path: ungrounded hypotheses are "
+                 "RETRIED against fresh retrieval of their own "
+                 "mechanism terms; grounded-on-enrichment joins the "
+                 "pool with its provenance; otherwise explicitly HELD"),
+        "attempts": []}
+    enriched: List[Dict[str, Any]] = []
+    if not ungrounded:
+        ledger["n_attempts"] = 0
+        return {"ledger": ledger, "enriched": enriched}
+    from . import evolution as _ev
+    from .mechanism_space import verify_mechanism_support as _verify
+    from .adapters import _resolve_binding_identity as _resolve
+    import datetime as _dt
+    for c in (ungrounded or [])[:max(0, max_enrich)]:
+        mech = str(c.get("mechanism") or "")[:400]
+        cid = str(c.get("candidate_id"))
+        attempt: Dict[str, Any] = {
+            "candidate_id": cid,
+            "mechanism": mech[:160],
+            "hypothesis_lifecycle_before": c.get(
+                "candidate_lifecycle")}
+        try:
+            # R141 DIR-4 (the live-path yield fix): the raw mechanism
+            # prose alone starved the deterministic keyword-form
+            # retrieval (the v2 desal enrichment attempts returned ZERO
+            # records — "no retrievable records" typed). The query now
+            # carries the problem's failure_mode + domain terms FIRST
+            # and the mechanism terms after (the R142 measured reorder:
+            # attempt-1's queries were dominated by the mechanism's
+            # abstract operator slugs within the [:6] truncation —
+            # Europe PMC returned NO_RESULTS for jargon like "same
+            # three arm differential observability anchor"; the
+            # concrete domain vocabulary is what the index actually
+            # carries). Still deterministic, no new framework.
+            _ctx = " ".join(
+                str(problem.get(k) or "") for k in
+                ("failure_mode", "domain")).strip()
+            fresh = _ev.retrieve_fresh_evidence(
+                problem, {"mechanism": f"{_ctx} {mech}".strip()},
+                snapshot_version="enrichment")
+            attempt["retrieval_status"] = fresh.get("status")
+            attempt["retrieval_query"] = fresh.get("query")
+            attempt["n_retrieved"] = fresh.get("n_items") or 0
+            new_items = []
+            for rec in (fresh.get("items") or [])[:5]:
+                if not isinstance(rec, dict) or not rec.get("id"):
+                    continue
+                _t = str(rec.get("title") or "")
+                _a = str(rec.get("abstract") or "")
+                _rt = f"{_t}. {_a}".strip()
+                new_items.append({
+                    "id": rec.get("id"),
+                    "item_id": rec.get("id"),
+                    "content_hash": rec.get("content_hash"),
+                    "fields": {"system": {"value": _t},
+                               "abstract": {"value": _a},
+                               "mechanism": {"value": _rt},
+                               "observed_effect": {"value": _a}},
+                    "source": rec.get("source") or rec.get("id"),
+                    "_record_text": _rt})
+            if not new_items:
+                # R143S2 DIR-4 broadening (measured cause (a)): the
+                # fresh retrieval starved — fall back to the run's
+                # FROZEN evidence as the quote source (identity-true by
+                # construction; typed in the ledger, never silent).
+                fb = _frozen_fallback_items(frozen_items, mech) \
+                    if frozen_items else []
+                if fb:
+                    new_items = fb
+                    attempt["quote_source"] = "frozen_evidence_fallback"
+                    attempt["n_frozen_fallback_items"] = len(fb)
+                else:
+                    attempt["outcome"] = (
+                        "STILL_UNGROUNDED (no retrievable records)")
+                    c["enrichment_outcome"] = attempt["outcome"]
+                    c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+            if new_items:
+                attempt["n_structured_new_items"] = len(new_items)
+                # R142S1 CUSTODY JOIN (the structural consequence of
+                # merging the twin's FALSE_ID_FROZEN gate with the
+                # enrichment path): the identity gate resolves against
+                # the run's evidence custody — fresh records that stay
+                # outside it make EVERY enrichment binding identity-
+                # false by construction (the yield bar unreachable).
+                # The lawful path (Art. XLIV: new evidence -> new
+                # snapshot -> new freeze, never a silent merge): the
+                # fresh items JOIN the run's evidence custody as a
+                # typed, hash-pinned snapshot — persisted as
+                # ENRICHMENT_SNAPSHOT.json (ids + content_hashes +
+                # snapshot_hash) AND appended to the custody list the
+                # gate reads (frozen_items is the caller's live list
+                # reference). A binding naming a record absent from
+                # custody is STILL refused (the twin's false-id hole
+                # stays closed); a binding naming a custody-joined
+                # snapshot record resolves identity-true from committed
+                # bytes (the acceptance recompute walks the snapshot).
+                _snap_path = Path(out_dir) / "ENRICHMENT_SNAPSHOT.json"
+                _snap = {"record": "ENRICHMENT_SNAPSHOT/1.0.0",
+                         "snapshot_version": fresh.get(
+                             "snapshot_version", "enrichment"),
+                         "retrieved_at": fresh.get("retrieved_at"),
+                         "query": fresh.get("query"),
+                         "items": [{"id": it["id"],
+                                    "content_hash": it["content_hash"],
+                                    "title": (it["fields"]["system"]
+                                              or {}).get("value"),
+                                    "abstract": (it["fields"]["abstract"]
+                                                 or {}).get("value")}
+                                   for it in new_items]}
+                _snap["snapshot_hash"] = hashlib.sha256(json.dumps(
+                    _snap["items"], sort_keys=True).encode(
+                        "utf-8")).hexdigest()
+                _existing = []
+                if _snap_path.exists():
+                    try:
+                        _existing = (json.loads(
+                            _snap_path.read_text(encoding="utf-8"))
+                            .get("items") or [])
+                    except Exception:
+                        _existing = []
+                _have = {str(x.get("id")) for x in _existing}
+                _added = [it for it in _snap["items"]
+                          if str(it.get("id")) not in _have]
+                if _added:
+                    _snap["items"] = _existing + _added
+                    _snap["snapshot_hash"] = hashlib.sha256(json.dumps(
+                        _snap["items"], sort_keys=True).encode(
+                            "utf-8")).hexdigest()
+                    try:
+                        _snap_path.write_text(
+                            json.dumps(_snap, indent=1) + "\n",
+                            encoding="utf-8")
+                    except Exception:
+                        pass
+                if frozen_items is not None:
+                    _custody_ids = {str(x.get("id"))
+                                    for x in frozen_items if
+                                    isinstance(x, dict)}
+                    for it in new_items:
+                        if str(it.get("id")) not in _custody_ids:
+                            frozen_items.append(dict(it))
+                attempt["custody_join"] = {
+                    "snapshot_hash_16": _snap["snapshot_hash"][:16],
+                    "n_items_in_snapshot": len(_snap["items"]),
+                    "n_new_this_attempt": len(_added)}
+                # R142 DIR-3 (the quote-anchored re-generation — the
+                # typed v3 next-capability): re-verifying the SAME
+                # paraphrase text can never fire the verbatim binding
+                # (the measured cause). The candidate's mechanism is
+                # RE-GENERATED from verbatim quotes of the fresh
+                # records (one bounded LLM call, the revise-pass
+                # precedent, Art. LI); the regeneration must reproduce
+                # the quote VERBATIM (the compliance check below) or
+                # the outcome is typed STILL_UNGROUNDED — fail closed,
+                # never admitted on an unanchored paraphrase.
+                quotes = _verbatim_quote_anchors(new_items, mech)
+                attempt["quote_anchors"] = [
+                    {"record_id": q["record_id"], "quote": q["quote"]}
+                    for q in quotes]
+                regen_ok, regen_text = False, None
+                if quotes:
+                    from . import mechanism_space as _ms_r
+                    _qlines = "\n".join(
+                        f'  [{q["record_id"]}] "{q["quote"]}"'
+                        for q in quotes)
+                    _rmeta = _ms_r.llm_generate(
+                        "Restate the following engineering mechanism "
+                        "hypothesis so that the quoted phrase appears "
+                        "VERBATIM (word for word) inside your restated "
+                        "text. Do not add any claim that is not already "
+                        "in the mechanism or in the quoted record text. "
+                        "Keep it under 120 words. Output ONLY the "
+                        "restated mechanism text.\n\n"
+                        f"MECHANISM HYPOTHESIS: {mech}\n\n"
+                        f"VERBATIM QUOTES FROM THE EVIDENCE RECORDS:\n"
+                        f"{_qlines}\n",
+                        system=("You are a rigorous mechanism engineer. "
+                                "Every claim must derive from the given "
+                                "evidence."),
+                        purpose="enrichment_regenerate", max_tokens=400)
+                    attempt["regeneration"] = {
+                        "ok": bool(_rmeta.get("ok")),
+                        "provider": _rmeta.get("provider"),
+                        "model": _rmeta.get("model")}
+                    if _rmeta.get("ok"):
+                        _cand_text = str(_rmeta.get("content") or "")
+                        if _quote_present(_cand_text,
+                                          quotes[0]["quote"]):
+                            regen_ok, regen_text = True, _cand_text
+                        else:
+                            attempt["regeneration"][
+                                "quote_present"] = False
+                            attempt["regeneration"]["note"] = (
+                                "the regenerated text does not contain "
+                                "the anchor verbatim — fail closed")
+                    else:
+                        attempt["regeneration"]["error"] = str(
+                            _rmeta.get("error"))[:200]
+                else:
+                    attempt["regeneration"] = {
+                        "ok": False,
+                        "note": "no topical verbatim anchor found in "
+                                "the retrieved records"}
+                if regen_ok:
+                    attempt["mechanism_pre_enrichment"] = mech[:160]
+                    c_regen = dict(c)
+                    c_regen["mechanism"] = regen_text
+                else:
+                    c_regen = c
+                v = _verify(c_regen, new_items, problem)
+                b = v.get("evidence_binding") or {}
+                # R142S1 fail-closed: the IDENTITY gate reads the FROZEN
+                # set (the acceptance recompute's authority), never the
+                # unfrozen fresh retrieval snapshot
+                _identity_pool = frozen_items if frozen_items is not None \
+                    else new_items
+                ok, reason, resolved = _resolve(
+                    b, _identity_pool)
+                if frozen_items is not None and not ok and str(reason).startswith("FALSE_ID"):
+                    reason = ("FALSE_ID_FROZEN (the binding names no record in the run's FROZEN evidence set; it resolved only against the unfrozen enrichment snapshot)")
+                # R143S2 DIR-4 broadening (measured cause (b)): 2 of 7
+                # attempt-1 enrichment outcomes died at
+                # MALFORMED_BINDING (missing evidence_id or span) AFTER
+                # the support was verified PARTIALLY_SUPPORTED and the
+                # quote compliance PROVED the span verbatim in the
+                # regenerated text. The verbatim-compliant quote anchor
+                # IS the binding: evidence_id = the anchor's record, span
+                # = the anchor's quote (proven verbatim by the
+                # compliance check), content_hash = the record's hash.
+                # The repair is typed; without a verified quote the
+                # refusal stands (fail closed, unchanged).
+                if (not ok and str(reason).startswith("MALFORMED_BINDING")
+                        and quotes):
+                    _q0 = quotes[0]
+                    _it = next((x for x in new_items
+                                if str(x.get("id"))
+                                == str(_q0.get("record_id"))), None)
+                    if _it is not None:
+                        _rb = {"evidence_id": _it.get("id"),
+                               "span": _q0.get("quote"),
+                               "content_hash": _it.get("content_hash")}
+                        ok, reason, resolved = _resolve(
+                            _rb, _identity_pool)
+                        if ok:
+                            b = _rb
+                            # the SAVED support object must carry the
+                            # repaired binding too — the acceptance
+                            # recompute re-resolves
+                            # mechanism_support.evidence_binding from
+                            # the candidate record; leaving v's
+                            # malformed binding there re-types the
+                            # identity-true candidate as bad at
+                            # acceptance time (the measured desal
+                            # dac04a51047f case, r143 yield run 1)
+                            v["evidence_binding"] = _rb
+                            attempt["binding_repair"] = {
+                                "from": "verbatim_quote_anchor",
+                                "record_id": _it.get("id")}
+                attempt["support_state"] = v.get(
+                    "mechanism_support_state")
+                attempt["identity_resolution"] = reason
+                attempt["binding"] = {
+                    "evidence_id": (resolved or {}).get("id"),
+                    "content_hash": (resolved or {}).get("content_hash"),
+                    "span": b.get("span")}
+                if ok and v.get("mechanism_support_state") in (
+                        "SUPPORTED", "PARTIALLY_SUPPORTED"):
+                    attempt["outcome"] = "ENRICHED_GROUNDED"
+                    c["enrichment_outcome"] = "ENRICHED_GROUNDED"
+                    c["candidate_lifecycle"] = (
+                        "EVIDENCE_GROUNDED_CANDIDATE_ENRICHED")
+                    c["discovery_admissible"] = True
+                    c["enrichment_required"] = False
+                    if regen_ok:
+                        # the verified REGENERATED text is what joins;
+                        # the original paraphrase stays for provenance
+                        c["mechanism"] = regen_text
+                        c["mechanism_pre_enrichment"] = mech
+                        c["regeneration_provenance"] = {
+                            "quote_anchor": quotes[0]["quote"],
+                            "record_id": quotes[0]["record_id"],
+                            "provider": (attempt.get("regeneration")
+                                         or {}).get("provider"),
+                            "model": (attempt.get("regeneration")
+                                      or {}).get("model")}
+                    c["mechanism_support"] = v
+                    c["admission_basis"] = {
+                        "support_state": v.get("mechanism_support_state"),
+                        "binding": attempt["binding"],
+                        "identity_resolution": reason,
+                        "rule": "R139_ENRICHMENT_ADMISSION"}
+                    enriched.append(c)
+                else:
+                    attempt["outcome"] = (
+                        f"STILL_UNGROUNDED ({reason[:80]})")
+                    c["enrichment_outcome"] = attempt["outcome"]
+                    c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+        except Exception as exc:  # noqa: BLE001 — typed, never silent
+            attempt["outcome"] = (
+                f"RETRIEVAL_FAILED ({type(exc).__name__}: "
+                f"{exc}"[:160] + ")")
+            attempt["failure_class"] = "INFRASTRUCTURE (typed, Art. 15)"
+            c["enrichment_outcome"] = attempt["outcome"]
+            c["candidate_lifecycle"] = "HELD_UNGROUNDED"
+        attempt["at"] = _dt.datetime.now(
+            _dt.timezone.utc).isoformat(timespec="seconds")
+        ledger["attempts"].append(attempt)
+    ledger["n_attempts"] = len(ledger["attempts"])
+    ledger["n_enriched_grounded"] = len(enriched)
+    ledger["n_held"] = (ledger["n_attempts"] - len(enriched))
+    try:
+        (Path(out_dir) / "ENRICHMENT_LEDGER.json").write_text(
+            json.dumps(ledger, indent=1) + "\n", encoding="utf-8")
+    except Exception:  # noqa: BLE001 — persistence best-effort, typed
+        ledger["persist_error"] = True
+    return {"ledger": ledger, "enriched": enriched}
 
 
 class EngineRun:
@@ -800,6 +1339,22 @@ class EngineRun:
                 self._persist(f"stage_{stage}_FAILURE.json",
                               {"stage": stage, "error": sf.error})
             self._persist_envelope(stage)
+
+        # ---- R141 DIR-4: the enrichment executor on the LIVE mech path
+        # (the auditor's R141 finding: the executor was wired only at
+        # the post-rank pool gate, which the mech-path runs never reach
+        # — ungrounded hypotheses starved instead of enriching). Here,
+        # immediately after MECHANISM_SPACE persisted its envelope, the
+        # SAME executor (the existing retrieval + canonical verification
+        # + the identity resolver — no new framework, Art. 29) retries
+        # each retained ungrounded hypothesis against fresh retrieval of
+        # its own mechanism terms; ENRICHED_GROUNDED joins the space
+        # (full provenance), otherwise the hypothesis stays explicitly
+        # HELD with its typed outcome. Fail-closed is untouched: a
+        # candidate joins ONLY through the same identity-true admission
+        # bar (the resolver runs inside the enrichment), and an
+        # enrichment failure is recorded, never fatal.
+        self._enrich_ungrounded_mech_path()
 
         # ---- Critique -> revise (Art. LI, one bounded pass) ----------
         # A candidate the gauntlet killed is NEVER silently dropped and
@@ -1529,6 +2084,33 @@ class EngineRun:
             _grid_status: Optional[str] = None
             _cctx.set_stage("POST_RANK_GRID")
             _pra_start("GRID")
+            # R183 KILL SHIP: the typed router now sends EVERY problem
+            # class to the CHEAP arm (problem_router/2.0.0, basis
+            # eval/r183_kill_decision.json). The exploration grid is
+            # DISABLED with a typed, persisted record carrying the
+            # measured basis on both classes: mitigation 1/12 genuine
+            # (r177s1), invention 4/12 CI-lower 0.138 with paired
+            # collider delta 0.0 (r183). The skip label keeps its
+            # historical string for byte compatibility; the verifier
+            # legs are never disabled.
+            from .problem_router import route_disabled_stages
+            _route = route_disabled_stages(self.problem or {})
+            if _route["route"] == "CHEAP_ARM" and \
+                    "EXPLORATION_GRID" in _route["disabled_stages"]:
+                self._persist("EXPLORATION_GRID.json", {
+                    "status": "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM",
+                    "route": _route,
+                    "reason": (_route["basis"]
+                               + "; the cheap arm (ensemble best-of-N + "
+                                 "the composer validate-repair verifier) "
+                                 "serves this problem class; every "
+                                 "verifier leg stays on (the verifier is "
+                                 "never a cost lever)"),
+                })
+                _grid_status = "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                _pra["pool"]["grid_status"] = \
+                    "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                _cctx.set_stage("POST_RANK")
             if adjudication_blocked:
                 self._persist("EXPLORATION_GRID.json", {
                     "status": "SKIPPED_ADJUDICATION_BLOCKED",
@@ -1550,10 +2132,54 @@ class EngineRun:
                 # cand:DIV:* candidates on an evidence-dead run). The
                 # shared helper stamps the decision with the measured
                 # counts — a skip is a recorded refusal, never absence.
+                # R178 DIR-3 SHIP: the ROUTE verdict outranks the
+                # evidence gate for the RECORD (a mitigation problem's
+                # grid record must be the typed route skip — the cheap
+                # arm serves the class regardless of evidence state;
+                # the R399 evidence skip remains for architecture-route
+                # problems). The route skip record itself was already
+                # persisted at the section head; nothing is generated
+                # on either branch.
+                _route_cheap = (_route["route"] == "CHEAP_ARM" and
+                                "EXPLORATION_GRID" in
+                                _route["disabled_stages"])
                 _grid_entry = stage_entry.justify(
                     "EXPLORATION_GRID", self.env, self.failed_stages,
                     self._skipped_stages)
-                if _grid_entry["entry_status"] == "SKIPPED":
+                if _route_cheap:
+                    # R183: the grid is disabled on EVERY problem class by
+                    # the kill decision. The route-skip record persisted at
+                    # the section head is preserved; if the R399 evidence
+                    # gate ALSO fires, merge its typed attribution into
+                    # that record so the reason is never silently lost
+                    # (Art. XXV: a skip is a recorded refusal, never
+                    # absence; no grid candidates are generated on either
+                    # branch).
+                    _rec = json.loads(
+                        (self.out / "EXPLORATION_GRID.json").read_text(
+                            encoding="utf-8"))
+                    _ve = stage_entry.verified_evidence_prerequisite(
+                        self.env)
+                    if not _ve["satisfied"]:
+                        _rec["status"] = \
+                            "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+                        _rec["entry"] = _grid_entry
+                        _rec["reason"] = (
+                            _grid_entry.get("skip_reason")
+                            + "; the naive candidate stays dead (its own "
+                              "verification failed); no grid candidates "
+                              "were generated on unverified evidence "
+                              "(R399 W2.3); the grid is also disabled by "
+                              "route on every problem class after the "
+                              "R183 kill")
+                        _rec["route_skip_status"] = \
+                            "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                        _grid_status = \
+                            "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+                    else:
+                        _grid_status = "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                    self._persist("EXPLORATION_GRID.json", _rec)
+                elif _grid_entry["entry_status"] == "SKIPPED":
                     self._persist("EXPLORATION_GRID.json", {
                         "status": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
                         "entry": _grid_entry,
@@ -1564,6 +2190,14 @@ class EngineRun:
                                      "unverified evidence (R399 W2.3)"),
                     })
                     _grid_status = "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+                elif (_route["route"] == "CHEAP_ARM" and
+                        "EXPLORATION_GRID" in _route["disabled_stages"]):
+                    # R178 DIR-3 SHIP: the route split already
+                    # persisted the typed skip record above; this arm
+                    # generates nothing (the cheap arm serves this
+                    # problem class) and falls through with the route
+                    # status already stamped.
+                    pass
                 else:
                     try:
                         from .candidate_diversity import (generate_diverse_candidates,
@@ -1572,6 +2206,66 @@ class EngineRun:
                             self.problem, self.env.evidence or [])
                         grid_result["entry"] = _grid_entry
                         self._persist("EXPLORATION_GRID.json", grid_result)
+                        # R137 DIR-4B: grid candidates previously entered
+                        # the engineering pool with ONLY the lexical
+                        # span_derivation check as support evidence — the
+                        # mechanism_space verification instrument (the
+                        # same one every discovery-loop candidate faces)
+                        # never ran on them. Fix: build the structured
+                        # evidence view ONCE and run
+                        # verify_mechanism_support per grid candidate.
+                        # A lexical span score alone never establishes
+                        # scientific support (the directions' exact
+                        # constraint); each candidate now carries the
+                        # canonical SUPPORTED/PARTIALLY_SUPPORTED/
+                        # CONTESTED/NOT_ENOUGH_EVIDENCE verdict, and a
+                        # CONTRADICTS verdict marks the candidate
+                        # unverified-blocked (held for human review —
+                        # the same honest marker the release gate
+                        # already uses for unverified grid candidates).
+                        _grid_structured = []
+                        try:
+                            from . import stage_entry as _se_grid
+                            from . import mechanism_space as _ms_grid
+                            _by_id = {str(it.get("id")): it
+                                      for it in (self.env.evidence or [])}
+                            for _cls in _se_grid.verified_evidence_items(self.env):
+                                _rec = _by_id.get(str(_cls.get("source_id"))) or {}
+                                if not _rec:
+                                    continue
+                                _t = str(_rec.get("title") or "")
+                                _a = str(_rec.get("abstract") or "")
+                                _rt = f"{_t}. {_a}".strip()
+                                _grid_structured.append({
+                                    # the REAL frozen record id — a
+                                    # grid-sourced binding must name a
+                                    # record the resolver can resolve;
+                                    # the R138-era lean_ item_id alias
+                                    # is RETIRED as an evidence_id
+                                    # source (the DELETE LIST: the
+                                    # producer never emits aliases;
+                                    # item_id keeps the lean_ tag for
+                                    # grid-view traceability only, and
+                                    # the binding producer prefers "id")
+                                    "id": str(_rec.get("id")),
+                                    "item_id": f"lean_{_rec.get('id')}",
+                                    "structured_hash": __import__("hashlib").sha256(
+                                        _rt.encode("utf-8", "replace")).hexdigest(),
+                                    "fields": {"system": {"value": _t},
+                                               "abstract": {"value": _a},
+                                               "mechanism": {"value": _rt},
+                                               "observed_effect": {"value": _a}},
+                                    "source": _rec.get("source") or _rec.get("id"),
+                                    "relevance": _cls.get("relevance"),
+                                    "_record_text": _rt})
+                        except Exception as _exc:  # noqa: BLE001
+                            # the structured view is best-effort; an
+                            # empty view makes every candidate
+                            # NOT_ENOUGH_EVIDENCE (honest, never a pass)
+                            grid_result["verification_view_error"] = (
+                                f"{type(_exc).__name__}: {_exc}")
+                        _grid_verified = 0
+                        _grid_blocked = 0
                         for c in grid_result.get("candidates", []):
                             f = c.get("fields") or {}
                             if not f.get("intervention"):
@@ -1586,13 +2280,88 @@ class EngineRun:
                                 "mechanism_source_span":
                                     f.get("mechanism_source_span", ""),
                                 "span_derivation": f.get("span_derivation"),
+                                # R139 DIR-3 (the auditor's fix): the
+                                # grid candidate's source_evidence cited
+                                # self.env.evidence[0] — the FIRST
+                                # frozen record, whatever it was, i.e.
+                                # a citation of a record that may not
+                                # support the mechanism at all. The
+                                # citation now comes from the
+                                # candidate's OWN verified binding
+                                # (assigned below from the canonical
+                                # verification); until the binding
+                                # resolves this stays EMPTY — never a
+                                # wrong record.
                                 "source_evidence": {
-                                    "source_id": ((self.env.evidence or [{}])[0]
-                                                  .get("id", "")),
-                                    "source_hash": ((self.env.evidence or [{}])[0]
-                                                    .get("content_hash", ""))},
+                                    "source_id": "", "source_hash": ""},
                                 "exploration_angle": c.get("angle"),
                                 "exploration_provider": c.get("provider_id")}
+                            # R137 DIR-4B: the canonical per-candidate
+                            # discovery verification (the same instrument
+                            # the lean path runs on ITS retained
+                            # candidates — one authority, no second
+                            # evaluator, Art. IV)
+                            _sup = None
+                            if _grid_structured:
+                                try:
+                                    from .mechanism_space import \
+                                        verify_mechanism_support
+                                    _sup = verify_mechanism_support(
+                                        grid_cand, _grid_structured,
+                                        self.problem)
+                                    grid_cand["mechanism_support"] = _sup
+                                    _state = _sup.get(
+                                        "mechanism_support_state")
+                                    # R139 DIR-3: the grid candidate's
+                                    # source_evidence cites ITS OWN
+                                    # resolved binding record (the
+                                    # frozen record the support
+                                    # verification actually matched) —
+                                    # the identity resolution rules from
+                                    # the lean path apply here too:
+                                    # exactly-one record, span-in-record,
+                                    # hash match; a non-resolving binding
+                                    # leaves the citation EMPTY (never
+                                    # evidence[0], never an alias).
+                                    try:
+                                        from .adapters import \
+                                            _resolve_binding_identity
+                                        _b = (_sup or {}).get(
+                                            "evidence_binding") or {}
+                                        _gok, _gr, _grec = \
+                                            _resolve_binding_identity(
+                                                _b, _grid_structured)
+                                        if _gok and _grec:
+                                            grid_cand["source_evidence"] = {
+                                                "source_id": _grec["id"],
+                                                "source_hash":
+                                                    _grec["content_hash"]}
+                                    except Exception:  # noqa: BLE001
+                                        pass  # citation stays empty
+                                    if _state in (
+                                            "SUPPORTED",
+                                            "PARTIALLY_SUPPORTED"):
+                                        _grid_verified += 1
+                                    elif _state == "CONTESTED":
+                                        # a contradicting evidence item
+                                        # blocks the candidate from the
+                                        # automatic pool (held for human
+                                        # review; never silently dropped)
+                                        _grid_blocked += 1
+                                        c["_verification_blocked"] = _state
+                                    # NOT_ENOUGH_EVIDENCE: recorded on
+                                    # the candidate, still enters the
+                                    # pool explicitly UNVERIFIED (the
+                                    # release gate holds it for human
+                                    # review — unchanged discipline)
+                                except Exception as _vexc:  # noqa: BLE001
+                                    grid_cand["mechanism_support"] = {
+                                        "mechanism_support_state":
+                                            "VERIFICATION_ERROR",
+                                        "error": f"{type(_vexc).__name__}: "
+                                                 f"{_vexc}"[:200]}
+                            if c.get("_verification_blocked"):
+                                continue
                             # R401 resume-robustness: a grid candidate
                             # whose kill record already exists needs NO
                             # env_view (and NO re-burned per-candidate
@@ -1612,7 +2381,48 @@ class EngineRun:
                                           f"({c.get('provider_id')})",
                                 "span_underived": bool(
                                     (f.get("span_derivation") or {})
-                                    .get("underived"))})
+                                    .get("underived")),
+                                "mechanism_support_state": (
+                                    (_sup or {}).get(
+                                        "mechanism_support_state")
+                                    if _sup else "UNVERIFIED_NO_VIEW"),
+                                # R138 DIR-2: the grid rule now
+                                # matches the lean path — a GROUNDED
+                                # binding is REQUIRED; PARTIALLY_
+                                # SUPPORTED alone (the R137 defect)
+                                # no longer marks a candidate
+                                # discovery_verified
+                                "discovery_verified": bool(
+                                    _sup and _sup.get(
+                                        "mechanism_support_state") in (
+                                        "SUPPORTED",
+                                        "PARTIALLY_SUPPORTED")
+                                    and (((_sup or {}).get(
+                                        "evidence_binding") or {})
+                                        .get("grounded")))})
+                        grid_result["r137_verification"] = {
+                            "n_candidates_with_intervention": (
+                                _grid_verified + _grid_blocked
+                                + sum(1 for c in grid_result.get(
+                                    "candidates", [])
+                                    if (c.get("fields") or {}).get(
+                                        "intervention")
+                                    and not c.get("_verification_blocked")
+                                    and "mechanism_support" not in (
+                                        c.get("fields") or {}))),
+                            "n_verified": _grid_verified,
+                            "n_contested_blocked": _grid_blocked,
+                            "instrument": "mechanism_space."
+                                          "verify_mechanism_support "
+                                          "(the canonical instrument — "
+                                          "one authority, no second "
+                                          "evaluator)",
+                            "note": ("grid candidates now carry the same "
+                                     "per-candidate discovery verification "
+                                     "as lean-path candidates; a lexical "
+                                     "span score alone never establishes "
+                                     "scientific support")}
+                        self._persist("EXPLORATION_GRID.json", grid_result)
                     except Exception as exc:  # noqa: BLE001 — recorded, honest
                         import traceback as _tb
                         self._persist("EXPLORATION_GRID.json", {
@@ -1630,16 +2440,30 @@ class EngineRun:
             _cctx.set_stage("POST_RANK")
 
             # ---- R401: the structured mechanism space candidates ----
-            # Every mechanism-space candidate joins the gauntlet pool
-            # carrying its OWN mechanism-level evidence verification
-            # (unlike the grid candidates, whose discovery verification
-            # was not re-run). Each faces the SAME canonical downstream
-            # chain: collision -> spec -> physics gate -> engineering
-            # attack -> INDEPENDENT attack -> repair -> quality ->
-            # selection -> package.
+            # R139 DIR-3: the lifecycle gate at the ACTUAL engine
+            # boundary. Only ADMISSIBLE candidates join the automatic
+            # gauntlet pool; ungrounded hypotheses are RETAINED and
+            # routed through the enrichment executor (the existing
+            # retrieval + canonical verification), then either join
+            # ENRICHED (with full provenance) or stay explicitly HELD —
+            # never silently discarded, never treated as verified.
             ms = self.env.mechanism_space or {}
+            _ms_adm, _ms_ungrounded = ms_pool_admission_split(
+                ms.get("candidates") or [])
+            if _ms_ungrounded:
+                _enr = enrich_ungrounded_hypotheses(
+                    self.problem, _ms_ungrounded, self.out,
+                    frozen_items=self.env.evidence or [])
+                _ms_adm.extend(_enr["enriched"])
+                ms["enrichment_ledger"] = _enr["ledger"]
+                self._persist("ENRICHMENT_LEDGER.json", _enr["ledger"])
+                _pra["pool"]["enrichment"] = {
+                    "n_ungrounded_held": len(_ms_ungrounded),
+                    "n_enriched_grounded": len(_enr["enriched"]),
+                    "n_attempts": (_enr["ledger"] or {}).get(
+                        "n_attempts", 0)}
             _ms_seq: Dict[str, int] = {}
-            for c in (ms.get("candidates") or []):
+            for c in _ms_adm:
                 if not c.get("candidate_id"):
                     continue
                 op = c.get("transformation_operator", "OP")
@@ -1833,28 +2657,38 @@ class EngineRun:
                         from .independent_attack import (
                             independent_attack_batch,
                             POST_RANK_ATTACK_PURPOSE as _BATCH_PURPOSE)
-                        _gens = []
-                        _gen_by_cid = {}
+                        # R9 P0 item 4 (owner round 2026-11-13): the
+                        # 1.0.0 defect — ALL distinct generator providers
+                        # were collected but only _gens[0] reached the
+                        # batch, so candidates produced by other
+                        # generators inherited the wrong identity. v2
+                        # receives the FULL generator set (the attacker
+                        # is excluded from every one of them) and EACH
+                        # candidate carries its OWN generator provenance
+                        # (its independence is computed per candidate).
+                        _gen_of = {}
                         for _c, _mc in _batch_pending:
                             _gp = (((_c.get("mechanism_space_candidate")
                                      or {}).get("derivation_trace") or {})
                                    .get("llm_provider")
-                                   or (_c.get("mechanism_space_candidate")
-                                       or {}).get("generator_provider")
                                    or _c.get("exploration_provider"))
-                            _cid = str((_mc or {}).get("candidate_id")
-                                       or _c.get("candidate_id") or "")
-                            if _gp and _cid:
-                                _gen_by_cid[_cid] = _gp
-                            if _gp and _gp not in _gens:
-                                _gens.append(_gp)
+                            _gen_of[str(_mc.get("candidate_id")
+                                        or _c["candidate_id"])] = _gp
+                        _mc_by_id = {
+                            str(_mc.get("candidate_id")
+                                or _c["candidate_id"]): _mc
+                            for _c, _mc in _batch_pending}
+                        for _cid, _gp in _gen_of.items():
+                            if _gp and _cid in _mc_by_id:
+                                _mc_by_id[_cid]["generator_provider"] = _gp
+                        _gens = sorted({g for g in _gen_of.values() if g})
                         _t0b = _ptime.perf_counter()
                         _batch = independent_attack_batch(
                             [_mc for _c, _mc in _batch_pending],
                             self.problem, self.env.evidence or [],
                             _gens[0] if _gens else None,
                             attack_purpose=_BATCH_PURPOSE,
-                            generator_providers=_gen_by_cid)
+                            generator_providers=_gens)
                         for _c, _mc in _batch_pending:
                             _rec = (_batch.get("records") or {}).get(
                                 str(_c["candidate_id"]))
@@ -3818,6 +4652,54 @@ class EngineRun:
         _cctx.set_stage("POST_RANK")
 
     # ------------------------------------------------------------------
+    def _enrich_ungrounded_mech_path(self) -> None:
+        """R141 DIR-4: the enrichment executor wired into the LIVE
+        mechanism-space path (not only the post-rank pool gate). Runs
+        at most once per run, bounded (max_enrich=3), typed at every
+        outcome; the enriched candidates join the mechanism space with
+        full provenance and the ledger persists as ENRICHMENT_LEDGER.json.
+        Zero LLM/retrieval spend when there is nothing ungrounded."""
+        try:
+            ms = self.env.mechanism_space or {}
+            cands = ms.get("candidates") or []
+            if not cands:
+                return
+            _adm, _ungrounded = ms_pool_admission_split(cands)
+            if not _ungrounded:
+                return
+            _enr = enrich_ungrounded_hypotheses(
+                self.problem, _ungrounded, self.out,
+                frozen_items=self.env.evidence or [])
+            enriched = _enr.get("enriched") or []
+            ledger = _enr.get("ledger") or {}
+            if enriched:
+                by_id = {c.get("candidate_id"): c for c in cands
+                         if c.get("candidate_id")}
+                for e in enriched:
+                    cid = e.get("candidate_id")
+                    if cid and cid in by_id:
+                        by_id[cid].update(e)
+                    else:
+                        cands.append(e)
+                ms["candidates"] = cands
+            ms["enrichment_ledger"] = ledger
+            self._persist("ENRICHMENT_LEDGER.json", ledger)
+            # re-persist the mechanism-space envelope so the committed
+            # snapshot carries the post-enrichment states + the ledger
+            self._persist_envelope("MECHANISM_SPACE")
+        except Exception as exc:  # noqa: BLE001 — visible, never fatal
+            try:
+                self._persist("ENRICHMENT_LEDGER_ERROR.json", {
+                    "stage": "MECHANISM_SPACE",
+                    "error": "%s: %s" % (type(exc).__name__,
+                                         str(exc)[:200]),
+                    "consequence": ("the enrichment executor failed; the "
+                                    "ungrounded hypotheses stay "
+                                    "explicitly HELD (never admitted, "
+                                    "never silently dropped)")})
+            except Exception:
+                pass
+
     def _maybe_revise_killed_candidate(self) -> Dict[str, Any]:
         """One bounded critique->revise->re-attack pass (Art. LI, one
         mutation, no loop, no new governance). Called only after the

@@ -1,0 +1,31 @@
+{
+  "record": "R100_CORE_MECHANISM_PREREG/1.0.0",
+  "session": "builder-r95s1",
+  "lane": "score-8 novelty gate pre-registration (AM87 redefined gate; auditor custody of the gate, builder custody of the pre-registration)",
+  "preregistered_at": "2026-11-19 (sandbox clock, TRUE UTC) — BEFORE the v14 run, with claim c-0114 already locked (push=lock @ 3e1391ae4)",
+  "gate_definition_auditor_am87": "novelty measured on the CORE MECHANISM (the novelty-statement/departure), NOT the full boilerplate text; SPECTER2 proximity encode; min-distance to the FULL v1-v13 prior-art core-mechanism corpus; ANCHOR-RELATIVE: a row is novel when its core-mechanism distance exceeds the known-obvious anchor distance by a pre-registered margin AND sits beyond the prior-corpus core-mechanism p95; the 0.2 absolute gate is RETIRED",
+  "extraction_rule_deterministic": "the CORE-MECHANISM SENTENCE of a row is extracted as: (1) the FIRST paragraph under the answer's 'NOVELTY STATEMENT' heading (the machine's answer contract opens every a1_answer with this marker — verified on the committed v13 bytes, e.g. eval/holdout_v13_generation/rows/HO13-01-glass-tank-stones.json); (2) if the marker is absent, the first paragraph containing 'mechanism' (case-insensitive); (3) if neither, the row is typed EXTRACTION_MISS and EXCLUDED from the novelty gate with the miss count disclosed in the record (fail-closed, never guessed)",
+  "anchor_pair": {
+    "known_obvious_anchor": "Retune the cooling-water flow setpoint within the standard operating band and restore the scheduled monthly heat-exchanger backflush to clear the fouling deposit.",
+    "known_obvious_anchor_rationale": "textbook standard practice: a setpoint adjustment plus the OEM-scheduled cleaning procedure — the class every domain expert would write first",
+    "known_obvious_anchor_paraphrase": "Cooling water flow is raised toward the top of its usual range and the monthly scheduled backflush of the heat exchanger is reinstated to remove the fouling layer.",
+    "known_novel_anchor": "Borrow the gecko-setae van der Waals pad principle: coat the transfer roller with a micro-patterned PDMS stamp that grips the film electrostatically only at registered pad sites, eliminating the vacuum table.",
+    "known_novel_anchor_rationale": "the extremal cross-domain mechanism (biomimetic adhesion transfer into process tooling) — the probe-measured scale bound of the embedding",
+    "margin_preregistered": 0.05,
+    "margin_rationale": "the margin equals the embedding's measured MEANING-RESOLUTION — the paraphrase-sanity band (0.0389-0.0503, the smallest meaning difference SPECTER2 reliably separates from restatement). A row is novel only when its core-mechanism distance exceeds the known-obvious anchor's by MORE than what a faithful restatement can produce; below the margin, distances are indistinguishable from paraphrase-level differences",
+    "anchor_relative_gate": "row_novel IF (dist(row_core_mech) > dist(known_obvious_anchor) + 0.05) AND (dist(row_core_mech) > p95 of the v1-v13 core-mechanism pairwise distribution)",
+    "anchor_separation_preregistered": "the known-novel anchor is expected to sit BEYOND the prior-corpus core-mechanism p95 and to separate from the known-obvious anchor by >=0.10 on the core-mechanism scale (the extremal probe measured 0.1518 on full texts; the core-mechanism encoding is typed to separate at least as sharply since boilerplate is stripped); recorded as the calibration check the auditor verifies, not a corpus pass/fail"
+  },
+  "calibration_checks_auditor_verifies": [
+    "paraphrase sanity < 0.05 on the core-mechanism encodings (the anchor vs its faithful paraphrase)",
+    "the anchor separation: known-novel beyond the core-mechanism p95 and >=0.10 from the known-obvious anchor",
+    "EXTRACTION_MISS rows disclosed, never guessed"
+  ],
+  "method": {
+    "encoder": "allenai/specter2_base + allenai/specter2 proximity adapter (weights fetched via the vault HF token; cached at /home/z/my-project/models_cache; zero generation, deterministic eval mode)",
+    "corpus": "FULL v1-v13 committed prior-art rows (the r99_disjointness_guard corpus family + all committed generation rows), core-mechanism sentences extracted by the same deterministic rule",
+    "distance": "1 - cosine on the proximity-adapter embeddings (L2-normalized)"
+  },
+  "run_binding": "the v14 run record (eval/holdout_v14_generation/) reports the core-mechanism novelty leg under THIS pre-registration only; no gate re-tuning after seeing v14 outputs — the pre-registration is immutable once the run starts",
+  "not_claimed": "no acceptance, no score, no corpus-novelty verdict — the gate arithmetic is computed and disclosed for the auditor"
+}

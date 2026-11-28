@@ -1,0 +1,88 @@
+{
+ "problem_id": "HO9-13-filter-press-cake-moisture",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    32,
+    36,
+    30
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9151804be033": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:814e6e3491a5": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:35:48.367572Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**\nThe proposed mitigation is a **high-shear recirculation conditioning cycle** applied to the feed tank prior to each filtration batch. Standard practice uses the press to process a static, pre-mixed sludge that has likely flocculated or formed a \"sludge blanket\" by the time it reaches the press, resulting in high cake moisture due to poor permeability and trapped water. The mitigation is a new arrangement where the existing pump is driven by the VFD to recirculate the sludge through a standard high-shear static mixer installed in the bypass loop at high flow rates, breaking up large flocs and reducing the feed viscosity to near-liquid consistency before the squeeze phase. This attacks the failure physics by maximizing the hydraulic conductivity of the forming cake, allowing the squeeze pressure to expel water more effectively.\n\n**PHYSICS CHECK**\nThe driving variable for high cake moisture after squeeze is the **cake resistance** ($R_c$), which is inversely proportional to the **hydraulic permeability** ($k$) of the particle matrix. Large, gel-like flocs create low-permeability structures that trap pore water even under 15 bar squeeze pressure. The mechanism moves the **floc size** **down** by applying high shear stress ($\\tau_s$) via the VFD-driven pump and static mixer, breaking flocs into primary particles.\n$$ R_c \\propto \\frac{1}{k} \\propto \\text{Floc Size} $$\nBy reducing floc size to primary particles, $k$ increases. For a typical mineral sludge, reducing floc size from 100 $\\mu$m aggregates to 10 $\\mu$m primary particles can increase permeability by an order of magnitude, directly lowering the residual moisture content after a fixed squeeze time.\n**DIRECTION-OF-EFFECT:** driving variable = **cake resistance**; the mechanism moves it **down** by **increasing permeability via floc breakup**; this **reduces** the **trapped water fraction**.\n\n**IMPLEMENTATION BILL**\n*   **MECHANISM CLASS:** Recirculation-based feed conditioning.\n*   **Row 1 (b):** Install a standard static mixer (helical element type) in the existing bypass/recirculation line between the feed tank and the press feed pump. This part is a catalog item, requiring no modification to the press plates.\n*   **Row 2 (c):** Configure the existing Variable Frequency Drive (VFD) to run the feed pump at 100% speed (maximum flow) during a 10-minute \"conditioning window\" at the start of the cycle, recirculating the sludge through the static mixer.\n*   **Row 3 (c):** Set the VFD to switch to standard filtration flow rate (e.g., 50% of max) after the 10-minute conditioning window to begin cake formation.\n*   **Row 4 (c):** Retune the existing pressure transducer setpoint to hold 15 bar for a fixed duration during the squeeze phase (no hardware change, just confirming the setpoint is active).\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Hardware:** The standard practice uses a bypass line and pump. This mechanism adds **one** catalog static mixer (Row 1). It does not modify the press. The VFD and pump are already present.\n*   **Operational Loss:** The 10-minute conditioning cycle adds 10 minutes to the total cycle time. For a standard 2-hour cycle, this is a **~8.3% reduction in throughput**. This loss is explicit.\n*   **Net Benefit:** The reduction in cake moisture reduces downstream drying energy or disposal volume significantly. The 8.3% throughput loss is traded for a lower moisture cake, which is the primary objective. The burden is **same-or-lower** in terms of complexity, with a clear operational cost.\n\n**EXECUTABLE TEST**\n1.  **Protocol:** Run three cycles: (1) Standard control (no recirculation conditioning), (2) With 10-min high-shear recirculation, (3) With 20-min high-shear recirculation.\n2.  **Instruments:** Use the existing moisture analyzer on the cake. Record cycle time.\n3.  **Pass/Fail Threshold:** The cake moisture in Cycle 2 must be $\\geq 5\\%$ absolute lower than Cycle 1. The cycle time penalty must be $\\leq 10$ minutes.\n4.  **Kill Criterion:** If moisture does not drop by 5% in Cycle 2, the mechanism is ineffective for this sludge type (e.g., if it is not shear-sensitive), and the test fails.\n\n**MECHANISM DIVERSITY & CONSTRAINT COMPLIANCE**\n*   **Constraint Check:** The problem allows \"feed/air-blow procedure only\" and \"squeeze-pressure/time retuning.\" It **excludes** press/plate redesign.\n*   **Compliance:** This mechanism uses a **feed procedure change** (recirculation conditioning) and a **parameter change** (VFD duty cycle). It does **not** modify the press plates. It does **not** use new dosing chemistry (flocculants are not mentioned as required for this specific high-moisture issue if it's a permeability issue; if it were a settling issue, chemistry would be first, but high moisture *after squeeze* is often a compaction/permeability issue).\n*   **Note on \"Feed/Air-blow only\":** The constraint says \"feed... procedure only.\" Recirculation is a feed procedure. It is permitted.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** Recirculation-based feed conditioning.",
+    "*   **Hardware:** The standard practice uses a bypass line and pump. This mechanism adds *",
+    "*   **Operational Loss:** The 10-minute conditioning cycle adds 10 minutes to the total cy",
+    "*   **Net Benefit:** The reduction in cake moisture reduces downstream drying energy or di",
+    "1.  **Protocol:** Run three cycles: (1) Standard control (no recirculation conditioning), ",
+    "2.  **Instruments:** Use the existing moisture analyzer on the cake. Record cycle time.",
+    "3.  **Pass/Fail Threshold:** The cake moisture in Cycle 2 must be $\\geq 5\\%$ absolute lowe",
+    "4.  **Kill Criterion:** If moisture does not drop by 5% in Cycle 2, the mechanism is ineff",
+    "*   **Constraint Check:** The problem allows \"feed/air-blow procedure only\" and \"squeeze-p",
+    "*   **Compliance:** This mechanism uses a **feed procedure change** (recirculation conditi",
+    "*   **Note on \"Feed/Air-blow only\":** The constraint says \"feed... procedure only.\" Recirc"
+   ]
+  }
+ },
+ "declared_template_prose": "** recirculation-based feed conditioning.",
+ "allowed_row_outside": 0,
+ "sha256_16": "63f6ff8cff87403f",
+ "smoke": false
+}

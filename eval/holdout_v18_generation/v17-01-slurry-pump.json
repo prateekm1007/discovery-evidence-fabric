@@ -1,0 +1,157 @@
+{
+ "problem_id": "v17-01-slurry-pump",
+ "domain": "abrasion_erosion",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P13",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9c6e6efd81d5": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:7fdbe7233abe": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:66dc67c100ec": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "abrasion_erosion",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "abrasion_erosion",
+   "n_analogies": 2,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:15:23Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.6,
+ "a1_answer": "NOVELTY STATEMENT\n1. Closest Conventional Practice: The field-standard practice for high-velocity slurry impeller erosion delivers a **DESIGN CHANGE** (harder/thicker surface) by applying hard-facing overlays (HVOF tungsten carbide or ceramic) or simply increasing impeller material thickness to survive Archard’s law (wear rate ~1/H), where H is hardness.\n2. Distinguishing Features: My mechanism departs by applying a **compliant_elastomer_coating** (specifically a high-durometer, low-modulus polyurethane/elastomer hybrid layer). Unlike hard-facing which relies on high static hardness (H) to resist cutting, this mechanism relies on **dynamic modulus reduction** and energy absorption: the compliant layer extends the impact duration ($\\Delta t$), reducing the peak transmitted stress ($\\sigma_{peak} = F/\\Delta t$) below the critical fracture/initiation threshold of the underlying base material, even if the coating itself wears. It changes the *physical coupling* from \"hardness-based resistance\" to \"impedance-matched energy dissipation.\"\n3. Objective Technical Problem: How to prevent subsurface fatigue cracking and material removal in an impeller exposed to high-velocity hard particle impacts without relying solely on increasing surface hardness.\n4. Mechanism: A **compliant_elastomer_coating** applied to the impeller suction and discharge vane surfaces. The low modulus ($E_c$) of the coating reduces the acoustic impedance mismatch between the particle/liquid and the base metal, absorbing kinetic energy of the quartz particles ($E_k = \\frac{1}{2}mv^2$) into viscoelastic damping rather than elastic reflection that causes spalling.\n5. Prediction: The impeller wear rate will drop by **≥50% (mm/year)** compared to a uncoated baseline of identical geometry and flow conditions.\n6. Kill Condition: **The mechanism is FALSIFIED if the coating wear rate does not decrease by at least 50% (mm/year) within 500 hours** of operation, measured by a **mass-loss coupon test** using a rotating-drum wear apparatus replicating the impeller tip velocity.\n\nPHYSICS CHECK\nThe governing physical relation is the impact stress reduction via impedance mismatch and contact time extension. \nStandard hard metal impact: $\\sigma_{peak} \\approx \\frac{F_{impact}}{A}$. With a compliant layer of thickness $h$ and modulus $E$, the contact time $\\Delta t$ increases by a factor of $\\sqrt{\\frac{E_{metal}}{E_{coating}}}$. \nMagnitude Verification: \nAssumed: Quartz particle impact energy $E_k = 50 \\text{ mJ}$ (Assumed typical slurry particle size 1mm, velocity 30 m/s). \nStandard Steel ($E \\approx 200 \\text{ GPa}$): $\\Delta t_{steel} \\approx 10 \\text{ \\mu s}$. \nCompliant Polyurethane ($E \\approx 100 \\text{ MPa}$ to $1 \\text{ GPa}$ depending on durometer; assuming high-durometer hybrid $E \\approx 1 \\text{ GPa}$ for slurry durability): $\\Delta t_{comp} \\approx \\Delta t_{steel} \\times \\sqrt{\\frac{200}{1}} \\approx 20 \\times 10 \\text{ \\mu s} = 200 \\text{ \\mu s}$. \nPeak stress $\\sigma_{peak} \\propto \\frac{1}{\\Delta t}$. Therefore, $\\sigma_{peak, comp} \\approx \\frac{1}{20} \\sigma_{peak, steel}$. \nIf $\\sigma_{peak, steel}$ is near the material yield/fatigue limit, the compliant layer reduces it to $\\frac{1}{20}$, preventing subsurface crack initiation in the base metal. The coating wears (compliantly) but protects the expensive impeller body. This is a valid physics-driven departure from \"harder surface.\"\n\nIMPLEMENTATION BILL\n*   **Component**: Slurry Pump Impeller Vane Coating.\n*   **Material**: High-durometer (>80 Shore D), abrasion-resistant thermoplastic elastomer (TPE) or filled polyurethane. \n    *   *Rationale*: Must be \"compliant\" (low modulus relative to steel) but high enough durometer to survive slurry shear. Standard HVOF is brittle; this is tough.\n*   **Instrument/Method**: Two-component spray or cast-in-place application. \n    *   *Input Stream*: ALREADY-RECORDED flow_rate and pressure from the pump’s existing PLC/DCS telemetry (stated in `signals_used`). These define the operating envelope ($v_{tip}$) for the physics check.\n*   **Reference/Threshold**: DERIVED from stated physics. \n    *   *Derivation*: $E_{coating} < 0.1 E_{base}$ required for significant stress reduction. Steel $E \\approx 200 \\text{ GPa}$. Coating $E \\le 20 \\text{ GPa}$. Most TPEs are $10-500 \\text{ MPa}$, so the condition is easily met.\n    *   *Threshold*: Wear rate $W_{coated} \\le 0.5 W_{bare}$.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability**: SAME class. Both require removing the impeller and applying a surface layer. HVOF requires specialized HVOF rigs; TPE casting/spraying requires standard thermal spray or cast-in-place facilities, often cheaper and less invasive.\n*   **Operability**: SAME class. No changes to pump operation. \n*   **Maintenance**: LIGHTER burden. Elastomer coatings are easier to repair (patch) than HVOF hard-facing which requires re-spraying and balancing. \n*   **Cost**: LOWER. TPE materials are less expensive than Tungsten Carbide HVOF powders.\n*   **Conclusion**: Same feasibility class, lower cost, easier repair, different mechanism (energy absorption vs. hardness resistance).\n\nEXECUTABLE TEST\n*   **Protocol**: \n    1.  Prepare two coupons: one bare AISI 4140 steel impeller segment, one coated with the proposed TPE layer (2mm thick).\n    2.  Mount both in a rotating-drum wear tester (slurry erosion rig) using the actual slurry medium (quartz particles in water).\n    3.  Operate at $v_{tip} = 30 \\text{ m/s}$ (ASSUMPTION based on typical slurry pump tip speed; if problem stated velocity, use that).\n    4.  Run for 500 hours.\n*   **Instruments**: Analytical balance (0.1 mg precision), micrometer (0.001 mm), optical profiler.\n*   **Pass/Fail Thresholds**: \n    *   Measure mass loss $\\Delta m$ and thickness loss $\\Delta h$ for both coupons.\n    *   Calculate wear rate $W = \\Delta h / t$ (mm/year equivalent).\n    *   PASS: $W_{coated} \\le 0.5 W_{bare}$.\n*   **Kill Criterion**: **The mechanism is FALSIFIED if the coating wear rate does not decrease by at least 50% (mm/year) within 500 hours** of operation, measured by the rotating-drum wear apparatus.\n*   **Validation**: This test validates the physical mechanism (energy absorption) by directly measuring the outcome (wear rate) against a baseline. It does not require commissioning a new monitoring system.\n\nCONSTRAINT BIND\n*   **Primary Stated Indicator**: The problem states \"impeller erodes.\" The primary indicator of failure is **wear depth/rate**. My mechanism targets this directly. \n*   **Secondary Indicators**: Flow rate and pressure are used to define the operating point (tip velocity) for the physics check, but they are not the monitored failure indicator. The monitored indicator is the physical erosion (wear rate), which is the PRIMARY stated failure metric.\n\nDESIGN POINT\n*   **Coating Modulus**: $E_{coating} \\approx 100 \\text{ MPa}$ (ASSUMPTION: High-durometer TPE, typical range 10-500 MPa, chosen to be low relative to steel but high enough for abrasion resistance).\n*   **Stress Reduction Factor**: $\\sqrt{\\frac{E_{steel}}{E_{coating}}} = \\sqrt{\\frac{200,000 \\text{ MPa}}{100 \\text{ MPa}}} = 44.7$. \n    *   *Note*: This assumes linear elastic contact. In reality, viscoelastic damping reduces peak stress further. \n*   **Target Wear Rate Reduction**: $\\ge 50\\%$ reduction in volumetric wear rate compared to bare steel.\n*   **Tip Velocity**: $v_{tip} = 30 \\text{ m/s}$ (ASSUMPTION: Typical for high-head slurry pumps). \n*   **Particle Impact Energy**: $E_k = \\frac{1}{2} m v^2$. For a 1mm quartz particle ($\\rho=2650 \\text{ kg/m}^3, d=1\\text{mm} \\rightarrow m \\approx 3.5 \\text{ mg}$), $E_k \\approx 0.5 \\times 0.0035 \\text{ kg} \\times (30)^2 \\approx 1.575 \\text{ J}$. Wait, 1mm particle is small. Let's assume 10mm particle for high-impact scenario? No, slurry is usually fine. Let's stick to the 1mm assumption but note that smaller particles have less impact energy. The mechanism is most critical for larger particles or high velocities. The 50% wear reduction is a conservative target for mixed particle sizes.",
+ "quant_prediction": {
+  "quantity": "droplet-impact erosion intensity ordering (v^5 scaling)",
+  "predicted_value": "relative 0.002 dimensionless vs a 100 m/s reference",
+  "calc_trace": "(30.0 m/s / 100 m/s)^5 = 0.002 dimensionless",
+  "falsifier": "a rain-erosion whirling-arm coupon must track the v^5 curve; a compliant layer's benefit shows as a threshold shift — if the coating does NOT raise the damaging-speed threshold >= 15%, it falsifies",
+  "units_ok": true,
+  "status": "computed",
+  "route": "specific:compliant_elastomer_coating"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "compliant_elastomer_coating",
+  "off_target": false,
+  "novelty": "strong",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Erosion failure is driven by the high kinetic energy of hard quartz particles impacting the surface at high velocities, causing localized material displacement and removal (cutting/plowing). | ingredient: The compliant elastomer coating increases the contact area and decreases the surface hardness relative to the particles, which mechanically facilitates material removal and increases the volumetric erosion rate per impact. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Erosion failure is driven by the high kinetic energy of hard quartz particles impacting the surface at high velocities, causing localized material displacement and removal (cutting/plowing).",
+   "ingredient_action": "The compliant elastomer coating increases the contact area and decreases the surface hardness relative to the particles, which mechanically facilitates material removal and increases the volumetric erosion rate per impact.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE",
+   "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+  },
+  "f75_type_gate": {
+   "forced_by": [
+    "REASONING_THRASH_LEAK"
+   ],
+   "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component**: Slurry Pump Impeller Vane Coating.",
+    "*   **Material**: High-durometer (>80 Shore D), abrasion-resistant thermoplastic elastomer",
+    "*   *Rationale*: Must be \"compliant\" (low modulus relative to steel) but high enough durom",
+    "*   **Instrument/Method**: Two-component spray or cast-in-place application.",
+    "*   *Input Stream*: ALREADY-RECORDED flow_rate and pressure from the pump’s existing PLC/D",
+    "*   **Reference/Threshold**: DERIVED from stated physics.",
+    "*   *Derivation*: $E_{coating} < 0.1 E_{base}$ required for significant stress reduction. ",
+    "*   *Threshold*: Wear rate $W_{coated} \\le 0.5 W_{bare}$.",
+    "*   **Installability**: SAME class. Both require removing the impeller and applying a surf",
+    "*   **Operability**: SAME class. No changes to pump operation.",
+    "*   **Maintenance**: LIGHTER burden. Elastomer coatings are easier to repair (patch) than ",
+    "*   **Cost**: LOWER. TPE materials are less expensive than Tungsten Carbide HVOF powders.",
+    "*   **Conclusion**: Same feasibility class, lower cost, easier repair, different mechanism"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, 1mm particle is small. Let's assume 10mm particle for high-impact scenario? No, slurry is usually fine. Let's stick to"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "be4f5cc3f7beb169"
+}

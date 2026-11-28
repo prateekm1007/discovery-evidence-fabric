@@ -1,0 +1,68 @@
+{
+ "problem_id": "HO8-01-al-anodize-burning",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip af6b5b311)",
+ "executor_id": "builder-r45s2@holdout-v8-generation-v81",
+ "machine": {
+  "machine": "V8.1.1",
+  "base": "V8.0 (r43_machine_v8, frozen) + AM42 D1 computed-physics layer (scripts/v81_physics.py) + D2 population search with TRIZ seeding (scripts/triz_principles.py)",
+  "request_model": "glm-4-plus",
+  "k_candidates": 3,
+  "repair_budget": 3,
+  "direction_llm": "selected candidate only",
+  "v81_1_fix": "candidate-plan enumeration dedupes INSIDE the loop (always exactly 3 distinct (class, principle) plans); the V8.1 attempt produced cands=2 on its first row (HO8-01) — that run was stopped and its single row VOIDED-BUILD-DEFECT (eval/v81_run_voided_v81_defect/)"
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T07:08:27.581388Z",
+ "a1_answer": "CANDIDATE CLASSES\n1. Electrolyte additive/complexant chemistry selection and dosing — attacks failure by altering oxide growth kinetics to be more uniform at rack contacts.\n2. Bath temperature setpoint retuning (e.g., lower to 15 °C) — attacks failure by reducing steady‑state oxide growth rate and current density at contacts.\n3. Ramp/soak current‑profile procedure (multi‑step current profile) — attacks failure by directly shaping the time‑dependent current density at the rack contact during the critical initial oxide formation.\n\nSELECTED: Ramp/soak current‑profile procedure  \nPHYSICS JUSTIFICATION FOR REJECTION OF NON‑DUTY‑CYCLE CANDIDATES: Burning at the rack contact is a transient phenomenon driven by the instantaneous current surge before a stable oxide layer forms; additive chemistry and temperature changes modify steady‑state oxide properties but do not mitigate the initial current‑density spike at the moment of current application. Only a current‑profile procedure directly controls the time‑dependent current density at the contact.\n\nMECHANISM CLASS: Ramp/soak current‑profile procedure\n\nNOVELTY STATEMENT (INTERVENTION)\nThe intervention is a two‑stage current profile: a 30 s soak at 0.5 A/dm² followed by a 60 s linear ramp to the standard 1.5 A/dm², replacing the standard single linear ramp from 0 to 1.5 A/dm² over 60 s.  \nStandard practice uses a single linear ramp (0→1.5 A/dm² in 60 s). The departure is the insertion of a low‑current soak before the ramp, which directly reduces the initial current density at the rack contact.  \nAdjacent‑technique clearance: The closest existing practice in anodizing and electroplating is a simple linear ramp; the novel element is the defined soak step at a sub‑critical current density.  \nMechanism: The soak allows a thin, uniform oxide to form at the rack contact, increasing contact resistance and distributing current more evenly before the full current is applied, thereby preventing the local current density from exceeding the burning threshold.\n\nPHYSICS CHECK\nGoverning relation: Local current density at rack contact J_local = J_applied × (A_total / A_contact).  \n- A_total / A_contact = 2 (ASSUMPTION: contact area ≈ 0.5 dm² for a 1 dm² part).  \n- Critical current density for burning initiation in 20 °C sulphuric anodizing J_crit ≈ 2.5 A/dm² (ASSUMPTION).  \nStandard profile: J_applied = 1.5 A/dm² (USER CONSTRAINT) → J_local = 3.0 A/dm² > J_crit → burning.  \nIntervention soak: J_applied = 0.5 A/dm² → J_local = 1.0 A/dm² < J_crit → no burning. After soak, oxide growth increases contact resistance; effective area ratio drops to 1.2 (ASSUMPTION). At full current J_applied = 1.5 A/dm² → J_local = 1.8 A/dm² < J_crit.  \nDirection‑of‑effect: The intervention decreases the initial applied current density at the rack contact from 1.5 A/dm² to 0.5 A/dm² during the soak, reducing J_local below J_crit and preventing burning.\n\nIMPLEMENTATION BILL\n| # | Item / Action | Tag | Details |\n|---|---------------|-----|---------|\n| 1 | Existing rectifier controller (programmable) | (a) | Already present in the anodizing line; used as‑is. |\n| 2 | Parameter change: upload new ramp/soak profile (0.5 A/dm² for 30 s soak, then linear ramp to 1.5 A/dm² over 60 s) | (c) | Standard operation on the existing controller; no new hardware, no custom machining, no new process steps. |\n\nBURDEN LEDGER (STANDARD‑PRACTICE PARITY)\n| Aspect | Standard Practice Bill | Intervention Bill | Comparison |\n|--------|------------------------|-------------------|------------|\n| Hardware procurement | Existing rectifier controller (a) | Existing rectifier controller (a) | Identical |\n| Parameter/procedure change | Linear ramp profile (c) | Ramp/soak profile (c) | Same class of operation; only parameter values differ |\n| Installation / commissioning | Load profile, verify | Load profile, verify | Same effort |\n| Maintenance / operating cost | No added cost | No added cost | Same |\n| **Overall burden class** | **Baseline** | **Same** | **Same‑or‑lower (same)** |\n\nEXECUTABLE TEST\nProtocol:  \n1. Select 50 identical aluminium parts.  \n2. Run 25 parts with the standard linear ramp (control) and 25 parts with the new ramp/soak profile (test) on the same line, same bath conditions (1.5 A/dm², 20 °C).  \n3. After anodizing, inspect rack contact zones for burning (visual discoloration, pitting, or voltage spike records).  \nInstruments: Existing rectifier voltage/current logging (already installed), visual inspection station.  \nPass/fail threshold: Burning incidence in test group ≤ 10% of control group incidence (i.e., >90% reduction).  \nDuration: 50 cycles (≈ 25 h at 30 min/cycle).  \nKill criterion: If test group burning incidence > 50% of control, revert to standard profile immediately.\n\nOPERATIONAL COST: 90 s per cycle (30 s soak + 60 s ramp) → 5% throughput loss assuming a 30 min (1800 s) baseline cycle (CALCULATED from ASSUMPTION of 30 min baseline). The soak occurs during production hours; no non‑producing interval offsets it.\n\nSIGNALS USED: none (open‑loop time‑based profile on existing rectifier controller)",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "DIRECTION_CHECK_UNAVAILABLE",
+   "reason": "HTTPError: HTTP Error 401: Unauthorized"
+  },
+  "population": {
+   "n_candidates": 3,
+   "selected": "cand_2",
+   "target_class": "surface-condition management",
+   "triz_principle": 3,
+   "candidate_scores": [
+    [
+     6,
+     0,
+     0
+    ],
+    [
+     2,
+     0,
+     0
+    ],
+    [
+     5,
+     0,
+     0
+    ]
+   ]
+  },
+  "residual_findings": {
+   "STANDARD_BILL": [
+    "CUSTOM_MACHINING: machining/machined work: | 2 | Parameter change: upload new ramp/soak profile (0.5 A/dm² for 30 s soak, then linear ramp to 1.5 A/dm² over 60 s) | (c) | Standard operation on the existi"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "COMPUTED_PHYSICS_RELATION_UNMAPPED": [
+    "the PHYSICS CHECK section names no relation this layer computes (expected one of: arrhenius, npsh, lsi, cop, larson_miller, dewpoint, fouling) — the bind does not guess"
+   ],
+   "DIRECTION_CHECK_UNAVAILABLE": [
+    "typed fail-open: HTTPError: HTTP Error 401: Unauthorized (the authoritative read stays the auditor's)"
+   ]
+  }
+ },
+ "sha256_16": "9d8f4e9fc027cf9b"
+}

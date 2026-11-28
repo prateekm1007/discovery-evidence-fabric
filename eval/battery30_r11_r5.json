@@ -1,0 +1,848 @@
+{
+ "record": "battery30_r11_r5/1.0.0",
+ "at": "2026-11-15T01:50:00.351890Z",
+ "pool": {
+  "n": 30,
+  "fresh": 18,
+  "dev12": 12
+ },
+ "spread_gate": {
+  "providers_ok": [
+   "xkiro"
+  ],
+  "spread_ok": false,
+  "earned_concurrency": 1
+ },
+ "aimd_events": [
+  {
+   "t": 41.4,
+   "event": "GROW",
+   "conc_now": 2
+  },
+  {
+   "t": 95.2,
+   "event": "GROW",
+   "conc_now": 3
+  },
+  {
+   "t": 150.9,
+   "event": "GROW",
+   "conc_now": 4
+  }
+ ],
+ "call_ledger_n": 81,
+ "call_ledger_summary": {
+  "xkiro/mistralai/ministral-14b": {
+   "ok": 50,
+   "failed": 31
+  }
+ },
+ "results": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 31.4,
+   "baseline_answer": "**Design/Intervention:** Implement a **dynamic cathode gas diffusion layer (GDL) with embedded micro-channel humidification (MCH)** and **electrochemically active bipolar plate (EABP) design** to locally regulate membrane hydration without increasing parasitic humidification load.\n\n**Leading Indicator:** *In-situ membrane hydration state via impedance spectroscopy (IS) at 1 kHz*, measured as the real part of impedance (R_real) normalized to baseline (R_real/R_real_0).\n\n**Threshold:** R_real/R_real_0 \u2264 1.15 (indicating <15% increase in ionic resistance) at 1.5 A/cm\u00b2 and 80\u00b0C stack temperature, with <10% parasitic humidification load (measured as additional water vapor mass flow rate in cathode outlet).\n\n**Falsification Test:**\n1. **Accelerated Degradation Test:** Operate stack at 1.5 A/cm\u00b2, 80\u00b0C, and 30% RH cathode inlet for 500 hours. Falsify if:\n   - R_real/R_real_0 exceeds 1.15 at any point, **or**\n   - Parasitic humidification load exceeds 10% (measured via mass flow meter at cathode outlet), **or**\n   - Local hot spots (>85\u00b0C) detected via IR thermography at any cell in the stack.\n2. **Control Comparison:** Test identical stack without MCH/EABP under same conditions. Falsify if modified design does not show statistically significant (p < 0.05) improvement in R_real/R_real_0 stability or hot spot reduction after 500 hours.",
+   "a1_answer": "**Design/Intervention:** Dynamic **anode recirculation humidification** with **electro-osmotic drag compensation** via a **variable-speed recirculation pump** controlled by a **localized membrane hydration sensor array** (e.g., impedance spectroscopy probes at 10 kHz).\n\n**Leading Indicator:** **Membrane hydration state (\u03bb, water content)** measured via in-situ impedance spectroscopy at the cathode inlet/exit, with a **threshold of \u03bb \u2265 12** (to prevent dehydration while avoiding excessive flooding).\n\n**Falsification Test:**\n1. **Baseline Test:** Operate stack at **1.5 A/cm\u00b2, 80\u00b0C, 100% RH cathode inlet** (current constraint) with **no anode humidification** (control). Measure:\n   - **Voltage drop \u2265 10%** (indicating dehydration-induced resistance rise).\n   - **Hot spot temperature \u2265 85\u00b0C** (localized via IR thermography).\n   - **Cathode humidification parasitic load > 10%** (measured via pump power draw).\n   If **any** of these occur, the intervention fails to mitigate the root cause.\n\n2. **Intervention Test:** Activate **anode recirculation** with **\u03bb-controlled pump speed** (adjusting flow to maintain \u03bb \u2265 12). Re-measure:\n   - **Voltage drop < 5%** (hydration maintained).\n   - **Hot spot temperature < 82\u00b0C** (thermal uniformity restored).\n   - **Cathode humidification parasitic load \u2264 10%** (constraint met).\n   If **all** thresholds are met for **\u2265 500 hours** under **cyclic load (1.0\u20131.5 A/cm\u00b2)**, the intervention is validated. Failure to meet **any** threshold falsifies the approach.\n\n---\n**Key Calculations/Assumptions:**\nUSER CONSTRAINT 1: **1.5 A/cm\u00b2** \u2013 Required current density (per user).\nUSER CONSTRAINT 2: **80\u00b0C stack temperature** \u2013 Nominal operating condition (per user).\nUSER CONSTRAINT 3: **\u2264 10% cathode humidification parasitic load** \u2013 Constraint on auxiliary power (per user).\nASSUMPTION 1: **\u03bb \u2265 12** \u2013 Minimum hydration threshold to prevent proton conductivity loss (derived from Nafion\u00ae literature; lower \u03bb increases resistance exponentially).\nASSUMPTION 2: **10 kHz impedance spectroscopy** \u2013 Frequency selected for sensitivity to membrane hydration (avoids electrode effects; per Springer *J. Power Sources* 2018).\nCALCULATED 1: **Anode recirculation flow rate = 0.5\u20131.0 cm\u00b3/min/cm\u00b2** \u2013 Estimated to compensate for electro-osmotic drag (~1.5 H\u2082O/H\u207a) at 1.5 A/cm\u00b2 (Nernst-Planck transport model).\nCALCULATED 2: **Pump parasitic load \u2264 5%** \u2013 Modeled via COMSOL for variable-speed pump (assumes 95% efficient motor; falsified if >10% measured).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 33.2,
+   "baseline_answer": "**Design/Intervention:** Implement a **hybrid electrolysis-copper alloy plate coating** with integrated **pulsed low-voltage direct current (DC) electrodes** (\u226410V) embedded in alternate plates to disrupt biofilm formation and inhibit scale nucleation.\n\n**Leading Indicator:** **Biofilm thickness (\u03bcm) + scale deposition rate (\u03bcm/month)** measured via ultrasonic thickness gauge (UTG) on sacrificial test plates, combined with **heat transfer coefficient (HTC) degradation rate (%/month)** from embedded RTD sensors.\n\n**Threshold:**\n- Biofilm thickness \u2264 50 \u03bcm after 12 months (baseline: 0 \u03bcm at installation).\n- Scale deposition rate \u2264 0.1 mm/month (baseline: 0 mm/month).\n- HTC degradation rate \u2264 5% over 12 months (from initial >2500 W/m\u00b2K).\n\n**Falsification Test:**\n1. **Field Validation:** Install 3 identical test sections (A: hybrid coating + pulsed DC, B: hybrid coating only, C: baseline stainless steel) in parallel loops. After 12 months, compare:\n   - UTG-measured biofilm/scale on A vs. B/C (failure if A\u2019s biofilm >50 \u03bcm or scale >0.1 mm/month).\n   - HTC from RTDs: if A\u2019s HTC drops >5% or falls below 2500 W/m\u00b2K, reject the design.\n2. **Chlorine Constraint Check:** Verify residual chlorine in loop remains \u22640.5 ppm via online sensor; if pulsed DC causes >0.5 ppm, abort.\n3. **Pressure Drop:** If \u0394P in A exceeds baseline (C) by >15% (indicating fouling), falsify.\n\n**Additional Constraint Check:** Confirm copper ion leaching from coating \u22640.1 ppm (per ASHRAE 188) via ICP-MS sampling.",
+   "a1_answer": "**Design/Intervention:** **Electrochemical Activation (ECA) with Titanium Anodes and Bipolar Electrodes**\n- **Mechanism:** In-situ generation of controlled oxidants (e.g., chlorine, ozone, and hydroxyl radicals) at <0.5 ppm residual via pulsed DC (10\u201350 V) to disrupt biofilm extracellular polymeric substances (EPS) and inhibit scale nucleation.\n- **Key Features:**\n  - **Titanium-based mixed-metal oxide (MMO) anodes** (ASSUMPTION: 90% Pt/Ir oxide coating; *rationale: balances corrosion resistance and oxidant efficiency*).\n  - **Bipolar electrode array** spaced at **USER CONSTRAINT: 100 mm pitch** (*constraint: matches plate channel width to ensure uniform field*).\n  - **Pulse width modulation (PWM) control** to limit residual oxidants to **USER CONSTRAINT: <0.5 ppm** (*constraint: meets chlorination limit*).\n  - **Flow bypass loop** for anode placement (CALCULATED: 5% of total flow; *rationale: minimizes pressure drop penalty*).\n\n---\n**Leading Indicator:** **Real-Time Biofilm/Scale Growth Rate (\u0394R_th)**\n- **Threshold:** **\u0394R_th < 0.0002 m\u00b2K/W over 12 months** (CALCULATED: Equivalent to <5% degradation from initial U = 2500 W/m\u00b2K; *rationale: maintains U > 2375 W/m\u00b2K, accounting for fouling factor safety margin*).\n- **Measurement:**\n  - **Temperature differential (\u0394T) across plates** (USER CONSTRAINT: \u00b10.1\u00b0C resolution; *constraint: standard PT100 accuracy*).\n  - **Pressure drop (\u0394P) across exchanger** (USER CONSTRAINT: \u00b11% of full scale; *constraint: differential pressure transmitter calibration*).\n  - **Derived U = Q/(A\u00b7\u0394T_log) where Q = m\u0307\u00b7Cp\u00b7\u0394T_bulk** (ASSUMPTION: Cp = 4.18 kJ/kgK for water; *rationale: standard for district cooling loops*).\n  - **Fouling resistance (R_f) = 1/U_fouled \u2013 1/U_clean** (CALCULATED: R_f_max = 0.0002 m\u00b2K/W; *threshold derived from \u0394U < 5%*).\n\n---\n**Falsification Test:**\n1. **Field Trial Protocol:**\n   - Install ECA system on **1 identical plate exchanger** in parallel with a **control unit** (no ECA).\n   - Operate both for **12 months** under identical flow (USER CONSTRAINT: 300 m\u00b3/h; *constraint: matches district loop design*), temperature (USER CONSTRAINT: 6\u201312\u00b0C supply; *constraint: typical chilled water range*), and water chemistry (USER CONSTRAINT: <300 ppm hardness, <500 ppm TDS; *constraint: typical district cooling feed*).\n   - Measure **\u0394R_th weekly** via \u0394T/\u0394P as above.\n\n2. **Falsification Criteria:**\n   - **Test fails if:**\n     - **ECA unit\u2019s \u0394R_th \u2265 0.0002 m\u00b2K/W** (i.e., U drops below 2375 W/m\u00b2K) **OR**\n     - **Control unit\u2019s \u0394R_th < ECA unit\u2019s \u0394R_th** (i.e., ECA performs worse than passive fouling) **OR**\n     - **Residual oxidant > 0.5 ppm for >1% of operating time** (USER CONSTRAINT violation; *constraint: chlorination limit*).\n   - **Acceptance:** ECA unit maintains \u0394R_th < 0.0002 m\u00b2K/W **and** residual oxidants \u2264 0.5 ppm for full 12-month period.\n\n---\n**Contingency Design Check:**\n- **Pressure Drop Penalty:** CALCULATED: <3% increase (ASSUMPTION: 100 mm pitch bipolar array adds 50 Pa",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 30.9,
+   "baseline_answer": "**Design/Intervention:** Modify impeller vane leading-edge geometry using a **cavitation-resistant hydrofoil profile** (e.g., NASA-Langley E384 or similar) with a **0.5\u00b0\u20131.0\u00b0 leading-edge sweep** and **0.2\u20130.3 mm radius fillet** to delay bubble formation. Pair with **increased vane thickness (1.2\u00d7 baseline)** at the leading edge (first 10% chord) while maintaining hydraulic efficiency via CFD-optimized camber adjustment.\n\n**Leading Indicator:** **Local NPSH margin at vane leading edge** (calculated via CFD or cavitation inception models) must exceed **2.0 m** (threshold: 1.5 m baseline + 0.5 m buffer for uncertainty). Monitor via **acoustic emission sensors** (threshold: <50 dB RMS at 20\u201350 kHz band during operation).\n\n**Falsification Test:**\n1. **Hydraulic Performance:** Operate pump at 85% best-efficiency flow for **1,000 hours** under controlled NPSH = 1.5 m. Measure head degradation: if **>3% drop** from baseline, reject design.\n2. **Material Integrity:** Section one impeller vane after 5 years (or equivalent accelerated testing via **vibration-induced cavitation rig** for 3,000 hours). If **leading-edge mass loss >0.1 mm** or **micro-pitting depth >0.05 mm**, reject design.\n3. **NPSH Margin Validation:** Perform **high-speed cavitation tunnel testing** (Reynolds number matched to field conditions). If **visible cavitation inception** occurs at NPSH < 2.0 m, reject design.",
+   "a1_answer": "**Design/Intervention:** **Impeller Vane Leading Edge Hardfacing with Cavitation-Resistant Alloy + NPSH Optimization via Inducer Modification**\n\n**Leading Indicator:** **Localized Vane Leading Edge Wear Rate (mm/year) + NPSH Margin (m)**\n- **Threshold:**\n  - Wear Rate: \u2264 0.05 mm/year (USER CONSTRAINT: 5-year life at 0.25 mm max erosion per year, assuming uniform wear; actual cavitation is localized, so threshold is 1/5 of uniform allowance to account for hotspots)\n  - NPSH Margin: \u2265 1.5 m (USER CONSTRAINT: explicit requirement)\n- **Engineering Rationale:**\n  - Hardfacing (e.g., Stellite 6 or similar Co-Cr-W alloy) increases erosion resistance by 5\u201310x vs. base material (ASSUMPTION: alloy hardness \u2265 50 HRC, cavitation erosion rate reduction factor = 8 based on empirical data for similar alloys).\n  - Inducer modification (increased diameter by 5% or addition of a low-specific-speed inducer stage) reduces inlet velocity by ~10% (CALCULATED: \u0394v \u221d \u221a(Q/N), where Q = 85% best-efficiency flow, N = constant; 5% inducer enlargement yields ~9% velocity reduction at fixed flow).\n\n**Falsification Test:**\n1. **Wear Rate Validation:**\n   - Operate pump at 85% best-efficiency flow for 12 months with hardfaced vanes and measure leading edge thickness loss via ultrasonic thickness gauge or profilometry.\n   - **Falsification Condition:** Measured wear rate > 0.07 mm/year (20% above threshold), indicating insufficient hardfacing or unexpected cavitation intensity.\n   - **Control:** Compare to identical unhardfaced impeller in parallel test (if feasible) or reference historical wear data for baseline material.\n\n2. **NPSH Margin Validation:**\n   - Conduct in-situ NPSH test at 85% flow using a calibrated venturi meter to measure suction pressure and calculate NPSH\u2083 (net positive suction head available).\n   - **Falsification Condition:** NPSH margin < 1.2 m (20% below threshold), indicating inducer modification is insufficient or system curve has shifted (e.g., due to fouling).\n   - **Control:** Compare to pre-modification NPSH test or CFD prediction with validated turbulence model (e.g., SST k-\u03c9).\n\n3. **Head Performance Validation:**\n   - Measure pump head at 85% flow via calibrated differential pressure transmitter across impeller.\n   - **Falsification Condition:** Head degradation > 3% from design curve (USER CONSTRAINT: 85% flow is off-design but must maintain acceptable efficiency; 3% is typical tolerance for minor off-design operation).\n   - **Control:** Compare to CFD prediction of modified impeller or identical pump with unmodified inducer.\n\n**Additional Constraint Check:**\n- **Power Consumption:** Verify no >5% increase in brake horsepower (BHP) at 85% flow post-modification (ASSUMPTION: inducer enlargement may increase BHP by \u22643% based on affinity laws; hardfacing has negligible effect).\n  - **Falsification Condition:** \u0394BHP > 5% (measured via torque sensor or power analyzer).\n  - **Rationale:** Exceeds typical tolerance for off-design operation and may violate system power limits.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "B",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 4,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 5,
+    "B6": 5
+   },
+   "decoded": "baseline"
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 31.2,
+   "baseline_answer": "**Design/Intervention:** Replace the conventional natural rubber (NR) elastomer with a **carbon-black reinforced ethylene propylene diene monomer (EPDM) compound** blended with **5-10% by weight of UV-stabilized thermoplastic polyurethane (TPU) microfibers** (10\u201350 \u00b5m diameter) and **15-20 phr (parts per hundred rubber) of high-structure carbon black (N330/N375 grade)**. Add a **0.1\u20130.2 mm thick fluoropolymer (FEP) barrier layer** between each elastomer layer to block ozone diffusion. Use **steel shim reinforcement** at every 3rd\u20135th elastomer layer (thickness ratio: 1:2 elastomer-to-steel) to limit creep strain accumulation.\n\n**Leading Indicator:** **Compressive creep strain at 75 years** (predicted via Arrhenius-accelerated aging tests) **\u2264 5% of total design deflection** (threshold: 5% of 10% = 0.5% annualized drift). Monitor via **dynamic stiffness ratio (E_dynamic/E_initial)** measured via resonant column testing; threshold: **\u2265 0.85** after 75-year equivalent aging.\n\n**Falsification Test:**\n1. **Accelerated Aging Protocol:** Subject 10 representative pads to **75\u00b0C, 50% RH, 1000 kPa cyclic compression (0.5\u20132 Hz, 50% strain amplitude)** for **10,000 hours** (equivalent to 75 years at 20\u00b0C via Arrhenius scaling, *E_a = 80 kJ/mol*). Measure:\n   - **Creep strain** (via LVDT) after 10,000 hours: **must not exceed 5% of total deflection**.\n   - **Ozone resistance:** Expose edges to **100 pphm ozone at 40\u00b0C for 1,000 hours**; **no cracks > 0.2 mm** in elastomer or FEP layers.\n   - **Stiffness drift:** Compare dynamic modulus before/after aging; **ratio \u2265 0.85**.\n2. **Field Validation:** Install 3 instrumented pads in a bridge with **embedded fiber Bragg grating (FBG) sensors** to measure **in-situ deflection drift** over 15 years. **Falsified if drift exceeds 0.5% annually** (extrapolated to 75 years > 10% total).\n\n**Constraint Compliance:** Steel shims limit creep strain to <5% total; FEP/TPU blend blocks ozone cracking; carbon black stabilizes stiffness. No replacement access required.",
+   "a1_answer": "**Design/Intervention:** *Hybrid Reinforced Elastomeric Pad with Carbon Black Shielding and Embedded Fiberglass Mesh*\n- **Core Layer:** High-performance chloroprene (CR) elastomer with **30%+ carbon black loading** (ASSUMPTION: Carbon black absorbs ozone and UV at >95% efficiency, per ASTM D2000/CR type 1 classification).\n- **Reinforcement:** **0.5 mm thick fiberglass mesh** embedded every **5 mm** of elastomer thickness (CALCULATED: Mesh spacing \u2264 5 mm ensures crack propagation energy absorption >100 J/m\u00b2, per ISO 13849-1).\n- **Lamination:** **Epoxy-bonded steel shims** at **\u00b125% of total thickness** (USER CONSTRAINT: Steel shims limit vertical drift to <10% by constraining lateral shear; shim placement ensures stiffness drift <5% over 75 years, per AASHTO LRFD 13.6.4.2).\n- **Surface Treatment:** **0.1 mm ozone-resistant silicone coating** on exposed elastomer faces (ASSUMPTION: Silicone coating reduces ozone ingress by >90%, per ASTM D1149).\n\n---\n**Leading Indicator:** *Cumulative Vertical Drift Ratio (D\u2087\u2085)*\n- **Threshold:** **D\u2087\u2085 \u2264 0.10** (USER CONSTRAINT: 10% of design deflection, per service life requirement).\n- **Calculation:**\n  - **Design Deflection (\u03b4\u2080):** 5 mm (ASSUMPTION: Typical for 100 mm thick pad under 50 MPa load, per EN 1337-3).\n  - **D\u2087\u2085 = (\u03b4\u2087\u2085 \u2013 \u03b4\u2080)/\u03b4\u2080 \u2264 0.10**, where \u03b4\u2087\u2085 = vertical deflection at 75 years.\n  - **\u03b4\u2087\u2085 = \u03b4\u2080 + (\u03b5\u2096 * t * L) + (\u03b5\u2092 * t)** (CALCULATED: \u03b5\u2096 = creep strain rate \u2264 0.0001/year (ASSUMPTION: CR elastomer with carbon black per ASTM D412 Type S), t = 75 years, L = 100 mm, \u03b5\u2092 = ozone-induced strain \u2264 0.005 (ASSUMPTION: Silicone + carbon black shielding per ISO 1431-1)).\n  - **\u03b4\u2087\u2085 \u2264 5 mm + (0.0001 * 75 * 100) + (0.005 * 100) = 5.5 mm \u2192 D\u2087\u2085 = 0.05/5 = 0.01 (5% drift)**.\n\n---\n**Falsification Test:**\n1. **Accelerated Aging + Load Cycling Test (ASTM D573 + AASHTO T302):**\n   - **Protocol:** Subject 3 identical pads to:\n     - **75-year equivalent ozone exposure** (100 ppm O\u2083, 40\u00b0C, 96 hours/week for 12 weeks; CALCULATED: Accelerates 75 years per ASTM G113).\n     - **10\u2076 load cycles** (50 MPa \u00b1 10 MPa, 1 Hz; CALCULATED: Equivalent to 75 years of HS20 truck traffic per NCHRP 12-28).\n   - **Pass/Fail:** If **D\u2087\u2085 > 0.10** (i.e., \u03b4\u2087\u2085 > 5.5 mm) **or** **cracks > 0.5 mm deep** propagate through \u22652 layers, reject design.\n   - **Control:** Test unshielded CR elastomer pads (no carbon black/silicone) as negative control; expect D\u2087\u2085 > 0.30 (ASSUMP",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "B",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 3,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 5,
+    "B6": 4
+   },
+   "decoded": "baseline"
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 30.2,
+   "baseline_answer": "**Design/Intervention:** Install **hydraulically optimized dead-end flushing loops** with **automated pressure-driven flushing** (1\u20132 flushes per week, 5\u201310 min duration at 2.5\u20133.0 m/s velocity) paired with **UV-C disinfection (20\u201340 mJ/cm\u00b2)** at the loop inlet to disrupt biofilm and oxidize organic matter.\n\n**Leading Indicator:** **Biofilm thickness (measured via epifluorescence microscopy or ATP bioluminescence)** at dead-end mains, threshold \u2264 **20 \u00b5m** (baseline: 0\u20135 \u00b5m in active mains).\n\n**Falsification Test:** If biofilm thickness exceeds **20 \u00b5m** *after 3 months* of continuous flushing + UV-C operation *and* nitrite spikes persist (> **0.1 mg/L** at farthest customer), the intervention fails. Confirm via **chlorine decay rate** (must remain < **0.1 mg/L/hr** post-flush) and **nitrification potential assays** (MPN for *AOB* must drop by \u2265 **50%**).",
+   "a1_answer": "**Design/Intervention:** **Intermittent Hydraulic Flushing with Optimized Velocity Surges**\n- **Mechanism:** Introduce short-duration (10\u201315 min), high-velocity (1.5\u20132.0 m/s) surges in dead-end mains during off-peak hours to physically disrupt biofilm via shear stress while maintaining bulk chlorine residual >1.0 mg/L at the farthest point.\n\n---\n**Leading Indicator:** **Biofilm Shear Stress (\u03c4) and Chlorine Residual Recovery Rate**\n- **Threshold:**\n  - **\u03c4:** \u2265 1.2 Pa (CALCULATED: \u03c4 = 0.5 * \u03c1 * v\u00b2, where \u03c1 = 1000 kg/m\u00b3, v = 1.5 m/s \u2192 \u03c4 = 1.125 Pa; threshold set 10% higher for safety margin).\n  - **Chlorine residual recovery:** \u2265 0.8 mg/L within 2 hours post-flush at the farthest monitoring point (USER CONSTRAINT: must not exceed 1.0 mg/L at any time during demand).\n- **Rationale:** \u03c4 > 1.2 Pa detaches >90% of mature biofilms (ASSUMPTION: based on *Characklis (1990)* shear detachment studies for *Pseudomonas*-dominated biofilms). Recovery rate ensures residual compliance during peak demand.\n\n---\n**Falsification Test:**\n1. **Field Trial:** Install inline shear stress sensors (e.g., drag force probes) and chlorine residual monitors at 3 dead-end mains (lengths: 500 m, 1000 m, 1500 m). Conduct 12 flushing events over 3 months at 25\u00b0C, measuring:\n   - Pre/post-flush \u03c4 (must exceed 1.2 Pa for \u226590% of flush duration).\n   - Chlorine residual at farthest point (must remain \u22651.0 mg/L during summer demand peak).\n   - Nitrite (NO\u2082\u207b) concentrations (must show \u226450% reduction in episodes >3 mg/L post-intervention).\n2. **Falsification Criteria:**\n   - If **>20% of flushing events** fail to achieve \u03c4 \u2265 1.2 Pa **or** chlorine residual drops below 1.0 mg/L at any monitoring point during demand, reject the design.\n   - If nitrite episodes (>3 mg/L) persist in **>30% of post-flush samples**, reject the approach (indicates biofilm regrowth or insufficient shear).\n3. **Control:** Compare to 3 unflushed dead-end mains; if nitrite episodes decrease by <20% in flushed mains vs. controls, falsify the intervention.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 34.3,
+   "baseline_answer": "**Design/Intervention:** Implement a **dual-sensor architecture with enzymatic and non-enzymatic (e.g., electrochemical redox cycling) glucose detection**, combined with a **micro-scale mechanical agitation system** (ultrasonic or piezoelectric) at the sensor-tissue interface.\n\n**Leading Indicator:** **Signal stability ratio (SSR)** = (Non-enzymatic signal amplitude / Enzymatic signal amplitude) over time, measured at the working electrode.\n- **Threshold:** SSR must remain > 0.85 for \u2265 90% of 14-day wear duration, with enzymatic signal drift < 5% MARD when cross-referenced with non-enzymatic readings.\n\n**Falsification Test:**\n1. **In-vitro:** Accelerated aging test in artificial interstitial fluid with 10% bovine serum albumin (BSA) and 5% fibrinogen, agitated at 100 Hz for 14 days. Falsify if SSR < 0.75 or enzymatic signal drift exceeds 10% MARD.\n2. **In-vivo:** 30-subject clinical trial (15 diabetic, 15 non-diabetic) with 14-day wear. Falsify if > 20% of subjects exceed 10% MARD or SSR drops below 0.80 for > 24 hours. Histological analysis of explanted sensors must confirm < 50% surface area coverage by protein/fibrin encapsulation.",
+   "a1_answer": "**Design/Intervention:** **Dynamic Electrochemical Cleaning (DEC) via Pulsed Reverse Voltage (PRV) with Anti-Fouling Coating (AFC)**\n\n**Leading Indicator:** **Sensor Signal Recovery Efficiency (SSRE) after Fouling Challenge**\n- **Threshold:** \u226590% signal recovery within 10 minutes of DEC activation, sustained for \u226514 days under continuous wear.\n- **Definition:** SSRE = (Post-Cleaning Glucose Signal / Pre-Fouling Baseline Signal) \u00d7 100%.\n\n**Falsification Test:**\n1. **In Vitro Fouling Simulation:**\n   - **Method:** Expose sensor to 100 \u00b5L of 10 mg/dL glucose + 10% bovine serum albumin (BSA) + 5% fetal bovine serum (FBS) in a flow cell (1 \u00b5L/min) for 14 days. Measure signal drift hourly.\n   - **Falsification Condition:** Signal drift exceeds **\u00b110% MARD** before 14 days **OR** SSRE < 90% after DEC activation on Day 14.\n   - **Rationale:** BSA/FBS mimics protein/tissue fouling; flow cell replicates interstitial fluid dynamics.\n\n2. **In Vivo Wear Test (Human Subjects):**\n   - **Method:** Deploy 20 subjects (Type 1/2 diabetes) with DEC-enabled sensors for 14 days. Compare MARD vs. non-DEC controls (historical or concurrent).\n   - **Falsification Condition:** DEC group MARD > **10%** **OR** \u22653 subjects show SSRE < 90% at any 24-hour interval.\n   - **Rationale:** Human wear validates real-world fouling (e.g., sweat, exudates, cellular debris).\n\n---\n**Design Details (Key Parameters):**\n- **PRV Pulse:** 1.2V reverse for 500 ms every 6 hours (USER CONSTRAINT: <10% energy drain from 100 mAh battery; ASSUMPTION: 3V coin cell, 50 \u00b5A quiescent current).\n- **AFC Composition:** 50 nm platinum nanoparticles + 20 nm poly(3,4-ethylenedioxythiophene) (PEDOT) layer (CALCULATED: 0.8 nm RMS roughness; ASSUMPTION: reduces fouling adhesion by 60% vs. bare electrode).\n- **Sensor Geometry:** 100 \u00b5m diameter working electrode with 5 \u00b5m AFC thickness (CALCULATED: 95% glucose diffusion recovery post-cleaning; ASSUMPTION: minimizes dead volume for PRV efficacy).\n\n---\n**Critical Assumptions:**\n- **ASSUMPTION:** PRV does not oxidize AFC beyond 14 days (validated via cyclic voltammetry for 10,000 cycles at 1.2V).\n- **ASSUMPTION:** Human skin fouling dominated by proteins (not lipids/carbohydrates); verified via mass spectrometry of ex vivo sensor deposits.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 27.8,
+   "baseline_answer": "**Design/Intervention:** *Anti-stiction comb finger tip geometry with sacrificial release layer and electrostatic pull-off*\n\n**Leading Indicator:** *Minimum comb finger tip radius (R) and electrostatic pull-off force (F_e)*\n- **Threshold for R:** \u2265 5 \u00b5m (sharpness reduction to blunt rounded tips, avoiding asperity contact)\n- **Threshold for F_e:** \u2265 100 \u00b5N (electrostatic force via bias voltage, sufficient to overcome stiction adhesion ~10\u201350 \u00b5N for MEMS-scale surfaces)\n\n**Falsification Test:**\n1. **Shock Test:** Subject device to 10,000 g half-sine pulse (0.5 ms duration) in all 6 axes (3 orthogonal + 3 rotated 45\u00b0).\n2. **Post-shock Check:** Measure zero-g offset via closed-loop calibration; if offset exceeds 50 mg **or** interdigitated electrode resistance drops below 10 M\u03a9 (indicating short), the design fails.\n3. **Electrostatic Verification:** Apply 50 V bias to comb fingers post-shock; if proof mass does not release within 10 ms, electrostatic pull-off is insufficient.\n\n**Constraint Compliance:** Design ensures no permanent stiction under 10,000 g while maintaining <50 mg zero-g offset via:\n- Tip geometry reducing contact area by 90% (from sharp edges to R \u2265 5 \u00b5m).\n- Sacrificial layer removal confirmed via SEM inspection (no residual polymer >100 nm).\n- Electrostatic force validated via finite-element simulation (COMSOL) and pull-off test.",
+   "a1_answer": "**Design/Intervention:** *Anti-stiction comb finger tip geometry with tapered edges and electrostatic release mechanism*\n\n**Leading Indicator:** *Minimum pull-off force (F_pull) required to separate comb fingers after shock*\n- **Threshold:** F_pull \u2264 0.5 \u03bcN (USER CONSTRAINT: 50 mg zero-g offset = 50 mg * 9.81 m/s\u00b2 * 0.001 m lever arm = 0.49 \u03bcN\u00b7m \u2192 0.5 \u03bcN conservative margin)\n- **Calculation:** F_pull = 2 * \u03b3 * W * L (ASSUMPTION: \u03b3 = 0.05 N/m surface energy for MEMS, W = 10 \u03bcm finger width, L = 100 \u03bcm finger length \u2192 F_pull = 0.1 \u03bcN baseline; tapered edges reduce \u03b3 by 30% \u2192 0.07 \u03bcN)\n- **Engineering Rationale:** Tapered edges reduce contact area and surface energy; electrostatic release (10V pulse) adds 0.4 \u03bcN force (CALCULATED: 10V * 40 fF gap capacitance * 1/2 * dV/dt \u2192 0.4 \u03bcN).\n\n**Falsification Test:**\n1. **Shock Test:** Subject device to 10,000 g (USER CONSTRAINT) half-sine pulse (0.5 ms duration) in all 6 axes using a drop tower or shock machine.\n2. **Post-Shock Measurement:** Measure zero-g offset (USER CONSTRAINT: >50 mg fails) using a laser Doppler vibrometer (LDV) or capacitive readout with 1 mg resolution.\n3. **Failure Condition:** If zero-g offset exceeds 50 mg **or** if optical inspection (500x microscope) reveals permanent finger welding, the design is falsified.\n4. **Control:** Repeat test on identical device without tapered edges/electrostatic release; failure here validates the intervention\u2019s necessity.",
+   "judge_outcome": "JUDGE_PARSE_FAILED",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": null,
+   "axes": {},
+   "decoded": "tie"
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 28.8,
+   "baseline_answer": "**Design/Intervention:** *Sodium diffusion barrier layer* integrated between the cover glass and encapsulant, using a thin (\u226450 nm) sputtered aluminum oxide (Al\u2082O\u2083) or titanium oxide (TiO\u2082) film with >99.9% sodium ion blocking efficiency.\n\n**Leading Indicator:** *Sodium ion flux rate* through the barrier, measured via secondary ion mass spectrometry (SIMS) after 10,000 hours of 1000 V DC bias at 85\u00b0C/85% RH. Threshold: \u22641\u00d710\u207b\u00b9\u2076 mol/cm\u00b2\u00b7s (equivalent to <0.01% annual power loss over 25 years).\n\n**Falsification Test:**\n1. Accelerated aging: Subject 100 modules (50 with barrier, 50 baseline) to 1000 V DC bias at 85\u00b0C/85% RH for 10,000 hours.\n2. Measure *effective shunt resistance* (R_sh) via dark I-V curves at 25\u00b0C. Falsification criterion: If the barrier-equipped modules exhibit \u22645% median R_sh degradation (vs. >20% in baseline) and SIMS confirms sodium ingress <1\u00d710\u207b\u00b9\u2076 mol/cm\u00b2\u00b7s, the design is validated. If not, reject the barrier material or thickness.",
+   "a1_answer": "**Design/Intervention:** *Sodium-ion diffusion barrier layer* integrated between the cover glass and encapsulant (e.g., thin-film alumina or titanium oxide coating, 50\u2013100 nm thick) with a *dual-layer encapsulant* (EVA + ion-blocking polymer like PVDF) to physically block Na+ migration while maintaining optical transparency (>90% at 300\u20131100 nm).\n\n**Leading Indicator:** *Accelerated sodium-ion migration rate* measured via **Time-of-Flight Secondary Ion Mass Spectrometry (ToF-SIMS)** depth profiling of Na+ concentration in the encapsulant after 1000-hour bias at 1000 V (equivalent to ~25 years under 85\u00b0C/85%RH, per Arrhenius scaling).\n\n**Threshold:**\n- **USER CONSTRAINT:** Annual power loss \u2264 0.5% over 25 years (equivalent to \u2264 12.5% cumulative shunting loss).\n- **CALCULATED:** Na+ concentration at cell/shunt interface \u2264 5\u00d710^16 cm^-3 (derived from 0.5% power loss threshold via finite-element modeling of shunt resistance degradation; ASSUMPTION: 1\u00d710^16 cm^-3 Na+ reduces shunt resistance by 0.04% annually under bias).\n- **ASSUMPTION:** 1000-hour test at 85\u00b0C/85%RH/1000 V accelerates Na+ diffusion by 1000\u00d7 vs. 25 years field (per IEC 61215:2016, Clause 10.12).\n\n**Falsification Test:**\n1. **ToF-SIMS depth profile** shows Na+ concentration > 5\u00d710^16 cm^-3 at the cell/encapsulant interface after 1000-hour bias test.\n2. **OR** **IV curve degradation** exceeds 0.5% annual power loss (measured via pulsed I-V at 25\u00b0C after 1000-hour test, per IEC 60904-10).\n3. **OR** **optical transmission** of the barrier layer drops below 90% at 300\u20131100 nm (measured via UV-Vis spectroscopy), invalidating the design.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 32.6,
+   "baseline_answer": "**Design/Intervention:** Active Thermal Compensation System with Real-Time Displacement Feedback\n- **Mechanism:** Embedded high-temperature strain gauges (HSGs) and a piezoelectric actuator ring around the spindle neck, paired with a closed-loop PID controller. The HSGs measure axial thermal elongation via strain-to-displacement conversion (calibrated to spindle material\u2019s CTE: 11.5 \u00b5m/m/\u00b0C for steel). The controller drives the actuator to preload the shaft in real-time, counteracting elongation.\n- **Threshold:** Displacement error \u2264 5 \u00b5m (50% margin under 10 \u00b5m constraint) during a 20-minute thermal ramp from 20\u00b0C to 60\u00b0C (worst-case warmup scenario). Actuator force limited to \u00b1200N to avoid bearing preload distortion.\n\n**Leading Indicator:** Spindle neck strain (\u03b5) measured by HSGs, converted to displacement (\u03b4 = \u03b5 \u00d7 gauge length \u00d7 CTE). Threshold: \u03b4 \u2264 5 \u00b5m at steady-state 60\u00b0C.\n\n**Falsification Test:**\n1. **Thermal Chamber Test:** Subject spindle to 20-minute ramp from 20\u00b0C to 60\u00b0C while monitoring:\n   - HSG-derived displacement (\u03b4) via DAQ.\n   - Laser interferometer measurement of tool center point (TCP) shift at the spindle tip (ground truth).\n2. **Falsification Criteria:** If \u03b4 exceeds 5 \u00b5m **or** TCP shift exceeds 10 \u00b5m at any point during the transient, the system fails. Repeat with \u00b110% variation in PID gains to ensure robustness.\n3. **Additional Check:** Post-test bearing inspection for actuator-induced preload artifacts (e.g., increased axial play > 3 \u00b5m). If present, the intervention is invalid.",
+   "a1_answer": "**Design/Intervention:** Active Thermal Compensation System (ATCS) with embedded fiber Bragg grating (FBG) sensors and a piezoelectric actuator ring\n\n**Leading Indicator:** Real-time spindle shaft elongation measured via FBG strain sensors (axial and radial) at 3 critical sections (near bearing, mid-shaft, tool interface)\n\n**Threshold:**\n- USER CONSTRAINT: Tool center point (TCP) displacement \u2264 10 \u00b5m (per user)\n- CALCULATED: FBG strain threshold = 1.25 \u00b5\u03b5 (10 \u00b5m / 800 mm shaft length, assuming 100 mm tool overhang) with 20% safety margin \u2192 **1.0 \u00b5\u03b5**\n- ASSUMPTION: Maximum allowable thermal gradient = 0.5\u00b0C/mm (empirical limit for steel spindle to avoid thermal bowing) *Rationale: Prevents non-uniform expansion that piezoelectric correction cannot fully compensate.*\n\n**Falsification Test:**\n1. **Pre-test:** Install FBG sensors and piezoelectric ring on spindle. Calibrate FBG response to known thermal loads (heating coil) and piezoelectric displacement (voltage input).\n2. **Warmup Test:** Operate spindle at max speed (USER CONSTRAINT: 20 min transient) while logging:\n   - FBG strain at 3 sections (target: \u22641.0 \u00b5\u03b5 deviation from baseline)\n   - TCP displacement via laser interferometer (target: \u226410 \u00b5m)\n   - Piezoelectric actuator voltage (target: \u2264\u00b15V to avoid hysteresis)\n3. **Falsification Criteria:**\n   - If **any** of the following occur:\n     - FBG strain exceeds 1.0 \u00b5\u03b5 at any section **OR**\n     - TCP displacement exceeds 10 \u00b5m **OR**\n     - Actuator voltage saturates (>\u00b15V) for >10% of transient\n   - **Conclusion:** ATCS fails to meet constraint. Re-evaluate sensor placement, actuator authority, or thermal model.\n\n**Engineering Rationale for Design:**\n- FBG sensors provide **sub-micron strain resolution** (0.1 \u00b5\u03b5) with **thermal immunity** (no electrical interference).\n- Piezoelectric ring enables **nanometer-scale correction** (1 \u00b5m/V at 1 kV) with **millisecond response**.\n- **No warmup idle cycles** required: ATCS corrects in real-time during operation.\n- **Constraint compliance path:** If FBG strain stays \u22641.0 \u00b5\u03b5, thermal elongation is \u22648 \u00b5m (1.0 \u00b5\u03b5 \u00d7 800 mm), and TCP displacement is held \u226410 \u00b5m via closed-loop piezoelectric correction.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 32.8,
+   "baseline_answer": "**Design/Intervention:** **Intermittent Backwash with Air Scour + Online Critical Flux Monitoring + Modular Fiber Bundles with Shear-Inducing Spacer Geometry**\n\n**Leading Indicator:** **Normalized Permeability Decline Rate (NPDR) = (\u0394J/J\u2080)/\u0394t**\n- **Threshold:** NPDR < 0.005 h\u207b\u00b9 (where J\u2080 = 18 LMH baseline flux, \u0394J = flux drop over \u0394t = 7 days)\n- **Design Parameters:**\n  1. **Backwash Protocol:** 30-second air scour (0.5 m\u00b3/m\u00b2\u00b7h) + 10-second liquid backwash (3\u00d7 operating flux) every 30 minutes (duty cycle: 10%).\n  2. **Spacer Geometry:** Triangular lattice spacers (1.2 mm pitch, 0.3 mm wire diameter) between fiber bundles to induce cross-flow shear > 0.1 Pa at 8 g/L MLSS.\n  3. **Critical Flux Control:** Reduce flux to 80% of critical flux (J_crit) when NPDR exceeds threshold, calculated via **modified resistance-in-series model** (R_t = R_m + R_f + R_cp; R_f growth rate < 0.02 m\u207b\u00b9/day).\n\n**Falsification Test:**\n- **Hypothesis:** The combined intervention maintains net flux \u2265 18 LMH with chemical cleaning intervals > 6 months at 8 g/L MLSS.\n- **Test Protocol:**\n  1. Operate pilot-scale module (100 m\u00b2) for 12 months under steady-state conditions (8 g/L MLSS, 20\u00b0C, COD 300 mg/L).\n  2. **Falsification Criteria:**\n     - **Primary:** Net flux < 18 LMH **or** chemical cleaning required within 6 months **or** NPDR > 0.005 h\u207b\u00b9 sustained for > 30 days.\n     - **Secondary:** Fouling layer thickness (via **confocal laser scanning microscopy**) exceeds 50 \u00b5m on > 30% of fibers at 6-month interval.\n  3. **Control:** Identical module without spacers or critical flux control (operate at constant 18 LMH).\n- **Pass/Fail:** If control module fails primary criteria **and** test module meets all thresholds, intervention is validated. If test module fails, redesign spacer geometry (increase shear to > 0.2 Pa) or adjust backwash frequency to 15-minute intervals.",
+   "a1_answer": "**Design/Intervention:** **Dynamic Aeration Pulse with Shear-Inducing Spacer Modification**\n- **Mechanism:** Introduce **non-uniform, high-shear aeration pulses** (30\u201360 sec bursts at 0.5\u20131.0 m\u00b3/air\u00b7m\u00b2\u00b7min) synchronized with **3D helical spacer insertion** (pitch: 10\u201315 mm, wire diameter: 0.8 mm) to disrupt SMP/EPS consolidation via **turbulent lift forces** and **scouring**. Spacer geometry increases cross-flow velocity by **20\u201330%** (CALCULATED: based on Darcy friction factor for helical spacers in hollow fibers, *f* \u2248 0.025\u20130.035).\n\n**Leading Indicator:** **Critical Flux Decay Rate (CFDR)**\n- **Threshold:** \u2264 **0.5 LMH/month** (USER CONSTRAINT: derived from 18 LMH net flux over 6 months, accounting for 10% safety margin).\n- **Definition:** Rate of decline in **normalized permeate flux** (LMH) during **steady-state operation** (measured via online pressure transducers and mass flow meters). Normalization accounts for MLSS (8 g/L) and temperature (20\u00b0C \u00b1 2\u00b0C).\n\n**Falsification Test:**\n1. **Control vs. Modified Module:** Operate **identical modules** (same membrane material, MLSS, feed) in parallel\u2014**one with dynamic aeration + spacers**, one with **conventional constant aeration (0.2 m\u00b3/air\u00b7m\u00b2\u00b7min)**.\n2. **Test Duration:** 6 months (USER CONSTRAINT).\n3. **Falsification Criteria:**\n   - If **CFDR > 0.5 LMH/month** in the modified module **or**\n   - If **chemical cleaning frequency** (measured via cleaning agent usage logs) **exceeds 6 months** in the modified module **or**\n   - If **EPS/SMP layer thickness** (measured via **confocal laser scanning microscopy** or **ATR-FTIR spectroscopy**) **exceeds 5 \u00b5m** (ASSUMPTION: threshold for permeability collapse in 8 g/L MLSS, based on *Muller et al. (2002)*),\n   then the intervention fails.\n\n**Additional Constraints Met:**\n- **Net Flux:** Dynamic aeration + spacers **increases critical flux by ~25%** (CALCULATED: via *Field et al. (1995)* correlation for scour-enhanced flux, adjusted for helical spacers).\n- **Chemical Cleaning:** Shear reduces **irreversible fouling** by **\u226540%** (ASSUMPTION: based on *Choi et al. (2005)* for air-scour systems; spacers add **15\u201320%** further reduction via enhanced back-transport).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 33.2,
+   "baseline_answer": "**Design/Intervention:** Implement a **graded cermet anode functional layer (Ni-YSZ + 10\u201320 vol% Ce\u2080.\u2088Gd\u2080.\u2082O\u2081.\u2089, CGO) with a porosity gradient (40% at electrolyte interface \u2192 60% at fuel channel)** between the dense electrolyte and the Ni-YSZ support. The CGO addition stabilizes Ni particle size during redox via redox-active buffer layers, while the porosity gradient accommodates volume change without delamination.\n\n**Leading Indicator:** **Anode-electrolyte interfacial shear strength (measured via 4-point bend test with a 0.5 mm notch at the interface)** must exceed **15 MPa** after 200 redox cycles (750\u00b0C, 5% H\u2082/air switching, 10 min per cycle). Threshold derived from finite-element stress analysis showing <12 MPa correlates with delamination onset.\n\n**Falsification Test:** Subject 10 cells to **200 redox cycles (5% H\u2082 \u2192 air, 10 min per cycle at 750\u00b0C)** while monitoring:\n1. **Interfacial shear strength** (4-point bend test, pre/post-cycling) must not degrade below 15 MPa.\n2. **Power density** at 0.7 V must remain \u22650.35 W/cm\u00b2 (measured via segmented cell testing).\n3. **Cell thickness** must not exceed 2.0 mm (measured via caliper post-test).\nFailure to meet all three criteria falsifies the design. Use SEM/EDS to confirm Ni particle size <1 \u00b5m and CGO connectivity at the interface.",
+   "a1_answer": "**Design/Intervention:** **Dual-Functional Anode Buffer Layer (ABL) with Ce0.8Sm0.2O1.9 (SDC) and Porous Ni-SDC Composite Gradient**\n- **ABL Composition:** 30 \u00b5m thick SDC layer (ionic/electronic mixed conductor) directly on YSZ electrolyte, followed by a 100 \u00b5m Ni-SDC composite gradient (Ni volume fraction decreasing from 40% at anode/ABL interface to 20% at anode/electrode interface).\n- **ABL Rationale:** SDC mitigates redox-induced Ni agglomeration via oxygen exchange buffering; gradient reduces thermal/stress mismatch between electrolyte and anode.\n\n**Leading Indicator:** **Anode-Electrolyte Interface Shear Strength (\u03c3_shear)**\n- **Threshold:** \u2265 15 MPa after 200 redox cycles (measured via 4-point bend test with pre-cracked bilayer).\n- **Engineering Rationale:** Below 15 MPa, delamination risk exceeds 10% (empirically correlated to sealing loss in planar SOFC stacks).\n\n**Falsification Test:**\n1. **Redox Cycling Protocol:** 200 cycles of 10 min air (oxidation) \u2192 10 min 3% H2/Ar (reduction) at 750\u00b0C, held at 0.7 V.\n2. **Post-Test Inspection:**\n   - **Failure Mode 1:** \u03c3_shear < 15 MPa \u2192 delamination confirmed via SEM cross-section (crack propagation at ABL/YSZ interface).\n   - **Failure Mode 2:** Power density < 0.35 W/cm\u00b2 \u2192 I-V curve degradation >15% (measured via segmented cell testing).\n   - **Failure Mode 3:** Thickness > 2 mm \u2192 optical profilometry confirms swelling beyond constraint.\n3. **Control:** Baseline Ni-YSZ anode (no ABL) must fail within 50 cycles (\u03c3_shear < 5 MPa) to validate test sensitivity.\n\n---\n**ASSUMPTION 1:** SDC thermal expansion coefficient (TEC) = 12.5 \u00d7 10\u207b\u2076/K matches YSZ (10.5 \u00d7 10\u207b\u2076/K) within \u00b110% \u2192 **Rationale:** Minimizes thermal stress at ABL/YSZ interface.\n**ASSUMPTION 2:** Ni-SDC gradient reduces Ni agglomeration by 70% vs. homogeneous Ni-YSZ \u2192 **Rationale:** Derived from Ni-YSZ redox studies (e.g., *Journal of Power Sources*, 2018, Vol. 380, p. 123).\n**CALCULATED 1:** ABL adds 130 \u00b5m to 2 mm package \u2192 **Rationale:** 30 \u00b5m SDC + 100 \u00b5m Ni-SDC gradient (verified via tape-cast thickness control).\n**USER CONSTRAINT 1:** 200 cycles \u2192 **Rationale:** Directly from service life requirement.\n**USER CONSTRAINT 2:** 0.35 W/cm\u00b2 at 0.7 V \u2192 **Rationale:** Minimum power density threshold for stack viability.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 30.2,
+   "baseline_answer": "**Design/Indicator:** *Dual-sensor adaptive flow impedance monitoring with real-time baseline drift correction*\n- **Primary sensor:** Microfabricated piezoelectric flow sensor (embedded in catheter hub) measuring volumetric flow rate (Q) and differential pressure (\u0394P) at 1 Hz.\n- **Secondary sensor:** Optical backscatter reflectance (OBRS) probe (integrated into catheter tip) detecting fibrin buildup via light attenuation at 680 nm and 850 nm wavelengths, sampled every 5 minutes.\n- **Algorithm:** Adaptive Kalman filter estimating baseline impedance (Z\u2080) from Q/\u0394P, with OBRS-derived fibrin index (F\u1d62) as a corrective term. Computes *normalized flow deficit* (NFD = (Q\u209c\u2091\u2093\u209c \u2013 Q\u2090\u2084\u209c\u209c)/Q\u209c\u2091\u2093\u209c) where Q\u2090\u2084\u209c\u209c is the 4-hour moving average.\n\n**Thresholds:**\n1. **Complete occlusion:** NFD > 0.95 for 3 consecutive minutes **OR** \u0394P > 3.5 psi sustained for 1 minute (falsification: 90% of complete kinks detected within 15 min).\n2. **Partial occlusion (delivery deficit >20%):** NFD > 0.20 for 60 minutes **OR** (NFD > 0.15 **AND** F\u1d62 > 0.7 arbitrary units) for 90 minutes (falsification: 80% of 20%+ deficits detected within 2 hours).\n3. **Nuisance alarm rate:** <0.07 alarms/14 days (falsification: >1 false alarm in 14-day wear test with no occlusion).\n\n**Falsification Test:**\n1. **Bench test:** Simulate 50 catheter kinks (30% partial, 70% complete) in a pulsatile flow loop (viscosity 3\u201315 cP, \u0394P 0.5\u20134 psi) with fibrin-coated tubing. Verify:\n   - 90% of complete occlusions flagged within 15 min.\n   - 80% of 20%+ partial occlusions flagged within 2 hours.\n   - <1 false alarm in 14 days of continuous monitoring (no occlusion).\n2. **Clinical validation:** 50 patients wear the device for 14 days; compare NFD-based alarms to gold-standard contrast CT scans for fibrin deposition (>0.5 mm) and manual occlusion checks. Acceptance: 95% sensitivity for >20% delivery deficit, <0.07 false alarms/patient.\n3. **Air emboli test:** Inject 0.1\u20130.5 \u00b5L air bubbles at 10 cm\u00b3/hr flow rate; verify detection within 2 minutes (falsification: >10% of bubbles undetected).",
+   "a1_answer": "**Design/Indicator:** *Dual-sensor occlusion detection system*\n- **Primary sensor:** *Microflow impedance sensor* (embedded in catheter hub) measuring real-time volumetric flow rate (mL/min) with 0.01 mL/min resolution.\n- **Secondary sensor:** *Ultrasonic Doppler flowmetry* (external patch) monitoring blood flow proxy in catheter lumen at 10 Hz sampling, flagging turbulent/abrupt flow changes.\n\n**Thresholds:**\n- **Complete occlusion:** Microflow < 0.005 mL/min (USER CONSTRAINT: 15-minute detection window at 0.3 mL/hr basal rate) **OR** Doppler signal amplitude drop > 90% for > 3 consecutive samples.\n- **Partial occlusion (delivery deficit > 20%):** Microflow < 80% of expected rate for > 10 minutes (CALCULATED: 20% deficit at 0.3 mL/hr = 0.06 mL/hr threshold, 10-minute window for 2-hour detection) **OR** Doppler coefficient of variation > 25% for > 5 minutes (ASSUMPTION: turbulent flow indicates partial blockage; tested in bench models with 50% lumen occlusion).\n- **Nuisance alarm suppression:** Require *both* sensors to cross thresholds simultaneously (ASSUMPTION: reduces false positives by requiring correlated failure modes).\n\n**Falsification Test:**\n1. **Complete occlusion:** Submerge catheter in glycerin (viscosity = blood) with 100% blockage at hub; verify < 15-minute detection in 95/100 trials (USER CONSTRAINT).\n2. **Partial occlusion:** Simulate 20% delivery deficit via calibrated flow restrictor; verify detection within 2 hours in 90/100 trials (USER CONSTRAINT).\n3. **Nuisance alarm rate:** Deploy in 50 patients for 14 days; verify \u2264 1 false alarm per 14 days (USER CONSTRAINT) with alarm defined as *both* sensors triggering without physical occlusion.\n4. **Form factor:** Confirm ultrasonic patch (< 30 g, < 5 cm\u00b2) and microflow hub (< 1 cm\u00b3) integrate into existing catheter without increasing profile beyond 0.05 mm (USER CONSTRAINT: no change to wearable form factor).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new06-bearing-vibration-predictor",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 31.8,
+   "baseline_answer": "**Design/Indicator:** High-frequency envelope demodulation (2x\u20135x shaft speed band) of the 1 kHz vibration sensor data, extracted via a 100\u2013500 Hz bandpass filter and RMS-averaged over 1-hour windows. Log the resulting **HF RMS envelope amplitude** (dB re 1 \u03bcm/s) at 1 Hz SCADA rate.\n\n**Threshold:** Trigger a warning when the **7-day moving average of HF RMS envelope amplitude** exceeds the **baseline + 12 dB**, where baseline = median of the lowest 10% of values in the prior 30 days. Escalate to alarm if the threshold is crossed for **3 consecutive days**.\n\n**Falsification Test:**\n1. **False Alarm Rate:** Monitor for \u22652 false alarms/year (defined as alarms where the bearing is not spalled at inspection).\n2. **Lead Time:** Validate that \u226580% of spalling events are flagged **\u226514 days before forced replacement** (confirmed via post-failure inspection logs).\n3. **Specificity:** Ensure the predictor does not alarm for **non-spalling failures** (e.g., misalignment, unbalance) in \u226590% of cases (cross-checked with maintenance records).\n4. **Failure Coverage:** Confirm the predictor catches **\u226590% of inner-race spalling cases** (via retrospective analysis of past failures).\n\n**Cost-Effective Implementation:**\n- Use existing 1 kHz sensor; no additional hardware.\n- Compute thresholds offline via SCADA; minimal runtime overhead.\n- Validate with 6 months of historical data (if available) or pilot on 3 identical fans for 3 months.",
+   "a1_answer": "**Design/Leading Indicator:**\nUse the **root mean square (RMS) of the 3\u201330 kHz vibration band** (high-frequency envelope analysis) extracted from the 1 kHz sensor, sampled at 1 Hz via SCADA. This band isolates **inner-race fault-induced high-frequency modulation** (ball-pass frequency of the inner race, BPFI) before it propagates into lower-frequency alarms.\n\n**Threshold:**\nSet a **dynamic threshold** using a **moving average + 3\u03c3** method:\n- **Baseline:** 7-day rolling median of the 3\u201330 kHz RMS (USER CONSTRAINT: aligns with SCADA logging frequency).\n- **Threshold:** Baseline + **3\u00d7standard deviation of the 7-day rolling window** (CALCULATED: balances sensitivity to incipient spalling vs. noise; 3\u03c3 captures ~99.7% of normal variation while flagging early deviations).\n- **Fire condition:** Threshold exceeded for **\u22653 consecutive SCADA samples (3 hours)** (ASSUMPTION: mitigates transient noise; 3 hours > typical bearing fault progression time constant).\n\n**Falsification Test:**\n1. **Kill Condition:** If the predictor fires **\u22653 times in a 30-day window** without confirmed inner-race spalling (via subsequent inspection or failure), **abandon the predictor** (USER CONSTRAINT: \u22642 false alarms/year \u2192 3 events in 30 days exceeds tolerance).\n2. **Validation:** For **\u226510 confirmed inner-race spalling cases** (USER CONSTRAINT: practical sample size for industrial fan fleet), verify:\n   - **\u226580% of cases** show **\u226514 days** of threshold breach before forced replacement (CALCULATED: meets \"fire at least 14 days before\" requirement).\n   - **No false positives** in a concurrent **1-year trial** on 5 identical fan drives (ASSUMPTION: representative sample to validate \u22642 false alarms/year).\n\n**Engineering Rationale for Constraints:**\n- **1 kHz sensor + 1 Hz logging:** High-frequency band (3\u201330 kHz) is alias-safe at 1 kHz sampling; 1 Hz logging ensures SCADA compatibility.\n- **14-day lead time:** 3\u201330 kHz RMS rises **~10\u201314 days** before spalling becomes visually detectable (ASSUMPTION: derived from bearing fault progression models for 350 kW fans).\n- **Cost-effectiveness:** No additional sensors; leverages existing infrastructure.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new08-pipeline-leak-predictor",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 33.8,
+   "baseline_answer": "**Design/Indicator:** *Pressure-Flow Residual Analysis (PFR) with Moving Average Baseline*\n\n**Threshold:** Trigger when the absolute PFR value exceeds **1.5% of nominal flow rate** (0.015 * Q_nominal) for **three consecutive 5-minute intervals**, sustained over **12 hours**.\n\n**Falsification Test:**\n1. **Field Validation:** Deploy PFR on 3 representative 10 km segments with known leak history. If >2 false alarms/month occur in any segment, reject the predictor.\n2. **Leak Detection Accuracy:** Simulate leaks of **0.5% Q_nominal** (target) and **0.3% Q_nominal** (minimum detectable) via controlled orifice tests. If PFR fails to detect **\u226580% of 0.5% leaks within 48 hours** or **\u226550% of 0.3% leaks within 72 hours**, reject.\n3. **Failure Prevention:** Monitor 5 segments with PFR for 6 months. If **\u22651 sudden large failure** occurs in a segment where PFR triggered **no prior alarm**, reject.\n\n**Engineering Notes:**\n- PFR = |(P_actual \u2013 P_expected) \u2013 (Q_actual \u2013 Q_expected)|, where P_expected/Q_expected are modeled via steady-state hydraulic equations using upstream/downstream transmitter data.\n- Baseline uses **7-day moving average** of PFR to filter transient noise (e.g., valve operations).\n- **Cost-Effective:** Uses existing SCADA data; no additional sensors. Computationally lightweight (can run on PLC).",
+   "a1_answer": "**Design/Leading Indicator:** *Pressure-Flow Gradient Deviation (PFGD) Index*\n**Rationale:** Leaks reduce flow while pressure upstream stabilizes (inertia), creating a detectable gradient mismatch between pressure and flow. PFGD isolates small leaks by normalizing deviations against nominal hydraulic resistance.\n\n---\n**Threshold Calculation:**\n1. **USER CONSTRAINT:** Nominal flow (Q_nom) = 1000 m\u00b3/h (ASSUMPTION: DN 600 at 1.5 m/s velocity for typical transmission systems).\n2. **USER CONSTRAINT:** Leak detection limit = 0.5% of Q_nom = 5 m\u00b3/h.\n3. **CALCULATED:** Hydraulic resistance (R) = \u0394P/Q_nom (ASSUMPTION: \u0394P = 100 kPa over 10 km for baseline; R = 100,000 Pa\u00b7s/m\u2076).\n4. **CALCULATED:** Expected pressure drop for leak (\u0394P_leak) = R \u00d7 5 m\u00b3/h = 500 Pa (0.5% of \u0394P).\n5. **CALCULATED:** PFGD threshold = 3 \u00d7 \u03c3_PFGD (ASSUMPTION: \u03c3_PFGD = 0.001 from 5-minute noise analysis; threshold = 0.003).\n   - **Engineering note:** 3\u03c3 ensures <0.1% false positives at 5-minute intervals (scaled to <1/month/10 km).\n\n---\n**Falsification Test:**\n1. **Test Setup:** Inject a **5 m\u00b3/h leak** (USER CONSTRAINT) at a random 10 km segment and a **10 m\u00b3/h leak** (control) at another segment. Monitor PFGD for 72 hours.\n2. **Pass Criteria:**\n   - PFGD \u2265 0.003 within 48 hours for 5 m\u00b3/h leak (USER CONSTRAINT).\n   - PFGD \u2264 0.003 for 95% of 5-minute intervals in non-leak segments (false alarm constraint).\n3. **Kill Criteria:** If PFGD fails to trigger for 5 m\u00b3/h within 48 hours **OR** false alarms exceed 1/month/10 km in a 30-day trial with no leaks.\n4. **Validation Metric:** True Positive Rate (TPR) \u2265 90% for 0.5% leaks; False Positive Rate (FPR) \u2264 0.03/month/10 km.\n\n---\n**Implementation Notes:**\n- **Algorithm:** PFGD = |(\u0394P_actual \u2013 \u0394P_expected)/\u0394P_expected|, where \u0394P_expected = R \u00d7 Q_actual.\n- **Data:** Use 5-minute rolling averages to filter noise; compare against a pipe-segment-specific R baseline.\n- **Cost:** Zero additional hardware (uses existing transmitters); computation via SCADA PLC.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new09-hvac-filter-predictor",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 29.8,
+   "baseline_answer": "**Design/Indicator:** *Normalized Fan Power Ratio (NFPR) \u2013 Supply Fan Power / (Return Fan Power \u00d7 Occupancy Factor)*\n\n**Threshold:** NFPR \u2265 1.25 (relative to baseline NFPR at filter installation) sustained for \u22653 days, with a 10% increase in pressure drop (if available) as a secondary confirmation.\n\n**Falsification Test:**\n1. **Baseline Validation:** Compare NFPR trends against actual filter replacement dates over 6 months. If >20% of replacements occur when NFPR <1.25, reject the predictor.\n2. **Energy/IAQ Tradeoff:** Monitor fan energy use and CO\u2082/PM\u2082.\u2085 levels (if logged) for 3 months post-implementation. If energy savings <15% or IAQ violations (e.g., >500 ppm CO\u2082 or 20% PM\u2082.\u2085 increase vs. baseline) exceed 5% of occupied hours, kill the predictor.\n3. **False Positive Rate:** If >30% of NFPR-triggered alerts result in filters needing replacement within 1 week of threshold crossing, adjust threshold or add pressure drop confirmation. If still >20% after adjustment, reject.",
+   "a1_answer": "**Design/Leading Indicator:**\n**Normalized Fan Power Ratio (NFPR)** \u2013 Calculated as:\n*(Supply Fan Power / Return Fan Power) / (Baseline Supply Fan Power / Baseline Return Fan Power)*\n**Rationale:** Fan power scales with pressure drop (\u0394P) across loaded filters, while normalizing to return fan power accounts for non-filter-related variations (e.g., ductwork, motor efficiency drift). Occupancy schedule adjusts baseline by weighting outdoor air flow (proxy for filter demand) during peak hours.\n\n---\n**Threshold:**\n**NFPR \u2265 1.15** (for \u22653 consecutive days)\n**Rationale:**\n- **USER CONSTRAINT:** Must resolve change-of-state within 1 week \u2192 3-day lag ensures actionable lead time.\n- **CALCULATED:** 1.15x \u0394P increase corresponds to **~50% loading** (ASSUMPTION: MERV-13 filter \u0394P rises linearly from 0.5\" to 2.5\" wg at 50% dust hold; baseline \u0394P = 0.5\" wg). Fan power \u221d \u0394P\u00b2, so 1.15x NFPR \u2248 1.32x \u0394P (\u221a1.15\u00b2 \u2248 1.07, adjusted for system curve nonlinearity).\n- **ASSUMPTION:** Supply/return fan curves are stable (\u00b15% annual drift); validated via annual fan audit (see falsification test).\n\n---\n**Falsification Test:**\n**Kill Condition:** If, over 12 months, \u226530% of NFPR-triggered replacements occur when **post-replacement NFPR \u2264 1.05** (i.e., filter was not loaded) **OR** \u226520% of failures (IAQ complaints or fan alarm trips) occur **without NFPR crossing 1.15** for \u22653 days.\n**Validation Metric:** Achieve \u226520% reduction in replacements (vs. fixed 90-day schedule) while maintaining **\u226410% increase in fan energy** (measured via BMS kWh logs) and **zero IAQ complaints** (occupant survey).\n**Engineering Rationale:** False positives (unloaded filters) or false negatives (missed failures) invalidate the predictor; energy/IAQ thresholds ensure cost-effectiveness and operational safety.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new10-solar-inverter-predictor",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 29.9,
+   "baseline_answer": "**Design/Indicator:** *Heatsink Temperature Variability Ratio (HTVR)*\nCompute the 5-minute rolling standard deviation of heatsink temperature (\u03c3_T) normalized by its 24-hour mean (\u03bc_T):\n**HTVR = \u03c3_T / \u03bc_T**\nUse only the 5-minute telemetry; discard any 5-minute points where DC voltage or AC power deviates >5% from their 24-hour mean (to exclude environmental transients).\n\n**Threshold:** *HTVR > 0.035*\nTrigger a warning if HTVR exceeds 0.035 for \u22653 consecutive 5-minute intervals within a 24-hour window. Reset warning if HTVR falls below 0.025 for 48 hours.\n\n**Falsification Test:**\n1. **Kill Condition:** If, over 12 months of operation, \u226520% of predicted degradations (HTVR warnings) do *not* result in:\n   - A fault log entry within 2 weeks *or*\n   - A measurable increase in DC ripple current (via post-mortem analysis of inverter telemetry during the last 24 hours before trip),\n   then discard the predictor.\n2. **Validation Condition:** If, over the same period, the predictor flags \u226580% of actual IGBT/capacitor failures (confirmed via post-trip inspection or lab analysis of replaced components) with \u226514 days of lead time, and false alarms do not exceed 1 per quarter per inverter, retain the predictor.\n3. **Constraint Check:** Use a chi-squared test to verify false alarm rate \u22641 per quarter (\u03b1=0.05). If p-value < 0.05, reject the predictor.",
+   "a1_answer": "**Design/Leading Indicator:**\n**Predictor:** *Normalized AC Power Degradation Rate (\u0394P_AC/\u0394T) combined with Heatsink Temperature Variance (\u03c3_T_hs)*\n\n**Rationale:**\n- **\u0394P_AC/\u0394T** (USER CONSTRAINT: 5-minute AC power telemetry) captures efficiency loss from IGBT degradation (ASSUMPTION: degraded IGBTs reduce AC output under constant DC input due to higher switching losses; threshold derived from empirical inverter derating curves).\n- **\u03c3_T_hs** (USER CONSTRAINT: 5-minute heatsink temperature) detects thermal instability from capacitor ripple current (CALCULATED: \u03c3_T_hs > 2.5\u00b0C over 24h indicates abnormal thermal cycling; ASSUMPTION: healthy inverters exhibit \u03c3_T_hs < 1.5\u00b0C due to stable thermal mass).\n\n**Threshold:**\n- **Primary Trigger:** \u0394P_AC/\u0394T < \u20130.15%/day **OR** \u03c3_T_hs > 2.5\u00b0C (24h rolling window).\n- **Secondary Confirmation:** Both metrics exceed thresholds for \u22653 consecutive days (USER CONSTRAINT: 2-week lead time; ASSUMPTION: degradation accelerates non-linearly 14 days pre-failure).\n\n**Falsification Test:**\n1. **Kill Condition:** If \u0394P_AC/\u0394T recovers to >\u20130.05%/day **and** \u03c3_T_hs < 2.0\u00b0C within 7 days of alert, predictor is invalid (false alarm).\n2. **Validation:** If inverter trips within 30 days **and** post-mortem confirms IGBT/capacitor failure, predictor is valid. Requires \u226580% true-positive rate over 100 inverter-years to reject null hypothesis (USER CONSTRAINT: <1 false alarm/quarter/inverter).\n3. **Control Test:** Compare against random fault logs\u2014predictor must show \u22655x higher true-positive rate for IGBT/capacitor failures than random sampling (CALCULATED: p < 0.05 via Fisher\u2019s exact test).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new11-conveyor-belt-predictor",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 33.8,
+   "baseline_answer": "**Design/Leading Indicator:**\nUse the **belt-scale throughput variance** (standard deviation of 1-minute mass flow measurements) as a proxy for carcass stiffness degradation. A degrading belt exhibits increasing **dynamic slack** under load, causing erratic throughput despite constant motor current. Compute the rolling 24-hour standard deviation of belt-scale readings (\u03c3\u2082\u2084) and normalize it by the mean throughput (\u03bc) to create a **relative throughput fluctuation index (RTFI = \u03c3\u2082\u2084/\u03bc)**.\n\n**Threshold:**\nFlag when **RTFI exceeds 0.035** (3.5% fluctuation) for **3 consecutive days**. This threshold is derived from empirical data showing that carcass fatigue reduces stiffness by ~15% before splice failure, manifesting as a 3\u20135% throughput variance increase under typical mining loads.\n\n**Falsification Test:**\nDeploy the predictor on **10 identical conveyor belts** over **6 months** and compare predictions against:\n1. **Ground truth:** Visual inspections every 2 weeks (gold standard).\n2. **False alarm rate:** \u22642 alarms/year where no splice tear or longitudinal failure occurs within 3 weeks.\n3. **Detection rate:** \u226580% of actual failures predicted \u22653 weeks prior.\nIf **<70% of failures are caught** or **>3 false alarms occur**, reject the predictor. Use a **chi-squared test (\u03b1=0.05)** to validate the alarm rate constraint.",
+   "a1_answer": "**Design/Leading Indicator:** *Drive-Motor Current Variability Index (\u0394I\u209c\u208b\u2081/\u0394I\u209c) at 1-minute resolution*\n**Engineering Rationale:** Carcass fatigue and cover wear increase belt stiffness and friction, causing non-linear torque demand fluctuations detectable via motor current. Variability (\u0394I) isolates these from steady-state loads.\n\n---\n**Threshold:** *\u0394I\u209c\u208b\u2081/\u0394I\u209c > 1.05 for \u22653 consecutive 1-minute samples, sustained over 1 hour*\n**Rationale:**\n- **USER CONSTRAINT (1.05):** 5% current variability threshold balances sensitivity to fatigue (ASSUMPTION: 5% \u0394I correlates to ~10% modulus increase in rubber compounds per ASTM D412, detectable before splice failure).\n- **USER CONSTRAINT (3 weeks):** 1.05 threshold calibrated via ASSUMPTION: 3-week fatigue progression in steel-cord belts (e.g., 0.3 mm/day cover wear \u2192 1.05 \u0394I at 75% remaining life per ISO 21183).\n- **USER CONSTRAINT (1-hour sustain):** Mitigates transient noise (e.g., material buildup) via ASSUMPTION: 1-hour persistence reduces false positives to <2/year (CALCULATED: Poisson model with \u03bb=0.0043 false alarms/day).\n\n---\n**Falsification Test:**\n1. **Deploy predictor** on 10 identical belts for 6 months; record \u0394I\u209c\u208b\u2081/\u0394I\u209c flags and actual failures.\n2. **Kill criterion:** If \u22653 false alarms occur in 6 months **OR** \u22651 failure occurs within 3 weeks of a flag.\n3. **Validate criterion:** If \u22642 false alarms/year **AND** all failures are flagged \u22653 weeks prior, adopt predictor.\n**Rationale:**\n- **USER CONSTRAINT (10 belts):** Statistical power to detect false alarm rate (ASSUMPTION: 95% confidence for \u03bb\u22640.0043/year).\n- **USER CONSTRAINT (6 months):** Covers seasonal load variations (e.g., humidity, material density).\n- **USER CONSTRAINT (3 weeks):** Directly tests predictor\u2019s lead-time constraint.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 4,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new12-axle-bearing-predictor",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 33.4,
+   "baseline_answer": "**Design/Leading Indicator:**\nAcoustic Envelope Modulation (AEM) of the bearing\u2019s **high-frequency resonance band (10\u201320 kHz)** extracted from the wayside microphone array, normalized by wheel-impact-load-detector (WILD) data to isolate bearing-specific signatures. Use **spectral kurtosis** of the demodulated envelope (bandpass-filtered at \u00b11 kHz around the dominant bearing resonance) as the predictor, computed over 1-minute rolling windows.\n\n**Threshold:**\nTrigger a warning when the **spectral kurtosis exceeds 3.5** (baseline: healthy bearings exhibit kurtosis < 2.5) for **\u22653 consecutive hours** during a wagon pass, with a **false-alarm rate < 0.1% per wagon** over 10,000 passes in validation.\n\n**Falsification Test:**\nDeploy the predictor on **100 randomly selected freight wagons** (mix of healthy and known spalling-prone bearings) for 6 months. **Kill the predictor if:**\n1. **\u226520% of predicted failures** (kurtosis > 3.5) do not result in spalling within 60 days *or* show no progression in subsequent depot inspections, **or**\n2. **\u22655% of actual spalling failures** (confirmed via depot inspection) are missed by the predictor, **or**\n3. The **false-alarm rate exceeds 0.1%** in the validation set, indicating poor specificity to bearing-only defects.\n\n**Cost-Effective Implementation:**\n- Reuse existing microphone array; no hardware changes.\n- Compute kurtosis in real-time via **FPGA-based spectral analysis** (cost: ~$5k/wayside station upgrade).\n- Validate using **existing depot inspection data** (no additional sensors or onboard hardware).",
+   "a1_answer": "**Design/Leading Indicator:** *Acoustic Envelope Modulation Depth (EMD) of the 3xBPF (3\u00d7Ball-Pass-Frequency) harmonic in the axle-box bearing\u2019s radial load zone, normalized by wheel-impact-load-detector (WILD) amplitude variance.*\n\n**Threshold:** *EMD > 0.15 dB (peak-to-peak) sustained over 3 consecutive 10-minute wayside passes, with WILD variance < 5% (indicating stable wheel-rail interaction).*\n\n---\n**CALCULATED 1:** *3xBPF frequency = 3 \u00d7 (D \u00d7 N \u00d7 60) / (2\u03c0 \u00d7 1000) Hz*\n*D = rolling-element diameter (mm), N = shaft RPM (from wheel diameter \u00d7 track speed).*\n*Rationale: Subsurface fatigue cracks in raceways modulate high-frequency acoustic emissions at harmonics of the ball-pass frequency, with 3xBPF being dominant for spalling initiation.*\n\n**CALCULATED 2:** *Minimum detectable EMD = 0.15 dB*\n*Derived from lab spalling tests showing 0.12 dB EMD at 60-day crack propagation (scaled to field noise floor of 0.03 dB RMS from wayside mic array specs).*\n\n**ASSUMPTION 1:** *Wayside mic array sensitivity = \u201330 dBFS \u00b1 2 dB for 5\u201320 kHz band (per typical Class I rail acoustic monitoring).*\n*Rationale: Ensures 3xBPF (typically 12\u201318 kHz for freight bearings) falls within measurable range.*\n\n**ASSUMPTION 2:** *Trackside temperature = 20\u00b0C \u00b1 10\u00b0C (no derailment risk below 120\u00b0C axle housing).*\n*Rationale: Excludes thermal noise as confounder for acoustic EMD trends.*\n\n---\n**Falsification Test:**\n1. **Deploy** on 500 random freight wagons (mix of bearing ages/loads) for 12 months.\n2. **Trigger** when EMD > 0.15 dB for 3+ passes; **ground-truth** via depot ultrasound (every 3 months) to confirm spalling depth < 0.5 mm (non-critical) or \u2265 0.5 mm (critical).\n3. **Kill criterion:** >20% false positives (EMD triggers but no spalling \u2265 0.5 mm) **or** <80% true positives (spalling \u2265 0.5 mm missed).\n4. **Validate:** If 60\u201390 days\u2019 lead time achieved in \u226575% of critical cases (spalling \u2192 seizure), adopt; else, reject.\n\n**Cost-Effective Rationale:**\n- Uses existing wayside sensors (no hardware changes).\n- EMD is invariant to train speed (normalized by WILD) and immune to ambient noise (bandpass-filtered).\n- Threshold tuned to 60-day window via CALCULATED 2, avoiding over-maintenance.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 23.2,
+   "baseline_answer": "### Proposed Design Intervention: Lattice-Stabilized Calcium-Silicon (Ca-Si) Alloys\n\nTo achieve a 15-year float life at 2.27 V/cell while keeping antimony content below 2%, the engineering solution is to replace antimony-doped positive grids with a high-purity **Calcium-Silicon (Ca-Si) alloy** incorporating a stabilizer, such as **Bismuth (Bi)** or **Tellurium (Te)**.\n\n1.  **Grid Alloy Modification:** The positive plate should utilize a cast or wrought Ca-Si alloy (e.g., Ca 0.05\u20130.1%, Si 0.05\u20130.15%, Bi 0.02\u20130.05%). Antimony ($Sb$) must be restricted to <0.05% (trace impurity levels) to strictly satisfy the \"no antimony content above 2 percent\" constraint (interpreted here as a strict exclusion of the traditional 3\u20134% Sb standard).\n2.  **Electrochemical Stabilization:** Pure Ca-Si grids corrode faster than Sb-lead grids at high float potentials. Adding small amounts of Bi or Te stabilizes the PbO\u2082 lattice, reducing the rate of grid corrosion without introducing the heavy grid-thickening required by antimony.\n3.  **Process Optimization:** To counteract the inherently higher corrosion of non-antimony grids at 2.27 V, the design must include:\n    *   **Thicker Grids:** Increase grid thickness to 1.0\u20131.2 mm to provide a larger \"corrosion buffer\" (sacrificial cross-section).\n    *   **Gel Electrolyte:** Use a silica-polymer composite gel (as evidenced in *[crossref] Development of Gel Electrolyte*) to prevent water loss and maintain oxygen recombination, which supports the VRLA design.\n    *   **Charge Control:** Implement a precise float charge algorithm (per *[openaire] Improved charge algorithms*) to avoid overcharging, which accelerates corrosion.\n\n### Expected Measurable Effect\n\n*   **Increased Time-to-Failure:** The primary metric is extending the \"time to capacity loss\" (80% Ah capacity) to >15 years (131,400 hours) at 25\u201330\u00b0C.\n*   **Slower Resistance Rise:** The internal resistance (IR) of the cell should increase at a rate of <0.1 \u00b5\u03a9/month. With antimony, the grid cross-section erodes uniformly, but with Ca-Si, the active material (PbO\u2082) often detaches before the grid fully corrodes. The stabilizer (Bi/Te) mitigates this detachment, keeping the active material adhered to the grid for longer.\n*   **Failure Mode Shift:** Instead of \"grid consumption\" (catastrophic short or open), the failure mode shifts to \"active material loss\" (shelving), which is a gradual capacity fade that can be monitored.\n\n### Falsification Test\n\nTo falsify this approach, perform an **Accelerated Corrosion Test** using the methodology outlined in *[openaire] Defining the life of valve-regulated lead-acid batteries*.\n\n1.  **Protocol:** Construct 20 Ah VRLA cells with:\n    *   **Sample A (Proposed):** Ca-Si-Bi grids (Sb <0.05%), 1.0 mm thickness, gel electrolyte, floated at 2.27 V/cell and 30\u00b0C.\n    *   **Sample B (Control):** Standard Sb-3% grids, floated at 2.27 V/cell and 30\u00b0C.\n2.  **Measurement:** Monitor:\n    *   Capacity (Ah) at 10-minute monthly intervals.\n    *   Internal Resistance (IR) via EIS (Electrochemical Impedance Spectroscopy).\n    *   Visual inspection of grid thinning (X-ray tomography every 6 months).\n3.  **Falsification Criterion:**\n    *   If **Sample A** fails to reach 80% of its initial capacity within 131,400 hours (or",
+   "a1_answer": "**Design/Intervention:** **Tin-Calcium (Ca-Sn) Alloy Grid with Micro-Porous Additive Coating**\n- **Mechanism:** Replace Sb (>2%) with **0.05\u20130.1% Ca + 0.5\u20131.0% Sn** alloy grid (USER CONSTRAINT: Sb \u2264 2% enforced) to suppress hydrogen evolution and corrosion. Apply **0.5\u20131.0 \u00b5m thick micro-porous ceramic (e.g., Al\u2082O\u2083 or ZrO\u2082) coating** on grid surface to physically block aggressive electrolyte penetration and provide a stable passivation layer (ASSUMPTION: coating porosity < 10% to balance ion transport and barrier function).\n\n**Leading Indicator:** **Grid Corrosion Rate (GCR) via In-Situ Electrical Resistance Tomography (ERT)**\n- **Threshold:** **GCR \u2264 0.5 \u00b5m/year** (CALCULATED: 15-year service life \u00d7 10 \u00b5m initial grid thickness / 30 = 5 \u00b5m total corrosion; conservative 0.5 \u00b5m/year threshold accounts for non-uniformity and edge effects).\n- **Measurement:** ERT monitors grid cross-sectional area loss by tracking resistance increase in 4 quadrants of the plate; baseline resistance *R\u2080* measured at 0 years, annual *\u0394R/R\u2080* \u2264 3% (ASSUMPTION: linear resistance-corrosion relationship validated via finite element modeling of grid geometry).\n\n**Falsification Test:**\n1. **Accelerated Life Test (ALT):** Subject 10 cells to **60\u00b0C float at 2.33 V/cell (10% overvoltage)** for **3,000 hours** (CALCULATED: 3,000 h \u00d7 2.27 V/60\u00b0C \u2248 15-year equivalent per Arrhenius model, *E\u2090 = 0.35 eV for PbO\u2082 corrosion*).\n2. **Post-ALT Validation:**\n   - **Grid Thickness:** Cross-section SEM of 3 random plates shows **\u226590% original thickness** (USER CONSTRAINT: 15-year life requires <10% thickness loss).\n   - **Capacity Retention:** Pulse discharge (1C for 1.5 h) shows **\u226580% nominal Ah** (USER CONSTRAINT: service threshold).\n   - **Coating Integrity:** SEM confirms **<5% coating delamination** and **no Sb-rich corrosion products** (ASSUMPTION: delamination >5% indicates coating failure).\n3. **Failure Criteria:** If **>2 of 10 cells fail any validation**, reject the design (e.g., coating porosity >10% or alloy composition drift).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 21.0,
+   "baseline_answer": "**Proposed Design/Intervention:**  \nReplace the ethylene-vinyl alcohol (EVOH) layer with a nanocomposite layer incorporating hydrophobic nanofillers (e.g., cellulose nanocrystals or graphene oxide) into a polyolefin matrix (e.g., PP or LLDPE) to maintain barrier properties under humid conditions. This leverages evidence from [europepmc] on nanocomposite technology enhancing barrier properties and [datacite] on PP\u2019s recyclability.  \n\n**Expected Measurable Effect:**  \nThe nanocomposite layer will reduce water vapor transmission rate (WVTR) to <0.5 g/m\u00b2/day over 18 months at 25\u00b0C/65% RH, as the nanofillers create a tortuous path for moisture/oxygen, mitigating plasticization.  \n\n**Test to Falsify:**  \nAccelerated aging at 40\u00b0C/75% RH for 6 months (equivalent to 18 months at 25\u00b0C/65% RH), followed by WVTR testing (ASTM E96). If WVTR exceeds 0.5 g/m\u00b2/day, the design fails.  \n\n**Evidence Constraints:**  \nWhile [europepmc] supports nanocomposites for barrier enhancement, [datacite] mandates monomaterial PP films for recyclability, limiting filler compatibility. If nanofillers impede recycling (per EN 18120-7), the design is invalid. The [arxiv] study on poly-PDO shows promise for chemical recyclability but lacks validation for humidity resistance, making it a less viable alternative here.",
+   "a1_answer": "**Design/Intervention:** Incorporate **10% by weight nanoclay (montmorillonite) exfoliated in the ethylene-vinyl alcohol (EVOH) layer** to disrupt polymer chain mobility and reduce plasticization effects.\n\n**Leading Indicator:** **Water Vapor Transmission Rate (WVTR) of the EVOH/nanoclay composite** measured via ASTM F1249 (permeation cell method).\n\n**Threshold:** **WVTR \u2264 0.3 g/m\u00b2/day** (30% margin below constraint) at 25\u00b0C, 65% RH after 18 months of accelerated aging (equivalent to 18 months real-time via Arrhenius extrapolation at 40\u00b0C, 90% RH).\n\n**Falsification Test:**\n1. **Accelerated Aging:** Expose samples to 40\u00b0C, 90% RH for 12 weeks (calculated via **ASSUMPTION: Q10 = 2.5** for moisture diffusion in EVOH, validated by prior literature on polymer aging).\n2. **Post-Aging WVTR:** Measure WVTR via ASTM F1249. If **USER CONSTRAINT: WVTR > 0.5 g/m\u00b2/day** (or **CALCULATED: > 0.3 g/m\u00b2/day** for the threshold), reject the design.\n3. **Microstructural Verification:** Confirm nanoclay exfoliation via **ASSUMPTION: X-ray diffraction (XRD) peak shift > 2\u0394\u03b8** (baseline EVOH peak at ~19\u00b0 2\u03b8) to ensure dispersion integrity post-aging.\n\n**Rationale for Threshold:**\n- **CALCULATED: 0.3 g/m\u00b2/day** accounts for **USER CONSTRAINT: 0.5 g/m\u00b2/day** plus **ASSUMPTION: 30% safety factor** for process variability (e.g., clay loading uniformity, humidity spikes during distribution).\n- **ASSUMPTION: Nanoclay reduces WVTR by 40%** (supported by prior studies on EVOH/clay nanocomposites, e.g., *Journal of Applied Polymer Science*, 2015).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 19.0,
+   "baseline_answer": "**Design/Intervention:**\nImplement a **SCADA-driven Specific Energy Consumption (SEC) drift monitor** on the 350 kW fan drive. The leading indicator is the **increase in specific energy required per unit of airflow** (or power-to-speed ratio) at the bearing, normalized against the healthy baseline. This detects the frictional torque increase caused by inner-race spalling before vibration amplitudes spike.\n\n1.  **Signal Source:** Use the existing 1 Hz SCADA logging. You do *not* use the 1 kHz vibration sensor for the primary alarm; it is useless at 1 Hz sampling for spalling detection (aliasing/Nyquist issues for early fault frequencies). Instead, rely on **Power Input (kW)** and **Fan Speed/RPM** (derived from motor VFD frequency if available, or inferred from load).\n2.  **Metric:** Calculate the **Effective Power-to-Speed Ratio** ($P_{eff} = P_{measured} / (Speed^3)$ or similar cubic law depending on fan type, or simply $P_{measured}$ at a constant set-point). As spalling progresses, mechanical losses (friction, heat generation) increase, causing the motor to draw more power to maintain the same fan performance, or the fan to slow down under constant power.\n3.  **Threshold:** Set the alarm at a **5% increase in specific energy consumption** over a rolling 7-day median baseline, sustained for 48 hours. This corresponds to early-stage spalling where frictional losses begin to dominate, typically occurring weeks before catastrophic vibration rise.\n\n**Expected Measurable Effect:**\n*   **Detection Time:** The 5% power drift will manifest 14+ days before the vibration alarm trips, as frictional losses accumulate linearly with spalling volume before the \"click\" or high-frequency vibration event occurs.\n*   **False Alarm Rate:** <2/year. Power fluctuation due to wind/load changes is slow. By using a 7-day moving median as the baseline, you filter out transient load spikes (seconds/minutes) and seasonal ambient temperature effects (which may be compensated for). Only sustained mechanical degradation triggers the alarm.\n\n**Concrete Test (Falsification):**\n**\"The 10-Month Retrospective Validation\"**\n\n1.  **Data Retrieval:** Pull 12 months of SCADA data (1 Hz) from the 350 kW drive *before* the last bearing failure or *during* a known failed unit replaced on schedule.\n2.  **Baseline Establishment:** Identify the \"Healthy Baseline\" period (e.g., 30 days post-replacement or pre-fault).\n3.  **Simulation:**\n    *   Apply the **5% drift threshold** logic to the historical data.\n    *   Mark the exact timestamp where the threshold was first breached.\n    *   Mark the timestamp where the **vibration alarm** actually tripped in the history.\n4.  **Validation Criteria (Kill Test):**\n    *   **KILL 1:** If the power drift threshold does *not* breach at least **14 days** prior to the vibration alarm, the indicator is too late.\n    *   **KILL 2:** If the 5% threshold triggers **more than 2 times** in the 12-month historical record *without* a subsequent bearing replacement/repair being verified, the indicator has too many false alarms.\n    *   **KILL 3:** If the power data is too noisy (standard deviation of the 1-Hz power signal at constant speed is >2%), making a 5% drift statistically indistinguishable from noise, the method is invalid with current sensors. In this case, you must either upgrade to a higher-fidelity power meter or abandon this indicator.\n\n**Why this works (Evidence Support):**\n*   **[europepmc] Wind Turbine Main Bearing Fault Prognosis Based Solely on SCADA Data:** This paper explicitly demonstrates that bearing prognosis is achievable *solely* using SCADA data, proving that power/torque deviations are valid early indicators for large rotating machinery without needing high-frequency vibration.\n*   **[europepmc] Non-Destructive Techniques...:** Lists \"oil monitoring\" and \"condition monitoring\" as key",
+   "a1_answer": "**Design/Leading Indicator:** High-frequency resonance demodulation (HFRD) envelope amplitude of the 3\u201315 kHz band extracted from the 1 kHz vibration sensor, sampled at 1 Hz via SCADA. Use a 14-day moving average (MA14) of the envelope amplitude to smooth transient noise.\n\n**Threshold:** Trigger alarm when MA14 exceeds 0.08 *g_rms* (USER CONSTRAINT: 0.08 *g_rms* is empirically derived from field data for 350 kW fan bearings with similar spalling progression rates; ASSUMPTION: 0.08 *g_rms* corresponds to ~20% of bearing life remaining based on ISO 15243 fatigue life models).\n\n**Falsification Test:**\n1. **False Alarm Rate:** Monitor for 12 months; if >2 false alarms occur (USER CONSTRAINT), reject the predictor.\n2. **Warning Lead Time:** For every confirmed spalling event, verify MA14 crosses threshold \u226514 days before repair is required (USER CONSTRAINT). If <80% of events meet this, reject.\n3. **Sensor Consistency:** Compare HFRD envelope trends against known bearing failure modes (e.g., spalling vs. outer-race fatigue). If >10% of alarms correlate with non-spalling failures (CALCULATED: 10% threshold based on 3\u03c3 confidence in failure mode classification), reject.\n4. **SCADA Logging Integrity:** Validate 1 Hz sampling captures \u226595% of envelope amplitude peaks (ASSUMPTION: Nyquist criterion for 15 kHz band at 1 Hz is violated, but MA14 smoothing mitigates aliasing; verify via 1-minute burst tests at 1 kHz). If <95% peak retention, adjust sampling or reject.\n\n**Engineering Rationale for Constraints:**\n- **1 kHz sensor/1 Hz logging:** HFRD uses bandpass filtering to isolate bearing fault frequencies; MA14 compensates for low sampling rate (CALCULATED: 14-day MA reduces noise variance by ~90% vs. raw data).\n- **14-day warning:** MA14 threshold set to detect spalling at ~20% life remaining (ASSUMPTION: ISO 15243 L10 life for 350 kW fan bearings is ~50,000 hours; 14 days = ~336 hours, or ~0.67% of life, but spalling progresses non-linearly near end-of-life).\n- **False alarms/year:** 2/year threshold balances sensitivity (USER CONSTRAINT) with operational tolerance (CALCULATED: 350 kW fan drives typically operate 8,760 hours/year; 2 false alarms/year = 0.00023 alarms/hour, or 1 alarm per 4,380 hours).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "B",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 3,
+    "A6": 3,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 5,
+    "B6": 5
+   },
+   "decoded": "baseline"
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 30.9,
+   "baseline_answer": "**Proposed Leading Indicator:** Stator Winding Impedance Spectral Signature (via Offline High-Voltage Insulation Resistance and Polarization Index Trending).\n\n**Rationale & Evidence Support:**\nThe core failure mechanism is stator winding insulation degradation via partial discharge (PD) leading to a ground fault. The constraint of \"offline PD testing only\" and \"no continuous monitoring hardware\" precludes real-time current signature analysis or magnetic sensor arrays, despite their utility noted in [europepmc]. Instead, we must rely on the dielectric properties of the insulation system.\n\nEvidence from [crossref] *Sistem Proteksi Motor 6 KV...* and [crossref] *Evaluasi... Relay Proteksi... PLTGU Gresik* confirms that protection for 6 kV boiler feed pumps relies heavily on accurate detection of ground faults and short circuits. However, these are *reactive* failures. To provide a 6-month leading indicator, we must detect the slow degradation of the insulation resistivity. The literature on epoxy-silicone composites [semantic_scholar] highlights that mechanical and delamination properties are key indicators of insulation health in high-voltage environments. While these specific material studies are for laminates, the principle holds: insulation aging correlates with changes in dielectric response.\n\n**Design/Intervention:**\nImplement a quarterly, offline, high-voltage Insulation Resistance (IR) and Polarization Index (PI) test program on the 4.16 kV motor stator windings.\n1.  **Baseline:** Establish a baseline IR/PI value at the last major overhaul.\n2.  **Monitoring:** Perform standardized IEC 60159 IR/PI tests every quarter.\n3.  **Threshold:** Set the alarm threshold at a **20% decrease in PI value** or a **50% drop in absolute IR** compared to the baseline, sustained over two consecutive quarterly tests. This accounts for test variability and temperature normalization (using standard temperature correction factors).\n\n**Expected Measurable Effect:**\nThis protocol will detect the progressive increase in leakage current and decrease in dielectric strength caused by PD-induced chemical and physical degradation (tracking, moisture ingress). By triggering maintenance at the 20% PI drop, you aim to intervene before the insulation collapses into a hard ground fault. This satisfies the \"6 months before ground fault\" requirement if the degradation trend is linear or slow-moving, which is typical for thermal aging, though accelerated by intermittent wetting. It prevents the \"emergency shutdowns triggered falsely\" because it is an offline, predictive maintenance trigger, not a real-time trip logic.\n\n**Concrete Validation Test (Falsification):**\nThe predictor is killed if:\n1.  **False Positive Rate:** The threshold triggers a maintenance recommendation in a new, healthy motor within 6 months without subsequent PD or ground fault evidence.\n2.  **Lead Time Failure:** In a retrospective analysis of motors that *did* fail via ground fault within 3 months, the 20% PI drop threshold was not crossed at the 6-month prior check.\n3.  **Irrelevance:** If the ground fault was caused by a mechanical factor (e.g., coil displacement from vibration) rather than slow insulation aging, the IR/PI trend will remain stable until the sudden fault, rendering the indicator useless for that specific failure mode.\n\n**Note on Evidence Limitations:**\nThe provided evidence does not explicitly link IR/PI trending to a 6-month lead time for 4.16 kV motors specifically. It confirms the importance of protection [crossref] and material properties [semantic_scholar], but the specific \"6-month\" lead time is an engineering assumption based on standard dielectric aging curves. If the failure mode is acute (e.g., mechanical vibration causing immediate tracking), this offline indicator will fail. The test must include a historical correlation check: do historical motors that failed show a 6-month PI decline? If not, the hypothesis is dead.",
+   "a1_answer": "**Design/Leading Indicator:** *Partial Discharge Inception Voltage (PDIV) measured via offline High-Voltage (HV) induced PD testing (IEC 60034-18-42) using a calibrated PD detector (e.g., MEGGER PD3 or equivalent) during outages.*\n\n**Threshold:** *PDIV \u2264 2.5 \u00d7 U<sub>m</sub>/\u221a3 (where U<sub>m</sub> = 4.16 kV), measured at \u22653 U<sub>m</sub> test voltage, with a detection sensitivity of \u22645 pC. Trigger corrective action if PDIV drops \u226515% from baseline over a 6-month interval.*\n\n---\n**CALCULATED 1:** *U<sub>m</sub> = 4.16 kV \u2192 Test voltage = 3 \u00d7 4.16 kV = 12.48 kV (ASSUMPTION: Standard HV test level per IEEE 95-2017 for offline PD testing, ensuring PD inception visibility without risking insulation breakdown).*\n**CALCULATED 2:** *Threshold PDIV = 2.5 \u00d7 (4.16 kV/\u221a3) \u2248 6.0 kV (ASSUMPTION: Conservative threshold set at 2.5\u00d7 rated phase voltage to account for aging and stress non-uniformity, per EPRI guidelines for PD detection in motors).*\n**CALCULATED 3:** *15% degradation threshold = 0.15 \u00d7 6.0 kV = 0.9 kV drop (ASSUMPTATION: Empirical correlation from PD progression studies in [Smith et al., 2018], where 15% PDIV drop precedes ground fault by \u22656 months in 90% of cases).*\n\n---\n**Falsification Test:**\n1. **Baseline Test:** Measure PDIV at commissioning or first outage (T\u2080). Record as *PDIV<sub>baseline</sub>*.\n2. **Follow-Up Tests:** Repeat PDIV measurement every 6 months (T\u2086, T\u2081\u2082, etc.).\n   - **Kill Condition:** If *PDIV<sub>T\u2086</sub> \u2265 PDIV<sub>baseline</sub> \u2212 0.9 kV* (i.e., <15% drop), reject predictor for this motor (false positive risk).\n   - **Validation Condition:** If *PDIV<sub>T\u2086</sub> < PDIV<sub>baseline</sub> \u2212 0.9 kV*, proceed with insulation repair/replacement. If subsequent ground fault occurs within 6 months, predictor fails (false negative). If no fault occurs within 12 months, predictor validated for this motor.\n\n**USER CONSTRAINT 1:** *Offline-only testing* \u2192 **Compliance:** PD testing requires motor de-energization (IEC 60034-18-42 mandates this for safety).\n**USER CONSTRAINT 2:** *6-month lead time* \u2192 **Compliance:** 15% PDIV drop threshold derived from [EPRI TR-1000000, 2015] shows 95% confidence in \u22656-month warning.\n**USER CONSTRAINT 3:** *No continuous monitoring* \u2192 **Compliance:** Offline PD testing meets requirement; eliminates hardware costs (ASSUMPTION: Capital cost of PD detector amortized over 5-year lifespan \u2248 $15k, vs. $50k+ for online PD systems).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 2
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 33.8,
+   "baseline_answer": "**Design/Leading Indicator:**\nUse the **temperature approach (\u0394T) between tube-side outlet and cooling-water inlet** as the leading indicator. Calculate it as:\n\u0394T = (Tube-side outlet temperature) \u2013 (Cooling-water inlet temperature).\nMonitor \u0394T continuously and compute its **weekly moving average** to smooth noise.\n\n**Threshold:**\nTrigger an alert when the **7-day moving average of \u0394T exceeds 10\u00b0C above the baseline** (baseline = \u0394T at commissioning or last cleaning, adjusted for seasonal cooling-water temperature variations). For a 300 MW unit, assume baseline \u0394T \u2248 5\u00b0C (typical for clean tubes); alert at **\u0394T > 15\u00b0C**.\n\n**Falsification Test:**\n1. **Predictive Power:** Over 3 months, if \u226580% of alerts (\u0394T > 15\u00b0C) precede back-pressure derating by \u22653 weeks, the predictor passes. If <60% do, reject.\n2. **Specificity:** If >20% of alerts fail to precede derating (false positives), adjust threshold upward in 1\u00b0C increments until specificity improves.\n3. **Mechanistic Check:** Verify \u0394T rise correlates with **increased tube-side pressure drop** (from existing flow/pressure measurements) and **reduced steam flow rate** (from turbine data), confirming biofouling as the root cause. If no correlation, reject.\n\n**Constraint Compliance:**\n- Uses only existing temperature/flow measurements.\n- Alerts \u22653 weeks before derating (\u0394T rise from biofouling typically precedes back-pressure by 4\u20136 weeks in similar units).\n- No new instrumentation.",
+   "a1_answer": "**Design/Leading Indicator:**\n**Condenser Tube-Side Approach Temperature (\u0394T_approach) Drift**\n*Definition:* The difference between the tube-side outlet temperature (measured at the condenser outlet) and the cooling water inlet temperature (measured at the cooling water pump discharge), normalized by the design clean-tube \u0394T_approach.\n*Rationale:* Biofouling increases thermal resistance, raising the tube-side outlet temperature for a given steam load. \u0394T_approach drift is directly tied to fouling accumulation and precedes back-pressure rise.\n\n---\n**Threshold:**\n**Calculated \u0394T_approach Drift Threshold: +15% above baseline (clean-tube) \u0394T_approach**\n*USER CONSTRAINT 1:* Derating limit = +10% back-pressure rise (assumed from typical turbine curves).\n*ASSUMPTION 1:* Baseline (clean-tube) \u0394T_approach = 5\u00b0C (typical for 300 MW units with seawater cooling; adjust if site data differs).\n*ASSUMPTION 2:* Fouling resistance adds linearly to \u0394T_approach; 15% drift correlates to ~50% of critical fouling resistance (from ASME PTC 12.2 guidelines for biofouling).\n*CALCULATED 1:* Threshold = 5\u00b0C * 1.15 = **5.75\u00b0C \u0394T_approach** (or +15% from baseline).\n*CALCULATED 2:* Time to derating at this threshold = **3 weeks** (from user constraint; validated via historical fouling rate data if available).\n\n---\n**Falsification Test:**\n**Test:** *\"If \u0394T_approach drift exceeds 5.75\u00b0C and the condenser is chemically cleaned within 3 weeks, but back-pressure does not rise by >10%, the predictor is false.\"*\n*Steps:*\n1. **Baseline \u0394T_approach:** Measure and record clean-tube \u0394T_approach (e.g., post-cleaning or during low-load operation).\n2. **Monitoring:** Track \u0394T_approach daily (using existing temperature measurements: tube-side outlet and cooling water inlet).\n3. **Alert:** Trigger alert at +15% drift (5.75\u00b0C).\n4. **Action:** Perform chemical cleaning or mechanical fouling mitigation.\n5. **Validation:**\n   - *Kill Condition:* If back-pressure does **not** rise >10% after cleaning, the \u0394T_approach drift predictor is invalid (fouling was not the primary cause or threshold is too conservative).\n   - *Confirm Condition:* If back-pressure rises >10% **before** cleaning at \u0394T_approach drift <5.75\u00b0C, the threshold is too aggressive (adjust to +10% drift).\n*USER CONSTRAINT 2:* No new instrumentation \u2192 rely on existing temperature transmitters (tube-side outlet and cooling water inlet).\n*ASSUMPTION 3:* Flow measurements are stable (no significant cooling water flow reduction), as flow changes would confound \u0394T_approach trends.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 19.1,
+   "baseline_answer": "**Proposed Design Intervention:** Replace the conventional elastomeric bearing pad with a **polyurea-coated, fiber-reinforced elastomeric laminate**. The polyurea coating (formulated for marine climates) will provide a dense, ozone-resistant barrier to prevent surface crazing, while embedded high-strength fibers (e.g., aramid) will mitigate creep-induced vertical deflection drift by constraining elastomer layer deformation. The polyurea\u2019s phase-separated microstructure ([europepmc]) enhances durability, and the fibers address long-term creep under sustained load ([arxiv]).  \n\n**Expected Measurable Effect:** Over 75 years in a marine climate, the bearing will exhibit:  \n1. **No measurable ozone-induced surface degradation** (verified via visual inspection and accelerated aging tests).  \n2. **Vertical deflection drift \u2264 20% of design tolerance** (monitored via periodic survey measurements, as no new instrumentation is allowed).  \n\n**Test to Falsify the Approach:** **Accelerated aging under combined creep and ozone exposure** per ASTM D573 (ozone) and ASTM D395 (compression set). The test subjects the bearing to:  \n- Continuous 25% static compression (simulating bridge load) at 40\u00b0C (accelerating creep).  \n- 50 ppm ozone concentration at 25\u00b0C (simulating marine climate degradation).  \n- Duration: 6 months (equivalent to ~75 years in real-time).  \n**Falsification criterion:** If the sample shows >30% compression set or visible surface crazing, the design fails.  \n\n**Note:** The evidence does not support claims about polyurea\u2019s creep resistance directly, but its mechanical robustness ([europepmc]) and fiber-reinforced composites\u2019 creep mitigation ([arxiv]) provide indirect support. If the test shows unacceptably high creep, the fiber reinforcement or polyurea formulation must be re-evaluated.",
+   "a1_answer": "**Design/Intervention:** *Encapsulation with UV-stabilized silicone gel and low-friction PTFE-coated steel shims*\n\n**Leading Indicator:** *Surface crazing depth (measured via ultrasonic C-scan) and vertical deflection drift (monitored via existing bridge joint gap measurements)*\n\n**Thresholds:**\n- **Crazing Depth:** USER CONSTRAINT: \u22640.5 mm (max allowable surface degradation before structural integrity risk)\n- **Vertical Deflection Drift:** CALCULATED: \u22641.5 mm/decade (derived from 75-year design life, assuming 12 mm total drift tolerance and linear degradation)\n- **PTFE Shim Wear:** ASSUMPTION: \u22640.1 mm/decade (based on 100 MPa compressive stress and 0.01% wear factor for PTFE under elastomer confinement)\n\n**Falsification Test:**\n1. **Accelerated Aging Chamber:** Subject encapsulated and unencapsulated bearing samples to 50 years of equivalent marine climate (UV, humidity, and cyclic loading per ASTM D4587) and measure:\n   - Crazing depth via ultrasonic C-scan (falsification if >0.5 mm in encapsulated samples).\n   - Vertical deflection drift under 50% design load (falsification if >7.5 mm total drift).\n2. **Field Validation:** Install instrumented test bearings (using existing joint gap measurements) on a bridge in a marine climate zone. After 10 years, measure:\n   - Crazing depth (falsification if >1 mm).\n   - Deflection drift (falsification if >1.5 mm/decade).\n   - PTFE shim wear via ultrasonic thickness measurement (falsification if >0.1 mm/decade).\n\n**Engineering Rationale for Constraints:**\n- **No new instrumentation:** Relies on existing joint gap measurements and ultrasonic testing (non-destructive, no additional sensors).\n- **Marine climate tolerance:** Silicone gel blocks UV/ozone exposure; PTFE shims resist corrosion and reduce friction-induced heat.\n- **75-year life extension:** Encapsulation isolates elastomer from environmental degradation; shims maintain load distribution and reduce creep.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 26.0,
+   "baseline_answer": "**Design Intervention: Solid Polymer Electrolyte (SPE) Integration with Hydrophobic Polymer Encapsulation**\n\nTo mitigate electrolyte dry-out and seal permeation under automotive constraints, the design must transition from a volatile liquid electrolyte to a thermodynamically stable solid or gel polymer matrix, combined with a low-permeability barrier.\n\n1.  **Electrolyte Switch:** Replace standard KOH or ionic liquid organic solvent electrolytes with a **Solid Polymer Electrolyte (SPE)** or a **gel electrolyte** based on fluoropolymer or high-temperature stable poly(ethylene oxide) blends. While the provided evidence notes that performance can decrease when switching from liquid to SPE due to interfacial impedance [semantic_scholar: MD simulation], modern SPEs with nanoscale ion channels or doped interfaces maintain sufficient conductivity at 65 \u00b0C. This eliminates solvent evaporation, the primary driver of the stated failure mode.\n2.  **Seal Enhancement:** Implement a **Hydrophobic Fluoropolymer (e.g., PTFE or PVDF) laminate** on the outer casing of the cell/module. This layer reduces vapor permeation rates by orders of magnitude compared to standard automotive plastics or metals used in typical seals.\n3.  **Thermal Management:** Integrate a **phase-change material (PCM) micro-encapsulated layer** between the module and the under-hood environment. This buffers the cell temperature, preventing localized hotspots that accelerate any remaining permeation or ionic transport degradation.\n\n**Expected Measurable Effect:**\n*   **Stable ESR:** Equivalent Series Resistance (ESR) will remain within $\\pm$10% of baseline over 10 years at 65 \u00b0C, preventing the \"climbing\" ESR that blocks cold-crank assist.\n*   **Capacitance Retention:** Loss will remain below the specified 10% threshold, as the solid state prevents the mass loss associated with liquid evaporation.\n*   **Height Constraint:** The SPE module and laminate layers can be integrated within the existing cell footprint, keeping the total added module height $\\le$ 1 mm.\n\n**Falsification Test:**\n**High-Temperature Permeation and ESR Ramp Test:**\n1.  Place the modified supercapacitor module in a thermal chamber set to **80 \u00b0C** (exceeding the 65 \u00b0C max ambient to stress the failure mode) with **0% relative humidity**.\n2.  Monitor **ESR** and **Capacitance** continuously over **1,000 hours** (accelerated aging proxy for 10 years).\n3.  **Falsification Criterion:** If ESR increases by more than **15%** or capacitance drops below **90%** of initial values at the 1,000-hour mark, the design fails. A successful design must maintain ESR within 10% and capacitance >90% at 80 \u00b0C, proving that the solid-state/seal system resists dry-out and permeation-induced transport collapse.\n\n*Note: The evidence [semantic_scholar: Extreme-Temperature EDLCs] confirms that high-temperature electrolyte decomposition is a key failure mode; moving to a solid-state system removes the volatile solvent, directly addressing the root cause of dry-out.*",
+   "a1_answer": "**Design/Intervention:** *Hybrid Electrolyte System with Vapor-Permeation Barrier and Passive Solvent Reservoir*\n- **Core:** Replace the current organic solvent electrolyte (e.g., acetonitrile-based) with a **1:1 volumetric blend of ionic liquid (IL) + low-vapor-pressure solvent** (e.g., 1-ethyl-3-methylimidazolium bis(trifluoromethylsulfonyl)imide [EMIM-TFSI] + propylene carbonate [PC]). IL provides thermal stability (>200\u00b0C) and low volatility; PC maintains ionic conductivity at low temps.\n- **Seal:** Integrate a **0.1 mm thick fluoropolymer (e.g., PFA) vapor-permeation barrier** between the aluminum separator and module housing, with a **0.05 mm laser-welded seam** to prevent edge leakage. Barrier reduces solvent loss by **90%** (vs. uncoated) per ASSUMPTION 1.\n- **Reservoir:** Embed a **passive solvent reservoir** (0.2 mm thick PC-soaked glass microfiber mat) in the module stack, connected via capillary wicking to the separator. Reservoir volume: **5% of total electrolyte** (CALCULATED 1). Replenishes evaporated solvent via capillary action without active components.\n\n**Leading Indicator:** *Equivalent Series Resistance (ESR) Drift at 65\u00b0C/2.7V*\n- **Threshold:** ESR increase \u2264 **20%** over 10 years (baseline: 5 m\u03a9 at 20\u00b0C). Derived from USER CONSTRAINT (10% capacitance loss \u2192 ESR rise \u226420% per ASSUMPTION 2).\n- **Monitoring:** In-situ ESR via **1 kHz impedance spectroscopy** during cold-crank pulses (\u201320\u00b0C). Use a **10 \u00b5s pulse-width** to avoid heating artifacts (CALCULATED 2).\n\n**Falsification Test:**\n1. **Accelerated Aging:** Subject 3 modules to **65\u00b0C/90% RH for 3,000 hours** (\u224810 years per ASSUMPTION 3) with **100% DoD cycling at 2.7V**. Measure ESR pre/post. **Fail if:** Any module exceeds **20% ESR rise** or shows **>10% capacitance fade** (USER CONSTRAINT).\n2. **Seal Integrity:** Submerge aged modules in **vacuum (10 Pa) for 72 hours** with **EMIM-TFSI tracer dye** in electrolyte. **Fail if:** Dye detected in housing (indicates barrier breach).\n3. **Cold-Crank Validation:** Perform **10,000 cold-crank pulses at \u201320\u00b0C** (12V/300A pulses). **Fail if:** <90% of pulses achieve **\u226580% target voltage rise** within 500 ms (per ASSUMPTION 4).\n\n---\n**ASSUMPTIONS:**\n1. PFA barrier reduces PC evaporation rate to **0.01%/day at 65\u00b0C** (vs. 0.1%/day uncoated) based on Fick\u2019s law with D_PFA = 1e-12 cm\u00b2/s (literature).\n2. ESR scales linearly with capacitance loss for ESR < 20% (validated in [Ref: JES 2018, Vol. 165, p. A3042]).\n3. 3,000 hours at 65\u00b0C \u2248 10 years via Arrhenius extrapolation (Ea = 80 kJ/mol for PC evaporation).\n4. Cold-crank pulse success defined by **RC time constant \u03c4 = ESR \u00d7 C < 500 ms** for 80% voltage rise.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 21.6,
+   "baseline_answer": "**Proposed Design/Intervention**\n\nThe most cost-effective leading indicator is the **time-varying contact resistance ($R_c$) of the brush block, derived from the slip-ring terminal voltage and measured excitation current.**\n\nAt 1-minute historian sampling intervals, you cannot resolve the high-frequency arcing transients or micro-vibrations. However, contact resistance in a healthy slip ring is stable with low variance. As wear progresses and the interface moves from pure sliding contact toward intermittent separation (the precursors to arcing), the effective contact area decreases, causing $R_c$ to rise. This rise is not instantaneous; it follows a stochastic, upward-trending noise band that begins weeks before catastrophic arcing. The leading indicator is the **drift in the median value** of the calculated $R_c$ and the **expansion of its rolling standard deviation**.\n\n**Operating Threshold**\n\nTo satisfy the \"1 false alarm per year\" constraint while providing \"2 weeks warning,\" a simple static threshold is insufficient because $R_c$ is load-dependent. The threshold must be a **baseline deviation metric**:\n\n1.  **Baseline Establishment:** Calculate the 30-day rolling median ($M_{30}$) and standard deviation ($\\sigma_{30}$) of $R_c$ at a standardized reference current (normalized for load).\n2.  **Primary Alarm (2-week warning):** Trigger when the instantaneous $R_c$ exceeds $M_{30} + 3\\sigma_{30}$ for 5 consecutive 1-minute intervals. This catches the start of the wear-driven drift.\n3.  **Critical Alarm (Aring Precursor):** Trigger when the short-term variance ($\\sigma_{1h}$) exceeds $2 \\times \\sigma_{30}$ for 24 hours. This captures the increased instability/separation events that precede the major arcing faults.\n\nThis dual-threshold approach filters out transient load spikes (which increase $R_c$ but recover quickly) while catching the persistent, non-recoverable drift caused by physical brush wear and surface degradation.\n\n**Expected Measurable Effect**\n\n*   **Leading Time:** The physical progression from stable sliding to intermittent separation takes days to weeks. The median drift in $R_c$ should be detectable 14\u201321 days before the arcing frequency becomes high enough to cause thermal or vibration alarms.\n*   **False Alarm Rate:** The $3\\sigma$ deviation from a 30-day baseline is statistically robust against normal operational variability, maintaining the <1/year target.\n*   **Cost:** No new hardware is required. It uses existing voltage and current sensors already present in the excitation system control cabinet.\n\n**Validation/Kill Test**\n\nThe test to falsify this predictor is a **historical correlation study** using archived data:\n\n1.  **Data Mining:** Retrieve 12 months of 1-minute historian data for the 1.5 MW generator, including periods where brush replacement or minor arcing events were logged (maintenance records).\n2.  **Retrospective Analysis:** Overlay the calculated $R_c$ drift and $\\sigma$ expansion on the timeline of the logged maintenance events.\n3.  **Falsification Criteria:**\n    *   If the $R_c$ drift does **not** begin rising significantly (>3$\\sigma$) at least 14 days before the recorded arcing/wear faults, the predictor is **killed**.\n    *   If the false positive rate in the historical data (periods where $R_c$ breached the threshold but no fault occurred) exceeds 1 event per machine-year, the threshold sensitivity must be re-tuned or the predictor rejected.\n\n**Evidence Support**\n*   **[doaj] Surface-Resolved Multiphysics Modeling...** supports the mechanism: it explicitly models how mechanical contact dynamics and intermittent separation activate arc channels. This confirms that separation (leading to resistance changes) is the precursor to arcing.\n*   **[crossref] Fractal contact resistance model of wind pitch slip ring...** supports the measurability: it demonstrates that contact resistance is a fractal, variable signal correlated with wear and vibration, making its statistical drift a valid metric.\n*   **[europepmc/other] Irrelevant materials science papers** are noted as not directly supporting the electrical",
+   "a1_answer": "**Design/Indicator:** *Slip-Ring Current Ripple Amplitude (SRCRA)* \u2013 the RMS of the high-frequency (10\u201350 Hz) current fluctuations in the excitation circuit, normalized by the mean excitation current. **Rationale:** Brush-slip-ring wear increases contact resistance non-uniformly, causing micro-arcing and stochastic current ripple at frequencies correlated with rotational speed (1800 rpm \u2192 ~30 Hz harmonics). This ripple precedes visible arcing by weeks and is detectable in existing excitation current measurements (already logged by historian).\n\n---\n**Threshold:** SRCRA \u2265 **0.008 \u00d7 I_excitation_mean** (8 mA ripple per 1 A mean current).\n**Rationale:**\n- USER CONSTRAINT: 1-minute sampling \u2192 Nyquist limit ~0.5 Hz; 10\u201350 Hz ripple must be extracted via bandpass filtering (e.g., 2nd-order Butterworth) from raw excitation current.\n- CALCULATED: 0.008 derived from empirical data of 1.5 MW machines: median ripple at 50% brush life = 0.005; 90th percentile at 80% brush life = 0.012. Threshold set at 66% of 90th percentile to allow 2-week lead time (ASSUMPTION: linear progression from 0.005 to 0.012 over 4 weeks).\n- ASSUMPTION: Excitation current mean > 100 A (typical for 1.5 MW); if lower, scale threshold proportionally (e.g., 0.008 \u00d7 50 A = 0.4 A ripple).\n\n---\n**Falsification Test:**\n1. **Kill Condition:** If SRCRA \u2265 0.008 triggers **and** the machine experiences a forced outage within 14 days **without** confirmed brush/slip-ring failure, the predictor is invalid. **Rationale:** False positives must be <1/year (USER CONSTRAINT).\n2. **Validation:** Over 12 months, the predictor must:\n   - Capture \u226580% of brush/slip-ring failures **\u226514 days before** forced outage (USER CONSTRAINT: 2-week lead time).\n   - False alarms \u22641/year (USER CONSTRAINT).\n   - **Design Check:** If SRCRA \u2265 0.008 correlates with **no** excitation transients in the next 7 days, reduce threshold to 0.006 for 3 months and retest. **Rationale:** Adaptive tuning to account for noise or non-failure ripple sources (e.g., load changes).\n3. **Data Requirements:** Use historian logs of:\n   - Excitation current (I_exc) at 1-min resolution.\n   - Excitation voltage (V_exc) to cross-validate ripple (V_exc ripple should mirror I_exc ripple if contact resistance is the dominant factor).\n   - **Filter:** Apply moving average (10-min window) to I_exc to isolate ripple; compute RMS of residuals in 10\u201350 Hz band.\n\n---\n**Implementation Notes:**\n- **Cost:** Zero additional sensors; uses existing historian data.\n- **Computational Load:** Minimal (bandpass filter + RMS calculation per 1-min data point).\n- **Constraint Workaround:** If historian lacks phase-resolved data, use magnitude-only ripple (less precise but sufficient for threshold crossing).",
+   "judge_outcome": "JUDGE_PARSE_FAILED",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": null,
+   "axes": {},
+   "decoded": "tie"
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 22.0,
+   "baseline_answer": "**Proposed Leading Indicator: Real-Time Fouling Resistance Coefficient ($R_f$)**\n\nThe most cost-effective measurable leading indicator is the **Fouling Resistance Coefficient ($R_f$)**, calculated in real-time via the BMS using existing sensor logs. This metric quantifies the thermal insulating effect of the fouling layer, decoupling it from ambient weather variability.\n\n**1. The Design Intervention**\nInstead of a fixed monthly calendar, implement an $R_f$-triggered cleaning protocol. The BMS continuously calculates $R_f$ using the condenser approach temperature differential:\n$$ R_f = \\frac{1}{U_{actual} \\cdot A} - \\frac{1}{U_{clean} \\cdot A} $$\nWhere $U_{actual}$ is derived from logged Condenser Water In/Out Temps, Condenser Pressure, and Evaporator Pressure/Flow.\n*   **Operating Threshold:** Set the trigger at **$R_f > 0.0002 \\, \\text{m}^2\\cdot\\text{K/W}$** (a typical economic balance point for centrifugal chillers, balancing cleaning cost vs. energy penalty).\n*   **Logic:** When $R_f$ exceeds this threshold for >24 hours under full-load conditions, initiate cleaning.\n\n**2. Expected Measurable Effect**\n*   **Fouling State Resolution:** By triggering on physical degradation rather than time, the chiller operates within the last 3 days of a full load cycle at the $R_f$ threshold, preventing the \"silent\" accumulation where efficiency drops below economic viability.\n*   **Energy Reduction:** We expect a **>3% compressor energy reduction** (e.g., 3\u20135%) compared to the fixed cadence. This is achieved by eliminating the \"wasted labor\" of cleaning clean tubes at the end of a cycle and, more importantly, by preventing the high-energy operation that occurs when tubes are fouled for weeks. The condenser pressure will remain lower for a greater portion of the season, reducing compressor head lift.\n\n**3. Concrete Validation Test (Falsification Protocol)**\nTo validate this predictor and satisfy the constraints, run a **Split-Season A/B Test**:\n*   **Control:** Maintain the fixed monthly cleaning cadence for the first 4 weeks of the season.\n*   **Test:** Implement the $R_f$-triggered cleaning for the subsequent 4 weeks.\n*   **Falsification Criteria:**\n    1.  **Energy:** If the average specific energy consumption (kWh/ton) during the Test period is not >3% lower than the Control period (normalized for ambient wet-bulb temperature), the predictor is considered ineffective for this plant.\n    2.  **Resolution:** If the time between cleaning events in the Test phase does not result in a stable $R_f$ baseline (i.e., $R_f$ does not resolve to near-zero post-clean and stay low for the next 3 days of full load), the threshold is miscalibrated.\n    3.  **Cost-Benefit:** If the labor savings from reduced cleaning frequency do not offset the cost of the BMS logic implementation within 6 months, the intervention is not cost-effective.\n\n**Evidence Support & Limitations**\n*   **Support:** The concept is supported by [crossref] \"Study of the failure of condenser tube,\" which highlights that fouling raises approach temperature and pressure, directly impacting compressor work. [crossref] \"Improving cooling efficiency...\" confirms that thermal efficiency losses are directly linked to fouling in cooling water loops.\n*   **Limitation:** The provided evidence [europepmc] regarding trees or cheese is **irrelevant** and does not support any claims made here. The [datacite] Skoog Buoy is a distinct technology (ocean heat pumping) and does not apply to a district cooling plant with open cooling towers. We rely solely on standard thermodynamic principles for chillers, which are well-established but not explicitly detailed in the retrieved non-chiller-specific literature. The 3% energy target is a conservative estimate based on typical chiller performance; if the plant operates at very low part-load, the impact of condenser fouling on total system energy may be <3%.",
+   "a1_answer": "**Design/Leading Indicator:**\n**Condenser Fouling Index (CFI) = (\u0394T_condenser_actual / \u0394T_condenser_clean) * (P_compressor_actual / P_compressor_clean)^0.3**\n*Engineering rationale:* CFI combines condenser temperature spread (\u0394T_condenser = T_condenser_supply - T_condenser_return) and compressor power efficiency to isolate fouling impact on heat transfer, normalized to a clean baseline. The 0.3 exponent accounts for compressor power\u2019s nonlinear sensitivity to condenser pressure rise.\n\n---\n**Threshold:**\n**CFI \u2265 1.08 at full load (chilled water supply = USER CONSTRAINT 6\u00b0C, condenser water supply = USER CONSTRAINT 32\u00b0C, outdoor wet-bulb = ASSUMPTION 25\u00b0C \u00b12\u00b0C)**\n*Engineering rationale:*\n- **USER CONSTRAINT 6\u00b0C:** Chilled water supply target (full load).\n- **USER CONSTRAINT 32\u00b0C:** Condenser water supply setpoint (open tower loop).\n- **ASSUMPTION 25\u00b0C \u00b12\u00b0C:** Wet-bulb range for \"full load\" (adjustable via site calibration).\n- **1.08 threshold:** CALCULATED from 3% compressor energy reduction target. A 1.08 CFI corresponds to ~8% fouling resistance (from lab correlations for organic/inorganic fouling in district cooling), which translates to ~3% compressor energy penalty at full load (CALCULATED via EER degradation curves for centrifugal chillers).\n\n---\n**Falsification Test:**\n**Run for 12 months with two parallel cohorts:**\n1. **Test Group:** Trigger cleaning when CFI \u2265 1.08 **and** \u0394CFI/\u0394time \u2265 0.02/day (rate-of-change filter to avoid false triggers from transient loads).\n2. **Control Group:** Fixed monthly cleaning (current practice).\n**Kill condition:** If after 12 months, the test group\u2019s **annualized compressor energy** does not exceed the control group\u2019s by \u22643% (measured via BMS kWh logs), **reject the predictor**. If it reduces energy by \u22653%, **accept the predictor** and refine threshold via local fouling rate calibration (e.g., adjust 1.08 to 1.06\u20131.10 based on site-specific fouling kinetics).\n\n---\n**Implementation Notes:**\n- **Baseline (\u0394T_condenser_clean, P_compressor_clean):** CALCULATED from post-cleaning data (first week after monthly maintenance) or via manufacturer curves if no recent cleaning exists.\n- **BMS Points Required:**\n  - Chilled water supply/return temperature (\u0394T_chilled).\n  - Condenser water supply/return temperature (\u0394T_condenser).\n  - Compressor power (P_compressor).\n  - Outdoor wet-bulb (for load normalization; exclude if wet-bulb < ASSUMPTION 23\u00b0C to avoid part-load noise).\n- **Resolution Check:** CFI must update hourly; 3-day resolution at full load is inherent if \u0394T_condenser and P_compressor are logged \u2265hourly (USER CONSTRAINT satisfied).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 26.4,
+   "baseline_answer": "**Engineering Recommendation: Active Thermal Homogenization via Phase-Change Material (PCM) Integration**\n\nThe primary driver of your imbalance failure is the **15\u00b0C top-to-bottom thermal gradient** causing differential self-discharge and aging rates across the 13-cell NMC-811 stack. NMC-811 is highly temperature-sensitive; a 15\u00b0C spread creates voltage offsets far exceeding the 35 mV rest-spread constraint, and 1 A balancing current is kinetically insufficient to correct these drifts over a 10-year lifespan. The existing passive balancer cannot compensate for thermally induced capacity divergence.\n\n**Proposed Intervention:**\nIntegrate a **high-conductivity Phase-Change Material (PCM) composite** into the module\u2019s void spaces between cells and the cabinet walls.\n1.  **Material:** Use a paraffin-based PCM with a melting point tuned to the module\u2019s nominal operating temperature (e.g., 30\u201335\u00b0C).\n2.  **Enhancement:** Infuse the PCM with a 3D graphene aerogel or expanded graphite matrix. This creates a high effective thermal conductivity (>0.5 W/m\u00b7K) without increasing footprint (utilizing existing dead volume).\n3.  **Mechanism:** The enhanced thermal path equalizes the temperature distribution, reducing the top-to-bottom gradient from 15\u00b0C to <2\u00b0C. By keeping all cells within a narrow isothermal band, the differential self-discharge rates and aging asymmetries are minimized. The existing 1 A balancer can then effectively maintain the 35 mV rest-spread constraint because the underlying electrochemical drift is thermally suppressed.\n\n**Expected Measurable Effect:**\n-   **Thermal Gradient:** Reduction of max \u0394T to \u22642\u00b0C under worst-case loading.\n-   **Rest Voltage Spread:** Stabilization of cell-to-cell rest voltage spread <35 mV after 1,000 cycles at 45\u00b0C.\n-   **Derate Events:** 90% reduction in BMS thermal derate/shutdown incidents over the first year.\n\n**Falsification Test:**\nConduct a **Thermal Step-Response Balancing Test**:\n1.  Place the modified module in a chamber with a 15\u00b0C vertical temperature gradient (simulating the failure condition).\n2.  Charge to 90% SoC, rest for 24 hours, and measure cell voltage spread.\n3.  **Falsification Criterion:** If the post-rest voltage spread exceeds 35 mV, or if the thermal mapping shows any two cells differing by >3\u00b0C during a 1 C discharge pulse, the intervention has failed. A successful design will show <5\u00b0C max difference between top and bottom cells and rest spread <35 mV.\n\n**Evidence & Constraints Analysis:**\n-   **NMC Specificity:** The provided evidence on **[europepmc] Interparticle Communication... in NMC Cathodes** highlights that NMC materials have complex lithium diffusion behaviors. Thermal gradients exacerbate these kinetic differences, making thermal management critical for consistency.\n-   **Thermal Safety:** **[crossref] Modeling and Simulation... Thermal Runaway** supports the need for thermal mitigation in module-scale designs, though this intervention is for stability, not runaway.\n-   **Footprint Constraint:** The use of **PCM composites** leverages existing volume, satisfying the \"no increase in module footprint\" constraint.\n-   **Balancing Constraint:** We do **not** increase balancing current. Instead, we reduce the *need* for high-current balancing by reducing the *rate* of drift.\n-   **Irrelevant Evidence:** The references to **[semantic_scholar] Lithium-Sulfur** and **[openaire] Immune System** are not relevant to NMC-811 module design and are disregarded. The **[crossref] 3.2 KWH... 18 Army Standard** reference confirms that modular designs often rely on standard cell configurations, but does not address the thermal imbalance issue.\n\n**Conclusion:** The 1 A balancer is the limiting factor, but it is a symptom, not the root cause. The root cause is thermal asymmetry. By engineering the thermal path to isothermality, the existing 1 A",
+   "a1_answer": "**Design/Intervention:** *Active Thermal Equalization with Integrated Heat Pipes and Passive Conductive Busbars*\n- **Mechanism:** Replace the existing busbars with **copper-aluminum composite busbars** (thermal conductivity \u2265 200 W/m\u00b7K) embedded with **micro-channel heat pipes** (1.5 mm diameter, 10 pipes per module) to actively redistribute heat from hotter cells (top) to cooler cells (bottom). Add **low-resistance thermal interface pads** (TIM) between cells and busbars (thermal resistance < 0.05 \u00b0C/cm\u00b2).\n- **Balancing Augmentation:** Retrofit the existing 1 A balancer with **pulse-width modulation (PWM) balancing** (duty cycle 1\u2013100%) to dynamically adjust current based on real-time cell voltage and temperature telemetry, rather than fixed 1 A.\n\n**Leading Indicator:** *Cell-to-Cell Temperature Spread (\u0394T_cell)*\n- **Threshold:** **\u2264 2 \u00b0C** (measured via embedded thermistors on each cell, averaged over 24 hours).\n- **Rationale:** A 15 \u00b0C gradient across the module would normally induce a **~30 mV cell-to-cell voltage spread at rest** (NMC-811: ~2 mV/\u00b0C \u00d7 15 \u00b0C). Reducing \u0394T_cell to \u2264 2 \u00b0C limits voltage spread to **\u2264 4 mV**, well below the 35 mV trip threshold, even with aging.\n\n**Falsification Test:**\n1. **Accelerated Thermal Cycling Test:**\n   - **Setup:** Subject the module to **1000 cycles** of **15 \u00b0C top-to-bottom gradient** (hot side: 45 \u00b0C, cold side: 30 \u00b0C) with **100% DoD cycling** (3 kWh \u2192 0% SoC).\n   - **Pass/Fail:** If **\u0394T_cell > 2 \u00b0C** *or* **cell-to-cell voltage spread > 35 mV** at rest in **>5% of cycles**, reject the design.\n   - **Measurement:** Thermistors on each cell (resolution: \u00b10.1 \u00b0C) and high-precision voltmeters (\u00b110 \u00b5V).\n\n2. **Long-Term Calendar Life Test:**\n   - **Setup:** Store the module at **40 \u00b0C with 50% SoC** for **3 years** (equivalent to ~10 years at 25 \u00b0C via Arrhenius scaling).\n   - **Pass/Fail:** If **post-test capacity fade > 10% per cell** *or* **\u0394T_cell > 2 \u00b0C** during a subsequent 15 \u00b0C gradient test, reject.\n   - **Measurement:** Full pack capacity test (C/10 discharge) and \u0394T_cell under controlled gradient.\n\n---\n**ASSUMPTIONS:**\n- **ASSUMPTION 1:** NMC-811 cell voltage-temperature coefficient is **~2 mV/\u00b0C at rest** (validated via datasheet or empirical testing).\n- **ASSUMPTION 2:** Heat pipes achieve **<1 \u00b0C temperature uniformity** across the module when active (verified via CFD or thermal mockup).\n- **ASSUMPTION 3:** PWM balancing can dynamically clamp voltage spread to **\u2264 1 mV** with 1 A average current (confirmed via lab testing on identical cells).\n\n**USER CONSTRAINTS:**\n- **USER CONSTRAINT 1:** **No increase in module footprint** \u2192 Heat pipes integrated into busbar thickness (adds <2 mm height).\n- **USER CONSTRAINT 2:** **Only 1 A balancing current** \u2192 PWM duty cycling enables effective balancing despite low current (e.g., 10% duty at 1 A = 0.1 A effective).\n- **USER CONSTRAINT 3:** **10-year calendar life** \u2192 Accelerated testing accounts for aging via temperature scaling (3 years at 40 \u00b0C \u2248 10 years at 25 \u00b0C).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "baseline_state": "COMMITTED_BASELINE",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 20.7,
+   "baseline_answer": "**Proposed Design:** Implement a real-time monitoring system that tracks the **rate of change of dissolved gas concentration** (specifically hydrogen, H\u2082, and methane, CH\u2084) using an online gas-in-oil sensor (e.g., micro-gas chromatograph or electrochemical sensor) with 15-minute resolution. This predictor will flag incipient faults by detecting accelerating gas generation rates, which precede absolute concentration thresholds used in traditional DGA.\n\n**Expected Measurable Effect:** A sustained increase in the slope (d[Gas]/dt) of H\u2082 or CH\u2084 over 7\u201310 days, providing at least 30 days of warning before the next DGA sample. This early detection is cost-effective because it leverages existing online sensors (top-oil temp, load current) to correlate gas rate changes with thermal/partial discharge events, without requiring new invasive hardware.\n\n**Validation Test:**  \n1. **Accelerated Aging Test:** Subject a laboratory-scale transformer to controlled thermal stress (e.g., 120\u00b0C top-oil temp) and partial discharge (using a needle electrode). Measure gas generation rates (H\u2082/CH\u2084) every 15 minutes alongside DGA samples.  \n2. **Falsification Condition:** If the gas rate change fails to precede DGA-confirmed faults by at least 30 days in \u226590% of test cases, the predictor is invalid. Alternatively, if no significant rate increase is observed during known fault conditions, the hypothesis is rejected.  \n\n**Evidence Support:**  \n- [core] shows furanic compounds (from paper degradation) and gases (H\u2082/CH\u2084) are key indicators of insulation degradation, validating their relevance as predictors.  \n- [europepmc] (nanofluids) notes that partial discharge inception voltage (PDIV) decreases with degradation, implying gas generation accelerates as faults progress.  \n- [semantic_scholar] (liquid-metal networks) supports the use of real-time, high-resolution sensors for detecting subtle changes, though not directly applicable here.  \n\n**Cost-Effectiveness:** This approach avoids expensive nanofluid retrofits ([europepmc]) or invasive sensors by repurposing existing data streams. It addresses the user\u2019s constraint of quarterly DGA sampling by enabling continuous, low-cost monitoring.",
+   "a1_answer": "**Design/Leading Indicator:** *Top-oil temperature rise (\u0394T) normalized by load current and ambient temperature, with a secondary check on tank pressure deviation.*\n\n**Threshold:**\n- **Primary Threshold:** \u0394T > **1.5\u00b0C per 10% load increase** (USER CONSTRAINT: 132/33 kV, 40 MVA transformer\u2019s typical thermal design margin; ASSUMPTION: 1.5\u00b0C exceeds normal thermal aging rate under load, accounting for 15-min resolution noise).\n- **Secondary Threshold:** Tank pressure deviation > **\u00b10.05 bar** (CALCULATED: 0.05 bar \u2248 5% of nominal pressure for a 40 MVA transformer at 33 kV, accounting for thermal expansion and gas dissolution effects).\n- **Time Window:** Trigger if sustained for **>72 hours** (CALCULATED: 3-day moving average to filter transient load/ambient fluctuations while ensuring 30-day advance warning).\n\n**Falsification Test:**\n1. **Data Collection:** Monitor 20 identical transformers (USER CONSTRAINT: statistical significance for rare faults) for 12 months, recording \u0394T, load current, ambient temperature, and tank pressure at 15-min intervals.\n2. **Fault Correlation:** Compare predictor flags to DGA results (USER CONSTRAINT: ground truth) and outage records. Kill if:\n   - **False Positives:** >20% of flags lack DGA confirmation or outage evidence of PD/thermal fault (ASSUMPTION: 20% threshold balances sensitivity vs. nuisance alarms).\n   - **False Negatives:** >10% of confirmed PD/thermal faults (via DGA or outage) are missed by the predictor (ASSUMPTION: 10% threshold ensures critical fault detection).\n3. **Mechanistic Validation:** For flagged cases, perform finite-element thermal modeling (CALCULATED: validate \u0394T threshold aligns with known PD/thermal fault signatures, e.g., hot spots >120\u00b0C for PD or >140\u00b0C for thermal faults). Kill if model-predicted fault location does not match DGA or outage findings.",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 5,
+    "A6": 5,
+    "B1": 1,
+    "B2": 0,
+    "B3": 1,
+    "B4": 3,
+    "B6": 3
+   },
+   "decoded": "a1"
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "baseline_state": "GENERATED",
+   "a1_state": "GENERATED",
+   "gen_wall_s": 31.6,
+   "baseline_answer": "**Design/Intervention:** Implement a **graded thermal expansion coefficient (CTE) interlayer** between the cathode (LSM) and electrolyte (YSZ) using a composite of **lanthanum strontium chromite (LSCr) and YSZ (80:20 vol%)**, with a **glass-ceramic seal modified with 5 wt% ceria (CeO\u2082)** to enhance toughness and reduce mismatch.\n\n**Leading Indicator:** **Cathode-Electrolyte Interface Crack Density** (measured via SEM cross-section analysis at 1000x magnification) and **Seal Leakage Rate** (as % of fuel flow via helium tracer gas test).\n\n**Thresholds:**\n- Crack density \u2264 0.5 cracks/mm along the interface after 500 cycles.\n- Seal leakage \u2264 1% of fuel flow (confirmed via pressure decay test at 800\u00b0C).\n- Open-circuit voltage (OCV) \u2265 1.0 V after 500 cycles (measured at 800\u00b0C, 0.1 A/cm\u00b2).\n\n**Falsification Test:**\n1. **Thermal Cycling Test:** Subject 3 identical stacks to 500 cycles (25\u00b0C \u2192 800\u00b0C at 5\u00b0C/min), then:\n   - **Post-cycle SEM:** If crack density > 0.5 cracks/mm in any stack, reject.\n   - **Helium Leak Test:** If leakage > 1% in any stack, reject.\n   - **OCV Measurement:** If OCV < 1.0 V in any stack, reject.\n2. **Mass Constraint Check:** If stack mass exceeds +2% after testing, reject.\n3. **Failure Mode Analysis:** If any stack fails before 500 cycles due to seal delamination or cathode spallation, redesign interlayer composition (e.g., adjust LSCr:YSZ ratio or add 10 wt% gadolinia-doped ceria to the seal).\n\n**Additional Validation:** Conduct **thermal shock resistance testing** (quench from 800\u00b0C to 25\u00b0C in air) on 5 samples; if \u22652 fail (visible cracks or OCV drop >5%), redesign.",
+   "a1_answer": "**Design/Intervention:** *Graded Thermal Expansion Coefficient (TEC) Interlayer at Cathode-Electrolyte Interface*\n- **Material:** Composite of 8YSZ (8 mol% yttria-stabilized zirconia) + 20 vol% lanthanum strontium cobalt ferrite (LSCF) particles (graded from 0% at electrolyte to 100% at cathode over 50 \u00b5m thickness).\n- **Purpose:** Match TEC between electrolyte (10.5 x 10\u207b\u2076/\u00b0C) and cathode (12.5 x 10\u207b\u2076/\u00b0C) via compositional gradient, reducing interfacial shear stress by 60% (calculated via finite element analysis of residual stress distribution).\n\n**Leading Indicator:** *Cathode-Electrolyte Interfacial Shear Stress (\u03c4)*\n- **Threshold:** \u03c4 < 5 MPa (USER CONSTRAINT: Below this, microcrack propagation energy (\u03b3 \u2248 2 J/m\u00b2 for YSZ) is insufficient to overcome interfacial toughness).\n- **Measurement:** Raman spectroscopy (peak shift of YSZ E_g mode at 640 cm\u207b\u00b9) to detect strain gradients; correlate with 4-point bend test of delaminated interfaces (ASSUMPTION: Strain > 0.1% correlates with \u03c4 > 5 MPa).\n\n**Falsification Test:**\n1. **Thermal Cycling Test:** Subject 5 stacks to 500 cycles (25\u2013800 \u00b0C, 5 \u00b0C/min) with inline gas crossover measurement (USER CONSTRAINT: Leakage > 1% of fuel flow = fail).\n2. **Post-Test Analysis:** Cross-section the seal and cathode-electrolyte interface; quantify microcrack density via SEM (CALCULATED: > 10 cracks/mm\u00b2 at interface = fail; ASSUMPTION: Cracks > 5 \u00b5m deep propagate through graded layer).\n3. **Electrical Validation:** Measure open-circuit voltage (OCV) after cycling; OCV < 1.0 V = fail (USER CONSTRAINT).\n\n**Mass Constraint Compliance:**\n- Graded layer adds 0.15 g/cm\u00b2 (ASSUMPTION: 20 vol% LSCF density = 6.4 g/cm\u00b3; 50 \u00b5m thickness).\n- Stack mass increase: < 1% for 100 cm\u00b2 active area (CALCULATED: 0.15 g/cm\u00b2 \u00d7 100 cm\u00b2 = 15 g; baseline stack mass = 1.5 kg).",
+   "judge_outcome": "JUDGE_VALID",
+   "judge": [
+    "xkiro",
+    "mistralai/ministral-14b"
+   ],
+   "prefer": "A",
+   "axes": {
+    "A1": 1,
+    "A2": 1,
+    "A3": 1,
+    "A4": 4,
+    "A6": 5,
+    "B1": 1,
+    "B2": 1,
+    "B3": 1,
+    "B4": 4,
+    "B6": 4
+   },
+   "decoded": "a1"
+  }
+ ],
+ "summary": {
+  "complete_valid": 28,
+  "a1_wins": 25,
+  "baseline_wins": 3,
+  "ties": 2,
+  "wilson_95_ci": [
+   0.8929,
+   0.728,
+   0.9629
+  ],
+  "wall_s": 1062.0
+ },
+ "d6_acceptance": {
+  "30_complete": false,
+  "ci_width_le_035": true,
+  "wall_le_180s": false,
+  "no_single_provider_bursts": false
+ }
+}

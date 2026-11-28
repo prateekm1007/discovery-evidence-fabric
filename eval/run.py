@@ -182,8 +182,49 @@ CRITERIA = {
 # an official-provider free-tier key is added only when the owner
 # supplies one. No further judge-routing work this round.
 JUDGE_CANDIDATES = [
+    # AM3 D4 (2026-11-14): the R3 generator served EXACTLY ONE rung
+    # (agnes/agnes-3.0-flash, 17 calls, per_call_timeline) — the judge
+    # must differ in provider AND model.
+    # R11 (2026-11-14, post-calibration reorder): the parallel crowllm
+    # session's OWN typed consequence is "D4/D5/Q6 stay on the xkiro
+    # mistral post-00:00Z path" — its 30-pair calibration MEASURED
+    # crowllm/deepseek-v4-flash:free at accuracy 0.667 < 0.8
+    # (10/30 JUDGE_PARSE_FAILED = PROVIDER_TOKEN_CORRUPTION,
+    # a66ed5a38/c74790585). run_judge_calibration re-measures LIVE with
+    # no cache, so a candidate ABOVE the acceptance judge costs its
+    # full paced calibration (~21 min wall at the measured 5-req/min
+    # free-tier cap) on EVERY route probe before the acceptance rung
+    # is reached. The acceptance judge therefore sits FIRST: the
+    # post-reset probe reaches xkiro/ministral-14b immediately
+    # (calibration previously measured 27/30-28/30 on this rung);
+    # crowllm stays registered as the redundancy rung behind it — when
+    # its parse-repair recalibration (c74790585's candidate repair)
+    # re-qualifies it, this order is revisited on measured bytes, not
+    # on hope (Art. XXV).
     ("xkiro", "mistralai/ministral-14b"),
     ("xkiro", "mistralai/ministral-8b"),
+    # crowllm/deepseek-v4-flash:free passed the FULL-LENGTH gate
+    # (3/3 complete verdict JSONs on the real 7786-char judge prompt,
+    # eval/crowllm_gate_r11.json; Chrome-UA transport requirement on
+    # the spec) — DeepSeek family, a different provider AND family
+    # from the agnes generator rung. JUDGE ROLE RETIRED (AM6 D4,
+    # documented: eval/builder_corrections/
+    # BC_CROWLLM_JUDGE_ROLE_RETIRED.json): three failure classes
+    # measured across three windows — breaker collapse (v1 0/30),
+    # PROVIDER_TOKEN_CORRUPTION parse failures (v2 0.667 < 0.8),
+    # transport 307-storms (v3 0/30 after the crowllm-only 2x
+    # parse-retry repair was implemented and re-run) — plus the 5/min
+    # free-tier cap that structurally blocks the battery wall target.
+    # REDUNDANCY/EMERGENCY-FALLBACK route only; re-qualification
+    # requires a new full-length gate + a 30-pair calibration on
+    # measured-good transport.
+    ("crowllm", "deepseek-v4-flash:free"),
+    # inception/mercury-3: the R4 lesson (judge_independent_rerun_
+    # r11_r4.json) is that mercury-3 passed tiny probes AND compact
+    # calibration (0.933) but failed 14/20 REAL full-length judgments
+    # (JUDGE_TRANSPORT_FAILED); measured dead since 2026-11-12 —
+    # audit-trail entry, never silently removed.
+    ("inception", "mercury-3"),
     ("unorouter", "deepseek-v4-flash:free"),
 ]
 #: R6: the operator-accepted LAST-RESORT judge. When NO independent
@@ -891,9 +932,27 @@ def probe_judge_route(baseline_provider: str) -> Dict[str, Any]:
     for prov, model in JUDGE_CANDIDATES:
         rec: Dict[str, Any] = {"provider": prov, "model": model,
                                "reference": (
-                                   "xkiro/ministral-14b historically "
-                                   "calibrated 30/30 (2026-11-10); record "
-                                   "preserved, never used as authorization"
+                                   # R9 P0 item 6 (owner round
+                                   # 2026-11-13): the historical
+                                   # references CONFLICTED (this file
+                                   # said 30/30 on 2026-11-10 while
+                                   # model_routing.py cites 27/30) —
+                                   # neither is the operative result.
+                                   # The LIVE measurement on the current
+                                   # commit is authoritative and its
+                                   # sanitized record is committed
+                                   # (eval/judge_calibration_live_r9.json,
+                                   # measured 2026-11-13: 28/30, corpus
+                                   # 52e2e215...); the historical numbers
+                                   # stay as history only, never as
+                                   # authorization.
+                                   "xkiro/ministral-14b historical "
+                                   "references conflict (30/30 on "
+                                   "2026-11-10 per the R5 record; "
+                                   "27/30 per model_routing) — history "
+                                   "is reference only; the OPERATIVE "
+                                   "calibration is the live record "
+                                   "eval/judge_calibration_live_r9.json"
                                    if (prov, model) ==
                                    ("xkiro", "mistralai/ministral-14b")
                                    else None)}
@@ -1197,10 +1256,17 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
         "=== ANSWER B ===",
         b_text,
         "",
-        "Score BOTH answers on these criteria, 1 (bad) to 5 (excellent):",
+        # AM3 D8 (anchored axes): criteria 1-3 are BINARY compliance
+        # gates, 0 (fail) or 1 (pass) — measured saturation on the R3
+        # judgments was 95-97% fives for these three, which made them
+        # decorative. Evidence (c4), clarification (c5) and novelty
+        # (c6) stay 1-5.
+        "First, three YES/NO compliance gates for EACH answer "
+        "(0 = fails the gate, 1 = passes):",
         "1 " + CRITERIA["a_answered"],
         "2 " + CRITERIA["b_user_vars"],
         "3 " + CRITERIA["c_prediction"],
+        "Then score BOTH answers 1 (bad) to 5 (excellent) on:",
         "4 " + CRITERIA["d_evidence"],
     ]
     if clar:
@@ -1210,15 +1276,17 @@ def _rubric_prompt(problem, a_text: str, b_text: str,
         "Grade strictly: vague/generic/number-ignoring/unverified claims "
         "score low; quantified, testable, package-grounded answers score "
         "high. If an answer carries a number absent from the packet, cap "
-        "that criterion at 2. Then state your overall preference. Answer "
-        "ONLY with these lines:",
-        "A1: <1-5>", "A2: <1-5>", "A3: <1-5>", "A4: <1-5>",
-        "B1: <1-5>", "B2: <1-5>", "B3: <1-5>", "B4: <1-5>",
+        "that criterion at 2. Then state your overall preference. "
+        "R11 JUDGE OUTPUT CONTRACT (owner item 5): respond with ONLY one "
+        "JSON object - no prose, no markdown fences - with exactly these "
+        "integer keys:",
+        '{"A1": <0|1>, "A2": <0|1>, "A3": <0|1>, "A4": <1-5>,',
     ]
     if clar:
-        lines += ["A5: <1-5>", "B5: <1-5>"]
-    lines += ["A6: <1-5>", "B6: <1-5>"]
-    lines.append("PREFER: A | B | TIE")
+        lines.append(' "A5": <1-5>, "B5": <1-5>,')
+    lines += ['"B1": <0|1>, "B2": <0|1>, "B3": <0|1>, "B4": <1-5>,',
+              '"A6": <1-5>, "B6": <1-5>,',
+              '"prefer": "A" | "B" | "TIE"}']
     return "\n".join(lines)
 
 
@@ -1260,17 +1328,26 @@ def _classify_transport_fail(res: Dict[str, Any]) -> str:
     return JUDGE_TRANSPORT_FAILED
 
 
+def _required_rubric_keys(clar: bool) -> list:
+    """The exact key set _validate_rubric_pass requires (single source:
+    both read this list; the missing-keys retry names them)."""
+    keys = [f"{s}{j}" for s in "AB" for j in range(1, 5)]
+    keys += ["A6", "B6"]
+    if clar:
+        keys += ["A5", "B5"]
+    return keys
+
+
 def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[str, Any]]:
     """Hard gate for one judge pass: all required rubric fields must be
     present and integer 1-5, and PREFER must be one of A|B|TIE.
     Truncated/malformed/empty output is a failed judgment — never a tie."""
     if not parsed:
         return None
-    required = [f"{s}{j}" for s in "AB" for j in range(1, 5)]
-    required += ["A6", "B6"]
-    if clar:
-        required += ["A5", "B5"]
+    required = _required_rubric_keys(clar)
     out: Dict[str, Any] = {}
+    legacy_normalized = 0
+    gate_keys = {f"{s}{j}" for s in "AB" for j in (1, 2, 3)}
     for k in required:
         v = parsed.get(k)
         if v is None:
@@ -1279,6 +1356,18 @@ def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[s
             iv = int(str(v).strip())
         except ValueError:
             return None
+        if k in gate_keys:
+            # AM3 D8: binary gates (0/1); a judge still on the legacy
+            # 1-5 scale is normalized (>=4 passes, else fails) and the
+            # normalization is typed on the record, never silent
+            if iv in (0, 1):
+                out[k] = iv
+            elif 2 <= iv <= 5:
+                out[k] = 1 if iv >= 4 else 0
+                legacy_normalized += 1
+            else:
+                return None
+            continue
         if not (1 <= iv <= 5):
             return None
         out[k] = iv
@@ -1286,6 +1375,8 @@ def _validate_rubric_pass(parsed: Dict[str, Any], clar: bool) -> Optional[Dict[s
     if prefer not in ("A", "B", "TIE"):
         return None
     out["prefer"] = prefer
+    if legacy_normalized:
+        out["legacy_scale_normalized_keys"] = legacy_normalized
     return out
 
 
@@ -1558,19 +1649,204 @@ def _m(v: List[int]) -> float:
 
 
 def _parse_rubric(raw: str) -> Dict[str, Any]:
+    """R11 owner item 5: STRUCTURED-OUTPUT-FIRST parsing. The judge is
+    instructed to return ONE JSON object ({"A1": .., ..., "prefer":
+    "A"|"B"|"TIE"}); the JSON object is extracted (fence-tolerant) and
+    read directly. The legacy line format (A1: 4 / PREFER: A) remains
+    a FALLBACK so frozen corpora graded before the R11 contract still
+    parse. A malformed output parses to nothing (the caller types the
+    parse failure - never guessed)."""
     import re
     fields: Dict[str, str] = {}
+    s = str(raw or "")
+    # ---- JSON first (the R11 structured contract)
+    i, j = s.find("{"), s.rfind("}")
+    if 0 <= i < j:
+        try:
+            obj = json.loads(s[i:j + 1])
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    ku = str(k).strip().upper()
+                    if ku == "PREFER":
+                        fields[ku] = str(v).strip()[:8]
+                    elif re.fullmatch(r"[AB][1-6]", ku):
+                        fields[ku] = str(v).strip()[:8]
+        except Exception:  # noqa: BLE001 - fall through to lines
+            pass
+    if fields:
+        prefer = fields.pop("PREFER", None)
+        for k, v in list(fields.items()):
+            try:
+                fields[k] = str(int(v))
+            except ValueError:
+                fields.pop(k, None)
+        return {**fields, "prefer": prefer}
+    # ---- legacy line-format fallback (frozen corpora)
     for m in re.finditer(r"^\s*([AB][1-6]|PREFER)\s*[:=]\s*(.+)$",
-                         raw or "", re.M):
+                         s, re.M):
         fields[m.group(1).upper()] = m.group(2).strip()[:8]
     prefer = fields.pop("PREFER", None)
     for k, v in list(fields.items()):
-        if k in {f"{s}{j}" for s in "AB" for j in range(1, 7)}:
+        if k in {f"{s2}{j2}" for s2 in "AB" for j2 in range(1, 7)}:
             try:
                 fields[k] = str(int(v))
             except ValueError:
                 fields.pop(k, None)
     return {**fields, "prefer": prefer}
+
+
+def _judge_judgment_call(provider: str, model: str, prompt: str,
+                         max_tokens: int = 2000,
+                         clar: bool = False):
+    """R11 owner item 5: ONE judge call with ONE parse retry and the
+    RAW OUTPUT LOGGED. Default max_tokens 2000->4000 for reasoning rungs (AM3 D5 measured
+    2026-11-14: inception/mercury-3 returned empty content with
+    finish_reason=length at 300 — the reasoning budget consumed the
+    cap; the SAME full-length prompt answers with the JSON contract at
+    2000. The R3 panel's 6/6 JUDGE_EMPTY_OUTPUT (F15) was this cap,
+    not prompt length). First attempt uses the structured-output
+    prompt; when the response fails the rubric contract, ONE retry
+    re-asks with the parse failure and the raw excerpt. Returns
+    {outcome, parsed, valid, raw, attempts, latencies, errors} - the
+    outcome is typed (JUDGE_VALID / JUDGE_TRANSPORT_FAILED /
+    JUDGE_EMPTY_OUTPUT / JUDGE_PARSE_FAILED), never converted."""
+    system_call = ("You are a strict blind rubric judge. "
+                   "English only. Respond with ONLY the JSON object.")
+    t0 = time.time()
+    res = _transport_call(provider, model, prompt,
+                          system_call, max_tokens=max_tokens)
+    lat1 = round(time.time() - t0, 1)
+    rec: Dict[str, Any] = {"attempts": [], "parsed": None,
+                           "valid": None, "raw": ""}
+    if res.get("status") != "OK":
+        rec["outcome"] = _classify_transport_fail(res)
+        rec["errors"] = [str(res.get("error"))[:200]]
+        rec["latencies"] = [lat1]
+        return rec
+    content1 = str(res.get("content") or "")
+    rec["raw"] = content1[:600]
+    rec["latencies"] = [lat1]
+    parsed = _parse_rubric(content1)
+    valid = _validate_rubric_pass(parsed, clar) if parsed else None
+    rec["attempts"].append({
+        "n": 1, "output_hash": hashlib.sha256(
+            content1.encode("utf-8")).hexdigest()[:16],
+        "parsed": bool(valid)})
+    if valid is not None:
+        rec["outcome"] = JUDGE_VALID
+        rec["parsed"], rec["valid"] = parsed, valid
+        return rec
+    if not content1.strip():
+        # AM3 D5 (measured): mercury-3's reasoning budget scales with
+        # the task; 4000 still starves the LONGEST pair prompts
+        # (finish_reason=length). ONE typed cap escalation (x2), then
+        # the outcome stands — the starvation is never silently
+        # converted into a verdict.
+        res1b = _transport_call(provider, model, prompt, system_call,
+                                max_tokens=max_tokens * 2)
+        rec["latencies"].append(round(time.time() - t0, 1))
+        rec["attempts"].append({"n": "1b_cap_escalated",
+                                "max_tokens": max_tokens * 2,
+                                "chars_out":
+                                    len(str(res1b.get("content") or ""))})
+        if res1b.get("status") == "OK" and str(res1b.get("content") or "").strip():
+            parsed1b = _parse_rubric(str(res1b.get("content")))
+            valid1b = _validate_rubric_pass(parsed1b, clar) \
+                if parsed1b else None
+            if valid1b is not None:
+                rec["outcome"] = JUDGE_VALID
+                rec["parsed"], rec["valid"] = parsed1b, valid1b
+                rec["cap_escalated"] = True
+                return rec
+        rec["outcome"] = JUDGE_EMPTY_OUTPUT
+        return rec
+    # ---- ONE parse retry (owner item 5): re-ask with the failure
+    # R11 2026-11-15 (measured live, xkiro mistral rungs): when the
+    # first attempt parses but FAILS VALIDATION, the most common shape
+    # is OMITTED KEYS (the model writes the contract's key order and
+    # skips one — e.g. B1,B2,B3 then jumps to A6, dropping B4; it
+    # reproduces even when the retry restates the generic contract and
+    # the example shape). NAMING the missing keys in the retry fixes
+    # it (measured: both mistral-14b and mistral-8b return complete
+    # valid JSON when the retry says 'missing the key "B4"'). Still a
+    # re-ask — nothing is guessed or repaired client-side (Art. XXV);
+    # a still-incomplete retry types JUDGE_PARSE_FAILED exactly as
+    # before.
+    _missing = [k for k in _required_rubric_keys(clar)
+                if k not in (parsed or {})]
+    retry_prompt = (prompt + "\n\nIMPORTANT: your previous response "
+                    "was not a parseable rubric judgment."
+                    + (f' It was missing the key(s) {", ".join(_missing)}.'
+                       if _missing else "")
+                    + " Respond "
+                    "AGAIN with ONLY the JSON object with the integer "
+                    "keys A1-A6, B1-B6 (A1-A3/B1-B3 are 0-or-1 gates, "
+                    "A4-A6/B4-B6 are 1-5) and 'prefer' "
+                    "(one of A, B, TIE). No other text.")
+    t1 = time.time()
+    res2 = _transport_call(provider, model, retry_prompt,
+                           "You are a strict blind rubric judge. "
+                           "English only. Respond with ONLY the JSON "
+                           "object.", max_tokens=max_tokens)
+    lat2 = round(time.time() - t1, 1)
+    rec["latencies"].append(lat2)
+    if res2.get("status") != "OK":
+        rec["outcome"] = _classify_transport_fail(res2)
+        rec["errors"] = [str(res2.get("error"))[:200]]
+        return rec
+    content2 = str(res2.get("content") or "")
+    rec["raw"] = (rec["raw"] + "\n--retry--\n" + content2[:600])[:1200]
+    rec["attempts"].append({
+        "n": 2, "output_hash": hashlib.sha256(
+            content2.encode("utf-8")).hexdigest()[:16],
+        "parsed": bool(_parse_rubric(content2))})
+    parsed2 = _parse_rubric(content2)
+    valid2 = _validate_rubric_pass(parsed2, clar) if parsed2 else None
+    if valid2 is not None:
+        rec["outcome"] = JUDGE_VALID
+        rec["parsed"], rec["valid"] = parsed2, valid2
+        return rec
+    # ---- crowllm-only second parse retry (AM6 D4; c74790585
+    # diagnosis): the free pool's PROVIDER_TOKEN_CORRUPTION class
+    # injects literal '.src' markers into JSON values under load; the
+    # ONE retry already recovered a complete valid rubric JSON in the
+    # diagnosis sample, so THIS rung gets one further honest re-ask
+    # (attempt 3) before a parse failure is typed. Nothing is guessed
+    # client-side — corrupted output is never repaired into a verdict;
+    # a still-unparseable attempt 3 types JUDGE_PARSE_FAILED exactly
+    # as before (Art. XXV). Every other rung keeps the owner-directed
+    # ONE-retry ladder byte-identical.
+    if provider == "crowllm" and content2.strip():
+        t2 = time.time()
+        res3 = _transport_call(provider, model, retry_prompt,
+                               "You are a strict blind rubric judge. "
+                               "English only. Respond with ONLY the "
+                               "JSON object.", max_tokens=max_tokens)
+        lat3 = round(time.time() - t2, 1)
+        rec["latencies"].append(lat3)
+        if res3.get("status") != "OK":
+            rec["outcome"] = _classify_transport_fail(res3)
+            rec["errors"] = rec.get("errors", []) + [
+                str(res3.get("error"))[:200]]
+            return rec
+        content3 = str(res3.get("content") or "")
+        rec["raw"] = (rec["raw"] + "\n--retry2--\n"
+                      + content3[:600])[:1800]
+        rec["attempts"].append({
+            "n": 3, "output_hash": hashlib.sha256(
+                content3.encode("utf-8")).hexdigest()[:16],
+            "parsed": bool(_parse_rubric(content3)),
+            "note": "crowllm-only 2x parse-retry (AM6 D4)"})
+        parsed3 = _parse_rubric(content3)
+        valid3 = (_validate_rubric_pass(parsed3, clar)
+                  if parsed3 else None)
+        if valid3 is not None:
+            rec["outcome"] = JUDGE_VALID
+            rec["parsed"], rec["valid"] = parsed3, valid3
+            return rec
+    rec["outcome"] = (JUDGE_EMPTY_OUTPUT if not content2.strip()
+                      else JUDGE_PARSE_FAILED)
+    return rec
 
 
 # ---------------------------------------------------------------------------
@@ -1621,44 +1897,49 @@ def run_judge_calibration(judge_route: Dict[str, Any]) -> Dict[str, Any]:
         else:
             a, b, good_is = bad, good, "B"
         prompt = _rubric_prompt(_intake_problem(problem), a, b, packet=entry.get("evidence"))
-        t0 = time.time()
-        res = _transport_call(judge_route["provider"], judge_route["model"], prompt,
-                              "You are a strict blind rubric judge. English only. "
-                              "Follow the exact output lines.", max_tokens=300)
-        lat = round(time.time() - t0, 1)
+        # R11 owner item 5: ONE structured-output call + ONE parse
+        # retry, raw output logged per attempt (the helper returns the
+        # typed outcome; the calibration semantics below are unchanged
+        # - a pair that never parses counts as WRONG, Art. XXV).
+        _jc = _judge_judgment_call(judge_route["provider"],
+                                   judge_route["model"], prompt,
+                                   max_tokens=4000,  # AM3 D5: reasoning rungs starve smaller caps (measured: 12/30 still finish_reason=length at 2000; 4000 covers the budget)
+                                   clar=bool(
+                                       problem.get(
+                                           "clarification_answer")))
+        lat = round(sum(_jc.get("latencies") or [0]), 1)
         _rec = {"problem_id": entry.get("problem_id"), "order": order,
-                "latency_s": lat}
-        if res.get("status") != "OK":
-            err = str(res.get("error") or "")
-            cls = _classify_transport_fail(res)
-            hc = _http_class(err)
+                "latency_s": lat,
+                "parse_attempts": _jc.get("attempts") or [],
+                "raw_output": (_jc.get("raw") or "")[:400],
+                # R9 P0 item 3 (owner round 2026-11-13): the per-case
+                # request/output hashes ride the calibration record —
+                # the judge's verdicts become re-verifiable byte-bound
+                # provenance (the corpus sha pins the INPUTS, the
+                # hashes pin each CASE's bytes). The transport returns
+                # bare content (the low-level flavor call), so the
+                # hashes are computed HERE over the exact bytes.
+                "prompt_hash": hashlib.sha256(
+                    (prompt or "").encode("utf-8")).hexdigest()}
+        if _jc["outcome"] != JUDGE_VALID:
+            err = str((_jc.get("errors") or [""])[0])
+            cls = _jc["outcome"]
+            hc = _http_class(err) if err else None
             if hc:
                 err_classes[hc] = err_classes.get(hc, 0) + 1
+            elif cls == JUDGE_PARSE_FAILED:
+                err_classes["PARSE_FAILED"] = err_classes.get(
+                    "PARSE_FAILED", 0) + 1
+            elif cls == JUDGE_EMPTY_OUTPUT:
+                err_classes["EMPTY_OUTPUT"] = err_classes.get(
+                    "EMPTY_OUTPUT", 0) + 1
             else:
                 err_classes[cls] = err_classes.get(cls, 0) + 1
             _rec.update({"outcome": cls, "error": err[:200],
                          "http_class": hc})
             details.append(_rec)
             continue
-        content = res.get("content") or ""
-        if not content.strip():
-            err_classes["EMPTY_OUTPUT"] = err_classes.get(
-                "EMPTY_OUTPUT", 0) + 1
-            _rec.update({"outcome": JUDGE_EMPTY_OUTPUT,
-                         "error": "empty content"})
-            details.append(_rec)
-            continue
-        parsed = _parse_rubric(content)
-        # calibration uses the same strict contract: all required rubric
-        # fields must parse (Art. XXV; a truncated answer is no answer)
-        valid = _validate_rubric_pass(parsed, bool(problem.get("clarification_answer")))
-        if valid is None:
-            err_classes["PARSE_FAILED"] = err_classes.get(
-                "PARSE_FAILED", 0) + 1
-            _rec.update({"outcome": JUDGE_PARSE_FAILED,
-                         "error": "missing/invalid required rubric fields"})
-            details.append(_rec)
-            continue
+        valid = _jc["valid"]
         pref = valid["prefer"]
         total += 1
         # map preference back to good/bad

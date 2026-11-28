@@ -1,0 +1,72 @@
+{
+ "problem_id": "HO8-07-brewery-diacetyl",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip af6b5b311)",
+ "executor_id": "builder-r45s2@holdout-v8-generation-v81",
+ "machine": {
+  "machine": "V8.1.1",
+  "base": "V8.0 (r43_machine_v8, frozen) + AM42 D1 computed-physics layer (scripts/v81_physics.py) + D2 population search with TRIZ seeding (scripts/triz_principles.py)",
+  "request_model": "glm-4-plus",
+  "k_candidates": 3,
+  "repair_budget": 3,
+  "direction_llm": "selected candidate only",
+  "v81_1_fix": "candidate-plan enumeration dedupes INSIDE the loop (always exactly 3 distinct (class, principle) plans); the V8.1 attempt produced cands=2 on its first row (HO8-01) — that run was stopped and its single row VOIDED-BUILD-DEFECT (eval/v81_run_voided_v81_defect/)"
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T07:56:19.412882Z",
+ "a1_answer": "MECHANISM CLASS: Gravity-triggered early diacetyl rest with high-reductase yeast at elevated pitch rate\n\nCANDIDATE CLASSES:\n1. Yeast strain/pitching-rate selection — attacks failure by increasing diacetyl reductase capacity (more cells, higher specific activity) to clear residual diacetyl faster\n2. Diacetyl-rest temperature setpoint retuning — attacks failure by increasing reduction rate constant via Arrhenius kinetics (higher temperature = exponentially faster reductase)\n3. Rest-timing/racking procedure (gravity-triggered early rest + yeast rousing) — attacks failure by initiating rest when yeast vitality is maximal (lower ethanol, higher metabolic activity) and maintaining suspension\nSELECTED: Rest-timing/racking procedure (gravity-triggered early rest) combined with strain/pitch selection — the primary driver of incomplete rest is low yeast vitality at terminal gravity; moving the rest earlier captures 2× higher reductase velocity from vitality, amplified by strain/pitch\n\nNOVELTY STATEMENT (INTERVENTION)\nProposed mitigation: initiate diacetyl rest at 60% apparent attenuation (not end of fermentation) at 18°C for 12h using a high-diacetyl-reductase lager strain pitched at 30M cells/mL (2× standard), then crash to 2°C. Standard practice: single commercial lager strain at 15M cells/mL, fixed-time rest at 16°C for 48h starting at terminal gravity. Departure: gravity-triggered timing (not fixed-time) + higher temperature/shorter duration + strain/pitch co-selection — a three-parameter arrangement change. Adjacent-technique clearance: wine sur-lie batonnage rouses lees but is time-scheduled, not gravity-triggered; bioethanol uses high-temp rests but at 30°C+ with thermotolerant yeast. This mechanism attacks the driving physics (diacetyl reductase velocity = f(temperature, cell count, ethanol inhibition)) by shifting the rest to the high-vitality window where ethanol is ~3% v/v (vs 5% at terminal), doubling specific reductase activity per literature.\n\nPHYSICS CHECK\nGoverning relation: Arrhenius kinetics for diacetyl reductase — k = A·exp(−Ea/RT), Ea ≈ 55 kJ/mol (CALCULATED from published yeast reductase data). Rate ratio 18°C (291K) vs 12°C (285K): exp[(55000/8.314)·(1/285−1/291)] = 1.85× (CALCULATED). Cell count 2× standard = 2× Vmax (ASSUMPTION: linear scaling at non-saturating diacetyl). Ethanol inhibition: reductase velocity at 3% EtOH ≈ 2× velocity at 5% EtOH (USER CONSTRAINT: literature value for lager yeast). Combined velocity multiplier vs standard practice (48h at 16°C, terminal gravity): (12h/48h) × (k_18C/k_16C) × 2 × 2 = 0.25 × 1.19 × 4 = 1.19× equivalent rest capacity (CALCULATED). Magnitude verification: 1.19× > 1.0, so residual diacetyl falls below 0.1 ppm flavor threshold (USER CONSTRAINT: typical lager diacetyl 0.15–0.3 ppm after standard rest; 19% margin clears threshold).\n\nIMPLEMENTATION BILL\n| Row | Component / Operation | Class | Tag | Where Attached / Parameter Set |\n|-----|----------------------|-------|-----|-------------------------------|\n| 1 | Existing 100 hL cylindroconical fermenter with jacket cooling/heating | Stated infrastructure | (a) | Problem device |\n| 2 | Existing inline densitometer (e.g., Anton Paar DMA 35) | Stated infrastructure | (a) | Fermenter bottom cone, existing |\n| 3 | Existing yeast propagation system (standard brewery) | Stated infrastructure | (a) | Brewery cellar |\n| 4 | Commercial high-reductase lager yeast (e.g., Saflager W-34/70 dry, 10B cells/g) | Procurable catalog | (b) | Pitched via existing propagation (Row 3) at 30M cells/mL |\n| 5 | Pitching rate setpoint: 30M cells/mL (2× standard 15M) | Parameter change | (c) | Row 3 propagation target |\n| 6 | Diacetyl rest trigger: start at 60% apparent attenuation (measured by Row 2) | Procedure change | (c) | Fermenter control system, existing PLC |\n| 7 | Rest temperature setpoint: 18°C for 12h | Parameter change | (c) | Row 1 jacket control, existing PID |\n| 8 | Post-rest crash: 2°C for lagering | Existing procedure | (a) | Row 1 jacket control, standard |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Burden Category | Standard Practice | This Intervention | Delta |\n|-----------------|-------------------|-------------------|-------|\n| Hardware install | None (uses existing fermenter, densitometer, propagation) | None (same) | 0 |\n| New procurement class | Commercial lager yeast (dry) | Commercial lager yeast (dry, different strain) | Same class (b) |\n| Parameter/procedure changes | Pitch rate 15M, rest at terminal gravity 16°C/48h | Pitch rate 30M, rest at 60% AA 18°C/12h | Same class (c), fewer setpoint changes |\n| Commissioning | Verify rest PID, gravity alarm | Verify rest PID, gravity alarm at 60% AA | Same effort |\n| Operation per batch | 48h rest at 16°C, then crash | 12h rest at 18°C, then crash | **OPERATIONAL COST: −36h tank occupancy per batch (CALCULATED); cooling energy ~15% lower for rest phase (CALCULATED from 12h×ΔT vs 48h×ΔT)** |\n| Maintenance | Standard yeast handling | Standard yeast handling | 0 |\n| Regulatory/qualification | Standard yeast GRAS | Standard yeast GRAS (W-34/70) | 0 |\n**Conclusion: Same-or-lower burden class. Tank time saved = quantified operational gain.**\n\nSIGNALS USED: Inline densitometer (existing, permitted measure) for 60% AA trigger; jacket temperature sensor (existing) for PID control. None (open-loop) for strain/pitch selection.\n\nEXECUTABLE TEST\nProtocol: Split-batch same wort (100 hL each). Control: standard strain (e.g., W-34/70) at 15M cells/mL, rest at terminal gravity 16°C/48h. Test: W-34/70 at 30M cells/mL, rest at 60% AA 18°C/12h. Both crash to 2°C, lager 21 days. Measure diacetyl at packaging via GC-FID (ASTM E2601) or enzymatic kit (Megazyme). Pass/fail: Test diacetyl < 0.1 ppm (flavor threshold) AND < Control diacetyl. Duration: 35 days (fermentation + lagering). Kill criterion: Test diacetyl > 0.15 ppm OR > Control diacetyl. Instruments: Existing lab GC or enzymatic kit (standard brewery QC).",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "DIRECTION_CHECK_UNAVAILABLE",
+   "reason": "HTTPError: HTTP Error 401: Unauthorized"
+  },
+  "population": {
+   "n_candidates": 3,
+   "selected": "cand_1",
+   "target_class": "contamination-source control",
+   "triz_principle": 3,
+   "candidate_scores": [
+    [
+     3,
+     0,
+     0
+    ],
+    [
+     6,
+     0,
+     0
+    ],
+    [
+     5,
+     0,
+     0
+    ]
+   ]
+  },
+  "residual_findings": {
+   "NAMED_VARIANT": [
+    "model/brand-marker: DMA 35 | | 2 | Existing inline densitometer (e.g., Anton Paar DMA 35) | Stated infrastruc",
+    "model/brand-marker: AA 18 | | Parameter/procedure changes | Pitch rate 15M, rest at terminal gravity 16°C/48"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but carries no QUANTIFIED OPERATIONAL COST line — state the operational cost as a number with a unit (throughput, energy, availability lost per day or per cycle) or an explicit zero WITH the off-production reason; the unquantified phrase no longer prices a duty cycle"
+   ],
+   "COMPUTED_PHYSICS_INCONSISTENT": [
+    "arrhenius: claimed 18 vs computed 3.748 (k2/k1 = exp[-Ea/R * (1/T2 - 1/T1)]; rel err 79.2%) exceeds the 40% band — the magnitude is a defect"
+   ],
+   "DIRECTION_CHECK_UNAVAILABLE": [
+    "typed fail-open: HTTPError: HTTP Error 401: Unauthorized (the authoritative read stays the auditor's)"
+   ]
+  }
+ },
+ "sha256_16": "e7dd8e1b25feb7c7"
+}

@@ -1,0 +1,42 @@
+{
+ "record": "R45_VERIFIER_C0062_PREFLIGHT/1.0.0",
+ "claim": "c-0064 (VERIFIER, builder-r45s1)",
+ "executor_claim": "c-0062 (builder-r44s1, OPEN; run in flight)",
+ "at": "2026-11-17T03:58:46Z (sandbox clock)",
+ "purpose": "the verifier instrument is BUILT and COMMITTED before the executor's run lands (Art. 18 durable execution; Art. 29(d) heartbeat); this preflight record carries the one leg that is independently completable NOW — the F59 courtesy recompute — plus the instrument inventory. The remaining 13 legs fire the moment eval/v8_run/ artifacts land on the remote: python3 scripts/r45_verifier_v8.py <run_tip_sha>",
+ "f59_courtesy_recompute": {
+  "verdict": "MATCHES_AUDITOR_SET",
+  "method": "independent byte-grep of the live token's middle segment (vault-read at runtime, never printed) over all 23 remote branch tips, the peer's r44_f59_scan.py method re-executed without touching their record file",
+  "result": {
+   "r448/visual-lab": [
+    "scripts/r447_canonical_space_record.py",
+    "scripts/r447_hf_deploy.py"
+   ]
+  },
+  "equals_peer_committed_record": true,
+  "equals_auditor_byte_verified_set": true,
+  "other_branch_hits": 0
+ },
+ "instrument": {
+  "script": "scripts/r45_verifier_v8.py",
+  "legs": [
+   "seal (canonical-tuple EXACT vs f65b9d8b…)",
+   "attestation (raw-slice recompute + call arithmetic)",
+   "one_generation (events trail)",
+   "rows (30 vs sealed packet, sha recompute, one executor)",
+   "scan_battery (full deterministic re-run, zero LLM; direction legs shape-checked only)",
+   "d3_runtime_binds (non-duty fraction, unpriced duty, cap firings, repairs/row vs v7 3.0)",
+   "claim_before_read (c-0062 push vs window start)",
+   "remote_ci_api_read (check-run API at the run SHA)",
+   "secret_grep_diff (base..tip)",
+   "trailers (run commits)",
+   "round_record (D2 + Art.27/16)",
+   "rubric_never_read",
+   "registry (one EXECUTOR, honest closeout status)",
+   "f59_courtesy (done — this record)"
+  ],
+  "zero_llm": true,
+  "private_rubric": "never opened by this session; the script names no rubric read path"
+ },
+ "note": "the verifier does NOT generate, does NOT re-run any LLM leg, and does NOT read any v8 problem byte until the executor's artifacts land (the c-0059 precedent; my claim c-0064 was pushed 03:51:33Z, before any v8 problem read by this session)"
+}

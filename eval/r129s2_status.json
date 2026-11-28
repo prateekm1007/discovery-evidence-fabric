@@ -1,0 +1,100 @@
+{
+ "record": "R129S2_STATUS/1.0.0",
+ "session": "builder-r129s1",
+ "at": "2026-11-22T17:20:00Z (sandbox clock, TRUE UTC)",
+ "base": "f404f2466",
+ "claim": "c-0205",
+ "work_id": "r129-bon-bindselect-round1",
+ "round_class": "INFRASTRUCTURE/MEASUREMENT (Art. 27 disclosed: zero engine lines this round; the only LLM legs are the preregistered run's own; detector bytes UNCHANGED)",
+ "dirs_addressed": {
+  "dir1_constitution_full_read": "DONE pre-claim — EPISTEMIC_CONSTITUTION.md v3.3.0 read in FULL from queue/dev12_r7 (221 lines: 29 articles + amendment records v3.0.0/v3.1.0/v3.2.0/v3.3.0 + the Art. 28 addendum; the 85-article disposition ledger included). The binding articles for this window identified and obeyed: Art. 20 (ablation gate), Art. 29(b/e) (claim-before-work, canonical paths, diff-before-push), Art. 27 (capability budget), Art. 17/F45 (custody), Art. 14 (honest width).",
+  "dir6_hf_credit_probe": "DONE (eval/r129s1_hf_credit_probe.json + scripts/r129s1_hf_credit_probe.py, committed in the lock push d43c60faa): whoami-v2 HTTP 200 (login prateekm1, fineGrained) + ONE max_tokens=2 router call through the engine's wired hf_router_chat: HTTP 200, meta-llama/llama-3.1-8b-instruct, 'OK.', 43 prompt / 2 completion tokens, probe spend 2.48e-06 USD. VERDICT typed FUNDED_HEADROOM_EXISTS — the third independent live funded call (c-0203 42/2, c-0204 38/8, this 43/2). Absolute balance NOT queryable for an individual token (typed honestly: no per-user credits endpoint; the org usage API is Enterprise-scoped). Panel projection from the committed r128 rate (2.54e-06 USD / 46 tokens = 5.52e-08 USD/token): score-8 panel ~0.0087 USD, GEPA compile round ~0.0058 USD — headroom SUFFICIENT for panel-scale runs unless the balance is already near zero, which the 200 status makes unlikely but does not exclude. Refusal class typed in the transport: 402 = payment_required, never retried (Art. 3). Token custody: digest 33bc7af22c62 MATCHES the committed records; token in the gitignored vault env-only, never printed/committed.",
+  "dir5_phaseB_lever1": "DONE round 1 (see the gate block below). GEPA compile + retrieval-grounded authoring: TYPED, NOT RUN this window — each is a quota-consuming run that must ride its own prereg under the same Art. 20 gate; this window's free-tier budget was consumed by the BoN run (96 legs, 26.9 min wall); the lanes are typed as the next-window slices with the HF-router headroom now proven (dir 6).",
+  "dir2_dir3_owner_gated": "TYPED, UNATTEMPTED: the vault has NO AWS_* keys (re-checked this window — XKIRO_API_KEY/AGNES_API_KEY/GH_PAT/HF_TOKEN only); the EC2/Bedrock lane stays owner-only; the score-8 panel stays owner+auditor-gated.",
+  "dir4_auditor": "UNTouched per the Art. 28 addendum authorship line (sealed sets + the AUDITOR_CONSTITUTION v1.3.0 canonical commit are the auditor's)."
+ },
+ "bon_gate": {
+  "arm": "bon2-bindselect (the prereg eval/r129_bon_prereg.json, committed BEFORE any run call in the lock push)",
+  "run": "24 items x 2 candidates = 96 LLM legs (48 author + 48 reviewer; 0 reviewer-skipped — every bare candidate surfaced findings), wall 1613.0 s, pool of 2, byte-resume records eval/r129_bon_run/, per-leg transport_attempts recorded (the r128 dir-5 commitment), parse retries 0 by construction, typed fails 0, rate-limit backoffs absorbed per the established 4x120 s pattern",
+  "arm_tally": "0/24 delivered defect rows (all four classes 0: input_availability 0, duty_pricing 0, constraint_violation 0, physics_direction_inversion 0)",
+  "incumbent_tally": "2/48 defect rows RECOMPUTED FROM THE COMMITTED F31e bytes (eval/r125_f31e_run/succ_d{1,2}_*.json via bill_defect_classes) — exactly the pinned pooled number; both rows duty_pricing (r125-05-s2/d1, r125-07-s2/d1) — the byte-consistency pin reproduced before the gate was read (Art. 3)",
+  "crosscheck": "PASS — an explicit-index second construction recomputes both tallies (arm 0, incumbent 2) in eval/r129_bon_scoring.json (the Art. 19-lite recompute, same-session; a different-session VERIFIER record is the twin's lane per Art. 29(c))",
+  "gate_art20": "ROUND1_WIN — selected 0 < incumbent 2 on the SAME 24 items; the arm SURVIVES round 1 and proceeds to round 2 confirmation (a full 48-row parity round), not deletion",
+  "selection_mechanism_evidence": "the bind-select step was NOT a degenerate tie: 22/24 items were [0,0] ties (tie -> candidate 1 per the prereg), but 2 items (r125-08-s1 [1,0] and r125-08-s2 [0,1]) had one defective candidate and one clean — the deterministic battery + preregistered rule selected the CLEAN candidate on both. On the incumbent's two defect items (r125-05-s2, r125-07-s2) BOTH candidates were clean — consistent with the class-scoped lesson: more draws give the deterministic selector a clean candidate to take, and the selection guarantees it is taken when it exists.",
+  "honest_bounds": "n=24 arm rows vs the incumbent's 48 committed rows on the same items (the incumbent pooled TWO draws; this round ran ONE draw-pair) — a round-1 ablation accept, NOT a significance claim and NOT a capability-score event (the r128 item-clustered width lesson stands, Art. 14); the free-tier compute cost is 2x the single-shot chain (96 legs vs 48) — typed, and the subject of the round-2 parity decision",
+  "usage": {
+   "author": {
+    "prompt_tokens": 12160,
+    "completion_tokens": 40467,
+    "cached_tokens": 512
+   },
+   "reviewer": {
+    "prompt_tokens": 57428,
+    "completion_tokens": 53927,
+    "cached_tokens": 0
+   },
+   "cached_hit_note": "cached_tokens 512/69588 = 0.7% — the agnes route's cache telemetry stays ~0 (the Phase-A finding re-confirmed on a bigger sample)"
+  }
+ },
+ "remote_ci": {
+  "pushed_sha": "cdbd86443",
+  "remote_ci_conclusion": "success",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success",
+    "id": 137275974520
+   }
+  ],
+  "note": "pushed_sha/conclusion = the tip this rebased close builds on (the twin's round-close; API-read GREEN, run 137275974520, read before this commit). THIS close's own push re-reads its check-run immediately after landing and the result is quoted in the final report.",
+  "read_at": "2026-11-22T18:05:00Z (sandbox clock, TRUE UTC)"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "ZERO engine lines this round: the round's commits (d43c60faa + ab22c9b98 + this close) touch no discovery_fabric/ bytes — the prereg, the probe, the runner, the scorer, the run records and the registry are scripts/ and eval/ only (git numstat d43c60faa^..HEAD measured below). The only LLM legs are the preregistered run's own.",
+  "engine_line_share_measured": 0,
+  "share_exception_reason": "TYPED EXCEPTION (F63 class) — INFRASTRUCTURE/MEASUREMENT round: the round's engine behavior change is NIL by design (an Art. 20 ablation arm executes the ACCEPTED frozen engine bytes unchanged; the variable is candidate count + selection, both outside the engine); no capability logic housed outside the engine; detector bytes unchanged.",
+  "primary_metric_delta": "the ablation arm's delivered-defect rows: incumbent 2/48 (recomputed from the committed F31e bytes) -> bon2-bindselect 0/24 on the SAME 24 items (eval/r129_bon_scoring.json; the Art. 20 ROUND1_WIN gate) — the measurement the Art. 20 round-2 parity decision reads; NOT a capability-score event (typed in the gate block)",
+  "deletions": "none (dir 8 honored: nothing deleted; the retired ceremony stays retired; the incumbent single-shot arm is NOT deleted — it is the Art. 20 incumbent the arm must keep beating)"
+ },
+ "ci_chain": [
+  {
+   "pushed_sha": "d43c60faa",
+   "check_run": 137267892171,
+   "conclusion": "failure",
+   "note": "the LOCK push — RED, kept on the board as measured: the registry validator (test_article29_parallel_coordination, 4 tests, ONE root cause) requires the current-tip registry to carry 'role' on every session record and 'claimed_at' on every claim; my new session + claim followed the older c-0191-era template"
+  },
+  {
+   "pushed_sha": "ab22c9b98",
+   "check_run": 137269242782,
+   "conclusion": "success",
+   "note": "the typed fix-forward: role='builder' on the session (the r89-r96 convention) + claimed_at on c-0205; no historical rewrite (the current tip is always strict per the F42 rule); article29 9/9 + the hook suites green locally before the push; THIS push's own run re-read and quoted"
+  },
+  {
+   "pushed_sha": "cdbd86443",
+   "check_run": 137275974520,
+   "conclusion": "success",
+   "note": "the twin's round-close (the rebase base) — API-read GREEN"
+  }
+ ],
+ "art27_budget": "zero engine lines this round (scripts/ + eval/ only, measured: the diff touches no discovery_fabric/ bytes); detector bytes unchanged; the round is typed INFRASTRUCTURE/MEASUREMENT (the F63 disclosed class)",
+ "art16_retirements": "none (dir 8: nothing new deleted; the retired ceremony stays retired; the incumbent single-shot arm is NOT deleted — it is the Art. 20 incumbent the ablation arm must keep beating)",
+ "registry_tail": "claims to c-0206 (c-0205 DONE re-applied on the twin's normalization; c-0206 theirs DONE); counter file c-0207 (the twin advanced it); tip = this commit; session builder-r129s1 registered (role builder)",
+ "next_window_slices": [
+  "ROUND 2 of the BoN arm: the 48-row parity round (both draws, n=3 candidates on the incumbent's defect items typed) — the Art. 20 confirmation before any instrument change",
+  "GEPA compile of the reviewer prompt on DEV slices with bill_defect_classes as fitness — its own prereg + claim (the precondition 'a trustworthy metric exists' is met; the HF headroom is proven)",
+  "retrieval-grounded authoring — its own prereg (the MOOSE-Chem/PatentChem stack wiring)",
+  "the owner's AWS EC2 host + the score-8 panel remain the top open items (dirs 2/3); the v16 sealed set remains auditor-authored (dir 4)"
+ ],
+ "collision_disclosure": {
+  "event": "the twin lane (builder-r121s1-3e8a41d7) landed its R129 round-close at cdbd86443 (claim c-0206, work r129-phaseA-speed-and-bon3-ablation, CI 137275974520 SUCCESS) while this session's round-close 49bd84c93 was UNPUSHED — the live Art. 29(e) non-FF scenario",
+  "resolution": "the two lanes are NOT byte-duplicates: the twin ran Phase A (speed accept, engine route_adapter/2.2.0: 2-key agnes rotation + Bedrock cachePoint + the model-id guard fix) AND a best-of-3 + bind-select ablation (eval/r129_phase_ab/, fresh single-shot incumbent 1/24); this lane ran the preregistered best-of-2 + bind-select against the COMMITTED F31e incumbent recompute (claim c-0205, 96 quota-consuming legs). Per Art. 29(e): disjoint artifacts rebased (59 vs 29 changed files; exactly 2 paths overlapped — the status path, which the twin took; this record is RETYPED as the second-lane record — and the registry, merged with both lanes' claims: c-0205 DONE re-applied on their normalization, c-0206 theirs); no force-push, no duplicate rebase, no history rewrite",
+  "phaseA_recognized": "the twin's Phase-A accept (median 16.3 s / worst 132.3 s, 24/24, 0 parse retries, 6 backoffs counted in-record, defect rate unchanged 1/24) stands on the board — this lane ran no Phase-A legs and claims none of it"
+ },
+ "bon_reconciliation": {
+  "bon2_this_lane": "ROUND1_WIN: 0/24 vs the committed incumbent 2/48 (recomputed from bytes, pin reproduced); selection discriminated on r125-08-s1/s2 taking the clean candidate; n=24 rows, one draw-pair",
+  "bon3_twin_lane": "round-1 LOSS: 2/24 vs a FRESH single-shot 1/24 at 2.1x calls (~9x median latency); the twin typed bon3 DELETED at round 2 unless it strictly beats ss",
+  "the_joint_mechanism_finding": "the twin typed the round's real yield: the bind-select WORKED in both lanes (both losses selected bind-clean candidates in their lane; this lane's battery+selection took the clean candidate on both discriminated items) but the REVIEWER REWRITE broke clean bills in their lane (duty_pricing introduced post-fix) — the residual delivered-defect source is the REVIEWER STAGE, not authoring (consistent with the c-0198/c-0199 anatomy: 6/96 intro rows SYSTEMIC). The two lanes' different verdicts are the reviewer-stage variance measured on different draws: the single-shot incumbent delivered 2/48 (committed pooled) and 1/24 (their fresh draw); the BoN arms delivered 0/24 (this lane) and 2/24 (theirs)",
+  "joint_art20_typing": "bon2 survives round 1 on its window (this record); bon3 is deleted at round 2 unless strictly better (the twin's typing, unchanged); the CLASS decision is the round-2 48-row parity run the twin's design already aims at GEPA (eval/r129_phaseB_design.json) — the reviewer-stage finding RE-AIMS Phase B: compiling IMPROVED_DIRECTIVE against the deterministic defect metric attacks the actual residual source",
+  "ledger_gap_typed": "the twin's ABLATION_REGISTRY.json carries NO bon3 entry (their registry is untouched at 14 entries) — the Art. 20 incumbent-challenge ledger for their bon3 arm should ride THEIR follow-up or the auditor's reading; this lane adds only its own bon2 entry (canonical-path ownership; no lane writes another's ledger rows)"
+ }
+}

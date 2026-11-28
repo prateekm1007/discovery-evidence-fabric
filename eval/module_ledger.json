@@ -1,0 +1,104 @@
+{
+ "record": "MODULE_LEDGER/1.0.0 (the R140 DIR-6 module ledger: every adopted/imported upstream module with its executable call path, live test, measured contribution — and every assessed-but-NOT-integrated lead with its typed reason)",
+ "claim": "c-0223 (live update r141s1)",
+ "at": "2026-11-23 (sandbox clock)",
+ "the_rule": "an import or a repository reference is NOT an integration (the R139 directions); each integrated module carries: the import-graph evidence (who imports it, where it executes), a live test (committed, CI-visible), the measured contribution, and a retirement clause (Art. 5/16)",
+ "integrated": [
+  {
+   "module": "discovery_fabric/engine/citation_identity.py",
+   "instrument_class": "bibliographic citation-identity verification (the R139 DIR-6 [[25]] pattern: exact lookup + fuzzy match + optional LLM arbiter; the deterministic core is the engine-native implementation)",
+   "origin": "engine-native deterministic core implementing the [[25]] pattern. PROVENANCE (re-typed per R140-F2): the original landing commit 17ca0e8e3 is UNREACHABLE from every remote ref (verified by a refs/* fetch sweep + cat-file probe this window) — the 'restored byte-identical from 17ca0e8e3' claim is UNVERIFIED-SOURCED. What IS verified: the restoration commit ae59bcf5a (reachable) carries citation_identity.py sha256[:16]=ed31ebab4a5457c2 + tests sha256[:16]=48c207b0eabcdbb5, and HEAD carries the IDENTICAL bytes (recomputed this window); 10/10 tests green at every audited head since. The lineage is ae59bcf5a -> HEAD; the 17ca0e8e3 leg is recorded as the claimed-but-unreachable origin (Art. 1: UNVERIFIED, not false).",
+   "call_site": "discovery_fabric/engine/evidence_classification.py:54 (import) -> :269 (classify_record_citation executed per frozen record at CLASSIFICATION custody time — before any mechanism construction sees the record)",
+   "import_graph_evidence": "grep: evidence_classification.py imports citation_identity and tags every classified item's record with the citation_identity verdict (field: citation_identity); the tags ride the classification envelope into the lean item construction (adapters.py) and the identity-true admission (_resolve_binding_identity, adapters.py:1271) consumes the frozen ids the instrument validates",
+   "live_test": "tests/test_citation_identity.py — 10/10 green (canonical exact, scheme normalization, alias detection, FORGED shape, title mismatch, the ambiguous band typed UNRESOLVED_ARBITER without an arbiter, the registry leg, the missing-title typed state, DETERMINISM (test_09: same bytes -> same verdict), the R138 HVAC collision items typed)",
+   "determinism_evidence": "test_09 pins same-bytes-same-verdict (the deterministic core: no LLM, no wall clock, no hash-order dependence — the v3.2.0 Art. 15 contract)",
+   "measured_contribution": "custody-time citation-identity tags on every frozen record; alias/forged-id citations are typed BEFORE admission (the R138 HVAC defect class killed at classification time, not just at the admission boundary)",
+   "retirement_clause": "retire if the identity-true admission (the consuming gate) is itself retired, or if a full RefChecker/SAFE integration supersedes the bibliographic slice with measured coverage on the same records"
+  },
+  {
+   "module": "discovery_fabric/engine/adapters.py::_resolve_binding_identity (+ apply_lifecycle_admission)",
+   "instrument_class": "the identity-true admission gate (R139 DIR-2 / R140 DIR-2; the auditor's acceptance contract)",
+   "origin": "engine-native (the R139S2 verifier probes + the R140 verifier records define the acceptance; the twin's r139s3 lane completed the tightening)",
+   "call_site": "adapters.py:1271 (_resolve_binding_identity) + :1377 (apply_lifecycle_admission) -> run.py's pool build (ms_pool_admission_split) + the grid verification (the per-candidate binding resolution)",
+   "import_graph_evidence": "run.py imports the resolver for the grid path; adapters.py's lean space calls apply_lifecycle_admission on every retained candidate; the enrichment executor (run.py) resolves enrichment bindings through the same resolver",
+   "live_test": "tests/test_binding_identity.py (12) + tests/test_pool_admission_gate.py (6) + tests/test_candidate_grounding_lifecycle.py (7) — 25/25 green; the R139S2 verifier probes (scripts/r139s2_verify_c0219.py, the independent acceptance) flip exactly per the contract",
+   "determinism_evidence": "the resolver is deterministic (zero LLM); the probes recompute byte-identically (the twin's committed record + my independent run agree)",
+   "measured_contribution": "P1-P4/P9 (alias/hash-absent/forged/foreign-span/duplicate-id) REFUSED; P5/P6 admitted verbatim-distinct; the R138 HVAC admitted bindings re-resolve 3/3 typed refusals",
+   "retirement_clause": "retire only with the admission gate itself (it IS the gate)"
+  },
+  {
+   "module": "discovery_fabric/engine/run.py::enrich_ungrounded_hypotheses + _verbatim_quote_anchors + _quote_present",
+   "integrated_at": "2026-11-23 (sandbox clock)",
+   "role": "the DIR-3 grounded-yield lift (R142-F1): the enrichment executor retrieves fresh evidence for ungrounded hypotheses, extracts VERBATIM topical anchor spans from the raw record text (the same normalization as the binding gram search, ranked by content-word overlap — never a random span), regenerates the mechanism FROM the quote through ONE bounded engine call (the revise-pass precedent, Art. LI; purpose=enrichment_regenerate), and admits ONLY through the UNCHANGED identity-true bar (the canonical verify_mechanism_support + the R139 resolver). The measured v3 cause it fixes: the enrichment re-verified the SAME paraphrase text — the verbatim binding cannot fire on paraphrases (the twin's honest 0/4 yield typing, c-0226).",
+   "executable_call_path": "EngineRun._enrich_ungrounded_mech_path -> enrich_ungrounded_hypotheses -> retrieve_fresh_evidence -> _verbatim_quote_anchors -> llm_generate(purpose=enrichment_regenerate) -> _quote_present -> verify_mechanism_support -> _resolve_binding_identity",
+   "live_test": "tests/test_quote_anchored_enrichment.py (5/5 green: verbatim+topical anchors, unrelated-record refusal, the paraphrase-must-fail compliance, the stop-word precondition, the wiring source pins)",
+   "measured_contribution": "typed PENDING-MEASUREMENT: the 5-problem yield run (c-0228) is the live measurement — the acceptance >=2/5 identity-true grounded with 0 bad admissions; this ledger entry carries the measurement pointer, not a claim",
+   "provenance": "engine-native; the twin's c-0225/c-0226 wiring + the R142 quote-anchor layer (this window)"
+  }
+ ],
+ "assessed_not_integrated": [
+  {
+   "module": "amazon-science/RefChecker",
+   "assessment": "the claim-triplet hallucination-checking pattern ([[24]]) is COVERED IN SLICE by the engine-native citation_identity + the canonical mechanism-support instrument; the full framework brings spaCy/model dependencies for a claim-extraction path the engine already runs deterministically (R453-LEAN: no extraction fan-out); integration needs a measured advantage on the same frozen records before adoption",
+   "status": "ASSESSED-NOT-INTEGRATED (revisit when a measured claim-triplet recall advantage is shown on the engine's own records)"
+  },
+  {
+   "module": "google-research/SAFE (SAF-Eval)",
+   "assessment": "search-augmented fact verification ([[2]]) needs a live search API per atomic fact — the engine's retrieval fabric already does evidence retrieval with typed provenance; the atomic-fact decomposition would duplicate the mechanism-support instrument's relation checks",
+   "status": "ASSESSED-NOT-INTEGRATED (revisit for the P5 post-cutoff rediscovery slice if its T2 citation-resolving retrieval needs per-fact verification)"
+  },
+  {
+   "module": "InfiniFlow/RAGFlow",
+   "assessment": "a full grounded-RAG SERVICE (Gitee [[33]]) — heavy deployment for a citation-provenance capability the engine already types per record (frozen custody + content hashes + the citation-identity tags); a service dependency for an already-covered slice",
+   "status": "ASSESSED-NOT-INTEGRATED"
+  },
+  {
+   "module": "AI-Compass quadruple-index citation cross-check",
+   "assessment": "the pattern ([[31]]: Semantic Scholar/OpenAlex cross-check) maps onto the engine's EXISTING connectors (semantic_scholar + openalex are live retrieval sources — the retrieval attribution shows 17 source jobs/run including both); the cross-check as an ENGINE feature = the citation_identity registry_lookup leg (implemented, optional, typed UNRESOLVED_ARBITER when absent)",
+   "status": "PATTERN-ADOPTED via the registry_lookup leg (the engine's own connectors serve the cross-check)"
+  },
+  {
+   "module": "pqaidevteam/PQAI",
+   "standing": "the R137/R139 assessment RETAINED: require a measured recall improvement over Google Patents/Lens before integration",
+   "status": "ASSESSED-NOT-INTEGRATED"
+  },
+  {
+   "module": "microsoft/mattergen",
+   "standing": "the R137 assessment RETAINED: revisit when a materials-composition problem class exists",
+   "status": "ASSESSED-NOT-INTEGRATED"
+  }
+ ],
+ "the_panel_reasoning_rungs": {
+  "dsr1": "deepseek-ai/DeepSeek-R1 via the HF router (scripts/r136_panel_v2_driver.py) — WIRED",
+  "qw32b": "Qwen/Qwen3-32B via the HF router — WIRED",
+  "note": "the R140 DIR-3 reasoning-rung requirement is met by the EXISTING roster; the qualification outcome (only dsv32 0.9 qualified) is the honest measured state; re-rolling judges on the SAME sealed pairs is Art. 7 multiple-testing (the twin's r139s3 refusal + the new auditor-authored sealed pairs requested in eval/r139s3_panel_audit_filing.json) — the R-CAL bar (>=3 judges, agreement>=0.7, alpha>=0.6, AUC>=0.8) stays NOT_MET until the auditor's new pairs land"
+ },
+ "no_score_claims": true,
+ "deletions": [
+  {
+   "module": "discovery_fabric/engine/causal_correctness.py",
+   "deleted_in": "d86f59aec (the re-applied prune; first deleted be7065706, clobbered by the twin's 8efc85b54 close — the auditor's R139S3-F1)",
+   "import_graph_evidence": "zero code importers at deletion (no import/from- references across discovery_fabric/, scripts/, tests/, .github/workflows/*.yml at bd2ec4f2a; the R455 record's claimed consumer tests/test_e21_series.py does not exist; remaining mentions in eval/ + R455 are data strings)",
+   "retirement_clause": "if a future round needs a causal-correctness evaluator, it must be re-authored against tests/test_e21d_domain_reasoning.py's contract with its own import-graph evidence"
+  }
+ ],
+ "worldwide_monitoring": {
+  "at": "2026-11-23 (sandbox clock)",
+  "ScienceOne_100": {
+   "finding": "the Chinese Academy of Sciences released the ScienceOne 100 model system in Beijing on 2026-04-28 — a platform-based open-source scientific model system (web-verified 2026-11-23 via web_search; sources: CAS release coverage, the ScienceOne AI-for-Science platform pages: waves/spectra/fields comprehension)",
+   "reachable_lever": "NONE INTEGRATED THIS WINDOW — the platform targets scientific-instrument modality comprehension, not bibliographic citation identity; revisit when a P5 rediscovery slice needs instrument-data grounding; no measured advantage typed, no adoption claim",
+   "typed_state": "MONITORED-NOT-INTEGRATED"
+  },
+  "GeekAI_gitee": {
+   "finding": "GeekAI (gitee: 星星/geekai, wisedak/geekai) is an open-source multi-model AI assistant platform aggregating OpenAI/Azure/ChatGLM/iFlytek-Spark/ERNIE APIs behind one gateway with an ops console (web-verified 2026-11-23)",
+   "reachable_lever": "NONE INTEGRATED — it is a serving/aggregation layer, not a grounding instrument; the engine's own route_adapter + vault rotation already serves the same slice deterministically; revisit only if a China-model-family judge (ChatGLM/ERNIE) enters an R-CAL roster and needs a reachable router",
+   "typed_state": "MONITORED-NOT-INTEGRATED"
+  }
+ },
+ "coordination_discipline_DIR6": {
+  "rule": "rebase-before-close: a round-close MUST fetch + rebase onto the remote tip and PRESERVE every other work_id's committed engine bytes (the twin's 8efc85b54 deleted the R139S3 DIR-6 integration + the prune; the auditor's R139S3-F2)",
+  "enforcement": "the EXISTING machinery only (no new guard kind): the claim registry (eval/work_claims.json) carries the discipline; the battery + the round-record gates verify the close's own bytes; the clobber is typed in BOTH status records (r139s3 disclosed the deletion + restored byte-identical; r140s1 recorded the clean close)",
+  "r140_close_audit": "the twin's bd2ec4f2a close was CLEAN (eval/records + the module ledger only; zero engine bytes touched) — the discipline HELD this round",
+  "r141s1_close_commitment": "this lane's close: fetch, rebase onto the tip, diff-check the engine dir against the base, never overwrite a foreign work_id's bytes"
+ }
+}

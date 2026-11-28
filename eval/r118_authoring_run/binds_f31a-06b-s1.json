@@ -1,0 +1,120 @@
+{
+ "problem_id": "f31a-06b-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Optimize Caustic CIP Parameters to Within Gasket Limits**\n\n**Mechanism:**\nThe failure occurs because hard-water scale (calcium carbonate/magnesium hydroxide) deposits on the pasteurizer plates, acting as an insulating layer that reduces heat transfer efficiency and creates localized hot spots (\"blisters\"). While acid descaling is effective, the intervening caustic CIP is currently ineffective (\"losing bite\") at removing residual scale or organic fouling that accelerates scale formation. To mitigate this without altering hardware, the chemical cleaning process must be optimized to maximize scale removal while strictly adhering to the mechanical limits of the system.\n\n**Implementation:**\n1.  **Raise Caustic Concentration to Maximum Rated Limit:** Increase the Sodium Hydroxide (NaOH) concentration in the CIP tank to **2.5 wt%**. This is the maximum limit specified for the system's gaskets. Higher concentration increases the alkalinity, which aids in saponifying organic contaminants that trap mineral scale and helps loosen loosely bonded inorganic deposits.\n2.  **Optimize Temperature and Residence Time:** Maintain the caustic CIP temperature at **75°C** (the upper limit for gasket integrity) and ensure the spray duration is sufficient for complete plate coverage (typically 20–30 minutes for pasteurizers). The combination of high concentration and maximum allowable temperature maximizes the chemical kinetic energy for cleaning.\n3.  **Adjust Acid Descaling Frequency:** Since the caustic step is now at its maximum chemical potential, any remaining stubborn scale must be addressed by increasing the frequency of the acid descaling cycle. The optimized caustic step will clear organic biofilms and loose deposits, allowing the subsequent acid step to target mineral scale more effectively without being blocked by organic interlayers.\n\n**Measures It Relies On:**\n*   **Gasket Rating Adherence:** This mitigation strictly relies on the constraint that the gaskets are rated for up to 2.5 wt% NaOH at 75°C. Exceeding this concentration or temperature would risk gasket swelling, deformation, or chemical degradation, leading to leaks and contamination.\n*   **Chemical Kinetics of Alkaline Cleaning:** It relies on the principle that alkaline solutions are superior for removing fats, proteins, and milk solids, which often form the matrix that holds mineral scale. By maximizing the alkaline strength within safe limits, the \"bite\" is restored to remove the organic component of the fouling.\n*   **Synergistic Effect with Acid Descaling:** The mitigation assumes that the caustic step prepares the surface for the acid step by removing organic barriers, thereby reducing the time and strength required for acid descaling and preventing the \"losing bite\" phenomenon in the caustic cycle alone.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is to extend the CIP caustic wash duration (soak time) and raise the caustic concentration to the maximum permitted limit (2.5 wt% NaOH), thereby increasing the total alkaline mass transfer into the scale deposits to restore CIP effectiveness, without modifying any physical equipment or adding new hardware.\n\nStandard practice: CIP programs typically run at a fixed, conservative concentration (e.g., 1.5–2.0 wt%) and a fixed cycle time (e.g., 30–45 minutes), which becomes insufficient as scale builds up, leading to the \"losing bite\" phenomenon.\nAdjacent-technique clearance: Standard practice in dairy/food industries is to either increase the concentration or increase the time; however, the specific departure here is the *simultaneous* maximization of both variables within the stated constraint (2.5 wt% limit) combined with a proportional extension of the soak time, creating a non-linear increase in the effective cleaning potential (ECP) defined by the product of concentration and time, rather than treating them as independent fixed parameters. The mechanism is a parameter-only change; no physical intervention is made to the pasteurizer plates.\n\nPHYSICS CHECK\nDriving variable: The rate of scale removal (mass of scale removed per unit area per unit time, $R_s$).\nGoverning relation: For alkaline removal of calcium-based scales, the rate is approximated by $R_s = k \\cdot C^n \\cdot T^m$, where $C$ is concentration, $T$ is soak time, and $k, n, m$ are kinetic constants. As scale layers thicken, the diffusion layer increases, effectively reducing the local $k$ and requiring higher $C \\cdot T$ to maintain $R_s$.\nDirection-of-effect: The mechanism moves the product $C \\cdot T$ UP.\nMagnitude verification: Standard practice might operate at $C_{std}=1.5\\%$ and $T_{std}=30$ min, yielding $C \\cdot T \\approx 45$. The proposed intervention moves to $C_{new}=2.5\\%$ and $T_{new}=60$ min (doubling the soak time to compensate for the slower kinetics of mature scale), yielding $C \\cdot T = 150$. This is a 3.3x increase in the driving potential for scale dissolution/loosening. This reduction in the \"failure driver\" (incomplete scale removal) restores the heat transfer coefficient by removing the insulating scale layer.\nInput-availability: No new inputs are required. The concentration and time are standard CIP control variables already present in the system's recipe management. The constraint explicitly permits raising concentration to 2.5 wt%.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Duty Cycle and Parameter Modulation\n\nStandard Practice Bill (Reference):\n- CIP Tank with NaOH dosing capability (stated)\n- Control system capable of setting concentration and time (stated)\n- Gaskets rated for 2.5 wt% at 75°C (stated)\n- Standard Cycle: 1.5-2.0 wt% NaOH, 30-45 min\n\nProposed Intervention Bill:\n1. [c] Modify CIP program parameters: Set caustic concentration to 2.5 wt% NaOH.\n   - *Tag:* [c] Parameter change on existing dosing system.\n   - *Justification:* Within stated constraint limit (2.5 wt%).\n2. [c] Modify CIP program parameters: Extend caustic soak duration to 60 minutes.\n   - *Tag:* [c] Parameter change on existing timer/sequencer.\n   - *Justification:* Standard practice performs CIP; extending time is a schedule/duty cycle change.\n3. [a] Operate existing gaskets and seals at the new operating point (2.5 wt%, 75°C).\n   - *Tag:* [a] Stated existing infrastructure.\n   - *Justification:* Gaskets are rated for this exact condition per the constraint.\n4. [a] Use existing heating system to maintain 75°C.\n   - *Tag:* [a] Stated existing infrastructure.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Hardware Addition: 0 new items.\n- Installation: 0 hours (no physical changes).\n- Operational Loss: The duty cycle change adds 30 minutes to the CIP cycle (assuming standard 30 min -> 60 min). This is a non-producing interval.\n  - *Pricing:* 30 minutes of downtime per CIP cycle. If CIP is run once per day, this is 0.5 hours of potential production loss per day. However, CIP is typically performed during non-peak windows or is negligible compared to the cost of plate fouling/blistering and reduced heat transfer efficiency which increases energy costs and reduces throughput over time. The trade is net positive: a 30-minute daily maintenance extension prevents long-term degradation of the pasteurizer's thermal efficiency and prevents plate blistering failures which would require expensive repairs or shutdowns.\n- Material Cost: The cost of NaOH is increased by (2.5/1.5 - 1) * volume * 60/30 factor. This is a standard consumable cost increase, within the same class as standard practice.\n- Conclusion: Same-or-lower burden class. The only burden is a small increase in chemical cost and a 30-minute extension of the cleaning window, both of which are standard operational adjustments, not capital expenditure or new hardware.\n\nEXECUTABLE TEST\nProtocol:\n1. Run a baseline CIP cycle with standard parameters (e.g., 1.5 wt% NaOH, 30 min) on a pasteurizer section that has known scale buildup. Measure heat transfer coefficient (HTC) after the cycle.\n2. Run a test CIP cycle with the proposed parameters (2.5 wt% NaOH, 60 min) on a similar scale buildup. Measure HTC after the cycle.\n3. Pass/Fail Threshold: The HTC after the test cycle must be ≥ 90% of the clean plate reference HTC, whereas the baseline cycle is expected to be < 70%. Alternatively, if direct HTC measurement is not available, measure the energy input required to achieve a target temperature rise; the test cycle must require significantly less energy (closer to clean plate values) than the baseline.\n4. Duration: One full CIP cycle duration (approx. 1-2 hours including fill, soak, drain, rinse).\n5. Kill Criterion: If the 2.5 wt% concentration causes any gasket leakage or visual deformation, or if the HTC improvement is less than 10% relative to the clean state, the mechanism is deemed ineffective or unsafe, and the test fails.\n\nCONSTRAINT BIND & COMPLIANCE\n- Constraint: \"The CIP caustic concentration may be raised; the system's gaskets are rated for up to 2.5 wt% NaOH at 75 C.\"\n- Compliance: The mechanism uses exactly 2.5 wt% NaOH, the maximum permitted. It does not exceed this. It does not require new gaskets. It does not modify the plates. It is a pure parameter change.\n- Permitted Set: The constraint permits raising concentration. It implicitly permits adjusting the associated time/duty cycle as standard practice. No physical hardware is added.\n- Direction of Effect: Moves driving potential (C*T) UP, which reduces the failure (scale remaining). Correct.\n- Input Availability: Uses standard CIP controls. No new sensors.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 2831,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 4999,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1. [c] Modify CIP program parameters: Set caustic concentration to 2.5 wt% NaOH.",
+     "- Attachment: Existing CIP dosing system (stated in standard practice infrastructure).",
+     "- Parameter: Concentration setpoint = 2.5 wt%, Temperature = 75°C, Soak Time = 15 min.",
+     "2. [c] Verify gasket compatibility: Confirm gaskets are rated for 2.5 wt% NaOH at 75°C.",
+     "- Attachment: Stated system constraint.",
+     "- Parameter: No hardware change; verification of existing spec against constraint.",
+     "3. [a] Execute standard CIP cycle with new parameters.",
+     "- Attachment: Existing pasteurizer and CIP loop.",
+     "- Parameter: Run cycle per modified program.",
+     "- Installation Burden: Zero. No new hardware.",
+     "- Commissioning Burden: Zero. Parameter change only.",
+     "- Operational Loss: The caustic consumption increases by a factor of 2.5 (from ~1.0 to 2.5",
+     "- Parity Conclusion: The burden is LOWER than the standard practice's burden of frequent p"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 6491,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "1. [c] Modify CIP program parameters: Set caustic concentration to 2.5 wt% NaOH and temper",
+     "2. [c] Modify CIP program parameters: Extend the hot alkaline hold time to 60 minutes at 2",
+     "3. [a] Utilize existing high-pressure water rinse cycle after the 60-minute caustic hold t"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 6702,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- CIP Tank with NaOH dosing capability (stated)",
+     "- Control system capable of setting concentration and time (stated)",
+     "- Gaskets rated for 2.5 wt% at 75°C (stated)",
+     "- Standard Cycle: 1.5-2.0 wt% NaOH, 30-45 min",
+     "1. [c] Modify CIP program parameters: Set caustic concentration to 2.5 wt% NaOH.",
+     "- *Tag:* [c] Parameter change on existing dosing system.",
+     "- *Justification:* Within stated constraint limit (2.5 wt%).",
+     "2. [c] Modify CIP program parameters: Extend caustic soak duration to 60 minutes.",
+     "- *Tag:* [c] Parameter change on existing timer/sequencer.",
+     "- *Justification:* Standard practice performs CIP; extending time is a schedule/duty cycle",
+     "3. [a] Operate existing gaskets and seals at the new operating point (2.5 wt%, 75°C).",
+     "- *Tag:* [a] Stated existing infrastructure.",
+     "- *Justification:* Gaskets are rated for this exact condition per the constraint.",
+     "4. [a] Use existing heating system to maintain 75°C.",
+     "- *Tag:* [a] Stated existing infrastructure.",
+     "- Hardware Addition: 0 new items.",
+     "- Installation: 0 hours (no physical changes).",
+     "- Operational Loss: The duty cycle change adds 30 minutes to the CIP cycle (assuming stand",
+     "- *Pricing:* 30 minutes of downtime per CIP cycle. If CIP is run once per day, this is 0.5",
+     "- Material Cost: The cost of NaOH is increased by (2.5/1.5 - 1) * volume * 60/30 factor. T",
+     "- Conclusion: Same-or-lower burden class. The only burden is a small increase in chemical "
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- CIP Tank with NaOH dosing capability (stated)",
+    "- Control system capable of setting concentration and time (stated)",
+    "- Gaskets rated for 2.5 wt% at 75°C (stated)",
+    "- Standard Cycle: 1.5-2.0 wt% NaOH, 30-45 min",
+    "1. [c] Modify CIP program parameters: Set caustic concentration to 2.5 wt% NaOH.",
+    "- *Tag:* [c] Parameter change on existing dosing system.",
+    "- *Justification:* Within stated constraint limit (2.5 wt%).",
+    "2. [c] Modify CIP program parameters: Extend caustic soak duration to 60 minutes.",
+    "- *Tag:* [c] Parameter change on existing timer/sequencer.",
+    "- *Justification:* Standard practice performs CIP; extending time is a schedule/duty cycle",
+    "3. [a] Operate existing gaskets and seals at the new operating point (2.5 wt%, 75°C).",
+    "- *Tag:* [a] Stated existing infrastructure.",
+    "- *Justification:* Gaskets are rated for this exact condition per the constraint.",
+    "4. [a] Use existing heating system to maintain 75°C.",
+    "- *Tag:* [a] Stated existing infrastructure.",
+    "- Hardware Addition: 0 new items.",
+    "- Installation: 0 hours (no physical changes).",
+    "- Operational Loss: The duty cycle change adds 30 minutes to the CIP cycle (assuming stand",
+    "- *Pricing:* 30 minutes of downtime per CIP cycle. If CIP is run once per day, this is 0.5",
+    "- Material Cost: The cost of NaOH is increased by (2.5/1.5 - 1) * volume * 60/30 factor. T",
+    "- Conclusion: Same-or-lower burden class. The only burden is a small increase in chemical "
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ]
+  }
+ }
+}

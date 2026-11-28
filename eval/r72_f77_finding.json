@@ -1,0 +1,36 @@
+{
+ "record": "R72_F77_FINDING/1.0.0",
+ "session": "builder-r72s1",
+ "date": "2026-11-18",
+ "finding_id": "F77",
+ "title": "P1.4 evidence staleness + CI byte-identity leg lost: the R70 chemistry elicitation changed engine behavior on the labelled-negative DEV corpus and no gate caught it",
+ "severity": "HIGH",
+ "caught_how": "Art. 2 self-attack during the R72 round: an independent recompute of the P1.4 labelled regression from the landed head bytes (114e77c57) diverged from the committed record bytes; isolation runs (pre-chemistry head 9b0c9820a reproduces the committed bytes EXACTLY) attribute the divergence to the R70 chemistry elicitation, not to environment nondeterminism",
+ "leg_A_evidence_staleness": {
+  "article": "Art. 1 v1.3.0 (committed bytes must be REPRODUCIBLE from a fresh clone at the named SHA)",
+  "committed_record_sha256": "920e46661455f3f64cbb9f491e8f02274b0def970f1979440b6a2fbb26f6092e",
+  "regenerated_record_sha256": "81597158d1ac0093410191fa0968b6ea6b778ff680cbe0ae401c34770e4354eb",
+  "record_last_regenerated_at": "R53 (597cbf30e) - population_search.py last changed at R70 (80629f9f7, the chemistry elicitation) AFTER the record was last regenerated",
+  "mechanism": "the landed CHEMISTRY_ADMITS_RX is broader than the superseded r70s1 design vocabulary (it includes acids?|oxid|inhibit|passivat|lubric\\w*|grease|oil\\s+film|emuls|biocid|contaminant|leach|ph\\b|dosage|dosing beyond the chelat/froth/coalesc/poison/scale class); six of twelve HO7 labelled-negative rows carry declared_domain_classes=null, where the P1.4 clamp passes and admission is regex-only - the elicitation fires there, the unconditional plans.sort(chemistry-first) reorders the population, the novelty pairwise comparisons permute (candidate IDs content-stable: 8957cc06017b et al. identical on both sides), the winner moves, and candidate_states re-derive - 8/12 rows differ, 7 of the 7 labelled negatives included",
+  "verdict_clauses_unchanged": "the gate verdict is PASS 0/0/0 on BOTH byte sets (0 allowed-measures violations, 0 false input-flags on labelled negatives, 0 prose-sourced directions) - the staleness changed NO verdict number; what went stale is the EVIDENCE BYTES, not the gate state",
+  "auditor_v9_verification_unaffected": "the R71 chemistry verification (8/8 admitting elicit+elect, 0/22 non-admitting changed) was computed on the v9 problem corpus, where the declared-domain clamp guards every non-admitting row - the finding does not contradict it; the unguarded surface is the null-domain class, which the v9 corpus happens not to exercise"
+ },
+ "leg_B_verifier_degradation": {
+  "article": "Art. 2 (never weaken the verifier to rescue a claim) + Art. 16 (retirements are typed, never silent)",
+  "fact": "the P1.4 CI byte-identity leg (git diff --exit-code on the committed report) added by the R53 F64 remedy (43239f80b, workflow lines 73-83) is ABSENT from the current workflow - the R60 restructure (4db375c3a) kept only the verdict grep; no retirement ledger entry records the loss",
+  "consequence": "CI stayed green at 80629f9f7 and 114e77c57 while the committed evidence went stale - the exact false-pass class the byte-gate existed to prevent (its first-contact catch was the wall-clock candidate-id nonce, R53)",
+  "restoration": "this commit restores BOTH legs of the R53 contract: the verdict grep AND git diff --exit-code -- eval/r52_labelled_regression.json, with the regenerated record committed in the SAME change (Art. 16: the replacement ships with its replacement)"
+ },
+ "isolation_evidence": {
+  "step_1": "driver run at landed head 114e77c57 in this sandbox: 3 consecutive runs + PYTHONHASHSEED 1/2/default ALL produce 81597158d1ac... (self-deterministic)",
+  "step_2": "driver run at pre-chemistry head 9b0c9820a: produces 920e46661455... == the committed bytes at 114e77c57 EXACTLY - this environment reproduces CI-environment behavior at that code state, so the divergence is CODE-ATTRIBUTED (the chemistry elicitation), not environment-attributed",
+  "step_3": "the restored byte-identity leg FAILS (exit 1) against the stale committed bytes pre-regeneration - fail-closed demonstrated live before the fix landed"
+ },
+ "not_changed_this_round": {
+  "chemistry_admits_rx_breadth": "the regex breadth is a CAPABILITY decision, not an evidence-integrity one - changing it now would be another unverified engine change right before the v10 freeze (the exact mistake class that produced this finding, Art. 20: a new change enters as an ablation arm or not at all)",
+  "v10_watch_item_for_the_auditor": "on null-domain rows the elicitation fires on tribology/oxidation vocabulary (gearbox-oil-varnish via lubric/oxid, lead-acid pitch via acids?, digester-foaming via ph\\b) - the superseded r70s1 lane deliberately excluded lubricant/tribology vocabulary ('wear physics is not chelant/frother/purification chemistry'); the auditor's v10 authoring should either declare domain classes on tribology rows (the clamp then guards) or rule the breadth acceptable - the auditor's call (AM62-class), typed here so it is not silent"
+ },
+ "fix_forward_commit": "the workflow byte-gate restoration + the regenerated record + this finding record ride ONE commit (1cb1be32e is the claim; the fix commit follows)",
+ "no_probes": "zero LLM probes; zero quota; deterministic tooling only",
+ "secrets": "no secret bytes in this record or the fix commit (the pre-commit detect-secrets hook is degraded in this sandbox - module unavailable - compensated by a manual all-refs token-pattern grep of the staged diff, typed in the round record)"
+}

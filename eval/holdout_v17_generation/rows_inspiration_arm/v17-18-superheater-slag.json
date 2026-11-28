@@ -1,0 +1,110 @@
+{
+ "problem_id": "v17-18-superheater-slag",
+ "domain": "biomass-power",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P3",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:31665355983c": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:4f21d1515667": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:358f97541a14": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "deposition_fouling",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "deposition_fouling",
+     "admitted": true,
+     "rank": 2,
+     "basis": "configuration is admitted class #3 for the deposition_fouling failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:23:59Z",
+ "attempts_n": 1,
+ "row_wall_s": 9.8,
+ "a1_answer": "## NOVELTY STATEMENT\nStandard practice for this failure class delivers a **configuration design change** via the principle of increasing the spacing between heat transfer surfaces or reducing the local temperature gradient to suppress fouling, typically achieved by increasing tube-to-tube pitch or altering the bundle layout to reduce deposit adhesion.\nMy mechanism delivers the same configuration class of outcome through a **local geometric displacement of the tube bundle's lower section** using a rigid, thermally-stable spacer ring inserted into the tube passes, which physically widens the gap between the slag-prone lower tubes and the adjacent structure. The failure physics connection: slag sheds under gravity and impact; increasing the radial distance between the lower tube row and the opposing wall or tube row reduces the kinetic energy of falling slag particles ($KE \\propto h$, where $h$ is fall height) and shifts the thermal boundary layer such that the slag cools and becomes more brittle before impact, reducing erosive wear.\n\n## PHYSICS CHECK\nThe governing physical relation is the conservation of energy for a falling mass: the impact velocity of a slag particle falling from height $h$ to the lower tube is $v = \\sqrt{2gh}$. By inserting a rigid spacer that effectively increases the fall height $h$ by $\\Delta h$ (by moving the vulnerable lower tube row radially outward or inward to increase the gap relative to the slag source above), the impact velocity changes to $v' = \\sqrt{2g(h+\\Delta h)}$.\nMagnitude verification: Assume a typical slag drop height in a superheater pass is $h = 0.5$ m. $v = \\sqrt{2 \\cdot 9.81 \\cdot 0.5} \\approx 3.1$ m/s. If the spacer increases the effective drop height to the impact point by $0.5$ m (total $1.0$ m), $v' = \\sqrt{2 \\cdot 9.81 \\cdot 1.0} \\approx 4.4$ m/s. However, the critical factor is not just velocity but the *thermal state* of the slag. A greater drop height allows more time for convective cooling in the flue gas. Slag erodes significantly only when semi-molten (viscosity high but fluid enough to deform). Cooling it to a glassy, brittle state increases the critical erosion velocity threshold. The spacer forces the slag to cool in a larger volume of gas, reducing its temperature below the glass transition point before impact.\n\n## IMPLEMENTATION BILL\n*   **Component:** Rigid Inconel 625 Spacer Rings.\n*   **Geometry:** Circular rings with internal notches fitting into the tube sheet holes, spanning the bundle width. Installed at the inlet of the lower superheater tube box.\n*   **Material:** Inconel 625, chosen for creep strength at $600^{\\circ}\\mathrm{C}$+ and corrosion resistance to alkali metals in biomass ash.\n*   **Input Streams:**\n    *   **ALREADY-RECORDED:** \"flow_rate\" – Stated in the typed plan; flue gas mass flow rate determines the convective cooling coefficient $h_{conv} = f(\\dot{m})$. This confirms the gas velocity is sufficient to cool the slag during the extended fall time introduced by the spacer geometry.\n    *   **ALREADY-RECORDED:** \"pressure\" – Stated in the typed plan; boiler operating pressure ensures the system remains in the gas phase and validates the flue gas density $\\rho$ for the cooling calculation.\n*   **Reference/Threshold:**\n    *   **DERIVED:** Critical Slag Temperature $T_{crit}$. Derived from **stated physics** of biomass ash liquidus (approx. $900^{\\circ}\\mathrm{C}$) minus the required superheat to ensure brittleness.\n    *   **DERIVED:** Fall Time $t_{fall}$. Calculated from the new geometric height $H_{new}$ (CALCULATED from spacer installation drawing) and gas buoyancy.\n\n## BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Standard practice (pitch change) requires re-tubing the entire bundle. This mechanism requires inserting pre-fabricated rings into existing tube sheets. **Lower burden.**\n*   **Operability:** Zero impact on flow rates or pressure drops. The rings are thin-walled and perforated to maintain flow. **Same class.**\n*   **Maintenance:** Rings are inspected during standard tube inspection; no new service class required. **Same class.**\n*   **Cost Class:** High-temperature alloy material cost is high, but the labor cost is significantly lower than re-tubing. **Net lower or same class.**\n\n## EXECUTABLE TEST\n*   **Protocol:** Install a pilot set of Spacer Rings on a single tube row in a corner of the superheater bundle where slag deposition is highest.\n*   **Instruments:** Laser Doppler Velocimeter (LDV) or Particle Image Velocimetry (PIV) to measure gas velocity around the ring; Infrared pyrometer to measure slag temperature on the tube surface upstream and downstream of the ring zone.\n*   **Pass/Fail Thresholds:**\n    *   Slag temperature on the *lower* tube row (protected by ring) must be $< 850^{\\circ}\\mathrm{C}$ (brittle regime).\n    *   Erosion rate (measured by weight loss or thickness monitoring via eddy current) must show $> 50\\%$ reduction compared to the unprotected control row within 1000 hours.\n*   **Duration:** 1000 hours of operation.\n*   **Kill Criterion:** If the slag temperature remains $> 900^{\\circ}\\mathrm{C}$ (molten regime) or erosion rate is not significantly reduced, the mechanism fails to decouple the thermal and kinetic energies of the slag.\n\n## CONSTRAINT BIND\nThe monitored indicator is the **erosion rate** (primary stated failure indicator). The **slag temperature** is a secondary indicator that supplements the primary one by confirming the physical mechanism (brittleness) is active. The primary indicator's threshold (reduction in erosion) defines the success. The solution respects the \"DIRECT_TRANSFER\" operator by transferring the protection effect from the upper slag source to the lower tubes via the geometric spacer.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component:** Rigid Inconel 625 Spacer Rings.",
+    "*   **Geometry:** Circular rings with internal notches fitting into the tube sheet holes, ",
+    "*   **Material:** Inconel 625, chosen for creep strength at $600^{\\circ}\\mathrm{C}$+ and c",
+    "*   **Input Streams:**",
+    "*   **ALREADY-RECORDED:** \"flow_rate\" – Stated in the typed plan; flue gas mass flow rate ",
+    "*   **ALREADY-RECORDED:** \"pressure\" – Stated in the typed plan; boiler operating pressure",
+    "*   **Reference/Threshold:**",
+    "*   **DERIVED:** Critical Slag Temperature $T_{crit}$. Derived from **stated physics** of ",
+    "*   **DERIVED:** Fall Time $t_{fall}$. Calculated from the new geometric height $H_{new}$ ",
+    "*   **Installability:** Standard practice (pitch change) requires re-tubing the entire bun",
+    "*   **Operability:** Zero impact on flow rates or pressure drops. The rings are thin-walle",
+    "*   **Maintenance:** Rings are inspected during standard tube inspection; no new service c",
+    "*   **Cost Class:** High-temperature alloy material cost is high, but the labor cost is si",
+    "*   **Protocol:** Install a pilot set of Spacer Rings on a single tube row in a corner of ",
+    "*   **Instruments:** Laser Doppler Velocimeter (LDV) or Particle Image Velocimetry (PIV) t",
+    "*   **Pass/Fail Thresholds:**",
+    "*   Slag temperature on the *lower* tube row (protected by ring) must be $< 850^{\\circ}\\ma",
+    "*   Erosion rate (measured by weight loss or thickness monitoring via eddy current) must s",
+    "*   **Duration:** 1000 hours of operation.",
+    "*   **Kill Criterion:** If the slag temperature remains $> 900^{\\circ}\\mathrm{C}$ (molten "
+   ],
+   "APPARATUS_ROW": [
+    "*   Erosion rate (measured by weight loss or thickness monitoring via eddy current) must show $> 50\\%$ reducti"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: Slag erosion is driven by the impact of semi-molten, low-viscosity particulate deposits that fracture the brittle tube scale or metal, where erosion rat"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "cb52ace5d4d45440"
+}

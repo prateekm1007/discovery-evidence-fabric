@@ -182,6 +182,16 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
         r"^mistralai/ministral-8b$",
         r"^mistralai/ministral-14b$",
     ],
+    # R11 credential round 2026-11-14 (crowllm.com, owner-supplied):
+    # the allowlist names EXACTLY the one measured serving rung —
+    # deepseek-v4-flash:free (tiny completion 200-OK 'OK' live
+    # 2026-11-14). The two v4.1 ids are 503 DEAD_UPSTREAM (measured,
+    # both stream and non-stream) and the premium/non-free ids are
+    # credit-gated — neither ever becomes a rung silently
+    # (xkiro/apinex premium-precedent; Art. XXVII).
+    "crowllm": [
+        r"^deepseek-v4-flash:free$",
+    ],
     # R461: the FIFTH router — bynara's -free family (the ids the
     # catalog actually serves; premium ids like glm-5.3, qwen3.8-max,
     # claude-opus-5, gpt-6-astra NEVER become rungs silently — the
@@ -230,23 +240,57 @@ PINNED_MODEL_FAMILIES: Dict[str, List[str]] = {
 #:          per-call id (glm-4-plus; recorded upstream drift: the CLI
 #:          routed glm-4-plus to zai-org/GLM-5.3 on some calls —
 #:          disclosed, not silent).
-#:   xkiro  free-tier remote router, KEYLESS serving measured live on
-#:          the coder host (30-pair judge calibration 27/30 = 0.90,
-#:          ELIGIBLE 2026-11-12); judge independence: different
-#:          provider+family from the synthesis head.
+#:   xkiro  free-tier remote router — the committed judge rung
+#:          (mistralai/ministral-14b, 30-pair judge calibration 27/30
+#:          = 0.90, ELIGIBLE 2026-11-12; judge independence: different
+#:          provider+family from the synthesis head). R8 re-measure
+#:          2026-11-13: AUTH IS NOW REQUIRED (the 2026-11-12 KEYLESS
+#:          serving is DEAD — every unauthenticated call answers 401
+#:          'Missing ClientApiKey'); the owner's supplied credential is
+#:          rejected by the validator itself ('Invalid or disabled
+#:          ClientApiKey', both hosts, both header schemes) — the rung
+#:          is credential-gated until a VALID key sits in XKIRO_API_KEY
+#:          (the runner loads the gitignored vault at startup; zero
+#:          code change on a valid key). RESOLVED same round: the
+#:          owner's second dashboard credential (sk-xt- form) VALIDATES
+#:          — the rung serves CREDENTIALED (measured live 2026-11-13:
+#:          admission probe ok=True fields_ok=True 622 ms; long-form
+#:          1437-1510 chars at 420/1000 max_tokens, finish=stop, 5.7-
+#:          6.0 s — the exact protocol where mercury starved). No
+#:          mercury id exists on this
+#:          gateway (69-model catalog, fetched live 2026-11-13); the
+#:          owner's 'Mercury 3' name resolves to nothing servable here.
 ROUTE_TABLE: Dict[str, Tuple[str, str]] = {
-    "synthesis": ("zai", "glm-4-plus"),
-    "attack": ("zai", "glm-4-plus"),
-    "composer": ("zai", "glm-4-plus"),
+    # r64s4 OWNER-DIRECTED re-registration (supersedes R36 per AM60):
+    # the zai/glm-4-plus route is RETIRED (Art. 16 ledger); the live
+    # purposes re-pin to the registered route (agnes-3.0-flash — the
+    # contract-fit winner measured under the real expansion
+    # contract); the engine's transports route through the loop-local
+    # gateway either way, so this is an id re-pin, not a transport
+    # change.
+    "synthesis": ("agnes", "agnes-3.0-flash"),
+    "attack": ("agnes", "agnes-3.0-flash"),
+    "composer": ("agnes", "agnes-3.0-flash"),
     # bulk = the fast LOCAL rung for the high-volume short steps
-    "bulk": ("zai", "glm-4-plus"),
+    "bulk": ("agnes", "agnes-3.0-flash"),
     "judge": ("xkiro", "mistralai/ministral-14b"),
-    "judge_last_resort": ("zai", "glm-4-plus"),
+    "judge_last_resort": ("agnes", "agnes-3.0-flash"),
 }
 #: Retirement/availability notes THIS WINDOW (measured; the routing
 #: authority is provider_health.RETIRED_ROUTE_PROVIDERS + the spec
 #: allowlists above — these notes are the recorded basis, Art. XXV).
 ROUTE_TABLE_NOTES: Dict[str, str] = {
+    "xkiro": ("R8 2026-11-13: auth now REQUIRED (keyless serving dead, "
+              "typed 401 'Missing ClientApiKey'); the FIRST supplied "
+              "owner credential was rejected by the validator ('Invalid "
+              "or disabled ClientApiKey') — typed AUTH_FAILURE; the "
+              "SECOND (sk-xt- form) VALIDATES: the judge rung serves "
+              "CREDENTIALED (admission probe ok=True 622 ms; long-form "
+              "complete at 420/1000 max_tokens, finish=stop, 5.7-6.0 s) "
+              "— the vault-loaded key took effect with ZERO code change; "
+              "no mercury id in the 69-model catalog; the unmeasured "
+              "mistral free ids stay one measurement away from the "
+              "allowlist"),
     "agnes": ("429 RATE_LIMITED 'used up today's text quota ... 1 "
               "request every 3 minutes' (probe record 2026-11-12; "
               "unusable as a synthesis/attack head this window)"),

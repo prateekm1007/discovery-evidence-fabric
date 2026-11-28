@@ -23,6 +23,7 @@ import importlib.util
 import json
 import os
 import time as _time
+import re as _re_mod
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -403,6 +404,34 @@ class A2RetrievalAdapter(BaseAdapter):
         # branch push allowlist). The envelope's provenance is the
         # single durable authority (Art. X).
         _retr_attr = report.get("retrieval_attribution") or {}
+        # R145 DIR-4 (claim c-0243 lineage): the MATH-PAPER FILTER at
+        # the retrieval boundary — pure-mathematics records (the
+        # measured wind failure class: 'Asymptotic Properties of
+        # Hilbert Geometry' et al. served for an engineering problem)
+        # are excluded from the evidence pool with a TYPED reason;
+        # the exclusions ride the provenance (never silent drops;
+        # custody preserved in the report). Fires only for
+        # engineering-problem text (the same guard as the re-query's
+        # exclusion — a math problem never triggers it).
+        _math_filter = None
+        try:
+            from .domain_requery import exclude_math
+            _kept, _exc = exclude_math(items, env.problem or {})
+            if _exc:
+                _math_filter = {
+                    "typed": "RETRIEVE_MATH_EXCLUDED",
+                    "excluded": [{"id": e["id"], "title": e["title"],
+                                  "reason": e["reason"]}
+                                 for e in _exc],
+                    "note": ("pure-mathematics records excluded at the "
+                             "retrieval boundary for an engineering "
+                             "problem (the R145 DIR-4 acceptance: 0 "
+                             "math-paper retrievals); the exclusion "
+                             "is typed in the provenance, never a "
+                             "silent drop")}
+                items = _kept
+        except Exception:  # noqa: BLE001 — the filter is additive
+            pass
         return _engine_result(
             {"evidence": items,
              "evidence_ids": [i.get("id", "") for i in items],
@@ -410,6 +439,7 @@ class A2RetrievalAdapter(BaseAdapter):
                             "retrieval_fabric": {
                                 "version": report.get("fabric_version"),
                                 "primary_query": report.get("primary_query"),
+                                "math_exclusion": _math_filter,
                                 "query_variant_count": len(
                                     report.get("query_variants", [])),
                                 "sources_attempted": stats.get(
@@ -1267,6 +1297,166 @@ def _ms_starved_cause(env, label):
     }
 
 
+def _resolve_binding_identity(binding: Dict[str, Any],
+                              frozen_items: List[Dict[str, Any]],
+                              ) -> tuple:
+    """R139 DIR-2: resolve a mechanism's evidence binding to an ACTUAL
+    frozen evidence record. Returns (ok, reason, resolved_record).
+
+    The R138 admission accepted any binding with non-empty
+    grounded/evidence_id/span — it never established that the id names
+    a real frozen record, that the quoted span lives in THAT record's
+    text, or that the bytes are the record's (hash match). The R138
+    HVAC run measured the consequence: a binding naming the synthetic
+    alias "lean_doi:10.1080/..." while the frozen record is
+    "doi:10.1080/...".
+
+    Resolution rules (fail closed — Art. 3; a binding that cannot
+    resolve is never admitted, and the refusal is typed):
+      1. evidence_id + span must be present (a malformed binding is
+         refused as MALFORMED_BINDING, never silently dropped).
+      2. The id must match EXACTLY ONE frozen record's id. Zero matches
+         -> FALSE_ID. More than one -> AMBIGUOUS_ID (duplicate ids make
+         the identity undecidable; unknown stays unknown).
+      3. The R138-era synthetic alias ("lean_" prefix) is REFUSED
+         (SYNTHETIC_ALIAS_REFUSED — R139S3/V99: an alias is never a
+         source identity; the stage-1 de-alias tolerance is deleted).
+      4. The span must appear IN the resolved record's text (the same
+         normalized token form the binding instrument uses) — a span
+         that names record A's id while quoting other bytes is refused
+         as SPAN_NOT_IN_RECORD.
+      5. BOTH the record and the BINDING must carry a content_hash and
+         they must be EQUAL (UNKNOWN_HASH on either absence,
+         HASH_MISMATCH on disagreement) — identity is proven by bytes,
+         not by name (Art. 1: exact bytes beat semantic plausibility).
+
+    PARTIALLY_SUPPORTED stays visibly distinct from direct support:
+    this resolver decides IDENTITY only — the support verdict rides
+    unchanged, and the admission basis records which state fired.
+    """
+    eid = str((binding or {}).get("evidence_id") or "").strip()
+    span = str((binding or {}).get("span") or "").strip()
+    b_hash = (binding or {}).get("content_hash")
+    if not eid or not span:
+        return False, "MALFORMED_BINDING (missing evidence_id or span)", None
+
+    def _find(rec_id: str):
+        matches = [it for it in (frozen_items or [])
+                   if isinstance(it, dict)
+                   and str(it.get("id") or it.get("item_id") or "") == rec_id]
+        return matches
+
+    matches = _find(eid)
+    if eid.startswith("lean_"):
+        # R139S3 (V99 + the DIR-2 acceptance contract): the R138-era
+        # "lean_" synthetic alias is REFUSED, never de-aliased — the
+        # stage-1 de-alias tolerated the alias by silently swapping in
+        # the real id, but a synthetic alias is not a source identity
+        # and the auditor's acceptance requires its refusal. The
+        # binding must name the ACTUAL frozen record id.
+        return False, (
+            f"SYNTHETIC_ALIAS_REFUSED ({eid!r} is an R138-era synthetic "
+            "alias, not a source identity — name the actual frozen "
+            "record id)"), None
+    if not matches:
+        return False, f"FALSE_ID (no frozen record named {eid!r})", None
+    if len(matches) > 1:
+        return False, (
+            f"AMBIGUOUS_ID ({len(matches)} frozen records share id "
+            f"{eid!r} — identity undecidable, fail closed)"), None
+    rec = matches[0]
+
+    # span-in-record verification (normalized tokens, same form the
+    # binding instrument uses)
+    rec_text = " ".join(str(rec.get(k) or "") for k in
+                        ("title", "abstract", "text", "content",
+                         "summary", "_record_text"))
+    span_toks = _re_mod.findall(r"[a-z0-9]+", span.lower())
+    rec_toks = _re_mod.findall(r"[a-z0-9]+", rec_text.lower())
+    span_norm = " ".join(span_toks)
+    rec_norm = " ".join(rec_toks)
+    if not span_norm or span_norm not in rec_norm:
+        return False, (
+            "SPAN_NOT_IN_RECORD (the quoted span does not appear in "
+            f"record {eid!r}'s text)"), None
+
+    # hash identity: the record must carry a hash AND the binding must
+    # carry one — identity is proven by bytes, not by name (Art. 1);
+    # a binding without its own hash cannot prove it names THESE bytes
+    r_hash = (rec.get("content_hash")
+              or (rec.get("provenance") or {}).get("content_hash"))
+    if not r_hash:
+        return False, (
+            f"UNKNOWN_HASH (record {eid!r} carries no content_hash — "
+            "identity unprovable by bytes, fail closed)"), None
+    if not b_hash:
+        return False, (
+            f"UNKNOWN_HASH (the binding names {eid!r} but carries no "
+            "content_hash — the stage-1 '(if present)' loophole is "
+            "closed: R139S3 requires the binding's own hash)"), None
+    if str(b_hash) != str(r_hash):
+        return False, (
+            f"HASH_MISMATCH (binding hash {str(b_hash)[:12]}... != "
+            f"record hash {str(r_hash)[:12]}...)"), None
+    return True, ("RESOLVED (exactly-one record; span-in-record; "
+                  "binding-hash == record-hash)"), {
+        "id": eid, "content_hash": str(r_hash), "record_text": rec_text}
+
+
+def apply_lifecycle_admission(retained: List[Dict[str, Any]],
+                              verifications: List[Dict[str, Any]],
+                              frozen_items: List[Dict[str, Any]],
+                              ) -> None:
+    """R138/R139: the candidate LIFECYCLE admission — the production
+    block the lean mechanism space runs on every retained candidate.
+    Factored here so tests drive the REAL admission (functional
+    coverage, not source-text patterns; the R139 directions).
+
+    Retention on distinctness is NOT admission. Admission requires
+    BOTH:
+      - a RESOLVED identity (R139: exactly-one frozen record by id,
+        span-in-record, binding-hash == record-hash — synthetic
+        aliases REFUSED per R139S3/V99), AND
+      - the canonical support verdict (SUPPORTED or
+        PARTIALLY_SUPPORTED — visibly distinct, recorded verbatim).
+    Everything else is UNGROUNDED_HYPOTHESIS: retained (never
+    discarded), enrichment_required, never represented as verified or
+    admissible. CONTESTED stays visible; NOT_ENOUGH_EVIDENCE never
+    converts."""
+    for c, v in zip(retained, verifications):
+        c["mechanism_support"] = v
+        _sup_state = (v or {}).get("mechanism_support_state")
+        _binding = (v or {}).get("evidence_binding") or {}
+        _res_ok, _res_reason, _res_rec = _resolve_binding_identity(
+            _binding, frozen_items)
+        if (_res_ok and _sup_state in (
+                "SUPPORTED", "PARTIALLY_SUPPORTED")):
+            c["candidate_lifecycle"] = "EVIDENCE_GROUNDED_CANDIDATE"
+            c["discovery_admissible"] = True
+            _binding["evidence_id"] = _res_rec["id"]
+            _binding["content_hash"] = _res_rec["content_hash"]
+            c["admission_basis"] = {
+                "support_state": _sup_state,
+                "binding": {"grounded": True,
+                            "evidence_id": _res_rec["id"],
+                            "content_hash": _res_rec["content_hash"],
+                            "span": _binding.get("span")},
+                "identity_resolution": _res_reason,
+                "rule": "R139_ADMISSION_RESOLVED_IDENTITY"}
+        else:
+            c["candidate_lifecycle"] = "UNGROUNDED_HYPOTHESIS"
+            c["discovery_admissible"] = False
+            c["enrichment_required"] = True
+            c["enrichment_reason"] = (
+                f"binding_grounded={bool(_binding.get('grounded'))}"
+                f" identity_resolution={_res_reason}"
+                f" support_state={_sup_state} — retained as an "
+                "explicitly ungrounded hypothesis (R138/R139): route "
+                "through evidence enrichment / further research / "
+                "testing; never represented as evidence-verified or "
+                "admissible")
+
+
 def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     """R453-LEAN-CORE: the lean mechanism-space construction (the
     external auditor mandate — no extraction fan-out; reuse the
@@ -1299,6 +1489,60 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
     by_id = {str(it.get("id")): it for it in (env.evidence or [])}
     _clk.mark("verified_evidence_collection",
               {"n_verified_items_examined": len(verified)})
+    # R145 DIR-4 (claim c-0243 lineage): the domain-anchored RE-QUERY
+    # on ZERO support — the measured wind root cause (the primary
+    # retrieval served arxiv mathematics papers for an engineering
+    # problem; 0 DIRECT/PARTIAL -> NO_EVIDENCE -> 0 candidates, and
+    # the R143-F5 synthesis complement sits downstream of the break).
+    # ONE typed second retrieval with the failure family's domain
+    # anchors forced; the SAME classifier admits fresh records (no
+    # invented support); everything recorded on the env. Runs at
+    # most ONCE per run (the env flag).
+    requery_record = None
+    if not verified and not getattr(env, "domain_requery_ran", False):
+        env.domain_requery_ran = True
+        try:
+            from .domain_requery import zero_support_requery
+            from .failure_mechanism_map import detect_failure_family
+            _fam = detect_failure_family(problem)
+            requery_record = zero_support_requery(env, problem, _fam)
+            if (requery_record or {}).get("state") == "RUN":
+                # the fresh supported records ride the SAME joined
+                # build: append the fresh evidence + merge the fresh
+                # classification items (the ids the joined loop reads)
+                fresh_ev = requery_record.get("fresh_evidence") or []
+                env.evidence = list(env.evidence or []) + [
+                    {**r, "domain_requery_promoted": True}
+                    for r in fresh_ev]
+                by_id.update({str(r.get("id")): r for r in fresh_ev})
+                ec = env.evidence_classification or {}
+                if isinstance(ec, dict):
+                    ec_items = list(ec.get("items") or [])
+                    fitems = list((requery_record.get(
+                        "fresh_classification") or {}).get("items")
+                        or [])
+                    seen_src = {it.get("source_id")
+                                for it in ec_items}
+                    ec_items += [it for it in fitems
+                                 if it.get("source_id") not in seen_src]
+                    ec["items"] = ec_items
+                    for k, v in (requery_record.get("fresh_counts")
+                                 or {}).items():
+                        ec.setdefault("counts", {})[k] = (
+                            (ec.get("counts") or {}).get(k, 0)) + v
+                    env.evidence_classification = ec
+                # rebuild the verified list over the merged env
+                verified = stage_entry.verified_evidence_items(env)
+                requery_record["n_promoted_joined"] = len(verified)
+                _clk.mark("domain_requery",
+                          {"family": requery_record.get("family"),
+                           "n_fresh": requery_record.get(
+                               "n_fresh_records"),
+                           "n_promoted_joined": len(verified)})
+        except Exception as e:  # noqa: BLE001 — typed degradation
+            requery_record = {"state": "REQUERY_ERROR",
+                              "error": f"{type(e).__name__}: "
+                                       f"{str(e)[:200]}"}
     items: List[Dict[str, Any]] = []
     for cls_item in verified:
         rec = by_id.get(str(cls_item.get("source_id"))) or {}
@@ -1322,7 +1566,14 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         # unbound/unextracted mechanism still caps at
         # PARTIALLY_SUPPORTS (never direct SUPPORTS).
         items.append({
-            "item_id": f"lean_{rec.get('id')}",
+            # R139 DIR-2 (the auditor's binding-identity mandate): the
+            # item id is the FROZEN RECORD'S OWN id — the synthetic
+            # "lean_" prefix is GONE. The R138 admission accepted a
+            # binding whose evidence_id was "lean_doi:10.1080/..." while
+            # the frozen record is "doi:10.1080/..." — an alias, not an
+            # identity. Every binding must resolve to the actual frozen
+            # record; the alias made that impossible.
+            "item_id": rec.get("id"),
             "structured_hash": _h.sha256(
                 record_text.encode("utf-8", "replace")).hexdigest(),
             "fields": {"system": {"value": title},
@@ -1336,6 +1587,12 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                 "construction": "R453_LEAN_REUSE_FREEZE_VERIFY_FACTS",
                 "claim_classification": cls_item.get("classification"),
             },
+            # R139 DIR-2: the record's content_hash surfaces at the TOP
+            # level so the verbatim binding can carry it and the
+            # admission resolver can verify binding-hash == record-hash
+            # (the R138 rule checked only non-emptiness; a binding now
+            # carries the actual hash of the record it names)
+            "content_hash": rec.get("content_hash"),
             # the verifier's relevance measurement, verbatim when the
             # classifier emitted it (None on legacy envelopes): the
             # canonical full-text overlap basis the operator selection
@@ -1355,6 +1612,10 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
         "problem_id": problem.get("problem_id", ""),
         "operator_ids": [],
         "n_structured_items": len(items),
+        # R145 DIR-4: the domain-anchored re-query record rides the
+        # space (typed: the query, the anchors, the math exclusions,
+        # the fresh counts, the promoted ids — never silent)
+        "domain_requery": requery_record,
     }
     if not items:
         space.update({
@@ -1684,8 +1945,13 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                "n_retained": len(retained)})
     verifications = [_ms.verify_mechanism_support(c, items, problem)
                      for c in retained]
-    for c, v in zip(retained, verifications):
-        c["mechanism_support"] = v
+    # R139S3: the resolver sees the RAW frozen record set (env.evidence),
+    # NOT the deduped lean view — the lean build collapses duplicate
+    # record ids in its by-id dict, which made a duplicate-id frozen
+    # set silently resolvable (the stage-1 P9 gap). Duplicate ids must
+    # stay visible to identity resolution: AMBIGUOUS_ID, fail closed.
+    apply_lifecycle_admission(retained, verifications,
+                              list(env.evidence or []))
     _clk.mark("mechanism_support_verification",
               {"support_states": [
                   (v.get("mechanism_support_state")
@@ -1704,11 +1970,25 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                       else "NO_CANDIDATES")
     space["n_candidates_generated"] = len(all_candidates)
     space["n_candidates_retained"] = len(retained)
-    # Article LXXX: span-binding facts over EVERY assembled mechanism
-    # (including ungrounded syntheses that never reached all_candidates).
-    space["span_binding_summary"] = _ms.span_summary(_assembled)
-    space["n_ungrounded_synthesis"] = space["span_binding_summary"][
-        "n_ungrounded_synthesis"]
+    # R138 DIR-2: the lifecycle counters + the admission state (the
+    # run's honest read: how many retained hypotheses are actually
+    # evidence-grounded, how many are explicitly ungrounded and routed
+    # to enrichment)
+    _n_adm = sum(1 for c in retained
+                 if c.get("discovery_admissible"))
+    space["lifecycle_counts"] = {
+        "n_generated": len(all_candidates),
+        "n_retained_distinct": len(retained),
+        "n_evidence_grounded": _n_adm,
+        "n_ungrounded_hypotheses": len(retained) - _n_adm,
+        "admission_rule": "grounded binding (evidence_id + span "
+                          "resolved) AND canonical support verdict "
+                          "(SUPPORTED/PARTIALLY_SUPPORTED)"}
+    space["n_candidates_admissible"] = _n_adm
+    space["admission_state"] = (
+        "ADMISSIBLE_CANDIDATES_PRESENT" if _n_adm
+        else ("ONLY_UNGROUNDED_HYPOTHESES" if retained
+              else "NO_CANDIDATES"))
     # R548: the Art. LXXXIV minimum is now enforced by the
     # distinctness instrument's own count — n_candidates_required
     # records the MINIMUM_DISTINCT_MECHANISMS bar (2), not the
@@ -1777,15 +2057,6 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
             "support_state": (
                 (_ac.get("mechanism_support") or {})
                 .get("mechanism_support_state")),
-            # Article LXXX: per-hypothesis span facts (grounded words +
-            # exact record binding) ride the attribution record.
-            "span_grounded": (_ac.get("span_binding") or {}).get(
-                "grounded"),
-            "span_state": (_ac.get("span_binding") or {}).get(
-                "span_state"),
-            "span_longest_verbatim_word_run": (
-                _ac.get("span_binding") or {}).get(
-                    "longest_verbatim_word_run"),
         })
     _att_outcome = _ms_attempt_outcome(
         bool(matched),
@@ -1825,8 +2096,6 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
                              if _att_cand_id else False),
         "distinctness_verdict": _att_dd.get("verdict"),
         "support_state": _att_sup.get("mechanism_support_state"),
-        "span_binding": (cand or {}).get("span_binding"),
-        "span_binding_summary": space.get("span_binding_summary"),
         "typed_outcome": _att_outcome.get("outcome"),
         "outcome_detail": {k: v for k, v in _att_outcome.items()
                            if k != "outcome"},
@@ -1883,7 +2152,6 @@ def _lean_mechanism_space(env, entry_block: Dict[str, Any]) -> Dict[str, Any]:
          "distinctness": {
              "n_distinct": dedup.get("n_distinct"),
              "n_indeterminate": dedup.get("n_indeterminate")},
-         "span_summary": space.get("span_binding_summary"),
          "n_retained": len(retained),
          "terminal_reason": space["state"],
          # R532 §3: the typed instantiation attempts ride the
@@ -1955,19 +2223,6 @@ def _ms_attempt_outcome(
                 "note": ("response parsed but carries no mechanism "
                          "content (mechanism + intervention both "
                          "empty)")}
-
-    # Article LXXX (owner audit 2026-11-13): a mechanism whose span does
-    # not carry >= 8 contiguous verbatim words from its OWN frozen
-    # record is UNGROUNDED_SYNTHESIS — an epistemic UNKNOWN, never a
-    # scientific rejection and never a candidate.
-    if (candidate_state or "") == "UNGROUNDED_SYNTHESIS":
-        return {"outcome": "UNGROUNDED_SYNTHESIS",
-                "candidate_state": candidate_state,
-                "epistemic_class": "UNKNOWN",
-                "not_a_scientific_rejection": True,
-                "note": ("span binding failed: < 8 contiguous verbatim "
-                         "words from the candidate's own frozen record "
-                         "or exact source/snapshot binding missing")}
 
     # R536 Cliff 1 (audit CB-classifier): the cemetery check MUST
     # precede the candidate_state check, independently of it.  A

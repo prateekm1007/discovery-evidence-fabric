@@ -1,0 +1,397 @@
+{
+ "a1_version": "r11_a1/1.0.0",
+ "problem_id": "bench-p02-leadacid-grid-corrosion",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '0e914506080e17227cb20f45ff2d1830f8af1f189edb5d2e6bae6e4818d37a57', 'baseline_answer_sha256': 'b2ddd6807c8a7edbda41177e93914436660e9107774fb4339875964c7f0e4681', 'evidence_sha256': 'ab35c845ed0074bccad94ccb4c2693a9ba1470aa723c138b4e4dc424c468f4ea', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 32,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 12.0,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Graphene-Carbon Nanotube Hybrid Grid",
+    "mechanism": "Electrically conductive graphene-CNT composite replaces lead grid, resisting corrosion via inert carbon lattice.",
+    "failure_link": "Mitigates grid cross-section loss by eliminating lead oxidation (corrosion) under float voltage.",
+    "cost_to_test": "$5K (10 samples, 3-month accelerated cycling at 2.27V, SEM/EDS analysis).",
+    "standard_solution": "Pure lead-calcium or lead-antimony grids (\u22642% Sb).",
+    "departure": "Replaces lead entirely with corrosion-resistant carbon hybrid; no Sb or Pb dissolution."
+   },
+   {
+    "lever": "process",
+    "name": "Electrochemical Deposition of Protective Metal Oxide Layer",
+    "mechanism": "In-situ anodic deposition of TiO\u2082 or ZrO\u2082 on grid surface via pulsed potential during manufacturing.",
+    "failure_link": "Blocks oxygen diffusion to lead, suppressing PbSO\u2084 \u2192 PbO\u2082 corrosion cycle.",
+    "cost_to_test": "$3K (5 plates, 2-week deposition trials, XPS/SEM validation).",
+    "standard_solution": "Passive organic coatings (e.g., epoxy) or no protection.",
+    "departure": "Active, conformal ceramic layer grown electrochemically; self-healing via redox cycling."
+   },
+   {
+    "lever": "design",
+    "name": "Bipolar Grid Architecture with Sacrificial Anode Zones",
+    "mechanism": "Alternating current paths: primary lead grid + adjacent magnesium/aluminum sacrificial strips.",
+    "failure_link": "Sacrificial strips corrode preferentially, preserving main grid cross-section for 15+ years.",
+    "cost_to_test": "$8K (3-cell prototypes, 1-year float test, resistance/voltage profiling).",
+    "standard_solution": "Uniform lead grid with no sacrificial elements.",
+    "departure": "Asymmetric corrosion distribution via galvanic coupling; no Sb or alloying changes."
+   },
+   {
+    "lever": "controls",
+    "name": "Dynamic Float Voltage Modulation with Oxygen Recombination Peaks",
+    "mechanism": "Pulse 2.27V \u2192 2.20V every 24h to break PbO\u2082 corrosion equilibrium and recombine O\u2082.",
+    "failure_link": "Interrupts sustained PbO\u2082 formation, reducing net grid consumption by 40%+.",
+    "cost_to_test": "$2K (10 cells, 6-month cycling with BMS integration, capacity tracking).",
+    "standard_solution": "Static 2.27V float (per user constraint).",
+    "departure": "Time-varying voltage *without* exceeding 2.27V max; leverages [doi:10.1109/bcaa.2000.838406]."
+   },
+   {
+    "lever": "operations",
+    "name": "Periodic Anodic Polarization Rejuvenation",
+    "mechanism": "Quarterly 10-minute anodic pulse at 2.4V to electrochemically strip PbSO\u2084 corrosion products.",
+    "failure_link": "Reverses partial grid sulfation/corrosion, restoring conductivity and cross-section.",
+    "cost_to_test": "$1K (5 cells, 3 rejuvenation cycles, impedance spectroscopy).",
+    "standard_solution": "No maintenance; passive float only.",
+    "departure": "Active, low-energy intervention to *reverse* corrosion (not just slow it)."
+   },
+   {
+    "lever": "measurement",
+    "name": "In-Situ Grid Corrosion Sensor Array",
+    "mechanism": "Embedded interdigitated microelectrodes measure local Pb\u00b2\u207a ion flux as corrosion proxy.",
+    "failure_link": "Triggers preemptive voltage adjustments or maintenance when corrosion rate exceeds 0.5%/year.",
+    "cost_to_test": "$15K (1 prototype cell, 6-month validation with post-mortem grid analysis).",
+    "standard_solution": "Periodic capacity/voltage checks (reactive, not predictive).",
+    "departure": "Real-time corrosion *rate* monitoring via electrochemical noise, enabling closed-loop control."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "b1919a5fd7180081",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Graphene-Carbon Nanotube Hybrid Grid\",\n      \"mechanism\": \"Electrically conductive graphene-CNT composite replaces lead grid, resisting corrosion via inert carbon lattice.\",\n      \"failure_link\": \"Mitigates grid cross-section loss by eliminating lead oxidation (corrosion) under float voltage.\",\n      \"cost_to_test\": \"$5K (10 samples, 3-month accelerated cycling at 2.27V, SEM/EDS analysis).\",\n      \"standard_solution\": \"Pure lead-calcium or lead-antimony grids (\u22642% Sb).\",\n      \"departure\": \"Replaces lead entirely with",
+  "raw_tail": " \"name\": \"In-Situ Grid Corrosion Sensor Array\",\n      \"mechanism\": \"Embedded interdigitated microelectrodes measure local Pb\u00b2\u207a ion flux as corrosion proxy.\",\n      \"failure_link\": \"Triggers preemptive voltage adjustments or maintenance when corrosion rate exceeds 0.5%/year.\",\n      \"cost_to_test\": \"$15K (1 prototype cell, 6-month validation with post-mortem grid analysis).\",\n      \"standard_solution\": \"Periodic capacity/voltage checks (reactive, not predictive).\",\n      \"departure\": \"Real-time corrosion *rate* monitoring via electrochemical noise, enabling closed-loop control.\"\n    }\n  ]\n}\n```"
+ },
+ "critique": {
+  "wall_s": 14.5,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   {
+    "lever": "materials",
+    "name": "Graphene-Carbon Nanotube Hybrid Grid",
+    "rationale": "No lead oxidation path, meets all constraints, and avoids operational complexity. Cost justified by 15-year life."
+   },
+   {
+    "lever": "process",
+    "name": "Electrochemical Deposition of Protective Metal Oxide Layer",
+    "rationale": "Low-cost, scalable, and directly targets oxygen diffusion. Risk of pinholes manageable with process optimization."
+   },
+   {
+    "lever": "design",
+    "name": "Bipolar Grid Architecture with Sacrificial Anode Zones",
+    "rationale": "Mechanically robust, no voltage constraint violations. Sacrificial zones buy time but require rigorous testing for hotspot risks."
+   }
+  ],
+  "standard_solution": "Pb-Ca-Sn alloy grids with <2% Sb, operated at fixed 2.27V float. Corrosion mitigated via alloying but still consumes grid over time.",
+  "raw_sha256": "61eb2dd8fdbb5c6f",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"materials\",\n      \"plausibility\": \"Plausible. Carbon lattice inert to PbO\u2082 corrosion, but graphene-CNT adhesion to active material may fail under thermal cycling (delamination).\",\n      \"constraint_audit\": {\n        \"15-year float life\": \"ok\",\n        \"2.27V\": \"ok\",\n        \"<2% Sb\": \"ok\",\n        \"corrosion\": \"ok\"\n      },\n      \"difference_from_standard\": \"Standard: Pb-Ca-Sn grids. Novelty: 100% carbon grid with no lead oxidation path.\"\n    },\n    {\n      \"lever\": \"process\",\n      \"plausibility\": \"Plausible. TiO\u2082/ZrO\u2082 barriers effective, but p"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Graphene-Carbon Nanotube Hybrid Grid",
+  "mechanism": "Electrically conductive graphene-CNT composite replaces lead grid, resisting corrosion via inert carbon lattice.",
+  "failure_link": "Mitigates grid cross-section loss by eliminating lead oxidation (corrosion) under float voltage."
+ },
+ "compose": {
+  "wall_s": 8.5,
+  "transport_ok": true,
+  "answer_sha256": "d3fc175257dc4860"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 2,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 25.0
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 11,
+    "assumption": 0,
+    "unbound_numbers": 0,
+    "all_numbers": 11,
+    "claims": [
+     {
+      "parameter": "PARAMETER: **grid conductivity** = 100\u2013200 S/m (rationale: graphene-CNT composites achieve this range at 1\u20135 wt% CNT loading, sufficient for VRLA positive plates; validated via percolation theory in p",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "achieve",
+       "composites",
+       "conductivity",
+       "graphene",
+       "grid",
+       "loading",
+       "percolation",
+       "plates",
+       "positive",
+       "prior",
+       "range",
+       "rationale",
+       "sufficient",
+       "theory",
+       "validated",
+       "vrla",
+       "works"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **CNT functionalization** = 10% oxygenated groups (rationale: balances active material adhesion and grid hydrophobicity; empirical targets from graphene-polymer composites in batteries).\nAS",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "active",
+       "adhesion",
+       "balances",
+       "batteries",
+       "composites",
+       "empirical",
+       "functionalization",
+       "graphene",
+       "grid",
+       "groups",
+       "hydrophobicity",
+       "material",
+       "oxygenated",
+       "polymer",
+       "rationale",
+       "targets"
+      ],
+      "pairs": [
+       {
+        "value": "10",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **graphene flake size** = 5\u201310 \u00b5m (rationale: maximizes surface area for active material binding while minimizing delamination risk under thermal stress).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "active",
+       "area",
+       "binding",
+       "delamination",
+       "flake",
+       "graphene",
+       "material",
+       "maximizes",
+       "minimizing",
+       "rationale",
+       "risk",
+       "size",
+       "stress",
+       "surface",
+       "thermal",
+       "while"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **Sb content** = 0% (rationale: user constraint; carbon grid inherently Sb-free).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "carbon",
+       "constraint",
+       "content",
+       "free",
+       "grid",
+       "inherently",
+       "rationale",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "0",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **float voltage** = 2.27 V/cell [User Constraint] \u2014 compliance with user\u2019s stated operational condition.\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "cell",
+       "compliance",
+       "condition",
+       "constraint",
+       "float",
+       "operational",
+       "user",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "2.27",
+        "unit": "v"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **service life target** = 15 years [User Constraint] \u2014 compliance with user\u2019s stated durability requirement.\n\nFALSIFICATION TEST: **n = 50 cells** at 45\u00b0C for 15 years; failure criterion = ",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "carbon",
+       "cells",
+       "compliance",
+       "constraint",
+       "continuous",
+       "corrosion",
+       "criterion",
+       "cross",
+       "delamination",
+       "durability",
+       "failure",
+       "falsification",
+       "float",
+       "grid",
+       "increase",
+       "inert",
+       "integrity",
+       "lattice",
+       "life",
+       "mechanism",
+       "reliance",
+       "requirement",
+       "resistance",
+       "sectional",
+       "service",
+       "test",
+       "user",
+       "validates",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "45",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "5",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT",
+  "a0plus_answer_sha256": "4f115e85940f6acb7b57ec6cba317c6d88c5a9bb25395fb2c49cd8af16bd5b31",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION: Replace the lead-based positive grid with a **graphene-carbon nanotube (CNT) hybrid composite**, forming an inert, electrically conductive lattice that eliminates lead oxidation pathways. The hybrid grid maintains structural integrity while resisting corrosion under continuous 2.27 V float charge, preserving cross-sectional area and internal resistance over 15 years. Active material adhesion is reinforced via functionalized CNT interfaces, mitigating delamination under thermal cycling. This approach adheres to the <2% antimony constraint by eliminating lead entirely.\n\nMECHANISM: The graphene-CNT lattice replaces lead as the primary conductive scaffold, preventing PbO\u2082 formation (the primary corrosion product) by eliminating lead exposure to oxygen and float voltage. The composite\u2019s chemical inertness and high electrical conductivity (comparable to lead) sustain grid integrity, while CNTs provide mechanical reinforcement against active material expansion/contraction during cycling.\n\nDEPARTURE FROM STANDARD: Standard grids use Pb-Ca-Sn alloys to suppress corrosion via alloying; this design replaces lead entirely with a 100% carbon-based grid, removing the oxidation pathway while maintaining conductivity.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **grid conductivity** = 100\u2013200 S/m (rationale: graphene-CNT composites achieve this range at 1\u20135 wt% CNT loading, sufficient for VRLA positive plates; validated via percolation theory in prior works).\nASSUMPTION PARAMETER: **CNT functionalization** = 10% oxygenated groups (rationale: balances active material adhesion and grid hydrophobicity; empirical targets from graphene-polymer composites in batteries).\nASSUMPTION PARAMETER: **graphene flake size** = 5\u201310 \u00b5m (rationale: maximizes surface area for active material binding while minimizing delamination risk under thermal stress).\nASSUMPTION PARAMETER: **Sb content** = 0% (rationale: user constraint; carbon grid inherently Sb-free).\nASSUMPTION PARAMETER: **float voltage** = 2.27 V/cell [User Constraint] \u2014 compliance with user\u2019s stated operational condition.\nASSUMPTION PARAMETER: **service life target** = 15 years [User Constraint] \u2014 compliance with user\u2019s stated durability requirement.\n\nFALSIFICATION TEST: **n = 50 cells** at 45\u00b0C for 15 years; failure criterion = >5% increase in grid cross-sectional resistance due to corrosion or delamination. The test validates the mechanism\u2019s reliance on **inert carbon lattice integrity** under continuous float voltage.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 8516,
+   "ttfb_ms": 8516,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 11068,
+   "ttfb_ms": 11068,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 5239,
+   "ttfb_ms": 5239,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 35.1,
+ "infra_time_s": {
+  "queue_wait": 0.0,
+  "gateway_setup": 70.1,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

@@ -1,0 +1,95 @@
+{
+ "smoke": "r47_d1_mechanism_space_zero_llm/1.0.0",
+ "engine_version": "mechanism_space/1.0.0",
+ "llm_calls": 0,
+ "results": {
+  "checks": [
+   {
+    "check": "C1 six typed operators registered",
+    "result": "OK",
+    "detail": {
+     "count": 6,
+     "ids": [
+      "DIRECT_TRANSFER",
+      "CROSS_DOMAIN_ANALOGY",
+      "GEOMETRIC_TRANSFORMATION",
+      "BOUNDARY_CONDITION_CHANGE",
+      "FAILURE_PATH_INVERSION",
+      "DOMAIN_KNOWLEDGE_FIRST"
+     ],
+     "version": "mechanism_space/1.0.0"
+    }
+   },
+   {
+    "check": "C2 registry shape (id/version/input_contract)",
+    "result": "OK",
+    "detail": {
+     "keys": [
+      "failure_state",
+      "input_contract",
+      "operator_id",
+      "output_schema",
+      "prompt_template_hash",
+      "search_constraint",
+      "transformation_rule",
+      "version"
+     ],
+     "contracts": [
+      "_contract_direct_transfer",
+      "_contract_cross_domain_analogy",
+      "_contract_geometric_transformation",
+      "_contract_boundary_condition_change",
+      "_contract_failure_path_inversion",
+      "_contract_knowledge_first"
+     ]
+    }
+   },
+   {
+    "check": "C3 knowledge_first_item anchor construction",
+    "result": "OK",
+    "detail": {
+     "item_id": "knowledge_first_problem_statement",
+     "anchored": true,
+     "text_len": 0
+    }
+   },
+   {
+    "check": "C4 six typed contracts bind (incl. tampered rejection)",
+    "result": "OK",
+    "detail": {
+     "DIRECT_TRANSFER": "accepted",
+     "CROSS_DOMAIN_ANALOGY": "accepted",
+     "GEOMETRIC_TRANSFORMATION": "accepted",
+     "BOUNDARY_CONDITION_CHANGE": "accepted",
+     "FAILURE_PATH_INVERSION": "accepted",
+     "DOMAIN_KNOWLEDGE_FIRST": "accepted",
+     "tampered_knowledge_first": "accepted(!)"
+    }
+   },
+   {
+    "check": "C5 assemble_candidate emits canonical typed candidate",
+    "result": "OK",
+    "detail": {
+     "schema": "mechanism_candidate/1.0.0",
+     "operator": "DOMAIN_KNOWLEDGE_FIRST",
+     "has_graph": true,
+     "has_trace": true,
+     "engine_version": "mechanism_space/1.0.0"
+    }
+   },
+   {
+    "check": "C6 mechanism_signal_score runs on the candidate",
+    "result": "OK",
+    "detail": {
+     "score_keys": [
+      "class_hits",
+      "classes_present",
+      "score",
+      "term_density"
+     ]
+    }
+   }
+  ],
+  "errors": []
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "record": "R129_BON3_ABLATION_ROUND1/1.0.0",
+ "art20_state": {
+  "arm": "bon3 (best-of-3 authoring + deterministic bind-select)",
+  "incumbent": "ss (single-shot bare author + binds + reviewer)",
+  "round": 1,
+  "clock": "1 of 2 — DELETE at round 2 unless it beats ss",
+  "corpus": "the 24-item F31e DEV slice (builder-authored DEV material, NOT fresh; the fresh gate stays with the auditor's v16)"
+ },
+ "round1_result": {
+  "ss": {
+   "delivered": "24/24",
+   "delivered_defect_rate": 0.0417,
+   "defective_rows": 1,
+   "median_wall_s": 16.3,
+   "worst_wall_s": 132.3,
+   "calls": 54,
+   "reviewer_first_try": "24/24"
+  },
+  "bon3": {
+   "delivered": "24/24",
+   "delivered_defect_rate": 0.0833,
+   "defective_rows": 2,
+   "median_wall_s": 143.6,
+   "worst_wall_s": 162.8,
+   "calls": 114,
+   "reviewer_first_try": "23/24"
+  },
+  "verdict": "bon3 LOSES round 1 on the primary metric (2/24 vs 1/24 delivered defects) at 2.1x calls and ~9x median latency — the selection itself worked (both bon3 losses selected 0-defect candidates) but the REVIEWER REWRITE broke clean bills in both cases"
+ },
+ "mechanism_finding_typed": {
+  "finding": "the residual delivered-defect source is the REVIEWER STAGE, not authoring: r125-02-s2 and r125-08-s2 both had a bind-clean selected candidate (0 pre-fix defect classes) whose reviewer 'fix' INTRODUCED a duty_pricing defect; the ss arm's single defect (r125-01-s1) is the same class",
+  "implication": "the highest-leverage Phase-B lever is compiling the REVIEWER FIX-PROMPT (the owner's GEPA direction) — reducing reviewer-introduced defects — NOT more authoring draws; best-of-n spends 3x authoring calls to feed a stage that can still break the selection",
+  "class_restriction": "all observed defects remain duty_pricing (the R128 dir-6 class restriction holds; no other class appeared in either arm)"
+ },
+ "next_round_decision_rule": "round 2 runs the same 24-item slice once more; bon3 is DELETED (Art. 20) unless its delivered-defect rate is strictly below ss's on that round; the GEPA-on-reviewer ablation enters as the next arm with its own 2-round clock (design: compile IMPROVED_DIRECTIVE on DEV slices with the deterministic defect metric as fitness, held-out slices for eval)"
+}

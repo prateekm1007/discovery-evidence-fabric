@@ -1,0 +1,66 @@
+{
+ "problem_id": "r125-08-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 4.46,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 670,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.57,
+   "usage": {
+    "prompt_tokens": 1041,
+    "completion_tokens": 1060,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"Mitigation: Implement a Closed-Loop Cycle-Time Correction Using Existing ",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "Mitigation: Implement a Closed-Loop Cycle-Time Correction Using Existing Oxygen Analyzer Feedback and Pressure-Compensated Scheduling.\n\nMechanism: The observed shortening of adsorption cycles alongside rising feed-air consumption at constant demand strongly indicates that the current fixed-timer control logic is failing to account for variations in feed-air pressure. As the pressure transmitter detects changes in feed pressure, the volumetric flow through the adsorption beds changes, altering the mass-transfer and breakthrough dynamics. A fixed time will therefore lead to premature switching (before optimal purity is achieved) or excessive air usage (switching too late). The mitigation dynamically adjusts the adsorption and purge cycle times in real-time based on the measured oxygen breakthrough point and the current feed pressure.\n\nImplementation:\n1.  **Pressure-Normalized Baseline:** Use the existing feed-air pressure transmitter to establish a baseline relationship between feed pressure and the ideal cycle time for a target purity level (e.g., 99.5% N2). This creates a pressure-compensated timer profile.\n2.  **Oxygen Analyzer Feedback for Switching:** Instead of relying solely on the pressure-adjusted timer for the switch point, use the existing product oxygen analyzer to monitor the purity of the nitrogen stream in real-time. The controller will continuously compare the analyzer output against the specification limit.\n3.  **Adaptive Cycle Extension:** Introduce a control algorithm (e.g., a simple integral control loop or a step-based adjustment) that monitors the oxygen analyzer signal during the latter half of the adsorption phase. If the oxygen concentration remains below the specification threshold when the pressure-compensated timer signal is triggered to switch, the controller holds the switch state and extends the current adsorption cycle in small increments (e.g., 5-second steps).\n4.  **Cycle Shortening Guard:** Conversely, if the oxygen analyzer indicates that the breakthrough point (where oxygen starts to rise significantly) is occurring much earlier than expected for the current feed pressure, the controller shortens the cycle to prevent unnecessary air consumption and bed loading, but never shorter than a minimum safe time derived from the pressure profile.\n5.  **Closed-Loop Optimization:** The cycle-time counter is updated with these new, dynamically adjusted times. Over successive cycles, the system learns the actual breakthrough curve for the current bed condition (accounting for any gradual degradation or moisture content) and feed conditions, ensuring that switching occurs precisely when purity starts to slip, maximizing air efficiency and maintaining specification compliance.\n\nMeasures It Relies On:\n*   **Product Oxygen Analyzer:** Provides the critical feedback signal indicating when purity is at risk of slipping below spec. This is the primary basis for extending or shortening the cycle.\n*   **Feed-Air Pressure Transmitter:** Used to normalize the expected cycle time based on flow rate variations. This ensures the base timing is appropriate for the actual air delivery pressure, preventing gross errors in timing due to pressure drops or surges.\n*   **Cycle-Time Counter:** The existing counter is repurposed not as a fixed timer, but as a dynamic variable that is adjusted by the control algorithm based on the other two sensors. It records the actual cycle lengths for trend analysis and allows the PLC/controller to implement the extended or shortened durations without requiring new hardware.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "Mitigation: Implement a Closed-Loop Cycle-Time Correction Using Existing Oxygen Analyzer Feedback and Pressure-Compensated Scheduling.\n\nDIRECTION-OF-EFFECT:\nDriving Variable: Deviation of the measured product oxygen concentration from the target purity threshold, specifically during the tail end of the adsorption phase where breakthrough is suspected. \nMechanism Direction: When the oxygen analyzer output remains below the specification limit at the scheduled switch point (indicating the bed is still in adsorption and not yet saturated), the control signal directs an EXTENSION of the current cycle time. Conversely, if the oxygen analyzer indicates that breakthrough is occurring significantly earlier than the pressure-compensated baseline predicts (purity drops too soon), the control signal directs a SHORTENING of the cycle to reduce air consumption, bounded by a minimum safe time. \nOutcome Direction: This modulation adjusts the duty cycle of the adsorption/purge phases to maintain nitrogen purity at or above specification while minimizing feed-air consumption, thereby reversing the observed trend of slipping purity and rising air use.\n\nImplementation:\n1. **Pressure-Normalized Baseline:** Use the existing feed-air pressure transmitter to establish a baseline relationship between feed pressure and the ideal cycle time for a target purity level. This creates a pressure-compensated timer profile, ensuring the base timing accounts for variations in mass-transfer dynamics due to flow rate changes.\n2. **Oxygen Analyzer Feedback for Switching:** Use the existing product oxygen analyzer to monitor the purity of the nitrogen stream in real-time. The controller continuously compares the analyzer output against the specification limit.\n3. **Adaptive Cycle Extension:** Introduce a control algorithm that monitors the oxygen analyzer signal during the latter half of the adsorption phase. If the oxygen concentration remains below the specification threshold when the pressure-compensated timer signal is triggered to switch, the controller holds the switch state and extends the current adsorption cycle in small increments.\n4. **Cycle Shortening Guard:** If the oxygen analyzer indicates that the breakthrough point is occurring much earlier than expected for the current feed pressure, the controller shortens the cycle to prevent unnecessary air consumption and bed loading, but never shorter than a minimum safe time derived from the pressure profile.\n5. **Closed-Loop Optimization:** The cycle-time counter is updated with these dynamically adjusted times. Over successive cycles, the system learns the actual breakthrough curve for the current bed condition and feed conditions.\n\nMeasures It Relies On:\n*   **Product Oxygen Analyzer:** Provides the feedback signal indicating when purity is at risk of slipping below spec. It is the primary basis for extending or shortening the cycle. \n    *   *Input Mapping:* The raw output (oxygen concentration %) is compared directly against a constant specification threshold (e.g., 0.5% O2 max for 99.5% N2) and the calculated breakthrough threshold to trigger extension or shortening logic.\n*   **Feed-Air Pressure Transmitter:** Used to normalize the expected cycle time based on flow rate variations. \n    *   *Input Mapping:* The raw pressure measurement is used in a lookup table or linear scaling function to determine the baseline nominal cycle time $T_{baseline}(P)$. This baseline acts as the setpoint for the adaptive algorithm.\n*   **Cycle-Time Counter:** The existing counter records the actual cycle lengths. \n    *   *Input Mapping:* The count value is converted to elapsed time (seconds) via the PLC scan clock. The control algorithm adjusts the target count for the next cycle based on the deviations detected by the oxygen analyzer and pressure transmitter.\n\nIMPLEMENTATION BILL:\n1. **Logic Update:** Modification of the existing PLC control routine to replace fixed timer logic with the adaptive algorithm described above. \n   *   *Cost Driver:* Engineering hours for logic development and simulation. No new hardware procurement.\n2. **Duty Cycle Modulation Impact:** The algorithm modulates the adsorption/purge duty cycle to optimize purity versus air consumption. \n   *   *Operational Cost:* \n       *   **Energy/Throughput:** By dynamically shortening cycles when breakthrough is early, the system reduces the duration of the high-energy purge phase and the associated feed-air consumption per unit of nitrogen produced, directly lowering the specific air consumption (SAc) and energy cost per cubic meter of product nitrogen.\n       *   **Availability:** By extending cycles when necessary to prevent purity slip, the system reduces downtime associated with failed quality checks or waste production, maintaining nominal availability. The 'cost' is a slight potential increase in air usage during transient conditions where purity is marginally below spec, which is mitigated by the shortening guard on subsequent cycles.\n   *   *Pricing Note:* The bill acknowledges that the operational cost benefit is realized through a reduction in variable costs (air compression energy) and waste nitrogen disposal costs, offsetting the negligible engineering amortization cost. No additional fixed capital cost is incurred as all sensors and counters are existing. No new instrumentation is added. No new maintenance intervals are introduced beyond existing standards for the oxygen analyzer and pressure transmitter.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1. **Logic Update:** Modification of the existing PLC control routine to replace fixed tim",
+   "*   *Cost Driver:* Engineering hours for logic development and simulation. No new hardware",
+   "2. **Duty Cycle Modulation Impact:** The algorithm modulates the adsorption/purge duty cyc",
+   "*   *Operational Cost:*",
+   "*   **Energy/Throughput:** By dynamically shortening cycles when breakthrough is early, th",
+   "*   **Availability:** By extending cycles when necessary to prevent purity slip, the syste",
+   "*   *Pricing Note:* The bill acknowledges that the operational cost benefit is realized th"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'the adaptive algorithm described above' shares no allowed-list stem (Use only existing sensors and existing measurements: the product oxygen analyzer...)"
+  ]
+ },
+ "wall_clock_s": 18.05,
+ "status": "DELIVERED_REVIEWED"
+}

@@ -1,0 +1,39 @@
+{
+ "problem_id": "eval-new07-transformer-dga-predictor",
+ "a1_source": "SYS_A1F_V4/r20_full_battery",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using dissolved gas analysis (DGA) with fixed quarterly sampling intervals.\nMy same-class mechanism departure is a physics-based thermal-electrical model that infers gas generation rate from operational parameters.\nThe connection to failure physics is that insulation degradation produces gases at rates proportional to thermal stress and electrical discharge activity, which can be inferred from temperature, load, and pressure dynamics.\n\nPHYSICS CHECK\nThe governing physical relation is the Arrhenius equation for thermal degradation rate: R = A * exp(-Ea/(R*T)), where R is the degradation rate, A is a constant, Ea is activation energy, R is the gas constant, and T is temperature. For oil-paper insulation, Ea ≈ 0.8 eV. At 90°C (363 K), R ≈ 10^-6 s^-1. A 10°C increase to 100°C (373 K) increases R by ~2.7x, matching observed DGA acceleration rates.\n\nIMPLEMENTATION BILL\nComponents:\n- Data acquisition system for existing sensors (ALREADY-RECORDED: top-oil temperature, load current, ambient temperature, tank pressure)\n- Signal processing unit for parameter normalization\n- Thermal-electrical model computation engine\n- Fault flagging system\n\nMaterials:\n- Standard industrial-grade signal conditioning hardware\n- Existing transformer instrumentation cabling\n\nInstruments:\n- Temperature sensors (ALREADY-RECORDED: top-oil temperature)\n- Current transducers (ALREADY-RECORDED: load current)\n- Ambient temperature sensors (ALREADY-RECORDED: ambient temperature)\n- Pressure transducers (ALREADY-RECORDED: tank pressure)\n\nProcedure:\n1. Collect 15-minute resolution data from existing sensors\n2. Normalize load current to transformer nameplate rating\n3. Calculate thermal stress index: (top-oil temp - 85°C)/(85°C) for top-oil temp > 85°C\n4. Calculate electrical stress index: (load current - 0.8 * rated current)/(0.2 * rated current) for load current > 0.8 * rated current\n5. Compute gas generation rate proxy: R = A * exp(-Ea/(R*T)) * (1 + thermal stress index + electrical stress index)\n6. Compare against threshold (CALCULATED from historical DGA data showing fault development at R > 1.2e-6 s^-1)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Same as existing sensor network - no additional installation required beyond utilizing existing instrumentation\nOperability: Minimal additional burden - automated computation from existing data streams\nMaintenance: No additional maintenance requirements beyond standard sensor calibration\nRough cost class: Low - utilizes existing infrastructure with only software/computation overhead\nConclusion: Same burden class as standard DGA monitoring (quarterly sampling) but with continuous monitoring capability\n\nEXECUTABLE TEST\nProtocol: \n1. Collect 15-minute resolution data from existing sensors during normal operation\n2. Compute gas generation rate proxy continuously\n3. Monitor for sustained threshold exceedance\n4. Compare against next scheduled DGA sample\n\nInstruments: Existing sensors (top-oil temperature, load current, ambient temperature, tank pressure)\n\nPass/fail threshold: Predictor must flag developing fault at least 30 days before DGA sample shows abnormal gas levels (>10% increase from baseline in any key gas)\n\nDuration: 90 days of continuous monitoring\n\nKill criterion: If predictor fails to flag a fault that is later confirmed by DGA, or produces false alarms with no corresponding DGA abnormalities, the predictor is invalidated\n\nValidation: Test against historical data where DGA showed developing faults, with known timing of fault onset relative to DGA detection",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.8,
+   "chars": 3574
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 7.6,
+   "chars": 3240,
+   "findings_disclosed": [
+    "ALLOWED_SIGNAL_ANSWER"
+   ]
+  },
+  {
+   "kind": "repair_2",
+   "latency_s": 8.4,
+   "chars": 3622,
+   "findings_disclosed": [
+    "ALLOWED_SIGNAL_ANSWER"
+   ]
+  }
+ ],
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "violations": {},
+  "repairs": 2
+ },
+ "generated_at": "2026-11-15T14:28:15.710814Z"
+}

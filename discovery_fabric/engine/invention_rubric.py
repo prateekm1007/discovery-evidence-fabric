@@ -1,0 +1,1215 @@
+"""discovery_fabric/engine/invention_rubric.py — the INVENTION RUBRIC
+(owner audit round R11, 2026-11-14, item 2).
+
+The owner's measured finding: A0+'s correctness-rubric "wins" over the
+baseline come from FORMAT AND LABELS, not better engineering, and the
+holdout gate (wins+ties >= 50%) can be passed by a baseline clone. The
+correctness rubric measures honesty and shape; it cannot measure
+whether an answer INVENTS anything. This module adds the separate
+instrument the owner specified — four axes, each scored 0-4:
+
+  1. NOVELTY vs the standard solution — does the answer's core
+     mechanism depart from the standard/off-the-shelf solution for
+     this failure, or restate it? (A baseline clone scores 0-1; a
+     genuinely different mechanism scores 3-4.)
+  2. FEASIBILITY — could the proposed intervention be implemented
+     with the stated resources and physics, without violating the
+     problem's stated constraints?
+  3. TESTABILITY — does the answer state a concrete, numeric,
+     falsifiable test protocol (temperature, duration, sample size,
+     numeric pass/fail criterion) for THE proposed mechanism?
+  4. CONSTRAINT COMPLIANCE — does the answer respect the user's
+     stated constraints (quoted from the problem) and its declared
+     evidence/assumption labels?
+
+Scoring is DETERMINISTIC where the axis is a byte-level property and
+CODER_HEURISTIC where it needs judgment; every score carries its
+rationale, and the coders' scores are an INPUT to the auditor's blind
+judging — never the gate itself (Art. XXVI: no self-certification;
+the owner's item 9 gate is AUDITOR-judged). Correctness scoring stays
+the existing correctness-rubric judge's job; this instrument never
+feeds the correctness gate.
+
+Serves: Art. LXXVII (a delivered idea is judged as an invention, not
+as pipeline output), Art. XXVI (coder scores are disclosed, never
+self-certified as the gate), Art. XIX (the instrument exists because
+a measured failure — the baseline-clone-passable gate — exposed it).
+"""
+from __future__ import annotations
+
+import json
+import re
+from typing import Any, Dict, List, Optional, Tuple
+
+INVENTION_RUBRIC_VERSION = "invention_rubric/2.2.1"  # 2.2.1 (VF-R114-2, R115 dir 4, c-0164): guard 2b — the DIRECT gerund consequence chain ("increases raising breaks", no comma) excluded as mechanism description when the sentence carries no intervention-agent signal; agent-ful proposed interventions stay violations (the asymmetric principle). 2.2.0 (F92/F91, R113 dirs 3+4): direction axis question_type-gated (predictor rows exempt) + the three R113-adjudicated false-positive classes guarded (baseline-context, participial-consequence, threshold-object inversion); cure-kinetics claims route through the engine's COMPUTED relation (thermoset_cure_residual_direction) — the regex stays an INPUT (Art. 3/6/8), never a retroactive gate. 2.1.0 (D6, c-0129): the two TRUTH-BEARING axes added (direction_correctness, magnitude_plausibility) — the auditor's anti-saturation direction: scores stop clustering at 4
+
+AXES = ("novelty", "feasibility", "testability", "constraint_compliance",
+        "direction_correctness", "magnitude_plausibility")
+
+#: controller signatures — a predictor question answered with a
+#: CONTROLLER is a routing regression (owner R11 item 6); it also
+#: caps novelty (a PID/tanh controller is the standard controls
+#: solution, not a novel indicator).
+_CONTROLLER_SIGNS = (
+    r"\bPID\b", r"\bKp\b", r"\bKi\b", r"\bKd\b", r"proportional[- ]gain",
+    r"integral gain", r"derivative gain", r"\bcontroller\b",
+    r"control loop", r"control valve", r"\bmodulat", r"\bactuator\b",
+    r"closed[- ]loop", r"\bsetpoint control\b", r"gain schedul",
+)
+
+#: indicator signatures — what a predictor-design answer must propose
+_INDICATOR_SIGNS = (
+    r"\bINDICATOR\b", r"\bleading indicator\b", r"\bmonitor\b",
+    r"\bhealth index\b", r"\bprognos", r"\bearly warning\b",
+    r"\bdetect(ion|s)?\b", r"\bsensor\b", r"\bsignal\b",
+    r"\bthreshold\b", r"\bdrift\b", r"\btrend\b", r"\bforecast\b",
+)
+
+#: the standard-solution vocabulary per domain lives in
+#: _STANDARD_SOLUTIONS (below) — the novelty comparator carries REAL
+#: standard-practice content.
+
+
+def _has(text: str, patterns: tuple) -> List[str]:
+    out = []
+    for p in patterns:
+        if re.search(p, text or "", re.IGNORECASE):
+            out.append(p)
+    return out
+
+
+def _numbers(text: str) -> List[str]:
+    return [m.group(0) for m in
+            re.finditer(r"\d+(?:\.\d+)?", text or "")]
+
+
+def _protocol_fields(answer: str) -> Dict[str, bool]:
+    """The four fields of a real falsification protocol (the same
+    fields the consistency check demands): temperature, duration,
+    sample size, numeric pass/fail criterion."""
+    a = answer or ""
+    return {
+        "temperature": bool(re.search(
+            r"\b\d+\s*(?:°?\s*C|deg\s*C|celsius|K\b)|ambient "
+            r"temperature", a, re.IGNORECASE)),
+        "duration": bool(re.search(
+            r"\b\d+\s*(?:hours?|hrs?|days?|weeks?|months?|cycles?|"
+            r"years?|minutes?)\b", a, re.IGNORECASE)),
+        "sample_size": bool(re.search(
+            r"\bn\s*=\s*\d+", a, re.IGNORECASE)),
+        "numeric_criterion": bool(re.search(
+            r"(?:fail|pass|criterion|reject|kill|trigger)[^.]{0,120}"
+            r"(?:exceed|above|below|less than|more than|>|<|≥|≤)"
+            r"[^.]{0,60}\d+|\d+\s*%[^.]{0,80}(?:fail|criterion|"
+            r"false alarm)", a, re.IGNORECASE)),
+    }
+
+
+def _user_constraint_text(problem: Dict[str, Any]) -> str:
+    parts = [str(problem.get(k) or "") for k in
+             ("device", "failure", "failure_mode", "constraint")]
+    parts += [str(v) for v in (problem.get("user_variables") or [])]
+    ca = problem.get("clarification_answer")
+    if isinstance(ca, str):
+        parts.append(ca)
+    elif isinstance(ca, dict):
+        parts.extend(str(x) for x in ca.values())
+    if problem.get("clarification_text"):
+        parts.append(str(problem["clarification_text"]))
+    return " ".join(parts)
+
+
+def score_answer(problem: Dict[str, Any], answer: str,
+                 baseline_answer: Optional[str] = None,
+                 standard_answer: Optional[str] = None,
+                 contract_state: Optional[Dict[str, Any]] = None,
+                 ) -> Dict[str, Any]:
+    """Score ONE answer on the invention rubric. Deterministic
+    anchors + disclosed heuristic deltas; every axis carries its
+    rationale. The baseline/standard answers are the NOVELTY
+    comparator: the answer's core mechanism is diffed against them
+    (token-Jaccard on the mechanism-bearing sentences)."""
+    a = str(answer or "")
+    prob_txt = _user_constraint_text(problem)
+    reasons: Dict[str, List[str]] = {ax: [] for ax in AXES}
+    scores: Dict[str, int] = {}
+
+    # ---- novelty vs the standard solution (0-4)
+    # comparator: the baseline answer and the standard-solution
+    # reference (when supplied). R11 measured fix (2026-11-14): the
+    # token-ratio form scored EVERY full answer novelty 4 — a verbose
+    # answer is trivially "≥55% distinct" from a thin comparator, so
+    # the baseline sat at the 4.0 ceiling and the item-9 gate's
+    # machine novelty delta degenerated to 0.0 between two 4.0s (the
+    # same passable-by-anything class the owner's audit ordered out).
+    # The diff is now SENTENCE-COVERAGE (robust to answer length): a
+    # mechanism sentence is covered when >=30% of its content tokens
+    # appear in the comparator vocabulary; the novelty score reads
+    # the covered FRACTION of the answer's mechanism sentences —
+    # standard-practice content overlaps the reference and scores
+    # low, a mechanism-level departure leaves whole sentences
+    # uncovered and scores high, and the verdict stays the
+    # auditor's (Art. XXVI).
+    def _mech_tokens(t: str) -> set:
+        stop = {"the", "and", "for", "with", "from", "that", "this",
+                "will", "shall", "must", "use", "used", "using",
+                "based", "when", "where", "which", "have", "has",
+                "are", "was", "were", "can", "may", "should", "into",
+                "than", "then", "over", "under", "such", "also",
+                "each", "any", "all", "more", "most", "per", "via"}
+        return {w for w in re.findall(r"[a-z][a-z\-]{4,}",
+                                      (t or "").lower())
+                if w not in stop}
+
+    def _mech_sentences(t: str) -> List[set]:
+        sents = [s for s in re.split(r"(?<=[.!?])\s+|\n+", (t or ""))
+                 if len(s.strip()) >= 8]
+        return [toks for s in sents
+                if len((toks := _mech_tokens(s))) >= 3]
+
+    a_sents = _mech_sentences(a)
+    comp_toks: set = set()
+    comp_name = "standard reference"
+    # R11 P2b (owner audit step 2): the BASELINE-UNION comparator is
+    # RETIRED as evidence (Art. LXIV: the superseded comparator retires
+    # in the same change that ships its replacement). The measured
+    # defect: unioning the baseline answer made the baseline's novelty
+    # identity-zero BY CONSTRUCTION, so "novelty_delta +1.8" was
+    # trivially satisfied by ANY answer that differs from the baseline
+    # — the owner's verdict, verbatim. The comparator is now the
+    # STANDARD-PRACTICE UNIVERSE: the standard-solution reference plus
+    # the domain's PRIOR-ART corpus (_PRIOR_ART, below) — established
+    # techniques score KNOWN, genuine departures score distinct. The
+    # baseline arm is scored like any other arm (its honest lexical
+    # novelty against standard practice, usually low) — no identity
+    # assumptions. The baseline_answer parameter is retained in the
+    # signature for callers that explicitly want the diff but is no
+    # longer part of the novelty evidence.
+    if baseline_answer:
+        comp_name = ("baseline answer (disclosed comparator, not the "
+                     "novelty evidence)")
+    if standard_answer:
+        comp_toks |= _mech_tokens(standard_answer)
+    pa = prior_art_reference(problem)
+    if pa:
+        comp_toks |= _mech_tokens(pa)
+        comp_name = "standard reference + prior-art corpus"
+    if a_sents and comp_toks:
+        # the KNOWN gate first (named-technique anchors): an idea that
+        # explicitly names an established technique is prior art for
+        # the domain, whatever its lexical distance from the corpus —
+        # measured basis in the corpus-recall overlap finding (R11
+        # P2b, 2026-11-14). The lexical distance below stays as the
+        # DISCLOSED secondary signal for the NOVEL path; the semantic
+        # verdict is the auditor's + the judge's (Art. XXVI).
+        try:
+            # AM3 D3: the gate reads the IDEA — the proposal head
+            # (everything before the DEPARTURE-FROM-STANDARD contrast,
+            # which names the standard solution BY DESIGN) — with the
+            # problem's requirement vocabulary stripped, so KNOWN
+            # requires a mechanism-level anchor match in the idea's own
+            # words, not a material-family mention of the requirement
+            # nouns (the measured over-withdrawal: UV-EVOH, IL-polymer,
+            # ZrO2).
+            _idea_head = a.split("DEPARTURE FROM STANDARD")[0]
+            _pa_d = prior_art_verdict_detail(_idea_head, problem)
+            _pa_v = _pa_d["verdict"]
+        except Exception:  # noqa: BLE001 — the anchor check failing
+            _pa_v = "NO_REFERENCE"  # leaves the distance path intact
+            _pa_d = {"fired": []}
+        if _pa_v == "KNOWN":
+            scores["novelty"] = 1
+            reasons["novelty"].append(
+                "KNOWN prior art: the idea's own mechanism words name "
+                "an established technique of this domain "
+                f"(mechanism-level anchors fired: "
+                f"{[f['anchor'] for f in _pa_d['fired']] or '?'}; "
+                "named-technique instrument at mechanism precision, "
+                "Amendment 3 D3) — capped at 1")
+        else:
+            # R11 P2b, second measured correction (2026-11-14): sentence
+            # COVERAGE of the answer still rewarded verbosity — the 3275-
+            # char baseline scored only 4/24 sentences covered and took
+            # novelty 4 again. The owner's axis is PRIOR-ART DISTANCE:
+            # corpus_recall = |corpus ∩ answer| / |corpus| — the fraction
+            # of the domain's established vocabulary the answer actually
+            # implements. Recall is normalized over the CORPUS, so a
+            # verbose standard-practice answer scores high recall (low
+            # novelty) and a genuine departure scores low recall (high
+            # novelty) regardless of answer length. Bands carry provenance
+            # in the rationale; the verdict stays the auditor's (Art. XXVI).
+            a_toks_all: set = set()
+            for st in a_sents:
+                a_toks_all |= st
+            recall = len(a_toks_all & comp_toks) / max(len(comp_toks), 1)
+            if recall >= 0.75:
+                scores["novelty"] = 0
+                reasons["novelty"].append(
+                    f"a clone of the {comp_name} body "
+                    f"(prior-art recall {recall:.2f})")
+            elif recall >= 0.50:
+                scores["novelty"] = 1
+                reasons["novelty"].append(
+                    f"implements the established techniques — "
+                    f"(prior-art recall {recall:.2f})")
+            elif recall >= 0.35:
+                scores["novelty"] = 2
+                reasons["novelty"].append(
+                    f"the standard mechanism family with material "
+                    f"parameter/design differences (prior-art recall "
+                    f"{recall:.2f})")
+            elif recall >= 0.20:
+                scores["novelty"] = 3
+                reasons["novelty"].append(
+                    f"a clearly different mechanism with shared "
+                    f"engineering vocabulary (prior-art distance "
+                    f"{1 - recall:.2f})")
+            else:
+                scores["novelty"] = 4
+                reasons["novelty"].append(
+                    f"a genuine departure from the {comp_name} "
+                    f"(prior-art distance {1 - recall:.2f})")
+    else:
+        scores["novelty"] = 0
+        reasons["novelty"].append("no comparator available — scored "
+                                  "against nothing, NOT a pass")
+    # a predictor question answered with a controller is the STANDARD
+    # controls move AND the audited routing regression — novelty cap 1
+    if str(problem.get("question_type") or "") == "predictor-design":
+        ctrl = _has(a, _CONTROLLER_SIGNS)
+        n_ctrl_core = sum(1 for p in ctrl if p in (
+            r"\bPID\b", r"\bKp\b", r"\bKi\b", r"\bKd\b",
+            r"proportional[- ]gain", r"integral gain",
+            r"derivative gain", r"gain schedul", r"\bcontroller\b"))
+        if n_ctrl_core >= 2:
+            scores["novelty"] = min(scores["novelty"], 1)
+            reasons["novelty"].append(
+                "the answer's core mechanism carries CONTROLLER "
+                "signatures (gain schedules / PID factors) for a "
+                "predictor question — the standard controls response, "
+                "and the audited routing regression (owner R11 item "
+                "6: a predictor question produces an indicator, never "
+                "a controller)")
+
+    # ---- feasibility (0-4): resource realism + constraint conflict
+    feas = 2
+    reasons["feasibility"].append("default: plausible-but-unverified "
+                                  "engineering content")
+    if _has(a, (r"\bexisting\b", r"\bretrofit\b", r"\ballows?\b",
+                r"\bstandard\b", r"\boff[- ]the[- ]shelf\b")):
+        feas += 1
+        reasons["feasibility"].append(
+            "states implementation resources (existing/standard "
+            "components)")
+    if _has(a, (r"\bnanofabricat", r"\bmolecular assembler\b",
+                r"\bquantum computer\b", r"\bunobtainium\b",
+                r"\bdoes not exist\b", r"\byet to be developed\b")):
+        feas -= 2
+        reasons["feasibility"].append("states non-existent technology")
+    # constraint compliance: numbers in the answer that directly
+    # contradict the user's stated constraint numbers cap the axis
+    u_nums = set(_numbers(prob_txt))
+    conflicts = []
+    for m in re.finditer(
+            r"(?:maximum|maximum of|not exceed|below|under|up to|"
+            r"less than)\s*(\d+(?:\.\d+)?)\s*([%A-Za-z]+)", a,
+            re.IGNORECASE):
+        pass  # constraint-shaped numbers are checked below
+    if u_nums:
+        # a stated constraint number re-quoted correctly is a plus;
+        # re-quoted with a different value where the constraint says
+        # exactly one number is a conflict
+        if any(n in a for n in u_nums):
+            feas += 1
+            reasons["feasibility"].append(
+                "re-states the user's own constraint values "
+                "consistently")
+    feas = max(0, min(4, feas))
+
+    # ---- R11 P2a (owner audit step 2): the PLAUSIBILITY GATE caps the
+    # feasibility axis. The measured defect: the scorer gave A1 a 4.0
+    # mean "despite p02 and new05" — resource realism words and
+    # constraint-number echoes say nothing about whether the mechanism
+    # SURVIVES the environment. The gate runs the SAME deterministic
+    # anchors the A1 critic uses (one source of truth,
+    # plausibility_critic) over the delivered answer: a KILL
+    # (environment incompatibility, magnitude contradiction, scope
+    # violation, premise violation under an installed-only premise,
+    # allowed-signal breach) caps feasibility at 2; a soft premise flag
+    # takes 1. Provenance rides the rationale (Art. XXVII); the
+    # threshold class is BUYER_DEFINED (the owner audit IS the
+    # calibration corpus) + ENGINEERING (the material rules).
+    try:
+        from discovery_fabric.engine.plausibility_critic import (
+            check_candidate as _plaus_check,
+            allowed_signals_from_constraint as _allowed_from)
+        _sigs, _ = _allowed_from(prob_txt)
+        _pa = _plaus_check({"mechanism": a[:1600]},
+                           prob_txt,
+                           failure_txt=str(problem.get("failure") or ""),
+                           allowed_signals=_sigs)
+        _plaus_kills = [k["anchor"] for k in _pa.get("kills") or []]
+        _plaus_flags = [f["flag"] for f in _pa.get("flags") or []]
+        if _plaus_kills:
+            feas = min(feas, 2)
+            reasons["feasibility"].append(
+                f"PLAUSIBILITY GATE cap (kills: {', '.join(_plaus_kills)}"
+                ") — the mechanism carries an anchor-killed "
+                "incompatibility/violation with recorded provenance "
+                "(owner-audit calibration corpus, Art. L/XXVII)")
+        if _plaus_flags and not _plaus_kills:
+            feas = max(1, feas - 1)
+            reasons["feasibility"].append(
+                f"premise flags ({', '.join(_plaus_flags)}) — the "
+                "mechanism assumes a component/fluid the stated device "
+                "does not carry (−1, not a kill; the critic "
+                "adjudicates)")
+    except Exception:  # noqa: BLE001 — a critic failure must not
+        pass           # silently change the score; absence is typed
+                       # by the score riding the uncapped value
+
+    scores["feasibility"] = feas
+
+    # ---- testability (0-4): the four protocol fields on THIS design
+    pf = _protocol_fields(a)
+    n_fields = sum(1 for v in pf.values() if v)
+    scores["testability"] = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4}[n_fields]
+    missing = [k for k, v in pf.items() if not v]
+    if n_fields == 4:
+        reasons["testability"].append(
+            "all four protocol fields present (temperature, duration, "
+            "sample size n, numeric pass/fail criterion)")
+    else:
+        reasons["testability"].append(
+            "protocol fields missing: " + ", ".join(missing))
+    if not pf["numeric_criterion"] and not pf["sample_size"]:
+        scores["testability"] = 0
+        reasons["testability"].append(
+            "no numeric criterion and no sample size — the answer is "
+            "not falsifiable as written")
+
+    # ---- constraint compliance (0-4): labeled honesty + quoted
+    # constraints respected + no user-constraint citations
+    cc = 2
+    reasons["constraint_compliance"].append(
+        "default: constraints addressed, honesty unverifiable from "
+        "bytes alone")
+    n_eb = len(re.findall(r"EVIDENCE[- ]BACKED", a, re.IGNORECASE))
+    n_asm = len(re.findall(r"ASSUMPTION", a, re.IGNORECASE))
+    if n_eb and n_asm:
+        cc += 1
+        reasons["constraint_compliance"].append(
+            f"carries both evidence labels ({n_eb} EVIDENCE-BACKED, "
+            f"{n_asm} ASSUMPTION mentions) — provenance honesty "
+            "instrumented")
+    elif n_eb and not n_asm:
+        cc -= 1
+        reasons["constraint_compliance"].append(
+            "EVIDENCE-BACKED labels with no ASSUMPTION anywhere — "
+            "unrealistic certainty for a design answer")
+    # a citation attached to an ASSUMPTION line is the owner's R11
+    # noise — hard cap 2
+    doi_on_asm = re.findall(
+        r"ASSUMPTION[^\n]*\[(?:doi|crossref|openaire|s2|arxiv):[^\n]*|"
+        r"\[(?:doi|crossref|openaire|s2|arxiv):[^\n]*\][^\n]*ASSUMPTION",
+        a, re.IGNORECASE)
+    if doi_on_asm:
+        cc = min(cc, 2)
+        reasons["constraint_compliance"].append(
+            f"{len(doi_on_asm)} citation(s) attached to ASSUMPTION "
+            "lines — the R11 audited noise")
+    if _has(a, (r"COMPLIES",)) and not _has(a, (r"VIOLATES",)):
+        cc += 1
+        reasons["constraint_compliance"].append(
+            "per-constraint COMPLIES statements present")
+    cc = max(0, min(4, cc))
+    scores["constraint_compliance"] = cc
+
+    # a contract-invalid / typed-incomplete arm state is DISCLOSED and
+    # caps constraint_compliance (the byte-level honesty instrument
+    # failed on this answer) — never a verdict conversion (Art. X)
+    if contract_state and contract_state not in (
+            "COMPLETE", None, "NOT_SCORED"):
+        scores["constraint_compliance"] = min(
+            scores["constraint_compliance"], 2)
+        reasons["constraint_compliance"].append(
+            f"the arm's typed delivery state is {contract_state} — "
+            "the honesty instrumentation did not fully pass")
+
+    # ---- direction_correctness (0-4, D6 truth-bearing; v2.2.0 F92
+    # guards, the R113 adjudication): the answer's causal claims must
+    # target the problem's OWN failure quantity and move it the
+    # IMPROVING way. A claim that raises the failure quantity is a
+    # truth violation (0-1); claims targeting other quantities are
+    # neutral, not wrong. No attributable claims = the neutral anchor
+    # 2 with the coverage typed (never silently a 4).
+    # F92 (R113 dir 3): the axis is GATED on question_type — it reads
+    # intervention-proposals only; predictor-design rows monitor a
+    # signal direction and are never subject to it (the HO15-20
+    # false-positive class). The regex stays an INPUT (Art. 3/6/8) —
+    # never a retroactive gate; the three adjudicated false-positive
+    # classes are GUARDED (skipped as non-claims), never
+    # score-converted.
+    qtype = str(problem.get("question_type")
+                or "intervention-proposal")
+    if qtype == "predictor-design":
+        scores["direction_correctness"] = 2
+        reasons["direction_correctness"].append(
+            "predictor-design row — the intervention-direction axis "
+            "does not apply (F92, the R113 adjudication: predictor "
+            "rows correctly monitor a worsening signal; reading their "
+            "monitoring language as a causal intervention claim is "
+            "the HO15-20 false-positive class)")
+    else:
+        fail_txt = " ".join(str(problem.get(k) or "") for k in
+                            ("failure", "failure_mode", "question"))
+        stop = {"the", "and", "with", "from", "that", "this", "when",
+                "which", "will", "shall", "must", "into", "under",
+                "over"}
+        fail_terms = {w for w in re.findall(r"[a-z][a-z-]{4,}",
+                                            fail_txt.lower())
+                      if w not in stop}
+        IMPROVE_RE = re.compile(
+            r"\b(reduc\w+|improv\w+|low(er|ers|ered)|eliminat\w+|"
+            r"preven\w+|minimiz\w+|avoid\w+|suppress\w+|mitigat\w+)",
+            re.IGNORECASE)
+        DEGRADE_RE = re.compile(
+            r"\b(increas\w+|rais\w+|worsen\w+|aggravat\w+|amplif\w+|"
+            r"exacerbat\w+)", re.IGNORECASE)
+        claim_re = re.compile(
+            r"\b(redu\w+|improv\w+|low\w+|eliminat\w+|preven\w+|"
+            r"minimiz\w+|avoid\w+|suppress\w+|mitig\w+|increas\w+|"
+            r"rais\w+|worsen\w+|aggravat\w+|amplif\w+|exacerbat\w+)\s+"
+            r"(?:the\s+|this\s+|its\s+)?([a-z][a-z-]{4,38})",
+            re.IGNORECASE)
+        # F92 guard machinery (the three R113-adjudicated
+        # false-positive classes):
+        BASELINE_CTX_RE = re.compile(
+            r"\b(standard\s+practice|current\s+practice|conventional|"
+            r"existing|presently|currently|the\s+baseline|as-?is|"
+            r"status\s+quo)\b[^.;]*$", re.IGNORECASE)
+        SUBORDINATOR_RE = re.compile(
+            r"\b(as|since|when|because|while|although|though|"
+            r"whereas)\s+[^,.;:]{0,60}$", re.IGNORECASE)
+        # guard 2b vocabulary (VF-R114-2, R115 dir 4): the DIRECT
+        # gerund consequence chain ("increases raising breaks" — no
+        # comma) and the intervention-agent signals whose presence
+        # keeps a claim scorable
+        CONSEQ_GERUND_RE = re.compile(
+            r"\b(?:raising|rising|causing|leading|driving|producing|"
+            r"creating|triggering)\b", re.IGNORECASE)
+        AGENT_RE = re.compile(
+            r"\b(we|i)\b|propose\w*|proposed|intervention|adding|"
+            r"add\b|introduc\w+|replac\w+|recommend\w*|adopt\w*|"
+            r"apply\w*|install\w*|inject\w*|coat\w*|select\w*|"
+            r"us(e|ing)|switch\w*|swap\w*", re.IGNORECASE)
+        # threshold/margin objects: a DEGRADE-class verb on them moves
+        # the failure AWAY (HO15-10: "raising the delamination
+        # threshold" is improving, not a violation)
+        THRESHOLD_OBJECTS = {
+            "threshold", "thresholds", "margin", "margins",
+            "resistance", "strength", "strengths", "toughness",
+            "lifetime", "durability", "headroom", "safety",
+            "capacity", "tolerance", "robustness"}
+        n_ok = n_bad = 0
+        for m in claim_re.finditer(a):
+            verb, obj = m.group(1).lower(), m.group(2).lower()
+            if not any(t in obj or obj in t for t in fail_terms):
+                continue                    # not the failure quantity
+            sent_start = max(a.rfind(c, 0, m.start())
+                             for c in ".!?\n")
+            before = a[sent_start + 1:m.start()]
+            span = m.group(0)
+            improve = bool(IMPROVE_RE.search(span))
+            degrade = bool(DEGRADE_RE.search(span))
+            # guard 1 — descriptive-baseline context (HO15-03): a
+            # DEGRADE-class claim inside a sentence describing the
+            # STANDARD-PRACTICE state is the baseline's own failure,
+            # not the proposed intervention. IMPROVE-class claims
+            # always survive (an improving claim near baseline
+            # vocabulary is the fix — contrastive frames included)
+            if (degrade and not improve
+                    and BASELINE_CTX_RE.search(before)):
+                continue
+            # guard 2 — participial consequence form (HO15-05/10): a
+            # DEGRADE-class gerund after a comma or inside a
+            # subordinate clause is a mechanism DESCRIPTION.
+            # IMPROVE gerunds are kept (an intervention's purpose
+            # clauses legitimately count)
+            if (degrade and not improve and verb.endswith("ing")
+                    and (before.rstrip().endswith((",", ";", ":"))
+                         or SUBORDINATOR_RE.search(
+                             a[max(0, m.start() - 80):m.start()]))):
+                continue
+            # guard 2b — direct-gerund consequence chain (VF-R114-2,
+            # R115 dir 4): a DEGRADE-class present-tense verb whose
+            # OBJECT IS a consequence gerund ("increases raising
+            # breaks" — the chain without a comma) or which is
+            # IMMEDIATELY FOLLOWED by one, is the mechanism's own
+            # chain, not a claim — EXCLUDED only when the sentence
+            # carries NO intervention-agent signal (a proposed
+            # intervention that raises the failure quantity stays a
+            # violation even with a trailing gerund; the asymmetric
+            # principle guard 3 already uses)
+            if (degrade and not improve
+                    and (CONSEQ_GERUND_RE.fullmatch(obj.strip())
+                         or CONSEQ_GERUND_RE.search(
+                             a[m.end():m.end() + 40]))
+                    and not AGENT_RE.search(a[sent_start + 1:m.end()])):
+                continue
+            # guard 3 — threshold objects, ASYMMETRIC inversion
+            # (HO15-10): a DEGRADE-class verb on a protective
+            # threshold/margin/resistance moves the failure AWAY
+            # (credit it). The inverse is deliberately NOT flipped:
+            # an IMPROVE-class verb on the failure quantity's own
+            # vocabulary stays the canonical improving claim (the
+            # HO15-14 lesson: "lower strength[-loss]" reduces the
+            # failure, never a violation)
+            if obj in THRESHOLD_OBJECTS and degrade and not improve:
+                improve, degrade = True, False
+            if improve:
+                n_ok += 1
+            elif degrade:
+                n_bad += 1                  # RAISES the failure qty
+        if n_bad > 0:
+            scores["direction_correctness"] = 1
+            reasons["direction_correctness"].append(
+                f"{n_bad} causal claim(s) move the problem's own "
+                f"failure quantity the WRONG way ({n_ok} improving) "
+                "— a truth-bearing violation, not a style issue")
+        elif n_ok >= 2:
+            scores["direction_correctness"] = 4
+            reasons["direction_correctness"].append(
+                f"{n_ok} causal claim(s) target the failure quantity "
+                "improving; none move it the wrong way")
+        elif n_ok == 1:
+            scores["direction_correctness"] = 3
+            reasons["direction_correctness"].append(
+                "one improving causal claim on the failure quantity; "
+                "thin causal coverage")
+        else:
+            scores["direction_correctness"] = 2
+            reasons["direction_correctness"].append(
+                "no causal claim attributable to the problem's own "
+                "failure quantity (typed neutral anchor — coverage "
+                "disclosed, never silently a 4)")
+
+    # ---- magnitude_plausibility (0-4, D6 truth-bearing): the numeric
+    # claims stay inside typed envelopes; a percent-improvement claim
+    # far beyond the problem's own stated headroom (10x) is a truth
+    # violation; >200% unconditional improvement is implausible.
+    pct = [float(x) for x in re.findall(r"(\d{1,4}(?:\.\d+)?)\s?%", a)]
+    prob_pct = [float(x) for x in re.findall(r"(\d{1,3}(?:\.\d+)?)\s?%",
+                                             prob_txt)]
+    mp = 4
+    if pct:
+        big = max(pct)
+        if prob_pct and big > 10.0 * max(prob_pct):
+            mp = 0
+            reasons["magnitude_plausibility"].append(
+                f"a {big:.0f}% claim vs the problem's own stated "
+                f"magnitude ({max(prob_pct):.1f}%) — a >10x "
+                "overclaim against the stated headroom")
+        elif big > 200:
+            mp = 1
+            reasons["magnitude_plausibility"].append(
+                f"an unconditional {big:.0f}% improvement claim — "
+                "beyond any typed plausible envelope")
+        elif big > 80:
+            mp = 2
+            reasons["magnitude_plausibility"].append(
+                f"{big:.0f}% improvement claimed — severe-effect "
+                "envelope (needs full bottleneck removal, which the "
+                "answer must and may not demonstrate)")
+        elif big > 50:
+            mp = 3
+            reasons["magnitude_plausibility"].append(
+                f"{big:.0f}% improvement claimed — aggressive but "
+                "within the severe envelope")
+        else:
+            reasons["magnitude_plausibility"].append(
+                f"all {len(pct)} percent claim(s) within the plausible "
+                "envelope (max "
+                f"{big:.0f}%)")
+    else:
+        mp = 2
+        reasons["magnitude_plausibility"].append(
+            "no percent claims to envelope-check (typed neutral "
+            "anchor — coverage disclosed)")
+    # ---- F91 (R113 dir 4): cure-kinetics claims route through the
+    # engine's COMPUTED relation — the regexes below only EXTRACT the
+    # claim's own numbers (INPUTS, Art. 3); the computed sign of
+    # thermoset_cure_residual_direction is the authority, never prose
+    # direction-matching (the HO15-10 class: "cure temperature from
+    # 150\u00b0C to 120\u00b0C ... reduces $f_{res}$ from ~15% (at
+    # high temp/low dose) to <2%" inverts the computed direction —
+    # conversion FALLS at the lower cure temperature, so residual
+    # oligomer RISES)
+    TEMP_PAIR_RE = re.compile(
+        r"(\d{2,3})(?:\.\d+)?\s*\u00b0?\s*C\s*(?:\u2192|->|\bto\b)"
+        r"\s*(\d{2,3})(?:\.\d+)?\s*\u00b0?\s*C", re.IGNORECASE)
+    RESID_PAIR_RE = re.compile(
+        r"(\d{1,3}(?:\.\d+)?)\s*%[^\n]{0,60}?\bto\b[^\n]{0,20}?"
+        r"\s*<?\s*(\d{1,3}(?:\.\d+)?)\s*%", re.IGNORECASE)
+    RESID_VOCAB_RE = re.compile(
+        r"residual|f_\{?res|unreacted|oligomer|monomer", re.IGNORECASE)
+    CURE_WORD_RE = re.compile(r"cure", re.IGNORECASE)
+    cure_pair = None
+    for m in TEMP_PAIR_RE.finditer(a):
+        if CURE_WORD_RE.search(a[max(0, m.start() - 200):
+                                  m.end() + 200]):
+            cure_pair = (float(m.group(1)), float(m.group(2)))
+            break
+    resid_pair = None
+    for m in RESID_PAIR_RE.finditer(a):
+        if RESID_VOCAB_RE.search(a[max(0, m.start() - 200):
+                                    m.end() + 200]):
+            r1_, r2_ = float(m.group(1)), float(m.group(2))
+            if r2_ < r1_:
+                resid_pair = (r1_, r2_)
+                break
+    if cure_pair and resid_pair:
+        t1_c, t2_c = cure_pair
+        r1, r2 = resid_pair
+        claimed_residual_falls = r2 < r1
+        from discovery_fabric.engine import physics_checks as _pc  # lazy (F83)
+        comp = _pc.thermoset_cure_residual_direction(t1_c, t2_c)
+        if (claimed_residual_falls
+                and comp.get("direction_of_effect") == "worsens"):
+            mp = min(mp, 1)
+            reasons["magnitude_plausibility"].append(
+                f"F91 computed-relation catch: the answer claims cure "
+                f"temp {t1_c:g}\u00b0C\u2192{t2_c:g}\u00b0C reduces "
+                f"the residual oligomer fraction {r1:g}%\u2192{r2:g}%, "
+                "but the engine's computed "
+                "thermoset_cure_residual_direction "
+                f"(k2/k1={comp.get('value')}) says conversion FALLS "
+                "at the lower cure temperature, so residual oligomer "
+                "RISES — the claim inverts the computed "
+                "direction-of-effect (Arrhenius cure kinetics; the "
+                "stoichiometry axis may dominate in reality — "
+                "typed magnitude/premise concern, the R113 "
+                "adjudication's HO15-10 class)")
+    scores["magnitude_plausibility"] = mp
+
+    return {"rubric_version": INVENTION_RUBRIC_VERSION,
+            "scorer": "coder_deterministic_v1",
+            "scores": scores,
+            "total": sum(scores.values()),
+            "rationale": reasons}
+
+
+def score_triple(problem: Dict[str, Any], arms: Dict[str, Dict[str, Any]],
+                 ) -> Dict[str, Any]:
+    """Score ONE problem's full arm set (baseline / a0plus / full / a1
+    ...). arms: name -> {answer, typed_state}. The comparison record
+    carries the per-axis means and the NOVELTY DELTA each arm posts
+    vs the baseline — the owner's item-9 gate reads exactly this
+    delta, auditor-judged."""
+    base_ans = str((arms.get("baseline") or {}).get("answer") or "")
+    out: Dict[str, Any] = {
+        "rubric_version": INVENTION_RUBRIC_VERSION,
+        "problem_id": problem.get("problem_id"),
+        "arms": {}}
+    std = standard_solution_reference(problem)
+    for name, rec in (arms or {}).items():
+        ans = str(rec.get("answer") or "")
+        if not ans.strip():
+            out["arms"][name] = {
+                "typed_state": rec.get("typed_state") or "NO_BYTES",
+                "scores": None,
+                "note": "no answer bytes — the compared object does "
+                        "not exist (Art. XXV); scored NOT"}
+            continue
+        # EVERY arm — the baseline included — is scored for novelty
+        # against the STANDARD practice universe: the standard-
+        # solution reference UNION the baseline answer (the frozen,
+        # audited standard-practice delivery for this problem). For
+        # the baseline arm this makes the departure identity-zero —
+        # the baseline IS the standard solution's answer by
+        # construction, and a lexical diff against itself is the
+        # honest 0, not a thin-reference artifact (R11 measured fix,
+        # 2026-11-14); the other arms' departure is measured from
+        # BOTH the generic standard practice and the problem's
+        # specific standard delivery.
+        s = score_answer(problem, ans,
+                         baseline_answer=None,  # R11 P2b: the
+                         # baseline-union comparator is RETIRED as
+                         # evidence — the comparator is the standard
+                         # reference + the prior-art corpus
+                         standard_answer=std,
+                         contract_state=rec.get("typed_state"))
+        out["arms"][name] = {"typed_state": rec.get("typed_state")
+                             or "NOT_SCORED",
+                             **s}
+    # the novelty delta vs baseline (the item-9 gate quantity)
+    b = (out["arms"].get("baseline") or {}).get("scores") or {}
+    for name, rec in out["arms"].items():
+        if name == "baseline" or not rec.get("scores"):
+            continue
+        if not b:
+            rec["novelty_delta_vs_baseline"] = "NOT_MEASURED"
+            continue
+        rec["novelty_delta_vs_baseline"] = round(
+            rec["scores"]["novelty"]
+            - b.get("novelty", 0), 2)
+        rec["feasibility_gap_vs_baseline"] = round(
+            abs(rec["scores"]["feasibility"]
+                - b.get("feasibility", 0)), 2)
+    return out
+
+
+#: the standard-solution statement per failure domain — REAL
+#: standard-practice content (the novelty comparator must carry the
+#: domain's actual standard vocabulary, or every verbose answer
+#: trivially scores novel against a thin sentence).
+_STANDARD_SOLUTIONS = {
+    # R11 comparator fix (measured 2026-11-14: the one-sentence
+    # references made EVERY full answer — the baseline included —
+    # score novelty 4 by trivial lexical distance, degenerating the
+    # item-9 gate's machine input to a 0.0 delta between two 4.0s).
+    # The references now carry the domain's actual standard-practice
+    # vocabulary at the length the rubric's own comment requires, so
+    # standard-practice content genuinely overlaps the comparator
+    # while mechanism-level departures still score distinct. ORDER
+    # MATTERS: 'imbalance' precedes 'partial discharge' because a
+    # battery failure text legitimately contains the word 'discharge'
+    # (measured: eval-new05-liion-balance-drift scored against the
+    # partial-discharge reference — the wrong domain comparator).
+    "imbalance": (
+        "The standard practice for cell imbalance in a battery pack: "
+        "a battery management system running periodic balancing, "
+        "passive bleeding or active charge transfer; capacity and "
+        "impedance grading to match cells at assembly; replacement "
+        "of the weakest cells or modules; and a tight thermal "
+        "environment so cells age uniformly. Trend per-cell state of "
+        "charge and internal resistance, and audit full-pack "
+        "capacity on a schedule."),
+    "partial discharge": (
+        "The standard practice for partial-discharge and insulation "
+        "degradation: uprate the insulation thermal class, improve "
+        "cooling and ventilation to reduce winding hot spots, keep "
+        "the load and ambient within nameplate limits, and run "
+        "scheduled offline diagnostics — insulation-resistance, "
+        "polarization-index, and tan-delta tests — plus online "
+        "partial-discharge monitoring where installed. Treat or "
+        "replace the insulating medium on a test schedule, trend "
+        "the discharge magnitude and pattern over time, and replace "
+        "windings or apparatus when the trend crosses the alarm "
+        "criteria."),
+    "grid corrosion": (
+        "The standard practice for positive grid corrosion in float "
+        "service: replace antimony-doped grid alloys with "
+        "lead-calcium or lead-calcium-tin alloys, thicken the "
+        "positive grids or redesign the grid geometry for a larger "
+        "corrosion buffer, and control the charge regime with a "
+        "temperature-compensated float voltage, limited overcharge, "
+        "and thermal management of the battery environment. Monitor "
+        "state of health on a schedule with capacity discharge "
+        "tests and internal-resistance or conductance measurements, "
+        "replace cells when delivered capacity falls below the "
+        "service threshold, and maintain electrolyte level and "
+        "recombination integrity."),
+    "fouling": (
+        "The standard practice for heat-exchanger fouling: "
+        "scheduled chemical cleaning with suited solvents and "
+        "biocide dosing, mechanical backwash or rodding, increased "
+        "cooling-water flow velocity to keep deposits suspended, "
+        "side-stream filtration, and surface coatings or alloy "
+        "selection to reduce adhesion. Monitor the fouling "
+        "resistance trend from differential-pressure and "
+        "heat-transfer data, derate the exchanger when the fouling "
+        "factor approaches the design margin, and clean on the "
+        "measured trend rather than a fixed calendar. For "
+        "chiller/condenser service the established indicators are "
+        "the fouling-resistance coefficient (Rf) computed from "
+        "BMS sensor logs, condenser approach temperature, cooling-"
+        "tower supply-temperature baselines, and capacity-delivery "
+        "trending (corpus expanded per Amendment 3 D3: measured "
+        "baseline-recall gap)."),
+    "brush wear": (
+        "The standard practice for brush and slip-ring wear: "
+        "replace the brushes at the wear limit, set brush spring "
+        "pressure inside the manufacturer band, seat and bed in new "
+        "brushes properly, keep the ambient humidity inside the "
+        "recommended band, and inspect wear and ring surface finish "
+        "on a schedule. Select the brush grade for the current "
+        "density and duty cycle, and correct ring runout or "
+        "vibration that accelerates wear. The established "
+        "predictors are the time-varying contact resistance from "
+        "slip-ring terminal voltage and measured excitation "
+        "current, brush-voltage-drop trending, current-variance "
+        "monitoring at historian sampling intervals, and ring "
+        "surface inspection (corpus expanded per Amendment 3 D3: "
+        "measured baseline-recall gap)."),
+    "spalling": (
+        "The standard practice for bearing spalling: replace the "
+        "bearing when vibration or condition indicators reach the "
+        "alarm limit, maintain the lubrication film with the "
+        "specified viscosity and quantity, keep contamination out "
+        "with sealing and filtration practice, correct misalignment "
+        "and mounting defects, and reduce load or speed where the "
+        "duty allows. Run periodic vibration monitoring against the "
+        "standard vibration zones and trend the defect frequencies."),
+    "dry-out": (
+        "The standard practice for electrolyte dry-out in "
+        "capacitors and supercapacitors: derate the operating "
+        "voltage below the rated maximum, control the operating and "
+        "ambient temperature, monitor equivalent series resistance "
+        "and capacitance on a trend, and replace the pack when ESR "
+        "or capacitance crosses the maintenance limit. Design the "
+        "duty cycle to the rated lifetime curves and avoid "
+        "sustained overvoltage or high ripple current."),
+    "creep": (
+        "The standard practice for elastomeric bearing creep: "
+        "specify the elastomer compound and hardness to the "
+        "governing bearing standard, replace or re-shim the pads "
+        "when deflection exceeds the limit, restore the seat level "
+        "with shims, and inspect the bearings on a schedule for "
+        "deformation, splitting, and hardening. Account for "
+        "temperature effects in the measured deflection and keep "
+        "the load within the rated capacity. Established bearing-"
+        "pad materials and protection: polyurea coatings, "
+        "fiber-reinforced elastomeric laminates (aramid fibers), "
+        "ozone-resistant elastomer compounds, and creep-deflection "
+        "drift trending (corpus expanded per Amendment 3 D3: the "
+        "R3 baseline's own standard-practice vocabulary measured "
+        "0.19 recall against the pre-expansion corpus — the "
+        "no-discrimination finding)."),
+    "barrier": (
+        "The standard practice for moisture and oxygen barrier in "
+        "multilayer packaging: increase the barrier-layer thickness "
+        "or add a supplemental high-barrier layer or foil, control "
+        "the lamination and sealing process for integral seals, "
+        "keep the processing and storage humidity within "
+        "specification, and qualify the structure with standard "
+        "WVTR and OTR permeation tests over the shelf-life "
+        "profile. Select layer materials for the intended thermal "
+        "history and verify seal integrity on the production line."),
+    "thermal cycling": (
+        "The standard practice for thermal-cycling endurance: limit "
+        "the cycle amplitude and ramp rate within the qualified "
+        "profile, add compliant buffer or interlayer design to "
+        "absorb differential expansion, select materials with "
+        "matched expansion coefficients, and qualify the assembly "
+        "with a standard thermal-cycling test to the required "
+        "cycle count. Monitor degradation indicators across the "
+        "campaign and retire the unit at the qualification "
+        "margin."),
+}
+
+
+#: R11 P2b (owner audit step 2): the PRIOR-ART corpus per failure
+#: domain — established, standard-practice TECHNIQUES (not one-sentence
+#: policies). This is what the novelty comparator diffs against now
+#: that the baseline-union is retired, and what the false-novelty
+#: instrument checks ideas against: a proposed "novel" idea that
+#: matches an entry here is KNOWN, and the instrument says so.
+#: Provenance: established engineering practice (ENGINEERING class,
+#: Art. XXVII); the corpus grows when the owner's seeded specimens are
+#: placed (typed NOT_PLACED until then — Art. XXV).
+_PRIOR_ART: Dict[str, str] = {
+    "spalling": (
+        "Established bearing and spalling techniques: vibration "
+        "spectral analysis with acceleration sensors, envelope "
+        "demodulation of bearing defect frequencies, spectral "
+        "kurtosis for transient-bearing-impact detection, ISO "
+        "vibration-severity zone monitoring, lubricant analysis and "
+        "particle counting, thermography of the housing, acoustic "
+        "emission monitoring, replacement at the vibration alarm "
+        "limit, and scheduled preventive replacement."),
+    "partial discharge": (
+        "Established partial-discharge and insulation techniques: "
+        "offline PD measurement per IEC 60270, phase-resolved PD "
+        "pattern analysis (PRPD), online PD monitoring with coupling "
+        "capacitors, tan-delta (power factor) testing, insulation "
+        "resistance and polarization-index tests, dissolved-gas "
+        "analysis (DGA) trending per IEEE C57.104 with gas-ratio "
+        "methods such as Duval's triangle, acoustic PD detection, "
+        "and scheduled oil sampling."),
+    "grid corrosion": (
+        "Established grid-corrosion techniques: lead-calcium and "
+        "lead-calcium-tin grid alloys, antimony-free grids, grid "
+        "thickening and geometry redesign, temperature-compensated "
+        "float-voltage regulation, capacity discharge testing, "
+        "conductance and internal-resistance ohmic measurement, "
+        "electrolyte-level maintenance, and cell replacement at the "
+        "capacity threshold."),
+    "fouling": (
+        "Established fouling techniques: scheduled chemical cleaning "
+        "with suited solvents and biocide dosing, mechanical "
+        "backwash and rodding, side-stream filtration, increased "
+        "cooling-water velocity, differential-pressure monitoring, "
+        "heat-transfer-coefficient trending, tube pigging, antifoul "
+        "surface coatings, copper-nickel and other biofouling-"
+        "resistant tube alloys, and chlorination programs."),
+    "brush wear": (
+        "Established brush and slip-ring techniques: brush "
+        "replacement at the wear limit, spring-pressure setting to "
+        "the manufacturer band, brush bedding-in, ambient-humidity "
+        "control, brush-grade selection for current density, ring "
+        "surface re-machining, and scheduled inspection."),
+    "dry-out": (
+        "Established dry-out techniques: operating-voltage derating, "
+        "temperature control, equivalent-series-resistance (ESR) "
+        "trending, capacitance-loss trending, thermal-derating to "
+        "the rated lifetime curves, ripple-current limiting, and "
+        "pack replacement at the ESR limit."),
+    "imbalance": (
+        "Established cell-imbalance techniques: battery-management-"
+        "system balancing (passive bleeding resistors and active "
+        "charge transfer), capacity and impedance grading of cells "
+        "at assembly, per-cell state-of-charge monitoring, "
+        "impedance trending, replacement of the weakest cells, and "
+        "tight thermal management so cells age uniformly."),
+    "creep": (
+        "Established elastomeric-bearing creep techniques: "
+        "elastomer compound and hardness specification to the "
+        "governing bridge-bearing standards, deflection monitoring, "
+        "shim restoration of the seat level, pad replacement at the "
+        "deflection limit, and scheduled inspection for deformation "
+        "and hardening."),
+    "barrier": (
+        "Established packaging-barrier techniques: foil lamination "
+        "and metallized films, increased EVOH barrier-layer "
+        "thickness, silicon-oxide barrier coatings, desiccant "
+        " sachets, WVTR and OTR permeation testing, seal-integrity "
+        "testing, and humidity-controlled storage and distribution."),
+    "thermal cycling": (
+        "Established thermal-cycling techniques: controlled ramp-"
+        "rate profiles, compliant buffer and interlayer design, "
+        "coefficient-of-thermal-expansion matching, glass-ceramic "
+        "and compliant seal structures, standard thermal-cycling "
+        "qualification tests to a required cycle count, and "
+        "degradation-indicator monitoring across the campaign."),
+}
+
+
+def prior_art_reference(problem: Dict[str, Any]) -> str:
+    """The PRIOR-ART statement for the failure domain — deterministic
+    from the same domain matcher the standard reference uses. Reference
+    input for scoring, never a delivered answer."""
+    std = standard_solution_reference(problem)
+    dom = ""
+    if std.startswith("STANDARD ("):
+        dom = std[len("STANDARD ("):std.find(")")]
+    if dom and dom in _PRIOR_ART:
+        return f"PRIOR-ART ({dom}): {_PRIOR_ART[dom]}"
+    return ""
+
+
+#: R11 P2b, third measured correction (2026-11-14): the corpus-recall
+#: instrument has a MEASURED discrimination ceiling — known prior-art
+#: ideas scored recall 0.23-0.52 while baseline answers scored
+#: 0.00-0.43 (the distributions overlap; a band between them would be
+#: tuning-until-it-lands, the exact gaming the owner's audit ordered
+#: out). The KNOWN verdict therefore rides NAMED-TECHNIQUE anchors:
+#: an idea that explicitly NAMES an established technique IS prior
+#: art for that domain — high precision, no band tuning. The lexical
+#: corpus distance stays in the rubric as a DISCLOSED secondary
+#: signal; the semantic novelty verdict is the auditor's + the
+#: independent judge's (Art. XXVI).
+_PRIOR_ART_TECHNIQUES: Dict[str, List[Tuple[str, bool]]] = {
+    # (anchor regex, is_signature) — signature = the technique's
+    # distinctive name; one signature or two plain anchors = KNOWN
+    "spalling": [
+        (r"spectral[ -]kurtosis|\bkurtosis\b", True),
+        (r"SCADA[ -]?(power|trend|based)[ -]?prognostic|machine[ -]"
+         r"learn(?:ing|ed)[ -]?(model|prognos)|gradient[ -]boosted",
+         True),
+        (r"envelope[ -](demodulat|spectrum|analysis|detect)", False),
+        (r"defect[ -]frequency|ISO[ ]?10816|ISO[ ]?20816", False),
+        (r"acoustic[ -]emission|particle[ -]count|lubricant[ -]analysis",
+         False),
+        (r"vibration[ -](monitor|program|alarm|zone)", False),
+    ],
+    "partial discharge": [
+        (r"PRPD|phase[- ]resolved", True),
+        (r"IEC[ ]?60270|C57\.104|\bDGA\b|dissolved[- ]gas|Duval", True),
+        (r"tan[- ]delta|polarization[ -]index|coupling[ -]capacitor",
+         False),
+        (r"acoustic[ -]PD|online[ -]PD[ -]monitor", False),
+        (r"insulation[- ]resistance|offline[ -]diagnostic", False),
+    ],
+    "grid corrosion": [
+        (r"lead[- ]calcium|antimony[- ]free", True),
+        (r"float[- ]voltage[ -](regulation|control)|capacity[ -]"
+         r"(discharge[ -])?test", False),
+        (r"conductance|internal[- ]resistance|ohmic", False),
+        (r"electrolyte[- ]level|recombination", False),
+    ],
+    "fouling": [
+        (r"chemical[ -]cleaning|biocide|backwash|pigging", True),
+        (r"C70600|90Cu[ -]?10Ni|copper[- ]nickel|cupronickel", True),
+        (r"side[- ]stream|chlorinat|antifoul|tin[- ]copper", False),
+        (r"differential[- ]pressure|heat[- ]transfer[- ]coefficient",
+         False),
+    ],
+    "brush wear": [
+        (r"wear[ -]limit|spring[ -]pressure|bedding[- ]in", True),
+        (r"brush[ -]grade|ring[ -]surface|runout", False),
+    ],
+    "dry-out": [
+        # AM3 D3 demoted True->False: ESR is the measured quantity
+        (r"\bESR\b|equivalent[ -]series[ -]resistance", False),
+        (r"capacitance[ -]trend|voltage[ -]derat|ripple[- ]current",
+         False),
+        (r"lifetime[ -]curves|thermal[ -]derat", False),
+    ],
+    "imbalance": [
+        (r"\bBMS\b|battery[- ]management|cell[ -]balanc", True),
+        (r"passive[ -]balanc|active[ -](balanc|charge[ -]transfer)",
+         True),
+        (r"cell[ -]grading|grading[ -]at[ -]assembly", False),
+        (r"state[- ]of[- ]charge[ -]monitor|impedance[ -]trend", False),
+    ],
+    "creep": [
+        (r"EN[ ]?1337|AASHTO", True),
+        (r"deflection[ -](monitor|limit)|shim|seat[ -]level", False),
+    ],
+    "barrier": [
+        # AM3 D3 demoted True->False: WVTR/OTR are measured quantities
+        # (requirement nouns), not technique names
+        (r"WVTR|OTR|seal[- ]integrity", False),
+        (r"nanoclay|nanocomposite|nanofiller|tortuosity", True),
+        (r"metallized|foil[ -]lamination|SiOx|desiccant", False),
+        (r"barrier[- ]layer[ -]thickness", False),
+    ],
+    "thermal cycling": [
+        # AM3 D3 demoted True->False: ramp rate/CTE are requirement nouns
+        (r"ramp[- ]rate|CTE|coefficient[ -]of[ -]thermal", False),
+        (r"buffer[ -]layer|interlayer|glass[- ]ceramic", False),
+        (r"qualification[ -]test|cycle[ -]count", False),
+    ],
+}
+
+
+def _prior_art_domain(problem: Dict[str, Any]) -> str:
+    std = standard_solution_reference(problem)
+    if std.startswith("STANDARD ("):
+        return std[len("STANDARD ("):std.find(")")]
+    return ""
+
+
+_PA_STRIP_STOP = {"the", "and", "for", "with", "from", "that", "this",
+                  "will", "shall", "must", "use", "used", "using",
+                  "based", "when", "where", "which", "have", "has",
+                  "are", "was", "were", "can", "may", "should", "into",
+                  "than", "then", "over", "under", "such", "also",
+                  "each", "any", "all", "more", "most", "per", "via",
+                  "only", "existing", "requirement", "require"}
+
+
+def _problem_vocab(problem: Dict[str, Any]) -> set:
+    """The USER'S OWN vocabulary (constraint + user_variables + device +
+    failure). AM3 D3: an anchor that fires only on the user's
+    requirement nouns (WVTR target, ESR budget, 1 A balancing current)
+    is a MATERIAL-FAMILY match, not a mechanism match — the idea is not
+    prior art for naming the requirement it must satisfy."""
+    # AM3 D3 measured scope fix: REQUIREMENT vocabulary only. Device/
+    # failure nouns stay (they are the domain vocabulary the anchors
+    # were built on; stripping them broke the fu-003 baseline's
+    # insulation-resistance anchor match — measured 2026-11-14).
+    t = str(problem.get("constraint") or "")
+    t += " " + " ".join(str(v) for v in (problem.get("user_variables")
+                                         or []))
+    t += " " + json.dumps(problem.get("clarification_answer") or "")
+    return {w for w in re.findall(r"[a-z][a-z\-]{2,}", t.lower())
+            if w not in _PA_STRIP_STOP}
+
+
+def _strip_problem_vocab(text: str, vocab: set) -> str:
+    """Remove the user's own vocabulary tokens (and anchor phrases built
+    from them) so the anchors read the IDEA'S OWN mechanism words."""
+    out = str(text or "")
+    for w in sorted(vocab, key=len, reverse=True):
+        out = re.sub(r"\b" + re.escape(w) + r"\b", " ", out,
+                     flags=re.IGNORECASE)
+    return out
+
+
+def prior_art_verdict_detail(idea_text: str,
+                             problem: Dict[str, Any]) -> Dict[str, Any]:
+    """AM3 D3 — the MECHANISM-LEVEL false-novelty verdict. KNOWN fires
+    only when an anchor matches the idea's OWN mechanism vocabulary
+    (the idea text minus the problem's requirement nouns, and minus the
+    DEPARTURE-FROM-STANDARD section which names the standard solution
+    BY DESIGN — the same measured lesson the novelty-search call site
+    already carries). A technique noun appearing only inside the
+    user's stated requirement or the departure contrast is a
+    material-family mention, never a mechanism match (the measured
+    over-withdrawal: UV-EVOH, IL-polymer, ZrO2 leads)."""
+    dom = _prior_art_domain(problem)
+    detail: Dict[str, Any] = {"domain": dom or None, "fired": [],
+                              "stripped_tokens_n": 0}
+    if not dom or dom not in _PRIOR_ART_TECHNIQUES:
+        detail["verdict"] = "NO_REFERENCE"
+        return detail
+    a_full = str(idea_text or "")
+    # the idea = everything BEFORE the departure contrast (that section
+    # names the standard solution by design)
+    a_idea = a_full.split("DEPARTURE FROM STANDARD")[0]
+    vocab = _problem_vocab(problem)
+    a_own = _strip_problem_vocab(a_idea, vocab).lower()
+    detail["stripped_tokens_n"] = len(vocab)
+    plain, sig = 0, []
+    for rx, is_sig in _PRIOR_ART_TECHNIQUES[dom]:
+        m = re.search(rx, a_own, re.IGNORECASE)
+        if m:
+            entry = {"anchor": m.group(0), "is_signature": is_sig,
+                     "mechanism_match": True}
+            detail["fired"].append(entry)
+            if is_sig:
+                sig.append(m.group(0))
+            else:
+                plain += 1
+    detail["verdict"] = "KNOWN" if (sig or plain >= 2) else "NOVEL"
+    return detail
+
+
+def prior_art_verdict(idea_text: str, problem: Dict[str, Any],
+                      detail: bool = False):
+    """The FALSE-NOVELTY instrument (owner audit step 2): does a
+    proposed idea match the domain's prior art? Returns KNOWN / NOVEL /
+    NO_REFERENCE (typed — Art. XXV: no corpus, no verdict). AM3 D3:
+    KNOWN = the idea NAMES an established technique IN ITS OWN
+    MECHANISM WORDS (one signature anchor or two plain anchors on the
+    idea text stripped of the problem's requirement vocabulary and the
+    departure contrast) — mechanism-level precision, not
+    material-family matching."""
+    d = prior_art_verdict_detail(idea_text, problem)
+    if detail:
+        return d
+    return d["verdict"]
+
+
+def _pa_tokens(t: str) -> set:
+    stop = {"the", "and", "for", "with", "from", "that", "this",
+            "will", "shall", "must", "use", "used", "using",
+            "based", "when", "where", "which", "have", "has",
+            "are", "was", "were", "can", "may", "should", "into",
+            "than", "then", "over", "under", "such", "also",
+            "each", "any", "all", "more", "most", "per", "via",
+            "established", "techniques", "practice", "standard",
+            "scheduled", "monitoring", "testing"}
+    return {w for w in re.findall(r"[a-z][a-z\-]{3,}", (t or "").lower())
+            if w not in stop}
+
+
+def standard_solution_reference(problem: Dict[str, Any]) -> str:
+    """The STANDARD solution statement for the failure domain — the
+    novelty comparator the rubric scores against. Deterministic from
+    the failure text. This is a REFERENCE input for scoring, never a
+    delivered answer (the reference text is typed STANDARD_REFERENCE,
+    not an arm)."""
+    f = (str(problem.get("failure") or "") + " "
+         + str(problem.get("failure_mode") or "")).lower()
+    for dom, txt in _STANDARD_SOLUTIONS.items():
+        if dom in f or any(re.search(r"\b" + re.escape(w),
+                                     f) for w in dom.split()):
+            return f"STANDARD ({dom}): {txt}"
+    # the failure vocabulary's own standard move
+    return ("STANDARD (domain practice): inspect on a schedule, "
+            "replace the worn component at its limit, derate the "
+            "operating stress, and improve the environment (the "
+            "domain's standard maintenance response).")

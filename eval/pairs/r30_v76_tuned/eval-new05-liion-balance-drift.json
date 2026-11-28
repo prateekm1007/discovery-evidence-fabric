@@ -1,0 +1,138 @@
+{
+ "problem_id": "eval-new05-liion-balance-drift",
+ "a1_source": "SYS_A1_INT_V72+V76/r30_v76_directive",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is a BMS firmware update that implements a Thermal‑Gradient Compensated Rest Balancing (TGCRB) algorithm: during every rest period (no charge/discharge for >1 h) the BMS wakes once per 24 h, measures all cell voltages, and applies the existing 1 A balancing current to the highest‑voltage cells (the cooler bottom cells) for a pre‑computed duration derived from the known 15 °C top‑to‑bottom gradient, holding the at‑rest cell‑to‑cell voltage spread below 35 mV.  \nStandard practice balances only during charge using a fixed voltage threshold, never balances during rest, and does not compensate for the thermal gradient.  \nAdjacent technique: “idle/storage balancing” exists in some BMS (e.g., periodic voltage‑threshold balancing while parked). Departure: TGCRB uses a position‑weighted, gradient‑derived schedule applied proactively, not reactively, so balancing charge exactly matches the predicted self‑discharge difference and no energy is wasted on unnecessary balancing.  \nMechanism: attacks the driving physics (temperature‑dependent self‑discharge differential) by proactively removing charge from the cooler cells at a rate that matches the predicted ΔI_sd, preventing the voltage spread from ever reaching the trip threshold.\n\nPHYSICS CHECK\nDriving variable = cell‑to‑cell voltage spread at rest (ΔV_rest).  \nGoverning relation: ΔV_rest ≈ (ΔI_sd · t) / (dQ/dV), where ΔI_sd is the self‑discharge current difference caused by the 15 °C gradient, t is rest time, and dQ/dV is the differential capacity. For NMC‑811 at 50 % SOC, dQ/dV ≈ 10 mV/%SOC, cell capacity ≈ 62 Ah. Typical self‑discharge at 25 °C ≈ 3 %/month (1.86 Ah/month); at 40 °C (top) ≈ 9 %/month (5.58 Ah/month). ΔI_sd ≈ (5.58‑1.86) Ah / 720 h ≈ 5.2 mA. Uncorrected daily ΔV_rest ≈ (5.2 mA × 24 h) / 62 Ah × (100 % / 10 mV) ≈ 2 mV/day → 35 mV in ~18 days.  \nTGCRB applies balancing charge Q_bal = I_bal · t_bal to the higher‑voltage (cooler) cells. With I_bal = 1 A, daily correction requires t_bal = 0.12 Ah / 1 A = 7.2 min/day, well within the 1 A capability.  \nDIRECTION‑OF‑EFFECT: driving variable = ΔV_rest; the mechanism moves it DOWN by applying balancing charge to the cooler cells; this REDUCES the failure driver.\n\nIMPLEMENTATION BILL\n| # | Item | Procurement tag | Notes |\n|---|------|----------------|-------|\n| 1 | BMS firmware update implementing TGCRB algorithm (wake schedule, voltage measurement, position‑weighted balancing duration calculation, hysteresis stop at 30 mV spread) | (c) | Parameter/procedure change on existing BMS microcontroller; delivered via standard OTA update mechanism. |\n| 2 | Existing BMS hardware (microcontroller, cell‑voltage ADCs, balancing MOSFETs, 1 A balancing resistors) | (a) | Used as‑is; no hardware modification. |\n| 3 | Existing 1 A balancing current capability | (a) | Used as‑is; duty cycle changed only. |\n| 4 | One‑time commissioning procedure: measure/confirm top‑to‑bottom thermal gradient (or accept nameplate 15 °C) and store position‑weighting factors in BMS non‑volatile memory | (c) | Procedure change; uses existing temperature sensors (if present) or nameplate gradient; no new instrumentation. |\n\nBURDEN LEDGER (STANDARD‑PRACTICE PARITY)\n| Aspect | Standard practice | TGCRB intervention | Burden comparison |\n|--------|-------------------|-------------------|-------------------|\n| Hardware procurement | BMS + balancing circuits (catalog) | Identical (rows 2,3) | Same |\n| Firmware development | Periodic OTA updates | One additional OTA update (row 1) | Same class (OTA update) |\n| Commissioning | Basic voltage/temperature check | Adds gradient characterization step (row 4) | One extra procedure step; same labor class |\n| Installation/commissioning | Standard cabinet install | Identical; firmware loaded during install | Same |\n| Operation | Balance during charge only | Balance during charge + 7 min/day rest balancing | Energy loss = 1 A × 3.7 V × 0.12 h/day = 0.44 Wh/day (0.015 % of 3 kWh/day) → explicit near‑zero operational loss |\n| Maintenance | None | None | Same |\n| Cost class | Standard BMS + balancing | No new parts, no new tooling | Same or lower |\n\nConclusion: same‑or‑lower burden class in every row; operational loss explicitly priced at 0.44 Wh/day (negligible).\n\nEXECUTABLE TEST\nProtocol:  \n1. Obtain two identical 13‑cell NMC‑811 modules (3 kWh each) with standard BMS.  \n2. Load Module A with standard firmware (charge‑only balancing). Load Module B with TGCRB firmware.  \n3. Place modules in an environmental chamber with a controlled 15 °C top‑to‑bottom gradient (heaters on top, coolers on bottom). Set both to 50 % SOC.  \n4. No charge/discharge cycles for 6 months (accelerated at 35 °C average to compress calendar aging; gradient maintained at 15 °C).  \n5. Record all cell voltages daily via the BMS (accuracy ±5 mV).  \nPass/fail thresholds:  \n- PASS: Module B maximum cell‑to‑cell voltage spread at rest remains <35 mV for the entire test.  \n- FAIL: Module B spread exceeds 35 mV at any measurement point.  \nKill criterion: If Module B exceeds 35 mV, the intervention is falsified.  \nDuration: 6 months (or equivalent accelerated time).  \nInstruments: Existing BMS voltage measurement (no added sensors); external thermocouples only for gradient verification (not part of deployed mechanism).",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 4044,
+   "latency_s": 106.2,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "KILL",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'footprint' in: spread held <5 mv.\n\nimplementation bill\n| item | class (a/b/c) | description |\n|------|---------------|-------",
+     "excluded stem 'module' in: the only added burden is ~0.08 %/year energy loss — far below any operational threshold.\n\nexecutable test\nprot",
+     "excluded stem 'module' in: module b: proposed firmware (4×/day wake, 32 s active balance top←bottom)",
+     "excluded stem 'modules' in: the only added burden is ~0.08 %/year energy loss — far below any operational threshold.\n\nexecutable test\nprot"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "9d43df57083e4612"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5513,
+   "latency_s": 103.7,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Firmware update: same class (software change), same deployment effort (OTA update), no n",
+     "- Balancer, voltage sensing, module: unchanged."
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'module' in: novelty statement (intervention)  \nproposed intervention: a position-aware rest-period balancing schedule that",
+     "excluded stem 'module' in: adds a scheduled task that, when the module has been idle >1 h, activates the balancer for 10 min every 24 h, ",
+     "excluded stem 'module' in: |\n| existing module mechanical assembly (13‑cell series stack) | (a) | used as‑is; the fixed top‑to‑bottom geo",
+     "excluded stem 'module' in: |\n\nburden ledger (standard‑practice parity)  \nstandard practice bill: bms firmware (balancing algorithm), acti"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "57924ccfc2e1b765",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Firmware update: same class (software change), same deployment effort (OTA update), no n; - Balancer, voltag",
+    "CONSTRAINT_EXCLUSION: excluded stem 'module' in: novelty statement (intervention)  \nproposed intervention: a position-aware rest-per",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 4361,
+   "latency_s": 72.6,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installation/commissioning: identical to standard OTA firmware update (same tools, same ",
+     "- Operation: no added sensors, no added hardware, no added process steps. Balancing runs d",
+     "- Maintenance: same firmware maintenance cycle.",
+     "- Cost class: same (software development and validation effort comparable to standard algo"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'increasing' in: mechanism: attacks the driving physics (temperature-dependent self-discharge rate difference) by converting th",
+     "excluded stem 'module' in: magnitude verification: accelerated aging simulation shows predictive algorithm reduces peak rest spread from ",
+     "excluded stem 'module' in: kill criterion: if module b spread exceeds 35 mv in more than 10% of rest periods, the mechanism is falsified."
+    ]
+   },
+   "sha256_16": "f7e36915c9a0a63e",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installation/commissioning: identical to standard OTA firmware update (same tools, same ; - Operation: no ad",
+    "CONSTRAINT_EXCLUSION: excluded stem 'increasing' in: mechanism: attacks the driving physics (temperature-dependent self-discharge ra"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 5329,
+   "latency_s": 95.5,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "e6ee83d05d163389",
+   "findings_disclosed": [
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T10:36:42.585283Z"
+}

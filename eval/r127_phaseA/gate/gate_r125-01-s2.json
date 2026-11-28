@@ -1,0 +1,80 @@
+{
+ "problem_id": "r125-01-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 4.68,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 819,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 10.34,
+   "usage": {
+    "prompt_tokens": 1164,
+    "completion_tokens": 1294,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Barrel Setpoint Correction Using Check",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Barrel Setpoint Correction Using Check-Weigher Feedback and Thermal Compensation**\n\n**Mechanism:**\nThe observed symptom of increased screw recovery time and part weight drift at constant barrel setpoints indicates a loss of heat transfer efficiency within the barrel zones, likely due to fouling (carbonization) on the thermocouple sensing elements or the barrel inner walls, causing the actual melt temperature to lag behind the setpoint. This results in lower melt viscosity, which the injection unit overcompensates for by injecting more volume/pressure to reach the same fill level, leading to higher part weight. The mitigation mechanism is to dynamically adjust the barrel zone temperature setpoints upward based on the deviation of the part weight from the target, using the existing check-weigher as the primary feedback sensor and the thermocouple readings as a secondary constraint to prevent overheating. This creates a self-tuning loop that counteracts the degrading thermal efficiency without new hardware.\n\n**Implementation:**\n1.  **Data Aggregation:** The machine’s controller continuously logs the cycle-time data, including the measured part weight from the check-weigher at every cycle, and the real-time temperature readings from the barrel zone thermocouples.\n2.  **Baseline Establishment:** Define the \"Target Weight\" ($W_{target}$) and establish a \"Baseline Weight Trend\" ($W_{baseline}$) using a moving average of part weights from a known good period (e.g., the start of the production run before drift began).\n3.  **Deviation Calculation:** Calculate the weight deviation $\\Delta W = W_{current} - W_{target}$ for the most recent $N$ cycles (where $N$ is a statistically significant number, e.g., 20).\n4.  **Setpoint Adjustment Algorithm:**\n    *   If $\\Delta W > Tolerance_{upper}$ (part is too heavy), the system applies a corrective temperature increment $\\Delta T_{corr} = K_p \\cdot \\Delta W$, where $K_p$ is a tuned gain factor (e.g., 0.5°C per gram of excess weight, depending on material).\n    *   The new setpoint for the affected barrel zones (typically the mid and rear zones where plasticization occurs) is updated: $Setpoint_{new} = Setpoint_{current} + \\Delta T_{corr}$.\n    *   **Safety Constraint:** The algorithm checks the thermocouple readings against a maximum allowable temperature limit ($T_{max}$) for the material. If $Setpoint_{new} > T_{max}$, the setpoint is capped at $T_{max}$, and an alert is triggered for manual cleaning/inspection, as thermal correction can no longer compensate for the fouling.\n5.  **Verification Loop:** After the setpoint change is implemented, the system monitors the next $N$ cycles. If the part weight returns to within tolerance and screw recovery time stabilizes/decreases, the new setpoint is locked. If not, the gain $K_p$ is automatically adjusted (increased slightly) for the next correction cycle, up to a defined limit.\n\n**Measures Relied Upon:**\n*   **Part Weight (Check-Weigher):** Primary output measure for determining the magnitude and direction of the process error.\n*   **Screw Recovery Time (Cycle-Time Logger):** Secondary diagnostic measure; a decrease in recovery time following a temperature setpoint increase confirms that melt plasticity has improved (lower viscosity due to higher temperature), validating that the thermal correction is effective.\n*   **Barrel Zone Thermocouple Readings:** Used to ensure the corrective setpoint adjustment does not violate material-specific temperature limits and to monitor the actual response of the barrel to the setpoint change, preventing thermal runaway or material degradation.\n*   **Cycle-Time Logger:** Provides the temporal context and data aggregation framework for calculating moving averages and detecting trends in weight and recovery time.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Barrel Setpoint Correction Using Check-Weigher Feedback and Thermal Compensation**\n\n**Mechanism:**\nThe observed symptom of increased screw recovery time and part weight drift at constant barrel setpoints indicates a loss of heat transfer efficiency within the barrel zones, likely due to fouling on the barrel inner walls. This causes the actual melt temperature to lag behind the setpoint, resulting in higher melt viscosity. The injection unit must inject more volume to achieve the same fill level, leading to higher part weight and longer screw recovery times. The mitigation mechanism is to dynamically adjust the barrel zone temperature setpoints upward based on the deviation of the part weight from the target, using the existing check-weigher as the primary feedback sensor and the thermocouple readings as a secondary constraint to prevent overheating.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** The deviation of the measured part weight from the target ($\\Delta W = W_{current} - W_{target}$).\n*   **Direction of Effect:** An increase in part weight above target ($\\Delta W > 0$) indicates insufficient melt temperature/plasticization (higher viscosity). Therefore, the driving variable is positive, and the corrective effect on the temperature setpoint is also positive (increase). The system increases the barrel zone setpoints to lower melt viscosity, thereby reducing the volumetric injection required and bringing the part weight back down towards the target.\n*   **Mechanistic Path:** $\\Delta W > 0$ \\$\\rightarrow$ Increase Setpoint $\\rightarrow$ Increase Actual Barrel Temp \\$\\rightarrow$ Decrease Melt Viscosity \\$\\rightarrow$ Decrease Required Injection Volume \\$\\rightarrow$ Decrease Part Weight \\$\\rightarrow$ Decrease Screw Recovery Time.\n\n**Implementation:**\n1.  **Data Aggregation:** The machine’s controller continuously logs the cycle-time data, including the measured part weight from the check-weigher at every cycle, and the real-time temperature readings from the barrel zone thermocouples.\n2.  **Baseline Establishment:** Define the \"Target Weight\" ($W_{target}$) and establish a \"Baseline Weight Trend\" ($W_{baseline}$) using a moving average of part weights from a known good period.\n3.  **Deviation Calculation:** Calculate the weight deviation $\\Delta W = W_{current} - W_{target}$ for the most recent $N$ cycles.\n4.  **Setpoint Adjustment Algorithm:**\n    *   If $\\Delta W > Tolerance_{upper}$, the system applies a corrective temperature increment $\\Delta T_{corr} = K_p \\cdot \\Delta W$.\n    *   The new setpoint is updated: $Setpoint_{new} = Setpoint_{current} + \\Delta T_{corr}$.\n    *   **Safety Constraint:** Check against $T_{max}$. If exceeded, cap and alert.\n5.  **Verification Loop:** Monitor next $N$ cycles. If part weight returns to tolerance and screw recovery time decreases, lock setpoint. Otherwise, adjust gain $K_p$.\n\n**Implementation Bill:**\n*   **Hardware Changes:** None. No new sensors or actuators are added.\n*   **Software/Controller Changes:**\n    *   Update PLC/controller logic to implement the moving average calculation for $W_{current}$.\n    *   Implement the conditional logic for $\\Delta W$ vs. $Tolerance_{upper}$.\n    *   Implement the linear gain calculation $\\Delta T_{corr} = K_p \\cdot \\Delta W$.\n    *   Implement the safety cap check against $T_{max}$ derived from material specs.\n    *   Configure the HMI to display the new $Setpoint_{new}$ and alert status.\n*   **Calibration/Tuning:**\n    *   Determine initial gain factor $K_p$ (degC/g) based on material thermal properties and historical data.\n    *   Define $N$ (number of cycles for averaging) and $Tolerance_{upper}$.\n    *   Verify $T_{max}$ limits for the specific resin being processed.\n\n**Measures Relied Upon:**\n*   **Part Weight ($W_{current}$):**\n    *   *Source:* Direct measurement from the **check-weigher**.\n    *   *Usage:* Primary feedback signal. $W_{current}$ is the mean of the last $N$ weigher readings. Used to calculate $\\Delta W = W_{current} - W_{target}$. $W_{target}$ is a fixed process parameter.\n*   **Screw Recovery Time ($T_{recovery}$):**\n    *   *Source:* Derived from the **cycle-time logger**.\n    *   *Derivation:* The cycle-time logger records the start and end times of the screw recovery (plasticization) phase. $T_{recovery} = t_{recovery\\ end} - t_{recovery\\ start}$.\n    *   *Usage:* Secondary verification metric. A decrease in $T_{recovery}$ confirms that melt viscosity has dropped due to increased temperature, validating the physical mechanism of the correction.\n*   **Barrel Zone Temperature ($T_{actual}$):**\n    *   *Source:* Direct measurement from the **barrel zone thermocouples**.\n    *   *Usage:* Safety constraint. $T_{actual}$ is monitored to ensure that $Setpoint_{new}$ does not cause $T_{actual}$ to exceed the material degradation limit $T_{max}$. The controller compares the requested $Setpoint_{new}$ against pre-defined material-specific $T_{max}$ values (process knowledge, not a measured value, but a constraint constant).\n*   **Cycle-Time Context:**\n    *   *Source:* **Cycle-time logger**.\n    *   *Usage:* Provides the timestamp and phase data required to isolate the screw recovery duration and to synchronize the check-weigher weight measurements with specific cycles for the moving average calculation.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Hardware Changes:** None. No new sensors or actuators are added.",
+   "*   **Software/Controller Changes:**",
+   "*   Update PLC/controller logic to implement the moving average calculation for $W_{curren",
+   "*   Implement the conditional logic for $\\Delta W$ vs. $Tolerance_{upper}$.",
+   "*   Implement the linear gain calculation $\\Delta T_{corr} = K_p \\cdot \\Delta W$.",
+   "*   Implement the safety cap check against $T_{max}$ derived from material specs.",
+   "*   Configure the HMI to display the new $Setpoint_{new}$ and alert status.",
+   "*   **Calibration/Tuning:**",
+   "*   Determine initial gain factor $K_p$ (degC/g) based on material thermal properties and ",
+   "*   Define $N$ (number of cycles for averaging) and $Tolerance_{upper}$.",
+   "*   Verify $T_{max}$ limits for the specific resin being processed.",
+   "*   **Part Weight ($W_{current}$):**",
+   "*   *Source:* Direct measurement from the **check-weigher**.",
+   "*   *Usage:* Primary feedback signal. $W_{current}$ is the mean of the last $N$ weigher re",
+   "*   **Screw Recovery Time ($T_{recovery}$):**",
+   "*   *Source:* Derived from the **cycle-time logger**.",
+   "*   *Derivation:* The cycle-time logger records the start and end times of the screw recov",
+   "*   *Usage:* Secondary verification metric. A decrease in $T_{recovery}$ confirms that mel",
+   "*   **Barrel Zone Temperature ($T_{actual}$):**",
+   "*   *Source:* Direct measurement from the **barrel zone thermocouples**.",
+   "*   *Usage:* Safety constraint. $T_{actual}$ is monitored to ensure that $Setpoint_{new}$ ",
+   "*   **Cycle-Time Context:**",
+   "*   *Source:* **Cycle-time logger**.",
+   "*   *Usage:* Provides the timestamp and phase data required to isolate the screw recovery "
+  ],
+  "APPARATUS_ROW": [
+   "*   **Hardware Changes:** None. No new sensors or actuators are added.",
+   "*   *Usage:* Safety constraint. $T_{actual}$ is monitored to ensure that $Setpoint_{new}$ does not cause $T_{a"
+  ]
+ },
+ "wall_clock_s": 23.05,
+ "status": "DELIVERED_REVIEWED"
+}

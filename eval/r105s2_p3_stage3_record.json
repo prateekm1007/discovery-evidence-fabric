@@ -1,0 +1,128 @@
+{
+ "record": "R105S2_P3_STAGE3_ADAPTIVE_CONFORMAL/1.0.0",
+ "ran_at": "2026-11-19T22:07:32Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r105s2",
+ "claim": "c-0125 (p3-realdata-conformal-validation; stage 3)",
+ "diagnosis": "the stage-2 41-unit FM failures = units with n < 2*CTX=192 cycles (the walk window channel[i-CTX:i] negative-index wrap for i<CTX; typed) — stage 3 enforces the n>=2*CTX floor; census: FD001 62/100 eligible, FD002 152/260 eligible, subsampled 40 (seed 17)",
+ "remedies": {
+  "sliding_conformal": "q_i = CONF-quantile of the last K=100 causal |one-step residuals| (fit-half primed) — the drift remedy",
+  "alarm_counting": "an alarm fires only after N_CONSEC=3 consecutive breaches; FA in alarms, per machine-year at the typed cadence (C-MAPSS 1 cycle/day -> 365 steps/yr; CWRU 0.1s segments -> 3.15e8/yr)"
+ },
+ "matched_budget_table": {
+  "note": "same fit half, same K, same alpha, same legs across arms; the fit cost: prototype enbpi bootstrap O(n_fit) per fit vs FM zero-shot (no fit); inference: the wall-clock rows below",
+  "inference_batched_call_ms_median": 4996.2,
+  "inference_batched_call_ms_p90": 12434.3
+ },
+ "results": {
+  "FD001/chronos-bolt-base/sliding": {
+   "n_units": 37,
+   "coverage_median": 0.887,
+   "alarms_per_1000_median": 0.0,
+   "alarms_per_machine_year_median": 0.0
+  },
+  "FD002/chronos-bolt-base/sliding": {
+   "n_units": 40,
+   "coverage_median": 0.8982,
+   "alarms_per_1000_median": 0.0,
+   "alarms_per_machine_year_median": 0.0
+  },
+  "FD001/TimeMoE-50M/sliding": {
+   "n_units": 37,
+   "coverage_median": 0.6542,
+   "alarms_per_1000_median": 45.872,
+   "alarms_per_machine_year_median": 16.743
+  },
+  "FD002/TimeMoE-50M/sliding": {
+   "n_units": 40,
+   "coverage_median": 0.9118,
+   "alarms_per_1000_median": 0.0,
+   "alarms_per_machine_year_median": 0.0
+  },
+  "FD001/chronos-bolt-base/static": {
+   "n_units": 37,
+   "coverage_median": 0.8559,
+   "alarms_per_1000_median": 0.0,
+   "alarms_per_machine_year_median": 0.0
+  },
+  "FD002/chronos-bolt-base/static": {
+   "n_units": 40,
+   "coverage_median": 0.8901,
+   "alarms_per_1000_median": 0.0,
+   "alarms_per_machine_year_median": 0.0
+  },
+  "CWRU/chronos-bolt-base/sliding": {
+   "hp0": {
+    "normal_file": 97,
+    "fault_file": 105,
+    "n_normal_segments": 203,
+    "healthy_sliding": {
+     "n_walk": 102,
+     "coverage": 0.9216,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault_sliding": {
+     "n_walk": 101,
+     "coverage": 0.9703,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    }
+   },
+   "hp1": {
+    "normal_file": 98,
+    "fault_file": 106,
+    "n_normal_segments": 403,
+    "healthy_sliding": {
+     "n_walk": 202,
+     "coverage": 0.901,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault_sliding": {
+     "n_walk": 151,
+     "coverage": 0.8543,
+     "alarms": 2,
+     "alarms_per_1000": 13.245
+    }
+   },
+   "hp2": {
+    "normal_file": 99,
+    "fault_file": 107,
+    "n_normal_segments": 404,
+    "healthy_sliding": {
+     "n_walk": 202,
+     "coverage": 0.9109,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault_sliding": {
+     "n_walk": 152,
+     "coverage": 0.8553,
+     "alarms": 2,
+     "alarms_per_1000": 13.158
+    }
+   },
+   "hp3": {
+    "normal_file": 100,
+    "fault_file": 108,
+    "n_normal_segments": 404,
+    "healthy_sliding": {
+     "n_walk": 202,
+     "coverage": 0.901,
+     "alarms": 0,
+     "alarms_per_1000": 0.0
+    },
+    "fault_sliding": {
+     "n_walk": 152,
+     "coverage": 0.8355,
+     "alarms": 4,
+     "alarms_per_1000": 26.316
+    }
+   }
+  }
+ },
+ "gates_reading": {
+  "note": "measurements for the auditor — NO acceptance claims; the gate arithmetic (coverage>=1-alpha, FA<=1/mach/yr, median<=2min, matched-budget ablation) is judged on THIS record + stages 1-2 together"
+ },
+ "no_acceptance_or_score_claims": true
+}

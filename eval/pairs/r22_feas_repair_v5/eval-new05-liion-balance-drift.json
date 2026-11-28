@@ -1,0 +1,50 @@
+{
+ "problem_id": "eval-new05-liion-balance-drift",
+ "a1_source": "SYS_A1_INT_V4+V5-repair-leg/r22_feas_repair_b18",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is to implement a thermal equalization system using phase change materials (PCMs) embedded within the cell spacing to maintain uniform temperature across the module, thereby minimizing capacity and self-discharge variations. Standard practice relies solely on active thermal management and passive balancing to address temperature gradients and imbalance. This mitigation departs by introducing localized thermal buffering at the cell level rather than module-level cooling. The closest existing practice is PCM use in electronics for thermal protection, but this adaptation targets equalization rather than peak temperature reduction, directly attacking the temperature-driven capacity drift mechanism.\n\nPHYSICS CHECK — The governing relation is the temperature dependence of capacity fade: dC/dT = α·C, where α is the temperature coefficient (typically ~0.3-0.5%/°C for NMC). By maintaining ΔT < 2°C across cells (vs. 15°C baseline), the capacity variation reduces by ~90% (from 4.5-7.5% to 0.5-1%). The PCM's latent heat absorption (e.g., paraffin with ΔH ~200 kJ/kg) for a 5°C temperature swing can buffer ~10 Wh/cell, sufficient to equalize thermal transients in the module.\n\nIMPLEMENTATION BILL — \n- 13-cell series string of NMC-811 cells; (a)\n- 1 A balancing circuit; (a)\n- Busbars connecting cells in series; (a)\n- Module casing with thermal management; (a)\n- Phase change material sheets (paraffin-based, 0.5 mm thickness, cut to cell dimensions); (b)\n- Thermal interface pads (silicone-based, 0.2 mm thickness); (b)\n- Installation procedure: clean cell surfaces, apply thermal pad, position PCM sheet, assemble module; (c)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \nStandard practice uses: 13-cell string, 1 A balancing circuit, busbars, module casing.\nThis intervention adds: PCM sheets (procurable thermal management material), thermal interface pads (standard electronics component), and installation procedure (no hardware cost).\nBurden class: Same as standard practice (all additions are standard catalog items with no new tooling or infrastructure required).\n\nEXECUTABLE TEST — \nProtocol: Cycle the module between 20-80% SOC at 1C rate with 15°C imposed gradient (top hot, bottom cold) for 500 cycles. Monitor cell voltages at rest every 50 cycles. Measure temperature at cell centers with thermocouples.\nPass/fail: Voltage spread must remain ≤35 mV at all measurements. If spread exceeds 35 mV at any point, intervention fails.\nKill criterion: Any cell voltage deviation >100 mV from mean indicates thermal runaway risk; test terminates immediately.\nDuration: 500 cycles (~6 months at 1C/day).\n\nFEASIBILITY AUDIT (V5):\n- 13-cell series string of NMC-811 cells; - (a) - stated equipment\n- 1 A balancing circuit; - (a) - stated equipment\n- Busbars connecting cells in series; - (a) - stated equipment\n- Module casing with thermal management; - (a) - stated equipment\n- Phase change material sheets; - (b) - procurable thermal management material\n- Thermal interface pads; - (b) - standard electronics component\n- Installation procedure; - (c) - parameter change to stated equipment",
+ "meta": {
+  "repairs": 1,
+  "residual_findings": {},
+  "audit_block": true,
+  "final_sha256_16": "82043e886a2f3579",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3492,
+    "latency_s": 11.9,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- 13-cell series string of NMC-811 cells",
+      "- 1 A balancing circuit",
+      "- Busbars connecting cells in series",
+      "- Module casing with thermal management",
+      "- 13-cell series assembly",
+      "- 1 A balancing circuit",
+      "- Standard busbar routing",
+      "- Standard assembly procedure",
+      "- Cell holder brackets: Modified existing design (same cost class)",
+      "- Busbars: Standard offset connection design (same cost class)",
+      "- Assembly procedure: Alternating orientation adds 5 min/module (same labor class)",
+      "- Thermal mapping: Adds 15 min/module post-assembly (same labor class)"
+     ]
+    },
+    "sha256_16": "1159c46c4542a8fc"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 3150,
+    "latency_s": 13.0,
+    "critic_verdict": "CLEAN",
+    "scan": {},
+    "sha256_16": "82043e886a2f3579"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T17:19:19.502648Z"
+}

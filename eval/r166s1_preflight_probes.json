@@ -1,0 +1,104 @@
+{
+ "record": "R166S1_PREFLIGHT_PROBES/1.0.0",
+ "session": "builder-r166s1",
+ "role": "VERIFIER (post-recycle preflight; no lane takes — c-0268/c-0269 stay builder-r165s1's, both leases live)",
+ "window": "2026-11-26 ~15:54-16:20Z (pre both crons: panel 00:05Z Nov 27 / P5 v2 01:30Z Nov 27)",
+ "base": "queue/dev12_r7 @ ebd966f6a57aff2bd42d91236b7f3fadd2fd9b68 (green: check-run surface success)",
+ "claim_before_work": "none filed — zero-burn verification window only (DIR 7: probes and reads carry no claim burn; no panel/P5 generation fired)",
+ "dir1_full_read": {
+  "epistemic_constitution": {
+   "sha": "ebd966f6a57aff2bd42d91236b7f3fadd2fd9b68",
+   "digest16": "153ac62efca36c2d",
+   "expected": "153ac62efca36c2d",
+   "match": true,
+   "articles": 30,
+   "amendments": 4,
+   "note": "30 '### Article' headers + 4 '## AMENDMENT RECORD' blocks counted from bytes (29+amendments per directions = this same file; the byte digest is authoritative)"
+  },
+  "auditor_constitution": {
+   "sha": "ea2484d44399",
+   "digest16": "3775f869a1c19a96",
+   "expected": "3775f869a1c19a96",
+   "match": true,
+   "articles": 14
+  },
+  "ledger": {
+   "verdicts_count": 121,
+   "last": "V130",
+   "v130_gate": "crons platform-side durable (R165-F1 closed); red tip healed (R165-F3 closed); panel 00:05 + P5 v2 01:30 scheduled; hy4 503 pending; score 7 consolidated",
+   "v130_score": 7,
+   "v130_consolidated": true
+  },
+  "vault": {
+   "restored_keys": 8,
+   "digests_only": [
+    "GH_PAT f1ebca5f9b62",
+    "XKIRO f6c09bee9bde (matches directions)",
+    "CENT_AI a5beece70d05",
+    "AGNES d0c666a3842f / AGNES_2 5c4dffd28fe4"
+   ],
+   "re_custody_additions": [
+    "TOKENROUTER_API_KEY c148574f6215 (from the R166 directions; not vault-managed — same class as the r164s1 custody, digests-only here)",
+    "CENT_AI_BASE_URL corrected 9eb06a0caddd -> 241514fcbcbe (https://api.cent-ai.dev/v1; the vault carried the bare-domain regression 'https://cent-ai.dev')"
+   ],
+   "secret_grep": "0 LIVE (r157s3_secret_grep.py: all 7 vault keys tree-hits=0 msg-hits=0)"
+  }
+ },
+ "probe_table": [
+  {
+   "probe": "xkiro GET /v1/models (vault key f6c09bee9bde)",
+   "status": "HTTP 200",
+   "finding": "auth VALID, 62 models listed; sensenova/sensenova-6.8-flash-lite PRESENT; mistralai/ministral-14b ABSENT; NO mistralai/* entries at all (full list enumerated)"
+  },
+  {
+   "probe": "xkiro POST /v1/chat/completions model=mistralai/ministral-14b max_tokens=16",
+   "status": "HTTP 404 (latency 0.1s)",
+   "finding": "{\"error\":{\"message\":\"Model \\\"mistralai/ministral-14b\\\" does not exist.\",\"type\":\"not_found_error\",\"code\":\"not_found\"}} — CONFIRMED DELISTED, not an outage; zero quota consumed (404 class)"
+  },
+  {
+   "probe": "xkiro POST /v1/chat/completions model=sensenova/sensenova-6.8-flash-lite max_tokens=16",
+   "status": "HTTP 429 (latency 0.1s)",
+   "finding": "'today's free-model token quota' reached — AUTH VALID, pool dead until 00:00 UTC Nov 27 reset as expected; the 00:05Z panel cron remains armed"
+  },
+  {
+   "probe": "tokenrouter G0 POST /chat/completions model=deepseek/deepseek-v4.1-flash-1017-free",
+   "status": "HTTP 200",
+   "finding": "G0 seat LIVE (served deepseek-ai/DeepSeek-V4.1-Flash-1017); the P5 v2 wrapper's G0 gate will pass"
+  },
+  {
+   "probe": "cent-ai J2 POST /v1/chat/completions model=hy4-flash:free @ https://api.cent-ai.dev/v1",
+   "status": "HTTP 503",
+   "finding": "{\"error\":{\"code\":\"upstream_unavailable\",\"message\":\"The model is temporarily unavailable...\"}} — outage persists (~since 09:32Z per R163; >6h); the 01:30Z P5 v2 cron's two-seat live gate will REFUSE to fire (exit 2, no burn, hold stands)"
+  }
+ ],
+ "panel_cron_550235_preflight": {
+  "claim": "c-0268 (builder-r165s1, OPEN, lease 2026-11-27T08:00Z)",
+  "scheduled": "2026-11-27T00:05Z",
+  "scope_from_bytes": "hy4f 30/30 VALID (skip); snlite 23 VALID + 2 RATE_LIMITED -> the runner retries 7 legs (5 never-landed + 2 RATE_LIMITED non-VALID; the R146 only-VALID-skip fix); mst14b 0/30",
+  "budget_fix_in_tree": "confirmed — scripts/r153_p4_panel_v18.py snlite budgets [12000] upfront (bf6da6e32)",
+  "THE_BLOCKER": "mistralai/ministral-14b is DELISTED from xkiro's catalog (404 not_found, byte-probed this window; also absent from R163's ~12:31Z probe — provider-side, persistent). The cron WILL fire and generate the snlite legs, but all 30 mst14b legs will return TRANSPORT_FAILED (the _leg retry loop retries 4x then lands TRANSPORT_FAILED; no quota burn on 404s, no VALID legs) -> the tally degenerates to snlite+hy4f only = 2 JUDGES, NOT the full 3-judge two-axis majority the score-8 bar requires. The tally's serving gate (>=3 judges) is checked from QUALIFICATION bytes at run start, NOT from live-model availability — the runner will not refuse to run.",
+  "what_this_is_not": "NOT an outage (503 class), NOT a quota issue, NOT a transport-configuration error (api.xkiro.com correct host confirmed), NOT a mid-gate judge-swap question for the builder to decide",
+  "decision_owner": "owner/auditor — the remedies are all registry/governance acts: (a) wait for xkiro to re-list the model (no evidence of that; R163 saw it absent 12:31Z Nov 26 too), (b) an owner-sealed judge replacement + re-qualification on a mistral-family substitute (NO mistral-family model is currently in xkiro's 62-model catalog — the family is GONE from this transport), or (c) an owner-sealed transport change (each = a new R-CAL, never mid-gate per V128/F2). The builder does NOT pick — no mid-gate swap (DELETE LIST)."
+ },
+ "substitute_candidates_typed_not_chosen": {
+  "note": "enumerated for the owner/auditor's decision ONLY; NONE is chosen or fired by this window (no mid-gate swap, V128; the serving set is FROZEN)",
+  "mistral_family_on_xkiro": "NONE — the entire mistralai/* family is absent from the current 62-model catalog (mst8b/mst3b/mst14b all gone)",
+  "xkiro_free_models_unqualified": "cohere/cmdr7b (acc 0.75, AM47 imbalance 3), cohere/tayae (acc 0.75, imbalance 3), stealth/bpickl (answered 0.375), mistral mst8b (acc 0.833 BUT AM47 imbalance 2 — the only one over the acc bar; failed AM47), cohere/aya32b (0 legs)",
+  "other_transports": "hy4f (cent-ai) already serves; a cent-ai free substitute would be a transport change = re-qualification, owner-sealed",
+  "bottom_line": "no lawful substitute is available TODAY without an owner seal; the panel cron's snlite legs remain valid evidence; the 3-judge tally needs either re-listing or an owner-seated substitute lane"
+ },
+ "p5_v2_cron_550250_preflight": {
+  "claim": "c-0269 (builder-r165s1, OPEN, lease 2026-11-27T12:00Z)",
+  "scheduled": "2026-11-27T01:30Z",
+  "gate": "two-seat live (G0 tokenrouter + J2 cent-ai hy4); G0 LIVE this window; J2 still 503 -> wrapper exits 2 without firing (no burn); the 21/30 infra-terminal archive stands untouched",
+  "corpus": "c9670d8dd4b55c0c sealed, 30 items, unmodified runner"
+ },
+ "cron_tool_status": "the session's cron tool errored 'No such tool available' x3 (typed; no further retries per discipline) — the platform-side durability confirmation rests on V130's auditor verification + commit b3403ac54's registration; next window verifies run_count directly",
+ "next_window_first_acts": [
+  "1. verify panel cron 550235 fired (run_count; the in-repo resume state is the fallback if it didn't) — expect snlite legs landing + 30 mst14b TRANSPORT_FAILED legfiles (404 class, zero quota burn)",
+  "2. verify the P5 v2 cron 550250's gate decision (J2 still 503 -> exit 2 no-fire is the expected honest outcome; if hy4 recovered, the counting run fired and the DIR-4 bar applies)",
+  "3. recompute the tally (r153s1_tally_recompute.py) — with mst14b dark the tally is 2-judge; type the score-8 gate as NOT_YET_MET unless an owner-sealed substitute landed in the interim",
+  "4. present the mst14b delist decision package to the owner/auditor (this record is the evidence base)"
+ ],
+ "burn_accounting": "zero generation this window: 5 transport probes only (2 xkiro status-probes on dead-pool models cost 0 tokens: one 404 before billing, one 429 before billing; 1 tokenrouter 20-token OK probe; 1 cent-ai 20-token probe refused 503; 1 xkiro /models GET) — no panel legs, no P5 items, no qualifications"
+}

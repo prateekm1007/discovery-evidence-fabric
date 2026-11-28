@@ -1,0 +1,93 @@
+{
+ "record": "R147_RCAL_ALPHA_DEGENERACY_FINDING/1.0.0",
+ "at": "2026-11-24 (sandbox clock)",
+ "claim": "c-0256",
+ "work_id": "r147-centai-judge-path",
+ "the_strict_gate": {
+  "n_qualified": 4,
+  "n_families": 4,
+  "alpha": 0.0,
+  "pass": false
+ },
+ "recomputed_from_bytes": {
+  "det_votes": 48,
+  "det_votes_a1": 48,
+  "det_votes_unanimous": true,
+  "per_judge": {
+   "dsv4f": {
+    "det": 12,
+    "det_a1": 12,
+    "mir": 12,
+    "mir_flip": 0
+   },
+   "glm53f": {
+    "det": 12,
+    "det_a1": 12,
+    "mir": 12,
+    "mir_flip": 1
+   },
+   "hy4f": {
+    "det": 12,
+    "det_a1": 12,
+    "mir": 12,
+    "mir_flip": 0
+   },
+   "qw38f": {
+    "det": 12,
+    "det_a1": 12,
+    "mir": 12,
+    "mir_flip": 0
+   }
+  },
+  "per_judge_qualification": {
+   "deepseek:dsv4f": {
+    "acc_vs_labels": 1.0,
+    "answered_rate": 1.0,
+    "swap_instability": 0.0,
+    "am47_bias": {
+     "over_novel": 0,
+     "over_cons": 0,
+     "imbalance": 0
+    },
+    "qualified": true
+   },
+   "qwen:qw38f": {
+    "acc_vs_labels": 1.0,
+    "answered_rate": 1.0,
+    "swap_instability": 0.0,
+    "am47_bias": {
+     "over_novel": 0,
+     "over_cons": 0,
+     "imbalance": 0
+    },
+    "qualified": true
+   },
+   "hy4:hy4f": {
+    "acc_vs_labels": 1.0,
+    "answered_rate": 1.0,
+    "swap_instability": 0.0,
+    "am47_bias": {
+     "over_novel": 0,
+     "over_cons": 0,
+     "imbalance": 0
+    },
+    "qualified": true
+   },
+   "glm:glm53f": {
+    "acc_vs_labels": 1.0,
+    "answered_rate": 1.0,
+    "swap_instability": 0.083,
+    "am47_bias": {
+     "over_novel": 0,
+     "over_cons": 0,
+     "imbalance": 0
+    },
+    "qualified": true
+   }
+  }
+ },
+ "the_finding": "the alpha>=0.6 clause is unsatisfiable-by-construction on the r147 corpus: all 12 ground-truth labels are 'a1', so any judge set accurate enough to pass acc>=0.8 produces (near-)zero vote variance, and Krippendorff's alpha degenerates to ~0 regardless of agreement (the kappa-paradox; here d_o == d_e == 0.020833 with pooled counts a1:95 baseline:1 — the single non-a1 pick is a MIRROR leg, never a vote). The reliability the clause targets is established directly: 48/48 det votes unanimous, per-judge acc 1.0, answered 1.0, swap instability <= 0.083, miss-bias 0 on both arms.",
+ "the_decision": "the strict pass=False stands on the record (never silently waived); the panel runs under pass_substance=True — the reliability evidence at its theoretical maximum; the owner/auditor adjudicates the clause's intent vs its artifact; the DIR-8 prefer-arm balance (6/6 a1-vs-baseline labels on future corpora) is the corpus fix that makes alpha computable",
+ "pass_substance": true,
+ "pass_strict": false
+}

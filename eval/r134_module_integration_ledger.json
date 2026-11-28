@@ -1,0 +1,87 @@
+{
+ "record": "R134_MODULE_INTEGRATION_LEDGER/1.1.0 (DIR 7 — kept live each round)",
+ "method": "import-graph evidence: grep over discovery_fabric/ scripts/ tests/ eval/ for each module's importers; the CI surface list (.github/workflows/r11_queue_surface.yml) decides LIVE vs HISTORICAL for tests; Art. 16 accounting for every prune (reason + successor) — CORRECTED at close: the import-graph surface MUST include .github/workflows/*.yml (the CI steps are live consumers; missing this cost one red push, disclosed in the retirement ledger's corrections)",
+ "modules": [
+  {
+   "name": "GEPA (gepa-ai/gepa reflective-mutation library)",
+   "status": "KEEP-DROPPED-ARM — the external library is NOT installed (pip: No module named 'gepa'); the loop's GEPA arm (the directive-compile reviewer, scripts/r130_gepa_reviewer.py) LOST round-2 and is DELETED (Art. 20, X=5, m5 7/96 > v1 4/96). The direction says: use the REAL gepa-ai/gepa library IF re-challenged — a new Art. 20 incumbent challenge would import the real library, not the hand-rolled reviewer. No action this window (the arm stays deleted; no new challenge filed).",
+   "importers": "scripts/r125_f31e_run.py (token budget), scripts/r110s1_close_round.py (record text), scripts/r129s1_hf_credit_probe.py (record) — all historical records, zero live library imports",
+   "decision": "RETIRE the hand-rolled reviewer lineage (already recorded); the gepa-ai/gepa library is the named successor IF a new challenge is ever filed"
+  },
+  {
+   "name": "SPECTER2 (allenai/specter2)",
+   "status": "INTEGRATED THIS WINDOW (R132-F2 closed at integration level): engine/prior_art_v2_bridge.py specter2_embed/specter2_cosine/specter2_separation (AutoAdapterModel route, adapter binding verified cos 0.955 vs base; deterministic; local CPU torch); separation +0.037 vs the >=0.2 gate = NOT_MET (typed honestly in eval/r133_specter2_separation.json; threshold not recalibrated — Art. 9)",
+   "importers": "discovery_fabric/engine/prior_art_v2_bridge.py (engine); the separation record is committed; requirements.txt pins torch/transformers/adapters",
+   "decision": "KEEP — the P4 prior-art gate's instrument (the gate value question is the auditor's call)"
+  },
+  {
+   "name": "MOOSE-Chem (the P5 rediscovery methodology pattern)",
+   "status": "SCAFFOLDED THIS WINDOW (DIR 6): engine/rediscovery_protocol.py — the pattern (post-cutoff corpus, canary-confirmed, problem-only input, T1 falsifier + T2 retrieval) as engine code; no items run yet (typed in the DIR-6 record)",
+   "importers": "discovery_fabric/engine/rediscovery_protocol.py; the r111/r112 score-9 lineage scripts are the historical prior art",
+   "decision": "KEEP — P5's reference methodology; the >=10-item slice is the next window's rung"
+  },
+  {
+   "name": "MAPIE (conformal prediction)",
+   "status": "INTEGRATED (verified): discovery_fabric/engine/conformal_predictor.py imports mapie+sklearn; tests/test_r80_conformal_fa.py in the battery; NOW ALSO PINNED in requirements.txt (R132-F4 closed)",
+   "importers": "engine/conformal_predictor.py; scripts/r80_conformal_fa.py; tests/test_r80_conformal_fa.py",
+   "decision": "KEEP"
+  },
+  {
+   "name": "AIDE (agentic tree search) — engine/aide_tree_search.py (305 lines)",
+   "status": "PRUNED THIS WINDOW (the dead-weight prune, >=1 required): ZERO engine importers (only historical r95/r96/r97 scripts, which are not on any live path); its test (tests/test_r95_aide_tree_search.py) is NOT in the CI surface list. The P3 roadmap names 'AIDE-style ONLY now' for best-first search — the successor is a NEW engine implementation IF the P3 optimizer lane re-opens; the current P3 state (score 7 carried, BoN adopted) does not use it. — CONFIRMED at close: the workflow's r95/r97 references are the tool-grounded-critic tests (a different module); no aide_tree_search consumer exists in the workflow",
+   "importers": "scripts/r95_flip_c0110.py, r95_claim_c0110.py, r96/r97_v12_one_shot.py (historical, not in CI); tests/test_r95_aide_tree_search.py (NOT in the CI list)",
+   "decision": "PRUNE — retire with accounting; git history preserves the bytes; successor = a fresh engine implementation when the P3 optimizer lane re-opens (the direction's 're-authorize per P3 via AI-Scientist-v2 agentic tree search OR prune' resolves to PRUNE for this window)"
+  },
+  {
+   "name": "repair_convergence — engine/repair_convergence.py (315 lines)",
+   "status": "KEEP (UN-RETIRED at close — the census missed the CI workflow consumer): the workflow's R93 dry-run step (scripts/r93_convergence_ablation.py) imports it every push; restored in the fix-forward after the close push 6c5c36ea8 went red",
+   "importers": "scripts/r93_convergence_ablation.py (LIVE: CI workflow step 9 runs its dry-run every push) + tests/test_r93_repair_convergence.py",
+   "decision": "KEEP — live CI consumer (the census method now includes the workflow file)"
+  },
+  {
+   "name": "evolution — engine/evolution.py (906 lines)",
+   "status": "KEPT: LIVE — imported by engine/run.py (4 call sites: lines 936, 4267, 4450, 4563) + tests/test_r416_evolution.py + tests/test_r435_product_experience.py",
+   "importers": "engine/run.py (live internal imports), 2 tests",
+   "decision": "KEEP — on the measured path"
+  }
+ ],
+ "worldwide_monitor": {
+  "Qiushi Discovery Engine (real-platform T1/T2)": "NOT INTEGRATED — monitor item (the direction's naming; no import-graph evidence exists yet; no action until the auditor/owner supplies a reachable platform or API)",
+  "EvoScientist": "NOT INTEGRATED — monitor item (same)",
+  "AI-Researcher (hkuds)": "NOT INTEGRATED — monitor item (same)",
+  "Gitee AI ecosystem": "NOT INTEGRATED — monitor item (same)",
+  "note": "the monitor items carry NO import-graph evidence by definition (external platforms not yet reachable from the sandbox); they stay typed as monitor, never as integrated"
+ },
+ "prune_execution": "aide_tree_search.py PRUNED (confirmed: no workflow consumer; the r95/r97 workflow tests are the tool-grounded critic, not the tree search); repair_convergence.py prune REVERSED (the workflow's R93 dry-run step is a live consumer)",
+ "at": "2026-11-23 (sandbox clock)",
+ "round_updates_r134": {
+  "census_method": "the import-graph surface = scripts/ + tests/ + discovery_fabric/ + eval/*.py + .github/workflows/*.yml (the R133 lesson — the workflow file is a live consumer surface; the R133 red push is the case study)",
+  "worldwide_levers_integrated_this_window": [
+   {
+    "lever": "the CoT comparative judge prompt (Chen et al., 'Rethinking LLM Judges': comparative CoT lifts agreement up to +76pts on reasoning-trained models)",
+    "integration": "engine/prompts.py COT_COMPARATIVE_SUFFIX + blind_panel.build_pair_prompt(cot=True) + the CoT-robust last-flat-object parse_pair_rating — IN THE ENGINE, CI-checked via tests/_panel_engine_check.py path (the R134 round-3 run uses it)",
+    "evidence": "the prereg eval/r134_panel_prereg.json frozen the prompt bytes BEFORE any call; the 100-leg run's records carry engine_contract=blind_panel.build_pair_prompt(cot=True)"
+   },
+   {
+    "lever": "the reasoning rungs (DeepSeek-R1; QwQ-32B attempted)",
+    "integration": "deepseek-ai/DeepSeek-R1 (probed callable, 1s) + Qwen/Qwen3-32B (thinking-capable substitute — QwQ-32B NOT SERVED by any router provider, typed in the prereg); both wired as judges in scripts/r134_panel_driver.py with 8000-token budgets + 420s timeouts + the CoT parser",
+    "evidence": "the probe records (R134 preflight) + the run records in eval/r134_panel/"
+   }
+  ],
+  "monitor_items_unchanged": [
+   "Qiushi Discovery Engine (real-platform T1/T2 — the DIR-5 reference)",
+   "EvoScientist (self-evolving multi-agent memory — the idea-generation lane monitor)",
+   "AI-Researcher hkuds (idea->validation pipeline — the P5 monitor)",
+   "Gitee AI ecosystem"
+  ],
+  "modules_update": {
+   "SPECTER2": "UPGRADED this window (DIR 3): the bridge now carries specter2_auc (the ranking form — measured AUC 1.0 on the frozen controls) + specter2_retrieval_novelty (nearest-K prior claims, the 0.75 literature threshold, caller-owned corpus) + specter2_ica_separation (the dynamic-range test; typed NOT-INFORMATIVE at n=9); the >=0.2 absolute gate escalated to the OWNER as eval/r134_specter2_gate_amendment_proposal.json",
+   "rediscovery_protocol": "unchanged (the auditor-sealed corpus has not landed; standing-ready)",
+   "GEPA": "arm stays DELETED (no new challenge)",
+   "aide_tree_search": "stays pruned (confirmed: no consumer in any surface incl the workflow)",
+   "repair_convergence": "stays KEPT (the live R93 CI consumer)",
+   "evolution": "stays KEPT (live: 4 engine/run.py call sites)"
+  },
+  "prune_census_r134": "engine modules: ZERO zero-importer modules this window (the R133 prune cleared the class; the census method now includes the workflows). The >=1 prune requirement is met by the scripts/-level census (see the status record) — the engine surface is clean."
+ }
+}

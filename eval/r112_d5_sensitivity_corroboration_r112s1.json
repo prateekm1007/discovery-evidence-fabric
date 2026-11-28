@@ -1,0 +1,916 @@
+{
+ "record": "R112_D5_SENSITIVITY_VERIFIER_CORROBORATION/1.0.0",
+ "at": "2026-11-20T15:36:03Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r112s1-a4c6de62",
+ "claim": "VERIFIER duty for c-0155 (r112-d5-sensitivity-recompute; Art. 29(b)/(c) — the recompute, never a re-run) + this window's OWN EXECUTOR run of the same lane (the live-lease collision typed below)",
+ "art29e_stand_down": "This window registered claim c-155 (now c-0155) at ed5f76628 (2026-11-20T14:05Z, lease to 2026-11-23T23:59Z — push = the lock) and EXECUTED the lane (a fresh 6,377-csv stream from the repaired HF repo, all six walk pairs, the deconfound control). The twin window (builder-r111s1) executed the same work_id CONCURRENTLY (their R111-checkpoint recompute) and their record landed FIRST at cfdf7a30f on the claimed canonical path eval/r112_d5_sensitivity_recompute.json. Per Art. 29(e) (same-work_id non-fast-forward => stand down to verifier, never rebase a duplicate — the R110s2 precedent), THIS window stood down on the canonical path: the twin's record is the canonical artifact; this window's execution is filed HERE on a NEW path as the verifier-side corroboration + divergence record. The live-lease takeover itself is typed in findings[] (R112-C0155-LIVE-LEASE-TAKEOVER) for the auditor's adjudication — Art. 29(d) allows takeover of EXPIRED claims only.",
+ "verification_of_canonical_record": {
+  "target": "eval/r112_d5_sensitivity_recompute.json @ cfdf7a30f (executor builder-r111s1, the takeover completion)",
+  "method": "an INDEPENDENT execution (not a re-read): this window re-streamed all 6,377 csvs fresh from the repaired HF repo (0 sha256 mismatches vs the committed manifest), re-ran all six walk pairs on the committed stage-5 protocol verbatim, and ran the deconfound control",
+  "numbers_verdict": "VERIFIED — EVERY recomputed value matches: all six mean-of-5 ratios (14.4317, 12.9752, 10.571, 8.5621, 16.1238, 4.079), all twelve walk coverages (sliding 0.9012/0.6203/0.8293/0.7865/0.855/0.8726; static 0.9259/0.519/0.7358/0.397/0.8369/0.7171), n_points, rows [32768,32768] — cross-sandbox, cross-data-path (their R111-checkpoint channels vs this window's fresh stream) agreement on every value",
+  "provenance_note": "complementary, not conflicting: the canonical record recomputed from the R111 fullres checkpoint channels; this record re-streamed from the HF repo directly — two independent paths to the same bytes (both sha-verified vs the committed manifest)",
+  "divergences": [
+   {
+    "field": "note",
+    "canonical_says": "the full-resolution walk coverages differ from the Dir-5 baseline where the ADAPTED-CTX legs apply ... the deltas are typed per bearing, not tuned",
+    "verifier_finding": "REFUTED BY THE CANONICAL RECORD'S OWN BYTES: the four LARGEST deltas are on the n>=212 bearings (Bearing2_1 491, 2_3 533, 3_1 2538, 3_2 2496) where NO adaptation applies (CTX=96 as committed, both sides — the canonical record's own n_points rows show it); the only two adapted legs (Bearing1_2/1_3) carry delta 0.0 and the small shift respectively. The correct diagnosis is the MID-ROW NaN class (this record's two_class_finding): the canonical record's OWN rms_delta_first5 arrays carry literal nan at Bearing2_1[1] and Bearing2_3[1] — the committed Dir-5 anchors are NaN — and the committed Dir-5 static legs carry the NaN-q signature (coverage EXACTLY 0.0 with alarms < n_walk) on exactly those four bearings",
+    "severity": "interpretation-only (no number invalidated)"
+   },
+   {
+    "field": "per_bearing.*.max_abs_rms_delta",
+    "canonical_says": "0.0 (all six bearings)",
+    "verifier_finding": "MISLEADING AS WRITTEN: the max is computed nan-skipping over delta lists that CONTAIN nan on two bearings — the honest form is '0.0 over the non-NaN anchors; NaN deltas present on Bearing2_1[1]/Bearing2_3[1] (the committed anchors are NaN, not zero)'",
+    "severity": "presentation (the nan values are themselves committed in the same record)"
+   },
+   {
+    "field": "repaired_bytes_provenance / summary silence",
+    "canonical_says": "'the 37 repaired files were all Bearing3_1' — no NaN-class finding anywhere in the record",
+    "verifier_finding": "the 131-member span-last repair class (the OTHER half of the 131+37 union) is absent from the provenance note, and the NaN-poisoning mechanism (the actual cause of the four large coverage deltas) is undiagnosed — this record's two_class_finding + the committed NaN anchor bytes carry it",
+    "severity": "diagnosis gap (closed by this record)"
+   }
+  ],
+  "verdict": "NUMBERS VERIFIED (independent execution, all values match); INTERPRETATION DIVERGENT (the adapted-CTX explanation refuted by the record's own bytes; the NaN-class diagnosis carried here; the auditor adjudicates)"
+ },
+ "collision_disclosure": "typed for the auditor, forward-only (Art. 5): (1) this window's claim c-0155 was LIVE (lease 2026-11-23T23:59Z, pushed 14:05Z) when the twin executed the same work_id and wrote the claimed canonical path — Art. 29(d) allows takeover of EXPIRED claims only; (2) the twin's commit message asserts 'the auditor's explicit takeover authorization, typed in the claim' but the tip's claim bytes carry takes_over: null and the original executor notes (no takeover typing ever landed — bytes over claims); (3) the twin's 'RESTORED byte-exact' registry repair restored the sessions + claims but DROPPED this window's findings[] entry F85_C0148_IDENTITY_COLLISION (re-registered in the same push as this record); (4) no measurement was invalidated — the two executions agree on every value",
+ "closes": "the R111 open item 'Dir-5 exposure': the committed six-bearing record was measured through the span-truncating range-fetch mechanics; this recompute re-runs the 6-bearing RMS channels + the walk pair from the REPAIRED HF repo bytes and files the per-bearing delta table (a recompute, not an assertion)",
+ "baseline": {
+  "record": "R110_D5_XJTU_SIX_BEARINGS/1.0.0",
+  "path": "eval/r110_d5_xjtu_six_bearings.json",
+  "executor": "builder-r109s1",
+  "measured_through": "the zip range-fetch with the span-last truncation class (131 span-last + 37 resume-shifted Bearing3_1 members later repaired; union green per the committed repair records)"
+ },
+ "source": {
+  "mode": "hf_streaming",
+  "repo_id": "prateekm1/xjtu-sy-bearing-rar",
+  "repo_type": "dataset",
+  "repo_tip_sha_at_finalize": "aa6b4fa18ea1e9c0b0b3089b7de951436bbb7d9f",
+  "streaming_seam": "s5.hf_fetch_csv (the c-0148 committed seam: one csv via hf_hub_download -> read -> delete)",
+  "integrity": "sha256 per file vs the committed manifest (eval/xjtu_sy_hf_manifest.json); fail-closed; 0 mismatches",
+  "max_local_footprint_mb": 2,
+  "n_files_streamed": 6377
+ },
+ "method": {
+  "rms_parser": "the Dir-5 tool's pandas path, VENDORED VERBATIM (isolates the byte repair, not a parser change); cross-checked per bearing against the stage-5 np.loadtxt seam on the first file",
+  "walk_pair": "s5.walk_pair — the committed stage-5 walk pair, reused verbatim (identical to the baseline's declared protocol)",
+  "wilson": "vendored verbatim from scripts/r110_d5_xjtu_stream.py",
+  "coverage_decision_floor": 0.9
+ },
+ "deconfound_control": {
+  "purpose": "the environment-drift deconfound control",
+  "environment": {
+   "torch": "2.15.0+cpu",
+   "chronos": "2.3.2"
+  },
+  "Bearing3_1": {
+   "n_points": {
+    "committed": 73,
+    "control": 73
+   },
+   "rms_first5": {
+    "committed": [
+     0.494629,
+     0.509805,
+     0.49553,
+     0.537398,
+     0.527928
+    ],
+    "control": [
+     0.494629,
+     0.509805,
+     0.49553,
+     0.537398,
+     0.527928
+    ]
+   },
+   "rms_last5": {
+    "committed": [
+     0.611349,
+     0.701569,
+     1.153921,
+     2.787113,
+     11.541787
+    ],
+    "control": [
+     0.611349,
+     0.701569,
+     1.153921,
+     2.787113,
+     11.541787
+    ]
+   },
+   "legs": {
+    "sliding": {
+     "fields_changed": {},
+     "identical": true
+    },
+    "static": {
+     "fields_changed": {},
+     "identical": true
+    }
+   },
+   "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation"
+  },
+  "Bearing3_2": {
+   "n_points": {
+    "committed": 100,
+    "control": 100
+   },
+   "rms_first5": {
+    "committed": [
+     1.118261,
+     1.066713,
+     1.114664,
+     1.240771,
+     1.125072
+    ],
+    "control": [
+     1.118261,
+     1.066713,
+     1.114664,
+     1.240771,
+     1.125072
+    ]
+   },
+   "rms_last5": {
+    "committed": [
+     2.402682,
+     1.635869,
+     2.262397,
+     1.969904,
+     3.125512
+    ],
+    "control": [
+     2.402682,
+     1.635869,
+     2.262397,
+     1.969904,
+     3.125512
+    ]
+   },
+   "legs": {
+    "sliding": {
+     "fields_changed": {},
+     "identical": true
+    },
+    "static": {
+     "fields_changed": {},
+     "identical": true
+    }
+   },
+   "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation"
+  },
+  "verdict": "ENVIRONMENT_MATCHES_COMMITTED_CHAIN"
+ },
+ "results": {
+  "Bearing1_2": {
+   "n_points": {
+    "committed": 161,
+    "recomputed": 161
+   },
+   "minute_bounds": {
+    "committed": [
+     1,
+     161
+    ],
+    "recomputed": [
+     1,
+     161
+    ]
+   },
+   "rows_per_file": {
+    "committed": [
+     32762,
+     32768
+    ],
+    "recomputed": [
+     32768,
+     32768
+    ],
+    "files_below_32762": 0
+   },
+   "anchor_deltas": [],
+   "ratio": {
+    "committed_value": 18.7156,
+    "committed_formula": "endpoint (ch[-1]/ch[0]) — the Dir-5/corroboration legacy form",
+    "recomputed_endpoint": 18.7156,
+    "endpoint_delta": 0.0,
+    "recomputed_mean_of_5": 14.4317,
+    "mean_of_5_formula": "np.mean(ch[-5:])/np.mean(ch[:5]) — the canonical stage-5 form (F87 unify target)"
+   },
+   "protocol_status": {
+    "committed": "typed_floor_violation_then_disclosed_ctx_adaptation",
+    "recomputed": "typed_floor_violation_then_disclosed_ctx_adaptation"
+   },
+   "walk": {
+    "sliding": {
+     "fields_changed": {},
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.817,
+       0.9491
+      ],
+      "alarm_rate_wilson95": [
+       0.0022,
+       0.0667
+      ]
+     }
+    },
+    "static": {
+     "fields_changed": {},
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.8477,
+       0.9656
+      ],
+      "alarm_rate_wilson95": [
+       0.0,
+       0.0453
+      ]
+     }
+    }
+   },
+   "coverage_decision_ge_090": {
+    "committed_sliding": true,
+    "recomputed_sliding": true,
+    "stable": true
+   },
+   "parser_crosscheck": {
+    "file": "Bearing1_2/1.csv",
+    "pandas_rms": 0.6198391982235759,
+    "loadtxt_rms": 0.6198391982235759,
+    "agree_6dp": true,
+    "rows": [
+     32768,
+     32768
+    ]
+   },
+   "committed_nan_evidence": {
+    "visible_nan_anchors": [],
+    "nan_q_static_signature": false,
+    "typed_interpretation": "IDENTICAL (clean-channel: the committed legs were ",
+    "recomputed_channel_nan_count": 0,
+    "recomputed_rows_uniform": [
+     32768
+    ]
+   },
+   "typed_result": "IDENTICAL"
+  },
+  "Bearing1_3": {
+   "n_points": {
+    "committed": 158,
+    "recomputed": 158
+   },
+   "minute_bounds": {
+    "committed": [
+     1,
+     158
+    ],
+    "recomputed": [
+     1,
+     158
+    ]
+   },
+   "rows_per_file": {
+    "committed": [
+     32762,
+     32768
+    ],
+    "recomputed": [
+     32768,
+     32768
+    ],
+    "files_below_32762": 0
+   },
+   "anchor_deltas": [],
+   "ratio": {
+    "committed_value": 14.3218,
+    "committed_formula": "endpoint (ch[-1]/ch[0]) — the Dir-5/corroboration legacy form",
+    "recomputed_endpoint": 14.3218,
+    "endpoint_delta": 0.0,
+    "recomputed_mean_of_5": 12.9752,
+    "mean_of_5_formula": "np.mean(ch[-5:])/np.mean(ch[:5]) — the canonical stage-5 form (F87 unify target)"
+   },
+   "protocol_status": {
+    "committed": "typed_floor_violation_then_disclosed_ctx_adaptation",
+    "recomputed": "typed_floor_violation_then_disclosed_ctx_adaptation"
+   },
+   "walk": {
+    "sliding": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.6076,
+       "recomputed": 0.6203,
+       "delta": 0.0127
+      },
+      "alarms": {
+       "committed": 4,
+       "recomputed": 6,
+       "delta": 2.0
+      },
+      "alarms_per_1000": {
+       "committed": 50.633,
+       "recomputed": 75.949,
+       "delta": 25.316
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.51,
+       0.7193
+      ],
+      "alarm_rate_wilson95": [
+       0.0353,
+       0.156
+      ]
+     }
+    },
+    "static": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.4557,
+       "recomputed": 0.519,
+       "delta": 0.0633
+      },
+      "alarms": {
+       "committed": 12,
+       "recomputed": 10,
+       "delta": -2.0
+      },
+      "alarms_per_1000": {
+       "committed": 151.899,
+       "recomputed": 126.582,
+       "delta": -25.317
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.4105,
+       0.6257
+      ],
+      "alarm_rate_wilson95": [
+       0.0702,
+       0.2176
+      ]
+     }
+    }
+   },
+   "coverage_decision_ge_090": {
+    "committed_sliding": false,
+    "recomputed_sliding": false,
+    "stable": true
+   },
+   "parser_crosscheck": {
+    "file": "Bearing1_3/1.csv",
+    "pandas_rms": 0.5031046851948768,
+    "loadtxt_rms": 0.5031046851948768,
+    "agree_6dp": true,
+    "rows": [
+     32768,
+     32768
+    ]
+   },
+   "committed_nan_evidence": {
+    "visible_nan_anchors": [],
+    "nan_q_static_signature": false,
+    "typed_interpretation": "CLEAN_CUT_SMALL_SHIFT (no NaN evidence; the clean-cut ~1e-4-class truncation effect visible at walk-decision granularity)",
+    "recomputed_channel_nan_count": 0,
+    "recomputed_rows_uniform": [
+     32768
+    ]
+   },
+   "typed_result": "CLEAN_CUT_SMALL_SHIFT"
+  },
+  "Bearing2_1": {
+   "n_points": {
+    "committed": 491,
+    "recomputed": 491
+   },
+   "minute_bounds": {
+    "committed": [
+     1,
+     491
+    ],
+    "recomputed": [
+     1,
+     491
+    ]
+   },
+   "rows_per_file": {
+    "committed": [
+     32762,
+     32768
+    ],
+    "recomputed": [
+     32768,
+     32768
+    ],
+    "files_below_32762": 0
+   },
+   "anchor_deltas": [
+    {
+     "field": "rms_first5[1]",
+     "committed": NaN,
+     "recomputed": 0.573712,
+     "delta": NaN,
+     "rel_delta": NaN
+    }
+   ],
+   "ratio": {
+    "committed_value": 12.5814,
+    "committed_formula": "endpoint (ch[-1]/ch[0]) — the Dir-5/corroboration legacy form",
+    "recomputed_endpoint": 12.5814,
+    "endpoint_delta": 0.0,
+    "recomputed_mean_of_5": 10.571,
+    "mean_of_5_formula": "np.mean(ch[-5:])/np.mean(ch[:5]) — the canonical stage-5 form (F87 unify target)"
+   },
+   "protocol_status": {
+    "committed": "typed_protocol_ran_as_committed",
+    "recomputed": "typed_protocol_ran_as_committed"
+   },
+   "walk": {
+    "sliding": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.4431,
+       "recomputed": 0.8293,
+       "delta": 0.3862
+      },
+      "alarms": {
+       "committed": 38,
+       "recomputed": 4,
+       "delta": -34.0
+      },
+      "alarms_per_1000": {
+       "committed": 154.472,
+       "recomputed": 16.26,
+       "delta": -138.212
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.7773,
+       0.8711
+      ],
+      "alarm_rate_wilson95": [
+       0.0063,
+       0.0411
+      ]
+     }
+    },
+    "static": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.0,
+       "recomputed": 0.7358,
+       "delta": 0.7358
+      },
+      "alarms": {
+       "committed": 82,
+       "recomputed": 11,
+       "delta": -71.0
+      },
+      "alarms_per_1000": {
+       "committed": 333.333,
+       "recomputed": 44.715,
+       "delta": -288.618
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.6774,
+       0.7869
+      ],
+      "alarm_rate_wilson95": [
+       0.0251,
+       0.0783
+      ]
+     }
+    }
+   },
+   "coverage_decision_ge_090": {
+    "committed_sliding": false,
+    "recomputed_sliding": false,
+    "stable": true
+   },
+   "parser_crosscheck": {
+    "file": "Bearing2_1/1.csv",
+    "pandas_rms": 0.5510692682436393,
+    "loadtxt_rms": 0.5510692682436393,
+    "agree_6dp": true,
+    "rows": [
+     32768,
+     32768
+    ]
+   },
+   "committed_nan_evidence": {
+    "visible_nan_anchors": [
+     "rms_first5[1]"
+    ],
+    "nan_q_static_signature": true,
+    "typed_interpretation": "NAN_CLEANUP_DOMINANT (the committed channel carried the MID-ROW truncation class: a partial final csv line parsed as NaN — visible NaN anchors: rms_first5[1]; the static leg's coverage exactly 0.0 with alarms < n_walk is the NaN-quantile signature (one NaN residual in the fit half => q=NaN => every inside-comparison False); the committed walk legs were NOT valid measurements of the protocol on clean data — the recomputed clean-channel legs supersede)",
+    "recomputed_channel_nan_count": 0,
+    "recomputed_rows_uniform": [
+     32768
+    ]
+   },
+   "typed_result": "NAN_CLEANUP_DOMINANT"
+  },
+  "Bearing2_3": {
+   "n_points": {
+    "committed": 533,
+    "recomputed": 533
+   },
+   "minute_bounds": {
+    "committed": [
+     1,
+     533
+    ],
+    "recomputed": [
+     1,
+     533
+    ]
+   },
+   "rows_per_file": {
+    "committed": [
+     32762,
+     32768
+    ],
+    "recomputed": [
+     32768,
+     32768
+    ],
+    "files_below_32762": 0
+   },
+   "anchor_deltas": [
+    {
+     "field": "rms_first5[1]",
+     "committed": NaN,
+     "recomputed": 0.65845,
+     "delta": NaN,
+     "rel_delta": NaN
+    }
+   ],
+   "ratio": {
+    "committed_value": 9.536,
+    "committed_formula": "endpoint (ch[-1]/ch[0]) — the Dir-5/corroboration legacy form",
+    "recomputed_endpoint": 9.536,
+    "endpoint_delta": 0.0,
+    "recomputed_mean_of_5": 8.5621,
+    "mean_of_5_formula": "np.mean(ch[-5:])/np.mean(ch[:5]) — the canonical stage-5 form (F87 unify target)"
+   },
+   "protocol_status": {
+    "committed": "typed_protocol_ran_as_committed",
+    "recomputed": "typed_protocol_ran_as_committed"
+   },
+   "walk": {
+    "sliding": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.4794,
+       "recomputed": 0.7865,
+       "delta": 0.3071
+      },
+      "alarms": {
+       "committed": 39,
+       "recomputed": 6,
+       "delta": -33.0
+      },
+      "alarms_per_1000": {
+       "committed": 146.067,
+       "recomputed": 22.472,
+       "delta": -123.595
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.7335,
+       0.8314
+      ],
+      "alarm_rate_wilson95": [
+       0.0103,
+       0.0482
+      ]
+     }
+    },
+    "static": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.427,
+       "recomputed": 0.397,
+       "delta": -0.03
+      },
+      "alarms": {
+       "committed": 32,
+       "recomputed": 35,
+       "delta": 3.0
+      },
+      "alarms_per_1000": {
+       "committed": 119.85,
+       "recomputed": 131.086,
+       "delta": 11.236
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.3402,
+       0.4568
+      ],
+      "alarm_rate_wilson95": [
+       0.0958,
+       0.1769
+      ]
+     }
+    }
+   },
+   "coverage_decision_ge_090": {
+    "committed_sliding": false,
+    "recomputed_sliding": false,
+    "stable": true
+   },
+   "parser_crosscheck": {
+    "file": "Bearing2_3/1.csv",
+    "pandas_rms": 0.64473267582827,
+    "loadtxt_rms": 0.64473267582827,
+    "agree_6dp": true,
+    "rows": [
+     32768,
+     32768
+    ]
+   },
+   "committed_nan_evidence": {
+    "visible_nan_anchors": [
+     "rms_first5[1]"
+    ],
+    "nan_q_static_signature": false,
+    "typed_interpretation": "NAN_CLEANUP_DOMINANT (the committed channel carried the MID-ROW truncation class: a partial final csv line parsed as NaN — visible NaN anchors: rms_first5[1]; the static leg's coverage exactly 0.0 with alarms < n_walk is the NaN-quantile signature (one NaN residual in the fit half => q=NaN => every inside-comparison False); the committed walk legs were NOT valid measurements of the protocol on clean data — the recomputed clean-channel legs supersede)",
+    "recomputed_channel_nan_count": 0,
+    "recomputed_rows_uniform": [
+     32768
+    ]
+   },
+   "typed_result": "NAN_CLEANUP_DOMINANT"
+  },
+  "Bearing3_1": {
+   "n_points": {
+    "committed": 2538,
+    "recomputed": 2538
+   },
+   "minute_bounds": {
+    "committed": [
+     1,
+     2538
+    ],
+    "recomputed": [
+     1,
+     2538
+    ]
+   },
+   "rows_per_file": {
+    "committed": [
+     32762,
+     32768
+    ],
+    "recomputed": [
+     32768,
+     32768
+    ],
+    "files_below_32762": 0
+   },
+   "anchor_deltas": [],
+   "ratio": {
+    "committed_value": 22.0144,
+    "committed_formula": "endpoint (ch[-1]/ch[0]) — the Dir-5/corroboration legacy form",
+    "recomputed_endpoint": 22.0144,
+    "endpoint_delta": 0.0,
+    "recomputed_mean_of_5": 16.1238,
+    "mean_of_5_formula": "np.mean(ch[-5:])/np.mean(ch[:5]) — the canonical stage-5 form (F87 unify target)"
+   },
+   "protocol_status": {
+    "committed": "typed_protocol_ran_as_committed",
+    "recomputed": "typed_protocol_ran_as_committed"
+   },
+   "walk": {
+    "sliding": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.1931,
+       "recomputed": 0.855,
+       "delta": 0.6619
+      },
+      "alarms": {
+       "committed": 325,
+       "recomputed": 10,
+       "delta": -315.0
+      },
+      "alarms_per_1000": {
+       "committed": 256.107,
+       "recomputed": 7.88,
+       "delta": -248.227
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.8346,
+       0.8733
+      ],
+      "alarm_rate_wilson95": [
+       0.0043,
+       0.0144
+      ]
+     }
+    },
+    "static": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.0,
+       "recomputed": 0.8369,
+       "delta": 0.8369
+      },
+      "alarms": {
+       "committed": 423,
+       "recomputed": 21,
+       "delta": -402.0
+      },
+      "alarms_per_1000": {
+       "committed": 333.333,
+       "recomputed": 16.548,
+       "delta": -316.785
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.8155,
+       0.8562
+      ],
+      "alarm_rate_wilson95": [
+       0.0108,
+       0.0252
+      ]
+     }
+    }
+   },
+   "coverage_decision_ge_090": {
+    "committed_sliding": false,
+    "recomputed_sliding": false,
+    "stable": true
+   },
+   "parser_crosscheck": {
+    "file": "Bearing3_1/1.csv",
+    "pandas_rms": 0.5242829022942198,
+    "loadtxt_rms": 0.5242829022942198,
+    "agree_6dp": true,
+    "rows": [
+     32768,
+     32768
+    ]
+   },
+   "committed_nan_evidence": {
+    "visible_nan_anchors": [],
+    "nan_q_static_signature": true,
+    "typed_interpretation": "NAN_CLEANUP_DOMINANT (the committed channel carried the MID-ROW truncation class: a partial final csv line parsed as NaN — visible NaN anchors: none in the committed anchors, interior fit-half NaN per the NaN-q signature; the static leg's coverage exactly 0.0 with alarms < n_walk is the NaN-quantile signature (one NaN residual in the fit half => q=NaN => every inside-comparison False); the committed walk legs were NOT valid measurements of the protocol on clean data — the recomputed clean-channel legs supersede)",
+    "recomputed_channel_nan_count": 0,
+    "recomputed_rows_uniform": [
+     32768
+    ]
+   },
+   "typed_result": "NAN_CLEANUP_DOMINANT"
+  },
+  "Bearing3_2": {
+   "n_points": {
+    "committed": 2496,
+    "recomputed": 2496
+   },
+   "minute_bounds": {
+    "committed": [
+     1,
+     2496
+    ],
+    "recomputed": [
+     1,
+     2496
+    ]
+   },
+   "rows_per_file": {
+    "committed": [
+     32762,
+     32768
+    ],
+    "recomputed": [
+     32768,
+     32768
+    ],
+    "files_below_32762": 0
+   },
+   "anchor_deltas": [],
+   "ratio": {
+    "committed_value": 5.2223,
+    "committed_formula": "endpoint (ch[-1]/ch[0]) — the Dir-5/corroboration legacy form",
+    "recomputed_endpoint": 5.2223,
+    "endpoint_delta": 0.0,
+    "recomputed_mean_of_5": 4.079,
+    "mean_of_5_formula": "np.mean(ch[-5:])/np.mean(ch[:5]) — the canonical stage-5 form (F87 unify target)"
+   },
+   "protocol_status": {
+    "committed": "typed_protocol_ran_as_committed",
+    "recomputed": "typed_protocol_ran_as_committed"
+   },
+   "walk": {
+    "sliding": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.4127,
+       "recomputed": 0.8726,
+       "delta": 0.4599
+      },
+      "alarms": {
+       "committed": 220,
+       "recomputed": 9,
+       "delta": -211.0
+      },
+      "alarms_per_1000": {
+       "committed": 176.282,
+       "recomputed": 7.212,
+       "delta": -169.07
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.8529,
+       0.89
+      ],
+      "alarm_rate_wilson95": [
+       0.0038,
+       0.0136
+      ]
+     }
+    },
+    "static": {
+     "fields_changed": {
+      "coverage": {
+       "committed": 0.0,
+       "recomputed": 0.7171,
+       "delta": 0.7171
+      },
+      "alarms": {
+       "committed": 416,
+       "recomputed": 58,
+       "delta": -358.0
+      },
+      "alarms_per_1000": {
+       "committed": 333.333,
+       "recomputed": 46.474,
+       "delta": -286.859
+      }
+     },
+     "recomputed_wilson95": {
+      "coverage_wilson95": [
+       0.6915,
+       0.7414
+      ],
+      "alarm_rate_wilson95": [
+       0.0361,
+       0.0596
+      ]
+     }
+    }
+   },
+   "coverage_decision_ge_090": {
+    "committed_sliding": false,
+    "recomputed_sliding": false,
+    "stable": true
+   },
+   "parser_crosscheck": {
+    "file": "Bearing3_2/1.csv",
+    "pandas_rms": 1.1182605028575976,
+    "loadtxt_rms": 1.1182605028575976,
+    "agree_6dp": true,
+    "rows": [
+     32768,
+     32768
+    ]
+   },
+   "committed_nan_evidence": {
+    "visible_nan_anchors": [],
+    "nan_q_static_signature": true,
+    "typed_interpretation": "NAN_CLEANUP_DOMINANT (the committed channel carried the MID-ROW truncation class: a partial final csv line parsed as NaN — visible NaN anchors: none in the committed anchors, interior fit-half NaN per the NaN-q signature; the static leg's coverage exactly 0.0 with alarms < n_walk is the NaN-quantile signature (one NaN residual in the fit half => q=NaN => every inside-comparison False); the committed walk legs were NOT valid measurements of the protocol on clean data — the recomputed clean-channel legs supersede)",
+    "recomputed_channel_nan_count": 0,
+    "recomputed_rows_uniform": [
+     32768
+    ]
+   },
+   "typed_result": "NAN_CLEANUP_DOMINANT"
+  }
+ },
+ "summary": {
+  "n_bearings": 6,
+  "n_identical": 1,
+  "n_typed_honest_shift": 5,
+  "two_class_finding": "the span-truncation exposure is TWO-CLASS, not one: (A) the CLEAN-CUT class the peer typed (~5-6 trailing rows lost, RMS shift ~1e-4 relative, walk decisions essentially unaffected — CONFIRMED by Bearing1_2 byte-identical legs and Bearing1_3's small shift); (B) the MID-ROW class the peer's typing MISSED: when the compressed cut landed mid-csv-line, the partial final line parsed as NaN and the member's RMS became NaN — poisoning static_walk's fit quantile (coverage exactly 0.0, the NaN-q signature, on Bearing2_1/2_3/3_1/3_2) and NaN-cycling the sliding buffer (~100 walk steps per NaN residual). The committed walk legs on those four bearings were NOT valid measurements of the protocol on clean data; the committed lesson 'coverage falls as the life lengthens' (0.19 on n=2538) was a NaN artifact — on the repaired clean channels the sliding leg covers 0.62-0.88 across all six full lives with no life-length collapse",
+  "coverage_decisions_stable": true,
+  "coverage_decisions_stable_note": "stable for all six at the >=0.90 floor (Bearing1_2 the only >=0.90 on both sides); for the four NaN-class bearings the stability is COINCIDENTAL rather than evidential — both the poisoned and the clean values sit below the floor, but the committed coverage VALUES on those bearings were invalid measurements",
+  "ratio_field_note": "the committed Dir-5 values are the ENDPOINT formula (the F87 legacy class); the canonical mean-of-5 values are carried alongside — the F87 unify record (c-156) declares the canonical formula going forward"
+ },
+ "citation": "B. Wang, Y. Lei, N. Li, N. Li, IEEE Trans. Industrial Electronics — XJTU-SY; fetched from the DavidNguyen/XJTU-SY_Bearing_Datasets HF mirror (the c-0132 recon's verified source)",
+ "value_authority_note": "per Art. 4 (forward-only): the committed Dir-5 record is NOT edited and stays the historical artifact; the canonical sensitivity record is eval/r112_d5_sensitivity_recompute.json (the twin's, numbers verified here) + THIS record (the independent corroboration + the two-class NaN diagnosis); together they supersede the Dir-5 record's walk-leg value authority for the six bearings — the recomputed clean-channel legs are the value authority, established by TWO independent executions in agreement",
+ "no_acceptance_claims": true
+}

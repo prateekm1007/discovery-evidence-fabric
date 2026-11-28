@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new11-conveyor-belt-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.5,
+   "chars": 2924
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using visual periodic inspection; my departure is a physics-based leading indicator derived from existing sensor data that detects belt degradation before visual signs appear by analyzing the relationship between drive motor current and belt tension changes due to carcass fatigue and cover wear.\n\nPHYSICS CHECK — The governing physical relation is the correlation between belt tension (inversely related to carcass elongation) and drive motor current (increases with tension). As the belt degrades, carcass fatigue reduces stiffness, causing elongation under load, which reduces tension for a given load, requiring higher motor current to maintain speed. Magnitude verification: A healthy belt might show 0.5% current increase per ton of load, while a degrading belt could show 1.2% increase per ton due to reduced effective tension.\n\nIMPLEMENTATION BILL — \n- Existing belt-scale sensor (measures material load, same class as standard monitoring)\n- Existing drive-motor current sensor (same class as standard monitoring)\n- Processing unit (same class as standard monitoring systems)\n- Algorithm that calculates the current/load ratio at 1-minute intervals\n- Baseline database storing historical current/load ratios (uses existing storage infrastructure)\n- Alert system when ratio exceeds threshold by 3 standard deviations from baseline (uses existing notification systems)\n\nAll components are either already present or are standard industrial monitoring components of the same class as existing belt monitoring systems.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installability: SAME (uses existing sensors, no new installation required)\n- Operability: SAME (same monitoring frequency, same operator interface)\n- Maintenance: SAME (same maintenance schedule as current monitoring systems)\n- Cost class: SAME (no additional hardware, only software implementation)\n- Different mechanism: Physics-based prediction vs. visual inspection\n\nEXECUTABLE TEST — \nProtocol: \n1. Collect 6 months of baseline data from a healthy conveyor belt\n2. Apply known wear simulation (controlled abrasion testing on sample section)\n3. Monitor current/load ratio continuously\n4. Record time until visible wear appears or splice failure occurs\n\nInstruments: \n- Belt-scale sensor (existing)\n- Drive-motor current sensor (existing)\n- Independent visual inspection verification\n\nPass/Fail Thresholds: \n- Must detect degradation at least 3 weeks before visible failure or 2 weeks before splice failure\n- Must not exceed 2 false alarms per year on baseline data\n- Must maintain >90% detection rate on simulated wear tests\n\nDuration: 6 months of continuous monitoring with periodic wear simulation\n\nKill Criterion: If the system fails to detect degradation within 3 weeks of visible failure or exceeds 2 false alarms during baseline monitoring, the predictor is rejected."
+}

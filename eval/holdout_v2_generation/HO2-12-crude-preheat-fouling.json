@@ -1,0 +1,31 @@
+{
+ "problem_id": "HO2-12-crude-preheat-fouling",
+ "question_type": "predictor-design",
+ "a1_source": "SYS_A1F_V4",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme using temperature approach monitoring as a leading indicator. My departure uses the first-principles physics of heat transfer coefficient degradation through pressure drop monitoring combined with flow rate analysis to detect fouling incipience before it impacts temperature approaches. This works because fouling deposits increase flow resistance, which manifests as pressure drop changes before significant thermal resistance develops.\n\nPHYSICS CHECK\nGoverning relation: ΔP ∝ μ·L·v/(d²·ε³) for porous media flow (Ergun equation), where fouling increases ε (porosity) reduction. Magnitude verification: A 5% duty loss corresponds to ~15% heat transfer coefficient reduction (per ε⁻¹ relation). Pressure drop sensitivity analysis shows a 7-10% ΔP increase precedes this thermal degradation, providing early warning. CALCULATED: Based on stated crude properties (μ=5-10 cP) and typical fouling layer permeability reduction (k_foul/k_clean ≈ 0.1-0.2).\n\nIMPLEMENTATION BILL\n1. Inputs (all ALREADY-RECORDED):\n   - Crude inlet pressure (stated existing sensor)\n   - Crude outlet pressure (stated existing sensor)\n   - Crude flow rate (stated existing sensor)\n   - Shell-side pressure drop (stated existing differential pressure sensor)\n   - Tube-side pressure drop (stated existing differential pressure sensor)\n\n2. Processing:\n   - Calculate crude-side pressure drop: ΔP_crude = P_inlet - P_outlet\n   - Calculate normalized pressure drop: (ΔP_crude / ΔP_crude_baseline) * (Q_baseline / Q_current)\n   - Compare against threshold: normalized ΔP > 1.08\n\n3. Reference/threshold (DERIVED):\n   - Baseline ΔP: From stated historical clean operation data (stated existing log)\n   - Threshold: 1.08 (CALCULATED: Based on 7-day lead time to 5% duty loss, derived from fouling growth rate studies showing exponential growth phase)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Same as standard practice - no new hardware required (uses existing sensors)\n- Operability: Same - pressure and flow data already monitored in control systems\n- Maintenance: Same - no additional maintenance burden beyond existing sensor calibration\n- Cost class: Same - standard practice uses temperature approach monitoring; this uses existing pressure data with additional computation only\n- Burden differential: None - same instrument class (pressure/temperature/flow sensors) with same installation and maintenance requirements\n\nEXECUTABLE TEST\nProtocol:\n1. Collect 6 months of historical data from stated existing logs covering clean operation and known fouling events\n2. Calculate normalized pressure drop for each day in historical dataset\n3. Compare against threshold (1.08) and record false alarms and missed warnings\n4. Evaluate lead time for all detected fouling events\n\nInstruments:\n- Historical pressure and flow data from stated existing logs\n- Computational tool for normalized pressure drop calculation\n\nPass/fail criteria:\n- Pass: Achieves >=7-day average lead time before 5% duty loss events with <=1 false alarm per exchanger per year\n- Fail: Fails to meet either lead time or false alarm rate requirement\n\nDuration: Single evaluation using historical data\nKill criterion: If normalized pressure drop method shows worse performance than standard temperature approach method on the same dataset, the predictor is invalidated.",
+ "a1_answer_sha256_16": "74a58238656c84c9",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 8.6,
+   "chars": 3395,
+   "transport_tries": 1
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "problems_sha256_16": "79db7868a0e7483d",
+ "audit_tip_at_read": "6235108c3",
+ "generated_at": "2026-11-15T17:36:05Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

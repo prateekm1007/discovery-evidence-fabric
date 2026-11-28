@@ -1,0 +1,1428 @@
+{
+ "record": "HOLDOUT_V3_GENERATION/1.0.0",
+ "work_id": "holdout-v3-generation",
+ "claim": "c-0016 (EXECUTOR builder-r25s1, one_shot, filed+pushed BEFORE any generation call — Art. 29(b)); the EXECUTOR is the non-author session per the sealed pre-registration's division of labor (author builder-r20s1)",
+ "at": "2026-11-15T19:52:21Z",
+ "custody": {
+  "audit_branch": "origin/audit/r11-auditor-verdict-20261114",
+  "audit_tip_at_read": "3053d8dce",
+  "problems_file": "audit/holdout_v3/holdout_v3_problems.json",
+  "problems_sha256_16": "38884e58524a3ffb",
+  "selection_sha256_received": "642bc9780da226abfdb5b5c30dc98a7f1134d6d23783fc50706c8cd205e9fadf",
+  "private_rubric_accessed": false,
+  "note": "executor received PROBLEMS ONLY per the sealed pre-registration; the PRIVATE rubric was never opened, listed, or copied by the executor (no rubric exists on any builder-visible branch by design; names-only custody listing)"
+ },
+ "discipline": {
+  "one_shot": "one generation pass per problem (Art. 29(c)); a call that returns content is never re-drawn; transport-level transient retries only (Art. 15)",
+  "machine": "FROZEN type-aware machine (committed BEFORE the sealed authoring, c-0014 pre-registration 5acb63012): intervention -> SYS_A1_INT_V61, predictor -> SYS_A1F_V5, byte-unchanged; critic + question-type gate + typed scans (base scan + DETERMINISTIC constraint-fit scan + predictor violations) + machine NEUTRAL repair directives (REPAIR_BUDGET=2) — the machine-internal repair loop is part of the machine under test (same code path as r20/r21/holdout v2 + the c-0014 scan extension, disclosed)",
+  "no_selection": "K_GEN=1 — no best-of-k, no selection (BOK arm RETIRED per ABLATION_REGISTRY)",
+  "no_judge": "NO judge calls, NO baseline/B-side assembly — the auditor scores with the PRIVATE rubric (never seen by builder/pipeline/judge)",
+  "no_iteration": "no rubric feedback, no problem-set iteration, no tuning — the problems are unseen (split=HOLDOUT; the executor is the non-author session)",
+  "stagger": "pace 13.0s between problems (shared upstream quota)"
+ },
+ "generator": {
+  "model": "zai-org/GLM-5.3",
+  "temperature": 0.0,
+  "max_tokens": 2600,
+  "route": "local zai gateway (infra, not contract)"
+ },
+ "results": [
+  {
+   "problem_id": "HO3-01-cooling-tower-legionella",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V61",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The engineering intervention is a pulsed UV irradiation system with automatic backwash side-stream filtration to disrupt biofilm formation and reduce Legionella colonization in the basin and film fill. Standard practice uses continuous chemical biocide dosing (excluded) or manual UV systems without side-stream filtration, which are ineffective against biofilm-embedded bacteria. Our mitigation introduces a novel pulsed-UV duty cycle synchronized with automatic backwash filtration to mechanically shear biofilm while delivering lethal UV doses to dislodged cells. The closest existing practice is continuous in-duct UV irradiation in recirculation loops, but our pulsed synchronization with filtration backwash creates a mechanical-kill synergy absent in current deployments.\n\nPHYSICS CHECK — The governing relation is biofilm shear stress τ = μ(du/dy), where pulsed UV creates thermal micro-expansion in biofilm while backwash flow velocity du/dy generates shear. At 0.5 Hz pulse frequency and 1.5 m/s backwash velocity, τ ≈ 0.8 Pa exceeds the 0.3 Pa biofilm yield strength, causing 60% greater detachment than continuous UV alone. UV fluence of 40 mJ/cm² per pulse (vs. 30 mJ/cm² continuous) achieves 4-log kill on dislodged cells per ASHRAE Standard 188-2023.\n\nIMPLEMENTATION BILL — \n- (b) UV reactor chamber with quartz sleeve and low-pressure amalgam lamp (replaces existing continuous UV unit)\n- (b) Pulsed power supply with 0.5 Hz programmable timer (catalog item)\n- (b) Side-stream filter with 5-μm rating and automatic backwash valve (replaces existing non-automatic unit)\n- (c) Recirculation flow rate increase to 15% of total flow (parameter change)\n- (c) UV pulse duty cycle: 10 seconds on/10 seconds off (configuration change)\n- (c) Backwash trigger: differential pressure across filter reaches 10 psi (procedure change)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard practice uses continuous UV (1 unit) + manual backwash (1 labor event/month). Our intervention replaces UV unit (same class), adds automatic backwash (same catalog class as manual unit), and adds pulse timer (same class as existing UV controls). Total burden: same hardware class, same installation labor (1 shift), and eliminates monthly labor for manual backwash. Net burden: same class with reduced maintenance.\n\nEXECUTABLE TEST — Install test loop with basin water spiked to 10⁵ CFU/L Legionella. Run 30-day trial with pulsed UV/filter vs. continuous UV only. Measure: (1) biofilm coverage on coupons (image analysis, pass if <20% vs. control >50%), (2) planktonic counts (pass if <50 CFU/L), (3) UV output stability (pass if ±5% variation). Kill criterion: if any parameter exceeds thresholds for 48 consecutive hours, test fails. Duration matches quarterly shutdown protocol.",
+   "a1_answer_sha256_16": "94de9868c6287cae",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4097,
+     "latency_s": 9.0,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'fill' in: novelty statement (intervention)\nto prevent legionella colonization in the cooling tower basin and film fill, ",
+       "excluded stem 'structure' in: operating procedure (c) - program pulsed operation (30 min on/90 min off) at 1.5a current  \n\nburden ledger (st",
+       "excluded stem 'structure' in: no additional infrastructure required; all components are standard catalog items of the same class as existing",
+       "excluded stem 'tower' in: novelty statement (intervention)\nto prevent legionella colonization in the cooling tower basin and film fill, "
+      ]
+     },
+     "sha256_16": "8d69adee904aa1db"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 4111,
+     "latency_s": 8.7,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'fill' in: novelty statement (intervention) — the engineering intervention is a pulsed uv irradiation system installed on",
+       "excluded stem 'fill' in: this intervention attacks the failure's driving mechanism by delivering a dna-damaging dose to waterborne legi",
+       "excluded stem 'fill' in: the uv transmittance of the cooling water is assumed at 85% (typical for treated water), giving a delivered do",
+       "excluded stem 'structure' in: the burden class is same-or-lower because: (1) no new infrastructure beyond existing recirculation loop, (2) h"
+      ]
+     },
+     "sha256_16": "56f56104901da047",
+     "findings_disclosed": [
+      "CONSTRAINT_EXCLUSION: excluded stem 'fill' in: novelty statement (intervention) — the engineering intervention is a pulsed uv irradi"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2806,
+     "latency_s": 6.2,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'fill' in: novelty statement (intervention) — the engineering intervention is a pulsed uv irradiation system with automat"
+      ]
+     },
+     "sha256_16": "94de9868c6287cae",
+     "findings_disclosed": [
+      "CONSTRAINT_EXCLUSION: excluded stem 'fill' in: novelty statement (intervention) — the engineering intervention is a pulsed uv irradi"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'fill' in: novelty statement (intervention) — the engineering intervention is a pulsed uv irradiation system with automat"
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:41:50Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-02-offshore-riser-internal-corrosion",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V61",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nThe intervention is a segmented inhibitor injection strategy targeting the dewpoint band using pulsatile dosing. Standard practice applies continuous inhibitor injection at 25 ppm across the entire riser length. This mitigation is a genuine departure because it introduces time-varying concentration pulses that exploit the hysteresis of corrosion inhibitor adsorption kinetics, allowing localized high inhibition at the corrosion site while maintaining average environmental compliance. Adjacent-technique clearance: The closest existing practice is continuous batch inhibitor injection, but our segmented pulsatile approach differs by intentionally creating concentration waves that match the condensation dynamics, rather than uniform distribution. The mechanism directly attacks the driving physics by ensuring inhibitor molecules are preferentially adsorbed during the wetting phase of the condensation cycle, reducing the electrochemical reaction window.\n\nPHYSICS CHECK  \nThe governing relation is the Langmuir adsorption isotherm for corrosion inhibitors: θ = (K·C)/(1 + K·C), where θ is surface coverage, K is adsorption constant, and C is concentration. Pulsatile dosing at 50 ppm for 2 hours every 6 hours maintains the same average concentration (16.7 ppm) but maximizes θ during wet periods by exceeding the critical micelle concentration (CMC) intermittently. This reduces the corrosion current density i_corr ∝ (1-θ) by ~40% compared to continuous 25 ppm dosing, as verified by potentiodynamic polarization tests showing a 0.2 V shift in E_corr and 3× lower i_corr at the peak pulse.\n\nIMPLEMENTATION BILL  \nStandard practice bill: (a) Riser inlet inhibitor injection skid, (b) Continuous injection pump, (c) 25 ppm inhibitor concentration.  \nIntervention bill:  \n(a) Riser inlet inhibitor injection skid (existing)  \n(b) Programmable logic controller (PLC) for pulsatile control (procurable standard catalog item, e.g., Siemens S7-1200)  \n(c) High-cycle solenoid valve (procurable standard catalog item, e.g., ASCO 8217G series)  \n(d) Modified injection procedure: 2-hour pulses at 50 ppm every 6 hours (parameter change to existing equipment)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n| Component | Standard | Intervention | Burden Change |  \n|-----------|----------|--------------|---------------|  \n| Injection skid | (a) Existing | (a) Existing | None |  \n| Injection pump | (b) Existing | Replaced with (b) PLC + (c) solenoid valve | Same class (control hardware) |  \n| Inhibitor usage | 25 ppm continuous | 16.7 ppm average | Lower chemical burden |  \n| Procedure | Continuous | Pulsatile schedule | Parameter change only |  \nConclusion: Same burden class (control system modification within existing infrastructure).  \n\nEXECUTABLE TEST  \nProtocol: Install PLC and solenoid valve in test section with coupon racks at 8 o'clock position. Instruments: ER probes, weight-loss coupons, pressure/temperature sensors. Pass/fail: Corrosion rate ≤ 0.3 mm/year after 90 days (66% reduction). Duration: 180 days (covering multiple condensation cycles). Kill criterion: Any coupon shows >0.5 mm/year or ER probe detects >0.5 mm/year instantaneous rate. Falsification: Compare intervention vs. control sections; intervention fails if corrosion rate not statistically lower (p<0.05, t-test).",
+   "a1_answer_sha256_16": "328e21579a5c9a38",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3337,
+     "latency_s": 7.1,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "sha256_16": "328e21579a5c9a38"
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 0,
+    "residual_findings": {}
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:42:10Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-03-vaccine-coldchain-overtemp",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V61",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention proposed is a dynamic defrost-interval controller that adjusts defrost timing based on real-time door-open activity, paired with a mandatory rapid-restock procedure triggered by door alarms. Standard practice uses a fixed defrost interval (e.g., 6-hour cycle) regardless of usage patterns, while this intervention defrosts only during low-activity periods to avoid concurrent door openings. The closest existing technique is adaptive defrost in commercial refrigeration, but it typically uses temperature hysteresis rather than door-activity correlation, making this a genuine departure. The mechanism attacks the failure by decoupling defrost from high-traffic periods, eliminating the coincidence of defrost heat surge and door-open recovery.\n\nPHYSICS CHECK — The governing relation is the heat load balance during defrost: Q_defrost = m_ice * L_fusion + Q_leak, where m_ice is mass of melted frost, L_fusion is latent heat (334 kJ/kg), and Q_leak is heat ingress during defrost. By defrosting only when door openings are low (e.g., <2 events/hour), Q_leak is minimized, reducing the temperature rise. For a typical defrost, m_ice = 0.5 kg, Q_leak drops from 50 kJ (with frequent doors) to 10 kJ (low activity), reducing ΔT from +12°C to +4°C (verified via cabinet thermal model).\n\nIMPLEMENTATION BILL — \n- **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door alarm with 30-second delay; No activity-based scheduling.\n- **Proposed Bill**:\n  - (a) Existing cabinet controller firmware update (activity-monitoring module)  \n  - (b) Procurable door-open sensor (already present in alarm system)  \n  - (c) Defrost-interval retuning: set to 6-hour base + activity-adjusted delay (max 12-hour)  \n  - (c) Rapid-restock procedure: staff must restock within 30 seconds of door closure (audible alarm enforces)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Standard uses: Controller, door alarm (fixed 30s delay), fixed defrost.  \n- Proposed adds: Firmware update (a, no hardware), sensor reuse (a), retuning (c), procedure (c).  \n- Burden: Same controller hardware, same alarm delay, no new tools. Training for new procedure is lighter than quarterly product loss (40k/quarter). Burden class: SAME (no new hardware, minor procedural change).\n\nEXECUTABLE TEST — \n- **Protocol**: Log cabinet temperature and door events for 4 weeks (baseline vs. intervention).  \n- **Instruments**: Existing temperature logger, door-open sensor (already in alarm system).  \n- **Pass/Fail**: Intervention must reduce >8°C excursions from 3/week to <1/week; excursion duration must drop from 15 min avg to <5 min.  \n- **Duration**: 4 weeks (covers 12 defrost cycles).  \n- **Kill Criterion**: If excursion rate remains >2/week, mechanism fails (physics: insufficient decoupling of defrost from traffic).",
+   "a1_answer_sha256_16": "ada70ed6c36f6634",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3314,
+     "latency_s": 7.8,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Fixed defrost interval (e.g., every 6 hours), door alarm with 30-seco",
+       "- Proposed intervention:",
+       "- Standard practice: Fixed controller parameters, no firmware changes.",
+       "- Protocol: Simulate high-traffic periods (e.g., 10 door openings in 1 hour) for 1 week, w",
+       "- Instruments: Existing cabinet temperature loggers (already present).",
+       "- Pass/fail: Temperature must not exceed +8°C for >10 minutes during any defrost or recove",
+       "- Duration: 7 days (to capture multiple defrost cycles and traffic patterns).",
+       "- Kill criterion: Any single excursion >+8°C for >12 minutes falsifies the approach."
+      ]
+     },
+     "sha256_16": "b2b89fc41f4fb90e"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3437,
+     "latency_s": 8.0,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Standard Practice Bill**:",
+       "- Fixed defrost interval controller (e.g., 6-hour cycle)",
+       "- Door alarm with 30-second delay after closure",
+       "- Manual temperature logging (not used for control)",
+       "- **Proposed Intervention Bill**:"
+      ]
+     },
+     "sha256_16": "09d6c93586ee6327",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Standard Practice Bill**:; - Fixed defrost interval controller (e.g., 6-hour cycle); - Door alarm with 30-"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2865,
+     "latency_s": 7.3,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door",
+       "- **Proposed Bill**:",
+       "- Standard uses: Controller, door alarm (fixed 30s delay), fixed defrost.",
+       "- Burden: Same controller hardware, same alarm delay, no new tools. Training for new proce",
+       "- **Protocol**: Log cabinet temperature and door events for 4 weeks (baseline vs. interven",
+       "- **Instruments**: Existing temperature logger, door-open sensor (already in alarm system)",
+       "- **Pass/Fail**: Intervention must reduce >8°C excursions from 3/week to <1/week; excursio",
+       "- **Duration**: 4 weeks (covers 12 defrost cycles).",
+       "- **Kill Criterion**: If excursion rate remains >2/week, mechanism fails (physics: insuffi"
+      ]
+     },
+     "sha256_16": "ada70ed6c36f6634",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door; - **Proposed Bill*"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door",
+      "- **Proposed Bill**:",
+      "- Standard uses: Controller, door alarm (fixed 30s delay), fixed defrost.",
+      "- Burden: Same controller hardware, same alarm delay, no new tools. Training for new proce",
+      "- **Protocol**: Log cabinet temperature and door events for 4 weeks (baseline vs. interven",
+      "- **Instruments**: Existing temperature logger, door-open sensor (already in alarm system)",
+      "- **Pass/Fail**: Intervention must reduce >8°C excursions from 3/week to <1/week; excursio",
+      "- **Duration**: 4 weeks (covers 12 defrost cycles).",
+      "- **Kill Criterion**: If excursion rate remains >2/week, mechanism fails (physics: insuffi"
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:52:44Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-04-paper-dryer-lint-fire",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V61",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The engineering change is to install a pulsed airflow reversal system in the hood exhaust ducts during the weekly 4-hour stop. Standard practice uses constant unidirectional airflow and manual cleaning; this intervention uses transient reverse pulses to dislodge lint without manual intervention. Adjacent-technique clearance: Industrial baghouse reverse-jet cleaning exists but requires dedicated pressure vessels and nozzles; this uses the existing hood fan and ductwork. The mechanism exploits the cohesive failure physics: lint adhesion is overcome by aerodynamic shear stress from sudden flow reversal, preventing accumulation before it reaches ignition thickness.\n\nPHYSICS CHECK — The governing relation is τ = μ(du/dy), where τ is shear stress at the duct wall, μ is air viscosity, and du/dy is velocity gradient. A 20 m/s reverse pulse generates τ ≈ 0.8 Pa, exceeding the lint adhesion strength (≈0.3 Pa). This reduces accumulation rate by >90%, as verified by pilot tests showing 0.5 mm/day accumulation vs. 5 mm/day in constant-flow sections.\n\nIMPLEMENTATION BILL — (vs. standard practice: weekly manual cleaning with scaffolding/brushes)\n1. Install solenoid valves (b) on existing hood fan discharge ducts (a) – 4 units, $120 each  \n2. Add programmable logic controller (b) to trigger valves during weekly stops – 1 unit, $800  \n3. Configure airflow reversal schedule (c): 3 pulses of 30 sec at 20 m/s every 15 min during 4-hr stop  \n4. No new ductwork or access doors required – uses existing cleaning windows (a)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Standard burden: scaffolding setup ($200), 2-person crew ($800), 4-hr cleaning ($3200). New burden: valves ($480), controller ($800), 0.5-hr programming ($100). Total: $1380 vs. $4200 – 67% lower burden. No new hardware classes; all items are catalog replacements.\n\nEXECUTABLE TEST — Protocol: Measure lint thickness via IR camera (existing) at 6 fixed points pre/post intervention. Pass/fail: <1 mm accumulation after 4 weeks of operation. Duration: 4 weeks. Kill criterion: If any point exceeds 2 mm, test fails. Validation: Compare accumulation rate to baseline data (previous 3 months).",
+   "a1_answer_sha256_16": "c5f93f7c61d2dc51",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2197,
+     "latency_s": 5.5,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "sha256_16": "c5f93f7c61d2dc51"
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 0,
+    "residual_findings": {}
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:53:03Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-05-immersion-fluid-degradation",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V61",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is to replace one standard activated-alumina cartridge in the side-loop filtration system with a chelating resin cartridge to preferentially bind copper ions while maintaining oxidation control. Standard practice uses activated-alumina cartridges solely for oxidation byproduct removal; this intervention introduces a second capture mechanism that selectively targets dissolved copper ions without requiring additional hardware, a departure from single-function filtration. Adjacent-technique clearance: The closest existing practice is using mixed-bed resins in power plant condensate systems, but those are designed for broad ion removal and require complete system redesign, whereas this intervention uses a targeted chelation mechanism in existing cartridge form factors. The mechanism exploits the preferential affinity of iminodiacetate functional groups for copper ions (Cu²⁺ > H⁺), reducing dissolved copper concentration while the alumina continues to handle acidic oxidation byproducts.\n\nPHYSICS CHECK\nThe governing relation is the Nernst distribution law for chelation: K_d = [Cu²⁺]_resin / [Cu²⁺]_fluid, where iminodiacetate resins exhibit K_d > 10⁴ for copper at 55°C. For a 38-server system with 1.2 m³ fluid volume and 50 ppm copper contamination, a 10\" chelating resin cartridge (≈2.5 L resin, capacity ≈1.2 eq/L) can reduce [Cu²⁺] by >90% (from 50 ppm to <5 ppm) before saturation, directly addressing the copper dissolution failure mechanism while maintaining the existing alumina's oxidation control function.\n\nIMPLEMENTATION BILL\n- Replace one existing activated-alumina cartridge with a standard iminodiacetate chelating resin cartridge (b) [net hardware: 0; uses existing cartridge housing]\n- Adjust side-loop flow rate to 15% of total loop flow (c) [parameter change; no new hardware]\n- Extend cartridge replacement interval to 6 months (c) [procedure change; leverages existing maintenance schedule]\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice: 2 activated-alumina cartridges replaced quarterly (8/year) + 6 hours downtime/year\nProposed intervention: 1 alumina + 1 chelating resin cartridge replaced biannually (4 cartridges/year) + 6 hours downtime/year\nBurden class: Same (identical downtime, fewer cartridge changes, no new hardware, no new skills required)\n\nEXECUTABLE TEST\nProtocol: Install test loop with identical copper coupon and fluid sample; monitor copper concentration via ICP-MS and fluid colorimetry weekly for 90 days.\nInstruments: ICP-MS for copper quantification, spectrophotometer for colorimetry, flowmeter.\nPass/fail: Copper reduction >80% vs control (untreated fluid) and fluid color improvement (ΔE < 2.0) within 30 days.\nDuration: 90 days (covers 2 cartridge service intervals).\nKill criterion: If copper reduction <50% or fluid darkening continues at >80% of original rate after 30 days, falsify the intervention.",
+   "a1_answer_sha256_16": "83c1a3f90da82c82",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4273,
+     "latency_s": 9.4,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Replaces one activated-alumina cartridge with chelating resin (no net hardware addition)",
+       "- Uses existing infrastructure (side-loop, housing, downtime budget)",
+       "- Adds only a procedural flow adjustment during service",
+       "1. Install chelating resin cartridge in parallel with existing activated-alumina cartridge",
+       "2. Monitor fluid monthly for:",
+       "- Dissolved copper (ICP-MS, pass threshold: <0.1 ppm)",
+       "- Acid number (ASTM D974, pass threshold: rise <0.02 mgKOH/g/month)",
+       "- Dielectric strength (ASTM D877, pass threshold: >50 kV)",
+       "3. Compare to baseline (no resin) for 6 months."
+      ]
+     },
+     "sha256_16": "09c0b4012dfffa1f"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2937,
+     "latency_s": 7.1,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {},
+     "sha256_16": "83c1a3f90da82c82",
+     "findings_disclosed": []
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 1,
+    "residual_findings": {}
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:53:32Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-06-greenhouse-emitter-clogging",
+   "question_type": "intervention-proposal",
+   "a1_source": "SYS_A1_INT_V61",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The engineering change to prevent emitter clogging is implementing a pulsed acid-dosing schedule synchronized with the irrigation cycle. Standard practice uses a continuous acid-dosing regimen to maintain pH 5.6, which only passively prevents precipitation but does not address root fragment intrusion. The pulsed dosing actively dissolves incipient precipitates and dislodges root fragments during low-flow intervals by creating pH micro-cycles, a departure from static pH maintenance. The closest existing practice is continuous acid injection in water treatment, but our pulsed micro-cycling differs by leveraging the irrigation's hydraulic transients to enhance mechanical flushing action without additional hardware.\n\nPHYSICS CHECK — The governing relation is the solubility equilibrium of calcium phosphate (Ksp = 2.07×10^-33 at 25°C). Pulsing acid to pH 5.2 temporarily increases [H+] by 2.5×, dissolving nascent precipitates before they crystallize fully. Each pulse creates a transient pressure wave (ΔP = ρ·g·Δh) that dislodges root fragments from emitter orifices. The magnitude verification: 0.4 pH unit drop increases solubility by ~50%, and 1-second pulses at 1 Hz generate 0.5–1.0 kPa pressure waves sufficient to dislodge fragments <100 μm.\n\nIMPLEMENTATION BILL —  \n- **Existing components retained**:  \n  - Standard acid-dosing system (nitric acid, pH 5.6 setpoint) [(a)]  \n  - Pressure-compensating emitters [(a)]  \n  - Screen filters [(a)]  \n- **New/modified components**:  \n  - PLC logic module with programmable timer (e.g., Siemens LOGO! 8, catalog #6ED1052-1MD08-0BA1) [(b)]  \n  - pH sensor with 1-second response time (e.g., Endress+Hauser Liquisys M, catalog #MTS40D) [(b)]  \n- **Procedure changes**:  \n  - Modify dosing schedule: 1-second pulse to pH 5.2 every 10 minutes during irrigation [(c)]  \n  - Flush automation: Trigger screen filter backwash when pH pulse completes [(c)]  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n| Standard Practice Burden | Proposed Intervention Burden |  \n|--------------------------|------------------------------|  \n| Continuous acid dosing (24/7) | Pulsed dosing (6% runtime) |  \n| Manual filter flush (weekly) | Automated flush (per pulse) |  \n| pH monitoring (continuous) | Same sensor + PLC module [(b)] |  \n| No new hardware | PLC module [(b)] |  \n**Conclusion**: Same burden class (existing infrastructure + one procurable PLC module). Runtime burden decreases (acid use down ~40%), and labor burden shifts from manual to automated flushing.\n\nEXECUTABLE TEST —  \n**Protocol**: Install system on 10% of greenhouse area (0.24 ha). Compare test zone (pulsed dosing) vs. control (continuous dosing) over 16 weeks.  \n**Instruments**: Flow meters per emitter, pressure transducers, pH loggers.  \n**Pass/Fail Threshold**: Test zone must maintain ≥92% outlet uniformity at week 14 (vs. control <85%).  \n**Duration**: 16 weeks (one full season).  \n**Kill Criterion**: If pH pulse causes root damage (pH <5.6 for >5 min), abort and revert to continuous dosing.  \n**Falsification**: Uniformity drops to control levels (85%) by week 14 in test zone, or precipitate mass in emitters is unchanged (gravimetric analysis).",
+   "a1_answer_sha256_16": "193159cb4682b711",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4541,
+     "latency_s": 10.2,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Install pulsed reverse-flow logic in flush controller.",
+       "2. Divide 2.4 hectares into 8 blocks; treat 4 blocks with pulsed flushing, 4 with steady f",
+       "3. Monitor emitter uniformity (pressure sensors at laterals) weekly for 14 weeks."
+      ]
+     },
+     "sha256_16": "a016f22ac084c6b7"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3026,
+     "latency_s": 6.9,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Intervention**:",
+       "- Ongoing: Pulse logic adds negligible runtime burden (PLC module idle between pulses).",
+       "- Uses only allowed measures (acid-dosing retuning and flush automation).",
+       "- No emitter/lateral redesign; root intrusion addressed via flushing (not chemicals).",
+       "- Fertilizer recipe unchanged (fixed by contract).",
+       "- Performance bound: pH ≥5.6 enforced by test kill criterion."
+      ]
+     },
+     "sha256_16": "e8000f06a5d9960b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Intervention**:; - Ongoing: Pulse logic adds negligible runtime burden (PLC module idle between pulses).; "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3210,
+     "latency_s": 8.6,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Existing components retained**:",
+       "- **New/modified components**:",
+       "- **Procedure changes**:"
+      ]
+     },
+     "sha256_16": "193159cb4682b711",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Existing components retained**:; - **New/modified components**:; - **Procedure changes**:"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Existing components retained**:",
+      "- **New/modified components**:",
+      "- **Procedure changes**:"
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:54:11Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-07-elevator-door-opener-trips",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers a MONITORING/INDICATION scheme using a simple current threshold to flag an overcurrent event.\n- My same-class mechanism departure is the detection of progressive belt-slip precursor dynamics by quantifying the harmonic distortion and asymmetry in the door-motor current waveform, which precedes the eventual belt slip and timeout trip.\n- This works because belt slip is not an instantaneous event but a progressive failure; the flattening rollers increase the belt's effective load non-uniformly, causing the motor current to develop a harmonic signature and DC offset long before the torque demand exceeds the motor's capability and triggers a timeout.\n\nPHYSICS CHECK\n- Governing physical relation: The harmonic distortion in motor current is proportional to the torque ripple caused by non-uniform belt loading (I_ripple ∝ ΔT). The DC offset indicates a sustained lateral force imbalance (I_dc ∝ F_lateral).\n- Magnitude verification: A typical door motor draws 5A RMS at 60Hz; a 10% third harmonic (0.5A) and a 5% DC offset (0.25A) are detectable above noise and correlate with a 20% increase in effective friction coefficient, which is the physical precursor to belt slip.\n\nIMPLEMENTATION BILL\n- Components:\n  - Data acquisition unit (reads door-motor current log) [ALREADY-RECORDDED: \"controller logs door-motor current per operation\"]\n  - Signal processing module (extracts harmonic content and DC offset from current waveform)\n  - Threshold comparison module (flags when harmonic distortion exceeds threshold)\n- Data streams:\n  - Door-motor current waveform (ALREADY-RECORDED: \"controller logs door-motor current per operation\")\n  - Door close-duration (ALREADY-RECORDED: \"controller logs door close-duration\")\n- References/Thresholds:\n  - Harmonic distortion threshold: 8% third harmonic current relative to fundamental (CALCULATED: from motor nameplate current of 5A RMS, 8% = 0.4A, detectable above 0.1A noise floor)\n  - DC offset threshold: 4% of motor current (CALCULATED: from motor nameplate current of 5A RMS, 4% = 0.2A, detectable above 0.05A noise floor)\n  - Time-to-failure window: 14 days (USER CONSTRAINT: \"warn >=14 days before a timeout trip\")\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME as standard practice (no new hardware, uses existing controller logs)\n- Operability: SAME as standard practice (no additional operator training required, automated alert)\n- Maintenance: SAME as standard practice (no new maintenance tasks, software update only)\n- Rough cost class: SAME as standard practice (low-cost software implementation, no new hardware)\n- Conclusion: SAME burden class, DIFFERENT mechanism (signal processing instead of simple thresholding)\n\nEXECUTABLE TEST\n- Protocol: Extract door-motor current logs for 60 operations preceding each of the last 10 timeout trips. For each log, compute the third harmonic distortion and DC offset of the current waveform. Also compute the same metrics for 100 random healthy operations from the same elevator.\n- Instruments: Data acquisition unit (reads existing logs), signal processing software\n- Pass/Fail Threshold: The harmonic distortion and DC offset must be significantly higher (p<0.01, t-test) in the 60 operations preceding a timeout trip compared to healthy operations. The predictor must achieve <=1 false alarm per 10 elevators/month (USER CONSTRAINT).\n- Duration: 1 month (sufficient to capture multiple failure cycles)\n- Kill Criterion: If the harmonic distortion and DC offset are not significantly elevated prior to timeout trips, or if false alarm rate exceeds 1 per 10 elevators/month, the predictor is invalidated.",
+   "a1_answer_sha256_16": "d71c0e41a7e6ec80",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3619,
+     "latency_s": 8.4,
+     "transport_tries": 1,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Components**:",
+       "- Data acquisition unit (reads door-motor current log)",
+       "- Signal processor (computes ΔI per close cycle)",
+       "- Threshold comparator (triggers alert if ΔI > 40 A)",
+       "- **Inputs (ALREADY-RECORDED)**:",
+       "- Door-motor current log (per problem statement: \"controller logs door-motor current per o",
+       "- Door close-duration log (per problem statement: \"controller logs door close-duration\")",
+       "- **References (DERIVED)**:",
+       "- ΔI threshold = 40 A (DERIVED FROM: stated physics + ASSUMPTION: healthy ΔI < 20 A)",
+       "- Warning window = 14 days (USER CONSTRAINT: \"warn >=14 days before timeout trip\")",
+       "- False alarm rate = ≤0.1/elevator/month (USER CONSTRAINT: \"≤1 false alarm per 10 elevator",
+       "- **Installability**: Same as standard (no new hardware; uses existing logs).",
+       "- **Operability**: Same (software update; no operator intervention).",
+       "- **Maintenance**: Same (no additional servicing; relies on existing sensor calibration).",
+       "- **Cost class**: Same (software-only; comparable to standard monitoring).",
+       "- **Burden parity**: Achieved—no new instruments, materials, or services beyond standard l",
+       "- **Protocol**:",
+       "1. Extract 6 months of door-motor current logs for 10 elevators (ALREADY-RECORDED data).",
+       "2. For each door close cycle, compute ΔI = I_max - I_min.",
+       "3. Flag cycles where ΔI > 40 A and record timestamp.",
+       "4. Check if flagged cycles precede a timeout trip within 14 days.",
+       "- **Instruments**: Existing log data; no new sensors.",
+       "- **Pass/fail threshold**:",
+       "- True positive rate ≥80% (≥4/5 trips predicted).",
+       "- False alarm rate ≤0.1/elevator/month (≤1 false alarm per 10 elevators/month).",
+       "- **Duration**: 6 months of retrospective analysis.",
+       "- **Kill criterion**: If true positive rate <80% or false alarms >0.1/elevator/month, pred",
+       "- **Validation**: Uses ALREADY-RECORDED data; no new collection needed.",
+       "- Primary indicator: Door-motor current signature (per problem statement: \"predictor must ",
+       "- Rationale: The failure-DEFINING event is the door-timeout trip, and current asymmetry is"
+      ]
+     },
+     "sha256_16": "09036642684b684d"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3029,
+     "latency_s": 7.5,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Components:",
+       "- Data acquisition unit (reads door-motor current log) [ALREADY-RECORDED: \"controller logs",
+       "- Signal processor (computes ΔI/I0 slope) [CALCULATED: ΔI = I_peak - I0, I0 = baseline cur",
+       "- Data streams:",
+       "- Door-motor current (per operation) [ALREADY-RECORDED: \"controller logs door-motor curren",
+       "- Door close-duration (per operation) [ALREADY-RECORDED: \"controller logs door close-durat",
+       "- Thresholds:",
+       "- ΔI/I0 slope ≥ 0.15/day [CALCULATED: 0.15/day = 15% current increase over 10 operations, ",
+       "- Warning trigger: slope ≥ 0.15/day for ≥14 days [USER CONSTRAINT: \"warn >=14 days before ",
+       "- False alarm limit: ≤1/10 elevators/month [USER CONSTRAINT: \"<=1 false alarm per 10 eleva",
+       "- Installability: Same as existing logging (no new hardware) [SAME burden class: uses exis",
+       "- Operability: Real-time slope computation (low CPU load) [SAME burden class: no operator ",
+       "- Maintenance: No calibration (thresholds from physics/specs) [SAME burden class: no maint",
+       "- Cost class: Software-only update (no sensors/materials) [SAME burden class: cheaper than",
+       "- Protocol:",
+       "1. Collect 30 days of door-motor current and close-duration logs from 10 elevators (300 to",
+       "2. Compute ΔI/I0 slope for each elevator per operation (I0 = nameplate rated current).",
+       "3. Flag elevators with slope ≥ 0.15/day for ≥14 days.",
+       "4. Monitor for door-timeout trips over next 30 days.",
+       "- Pass/fail:",
+       "- Pass: ≥80% of trips predicted ≥14 days early, ≤1 false alarm/10 elevators/month.",
+       "- Fail: <50% prediction rate or >2 false alarms.",
+       "- Duration: 60 days (30 days analysis + 30 days validation).",
+       "- Kill criterion: If slope does not correlate with trips (R² < 0.7), mechanism is falsifie"
+      ]
+     },
+     "sha256_16": "b417a7664eded96a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Components:; - Data acquisition unit (reads door-motor current log) [ALREADY-RECORDED: \"controller logs; - S"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3668,
+     "latency_s": 7.2,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Components:",
+       "- Data acquisition unit (reads door-motor current log) [ALREADY-RECORDDED: \"controller log",
+       "- Signal processing module (extracts harmonic content and DC offset from current waveform)",
+       "- Threshold comparison module (flags when harmonic distortion exceeds threshold)",
+       "- Data streams:",
+       "- Door-motor current waveform (ALREADY-RECORDED: \"controller logs door-motor current per o",
+       "- Door close-duration (ALREADY-RECORDED: \"controller logs door close-duration\")",
+       "- References/Thresholds:",
+       "- Harmonic distortion threshold: 8% third harmonic current relative to fundamental (CALCUL",
+       "- DC offset threshold: 4% of motor current (CALCULATED: from motor nameplate current of 5A",
+       "- Time-to-failure window: 14 days (USER CONSTRAINT: \"warn >=14 days before a timeout trip\"",
+       "- Installability: SAME as standard practice (no new hardware, uses existing controller log",
+       "- Operability: SAME as standard practice (no additional operator training required, automa",
+       "- Maintenance: SAME as standard practice (no new maintenance tasks, software update only)",
+       "- Rough cost class: SAME as standard practice (low-cost software implementation, no new ha",
+       "- Conclusion: SAME burden class, DIFFERENT mechanism (signal processing instead of simple "
+      ]
+     },
+     "sha256_16": "d71c0e41a7e6ec80",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Components:; - Data acquisition unit (reads door-motor current log) [ALREADY-RECORDDED: \"controller log; - S"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Components:",
+      "- Data acquisition unit (reads door-motor current log) [ALREADY-RECORDDED: \"controller log",
+      "- Signal processing module (extracts harmonic content and DC offset from current waveform)",
+      "- Threshold comparison module (flags when harmonic distortion exceeds threshold)",
+      "- Data streams:",
+      "- Door-motor current waveform (ALREADY-RECORDED: \"controller logs door-motor current per o",
+      "- Door close-duration (ALREADY-RECORDED: \"controller logs door close-duration\")",
+      "- References/Thresholds:",
+      "- Harmonic distortion threshold: 8% third harmonic current relative to fundamental (CALCUL",
+      "- DC offset threshold: 4% of motor current (CALCULATED: from motor nameplate current of 5A",
+      "- Time-to-failure window: 14 days (USER CONSTRAINT: \"warn >=14 days before a timeout trip\"",
+      "- Installability: SAME as standard practice (no new hardware, uses existing controller log",
+      "- Operability: SAME as standard practice (no additional operator training required, automa",
+      "- Maintenance: SAME as standard practice (no new maintenance tasks, software update only)",
+      "- Rough cost class: SAME as standard practice (low-cost software implementation, no new ha",
+      "- Conclusion: SAME burden class, DIFFERENT mechanism (signal processing instead of simple "
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:54:47Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-08-irrigation-pump-waterhammer",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "contract_for_qt": true,
+   "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers a MONITORING/INDICATION scheme using peak pressure amplitude as a leading indicator for surge-induced joint fatigue.  \n- My same-class departure: cumulative surge dose (integrated pressure-time product above nominal) as a fatigue proxy, replacing isolated peak amplitude with a damage-mechanism-relevant metric.  \n- Connection: PVC joint fatigue is a cumulative damage process; the total \"dose\" of transients better predicts fatigue life than single-event peaks.  \n\n**PHYSICS CHECK**  \n- Governing relation: Cumulative damage = Σ[(P_i - P_nominal) / P_critical]^n for n transients (Palmgren-Miner rule for fatigue).  \n- Magnitude verification: For PVC, n ≈ 4 (typical for polymers); P_critical ≈ 1.5x P_nominal (stated pipe spec). A single transient at 2x P_nominal contributes 16x more damage than one at 1.25x P_nominal.  \n\n**IMPLEMENTATION BILL**  \n- **Input streams**:  \n  - 10 Hz pressure trace at pump header (ALREADY-RECORDED; stated: \"pressure transducers already log at 10 Hz at the pump header\").  \n- **Processing**:  \n  - Compute surge dose: D = Σ[(P_i - P_nominal) * Δt] for all P_i > P_nominal in a season.  \n  - Threshold: D_critical = 1,000 bar·s (CALCULATED; derived from PVC fatigue limit: 1e6 cycles at 1.25x P_nominal → 1,000 bar·s equivalent).  \n- **Output**: Seasonal surge dose counter with alert at D_critical.  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- **Installability**: Same (uses existing pressure transducer; no new hardware).  \n- **Operability**: Same (real-time processing on existing data logger).  \n- **Maintenance**: Same (no additional calibration; software update only).  \n- **Cost class**: SAME (no new sensors; marginal compute cost).  \n- **Why worth it**: Reduces false alerts from isolated peaks while capturing cumulative fatigue risk.  \n\n**EXECUTABLE TEST**  \n- **Protocol**:  \n  1. Process 3 years of historical 10 Hz pressure data (ALREADY-RECORDED).  \n  2. Compute D per season and flag seasons where D > D_critical.  \n  3. Compare flagged seasons to actual joint-burst dates (stated: \"two joint bursts in three years\").  \n- **Pass/fail**:  \n  - PASS: Predictor flags both burst seasons with ≤2 false alerts/season.  \n  - FAIL: >2 false alerts or misses a burst season.  \n- **Duration**: 1 week (historical data processing).  \n- **Kill criterion**: If D shows no correlation with bursts (e.g., bursts occur in low-D seasons), mechanism is falsified.  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Peak pressure transient amplitude at pump header (stated: \"the failure-DEFINING quantity is the peak pressure transient amplitude\").  \n- Rationale: Cumulative dose supplements (not replaces) this primary indicator by adding fatigue-mechanism context.",
+   "a1_answer_sha256_16": "3b100c531a061705",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3254,
+     "latency_s": 7.3,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams** (ALREADY-RECORDED):",
+       "- 10 Hz pressure trace at pump header (stated: \"pressure transducers already log at 10 Hz ",
+       "- 10 Hz pressure trace at high point 2 (stated: \"pressure transducers already log at 10 Hz",
+       "- **Reference/thresholds** (DERIVED):",
+       "- **P_f (static failure pressure)**: CALCULATED from PVC pipe spec (e.g., SDR 26 PVC has P",
+       "- **m (fatigue exponent)**: CALCULATED from stated PVC material properties (m = 5, typical",
+       "- **Fatigue budget (B)**: CALCULATED from historical failure data (two bursts in three yea",
+       "- **Alert threshold**: CALCULATED as B × (P_f)^m = 0.167 × (1.03e6)^5 Pa^5 (converted to p",
+       "- **Installability**: SAME (uses existing pressure transducers; no new hardware).",
+       "- **Operability**: SAME (real-time computation via existing PLC/SCADA; no additional opera",
+       "- **Maintenance**: SAME (pressure transducer maintenance unchanged; software update only).",
+       "- **Cost class**: SAME (no new instrumentation; minor software development cost).",
+       "- **Why worth it**: Prevents false negatives from isolated low-amplitude surges that colle",
+       "- **Protocol**:",
+       "1. Use 1 year of historical 10 Hz pressure data (pump header + high point 2) from two seas",
+       "2. Compute cumulative fatigue dose for each season using Σ (P_i / P_f)^m.",
+       "3. Compare dose to alert threshold (B × P_f^m).",
+       "- **Instruments**: Existing pressure logs; standard data processing software.",
+       "- **Pass/fail threshold**: Predictor must trigger an alert in the season with a burst but ",
+       "- **Duration**: 1 week (data processing time).",
+       "- **Kill criterion**: If predictor fails to distinguish between seasons, reject mechanism.",
+       "- **Validation**: Uses ALREADY-RECORDED data (stated historical logs)."
+      ]
+     },
+     "sha256_16": "91db83f80c7e1718"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2281,
+     "latency_s": 5.1,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams** (ALREADY-RECORDDED): 10 Hz pressure trace at pump header (stated: \"pre",
+       "- **Processing**: Rainflow cycle counting algorithm (applied to pressure trace).",
+       "- **Reference** (DERIVED from stated physics): Fatigue budget = 1.0 (from Miner’s rule for",
+       "- **Threshold** (CALCULATED from stated physics): Cumulative damage sum = 0.8 (20% safety ",
+       "- **Output**: Alert when cumulative damage sum exceeds threshold.",
+       "- **Installability**: Same (uses existing pressure transducer).",
+       "- **Operability**: Same (real-time processing on existing data stream).",
+       "- **Maintenance**: Same (no new hardware).",
+       "- **Cost class**: Same (software-only addition).",
+       "- **Burden parity**: Achieved; no new instrumentation or validation program needed.",
+       "- **Protocol**: Process 10 Hz pump header pressure data from 12 past power-off events (alr",
+       "- **Instruments**: Existing pressure data log.",
+       "- **Pass/fail threshold**: Predictor must flag all 2 known joint-burst events (cumulative ",
+       "- **Duration**: Single pass over historical data.",
+       "- **Kill criterion**: If >2 false alerts or a known burst event is missed, predictor is in"
+      ]
+     },
+     "sha256_16": "4ae8765a4f1e3f81",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Input streams** (ALREADY-RECORDDED): 10 Hz pressure trace at pump header (stated: \"pre; - **Processing**: "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2753,
+     "latency_s": 6.3,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams**:",
+       "- 10 Hz pressure trace at pump header (ALREADY-RECORDED; stated: \"pressure transducers alr",
+       "- **Processing**:",
+       "- Compute surge dose: D = Σ[(P_i - P_nominal) * Δt] for all P_i > P_nominal in a season.",
+       "- Threshold: D_critical = 1,000 bar·s (CALCULATED; derived from PVC fatigue limit: 1e6 cyc",
+       "- **Output**: Seasonal surge dose counter with alert at D_critical.",
+       "- **Installability**: Same (uses existing pressure transducer; no new hardware).",
+       "- **Operability**: Same (real-time processing on existing data logger).",
+       "- **Maintenance**: Same (no additional calibration; software update only).",
+       "- **Cost class**: SAME (no new sensors; marginal compute cost).",
+       "- **Why worth it**: Reduces false alerts from isolated peaks while capturing cumulative fa",
+       "- **Protocol**:",
+       "1. Process 3 years of historical 10 Hz pressure data (ALREADY-RECORDED).",
+       "2. Compute D per season and flag seasons where D > D_critical.",
+       "3. Compare flagged seasons to actual joint-burst dates (stated: \"two joint bursts in three",
+       "- **Pass/fail**:",
+       "- PASS: Predictor flags both burst seasons with ≤2 false alerts/season.",
+       "- FAIL: >2 false alerts or misses a burst season.",
+       "- **Duration**: 1 week (historical data processing).",
+       "- **Kill criterion**: If D shows no correlation with bursts (e.g., bursts occur in low-D s",
+       "- Primary indicator: Peak pressure transient amplitude at pump header (stated: \"the failur",
+       "- Rationale: Cumulative dose supplements (not replaces) this primary indicator by adding f"
+      ]
+     },
+     "sha256_16": "3b100c531a061705",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Input streams**:; - 10 Hz pressure trace at pump header (ALREADY-RECORDED; stated: \"pressure transducers a"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Input streams**:",
+      "- 10 Hz pressure trace at pump header (ALREADY-RECORDED; stated: \"pressure transducers alr",
+      "- **Processing**:",
+      "- Compute surge dose: D = Σ[(P_i - P_nominal) * Δt] for all P_i > P_nominal in a season.",
+      "- Threshold: D_critical = 1,000 bar·s (CALCULATED; derived from PVC fatigue limit: 1e6 cyc",
+      "- **Output**: Seasonal surge dose counter with alert at D_critical.",
+      "- **Installability**: Same (uses existing pressure transducer; no new hardware).",
+      "- **Operability**: Same (real-time processing on existing data logger).",
+      "- **Maintenance**: Same (no additional calibration; software update only).",
+      "- **Cost class**: SAME (no new sensors; marginal compute cost).",
+      "- **Why worth it**: Reduces false alerts from isolated peaks while capturing cumulative fa",
+      "- **Protocol**:",
+      "1. Process 3 years of historical 10 Hz pressure data (ALREADY-RECORDED).",
+      "2. Compute D per season and flag seasons where D > D_critical.",
+      "3. Compare flagged seasons to actual joint-burst dates (stated: \"two joint bursts in three",
+      "- **Pass/fail**:",
+      "- PASS: Predictor flags both burst seasons with ≤2 false alerts/season.",
+      "- FAIL: >2 false alerts or misses a burst season.",
+      "- **Duration**: 1 week (historical data processing).",
+      "- **Kill criterion**: If D shows no correlation with bursts (e.g., bursts occur in low-D s",
+      "- Primary indicator: Peak pressure transient amplitude at pump header (stated: \"the failur",
+      "- Rationale: Cumulative dose supplements (not replaces) this primary indicator by adding f"
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:55:19Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-09-bakery-oven-gasket-degradation",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using a fixed threshold on cavity-temperature recovery time. My same-class departure is a dynamic threshold that adapts to steam-valve duty drift, detecting gasket hardening before recovery time exceeds the static failure threshold. The failure physics: gasket hardening increases leakage area, raising the steam demand (valve duty) needed to maintain pressure; this occurs before recovery time degrades enough to trigger a static threshold.  \n\nPHYSICS CHECK — Governing relation: Steam leakage rate ∝ (valve duty - baseline duty) × √(cavity pressure). For a hardened gasket, leakage area increases, requiring higher valve duty to compensate. Magnitude check: If gasket leakage area doubles, valve duty must increase ~20% to maintain pressure (per steam flow equations), while recovery time may only increase by 5-10% initially. This confirms duty drift precedes recovery time degradation.  \n\nIMPLEMENTATION BILL —  \n- **Inputs**:  \n  - Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"oven controller already records... cavity-temperature recovery time per bake\")  \n  - Steam-valve duty cycle per bake (ALREADY-RECORDED, per problem statement: \"oven controller already records steam-valve duty\")  \n- **Reference/Thresholds**:  \n  - Baseline steam duty: DERIVED from last 30 bakes' mean duty (stated data: \"ALREADY RECORDED\" steam-valve duty logs)  \n  - Duty drift threshold: DERIVED from baseline duty × 1.15 (15% increase; stated physics: steam leakage ∝ valve duty for fixed pressure)  \n  - Recovery time threshold: DERIVED from problem's failure definition (not explicitly stated but implied by \"failure-DEFINING symptom is the cavity temperature-recovery time\")  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- **Installability**: Same as standard practice (uses existing logs; no new hardware).  \n- **Operability**: Same (no additional operator steps; automated calculation).  \n- **Maintenance**: Same (no new maintenance tasks; software-based).  \n- **Cost class**: Same (no new instruments or materials; only data processing).  \n- **Why worth it**: Avoids 50% of false alarms by detecting duty drift before recovery time degrades, reducing unnecessary bake interruptions.  \n\nEXECUTABLE TEST —  \n- **Protocol**:  \n  1. Collect steam-valve duty and recovery time for 60 bakes (using ALREADY-RECORDED logs).  \n  2. Calculate baseline duty from first 30 bakes.  \n  3. Flag any bake where duty exceeds baseline × 1.15.  \n  4. Compare flags to actual quality failures (recovery time > failure threshold).  \n- **Pass/Fail**:  \n  - Pass: ≥90% of actual failures flagged ≥10 bakes prior; ≤1 false alarm per 60 bakes.  \n  - Fail: <90% of failures detected or >1 false alarm.  \n- **Duration**: 60 bakes (2 weeks at 14 bakes/day).  \n- **Kill Criterion**: If duty drift does not precede recovery time degradation by ≥10 bakes, the mechanism is falsified.  \n- **Validation**: Against ALREADY-RECORDED data (steam-duty and recovery-time logs).  \n\nCONSTRAINT BIND — Primary indicator: Cavity-temperature recovery time (explicitly stated as the \"failure-DEFINING symptom\"). Secondary indicator: Steam-valve duty (supplements primary by detecting early drift). The predictor uses both: duty drift flags potential issues, but recovery time remains the final arbiter of failure.",
+   "a1_answer_sha256_16": "4cb6a6c508711cf9",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2709,
+     "latency_s": 5.7,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Primary indicator: Cavity-temperature recovery time (ALREADY-RECORDED, per problem state",
+       "- Secondary indicator: Rate of change of steam-valve duty (ALREADY-RECORDED, per problem s",
+       "- Threshold: Steam-valve duty rate > 0.15%/bake (CALCULATED, from 20% leakage increase ove",
+       "- Reference: Baseline steam-valve duty rate (DERIVED, from first 7 bakes of oven operation",
+       "- Procedure: Log steam-valve duty per bake; compute 7-bake moving average rate; trigger wa",
+       "- Installability: SAME (uses existing logs, no new hardware)",
+       "- Operability: SAME (no additional operator steps, automated calculation)",
+       "- Maintenance: SAME (no calibration, same data collection)",
+       "- Cost class: SAME (no additional instrumentation, only software logic)"
+      ]
+     },
+     "sha256_16": "890180d59502d981"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3025,
+     "latency_s": 6.0,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Primary indicator: Cavity-temperature recovery time (ALREADY-RECORDING, per problem stat",
+       "- Secondary indicator: Steam-valve duty cycle (ALREADY-RECORDING, per problem statement: \"",
+       "- Reference threshold: Dynamic threshold = Baseline recovery time × (1 + k × (Steam duty /",
+       "- Algorithm: Compute dynamic threshold after each bake. If recovery time > threshold, flag",
+       "- Installability: Same as standard (uses existing logs; no new hardware).",
+       "- Operability: Identical to standard (no new training; same alert interface).",
+       "- Maintenance: Same (no calibration; threshold recalculated automatically from recent data",
+       "- Cost class: Same (no additional materials/services; only software logic).",
+       "- Protocol: Use 6 months of ALREADY-RECORDED data (recovery time + steam duty) from a know",
+       "- Pass/fail: Must warn ≥10 bakes before the first quality failure (per USER CONSTRAINT) wi",
+       "- Duration: Single pass over historical data.",
+       "- Kill criterion: If warning occurs <10 bakes before failure or false alarms >1/60 bakes, ",
+       "- Validation: Thresholds derived from physics and existing data (no new collection needed)"
+      ]
+     },
+     "sha256_16": "0750861a784a98b6",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Primary indicator: Cavity-temperature recovery time (ALREADY-RECORDING, per problem stat; - Secondary indica"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3380,
+     "latency_s": 7.0,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs**:",
+       "- Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"ove",
+       "- Steam-valve duty cycle per bake (ALREADY-RECORDED, per problem statement: \"oven controll",
+       "- **Reference/Thresholds**:",
+       "- Baseline steam duty: DERIVED from last 30 bakes' mean duty (stated data: \"ALREADY RECORD",
+       "- Duty drift threshold: DERIVED from baseline duty × 1.15 (15% increase; stated physics: s",
+       "- Recovery time threshold: DERIVED from problem's failure definition (not explicitly state",
+       "- **Installability**: Same as standard practice (uses existing logs; no new hardware).",
+       "- **Operability**: Same (no additional operator steps; automated calculation).",
+       "- **Maintenance**: Same (no new maintenance tasks; software-based).",
+       "- **Cost class**: Same (no new instruments or materials; only data processing).",
+       "- **Why worth it**: Avoids 50% of false alarms by detecting duty drift before recovery tim",
+       "- **Protocol**:",
+       "1. Collect steam-valve duty and recovery time for 60 bakes (using ALREADY-RECORDED logs).",
+       "2. Calculate baseline duty from first 30 bakes.",
+       "3. Flag any bake where duty exceeds baseline × 1.15.",
+       "4. Compare flags to actual quality failures (recovery time > failure threshold).",
+       "- **Pass/Fail**:",
+       "- Pass: ≥90% of actual failures flagged ≥10 bakes prior; ≤1 false alarm per 60 bakes.",
+       "- Fail: <90% of failures detected or >1 false alarm.",
+       "- **Duration**: 60 bakes (2 weeks at 14 bakes/day).",
+       "- **Kill Criterion**: If duty drift does not precede recovery time degradation by ≥10 bake",
+       "- **Validation**: Against ALREADY-RECORDED data (steam-duty and recovery-time logs)."
+      ]
+     },
+     "sha256_16": "4cb6a6c508711cf9",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Inputs**:; - Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"ove; - S"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Inputs**:",
+      "- Cavity-temperature recovery time per bake (ALREADY-RECORDED, per problem statement: \"ove",
+      "- Steam-valve duty cycle per bake (ALREADY-RECORDED, per problem statement: \"oven controll",
+      "- **Reference/Thresholds**:",
+      "- Baseline steam duty: DERIVED from last 30 bakes' mean duty (stated data: \"ALREADY RECORD",
+      "- Duty drift threshold: DERIVED from baseline duty × 1.15 (15% increase; stated physics: s",
+      "- Recovery time threshold: DERIVED from problem's failure definition (not explicitly state",
+      "- **Installability**: Same as standard practice (uses existing logs; no new hardware).",
+      "- **Operability**: Same (no additional operator steps; automated calculation).",
+      "- **Maintenance**: Same (no new maintenance tasks; software-based).",
+      "- **Cost class**: Same (no new instruments or materials; only data processing).",
+      "- **Why worth it**: Avoids 50% of false alarms by detecting duty drift before recovery tim",
+      "- **Protocol**:",
+      "1. Collect steam-valve duty and recovery time for 60 bakes (using ALREADY-RECORDED logs).",
+      "2. Calculate baseline duty from first 30 bakes.",
+      "3. Flag any bake where duty exceeds baseline × 1.15.",
+      "4. Compare flags to actual quality failures (recovery time > failure threshold).",
+      "- **Pass/Fail**:",
+      "- Pass: ≥90% of actual failures flagged ≥10 bakes prior; ≤1 false alarm per 60 bakes.",
+      "- Fail: <90% of failures detected or >1 false alarm.",
+      "- **Duration**: 60 bakes (2 weeks at 14 bakes/day).",
+      "- **Kill Criterion**: If duty drift does not precede recovery time degradation by ≥10 bake",
+      "- **Validation**: Against ALREADY-RECORDED data (steam-duty and recovery-time logs)."
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:55:50Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-10-forklift-watering-events",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme based on manual electrolyte level checks or time-based watering schedules. My departure is a physics-based deficit inference from existing operational logs, avoiding manual checks. The mechanism works because electrolyte loss is directly proportional to charge amp-hours transferred, and the fill volume logged by the watering cart compensates this loss; a deficit indicates insufficient watering, causing plate-top sulfation and capacity loss.\n\nPHYSICS CHECK — The governing relation is Faraday's law: electrolyte loss (mL) = (charge amp-hours × 3.86 mL/Ah) / battery capacity (Ah). For a typical 500Ah battery, 100Ah charge transfers ~386mL of water. Magnitude verification: a 20% capacity loss (100Ah) requires ~38.6L of uncompensated electrolyte loss, matching the failure physics.\n\nIMPLEMENTATION BILL —  \n- **Inputs**:  \n  - Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED: per problem statement, \"chargers already log charge amp-hours\").  \n  - Watering cart log: \"fills per battery\" (ALREADY-RECORDED: per problem statement, \"watering cart logs fills per battery\").  \n- **Calculations**:  \n  - Cumulative charge transfer (Ah) = sum of charge amp-hours per battery (CALCULATED: from charger log).  \n  - Cumulative fill volume (mL) = fills per battery × 4L/fill (ASSUMPTION: standard 4L fill volume per watering event; typical for lead-acid batteries).  \n  - Electrolyte deficit (mL) = (cumulative charge transfer × 3.86 mL/Ah) - cumulative fill volume (CALCULATED: Faraday's law).  \n- **Indicator**: Electrolyte deficit (mL) per battery.  \n- **Threshold**: 2000mL deficit (CALCULATED: 2000mL ≈ 5.18Ah uncompensated loss, triggering warning before 20% capacity loss threshold).  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- **Installability**: Same as standard practice (no new hardware; uses existing logs).  \n- **Operability**: Automated log processing (same burden as manual checks; lower labor cost).  \n- **Maintenance**: Zero (logs are already recorded; no new sensors).  \n- **Cost class**: Same as standard practice (no new equipment; only data processing).  \n- **Conclusion**: Same burden class, different mechanism (physics-based inference vs. manual checks).  \n\nEXECUTABLE TEST —  \n- **Protocol**:  \n  1. Collect 6 months of charger and watering cart logs for all 18 batteries.  \n  2. Calculate daily electrolyte deficit for each battery using the above method.  \n  3. Flag batteries with deficit ≥2000mL.  \n  4. Monitor flagged batteries for 30 days for capacity loss (via charger logs or load tests).  \n- **Instruments**: Charger logs, watering cart logs, load tester (for validation).  \n- **Pass/Fail**:  \n  - Pass: ≥90% of flagged batteries show capacity loss within 30 days; false alarms ≤1/month.  \n  - Fail: <90% correlation or >1 false alarm/month.  \n- **Duration**: 30 days post-flag.  \n- **Kill criterion**: If correlation <90% or false alarms exceed threshold, the predictor is invalid.  \n\nCONSTRAINT BIND — The primary indicator is electrolyte level deficit (per problem statement: \"the failure-DEFINING quantity is the electrolyte level deficit the fills compensate\"). The predictor directly infers this deficit from existing logs, meeting the constraint.",
+   "a1_answer_sha256_16": "eef88aa87e6b6e8b",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2480,
+     "latency_s": 5.6,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs**:",
+       "- Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED)",
+       "- Watering cart log: \"fill volume per battery\" (ALREADY-RECORDED)",
+       "- **Reference/Thresholds**:",
+       "- Healthy electrolyte loss rate: 0.15 mL/Ah (CALCULATED from stated physics: 15 mL/100 Ah)",
+       "- Warning threshold: 0.3 mL/Ah (2x healthy rate, CALCULATED from physics)",
+       "- **Procedure**:",
+       "1. For each battery, compute daily loss rate = (total fill volume) / (total charge amp-hou",
+       "2. Trigger warning when loss rate exceeds 0.3 mL/Ah for 3 consecutive days",
+       "- **Installability**: Same as standard (uses existing logs; no new hardware).",
+       "- **Operability**: Same (automated calculation from existing data).",
+       "- **Maintenance**: Same (no added maintenance; logs already exported).",
+       "- **Cost class**: Same (zero new instrumentation; only computation overhead)."
+      ]
+     },
+     "sha256_16": "634c3bf1532be999"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5627,
+     "latency_s": 11.3,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs**:",
+       "- Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED: per problem statement, \"c",
+       "- Watering cart log: \"fill volume per battery\" (ALREADY-RECORDED: per problem statement, \"",
+       "- **Processing**:",
+       "- Time-integrated electrolyte deficit calculator: Computes cumulative difference between c",
+       "- Battery capacity normalizer: Divides cumulative deficit by battery nameplate capacity (C",
+       "- **Thresholds**:",
+       "- Electrolyte deficit threshold: 0.14 (CALCULATED: 7 days * typical daily charge throughpu",
+       "- False alarm threshold: 0.0033 (CALCULATED: 1 false alarm per month / 18 batteries / 30 d",
+       "- **Output**:",
+       "- Binary alert: Triggers when normalized cumulative deficit exceeds 0.14 (primary indicato",
+       "- **Installability**: SAME as standard practice (no new hardware; uses existing charger an",
+       "- **Operability**: SAME as standard practice (no additional operator training; logs are al",
+       "- **Maintenance**: SAME as standard practice (no additional maintenance; logs are already ",
+       "- **Rough cost class**: SAME as standard practice (no additional cost; uses existing data ",
+       "- **Conclusion**: SAME burden class as standard practice (manual checks or impedance probe"
+      ]
+     },
+     "sha256_16": "ec6d20769c7ef735",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Inputs**:; - Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED: per problem statement, \"c; - W"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3278,
+     "latency_s": 7.0,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs**:",
+       "- Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED: per problem statement, \"c",
+       "- Watering cart log: \"fills per battery\" (ALREADY-RECORDED: per problem statement, \"wateri",
+       "- **Calculations**:",
+       "- Cumulative charge transfer (Ah) = sum of charge amp-hours per battery (CALCULATED: from ",
+       "- Cumulative fill volume (mL) = fills per battery × 4L/fill (ASSUMPTION: standard 4L fill ",
+       "- Electrolyte deficit (mL) = (cumulative charge transfer × 3.86 mL/Ah) - cumulative fill v",
+       "- **Indicator**: Electrolyte deficit (mL) per battery.",
+       "- **Threshold**: 2000mL deficit (CALCULATED: 2000mL ≈ 5.18Ah uncompensated loss, triggerin",
+       "- **Installability**: Same as standard practice (no new hardware; uses existing logs).",
+       "- **Operability**: Automated log processing (same burden as manual checks; lower labor cos",
+       "- **Maintenance**: Zero (logs are already recorded; no new sensors).",
+       "- **Cost class**: Same as standard practice (no new equipment; only data processing).",
+       "- **Conclusion**: Same burden class, different mechanism (physics-based inference vs. manu",
+       "- **Protocol**:",
+       "1. Collect 6 months of charger and watering cart logs for all 18 batteries.",
+       "2. Calculate daily electrolyte deficit for each battery using the above method.",
+       "3. Flag batteries with deficit ≥2000mL.",
+       "4. Monitor flagged batteries for 30 days for capacity loss (via charger logs or load tests",
+       "- **Instruments**: Charger logs, watering cart logs, load tester (for validation).",
+       "- **Pass/Fail**:",
+       "- Pass: ≥90% of flagged batteries show capacity loss within 30 days; false alarms ≤1/month",
+       "- Fail: <90% correlation or >1 false alarm/month.",
+       "- **Duration**: 30 days post-flag.",
+       "- **Kill criterion**: If correlation <90% or false alarms exceed threshold, the predictor "
+      ]
+     },
+     "sha256_16": "eef88aa87e6b6e8b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Inputs**:; - Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED: per problem statement, \"c; - W"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Inputs**:",
+      "- Charger log: \"charge amp-hours per battery\" (ALREADY-RECORDED: per problem statement, \"c",
+      "- Watering cart log: \"fills per battery\" (ALREADY-RECORDED: per problem statement, \"wateri",
+      "- **Calculations**:",
+      "- Cumulative charge transfer (Ah) = sum of charge amp-hours per battery (CALCULATED: from ",
+      "- Cumulative fill volume (mL) = fills per battery × 4L/fill (ASSUMPTION: standard 4L fill ",
+      "- Electrolyte deficit (mL) = (cumulative charge transfer × 3.86 mL/Ah) - cumulative fill v",
+      "- **Indicator**: Electrolyte deficit (mL) per battery.",
+      "- **Threshold**: 2000mL deficit (CALCULATED: 2000mL ≈ 5.18Ah uncompensated loss, triggerin",
+      "- **Installability**: Same as standard practice (no new hardware; uses existing logs).",
+      "- **Operability**: Automated log processing (same burden as manual checks; lower labor cos",
+      "- **Maintenance**: Zero (logs are already recorded; no new sensors).",
+      "- **Cost class**: Same as standard practice (no new equipment; only data processing).",
+      "- **Conclusion**: Same burden class, different mechanism (physics-based inference vs. manu",
+      "- **Protocol**:",
+      "1. Collect 6 months of charger and watering cart logs for all 18 batteries.",
+      "2. Calculate daily electrolyte deficit for each battery using the above method.",
+      "3. Flag batteries with deficit ≥2000mL.",
+      "4. Monitor flagged batteries for 30 days for capacity loss (via charger logs or load tests",
+      "- **Instruments**: Charger logs, watering cart logs, load tester (for validation).",
+      "- **Pass/Fail**:",
+      "- Pass: ≥90% of flagged batteries show capacity loss within 30 days; false alarms ≤1/month",
+      "- Fail: <90% correlation or >1 false alarm/month.",
+      "- **Duration**: 30 days post-flag.",
+      "- **Kill criterion**: If correlation <90% or false alarms exceed threshold, the predictor "
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:56:27Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-11-mri-chiller-surge",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using condenser approach temperature (T_approach) as the primary leading indicator for surge prediction. Our departure is a novel surge precursor inferred from the dynamic pressure ratio (P_disch/P_suction) and its rate of change under constrained condenser airflow, leveraging the thermodynamic instability that precedes surge. This mechanism works because surge initiates when the compressor's operating point crosses the surge limit, which is governed by the pressure ratio and its sensitivity to condenser fouling/ambient changes.\n\nPHYSICS CHECK — The governing physical relation is the compressor surge limit, defined by the pressure ratio (PR = P_disch/P_suction) and its derivative (dPR/dt). As ambient temperature rises, condenser effectiveness drops, increasing PR. Surge occurs when PR exceeds the surge limit and dPR/dt is positive (rapidly increasing pressure ratio). Magnitude verification: Typical screw chillers surge at PR ~3.5–4.0; a 0.1/min dPR/dt indicates rapid approach to this limit (CALCULATED from compressor performance curves).\n\nIMPLEMENTATION BILL — Components/materials/instruments:  \n- **Input streams**:  \n  - Suction pressure (P_suction) – ALREADY-RECORDED (problem: \"suction pressure... logged every 10 seconds\")  \n  - Discharge pressure (P_disch) – ALREADY-RECORDED (problem: \"discharge pressure... logged every 10 seconds\")  \n  - Condenser fan staging – ALREADY-RECORDED (problem: \"condenser fan staging... logged every 10 seconds\")  \n- **Computations**:  \n  - Pressure ratio (PR = P_disch/P_suction) – DERIVED (stated physics: thermodynamic definition)  \n  - Rate of change of PR (dPR/dt) – DERIVED (stated physics: derivative of logged data)  \n- **Thresholds**:  \n  - PR surge limit = 3.7 – DERIVED (stated spec: typical screw chiller surge PR, per manufacturer data)  \n  - dPR/dt threshold = 0.08/min – DERIVED (stated physics: surge instability onset, from compressor performance curves)  \n- **Logic**: If PR > 3.7 AND dPR/dt > 0.08/min AND fan staging = max (constrained airflow), trigger warning.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- **Installability**: SAME (uses existing logs; no new hardware).  \n- **Operability**: SAME (controller logic addition; no operator training).  \n- **Maintenance**: SAME (no new sensors; software-only update).  \n- **Cost class**: SAME (no material/instrument cost; minor engineering effort).  \n- **Why worth it**: Eliminates surge trips without false alarms (per test), avoiding $9k/cancellation costs.  \n\nEXECUTABLE TEST —  \n- **Protocol**:  \n  1. Collect 6 months of historical logs (P_suction, P_disch, fan staging, surge events) from the chiller.  \n  2. Compute PR and dPR/dt for each 10-second interval.  \n  3. For each surge event, check if PR > 3.7 AND dPR/dt > 0.08/min AND fan staging = max occurred ≥20 minutes prior.  \n  4. Count false alarms (warnings without surge) and missed surges (no warning before surge).  \n- **Instruments**: Existing chiller controller logs (ALREADY-RECORDED data).  \n- **Pass/fail**:  \n  - PASS: ≥20-minute lead time on all surges, ≤1 false alarm per 30 cooling days.  \n  - FAIL: <20-minute lead time or >1 false alarm per 30 cooling days.  \n- **Duration**: 6 months of historical data analysis.  \n- **Kill criterion**: If lead time <20 minutes or false alarms >1/30 days, mechanism is invalid.  \n- **Validation**: Uses ALREADY-RECORDED data (problem states logs exist); no new data collection.  \n\nCONSTRAINT BIND — The primary indicator is condenser approach temperature (per problem: \"failure-DEFINING precursor\"). Our supplement is the pressure ratio and its rate of change, which directly measures the compressor's approach to surge (thermodynamic instability), while T_approach remains the primary indicator for condenser performance.",
+   "a1_answer_sha256_16": "48bdd438b673d57a",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3090,
+     "latency_s": 6.8,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams**:",
+       "- Condenser approach temperature (T_approach) – ALREADY-RECORDED (from suction/discharge p",
+       "- Condenser fan staging status (1-4 stages) – ALREADY-RECORDED (fan bank telemetry).",
+       "- **Reference/thresholds**:",
+       "- T_approach rate-of-change threshold = 0.5°C/min – DERIVED (stated physics: heat transfer",
+       "- Fan staging threshold = 4 (max) – DERIVED (stated spec: fan bank has 4 stages).",
+       "- **Components**:",
+       "- Edge computing device (e.g., PLC or edge server) – calculates derivative of T_approach o",
+       "- Alert logic: If (dT_approach/dt > 0.5°C/min AND fan staging = 4), trigger warning.",
+       "- **Installability**: Same as standard (uses existing logs; no new hardware).",
+       "- **Operability**: Same (no training; alert integrates with existing chiller HMI).",
+       "- **Maintenance**: Same (no sensors to maintain; software update only).",
+       "- **Cost**: Same class (edge device < $500 vs. standard vibration sensors > $2k).",
+       "- **False alarm rate**: Meets constraint (≤1/30 days) via derivative smoothing (2-minute w"
+      ]
+     },
+     "sha256_16": "04fa2154d64bb339"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2994,
+     "latency_s": 6.7,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams**:",
+       "- Discharge pressure (P_disch) – ALREADY-RECORDED (from problem statement: \"chiller contro",
+       "- Ambient temperature (T_amb) – ALREADY-RECORDED (from problem statement: \"condenser appro",
+       "- **Reference/threshold**:",
+       "- Baseline ratio (P_disch_nom/T_amb_nom) – DERIVED from stated chiller nameplate data at d",
+       "- Surge threshold = 1.1 × baseline ratio – DERIVED from physics (10% margin for incipient ",
+       "- **Installability**: No new hardware (uses existing pressure/ambient logs) – SAME as stan",
+       "- **Operability**: Computationally trivial (real-time ratio) – SAME as standard practice.",
+       "- **Maintenance**: No additional sensors or calibration – SAME as standard practice.",
+       "- **Cost class**: Negligible (software-only) – SAME as standard practice.",
+       "- **Protocol**:",
+       "1. Extract 30 days of historical P_disch, T_amb, and surge trip logs (ALREADY-RECORDED dat",
+       "2. Compute P_disch/T_amb for each 10-second interval.",
+       "3. Flag intervals where ratio exceeds 1.1 × baseline.",
+       "4. Measure time between flag and surge trip.",
+       "- **Pass/fail**:",
+       "- **Pass**: All surge trips preceded by a flag ≥20 minutes earlier; ≤1 false alarm per 30 ",
+       "- **Fail**: Any surge trip not flagged ≥20 minutes prior or >1 false alarm in 30 days.",
+       "- **Duration**: 30-day data review (historical data suffices per problem constraints).",
+       "- **Kill criterion**: If ≤80% of surge trips are predicted ≥20 minutes early.",
+       "- Primary indicator: Condenser approach temperature (T_approach) per problem statement (\"f",
+       "- My predictor (P_disch/T_amb) supplements T_approach by normalizing for ambient effects, "
+      ]
+     },
+     "sha256_16": "330a5c2955054847",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Input streams**:; - Discharge pressure (P_disch) – ALREADY-RECORDED (from problem statement: \"chiller cont"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3839,
+     "latency_s": 8.4,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input streams**:",
+       "- Suction pressure (P_suction) – ALREADY-RECORDED (problem: \"suction pressure... logged ev",
+       "- Discharge pressure (P_disch) – ALREADY-RECORDED (problem: \"discharge pressure... logged ",
+       "- Condenser fan staging – ALREADY-RECORDED (problem: \"condenser fan staging... logged ever",
+       "- **Computations**:",
+       "- Pressure ratio (PR = P_disch/P_suction) – DERIVED (stated physics: thermodynamic definit",
+       "- Rate of change of PR (dPR/dt) – DERIVED (stated physics: derivative of logged data)",
+       "- **Thresholds**:",
+       "- PR surge limit = 3.7 – DERIVED (stated spec: typical screw chiller surge PR, per manufac",
+       "- dPR/dt threshold = 0.08/min – DERIVED (stated physics: surge instability onset, from com",
+       "- **Logic**: If PR > 3.7 AND dPR/dt > 0.08/min AND fan staging = max (constrained airflow)",
+       "- **Installability**: SAME (uses existing logs; no new hardware).",
+       "- **Operability**: SAME (controller logic addition; no operator training).",
+       "- **Maintenance**: SAME (no new sensors; software-only update).",
+       "- **Cost class**: SAME (no material/instrument cost; minor engineering effort).",
+       "- **Why worth it**: Eliminates surge trips without false alarms (per test), avoiding $9k/c",
+       "- **Protocol**:",
+       "1. Collect 6 months of historical logs (P_suction, P_disch, fan staging, surge events) fro",
+       "2. Compute PR and dPR/dt for each 10-second interval.",
+       "3. For each surge event, check if PR > 3.7 AND dPR/dt > 0.08/min AND fan staging = max occ",
+       "4. Count false alarms (warnings without surge) and missed surges (no warning before surge)",
+       "- **Instruments**: Existing chiller controller logs (ALREADY-RECORDED data).",
+       "- **Pass/fail**:",
+       "- PASS: ≥20-minute lead time on all surges, ≤1 false alarm per 30 cooling days.",
+       "- FAIL: <20-minute lead time or >1 false alarm per 30 cooling days.",
+       "- **Duration**: 6 months of historical data analysis.",
+       "- **Kill criterion**: If lead time <20 minutes or false alarms >1/30 days, mechanism is in",
+       "- **Validation**: Uses ALREADY-RECORDED data (problem states logs exist); no new data coll"
+      ]
+     },
+     "sha256_16": "48bdd438b673d57a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Input streams**:; - Suction pressure (P_suction) – ALREADY-RECORDED (problem: \"suction pressure... logged "
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- **Input streams**:",
+      "- Suction pressure (P_suction) – ALREADY-RECORDED (problem: \"suction pressure... logged ev",
+      "- Discharge pressure (P_disch) – ALREADY-RECORDED (problem: \"discharge pressure... logged ",
+      "- Condenser fan staging – ALREADY-RECORDED (problem: \"condenser fan staging... logged ever",
+      "- **Computations**:",
+      "- Pressure ratio (PR = P_disch/P_suction) – DERIVED (stated physics: thermodynamic definit",
+      "- Rate of change of PR (dPR/dt) – DERIVED (stated physics: derivative of logged data)",
+      "- **Thresholds**:",
+      "- PR surge limit = 3.7 – DERIVED (stated spec: typical screw chiller surge PR, per manufac",
+      "- dPR/dt threshold = 0.08/min – DERIVED (stated physics: surge instability onset, from com",
+      "- **Logic**: If PR > 3.7 AND dPR/dt > 0.08/min AND fan staging = max (constrained airflow)",
+      "- **Installability**: SAME (uses existing logs; no new hardware).",
+      "- **Operability**: SAME (controller logic addition; no operator training).",
+      "- **Maintenance**: SAME (no new sensors; software-only update).",
+      "- **Cost class**: SAME (no material/instrument cost; minor engineering effort).",
+      "- **Why worth it**: Eliminates surge trips without false alarms (per test), avoiding $9k/c",
+      "- **Protocol**:",
+      "1. Collect 6 months of historical logs (P_suction, P_disch, fan staging, surge events) fro",
+      "2. Compute PR and dPR/dt for each 10-second interval.",
+      "3. For each surge event, check if PR > 3.7 AND dPR/dt > 0.08/min AND fan staging = max occ",
+      "4. Count false alarms (warnings without surge) and missed surges (no warning before surge)",
+      "- **Instruments**: Existing chiller controller logs (ALREADY-RECORDED data).",
+      "- **Pass/fail**:",
+      "- PASS: ≥20-minute lead time on all surges, ≤1 false alarm per 30 cooling days.",
+      "- FAIL: <20-minute lead time or >1 false alarm per 30 cooling days.",
+      "- **Duration**: 6 months of historical data analysis.",
+      "- **Kill criterion**: If lead time <20 minutes or false alarms >1/30 days, mechanism is in",
+      "- **Validation**: Uses ALREADY-RECORDED data (problem states logs exist); no new data coll"
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:57:02Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  },
+  {
+   "problem_id": "HO3-12-paver-screed-wear",
+   "question_type": "predictor-design",
+   "a1_source": "SYS_A1F_V5",
+   "contract_for_qt": true,
+   "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a MONITORING/INDICATION scheme using mat thickness deviation as the primary indicator. Our mechanism departs by inferring screed edge wear from the nonlinear damping of screed vibration amplitude at constant frequency and extension-plate position. This works because edge thinning reduces screed mass stiffness, increasing vibration amplitude decay rate under constant force.  \n\nPHYSICS CHECK  \nGoverning relation: Damping ratio ζ ∝ (vibration amplitude decay rate) / (2π × frequency). For a 4 mm wear (5% mass loss), ζ increases by ~2.5% (CALCULATED: ζ = c/(2√(mk)), m↓5% → ζ↑2.5%). Detectable as amplitude decay rate change >1.5% (ASSUMPTION: sensor resolution ±0.5 Hz/amplitude).  \n\nIMPLEMENTATION BILL  \n- Inputs:  \n  - ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)  \n  - ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)  \n  - ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log (source: paver logs)  \n  - ALREADY-RECORDDED: \"mat thickness deviation\" (mm) per meter (source: grade control logs)  \n- Reference threshold: DERIVED from stated physics: vibration amplitude decay rate threshold = 1.5% (CALCULATED: ζ increase from 5% mass loss).  \n- Procedure: Compute amplitude decay rate over 10-second windows at constant frequency/extension; trigger if rate exceeds threshold.  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: Same (uses existing logs)  \n- Operability: Same (no new training; automated flag)  \n- Maintenance: Same (no new hardware)  \n- Cost class: SAME (no added instruments or labor)  \n- Burden difference: None (reuses existing data streams).  \n\nEXECUTABLE TEST  \n- Protocol: Analyze 3 months of historical log data (200 km paving) with known wear events.  \n- Instruments: Existing log data (no new hardware).  \n- Pass/fail: Must detect wear events with <10% false alarms and >90% lead time (150 m).  \n- Duration: 1 day (historical data analysis).  \n- Kill criterion: If false alarms >1 per 10 km or lead time <150 m, mechanism fails.  \n\nCONSTRAINT BIND  \nPrimary indicator: Mat thickness deviation (stated as failure-defining quantity). Our mechanism supplements it by inferring wear cause from vibration data, but threshold is still based on 4 mm mat drift.",
+   "a1_answer_sha256_16": "251d88fceeb85a7e",
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2418,
+     "latency_s": 5.5,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Inputs:",
+       "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log",
+       "- ALREADY-RECORDED: \"screed amplitude\" (mm) per shift log",
+       "- ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log",
+       "- ALREADY-RECORDED: \"mat thickness sensor deviation\" (mm) per meter log",
+       "- Calculation:",
+       "- DERIVED: Baseline vibration frequency (f₀) = mean of first 3 shift logs at new plate ins",
+       "- DERIVED: Threshold Δf = -0.15 Hz (CALCULATED from steel density and 1 mm wear geometry)",
+       "- Output: Leading indicator = (f₀ - current f) / f₀",
+       "- Installability: SAME (uses existing vibration sensor)",
+       "- Operability: SAME (no new training; logs already reviewed)",
+       "- Maintenance: SAME (no additional hardware)",
+       "- Cost: SAME (no new instrumentation; only signal processing)",
+       "- Advantage: Prevents 200 m rework by catching wear earlier than mat thickness drift"
+      ]
+     },
+     "sha256_16": "3fff6af64bb128e6"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2307,
+     "latency_s": 5.1,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Inputs:",
+       "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)",
+       "- ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)",
+       "- Processing:",
+       "- Compute frequency harmonic ratio (2nd/1st harmonic amplitude) from FFT of vibration sign",
+       "- DERIVED reference threshold: harmonic_ratio > 0.15 (source: stated physics: Δf/f₀ = 0.02",
+       "- Output:",
+       "- Alert when harmonic_ratio > threshold AND amplitude is constant (±5% of mean)",
+       "- Installability: Same as existing vibration logging (no new hardware)",
+       "- Operability: Uses existing logs (no new training)",
+       "- Maintenance: Zero added maintenance (software-only)",
+       "- Cost: Same class as standard monitoring (no physical sensors)",
+       "- Parity: Identical burden class, different mechanism",
+       "- Protocol: Analyze 10 weeks of historical log data covering 2 known wear events",
+       "- Instruments: Existing vibration log files",
+       "- Pass/fail: Alert ≥150 m before each 4 mm drift event with ≤1 false alarm per 10 km",
+       "- Duration: Single analysis run",
+       "- Kill criterion: If alerts occur <150 m before drift or false alarms >1 per 10 km, predic",
+       "- Validation: Against ALREADY-RECORDED mat thickness deviations (source: grade control log"
+      ]
+     },
+     "sha256_16": "c8d26801b723c31a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Inputs:; - ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs); - ALREADY"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2333,
+     "latency_s": 5.6,
+     "transport_tries": 1,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Inputs:",
+       "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)",
+       "- ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)",
+       "- ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log (source: paver logs)",
+       "- ALREADY-RECORDDED: \"mat thickness deviation\" (mm) per meter (source: grade control logs)",
+       "- Reference threshold: DERIVED from stated physics: vibration amplitude decay rate thresho",
+       "- Procedure: Compute amplitude decay rate over 10-second windows at constant frequency/ext",
+       "- Installability: Same (uses existing logs)",
+       "- Operability: Same (no new training; automated flag)",
+       "- Maintenance: Same (no new hardware)",
+       "- Cost class: SAME (no added instruments or labor)",
+       "- Burden difference: None (reuses existing data streams)."
+      ]
+     },
+     "sha256_16": "251d88fceeb85a7e",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Inputs:; - ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs); - ALREADY"
+     ]
+    }
+   ],
+   "machine_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Inputs:",
+      "- ALREADY-RECORDED: \"screed vibration frequency\" (Hz) per shift log (source: paver logs)",
+      "- ALREADY-RECORDED: \"screed vibration amplitude\" (mm) per shift log (source: paver logs)",
+      "- ALREADY-RECORDED: \"extension-plate position\" (mm) per shift log (source: paver logs)",
+      "- ALREADY-RECORDDED: \"mat thickness deviation\" (mm) per meter (source: grade control logs)",
+      "- Reference threshold: DERIVED from stated physics: vibration amplitude decay rate thresho",
+      "- Procedure: Compute amplitude decay rate over 10-second windows at constant frequency/ext",
+      "- Installability: Same (uses existing logs)",
+      "- Operability: Same (no new training; automated flag)",
+      "- Maintenance: Same (no new hardware)",
+      "- Cost class: SAME (no added instruments or labor)",
+      "- Burden difference: None (reuses existing data streams)."
+     ]
+    }
+   },
+   "problems_sha256_16": "38884e58524a3ffb",
+   "audit_tip_at_read": "3053d8dce",
+   "generated_at": "2026-11-15T19:57:31Z",
+   "one_shot": true,
+   "judged": false,
+   "judge": "NONE — auditor scores with the PRIVATE rubric"
+  }
+ ]
+}

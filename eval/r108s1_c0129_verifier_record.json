@@ -1,0 +1,172 @@
+{
+ "record": "R108S1_C0129_VERIFIER/1.0.0",
+ "verifier": "builder-r108s1",
+ "claim": "c-0132 (VERIFIER duty over c-0129)",
+ "verified_executor": "builder-r105s2",
+ "verified_claims": "c-0129 stages committed at 44c11c4a1 + f04d92713",
+ "method": "independent recompute from committed bytes; the only executed code is this script + the engine's own deterministic modules on committed inputs (the c-0131 precedent); zero LLM, zero quota, zero generation, zero re-serves",
+ "checks": [
+  {
+   "check": "D6-a0",
+   "result": "PASS",
+   "detail": "per_row count == 30 (got 30)",
+   "evidence": ""
+  },
+  {
+   "check": "D6-a1",
+   "result": "PASS",
+   "detail": "independent tally == committed histograms/distinct_levels",
+   "evidence": "{\"recomputed\": {\"novelty\": {\"0\": 21, \"1\": 2, \"3\": 1, \"4\": 6}, \"feasibility\": {\"3\": 29, \"4\": 1}, \"testability\": {\"0\": 2, \"2\": 10, \"3\": 18}, \"constraint_compliance\": {\"2\": 30}, \"direction_correctness\": {\"1\": 4, \"2\": 17, \"3\": 6, \"4\": 3}, \"magnitude_plausibility\": {\"2\": 10, \"3\": 5, \"4\": 15}}, \"distinct\": {\"novelty\": 4, \"feasibility\": 2, \"testability\": 3, \"constraint_compliance\": 1, \"direction_correctn"
+  },
+  {
+   "check": "D6-a2",
+   "result": "PASS",
+   "detail": "alias fields == canonical axis scores",
+   "evidence": ""
+  },
+  {
+   "check": "D6-b0",
+   "result": "PASS",
+   "detail": "audit-branch v15 problems readable",
+   "evidence": ""
+  },
+  {
+   "check": "D6-b1",
+   "result": "PASS",
+   "detail": "burned row files == 30 (got 30)",
+   "evidence": ""
+  },
+  {
+   "check": "D6-b2",
+   "result": "PASS",
+   "detail": "engine re-score (deterministic) == committed per_row on all axes + totals for all 30 rows",
+   "evidence": ""
+  },
+  {
+   "check": "D6-c1",
+   "result": "PASS",
+   "detail": "direction_correctness distinct levels >= 3 (got 4: {'1': 4, '2': 17, '3': 6, '4': 3})",
+   "evidence": ""
+  },
+  {
+   "check": "D6-c2",
+   "result": "PASS",
+   "detail": "magnitude_plausibility distinct levels >= 3 (got 3: {'2': 10, '3': 5, '4': 15})",
+   "evidence": ""
+  },
+  {
+   "check": "D4-a1",
+   "result": "PASS",
+   "detail": "latest CORRECT event recomputed from rows == estimate.latest_event_answered_correctly (2025-08-07 vs 2025-08-07)",
+   "evidence": ""
+  },
+  {
+   "check": "D4-a2",
+   "result": "FAIL",
+   "detail": "VERIFIER monotonicity probe: no WRONG row predates the latest CORRECT row (first wrong: 2024-07-23) — the probe's knowledge boundary is NOT monotonic; typed finding VF-7",
+   "evidence": ""
+  },
+  {
+   "check": "D4-a2b",
+   "result": "FAIL",
+   "detail": "corpus-rule bound (2025-05-07 = latest-correct MINUS one quarter) must be >= the first demonstrated-failure date (2025-09-29) for the post-cutoff property — the committed bound is EARLIER than the model's demonstrated knowledge (correct through 2025-08-07), so a corpus built on it can admit in-training items; typed finding VF-6 (P1)",
+   "evidence": ""
+  },
+  {
+   "check": "D4-a2c",
+   "result": "PASS",
+   "detail": "the battery carries the model's SELF-REPORTED cutoff ('January 2025', the 2025-04-14 row, graded WRONG on the Llama-4 fact) — the committed estimate's basis ('latest correct 2025-08-07') is therefore LEAKED knowledge, not cutoff evidence; the defensible statement is the BOUND [2025-01 self-report, 2025-09-29 first failure]; typed finding VF-7",
+   "evidence": ""
+  },
+  {
+   "check": "D4-a3",
+   "result": "PASS",
+   "detail": "corpus rule bound == latest-correct minus one quarter (2025-08-07 - 1q = 2025-05-07; rule asserts 2025-05-07)",
+   "evidence": ""
+  },
+  {
+   "check": "D4-a4",
+   "result": "PASS",
+   "detail": "zero CALL_FAILED rows in the committed run-2 battery (grades: {'CORRECT': 11, 'WRONG': 5, 'UNKNOWN_OK': 6, 'HALLUCINATION_RISK': 1})",
+   "evidence": ""
+  },
+  {
+   "check": "D4-b1",
+   "result": "PASS",
+   "detail": "corpus items == 30 (got 30)",
+   "evidence": ""
+  },
+  {
+   "check": "D4-b2",
+   "result": "PASS",
+   "detail": "100% of the c-0127 corpus predates the 2025-05-07 corpus-rule bound (histogram {'2024/01': 2, '2024/02': 3, '2024/04': 1, '2024/05': 2, '2024/06': 3, '2024/07': 7, '2024/08': 8, '2024/09': 4}) -> the 0.30 recovery is an UPPER bound on post-cutoff rediscovery",
+   "evidence": ""
+  },
+  {
+   "check": "D5-a1",
+   "result": "PASS",
+   "detail": "REPAIR_TEMPERATURE == 0.3 (got 0.3)",
+   "evidence": ""
+  },
+  {
+   "check": "D5-a2",
+   "result": "PASS",
+   "detail": "repair_prompt carries (own raw output echo, typed parse error, required-key schema, only-JSON directive) [raw=True err=True schema=True onlyjson=True]",
+   "evidence": ""
+  },
+  {
+   "check": "D5-a3",
+   "result": "PASS",
+   "detail": "parse_generator_output fails closed (ValueError) on garbage — the repair trigger is real",
+   "evidence": ""
+  },
+  {
+   "check": "D5-b1",
+   "result": "PASS",
+   "detail": "solver bytes carry: the single repair call, the agnes_repair_calls usage counter, the typed ITEM_GENERATION_PARSE_EXHAUSTION state, the repair_attempted+first_error disclosure [retry=True usage=True exhaust=True disclosed=True]",
+   "evidence": ""
+  },
+  {
+   "check": "D5-b2",
+   "result": "PASS",
+   "detail": "engine RETRY_ONCE == 1 (the retry-once convention; never a re-roll)",
+   "evidence": ""
+  },
+  {
+   "check": "D5-c1",
+   "result": "PASS",
+   "detail": "committed score-9 protocol suites green (rc=0; ...............                                                          [100%])",
+   "evidence": ""
+  }
+ ],
+ "n_pass": 20,
+ "n_fail": 2,
+ "findings": [
+  {
+   "id": "VF-5 (r108s1, P3)",
+   "finding": "no committed test exercises the D5 repair contract (repair_prompt content, the double-failure exhaustion state machine, the agnes_repair_calls accounting) — the committed suite covers parse contracts and adjudication but not the repair path added at f04d92713",
+   "evidence": "tests/test_score9_rediscovery_protocol.py test inventory (8 tests, none touch repair_prompt/REPAIR_TEMPERATURE); grep over tests/ finds no repair-path test",
+   "severity": "P3 (the contract is engine-side deterministic and this verifier exercises it live; the gap is coverage, not correctness)"
+  },
+  {
+   "id": "VF-6 (r108s1, P1 — pre-rebuild, zero contamination)",
+   "finding": "the committed D4 corpus rule binds rebuilt items STRICTLY AFTER 2025-05-07 (latest-correct minus one quarter) — the margin points the WRONG WAY: the battery's own bytes demonstrate knowledge through 2025-08-07 (the GPT-5 row, graded CORRECT), so a corpus built on the committed rule can admit 2025-05..2025-09 items the model demonstrably knows. The post-cutoff property requires items strictly AFTER the first demonstrated failure (2025-09-29), with the 2026 window (all rows honest-unknown except one typed HALLUCINATION_RISK) as the strongest bound. The rebuild has NOT executed (the corpus bytes do not exist yet), so no measurement is contaminated; the fix is a rule rebind BEFORE the rebuild runs.",
+   "evidence": "eval/r105s2_agnes_cutoff_probe.json rows: 2025-08-07 CORRECT (GPT-5), 2025-09-29/30 WRONG, 2025-11-18 WRONG, all 2026 rows UNKNOWN_OK except 2026-07-15 HALLUCINATION_RISK; corpus_rule_typed: 'STRICTLY AFTER 2025-08-07 minus one quarter'",
+   "severity": "P1 (binds the D4 rebuild's validity; the auditor's acceptance test '100% of corpus items dated after the cutoff' is NOT satisfiable under the committed rule)"
+  },
+  {
+   "id": "VF-7 (r108s1, P2)",
+   "finding": "the committed cutoff estimate (~2025-08/09, from latest-correct 2025-08-07) rests on rows that are LEAKED knowledge, not cutoff evidence: the model SELF-REPORTS 'my knowledge cutoff is in January 2025' (the 2025-04-14 row) and mis-dates its own present ('the 2024 Paris Olympics have not taken place yet', the 2024-07-23 row) yet answers May-Aug-2025 events correctly — knowledge is NOT monotonic in event date. The defensible statement is the BOUND [2025-01 (self-report), 2025-09-29 (first demonstrated failure)]. The corpus rule must anchor on the bound's UPPER end (VF-6).",
+   "evidence": "probe rows 2024-07-23 (WRONG, self-dating pre-July-2024 + hallucinated Tokyo-2020 winner 'Marvin Braün'), 2025-04-14 (WRONG, self-reported January-2025 cutoff), 2025-05-20..2025-08-07 (CORRECT — leaked knowledge), 2025-09-29+ (no demonstrated knowledge)",
+   "severity": "P2 (the estimate text overstates precision; the conservative USE of it is recoverable via VF-6's rebind)"
+  },
+  {
+   "id": "VF-8 (r108s1, P3, observational)",
+   "finding": "grading-class tension inside the probe battery: the 2025-09-29 answer ('As of my last update, I do not have information regarding events in September 2025...') is an honest-unknown-SHAPED answer graded WRONG, while the 2026 rows with the same shape are UNKNOWN_OK — the class boundary is not uniform across the battery. Both classes bound knowledge from above identically (no demonstrated knowledge), so the VF-6 corpus bound is unaffected; the tension is disclosed for the auditor's re-adjudication of the probe method.",
+   "evidence": "probe rows 2025-09-29 (WRONG, unknown-shaped) vs 2026-01-15..2026-11-01 (UNKNOWN_OK)",
+   "severity": "P3 (method hygiene; no measurement impact)"
+  }
+ ],
+ "verdict_typed": "TYPED FINDINGS PRESENT — D6 verifies CLEAN (the auditor's rubric-spread acceptance clause recompute-confirmed: 4 levels direction_correctness, 3 levels magnitude_plausibility, and the engine re-score reproduces the committed per_row EXACTLY on all 30 rows); D5 verifies CLEAN (the repair contract is real, fail-closed, single-retry, disclosed; the committed suites green); D4-stage1 carries VF-6 (P1: the corpus-rule margin points the WRONG WAY — the bound must be >= the first demonstrated failure 2025-09-29, not latest-correct minus a quarter) + VF-7 (P2: the estimate basis is leaked knowledge; the defensible cutoff is the BOUND [2025-01 self-report, 2025-09-29 first failure]) + VF-8 (P3 grading-class tension). The rebuild has NOT executed — zero contamination; the rule rebind lands BEFORE any rebuilt corpus byte. The executor lane's D4 stage is NOT verified clean; D5/D6 ARE.",
+ "no_acceptance_claims": true
+}

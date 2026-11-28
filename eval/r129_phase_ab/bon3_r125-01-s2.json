@@ -1,0 +1,85 @@
+{
+ "problem_id": "r125-01-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 127.21,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 1294,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.04,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 680,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 129.55,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 268,
+    "completion_tokens": 1392,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 7.65,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1767,
+    "completion_tokens": 1666,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "REASONING_THRASH_LEAK: *Correction:* High viscosity (slow recovery) usually requires **higher** temperatures to reduce viscosity. If ",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "*Correction:* High viscosity (slow recovery) usually requires **higher** temperatures to reduce viscosity. If part weight is *above*"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a closed-loop **Barrel Zone Temperature Recalibration Protocol** using the Check-Weigher and Cycle-Time Logger to compensate for material rheology drift. The observed symptoms\u2014part weight drifting above target and screw recovery time growing simultaneously at constant setpoints\u2014indicate that the melt viscosity has increased relative to the machine's hydraulic capabilities. This typically occurs when the effective material viscosity exceeds what the current barrel temperatures can sustain for the required injection speed, or when back-pressure effects are unaccounted for. The mitigation leverages the **Check-Weigher** (mass proxy for volumetric packing) and **Cycle-Time Logger** (time proxy for screw resistance/viscosity) to detect this combined deviation. It then triggers a calculated **Thermocouple Setpoint Shift** to the rear barrel zones to restore the melt flow characteristics.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Mean Part Weight Deviation ($\\Delta W$) and Mean Screw Recovery Time Deviation ($\\Delta t_{rec}$).\n*   **Direction:** Both variables are trending **positive** (weight above target, recovery time above baseline).\n*   **Mechanical Consequence:** The positive drift in both signals indicates an **increase in effective melt viscosity** or packing pressure losses that are forcing the machine to over-pump (hence high weight) while resisting screw retraction (hence slow recovery). To counteract this, the thermal setpoints must be adjusted in the direction that **reduces** melt viscosity. Therefore, the driving correction is to **INCREASE** the rear barrel zone temperatures. Raising the temperature lowers the viscosity, reducing the pressure required to fill the mold (lowering part weight) and reducing the torque required to retract the screw (shortening recovery time).\n\n**Implementation:**\n\n1.  **Data Correlation & Baseline:**\n    *   Using the **Cycle-Time Logger**, extract the current mean ($\\mu_{t_{rec}}$) and standard deviation ($\\sigma_{t_{rec}}$) of screw recovery time.\n    *   Using the **Check-Weigher**, extract the mean part weight ($\\mu_{W}$) and calculate the deviation from the target weight ($W_{target}$): $\\Delta W = \\mu_{W} - W_{target}$.\n    *   Establish the baseline recovery time ($t_{rec, baseline}$) from historical stable operation data stored in the **Cycle-Time Logger**.\n\n2.  **Control Logic (Soft PLC/Recipe Adjustment):**\n    *   **Trigger Condition:** The system monitors rolling averages over 50 cycles. The compensation logic activates when:\n        *   $\\mu_{W} > W_{target} + 2\\%$ **AND**\n        *   $\\mu_{t_{rec}} > t_{rec, baseline} + 10\\%$.\n    *   **Action:** Upon trigger, the controller calculates a temperature adjustment $\\Delta T$.\n    *   **Formula for Input:** Since no direct viscosity sensor exists, the temperature shift is derived heuristically from the magnitude of the weight deviation, bounded by the recovery time anomaly to confirm viscosity-related cause:\n        *   $\\Delta T = k_1 \\cdot (\\Delta W / W_{target}) + k_2 \\cdot ((\\mu_{t_{rec}} - t_{rec, baseline}) / t_{rec, baseline})$\n        *   Where $k_1$ and $k_2$ are gain coefficients determined by historical correlation data between weight/recovery drift and required temperature changes (stored in the **Cycle-Time Logger**'s historical records or defined by operator engineering limits).\n        *   *Simplified Fixed-Step Alternative for Safety:* If dynamic gains are not defined, apply a fixed step of $\\Delta T = +5^\\circ\\text{C}$ to the setpoints of the rear two barrel zones, as validated by the simultaneous positive drift in weight and recovery time.\n\n3.  **Feedback Loop:**\n    *   Apply the calculated temperature increase to the **Barrel Zone Thermocouples** setpoints for the rear zones via the HMI/Controller.\n    *   Monitor the **Check-Weigher** ($\\mu_{W}$) and **Cycle-Time Logger** ($\\mu_{t_{rec}}$) for the subsequent 50 cycles.\n    *   **Convergence Check:**\n        *   If $\\mu_{W}$ returns to $[W_{target} \\pm 1\\%]$ AND $\\mu_{t_{rec}}$ returns to $[t_{rec, baseline} \\pm 5\\%]$, lock the new setpoint.\n        *   If weight decreases but recovery time remains high, or if weight overshoots below target, reduce the step size or hold, and escalate for manual review of material lot quality.\n    *   **Safety Limit:** Do not increase temperature beyond the material's maximum safe processing temperature defined in the recipe limits (derived from static engineering data, not a new sensor).\n\n4.  **Safety/Constraint Check:**\n    *   Uses only: **Barrel Zone Thermocouples** (for setpoint adjustment), **Cycle-Time Logger** (for recovery time metrics), **Check-Weigher** (for weight metrics).\n    *   No new sensors added.\n    *   Adjusts existing parameters.\n\n**Implementation Bill:**\n\n| Component | Action | Data Source/Input | Formula/Derivation |\n| :--- | :--- | :--- | :--- |\n| **Control Logic** | Monitor Weight Drift | **Check-Weigher** | $\\Delta W = \\mu_{W} - W_{target}$ |\n| **Control Logic** | Monitor Recovery Time Drift | **Cycle-Time Logger** | $\\Delta t_{rec} = \\mu_{t_{rec}} - t_{rec, baseline}$ |\n| **HMI/PLC** | Calculate Temp Shift | Derived from Check-Weigher & Cycle-Time Logger | $\\Delta T_{new} = \\max(0, k \\cdot \\Delta W)$ where $k$ is a pre-defined gain or fixed 0.1% per $^\\circ$C, validated by $\\Delta t_{rec}$ positive trend. |\n| **Barrel Controller** | Apply Setpoint Change | **Barrel Zone Thermocouples** | $T_{setpoint, new} = T_{setpoint, old} + \\Delta T_{new}$ (applied to rear zones) |\n| **Safety Interlock** | Check Temp Limit | Static Recipe Data / **Barrel Zone Thermocouples** | If $T_{setpoint, new} > T_{max, material}$, block adjustment and alert. |\n\n**Measures it Relies On:**\n*   **Check-Weigher:** Provides the real-time mean part weight signal ($\\mu_{W}$) and target reference ($W_{target}$ is a static recipe parameter).\n*   **Cycle-Time Logger:** Provides the screw recovery time signal ($\\mu_{t_{rec}}$) and the historical baseline ($t_{rec, baseline}$). The baseline is derived from the mean of recovery times during the previous 500 stable cycles stored in the logger.\n*   **Barrel Zone Thermocouples:** Used to read current actual temperatures and to actuate the setpoint shifts via the existing temperature controllers.\n*   **Static Recipe Parameters:** $W_{target}$, $T_{max, material}$, and gain coefficients $k_1, k_2$ are derived from engineering specifications and historical data, not new instrumentation.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Check-Weigher:** Provides the real-time mean part weight signal ($\\mu_{W}$) and targ",
+   "*   **Cycle-Time Logger:** Provides the screw recovery time signal ($\\mu_{t_{rec}}$) and t",
+   "*   **Barrel Zone Thermocouples:** Used to read current actual temperatures and to actuate",
+   "*   **Static Recipe Parameters:** $W_{target}$, $T_{max, material}$, and gain coefficients"
+  ]
+ },
+ "wall_clock_s": 149.24,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

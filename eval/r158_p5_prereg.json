@@ -1,0 +1,281 @@
+{
+ "record": "R158_P5_TOKENROUTER_PREREG/1.0.0",
+ "claim": "c-0264 (the P5 side of the claim; the panel lane stays quota-gated — no panel bytes touched)",
+ "work_id": "r158-p5-tokenrouter-rediscovery",
+ "session": "builder-r158",
+ "at": "2026-11-25 ~15:0x UTC",
+ "one_run_statement": "ONE unattended run; byte-resume checkpoint per item (a completed item is never re-run); 0 mid-run protocol edits (the interventions counter stays 0)",
+ "corpus": {
+  "source": "eval/r106_score9_corpus_postcutoff/sampled_items.jsonl (the r105s2 build: Crossref post-2025-10-01 chemistry items, post-AGNES-cutoff; agnes latest-correct 2025-08-07, conservative 2025-05-07)",
+  "n_items": 30,
+  "item_ids": [
+   "pc-01",
+   "pc-02",
+   "pc-03",
+   "pc-04",
+   "pc-05",
+   "pc-06",
+   "pc-07",
+   "pc-08",
+   "pc-09",
+   "pc-10",
+   "pc-11",
+   "pc-12",
+   "pc-13",
+   "pc-14",
+   "pc-15",
+   "pc-16",
+   "pc-17",
+   "pc-18",
+   "pc-19",
+   "pc-20",
+   "pc-21",
+   "pc-22",
+   "pc-23",
+   "pc-24",
+   "pc-25",
+   "pc-26",
+   "pc-27",
+   "pc-28",
+   "pc-29",
+   "pc-30"
+  ],
+  "corpus_sha16": [
+   "c5f8dfff25f92e5c",
+   "4ce8cb0e808c6732",
+   "4a5b4a3090f91c61",
+   "2dd23ecb9a0a9121",
+   "05ba2cb83fea007f",
+   "cb4d9ade7787f652",
+   "9f7e698c98397b5d",
+   "8a67c2a8c8d8905e",
+   "38217de275e71ccd",
+   "2c11dad23ed4f6c5",
+   "0d3947cf9e0826dc",
+   "178fbd838e82a777",
+   "6480837f1c870e4b",
+   "2b69aac30dc1bf62",
+   "3bad335e1e644de0",
+   "985a12662ba58b37",
+   "ccc0e2652f66a191",
+   "7f19def1d1e9d4c0",
+   "52a25c8a9e6529a2",
+   "98d333564476cacf",
+   "aeb95cde59ca68a4",
+   "9518ecfde510096d",
+   "52f7f19057f8f251",
+   "7fd2c83f29820fb7",
+   "fa3d2c0e16dc99db",
+   "33be18f83f88edfe",
+   "95a969dd1e0ef82b",
+   "31b84971b1f912b4",
+   "197b9979ae735d07",
+   "ece0b5bbf328a2c9"
+  ]
+ },
+ "seats": {
+  "generator": {
+   "seat": "G0 (the agent under test)",
+   "transport": "tokenrouter free lane",
+   "model": "deepseek/deepseek-v4.1-flash-1017-free",
+   "prompt": "the protocol generator_prompt (problem-only: background survey + question + main inspiration + inspiration papers; the title and ground truth are structurally absent) EXTENDED with the T1/T2 output contract",
+   "output_schema": {
+    "hypothesis": "str",
+    "key_mechanism": "str",
+    "predicted_result": "str",
+    "t1_falsifier": {
+     "falsifier_id": "str",
+     "mechanism_claim": "str",
+     "executable": "bool",
+     "kill_condition": "str",
+     "can_fail": "bool"
+    },
+    "t2_citations": [
+     {
+      "citation": "a DOI or resolvable URL",
+      "relation": "str"
+     }
+    ]
+   },
+   "retry": "RETRY_ONCE on typed parse failure (one repair round, the protocol contract)",
+   "cutoff_risk_typed": "the lane's own training cutoff is UNVERIFIED; the canary scan (0 lure hits) is the contamination guard; any hit types the run contaminated"
+  },
+  "J1": {
+   "transport": "z-ai chat (glm family, the r106 seat)",
+   "prompt": "the protocol judge_prompt (mechanism-level RECOVERED/PARTIAL/NOT_RECOVERED vs the committed ground truth)"
+  },
+  "J2": {
+   "transport": "cent-ai hy4-flash:free",
+   "seat_note": "r106's J2 was xkiro/cohere-command-a; the xkiro quota is dead until Nov 26 00:00 UTC — the seat MOVES to the cent-ai free lane, PRE-REGISTERED here (not a mid-run edit)",
+   "prompt": "the same protocol judge_prompt"
+  },
+  "f2_check": "the generator family (deepseek) serves ZERO judge seats; J1 glm + J2 hy4 + generator deepseek = three distinct families"
+ },
+ "t1_t2_contracts": {
+  "t1": "t1_valid (engine, deterministic): every T1_FALSIFIER_KEYS key present AND can_fail true — a falsifier that cannot fail is not a falsifier",
+  "t2": "the runner resolves every agent citation DETERMINISTICALLY (Crossref/DOI/URL HTTP, no LLM): 'resolves' := a real record returns; 'supports_claim_as_stated' := the resolved title+abstract covers >=2 distinctive terms of the agent's key_mechanism (a keyword-coverage proxy, typed honestly as deterministic and weak — no LLM in the T2 tier); one dead or non-supporting citation fails the item's T2",
+  "accept_tier": ">=1 T1-valid item AND >=1 T2-valid item (the DIR-4 accept: >=1 T1+T2 validated)"
+ },
+ "canary_set": {
+  "authoring": "delegated-owner act this window (the DIR-4 delegation); a distinctive 8-word span from each item's ground_truth.main_hypothesis, asserted ABSENT from the served block",
+  "seal": "sha16 per lure below; the texts never enter any prompt; the scan is post-generation, case-insensitive, the engine canary_scan",
+  "lures": [
+   {
+    "probe_id": "cy-pc-01",
+    "item_id": "pc-01",
+    "lure_sha16": "18bf8706a221686d"
+   },
+   {
+    "probe_id": "cy-pc-02",
+    "item_id": "pc-02",
+    "lure_sha16": "c4c185c70f50f34d"
+   },
+   {
+    "probe_id": "cy-pc-03",
+    "item_id": "pc-03",
+    "lure_sha16": "962b62102110a502"
+   },
+   {
+    "probe_id": "cy-pc-04",
+    "item_id": "pc-04",
+    "lure_sha16": "334aa06e0803ec45"
+   },
+   {
+    "probe_id": "cy-pc-05",
+    "item_id": "pc-05",
+    "lure_sha16": "c0749be2b1f212c8"
+   },
+   {
+    "probe_id": "cy-pc-06",
+    "item_id": "pc-06",
+    "lure_sha16": "0b0900d36014afa8"
+   },
+   {
+    "probe_id": "cy-pc-07",
+    "item_id": "pc-07",
+    "lure_sha16": "152a6ace2a679b90"
+   },
+   {
+    "probe_id": "cy-pc-08",
+    "item_id": "pc-08",
+    "lure_sha16": "4144225a8ad5887a"
+   },
+   {
+    "probe_id": "cy-pc-09",
+    "item_id": "pc-09",
+    "lure_sha16": "a1981a998fc8b98e"
+   },
+   {
+    "probe_id": "cy-pc-10",
+    "item_id": "pc-10",
+    "lure_sha16": "282ed77250536904"
+   },
+   {
+    "probe_id": "cy-pc-11",
+    "item_id": "pc-11",
+    "lure_sha16": "34a36b5154fda216"
+   },
+   {
+    "probe_id": "cy-pc-12",
+    "item_id": "pc-12",
+    "lure_sha16": "90528f7f422aac5b"
+   },
+   {
+    "probe_id": "cy-pc-13",
+    "item_id": "pc-13",
+    "lure_sha16": "c26529d37af3cef5"
+   },
+   {
+    "probe_id": "cy-pc-14",
+    "item_id": "pc-14",
+    "lure_sha16": "2d464e169449ba89"
+   },
+   {
+    "probe_id": "cy-pc-15",
+    "item_id": "pc-15",
+    "lure_sha16": "a980bc22dfbedabd"
+   },
+   {
+    "probe_id": "cy-pc-16",
+    "item_id": "pc-16",
+    "lure_sha16": "fa50f6f4556660d0"
+   },
+   {
+    "probe_id": "cy-pc-17",
+    "item_id": "pc-17",
+    "lure_sha16": "e82e4001721708a3"
+   },
+   {
+    "probe_id": "cy-pc-18",
+    "item_id": "pc-18",
+    "lure_sha16": "1e4f65ee4629d2db"
+   },
+   {
+    "probe_id": "cy-pc-19",
+    "item_id": "pc-19",
+    "lure_sha16": "4536c6014c265292"
+   },
+   {
+    "probe_id": "cy-pc-20",
+    "item_id": "pc-20",
+    "lure_sha16": "50b887f6a10d10c8"
+   },
+   {
+    "probe_id": "cy-pc-21",
+    "item_id": "pc-21",
+    "lure_sha16": "1dce74995c3e27fc"
+   },
+   {
+    "probe_id": "cy-pc-22",
+    "item_id": "pc-22",
+    "lure_sha16": "66e06d93766fd2ad"
+   },
+   {
+    "probe_id": "cy-pc-23",
+    "item_id": "pc-23",
+    "lure_sha16": "8b0fa3f84d3c57e0"
+   },
+   {
+    "probe_id": "cy-pc-24",
+    "item_id": "pc-24",
+    "lure_sha16": "c903b3c6312c8281"
+   },
+   {
+    "probe_id": "cy-pc-25",
+    "item_id": "pc-25",
+    "lure_sha16": "6cf145216e6868c5"
+   },
+   {
+    "probe_id": "cy-pc-26",
+    "item_id": "pc-26",
+    "lure_sha16": "c2fef82d90108455"
+   },
+   {
+    "probe_id": "cy-pc-27",
+    "item_id": "pc-27",
+    "lure_sha16": "4b599fcabdfa3145"
+   },
+   {
+    "probe_id": "cy-pc-28",
+    "item_id": "pc-28",
+    "lure_sha16": "8cca511877a49e95"
+   },
+   {
+    "probe_id": "cy-pc-29",
+    "item_id": "pc-29",
+    "lure_sha16": "c2e348502cf43ce3"
+   },
+   {
+    "probe_id": "cy-pc-30",
+    "item_id": "pc-30",
+    "lure_sha16": "50d329b4a17e1d29"
+   }
+  ]
+ },
+ "acceptance": {
+  "recovery": "the engine acceptance(recoveries): >=40% RECOVERED (bar 0.4, min 12 hits on n=30) via the two-judge adjudicate (RECOVERED iff BOTH judges; NOT_RECOVERED iff BOTH; else PARTIAL; a judge failure degrades to PARTIAL — fail closed, never toward the bar)",
+  "canary": "0 lure hits across all 30 generations (any hit fails the gate and types contamination)",
+  "tiers": ">=1 T1-valid + >=1 T2-valid",
+  "judge_failure_tolerated": "a failed judge call is typed and the item degrades to PARTIAL (never re-rolled to seek a better verdict)"
+ }
+}

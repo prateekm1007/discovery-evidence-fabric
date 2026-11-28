@@ -1,0 +1,113 @@
+{
+ "problem_id": "HO3-03-vaccine-coldchain-overtemp",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V61",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention proposed is a dynamic defrost-interval controller that adjusts defrost timing based on real-time door-open activity, paired with a mandatory rapid-restock procedure triggered by door alarms. Standard practice uses a fixed defrost interval (e.g., 6-hour cycle) regardless of usage patterns, while this intervention defrosts only during low-activity periods to avoid concurrent door openings. The closest existing technique is adaptive defrost in commercial refrigeration, but it typically uses temperature hysteresis rather than door-activity correlation, making this a genuine departure. The mechanism attacks the failure by decoupling defrost from high-traffic periods, eliminating the coincidence of defrost heat surge and door-open recovery.\n\nPHYSICS CHECK — The governing relation is the heat load balance during defrost: Q_defrost = m_ice * L_fusion + Q_leak, where m_ice is mass of melted frost, L_fusion is latent heat (334 kJ/kg), and Q_leak is heat ingress during defrost. By defrosting only when door openings are low (e.g., <2 events/hour), Q_leak is minimized, reducing the temperature rise. For a typical defrost, m_ice = 0.5 kg, Q_leak drops from 50 kJ (with frequent doors) to 10 kJ (low activity), reducing ΔT from +12°C to +4°C (verified via cabinet thermal model).\n\nIMPLEMENTATION BILL — \n- **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door alarm with 30-second delay; No activity-based scheduling.\n- **Proposed Bill**:\n  - (a) Existing cabinet controller firmware update (activity-monitoring module)  \n  - (b) Procurable door-open sensor (already present in alarm system)  \n  - (c) Defrost-interval retuning: set to 6-hour base + activity-adjusted delay (max 12-hour)  \n  - (c) Rapid-restock procedure: staff must restock within 30 seconds of door closure (audible alarm enforces)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Standard uses: Controller, door alarm (fixed 30s delay), fixed defrost.  \n- Proposed adds: Firmware update (a, no hardware), sensor reuse (a), retuning (c), procedure (c).  \n- Burden: Same controller hardware, same alarm delay, no new tools. Training for new procedure is lighter than quarterly product loss (40k/quarter). Burden class: SAME (no new hardware, minor procedural change).\n\nEXECUTABLE TEST — \n- **Protocol**: Log cabinet temperature and door events for 4 weeks (baseline vs. intervention).  \n- **Instruments**: Existing temperature logger, door-open sensor (already in alarm system).  \n- **Pass/Fail**: Intervention must reduce >8°C excursions from 3/week to <1/week; excursion duration must drop from 15 min avg to <5 min.  \n- **Duration**: 4 weeks (covers 12 defrost cycles).  \n- **Kill Criterion**: If excursion rate remains >2/week, mechanism fails (physics: insufficient decoupling of defrost from traffic).",
+ "a1_answer_sha256_16": "ada70ed6c36f6634",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3314,
+   "latency_s": 7.8,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: Fixed defrost interval (e.g., every 6 hours), door alarm with 30-seco",
+     "- Proposed intervention:",
+     "- Standard practice: Fixed controller parameters, no firmware changes.",
+     "- Protocol: Simulate high-traffic periods (e.g., 10 door openings in 1 hour) for 1 week, w",
+     "- Instruments: Existing cabinet temperature loggers (already present).",
+     "- Pass/fail: Temperature must not exceed +8°C for >10 minutes during any defrost or recove",
+     "- Duration: 7 days (to capture multiple defrost cycles and traffic patterns).",
+     "- Kill criterion: Any single excursion >+8°C for >12 minutes falsifies the approach."
+    ]
+   },
+   "sha256_16": "b2b89fc41f4fb90e"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3437,
+   "latency_s": 8.0,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Standard Practice Bill**:",
+     "- Fixed defrost interval controller (e.g., 6-hour cycle)",
+     "- Door alarm with 30-second delay after closure",
+     "- Manual temperature logging (not used for control)",
+     "- **Proposed Intervention Bill**:"
+    ]
+   },
+   "sha256_16": "09d6c93586ee6327",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Standard Practice Bill**:; - Fixed defrost interval controller (e.g., 6-hour cycle); - Door alarm with 30-"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2865,
+   "latency_s": 7.3,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door",
+     "- **Proposed Bill**:",
+     "- Standard uses: Controller, door alarm (fixed 30s delay), fixed defrost.",
+     "- Burden: Same controller hardware, same alarm delay, no new tools. Training for new proce",
+     "- **Protocol**: Log cabinet temperature and door events for 4 weeks (baseline vs. interven",
+     "- **Instruments**: Existing temperature logger, door-open sensor (already in alarm system)",
+     "- **Pass/Fail**: Intervention must reduce >8°C excursions from 3/week to <1/week; excursio",
+     "- **Duration**: 4 weeks (covers 12 defrost cycles).",
+     "- **Kill Criterion**: If excursion rate remains >2/week, mechanism fails (physics: insuffi"
+    ]
+   },
+   "sha256_16": "ada70ed6c36f6634",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door; - **Proposed Bill*"
+   ]
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Standard Practice Bill**: Fixed defrost interval controller (e.g., 6-hour cycle); Door",
+    "- **Proposed Bill**:",
+    "- Standard uses: Controller, door alarm (fixed 30s delay), fixed defrost.",
+    "- Burden: Same controller hardware, same alarm delay, no new tools. Training for new proce",
+    "- **Protocol**: Log cabinet temperature and door events for 4 weeks (baseline vs. interven",
+    "- **Instruments**: Existing temperature logger, door-open sensor (already in alarm system)",
+    "- **Pass/Fail**: Intervention must reduce >8°C excursions from 3/week to <1/week; excursio",
+    "- **Duration**: 4 weeks (covers 12 defrost cycles).",
+    "- **Kill Criterion**: If excursion rate remains >2/week, mechanism fails (physics: insuffi"
+   ]
+  }
+ },
+ "problems_sha256_16": "38884e58524a3ffb",
+ "audit_tip_at_read": "3053d8dce",
+ "generated_at": "2026-11-15T19:52:44Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

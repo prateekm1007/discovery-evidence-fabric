@@ -1,0 +1,37 @@
+{
+ "amendment": "Article LXXXVII — The Secrets Vault (Single Store + Lookup-First)",
+ "from_version": "2.11.0",
+ "to_version": "2.12.0",
+ "sponsor": "Operator directive 2026-11-14: put all secrets (PAT, AI model tokens, other important secrets) in the vault; amend the constitution so all secrets are saved in the vault and looked up there whenever keys/PATs are needed (delivered with a rotated GitHub PAT)",
+ "extends": [
+  "LXXIII (Operator Secrets Registry, 2026-09-16): names the gitignored .env.keys as the vault of record for this sandbox and closes the ask-again loop",
+  "LXXVI (Credential Custody, 2026-09-18): adds the arrival-custody rule (a secret goes into the vault FIRST, before any use) and the rotation-sweep rule (a rotated value replaces every stored copy of the old one outside the vault in the same session)"
+ ],
+ "articles_touched": [
+  "LXXXVII (new)"
+ ],
+ "serves": [
+  "LXXIII",
+  "LXXVI",
+  "X",
+  "XXXI",
+  "LXXXV"
+ ],
+ "round": "R11",
+ "operators_directive_verbatim": "put all secrets like PAT and tokens for AI models and other imporant secrets in your vault, and addthat all secrets are saved in vault in your constitution, which you will look up whenever you needs keys, pat, etc",
+ "mechanism": {
+  "vault_of_record": ".env.keys (repo root, gitignored; SECRETS_VAULT override honored)",
+  "loaders": [
+   "scripts/r7_queue_runner.py::_load_key_vault",
+   "discovery_fabric/engine/adapters.py::load_credentials"
+  ],
+  "lookup_order": "process env wins > explicit path > .env.keys > $SECRETS_VAULT",
+  "verification": "names + SHA-256 fingerprints only; values never logged, tracked, or echoed"
+ },
+ "actions_this_session": [
+  "rotated GitHub PAT stored in the vault under GH_PAT with GITHUB_TOKEN alias",
+  "git remote URL updated in place to the rotated PAT (no echo)",
+  "tracked-tree secret scan: zero hits outside the vault (typed PASS)",
+  "provider keys (AGNES/INCEPTION/OPENROUTER/XKIRO) confirmed present in the vault by name"
+ ]
+}

@@ -844,7 +844,6 @@ def independent_attack(candidate: Dict[str, Any],
                   "(fresh adversarial conversation, generator reasoning "
                   "never shown; no alternative provider credentialed — "
                   "disclosed, never claimed as provider separation)")),
-        "calibration": _calibration_attestation(),
         "prompt_hash": meta.get("prompt_hash"),
         "output_hash": meta.get("output_hash"),
         "llm_status": meta.get("status"),
@@ -931,45 +930,7 @@ def independent_attack(candidate: Dict[str, Any],
 # is preserved: the attacker is a different reasoning context; on one
 # rung it is SEPARATE_CONTEXT, recorded, never claimed as
 # provider separation).
-ATTACK_BATCH_VERSION = "independent_attack_batch/1.0.0"
-
-
-def _calibration_attestation() -> Dict[str, Any]:
-    """Art. L/owner audit 2026-11-13: the attack record carries the
-    DERIVED calibration state for ITS OWN instrument version. Fail-closed:
-    an unmeasured instrument records UNKNOWN_NOT_CALIBRATED (never an
-    implied clean bill). The yield instrument consumes this block — it
-    never grants attack survival without CALIBRATED."""
-    try:
-        from .attacker_calibration import resolve_state
-        st = resolve_state(instrument_version=ATTACK_VERSION)
-    except Exception as exc:  # noqa: BLE001 — fail closed, typed
-        return {"instrument": ATTACK_VERSION,
-                "state": "UNKNOWN_NOT_CALIBRATED",
-                "terminal_kill_admissible": False,
-                "error": f"{type(exc).__name__}: {exc}"[:200]}
-    measured = st.get("measured") or {}
-    return {
-        "instrument": ATTACK_VERSION,
-        "gate_version": st.get("gate_version"),
-        "state": st.get("state") or "UNKNOWN_NOT_CALIBRATED",
-        "terminal_kill_admissible": bool(
-            st.get("terminal_kill_admissible")),
-        "n_cases": measured.get("n_cases_attacked"),
-        "attacker_ring": measured.get("attacker_ring"),
-        "measurement_path": st.get("measurement_path"),
-        "measurement_sha256": st.get("measurement_sha256"),
-        "reason": st.get("reason"),
-    }
-
-
-def _independence_for(generator_provider: Optional[str],
-                      attacker_provider: Optional[str]) -> str:
-    if generator_provider and attacker_provider:
-        return ("SEPARATE_PROVIDER"
-                if generator_provider != attacker_provider
-                else "SEPARATE_CONTEXT")
-    return "UNAVAILABLE"
+ATTACK_BATCH_VERSION = "independent_attack_batch/2.0.0"
 
 _ATTACK_BATCH_HEADER = """You are a hostile independent reviewer attacking {n} engineering invention candidates. You did NOT propose any of them and you owe them nothing. Find the strongest reasons EACH fails.
 
@@ -1005,17 +966,43 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
                              generator_provider: Optional[str],
                              attack_purpose: str = "independent_attack",
                              llm_generate=None,
-                             generator_providers: Optional[Dict[str, str]] = None,
+                             generator_providers: Optional[List[str]] = None,
+                             group_size: int = 2,
                              ) -> Dict[str, Any]:
-    """ONE adversarial call for ALL candidates (directive 3).
+    """Adversarial attack for ALL candidates in MEASURED, BOUNDED groups
+    (R9 P0 item 4, owner round 2026-11-13).
+
+    v2 repairs the measured independence defect of 1.0.0: the caller
+    collected the DISTINCT generator providers of the batch but passed
+    only _gens[0] — the batch's independence verdicts were computed
+    against ONE generator while candidates produced by OTHER generators
+    (if any) inherited the wrong identity (a shared attacker call does
+    not make every candidate independent).
+
+    v2 contract:
+      - the attacker is admitted with exclude_providers covering EVERY
+        distinct generator provider in the batch (demonstrably
+        independent of every generator — the directive's option 2);
+      - per-candidate independence is computed PER CANDIDATE against
+        that candidate's OWN generator identity (carried on the
+        candidate dict as generator_provider; the caller attaches it);
+      - a cascade fallback onto a provider inside the generator set is
+        typed SHARED_WITH_A_GENERATOR — never labeled independent
+        (Art. XLV: SEPARATE_CONTEXT is not provider independence);
+      - batches are split into BOUNDED groups (group_size, default 2)
+        so the 4000-token output budget cannot truncate later candidate
+        sections (the measured incomplete-attack mode); EVERY group is
+        a separate measured transport call and its transport record
+        rides the result.
 
     `llm_generate` is injectable for tests (the engine's
     mechanism_space.llm_generate by default — ONE transport path,
     Art. X — the same injection contract as compose_answer).
 
-    Returns {batch: True, batch_version, n_candidates, transport: {...},
-             records: {candidate_id: <the independent_attack-shaped
-             record>}, unparsed: [candidate_id, ...]}.
+    Returns {batch: True, batch_version, n_candidates, transport:
+    <merged summary>, transports: [<per-group measured records>],
+    records: {candidate_id: <the independent_attack-shaped record>},
+    unparsed: [candidate_id, ...]}.
 
     A candidate whose section is missing or unparseable gets the typed
     ATTACK_INCOMPLETE record (never killed by an attack that did not
@@ -1025,216 +1012,246 @@ def independent_attack_batch(candidates: List[Dict[str, Any]],
         from .mechanism_space import llm_generate as _lg
     else:
         _lg = llm_generate
-    # OWNER AUDIT 2026-11-13: each candidate's OWN generator provider
-    # (not the first candidate's, the old `_gens[0]` bug) governs its
-    # independence verdict. The batch call excludes every listed
-    # generator provider; the per-candidate mode is computed from the
-    # candidate's own generator vs the ACTUALLY SERVED attacker.
-    _gen_map = {str(k): str(v) for k, v in
-                (generator_providers or {}).items() if v}
 
-    def _gen_for(cid: str) -> Optional[str]:
-        return _gen_map.get(cid) or generator_provider
-
-    _all_gens = sorted({g for g in _gen_map.values() if g} |
-                       ({generator_provider} if generator_provider
-                        else set()))
-    ev_lines = []
-    for e in (evidence or [])[:5]:
-        ev_lines.append(
-            f"- [{e.get('id') or e.get('item_id')}] "
-            f"{str(e.get('title') or '')[:110]}")
-    evidence_text = "\n".join(ev_lines) if ev_lines else "(none held)"
-    prompt = _ATTACK_BATCH_HEADER.format(
-        n=len(candidates), i_fmt="<i>") + "\n".join(
-        _ATTACK_BATCH_CAND.format(
-            idx=i, cid=str(c.get("candidate_id") or f"cand{i}"),
-            mechanism=str(c.get("mechanism") or "")[:600],
-            intervention=str(c.get("intervention") or "")[:600],
-            predicted_effect=str(c.get("predicted_effect") or "")[:400],
-            testable_prediction=str(
-                c.get("testable_prediction") or "")[:400],
-            known_failure_modes="; ".join(
-                c.get("known_failure_modes") or [])[:400] or "(none)")
-        for i, c in enumerate(candidates, 1))
-    prompt += (f"\n\nPROBLEM:\n- Device: {problem.get('device', '')}\n"
-               f"- Failure: {problem.get('failure', '')}\n"
-               f"- Baseline (the un-invented standard): "
-               f"{_baseline_text(problem)}\n\nEVIDENCE HELD (the "
-               "candidates' own evidence bundle):\n" + evidence_text)
-    meta = _lg(
-        prompt,
-        system="You are a hostile independent engineering reviewer. "
-               "Attack every candidate as instructed. Every KILL must "
-               "cite a specific concrete basis and bind it (GROUNDED_"
-               "IN: evidence id, quoted record span, the numbers, or "
-               "the violated boundary clause).",
-        purpose=attack_purpose, exclude_providers=_all_gens or None,
-        max_tokens=min(1600 * max(1, len(candidates)), 4000))
-    _attacker_provider = meta.get("provider")
-    _independence_by_candidate = {
-        str(c.get("candidate_id") or i): _independence_for(
-            _gen_for(str(c.get("candidate_id") or i)),
-            _attacker_provider)
-        for i, c in enumerate(candidates, 1)}
-    transport = {
+    gen_set = {str(g) for g in ([generator_provider]
+                                + list(generator_providers or []))
+               if g}
+    groups = [candidates[i:i + max(1, group_size)]
+              for i in range(0, len(candidates), max(1, group_size))]
+    out: Dict[str, Any] = {"batch": True,
+                           "batch_version": ATTACK_BATCH_VERSION,
+                           "n_candidates": len(candidates),
+                           "records": {}, "unparsed": [],
+                           "transports": []}
+    merged_transport: Dict[str, Any] = {
         "batch_version": ATTACK_BATCH_VERSION,
         "n_candidates": len(candidates),
-        "attacker_provider": meta.get("provider"),
-        "attacker_model": meta.get("model"),
-        "prompt_hash": meta.get("prompt_hash"),
-        "output_hash": meta.get("output_hash"),
-        "llm_status": meta.get("status"),
-        "generator_providers_excluded": _all_gens,
-        "independence_by_candidate": _independence_by_candidate,
-        # Global (conservative) summary only: SEPARATE_PROVIDER iff every
-        # candidate has a distinct generator; never implied from one
-        # candidate's identity (the audited `_gens[0]` defect).
-        "independence_mode": (
-            "SEPARATE_PROVIDER"
-            if _independence_by_candidate and all(
-                v == "SEPARATE_PROVIDER"
-                for v in _independence_by_candidate.values())
-            else "SEPARATE_CONTEXT"),
-        "calibration": _calibration_attestation(),
-        "attacked_at": utc_now(),
-    }
-    out: Dict[str, Any] = {"batch": True, "batch_version":
-                           ATTACK_BATCH_VERSION,
-                           "n_candidates": len(candidates),
-                           "transport": transport, "records": {},
-                           "unparsed": []}
-    if not isinstance(meta, dict) or not meta.get("ok"):
-        for c in candidates:
-            cid = str(c.get("candidate_id") or "")
-            rec = {
-                "attack_version": ATTACK_VERSION,
-                "attack_batch": {"batch_version": ATTACK_BATCH_VERSION,
-                                 "transport": transport},
-                "attack_purpose": attack_purpose,
-                "candidate_id": cid,
-                "generator_provider": _gen_for(cid),
-                "attacker_provider": transport["attacker_provider"],
-                "attacker_model": transport["attacker_model"],
-                "independence_mode": _independence_by_candidate.get(
-                    cid, transport["independence_mode"]),
-                "calibration": transport["calibration"],
-                "llm_status": transport["llm_status"],
-                "state": "ATTACK_INCOMPLETE",
-                "items": [], "overall": "ATTACK_INCOMPLETE",
-                "attacked_at": transport["attacked_at"],
-                "note": ("the batched independent attack could not run "
-                         f"(LLM unavailable: {transport['llm_status']}) "
-                         "— the candidate is NOT killed by an attack "
-                         "that did not execute (Art. XXIX)")}
-            out["records"][cid] = rec
-        return out
-    content = meta.get("content") or ""
-    # split the response into per-candidate sections
-    sections: Dict[str, str] = {}
-    cur = None
-    buf: List[str] = []
-    import re as _re
-    for ln in content.split("\n"):
-        m = _re.match(r"^\s*==\s*CANDIDATE\s+(\S+)\s*==", ln)
-        if m:
-            if cur is not None:
-                sections[cur] = "\n".join(buf)
-            cur = m.group(1).strip()
-            buf = []
-        elif cur is not None:
-            buf.append(ln)
-    if cur is not None:
-        sections[cur] = "\n".join(buf)
-    for i, c in enumerate(candidates, 1):
-        cid = str(c.get("candidate_id") or "")
-        sec = sections.get(cid) or sections.get(str(i)) or ""
-        if not sec.strip():
-            out["unparsed"].append(cid)
-            out["records"][cid] = {
-                "attack_version": ATTACK_VERSION,
-                "attack_batch": {"batch_version": ATTACK_BATCH_VERSION,
-                                 "transport": transport},
-                "attack_purpose": attack_purpose,
-                "candidate_id": cid,
-                "generator_provider": _gen_for(cid),
-                "attacker_provider": transport["attacker_provider"],
-                "attacker_model": transport["attacker_model"],
-                "independence_mode": _independence_by_candidate.get(
-                    cid, transport["independence_mode"]),
-                "calibration": transport["calibration"],
-                "llm_status": transport["llm_status"],
-                "state": "ATTACK_INCOMPLETE",
-                "items": [], "overall": "ATTACK_INCOMPLETE",
-                "attacked_at": transport["attacked_at"],
-                "note": ("the batched attack returned no readable "
-                         "section for this candidate — typed "
-                         "ATTACK_INCOMPLETE, never a kill (Art. XXIX)")}
-            continue
-        items = _validate_parsed(_parse_attack(sec), c, evidence or [])
-        interventions = _adjudicate_interventions(
-            _parse_interventions(sec), c, evidence or [])
-        valid = [x for x in items if x["verdict"] in VALID_CLASS_VERDICTS]
-        kills = [x for x in valid if x["verdict"] == "KILL"]
-        demoted = [x for x in items
-                   if x["verdict"] == DEMOTED_CLASS_VERDICT]
-        risks = [x for x in valid if x["verdict"] == "RISK"]
-        invalids = [x for x in items if x["verdict"] == "INVALID"]
-        rec: Dict[str, Any] = {
-            "attack_version": ATTACK_VERSION,
-            "attack_batch": {"batch_version": ATTACK_BATCH_VERSION,
-                             "transport": transport},
-            "attack_purpose": attack_purpose,
-            "candidate_id": cid,
-            "generator_provider": _gen_for(cid),
-            "attacker_provider": transport["attacker_provider"],
-            "attacker_model": transport["attacker_model"],
-            "independence_mode": _independence_by_candidate.get(
-                cid, transport["independence_mode"]),
-            "calibration": transport["calibration"],
-            "independence_note": (
-                "the batched attacker ran on a different provider than "
-                "THIS candidate's generator"
-                if _independence_by_candidate.get(cid) ==
+        "generator_providers": sorted(gen_set),
+        "n_groups": len(groups)}
+
+    def _attack_one_group(group: List[Dict[str, Any]],
+                          group_idx: int) -> None:
+        ev_lines = []
+        for e in (evidence or [])[:5]:
+            ev_lines.append(
+                f"- [{e.get('id') or e.get('item_id')}] "
+                f"{str(e.get('title') or '')[:110]}")
+        evidence_text = "\n".join(ev_lines) if ev_lines else "(none held)"
+        prompt = _ATTACK_BATCH_HEADER.format(
+            n=len(group), i_fmt="<i>") + "\n".join(
+            _ATTACK_BATCH_CAND.format(
+                idx=i, cid=str(c.get("candidate_id") or f"cand{i}"),
+                mechanism=str(c.get("mechanism") or "")[:600],
+                intervention=str(c.get("intervention") or "")[:600],
+                predicted_effect=str(c.get("predicted_effect") or "")[:400],
+                testable_prediction=str(
+                    c.get("testable_prediction") or "")[:400],
+                known_failure_modes="; ".join(
+                    c.get("known_failure_modes") or [])[:400] or "(none)")
+            for i, c in enumerate(group, 1))
+        prompt += (f"\n\nPROBLEM:\n- Device: {problem.get('device', '')}\n"
+                   f"- Failure: {problem.get('failure', '')}\n"
+                   f"- Baseline (the un-invented standard): "
+                   f"{_baseline_text(problem)}\n\nEVIDENCE HELD (the "
+                   "candidates' own evidence bundle):\n" + evidence_text)
+        meta = _lg(
+            prompt,
+            system="You are a hostile independent engineering reviewer. "
+                   "Attack every candidate as instructed. Every KILL must "
+                   "cite a specific concrete basis and bind it (GROUNDED_"
+                   "IN: evidence id, quoted record span, the numbers, or "
+                   "the violated boundary clause).",
+            purpose=attack_purpose,
+            exclude_providers=sorted(gen_set) if gen_set else None,
+            max_tokens=min(1600 * max(1, len(group)), 4000))
+        transport = {
+            "batch_version": ATTACK_BATCH_VERSION,
+            "group": group_idx,
+            "n_candidates": len(group),
+            "candidate_ids": [str(c.get("candidate_id") or f"cand{i}")
+                              for i, c in enumerate(group, 1)],
+            "attacker_provider": meta.get("provider"),
+            "attacker_model": meta.get("model"),
+            "prompt_hash": meta.get("prompt_hash"),
+            "output_hash": meta.get("output_hash"),
+            "llm_status": meta.get("status"),
+            "excluded_generator_providers": sorted(gen_set),
+            "independence_mode": (
                 "SEPARATE_PROVIDER"
-                else "the batched attacker ran in an independent "
-                     "reasoning context on the SAME provider as this "
-                     "candidate's generator (SEPARATE_CONTEXT_ONLY — "
-                     "never independent provider validation)"),
-            "prompt_hash": transport["prompt_hash"],
-            "output_hash": transport["output_hash"],
-            "llm_status": transport["llm_status"],
-            "ring_pin": {"requested": None, "mode": "PRODUCTION_CASCADE",
-                         "served_provider": transport["attacker_provider"],
-                         "served_model": transport["attacker_model"],
-                         "pin_status": None,
-                         "note": ("production attacks keep the "
-                                  "availability cascade")},
-            "attacked_at": transport["attacked_at"],
-            "items": items,
-            "intervention_suggestions": interventions,
-            "counts": {"KILL": len(kills), "RISK": len(risks),
-                       "SURVIVE": len([x for x in valid
-                                       if x["verdict"] == "SURVIVE"]),
-                       "ABSTAIN_DEMOTED": len(demoted),
-                       "INVALID": len(invalids)}}
-        if kills:
-            rec["state"] = "ATTACK_RUN"
-            rec["overall"] = "KILLED"
-            rec["kill_basis"] = [
-                {"attack_class": k["attack_class"], "basis": k["basis"],
-                 "grounding": k.get("grounding")} for k in kills]
-        elif demoted:
-            rec["state"] = "ATTACK_RUN"
-            rec["overall"] = OVERALL_ESCALATED
-            rec["preserved_objections"] = [
-                {"attack_class": d["attack_class"], "basis": d["basis"],
-                 "grounding": d.get("grounding")} for d in demoted]
-        elif risks or invalids:
-            rec["state"] = "ATTACK_RUN"
-            rec["overall"] = "UNCERTAIN"
-        else:
-            rec["state"] = "ATTACK_RUN"
-            rec["overall"] = "SURVIVED"
-        out["records"][cid] = rec
+                if (gen_set and meta.get("provider")
+                    and meta.get("provider") not in gen_set)
+                else "SHARED_WITH_A_GENERATOR"),
+            "attacked_at": utc_now(),
+        }
+        out["transports"].append(transport)
+        if group_idx == 1:
+            merged_transport.update({
+                "attacker_provider": transport["attacker_provider"],
+                "attacker_model": transport["attacker_model"],
+                "llm_status": transport["llm_status"],
+                "independence_mode": transport["independence_mode"],
+                "attacked_at": transport["attacked_at"]})
+
+        def _independence_for(c: Dict[str, Any]) -> tuple:
+            """PER-CANDIDATE independence (the 1.0.0 defect): the
+            candidate's OWN generator identity decides — never the
+            batch head's. SHARED_WITH_A_GENERATOR when the attacker's
+            provider is inside the candidate's generator set (own or
+            batch); SEPARATE_PROVIDER only when the attacker differs
+            from every generator that produced this candidate."""
+            own_gen = str(c.get("generator_provider")
+                          or generator_provider or "")
+            my_gens = ({own_gen} | gen_set) if own_gen else set(gen_set)
+            ap = transport.get("attacker_provider")
+            if ap and (not my_gens or ap not in my_gens):
+                return ("SEPARATE_PROVIDER",
+                        "the attacker ran on a different provider than "
+                        f"the candidate's generator ({own_gen or 'unrecorded'})"
+                        " and every other generator in this batch")
+            return ("SHARED_WITH_A_GENERATOR",
+                    "the attacker's provider is inside this batch's "
+                    "generator set (cascade fallback or pin) — provider "
+                    "independence is NOT claimed (Art. XLV: a separate "
+                    "conversation context is not independent validation)")
+
+        if not isinstance(meta, dict) or not meta.get("ok"):
+            for c in group:
+                cid = str(c.get("candidate_id") or "")
+                mode, note = _independence_for(c)
+                rec = {
+                    "attack_version": ATTACK_VERSION,
+                    "attack_batch": {"batch_version":
+                                     ATTACK_BATCH_VERSION,
+                                     "transport": transport},
+                    "attack_purpose": attack_purpose,
+                    "candidate_id": cid,
+                    "generator_provider": str(c.get("generator_provider")
+                                              or generator_provider or ""),
+                    "attacker_provider": transport["attacker_provider"],
+                    "attacker_model": transport["attacker_model"],
+                    "independence_mode": mode,
+                    "independence_note": note,
+                    "llm_status": transport["llm_status"],
+                    "state": "ATTACK_INCOMPLETE",
+                    "items": [], "overall": "ATTACK_INCOMPLETE",
+                    "attacked_at": transport["attacked_at"],
+                    "note": ("the batched independent attack could not "
+                             f"run (LLM unavailable: "
+                             f"{transport['llm_status']}) — the "
+                             "candidate is NOT killed by an attack that "
+                             "did not execute (Art. XXIX)")}
+                out["records"][cid] = rec
+            return
+        content = meta.get("content") or ""
+        # split the response into per-candidate sections
+        sections: Dict[str, str] = {}
+        cur = None
+        buf: List[str] = []
+        import re as _re
+        for ln in content.split("\n"):
+            m = _re.match(r"^\s*==\s*CANDIDATE\s+(\S+)\s*==", ln)
+            if m:
+                if cur is not None:
+                    sections[cur] = "\n".join(buf)
+                cur = m.group(1).strip()
+                buf = []
+            elif cur is not None:
+                buf.append(ln)
+        if cur is not None:
+            sections[cur] = "\n".join(buf)
+        for i, c in enumerate(group, 1):
+            cid = str(c.get("candidate_id") or "")
+            sec = sections.get(cid) or sections.get(str(i)) or ""
+            mode, note = _independence_for(c)
+            own_gen = str(c.get("generator_provider")
+                          or generator_provider or "")
+            if not sec.strip():
+                out["unparsed"].append(cid)
+                out["records"][cid] = {
+                    "attack_version": ATTACK_VERSION,
+                    "attack_batch": {"batch_version":
+                                     ATTACK_BATCH_VERSION,
+                                     "transport": transport},
+                    "attack_purpose": attack_purpose,
+                    "candidate_id": cid,
+                    "generator_provider": own_gen,
+                    "attacker_provider": transport["attacker_provider"],
+                    "attacker_model": transport["attacker_model"],
+                    "independence_mode": mode,
+                    "independence_note": note,
+                    "llm_status": transport["llm_status"],
+                    "state": "ATTACK_INCOMPLETE",
+                    "items": [], "overall": "ATTACK_INCOMPLETE",
+                    "attacked_at": transport["attacked_at"],
+                    "note": ("the batched attack returned no readable "
+                             "section for this candidate — typed "
+                             "ATTACK_INCOMPLETE, never a kill (Art. XXIX)")}
+                continue
+            items = _validate_parsed(_parse_attack(sec), c,
+                                     evidence or [])
+            interventions = _adjudicate_interventions(
+                _parse_interventions(sec), c, evidence or [])
+            valid = [x for x in items
+                     if x["verdict"] in VALID_CLASS_VERDICTS]
+            kills = [x for x in valid if x["verdict"] == "KILL"]
+            demoted = [x for x in items
+                       if x["verdict"] == DEMOTED_CLASS_VERDICT]
+            risks = [x for x in valid if x["verdict"] == "RISK"]
+            invalids = [x for x in items if x["verdict"] == "INVALID"]
+            rec: Dict[str, Any] = {
+                "attack_version": ATTACK_VERSION,
+                "attack_batch": {"batch_version":
+                                 ATTACK_BATCH_VERSION,
+                                 "transport": transport},
+                "attack_purpose": attack_purpose,
+                "candidate_id": cid,
+                "generator_provider": own_gen,
+                "attacker_provider": transport["attacker_provider"],
+                "attacker_model": transport["attacker_model"],
+                "independence_mode": mode,
+                "independence_note": note,
+                "prompt_hash": transport["prompt_hash"],
+                "output_hash": transport["output_hash"],
+                "llm_status": transport["llm_status"],
+                "ring_pin": {"requested": None,
+                             "mode": "PRODUCTION_CASCADE",
+                             "served_provider":
+                             transport["attacker_provider"],
+                             "served_model": transport["attacker_model"],
+                             "pin_status": None,
+                             "note": ("production attacks keep the "
+                                      "availability cascade")},
+                "attacked_at": transport["attacked_at"],
+                "items": items,
+                "intervention_suggestions": interventions,
+                "counts": {"KILL": len(kills), "RISK": len(risks),
+                           "SURVIVE": len([x for x in valid
+                                           if x["verdict"] == "SURVIVE"]),
+                           "ABSTAIN_DEMOTED": len(demoted),
+                           "INVALID": len(invalids)}}
+            if kills:
+                rec["state"] = "ATTACK_RUN"
+                rec["overall"] = "KILLED"
+                rec["kill_basis"] = [
+                    {"attack_class": k["attack_class"],
+                     "basis": k["basis"],
+                     "grounding": k.get("grounding")} for k in kills]
+            elif demoted:
+                rec["state"] = "ATTACK_RUN"
+                rec["overall"] = OVERALL_ESCALATED
+                rec["preserved_objections"] = [
+                    {"attack_class": d["attack_class"],
+                     "basis": d["basis"],
+                     "grounding": d.get("grounding")} for d in demoted]
+            elif risks or invalids:
+                rec["state"] = "ATTACK_RUN"
+                rec["overall"] = "UNCERTAIN"
+            else:
+                rec["state"] = "ATTACK_RUN"
+                rec["overall"] = "SURVIVED"
+            out["records"][cid] = rec
+
+    for gi, g in enumerate(groups, 1):
+        _attack_one_group(g, gi)
+    out["transport"] = merged_transport
     return out

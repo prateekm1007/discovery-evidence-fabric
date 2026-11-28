@@ -1,0 +1,943 @@
+{
+ "record": "BATTERY_V7_1_CATALOG_R27/1.0.0",
+ "at": "2026-11-15T22:47:33.502724Z",
+ "work_id": "r26-v7-catalog-battery",
+ "claim": "c-0021 (EXECUTOR builder-r27s1, Art. 29(b) claim-before-work; work_id r26-v7-catalog-battery — the Art. 29(d) takeover of the c-0020 dead lease resumes the SAME work item; the CI takeover rule caught the first filing's new-work_id error, corrected pre-push of the work commits)",
+ "amendment_basis": "AM26 D1 verbatim: 'Run the full 30-pair V7 battery and tune feasibility to parity. The pilot is at 0.375; close the last 0.125 (e.g., ensure every bill line is a catalog part / standard operation, no custom machining like the p04 vane reprofile). Accept: feasibility |gap| <=0.25 AND novelty delta >=0.5 on >=30 pairs, auditor-judged.'",
+ "byte_map": {
+  "n_pairs": 30,
+  "n_interventions": 18,
+  "n_predictors": 12,
+  "composition": {
+   "V7_R26_FROZEN_interventions": 11,
+   "V71_R27_TUNED_interventions": 7,
+   "V5_R26_FROZEN_predictors": 12
+  },
+  "map_note": "the pre-registered r26 ALL-FRESH map (18 V7 interventions + 12 V5 predictors), unchanged; the 7 tuned rows are re-draws of the scan-flagged rows under SYS_A1_INT_V71 (the AM26 D1 tuning), each drawn ONCE under the c-0021 machine; the 23 frozen rows are never re-drawn (Art. 29(c))"
+ },
+ "tuning_ledger": {
+  "flagged_set": [
+   "bench-p01-pemfc-dehydration",
+   "bench-p04-pump-cavitation",
+   "bench-p08-mems-stiction",
+   "bench-p09-packaging-barrier",
+   "bench-p11-spindle-thermal-drift",
+   "eval-new01-supercap-dryout",
+   "eval-sofc-thermal-cycling"
+  ],
+  "flagged_basis": "the r27 standard-bill scan over the r26 V7 generation flags EXACTLY these 7 rows (pinned: tests/test_r27_standard_bill_scan.py::test_flagged_set_is_exactly_seven); convergence with the AM26 auditor-judged pilot: the pilot's 3 gap-1 rows (bench-p01 bespoke wick, bench-p04 CNC reprofile, bench-p08 custom recipe) are all in the flagged set",
+  "machine": "contract_for_v71 (V7 + STANDARD-BILL BIND) + critic + type gate + typed scans (base + constraint-fit + catalog v2 + STANDARD-BILL r27) + NEUTRAL repairs budget 2 (V71_REPAIR_DIRECTIVE); K_GEN=1; judge-blind (no outcome feedback, no judged numbers in any prompt — the AM26 direction is a structural bind)",
+  "per_row": {
+   "bench-p01-pemfc-dehydration": {
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": 8,
+     "CONSTRAINT_EXCLUSION": 4,
+     "NAMED_VARIANT": 1
+    },
+    "attempts": 3,
+    "answer_sha256_16": "ab6861bc0af8ae81",
+    "gen_s": 24.5
+   },
+   "bench-p04-pump-cavitation": {
+    "repairs": 0,
+    "residual_findings": {},
+    "attempts": 1,
+    "answer_sha256_16": "8f511f6a1e611930",
+    "gen_s": 6.2
+   },
+   "bench-p08-mems-stiction": {
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": 3,
+     "CONSTRAINT_EXCLUSION": 1
+    },
+    "attempts": 3,
+    "answer_sha256_16": "b6f26657ac3dfb22",
+    "gen_s": 18.4
+   },
+   "bench-p09-packaging-barrier": {
+    "repairs": 1,
+    "residual_findings": {},
+    "attempts": 2,
+    "answer_sha256_16": "6c7762ab7d722e5b",
+    "gen_s": 16.6
+   },
+   "bench-p11-spindle-thermal-drift": {
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": 10,
+     "CONSTRAINT_EXCLUSION": 4,
+     "NAMED_VARIANT": 1
+    },
+    "attempts": 3,
+    "answer_sha256_16": "0074ef45e21851a3",
+    "gen_s": 26.5
+   },
+   "eval-new01-supercap-dryout": {
+    "repairs": 2,
+    "residual_findings": {
+     "BILL_UNTAGGED": 6,
+     "CONSTRAINT_EXCLUSION": 4
+    },
+    "attempts": 3,
+    "answer_sha256_16": "848ea404936e4d00",
+    "gen_s": 20.6
+   },
+   "eval-sofc-thermal-cycling": {
+    "repairs": 2,
+    "residual_findings": {
+     "CONSTRAINT_EXCLUSION": 4,
+     "STANDARD_BILL": 2
+    },
+    "attempts": 3,
+    "answer_sha256_16": "a4357c7ff510b56c",
+    "gen_s": 26.6
+   }
+  },
+  "disclosed_residual": {
+   "eval-sofc-thermal-cycling": "STANDARD_BILL CUSTOM_MATERIAL residual after the repair budget 2: the re-draw relocated the graded seal into a BILAYER of two glass-ceramic layers but differentiated them by intergranular-phase fraction (5% vs 25%) — a composition-specified material row the scan correctly still flags; the budget is exhausted, so the residual stands as the honest machine output, disclosed, auditor-judged"
+  }
+ },
+ "standard_bill_scan_final": {
+  "interventions_scanned": 18,
+  "clean": 17,
+  "findings_by_row": {
+   "bench-p01-pemfc-dehydration": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p02-leadacid-grid-corrosion": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p03-phe-biofouling": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p04-pump-cavitation": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p05-bridge-bearing-aging": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p06-water-biofilm": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p07-cgm-biofouling": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p08-mems-stiction": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p09-packaging-barrier": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p10-pv-pid": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p11-spindle-thermal-drift": {
+    "clean": true,
+    "findings": []
+   },
+   "bench-p12-mbr-fouling": {
+    "clean": true,
+    "findings": []
+   },
+   "dev-fu-005-bridge-bearing": {
+    "clean": true,
+    "findings": []
+   },
+   "eval-new01-supercap-dryout": {
+    "clean": true,
+    "findings": []
+   },
+   "eval-new03-insulin-pump-occlusion": {
+    "clean": true,
+    "findings": []
+   },
+   "eval-new05-liion-balance-drift": {
+    "clean": true,
+    "findings": []
+   },
+   "eval-sofc-redox": {
+    "clean": true,
+    "findings": []
+   },
+   "eval-sofc-thermal-cycling": {
+    "clean": false,
+    "findings": [
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 5% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 5% intergranular phase), applied as a 50-µm layer adjacen",
+     "CUSTOM_MATERIAL: intergranular-phase formulation: | Glass-ceramic powder, 25% glass phase | (b) | Commercial glass-ceramic powder (e.g., G18 composition, 25% intergranular phase), applied as a 50-µm layer adjac"
+    ]
+   }
+  }
+ },
+ "rows": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/bench-p01-pemfc-dehydration.json",
+   "answer_sha256_16": "ab6861bc0af8ae81",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 8,
+    "CONSTRAINT_EXCLUSION": 4,
+    "NAMED_VARIANT": 1
+   },
+   "a1_answer_chars": 4540,
+   "generated_at": "2026-11-15T22:41:46.631141Z"
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p02-leadacid-grid-corrosion.json",
+   "answer_sha256_16": "dc6dc4e0e68d5e01",
+   "repairs": 1,
+   "residual_findings": {},
+   "a1_answer_chars": 4071,
+   "generated_at": "2026-11-15T21:34:02.365120Z"
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p03-phe-biofouling.json",
+   "answer_sha256_16": "11dda50fd19cf18a",
+   "repairs": 0,
+   "residual_findings": {},
+   "a1_answer_chars": 3125,
+   "generated_at": "2026-11-15T21:05:34.447691Z"
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/bench-p04-pump-cavitation.json",
+   "answer_sha256_16": "8f511f6a1e611930",
+   "repairs": 0,
+   "residual_findings": {},
+   "a1_answer_chars": 3137,
+   "generated_at": "2026-11-15T22:41:52.784389Z"
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p05-bridge-bearing-aging.json",
+   "answer_sha256_16": "140b98261ed71d0e",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 5,
+    "APPARATUS_ROW": 1
+   },
+   "a1_answer_chars": 3212,
+   "generated_at": "2026-11-15T21:34:22.246676Z"
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p06-water-biofilm.json",
+   "answer_sha256_16": "5b84a2d24f72b523",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 5,
+    "NAMED_VARIANT": 1
+   },
+   "a1_answer_chars": 3570,
+   "generated_at": "2026-11-15T21:34:43.447456Z"
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p07-cgm-biofouling.json",
+   "answer_sha256_16": "22b94e0c13f65434",
+   "repairs": 2,
+   "residual_findings": {
+    "NAMED_VARIANT": 1
+   },
+   "a1_answer_chars": 3953,
+   "generated_at": "2026-11-15T21:35:05.506640Z"
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/bench-p08-mems-stiction.json",
+   "answer_sha256_16": "b6f26657ac3dfb22",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 3,
+    "CONSTRAINT_EXCLUSION": 1
+   },
+   "a1_answer_chars": 2831,
+   "generated_at": "2026-11-15T22:42:11.169001Z"
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/bench-p09-packaging-barrier.json",
+   "answer_sha256_16": "6c7762ab7d722e5b",
+   "repairs": 1,
+   "residual_findings": {},
+   "a1_answer_chars": 3258,
+   "generated_at": "2026-11-15T22:42:27.752538Z"
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p10-pv-pid.json",
+   "answer_sha256_16": "d00d883ed5429707",
+   "repairs": 1,
+   "residual_findings": {},
+   "a1_answer_chars": 3062,
+   "generated_at": "2026-11-15T21:35:49.590585Z"
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/bench-p11-spindle-thermal-drift.json",
+   "answer_sha256_16": "0074ef45e21851a3",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 10,
+    "CONSTRAINT_EXCLUSION": 4,
+    "NAMED_VARIANT": 1
+   },
+   "a1_answer_chars": 3618,
+   "generated_at": "2026-11-15T22:42:54.240850Z"
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/bench-p12-mbr-fouling.json",
+   "answer_sha256_16": "3fcf6ec65e87d2cd",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 9,
+    "APPARATUS_ROW": 4
+   },
+   "a1_answer_chars": 2898,
+   "generated_at": "2026-11-15T21:36:38.903297Z"
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/dev-fu-005-bridge-bearing.json",
+   "answer_sha256_16": "d928b3b1e2e37ac7",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 2,
+    "CONSTRAINT_EXCLUSION": 4
+   },
+   "a1_answer_chars": 2754,
+   "generated_at": "2026-11-15T21:36:57.927793Z"
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/eval-new01-supercap-dryout.json",
+   "answer_sha256_16": "848ea404936e4d00",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 6,
+    "CONSTRAINT_EXCLUSION": 4
+   },
+   "a1_answer_chars": 3721,
+   "generated_at": "2026-11-15T22:43:14.855385Z"
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new03-insulin-pump-occlusion.json",
+   "answer_sha256_16": "1697e35cc598e15e",
+   "repairs": 2,
+   "residual_findings": {
+    "DEV_NEED": 1,
+    "BILL_UNTAGGED": 6,
+    "NAMED_VARIANT": 1
+   },
+   "a1_answer_chars": 3757,
+   "generated_at": "2026-11-15T21:41:40.960562Z"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new05-liion-balance-drift.json",
+   "answer_sha256_16": "58c65f8bc7a9803f",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 5,
+    "CONSTRAINT_EXCLUSION": 1,
+    "APPARATUS_ROW": 2
+   },
+   "a1_answer_chars": 2977,
+   "generated_at": "2026-11-15T21:42:59.839129Z"
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "question_type": "intervention-proposal",
+   "stage": "V7_R26_FROZEN",
+   "contract": "SYS_A1_INT_V7/r26_a1w_v7_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-sofc-redox.json",
+   "answer_sha256_16": "cedf187b2ce727af",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 10,
+    "CONSTRAINT_EXCLUSION": 4,
+    "APPARATUS_ROW": 4,
+    "NAMED_VARIANT": 1
+   },
+   "a1_answer_chars": 3695,
+   "generated_at": "2026-11-15T21:43:22.840432Z"
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "question_type": "intervention-proposal",
+   "stage": "V71_R27_TUNED",
+   "contract": "SYS_A1_INT_V71/r27_a1w_v71_contract",
+   "pair_path": "eval/pairs/r27_v71_tuned/eval-sofc-thermal-cycling.json",
+   "answer_sha256_16": "a4357c7ff510b56c",
+   "repairs": 2,
+   "residual_findings": {
+    "CONSTRAINT_EXCLUSION": 4,
+    "STANDARD_BILL": 2
+   },
+   "a1_answer_chars": 3141,
+   "generated_at": "2026-11-15T22:43:41.417155Z"
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/dev-fu-001-bearing-spalling.json",
+   "answer_sha256_16": "465dea6b4e029699",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 25
+   },
+   "a1_answer_chars": 2807,
+   "generated_at": "2026-11-15T21:44:09.695928Z"
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/dev-fu-003-motor-insulation.json",
+   "answer_sha256_16": "4bab50997edefc5f",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 23
+   },
+   "a1_answer_chars": 2778,
+   "generated_at": "2026-11-15T21:44:33.227224Z"
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/dev-fu-004-fouling.json",
+   "answer_sha256_16": "a8aa13e9aee5905f",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 13
+   },
+   "a1_answer_chars": 3090,
+   "generated_at": "2026-11-15T21:44:58.560623Z"
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new02-slipring-predictor.json",
+   "answer_sha256_16": "621a33bd250e7d21",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 21,
+    "CONSTRAINT_EXCLUSION": 4
+   },
+   "a1_answer_chars": 3029,
+   "generated_at": "2026-11-15T21:45:21.961972Z"
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new04-chiller-fouling-predictor.json",
+   "answer_sha256_16": "4714ce5977da28a8",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 18
+   },
+   "a1_answer_chars": 3148,
+   "generated_at": "2026-11-15T21:51:25.652573Z"
+  },
+  {
+   "problem_id": "eval-new06-bearing-vibration-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new06-bearing-vibration-predictor.json",
+   "answer_sha256_16": "cb26e0286286c454",
+   "repairs": 1,
+   "residual_findings": {},
+   "a1_answer_chars": 2961,
+   "generated_at": "2026-11-15T21:52:08.234362Z"
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new07-transformer-dga-predictor.json",
+   "answer_sha256_16": "d39b3ef55b47ccaa",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 20
+   },
+   "a1_answer_chars": 2681,
+   "generated_at": "2026-11-15T21:52:43.380250Z"
+  },
+  {
+   "problem_id": "eval-new08-pipeline-leak-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new08-pipeline-leak-predictor.json",
+   "answer_sha256_16": "6cd02cdee2c768cf",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 8
+   },
+   "a1_answer_chars": 2588,
+   "generated_at": "2026-11-15T21:53:08.180513Z"
+  },
+  {
+   "problem_id": "eval-new09-hvac-filter-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new09-hvac-filter-predictor.json",
+   "answer_sha256_16": "a104117366d7f02a",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 20
+   },
+   "a1_answer_chars": 2896,
+   "generated_at": "2026-11-15T21:53:34.424865Z"
+  },
+  {
+   "problem_id": "eval-new10-solar-inverter-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new10-solar-inverter-predictor.json",
+   "answer_sha256_16": "0bcc054d717a5c87",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 19
+   },
+   "a1_answer_chars": 2812,
+   "generated_at": "2026-11-15T21:54:01.783750Z"
+  },
+  {
+   "problem_id": "eval-new11-conveyor-belt-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new11-conveyor-belt-predictor.json",
+   "answer_sha256_16": "1ca9e02949ef48c4",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 26,
+    "CONSTRAINT_EXCLUSION": 4
+   },
+   "a1_answer_chars": 2933,
+   "generated_at": "2026-11-15T21:54:26.018164Z"
+  },
+  {
+   "problem_id": "eval-new12-axle-bearing-predictor",
+   "question_type": "predictor-design",
+   "stage": "V5_R26_FROZEN",
+   "contract": "SYS_A1F_V5/r24_a1w_v61_contract",
+   "pair_path": "eval/pairs/r26_v7_catalog/eval-new12-axle-bearing-predictor.json",
+   "answer_sha256_16": "a88b355fbbeaca14",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": 20
+   },
+   "a1_answer_chars": 2984,
+   "generated_at": "2026-11-15T21:54:53.872011Z"
+  }
+ ],
+ "baselines": {
+  "bench-p01-pemfc-dehydration": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "b0f06d598d11d1e0"
+  },
+  "bench-p02-leadacid-grid-corrosion": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "b2ddd6807c8a7edb"
+  },
+  "bench-p03-phe-biofouling": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "31f74ea134d2d3b8"
+  },
+  "bench-p04-pump-cavitation": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "f2ff797859ed6a11"
+  },
+  "bench-p05-bridge-bearing-aging": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "e3b9c1a90abc29ac"
+  },
+  "bench-p06-water-biofilm": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "fead31e8162affb7"
+  },
+  "bench-p07-cgm-biofouling": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "8c0003a6cb0a964f"
+  },
+  "bench-p08-mems-stiction": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "a63edb334296d6eb"
+  },
+  "bench-p09-packaging-barrier": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "858a7af6562dc8ad"
+  },
+  "bench-p10-pv-pid": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "fbc1c89da3cbb30f"
+  },
+  "bench-p11-spindle-thermal-drift": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "9ccca240f4f15d0e"
+  },
+  "bench-p12-mbr-fouling": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "3dbe6c4fcaea2b29"
+  },
+  "dev-fu-005-bridge-bearing": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "48b8b76a1f720739"
+  },
+  "eval-new01-supercap-dryout": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "368c80c5a26ab7aa"
+  },
+  "eval-new03-insulin-pump-occlusion": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "5e33956395f4388c"
+  },
+  "eval-new05-liion-balance-drift": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "8b27dae1c659dd23"
+  },
+  "eval-sofc-redox": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "7cda1bfe0f2ffc45"
+  },
+  "eval-sofc-thermal-cycling": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "c9ef9b2afa0638ec"
+  },
+  "dev-fu-001-bearing-spalling": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "a34cc50ed73e445d"
+  },
+  "dev-fu-003-motor-insulation": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "99e52e15131dcb76"
+  },
+  "dev-fu-004-fouling": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "0db5f393ec5d413e"
+  },
+  "eval-new02-slipring-predictor": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "e9186400d448e734"
+  },
+  "eval-new04-chiller-fouling-predictor": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "91beb0db7e7c98ec"
+  },
+  "eval-new06-bearing-vibration-predictor": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "4c717a13101dfd13"
+  },
+  "eval-new07-transformer-dga-predictor": {
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "baseline_sha256_16": "526e18ee4625a5ef"
+  },
+  "eval-new08-pipeline-leak-predictor": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "2a1d3478d81bdd59"
+  },
+  "eval-new09-hvac-filter-predictor": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "f7214a9db6288ce3"
+  },
+  "eval-new10-solar-inverter-predictor": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "161dbecb642c0d0f"
+  },
+  "eval-new11-conveyor-belt-predictor": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "d58fcb17a2aafc50"
+  },
+  "eval-new12-axle-bearing-predictor": {
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "baseline_sha256_16": "6317f13103ae9fd1"
+  }
+ },
+ "summary_intervention_rows": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "stage": "V7_R26_FROZEN",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "stage": "V71_R27_TUNED",
+   "novelty_delta": null,
+   "a1_feasibility": null,
+   "baseline_feasibility": null,
+   "feasibility_abs_gap": null,
+   "judged": false,
+   "judged_by": null,
+   "typed_pending": "PENDING-AUDITOR — the gate is auditor-judged (Art. 14/LXXXVI, AM26); the builder never scores its own generation (Art. 10: no self-certification)"
+  }
+ ],
+ "acceptance_verbatim": "feasibility |gap| <= 0.25 AND novelty delta >= 0.5 on >= 30 pairs, auditor-judged; the ablation beats the incumbent (CI excludes it) — incumbent r20 intervention fgap 1.5, nd 2.333",
+ "art20": "lever kind novelty-relocation (V7 family), round 1 of 2 — the V7.1 tuning is a contract TIGHTENING inside the SAME arm (every V7.1-compliant bill is V7-compliant); the registry entry carries the typed amendment",
+ "judge": {
+  "gate_owner": "AUDITOR (Art. 14/LXXXVI, AM26: the machine judge is an input, never the verdict; the judge-block is resolved by auditor-judging the committed bytes)",
+  "machine_judge_crosscheck": "TYPED BLOCKED — the vault holds no CROWLLM_API_KEY in this sandbox (re-checked at assembly; Art. 17: keys are operator-supplied); per AM26 D2 this is optional and not a gate dependency",
+  "judge_packet": "eval/r27_judge_packet.json (per-pair problem + a1 + baseline + the pre-registered rubric prompt)"
+ },
+ "independence": "auditor independent of builder/pipeline/generator judges the committed bytes; the builder's generation rode the zai gateway (generation transport — Art. 10 separates generation from VERIFICATION; judging on the generator's own route would be self-certification and is NOT done)"
+}

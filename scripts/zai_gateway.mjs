@@ -51,21 +51,107 @@
  *    (the caller gets a reset and its own retry owns a fresh connection),
  *    so no caller can hang forever on a silent connection.
  *
+ * R67s2 MULTI-KEY CUSTODY (owner delivery 2026-11-18, in-channel, mid
+ * run): the owner delivered a second Agnes key alongside the original
+ * (both live-probed 200 / served==requested / agnes-3.0-flash before
+ * admission — R36 discipline; digests d0c666a3842f + 5c4dffd28fe4,
+ * CORR-3 class, vault-only). The measured free-user 429 quota is PER
+ * KEY (the 12/30 window exhausted key 1 at 08:24:01Z), so the agnes
+ * branch now carries an ordered key list and altComplete rotates on
+ * 429 with NO sleep (a fresh bucket), sleeping 30 s only when every
+ * key is exhausted. Each alt call's log entry carries the serving
+ * key's sha256[:12] digest (never raw bytes, Art. 17) — the per-key
+ * served-call distribution is auditor-verifiable against the custody
+ * records. Pure transport plumbing: zero epistemic authority granted,
+ * the registered route (agnes-3.0-flash) and all engine gates are
+ * unchanged.
+ *
  * Usage:
  *   ZAI_GATEWAY_KEY=<secret> node scripts/zai_gateway.mjs [port]
  *   (default port 8787; binds 127.0.0.1 only)
  */
 import http from "node:http";
+import https from "node:https";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import os from "node:os";
+import { fileURLToPath } from "node:url";
 
 const PORT = Number(process.argv[2] || process.env.ZAI_GATEWAY_PORT || 8787);
 const KEY = process.env.ZAI_GATEWAY_KEY || "";
+// R64s4 upstream switch (typed, owner-directed): ZAI_GATEWAY_UPSTREAM
+// selects the completion upstream. Default "zai-cli" = the historical
+// z-ai CLI path, byte-identical behavior. "xkiro" = HTTP POST to the
+// qualified alternate provider (c-0078 end-to-end, R58 custody probe,
+// owner-supplied key via vault env pass-through in start_gateway).
+// Precedent R458-C1 applies unchanged: the upstream serves the
+// REGISTERED model id regardless of the request body's id — the
+// request id is recorded verbatim (requested_model) and the SERVED
+// identity (the response's model echo) remains the attestation
+// evidence (AM37 section 2).
+const UPSTREAM = (process.env.ZAI_GATEWAY_UPSTREAM || "zai-cli")
+  .trim().toLowerCase();
+// Typed reasoning headrooms (measured, disclosed):
+//  - xkiro command-a-plus: ~1000-token invisible reasoning (r64s4
+//    sized probe) — BUT the contract-fit probe (r64s4, real 19K-char
+//    expansion contract) FALSIFIED it under the machine's token
+//    contract: the full budget consumed, zero visible chars.
+//  - agnes flash tier: 512 (c-0078 measured); agnes-3.0-flash on the
+//    REAL contract: 31 s, 12,238 visible chars, correct output shape
+//    — the registered id (r64s4 contract-fit decision).
+const XKIRO_HEADROOM = 1024;
+const AGNES_HEADROOM = 512;
+// The alternate-upstream config table (typed; env-selected). The
+// transport contracts are the c-0078/R58 measured ones.
+const ALT_UPSTREAMS = {
+  xkiro: {
+    base: (process.env.XKIRO_BASE_URL ||
+           "https://api.xkiro.com/v1").replace(/\/+$/, ""),
+    model: process.env.XKIRO_MODEL_ID || "cohere/command-a-plus",
+    keyEnvs: ["XKIRO_API_KEY"],
+    // Cloudflare 1010 bans tool UAs — browser UA REQUIRED (R58).
+    ua: "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) "
+        + "Gecko/20100101 Firefox/132.0",
+    headroom: XKIRO_HEADROOM,
+  },
+  agnes: {
+    base: (process.env.AGNES_BASE_URL ||
+           "https://apihub.agnes-ai.com/v1").replace(/\/+$/, ""),
+    model: process.env.AGNES_MODEL_ID || "agnes-3.0-flash",
+    // R67s2 multi-key custody (owner delivery 2026-11-18, in-channel,
+    // both keys live-probed 200 / served==requested / agnes-3.0-flash
+    // before admission, R36 discipline): the free-user 429 quota is
+    // PER KEY (measured mid-run: the 12/30 window exhausted key
+    // d0c666a3842f at 08:24:01Z), so the agnes branch carries an
+    // ORDERED key list; altComplete rotates to the next key on 429
+    // (separate quota bucket — immediate, no sleep) and sleeps only
+    // when every key is exhausted. Every alt call log entry carries
+    // the serving key's digest sha256[:12] (the CORR-3 custody class
+    // — zero key bytes in any log or commit, Art. 17).
+    keyEnvs: ["AGNES_API_KEY", "AGNES_API_KEY_2"],
+    ua: "agnes-route-adapter/1.0",
+    headroom: AGNES_HEADROOM,
+  },
+};
+const ALT = ALT_UPSTREAMS[UPSTREAM] || null;
+if (UPSTREAM !== "zai-cli" && !ALT) {
+  console.error("[zai-gateway] unknown ZAI_GATEWAY_UPSTREAM="
+                + UPSTREAM + " (known: zai-cli, "
+                + Object.keys(ALT_UPSTREAMS).join(", ") + ")");
+  process.exit(2);
+}
+// R58 fix (F64-class, typed): the default log path was HARDCODED to a
+// foreign clone's absolute path (/home/z/my-project/discovery-evidence-
+// fabric/...) — a sandbox-path-bound artifact location (auditor Art. 1
+// v1.3.0: sandbox-bound evidence is UNVERIFIED even when committed).
+// Every attestation in THIS clone measured 0 completed calls because
+// the calls were logged into the OTHER clone's tree. Default: relative
+// to THIS script's repo (scripts/../ENGINE_RUNS/), overridable by env.
 const LOG = process.env.ZAI_GATEWAY_LOG ||
-  "/home/z/my-project/discovery-evidence-fabric/ENGINE_RUNS/zai_gateway_calls.jsonl";
+  path.join(path.dirname(fileURLToPath(import.meta.url)),
+            "..", "ENGINE_RUNS", "zai_gateway_calls.jsonl");
 
 if (!KEY) {
   console.error("[zai-gateway] refusing to start: ZAI_GATEWAY_KEY unset");
@@ -77,6 +163,123 @@ const sha = (s) => crypto.createHash("sha256").update(s, "utf8").digest("hex");
 
 function logCall(entry) {
   try { fs.appendFileSync(LOG, JSON.stringify(entry) + "\n"); } catch (_) {}
+}
+
+/** One completion through an alternate HTTP upstream (R64s4). Same
+ *  resolve shape as zaiComplete: {content, model, finish_reason,
+ *  usage, latency_ms, key_id}. Serves cfg.model regardless of the
+ *  requested id (R458-C1 precedent). R67s2 retry ladder: a 429 is
+ *  PER-KEY quota, so it rotates through cfg.keyEnvs IMMEDIATELY (no
+ *  sleep — a different quota bucket); when every key is exhausted
+ *  (or on a 5xx), one bounded 30 s retry restarting from key 0, then
+ *  a typed error to the caller's own retry ladder. key_id = the
+ *  serving key's sha256[:12] digest (custody class; never raw). */
+function altComplete(cfg, messages, requestedModel, callerMaxTokens,
+                     timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const keys = cfg.keyEnvs
+      .map((e) => ({ env: e, value: process.env[e] || "" }))
+      .filter((k) => k.value)
+      .map((k) => ({
+        env: k.env, value: k.value,
+        id: crypto.createHash("sha256").update(k.value, "utf8")
+          .digest("hex").slice(0, 12),
+      }));
+    if (!keys.length) {
+      return reject(new Error(
+        "[no-upstream-key] none of " + cfg.keyEnvs.join("/")
+        + " set (vault custody — start_gateway must pass the vault "
+        + "env through)"));
+    }
+    const mt = (Number(callerMaxTokens) > 0
+                ? Number(callerMaxTokens) : 512) + cfg.headroom;
+    const payload = JSON.stringify({
+      model: cfg.model,
+      messages,
+      max_tokens: mt,
+      temperature: 0.0,
+    });
+    const attempt = (keyIdx, triesLeft) => {
+      const k = keys[keyIdx];
+      const t0 = Date.now();
+      const u = new URL(cfg.base + "/chat/completions");
+      const req = https.request({
+        hostname: u.hostname, port: 443, path: u.pathname,
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + k.value,
+          "Content-Type": "application/json",
+          "User-Agent": cfg.ua,
+          "Content-Length": Buffer.byteLength(payload),
+        },
+      }, (res) => {
+        let data = "";
+        res.on("data", (c) => { data += c; });
+        res.on("end", () => {
+          const latencyMs = Date.now() - t0;
+          if (res.statusCode >= 400) {
+            const is429 = res.statusCode === 429;
+            const retryable = is429 || res.statusCode >= 500;
+            const rotate = is429 && keyIdx + 1 < keys.length;
+            logCall({
+              ts: new Date().toISOString(),
+              status: retryable && (rotate || triesLeft > 0)
+                ? "RATE_LIMITED_RETRY" : "UPSTREAM_ERROR",
+              upstream: UPSTREAM, http_status: res.statusCode,
+              requested_model: requestedModel,
+              model: cfg.model,
+              key_id: k.id,
+              rotated_to_key_id: rotate
+                ? keys[keyIdx + 1].id : undefined,
+              body_head: data.slice(0, 200),
+            });
+            if (rotate) {
+              // per-key quota: the next bucket is fresh — no sleep
+              return attempt(keyIdx + 1, triesLeft);
+            }
+            if (retryable && triesLeft > 0) {
+              return setTimeout(() => attempt(0, triesLeft - 1),
+                                30_000);
+            }
+            return reject(new Error(
+              UPSTREAM + " HTTP " + res.statusCode + ": "
+              + data.slice(0, 200)));
+          }
+          let parsed;
+          try { parsed = JSON.parse(data); } catch (e) {
+            return reject(new Error(
+              UPSTREAM + " parse: " + e.message));
+          }
+          const ch = (parsed.choices || [{}])[0] || {};
+          const content = String(
+            (ch.message || {}).content || "");
+          if (!content.trim()) {
+            return reject(new Error(
+              "empty content (finish_reason="
+              + (ch.finish_reason || "?") + ", completion_tokens="
+              + ((parsed.usage || {}).completion_tokens ?? "?")
+              + ")"));
+          }
+          resolve({
+            content,
+            model: parsed.model || cfg.model,
+            finish_reason: ch.finish_reason || "stop",
+            usage: parsed.usage || null,
+            latency_ms: latencyMs,
+            key_id: k.id,
+          });
+        });
+      });
+      req.setTimeout(timeoutMs, () => {
+        req.destroy(new Error(
+          UPSTREAM + " timeout after " + timeoutMs + " ms"));
+      });
+      req.on("error", (e) => reject(e));
+      req.write(payload);
+      req.end();
+    };
+    attempt(0, 1);
+  });
 }
 
 /** One completion through the z-ai CLI (bun script; robust resolution of
@@ -264,9 +467,14 @@ const server = http.createServer(async (req, res) => {
     const thinkingMode = requestedModel.endsWith("-thinking");
     const t0 = Date.now();
     try {
-      const out = await zaiComplete(messages, 400_000, thinkingMode);
+      const callerMt = Number(payload?.max_tokens || 0);
+      const out = ALT
+        ? await altComplete(ALT, messages, requestedModel, callerMt,
+                            400_000)
+        : await zaiComplete(messages, 400_000, thinkingMode);
       const entry = {
         ts: new Date().toISOString(),
+        upstream: UPSTREAM,
         model: out.model,
         requested_model: requestedModel,
         thinking_mode: thinkingMode,
@@ -275,6 +483,8 @@ const server = http.createServer(async (req, res) => {
         content_sha256: sha(out.content),
         latency_ms: out.latency_ms,
         usage: out.usage,
+        key_id: out.key_id,  // alt upstreams: custody digest of the
+        // serving key (R67s2); undefined (dropped) on the zai-cli path
         status: "OK",
       };
       logCall(entry);
@@ -314,6 +524,9 @@ server.headersTimeout = 55_000;   // headers only (must be < requestTimeout)
 
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`[zai-gateway] listening on 127.0.0.1:${PORT}`);
+  console.log(`[zai-gateway] upstream=${UPSTREAM}`
+    + (ALT ? ` (${ALT.base}, model=${ALT.model}, `
+           + `headroom=${ALT.headroom})` : ""));
   console.log(`[zai-gateway] call log: ${LOG}`);
   console.log(`[zai-gateway] R6 pacing: start=${PACING_START_S}s ` +
     `max=${PACING_MAX_S}s backoff=${PACING_429_BACKOFF_S}s (AIMD, ` +

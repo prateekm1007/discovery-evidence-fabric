@@ -1,0 +1,184 @@
+{
+ "record": "R105S2_P3_STAGE1_REALDATA_SMOKE/1.0.0",
+ "ran_at": "2026-11-19T21:11:26Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r105s2",
+ "claim": "c-0125 (work_id p3-realdata-conformal-validation, kind measurement; OPEN, lease 2026-11-22)",
+ "stack": "the r80 committed conformal-FA prototype (scripts/r80_conformal_fa.py importlib-verbatim, Ridge+enbpi random_state=17, ensemble=False, lags=8) on REAL channels; ZERO foundation models, zero LLM, zero generation",
+ "alpha": 0.1,
+ "provenance": {
+  "cmapss": {
+   "source": "https://phm-datasets.s3.amazonaws.com/NASA/6.+Turbofan+Engine+Degradation+Simulation+Data+Set.zip (the NASA PCoE repository canonical link, read from nasa.gov)",
+   "zip_sha256_16": "c9c5dec12a945a82e8bb4446",
+   "citation": "A. Saxena and K. Goebel (2008), NASA Prognostics Data Repository, NASA Ames Research Center (requested citation)"
+  },
+  "cwru": {
+   "source": "https://engineering.case.edu/bearingdatacenter (the 12kHz Drive-End subset: 16 files — normals 97-100, IR_007 105-108, B_007 118-121, OR_007@6h 130-133)",
+   "aggregate_sha256_16": "049ab035a66ac3c9",
+   "citation": "Case Western Reserve University Bearing Data Center (freely available per the site)"
+  },
+  "xjtu_sy": {
+   "citation": "B. Wang, Y. Lei, N. Li, N. Li, IEEE Trans. Reliability 69(1):401-412, 2020, DOI 10.1109/TR.2018.2882682 (requested)",
+   "status": "TYPED OPEN — data acquired (6 RAR parts, manifest eval/p3_realdata/xjtu_sy_parts_manifest.txt) + listing verified (7707 csv files, 9 bearing folders: 35Hz12kN x5, 40Hz10kN x4 — a PARTIAL set vs the official 15 bearings; the Drive folder fetch did not return the remaining parts), extraction BLOCKED (RAR5 volumes; unrar-free 0.3.1 cannot read them; 10.2GB raw vs the 9.9GB rootfs). Re-fetch + extract in a window with disk/RAR5 headroom."
+  }
+ },
+ "results": {
+  "cmapss": {
+   "FD001": {
+    "channel_1indexed": 14,
+    "n_units_evaluated": 100,
+    "n_units_skipped_short": 0,
+    "coverage_min": 0.2051,
+    "coverage_median": 0.5036,
+    "coverage_max": 0.9901,
+    "gate_coverage_ge_090": false,
+    "healthy_fa_median_per_1000": 50.0
+   },
+   "FD002": {
+    "channel_1indexed": 1,
+    "n_units_evaluated": 260,
+    "n_units_skipped_short": 0,
+    "coverage_min": 0.7391,
+    "coverage_median": 0.94,
+    "coverage_max": 1.0,
+    "gate_coverage_ge_090": true,
+    "healthy_fa_median_per_1000": 0.0
+   },
+   "FD003": {
+    "channel_1indexed": 9,
+    "n_units_evaluated": 100,
+    "n_units_skipped_short": 0,
+    "coverage_min": 0.1806,
+    "coverage_median": 0.4932,
+    "coverage_max": 0.9318,
+    "gate_coverage_ge_090": false,
+    "healthy_fa_median_per_1000": 50.0
+   },
+   "FD004": {
+    "channel_1indexed": 1,
+    "n_units_evaluated": 249,
+    "n_units_skipped_short": 0,
+    "coverage_min": 0.7451,
+    "coverage_median": 0.9355,
+    "coverage_max": 1.0,
+    "gate_coverage_ge_090": true,
+    "healthy_fa_median_per_1000": 0.0
+   }
+  },
+  "cwru": {
+   "pairs": [
+    {
+     "hp": 0,
+     "normal_file": 97,
+     "healthy_fa_per_1000": -0.0,
+     "IR_007": [
+      {
+       "file": 105,
+       "alarm_rate": 1.0
+      }
+     ],
+     "B_007": [
+      {
+       "file": 118,
+       "alarm_rate": 1.0
+      }
+     ],
+     "OR_007_6h": [
+      {
+       "file": 130,
+       "alarm_rate": 1.0
+      }
+     ]
+    },
+    {
+     "hp": 1,
+     "normal_file": 98,
+     "healthy_fa_per_1000": -0.0,
+     "IR_007": [
+      {
+       "file": 106,
+       "alarm_rate": 1.0
+      }
+     ],
+     "B_007": [
+      {
+       "file": 119,
+       "alarm_rate": 1.0
+      }
+     ],
+     "OR_007_6h": [
+      {
+       "file": 131,
+       "alarm_rate": 1.0
+      }
+     ]
+    },
+    {
+     "hp": 2,
+     "normal_file": 99,
+     "healthy_fa_per_1000": -0.0,
+     "IR_007": [
+      {
+       "file": 107,
+       "alarm_rate": 1.0
+      }
+     ],
+     "B_007": [
+      {
+       "file": 120,
+       "alarm_rate": 1.0
+      }
+     ],
+     "OR_007_6h": [
+      {
+       "file": 132,
+       "alarm_rate": 1.0
+      }
+     ]
+    },
+    {
+     "hp": 3,
+     "normal_file": 100,
+     "healthy_fa_per_1000": -0.0,
+     "IR_007": [
+      {
+       "file": 108,
+       "alarm_rate": 1.0
+      }
+     ],
+     "B_007": [
+      {
+       "file": 121,
+       "alarm_rate": 1.0
+      }
+     ],
+     "OR_007_6h": [
+      {
+       "file": 133,
+       "alarm_rate": 1.0
+      }
+     ]
+    }
+   ],
+   "seg_seconds": 0.1,
+   "machine_year_segments": 315360000
+  }
+ },
+ "gates_table": {
+  "note": "MEASUREMENTS for the auditor's gate verdicts — the builder claims NO acceptance; the median-inference and matched-budget gates BIND to the FM stack (stage 2/3)",
+  "coverage_ge_1_minus_alpha": {
+   "cmapss": {
+    "FD001": false,
+    "FD002": true,
+    "FD003": false,
+    "FD004": true
+   },
+   "cwru": "the coverage leg on the normal-baseline tail is reported per-pair (healthy_fa_per_1000)"
+  },
+  "fa_le_1_per_machine_year": {
+   "unit_typed": "CWRU cadence 0.1s/segment -> 315360000 segments per machine-year; C-MAPSS cadence is 1 cycle/cycle-row — the per-machine-year conversion for cycles needs a duty assumption TYPED STAGE 3 (not guessed here)"
+  },
+  "median_inference_le_2min": "STAGE 2 (the FM stack)",
+  "matched_budget_dev_ablation": "STAGE 3"
+ },
+ "no_acceptance_or_score_claims": true
+}

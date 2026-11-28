@@ -1,0 +1,137 @@
+{
+ "problem_id": "v17-09-cloud-seeding",
+ "domain": "nucleation_phase_change",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:5eb6590103b0": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:97b7e881f355": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:1e537e21cad1": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "nucleation_phase_change",
+   "confidence": 1.0,
+   "evidence_span": "nucleation, supercool",
+   "allowed_mech_classes": [
+    "controlled_nucleation_sites",
+    "acoustic_ultrasonic_nucleation",
+    "dissolved_gas_management",
+    "superheat_pressure_path_control",
+    "nucleation_inhibitor_dosing"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "controlled_nucleation_sites",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:37:30Z",
+ "attempts_n": 1,
+ "row_wall_s": 18.7,
+ "a1_answer": "NOVELTY STATEMENT\n1. Closest conventional practice for this failure class: Adds heat flux or adjusts aircraft altitude to force cloud temperature below the thermodynamic freezing point, relying on stochastic Heterogeneous or Homogeneous nucleation to eventually initiate ice.\n2. Same-class mechanism departure: Replaces stochastic thermal forcing with **controlled_nucleation_sites** via active **acoustic_ultrasonic_nucleation** (sonocrystallization) applied directly to the droplet volume, pinning the phase-change initiation to a deterministic acoustic pressure threshold rather than a random supercooling fluctuation.\n3. Failure-physics connection: Ice nucleation is a stochastic event governed by the Gibbs free energy barrier; supercooling below -5°C without an inertial trigger causes \"inefficient\" droplet survival. High-intensity focused ultrasound (HIFU) generates cavitation micro-bubbles that act as transient heterogeneous sites, drastically reducing the free-energy barrier for ice nucleation ($\\Delta G^*$) and triggering crystallization on-demand at a specific acoustic pressure amplitude, independent of the bulk droplet temperature's stochastic drift.\n\nPHYSICS CHECK\nThe governing physical relation for ultrasonic freezing initiation is the cavitation-based heterogeneous nucleation threshold, where the effective nucleation rate $J$ increases when the acoustic pressure amplitude $P_{ac}$ exceeds the critical cavitation threshold $P_{crit}$.\n**Magnitude Verification:**\nHeterogeneous nucleation rate on a bubble surface scales as $J \\propto \\exp\\left(-\\frac{\\Delta G^*_{het}}{k_B T}\\right)$, where $\\Delta G^*_{het} = \\Delta G^*_{hom} \\cdot f(\\theta)$.\nFor water at marginal supercooling ($\\Delta T \\approx 2-3 \\, ^\\circ\\text{C}$), the homogeneous nucleation rate is negligible ($J \\approx 0$).\nThe critical cavitation threshold for ice nucleation in supercooled water is typically **5–10 MPa** (peak negative pressure).\nStandard commercial cloud seeding uses passive silver iodide; the acoustic intervention requires a local pressure peak $P_{ac} \\ge 5 \\, \\text{MPa}$ to sustain cavitation bubbles large enough ($R > 1 \\, \\mu\\text{m}$) to stabilize the ice embryo.\n*Calculation:* If $P_{ac} = 2 \\, \\text{MPa}$ (typical diagnostic ultrasound), cavitation is sub-critical, and the mechanism **fails** to reduce the barrier. The design must specify a therapeutic/industrial transducer operating at $P_{ac} \\ge 5 \\, \\text{MPa}$ to guarantee the physical coupling.\n\nIMPLEMENTATION BILL\n*   **Primary Intervention:** High-Intensity Focused Ultrasound (HIFU) transducer array integrated into the seeding payload (replacing passive dispersal nozzles).\n    *   *Input Stream:* **ALREADY-RECORDED**: Acoustic pressure amplitude $P_{ac}$ (measured by a calibrated hydrophone at the focal point).\n    *   *Reference/Threshold:* **DERIVED**: Critical cavitation pressure $P_{crit} \\approx 5 \\, \\text{MPa}$ for water at $-5 \\, ^\\circ\\text{C}$ (derived from standard sonocrystallization literature for water; labeled CALCULATED from physics of cavitation stability).\n*   **Secondary Component:** Ice particle counter (in-line or post-collect) to verify crystal formation.\n    *   *Input Stream:* **ALREADY-RECORDED**: Optical particle counter data stream (standard in cloud physics research kits).\n    *   *Reference:* **DERIVED**: Zero ice particles at $P_{ac} < P_{crit}$; finite flux $> 0$ at $P_{ac} \\ge P_{crit}$.\n*   **Procedure:**\n    1.  Cool a controlled volume of pure water to $-3 \\, ^\\circ\\text{C}$ (marginal supercooling) in a bench rig.\n    2.  Apply HIFU pulse with $P_{ac} = 6 \\, \\text{MPa}$.\n    3.  Monitor for phase-change initiation (cloudiness/particle count).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Standard Practice Burden:** Passive dispersal of silver iodide or liquid water; relies on ambient thermal fluctuations. No active power source required for the seeding agent itself (only aircraft flight power).\n*   **Proposed Burden:** Adds a high-power ultrasound generator and transducer array.\n*   **Parity Analysis:** The burden is HEAVIER in power consumption and component mass (transducer + generator). However, it is LIGHTER in operational uncertainty because it does not depend on the stochastic arrival of a \"lucky\" droplet reaching critical supercooling.\n*   **Worthiness:** The increase in hardware burden is justified by the elimination of the \"inefficient at marginal supercooling\" failure mode; the system works at $-3 \\, ^\\circ\\text{C}$ where passive seeding fails, removing the need to fly to colder altitudes (reducing fuel/flight time burden).\n\nEXECUTABLE TEST\n*   **Protocol:** Bench-scale sonocrystallization rig. A 1L chamber of distilled water is cooled to $-3.0 \\, ^\\circ\\text{C}$ (stable supercooling, no ice). An HIFU transducer (200 kHz) is focused at the center. An optical probe monitors for the appearance of ice crystals.\n*   **Instruments:** Calibrated HIFU generator (0–10 MPa capability), Hydrophone, Optical Particle Counter.\n*   **Pass/Fail Threshold:** \n    *   *Control:* No ice formation within 60 seconds at $P_{ac} = 0 \\, \\text{MPa}$.\n    *   *Treatment:* Ice formation initiated within **5 seconds** of applying $P_{ac} = 6 \\, \\text{MPa}$.\n*   **Duration:** 10-second pulse duration.\n*   **Kill Criterion:** \"The mechanism is **falsified** if the time-to-ice-nucleation $t_{nucl}$ does not decrease from $> 60 \\, \\text{s}$ to $< 5 \\, \\text{s}$ within a 10-second acoustic pulse window at $P_{ac} = 6 \\, \\text{MPa}$.\"\n\nCONSTRAINT BIND\n*   **Primary Stated Indicator:** The problem states \"inefficient... at marginal supercooling.\" The primary indicator of success is **Ice Nucleation Rate (or Time-to-Nucleation)**.\n*   **Secondary Indicator:** Acoustic Pressure Amplitude $P_{ac}$ is the control input, not the indicator of the physical outcome. The optical particle count is the direct measurement of the phase change.\n*   **Compliance:** The test directly measures the reduction in time-to-nucleation (the efficiency metric) at a fixed marginal supercooling temperature, satisfying the constraint to mitigate the specific failure mode.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Primary Intervention:** High-Intensity Focused Ultrasound (HIFU) transducer array in",
+    "*   *Input Stream:* **ALREADY-RECORDED**: Acoustic pressure amplitude $P_{ac}$ (measured b",
+    "*   *Reference/Threshold:* **DERIVED**: Critical cavitation pressure $P_{crit} \\approx 5 \\",
+    "*   **Secondary Component:** Ice particle counter (in-line or post-collect) to verify crys",
+    "*   *Input Stream:* **ALREADY-RECORDED**: Optical particle counter data stream (standard i",
+    "*   *Reference:* **DERIVED**: Zero ice particles at $P_{ac} < P_{crit}$; finite flux $> 0$",
+    "*   **Procedure:**",
+    "1.  Cool a controlled volume of pure water to $-3 \\, ^\\circ\\text{C}$ (marginal supercoolin",
+    "2.  Apply HIFU pulse with $P_{ac} = 6 \\, \\text{MPa}$.",
+    "3.  Monitor for phase-change initiation (cloudiness/particle count).",
+    "*   **Standard Practice Burden:** Passive dispersal of silver iodide or liquid water; reli",
+    "*   **Proposed Burden:** Adds a high-power ultrasound generator and transducer array.",
+    "*   **Parity Analysis:** The burden is HEAVIER in power consumption and component mass (tr",
+    "*   **Worthiness:** The increase in hardware burden is justified by the elimination of the"
+   ],
+   "APPARATUS_ROW": [
+    "3.  Monitor for phase-change initiation (cloudiness/particle count)."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 1,
+   "mapped_mechanism": "controlled_nucleation_sites",
+   "cross_domain": "pharmaceutical processing"
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "fatigue life factor (Basquin, b=3 anchor)",
+    "predicted_value": "N ratio = 1.95 dimensionless for a 20% amplitude cut at 10 MPa",
+    "calc_trace": "(0.8)^-3 = 1.95 dimensionless (Basquin N~S^-3)",
+    "falsifier": "the runout life must exceed 2.0 dimensionlessx baseline in the stepped S-N coupon test; the opposite result falsifies the invention"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "eb171a63c8836e07"
+}

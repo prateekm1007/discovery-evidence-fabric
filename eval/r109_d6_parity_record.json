@@ -1,0 +1,40 @@
+{
+ "record": "R109_D6_PYMUPDF_PARITY/1.0.0",
+ "at": "2026-11-20T07:42:26Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s1",
+ "claim": "c-0133 (r109-lane-d6-pymupdf; the R108 direction 6)",
+ "swap": {
+  "removed": "PyMuPDF (fitz) — AGPL-3.0-or-commercial, excluded by rule",
+  "successors": [
+   "pypdf 6.6.0 BSD-3: view.py::_pdf_pages_text primary (page-list 1:1)",
+   "pdfplumber 0.11.9 MIT: gate_P block rects (_pqg_line_blocks, MuPDF-blocks clustering semantics; calibrated thresholds unchanged: inter-area >200pt^2 AND >30% of smaller block)",
+   "poppler pdftoppm -gray -r 36 subprocess: the ink-coverage leg (FileNotFoundError -> typed P-NO-RENDER warn, Art. 15)"
+  ],
+  "typed_warns": "P-NO-FITZ -> P-NO-GEOMETRY (pdfplumber) + P-NO-RENDER (pdftoppm)"
+ },
+ "acceptance": {
+  "zero_fitz_imports": {
+   "count": 0,
+   "hits": []
+  },
+  "notice_row_retired": true,
+  "retirement_ledger": "eval/retirement_ledger.json R109-D6-PYMUPDF-AGPL-RETIREMENT",
+  "import_coverage_test": {
+   "cmd": "python3 -m pytest tests/test_notice_import_coverage.py tests/test_r440_package_quality_gate.py -q",
+   "exit": 0,
+   "tail": [
+    "...........                                                              [100%]"
+   ]
+  },
+  "domain_applicability_test": {
+   "cmd": "python3 -m pytest tests/test_r443_domain_applicability.py -q",
+   "exit": 0,
+   "tail": [
+    "",
+    "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html"
+   ]
+  }
+ },
+ "fixture_class_note": "the golden regression (benchmarks/r440/golden_packages P-04.zip + P-07.zip, frozen structural references) + the blind-corpus verdicts are the committed real-bytes acceptance; no hand-built fixture gates the swap (Art. 22)",
+ "typed_conclusion": "the R108 direction-6 acceptance is MET: the NOTICE fitz row retired with Art. 16 accounting; test_notice_import_coverage green with zero fitz imports tree-wide; the gate parity holds on the committed golden + blind-corpus bytes"
+}

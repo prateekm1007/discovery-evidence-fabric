@@ -1,0 +1,16 @@
+### Mitigation Proposal
+
+**1. Mechanism**
+Implement a **Closed-Loop Combustion Optimization Strategy** that actively trims the excess air coefficient ($\lambda$) to the minimum viable level. The mechanism relies on the inverse relationship between excess air and heat loss: by reducing the mass flow of uncombusted air exiting the stack, the sensible heat loss carried out by the flue gases is minimized, thereby improving the heat transfer in the economizer, lowering stack temperature, and reducing specific fuel consumption.
+
+**2. Implementation**
+*   **Step 1: Establish Baseline & Limits:** Use the existing O2 trim analyzer to measure current flue gas oxygen content. Determine the current excess air percentage. Establish a safe minimum O2 target (e.g., 2.0–3.0% O2, depending on fuel type and CO/CO2 readings if available, otherwise conservatively 3.0%) to avoid CO poisoning and unstable combustion.
+*   **Step 2: Controller Logic:** Configure the boiler management system to use the O2 analyzer signal as the primary process variable for air-fuel ratio control. Implement a feedback loop where the fuel flow meter (mass flow) is the forward feed signal, and the O2 trim adjusts the combustion air damper or variable frequency drive (VFD) on the induced draft (ID) fan.
+*   **Step 3: Dynamic Trim:** As the stack temperature rises and economizer approach degrades, the controller will detect an increase in O2 (indicating too much excess air). It will automatically reduce the air flow to bring O2 back to the setpoint. Conversely, if O2 drops too low, it will increase air flow. The fuel flow meter ensures the air-fuel ratio remains stoichiometrically consistent at the new lower air rate.
+*   **Step 4: Monitoring:** Continuously monitor the feedwater thermocouple (to confirm increased economizer duty) and stack thermocouple (to confirm reduced heat loss) to validate that the efficiency improvement is realized.
+
+**3. Measures It Relies On**
+*   **O2 Trim Analyzer:** Provides the real-time feedback necessary to close the loop on excess air. This is the critical sensor for determining the optimal air-fuel ratio.
+*   **Fuel Flow Meter:** Provides the accurate mass flow rate of fuel, allowing the control system to scale air demand proportionally (forward feed) before the O2 feedback makes fine adjustments.
+*   **Stack Thermocouple & Feedwater Thermocouple:** Used as validation instruments to confirm that the mitigation is working by showing a decrease in stack temperature (reduced sensible heat loss) and an increase in feedwater outlet temperature (improved economizer heat transfer), which together prove the reduction in fuel per tonne of steam.
+*   **No New Instrumentation:** The solution uses only the specified existing sensors and actuators (air damper/fan, which are assumed to be part of the existing combustion control system).

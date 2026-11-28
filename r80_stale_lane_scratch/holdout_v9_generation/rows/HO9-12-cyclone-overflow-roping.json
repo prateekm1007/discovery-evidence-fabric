@@ -1,0 +1,95 @@
+{
+ "problem_id": "HO9-12-cyclone-overflow-roping",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    35,
+    20,
+    15
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:cf1aa2911ec7": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:9124336478c3": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:34:33.800160Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is the **differential retuning of the Inlet-Pressure Setpoint** specifically for the cluster units that are exhibiting underflow roping, decoupled from the global cluster pressure average. Standard practice operates a desliming cluster with a single global inlet-pressure setpoint (or narrow band) to maximize overall cluster throughput, ignoring the individual particle-size distribution (PSD) variations in the feed that cause specific vortices to \"rope\" (forming a continuous fiber-like stream instead of a dispersed slurry) due to low local shear rates. The novel departure is applying a **local pressure modulation protocol**: using the *stated* pressure and flow signals, the system actively identifies the specific cyclones within the cluster where the pressure/flow ratio falls below the calculated \"rope-avoidance threshold\" and transiently *increases* their inlet pressure setpoint relative to their immediate neighbors. This is a \"configuration\" measure that uses the *existing* control loop infrastructure (PLC/DCS) to perform a targeted local duty cycle rather than a global parameter shift. The adjacent-technique clearance is against \"global pressure optimization,\" which treats the cluster as a black box; this mechanism treats the cluster as an array of independent hydrodynamic units, using local pressure elevation to increase local Reynolds numbers and shear rates, thereby breaking the viscous filament (rope) before it reaches the underflow spigot.\n\nPHYSICS CHECK\n**Governing Relation:** Underflow roping in high-density slurry cyclones is driven by insufficient local shear rate at the apex. Roping occurs when the viscosity of the slurry phase creates a stable filament. The shear rate $\\dot{\\gamma}$ in the vortex core scales with the tangential velocity $v_\\theta$, which is driven by the inlet dynamic pressure $\\Delta P$.\n$$ \\dot{\\gamma} \\propto \\frac{v_\\theta}{r} \\propto \\sqrt{\\frac{\\Delta P}{\\rho}} \\cdot \\frac{1}{r} $$\nRoping probability $P_{rope}$ decreases as $\\dot{\\gamma}$ exceeds a critical shear threshold $\\dot{\\gamma}_{crit}$ required to disperse the fiber-like stream.\n**Direction-of-Effect:** Driving variable = Local Inlet Pressure ($\\Delta P_{local}$) relative to the global average. The mechanism moves it **UP** (transient local increase) for specific units. This **increases** local shear rate $\\dot{\\gamma}$, thereby **reducing** the underflow roping frequency.\n**Magnitude Verification:** To disrupt a 250 mm cyclone underflow rope, the shear rate must increase by approximately 20-30% to exceed the yield stress of the diluted slurry filament. Since $v \\propto \\sqrt{\\Delta P}$, a 20% increase in shear requires a $\\sim 44\\%$ increase in $\\Delta P$. The mechanism allows transient pulses of +20% to +50% on $\\Delta P_{local}$, which is within the standard operating range of the inlet control valves (typically 60-100% opening). This pulse frequency (every 30-60 seconds) is fast enough to prevent steady-state rope formation without altering the long-term mass balance.\n\nIMPLEMENTATION BILL\n*   **Row 1: Control Logic Update (PLC/DCS Routine)**\n    *   **Description:** Update the existing supervisory control program to implement a \"Local Pressure Boost\" algorithm. This logic monitors the individual inlet pressure transducers and flow meters *already installed* for each of the 250 mm cyclones in the cluster. If $P_{i} < P_{global} - \\text{Margin}$, it commands the inlet control valve for unit $i$ to open 10-15% (increasing $\\Delta P$) for a 5-minute duty cycle, then revert.\n    *   **Tag:** (c) – Parameter/Procedure change to existing equipment.\n    *   **Note:** No new sensors. No new valves. Uses the *stated* existing instrumentation (pressure/flow per unit) and existing actuators (control valves).\n*   **Row 2: Operating Procedure Change (Shift Log/Override Protocol)**\n    *   **Description:** Establish a standard operating procedure (SOP) for operators to acknowledge \"Local Boost\" events. The system logs the pressure deviation and the corrective action. This is a procedural change to how the cluster is monitored and adjusted, replacing static setpoint maintenance with dynamic local retuning.\n    *   **Tag:** (c) – Procedural change.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Standard Practice Bill:** 1. Maintain global pressure setpoint. 2. Manual adjustment if underflow issue reported. 3. Periodic valve maintenance.\n*   **Intervention Bill:** 1. Software update to existing PLC (negligible cost). 2. SOP creation (paperwork/training). 3. Same valve maintenance.\n*   **Comparison:** The intervention adds *zero* hardware burden. It shifts the burden from *reactive manual labor* (troubleshooting ropes) to *automated logic* (preventing ropes). The operational loss is **zero** because the pressure boost is transient and localized; the global average pressure remains constant, and the total throughput is unchanged. The \"cost\" is a slight increase in actuator cycling for specific valves, which is within the rated life of standard control valves.\n*   **Conclusion:** Burden is **LOWER** than standard practice (which suffers from downtime/efficiency loss due to roping). No new hardware, no new instrumentation, no new materials.\n\nEXECUTABLE TEST\n**Protocol:**\n1.  Baseline: Run cluster at standard global pressure setpoint for 24 hours. Log underflow roping events (visual confirmation or underflow density spike) for each cyclone.\n2.  Intervention: Activate the \"Local Pressure Boost\" logic. Setpoint: If individual unit pressure drops >5% below the cluster median for >60 seconds, command a +15% pressure pulse for 5 minutes.\n3.  Duration: 7 days continuous operation.\n4.  Instrumentation: Use *existing* inlet pressure transducers and underflow density meters (if available) or visual spigot observation.\n5.  Pass/Fail Threshold: **PASS** if the average underflow roping frequency per cluster unit drops by >50% compared to baseline, AND the global cluster overflow density remains within $\\pm 1\\%$ of baseline. **FAIL** if roping persists OR global overflow density degrades (indicating excessive pressure boost causing poor cut-point).\n6.  Kill Criterion: If valve cycling exceeds manufacturer's rated actuation frequency (e.g., >1 cycle/min), disable the boost and revert to standard manual control, as this indicates the pressure dynamics are too unstable for the proposed logic.\n\nCONSTRAINT COMPLIANCE\n*   **Allowed Measures:** \"Inlet-pressure setpoint retuning\" is explicitly allowed. This mechanism uses dynamic retuning of the *local* inlet pressure setpoint via the existing control loop.\n*   **Exclusions:** \"No cyclone or apex redesign\" is respected. No physical changes to the cyclone body or spigot.\n*   **Permitted Set:** The answer draws only from parameter/procedure changes (retuning the pressure control loop). No physical parts are added.\n*   **Input Availability:** The logic requires $P_{i}$ (inlet pressure) and $F_{i}$ (inlet flow). The problem states \"signals_used: ['flow_rate', 'pressure']\" and standard cyclone clusters are instrumented with these. No new sensors are required.\n*   **Certified System:** No new hardware is added to the process stream. The intervention is purely computational/procedural within the existing DCS/PLC boundary.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Row 1: Control Logic Update (PLC/DCS Routine)**",
+    "*   **Description:** Update the existing supervisory control program to implement a \"Local",
+    "*   **Note:** No new sensors. No new valves. Uses the *stated* existing instrumentation (p",
+    "*   **Row 2: Operating Procedure Change (Shift Log/Override Protocol)**",
+    "*   **Description:** Establish a standard operating procedure (SOP) for operators to ackno",
+    "*   **Standard Practice Bill:** 1. Maintain global pressure setpoint. 2. Manual adjustment",
+    "*   **Intervention Bill:** 1. Software update to existing PLC (negligible cost). 2. SOP cr",
+    "*   **Comparison:** The intervention adds *zero* hardware burden. It shifts the burden fro",
+    "*   **Conclusion:** Burden is **LOWER** than standard practice (which suffers from downtim"
+   ],
+   "APPARATUS_ROW": [
+    "*   **Description:** Establish a standard operating procedure (SOP) for operators to acknowledge \"Local Boost\""
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "ebcfe4266aa17a9d",
+ "smoke": false
+}

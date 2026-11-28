@@ -1,0 +1,22 @@
+**Mitigation Proposal: Introduction of Permanent Anti-Adhesion Conformal Coating**
+
+**1. Mechanism**
+The proposed engineering change is to apply a thin, permanent, low-surface-energy conformal coating to the surfaces of the interdigitated comb fingers and the opposing electrode structure. This creates a physical interlayer that fundamentally alters the interfacial forces. The mechanism relies on reducing the van der Waals interaction area and introducing surface repulsion. By preventing direct metal-to-metal (or metal-to-silicon) contact, the capillary force (which is often the dominant force in stiction due to ambient humidity and condensation during shock) is eliminated or drastically reduced. Furthermore, the coating reduces the work of adhesion, meaning that even if the gap closes, the normal force required to separate the structures during the shock rebound phase is significantly lower than the static electrostatic or mechanical forces causing the latch. This ensures that when the 10,000g shock subsides, the proof mass can return to its zero-g bias position without getting stuck.
+
+**2. Implementation**
+*   **Material Selection:** Use an Atomic Layer Deposition (ALD) process to deposit a uniform layer of Aluminum Oxide (Al₂O₃) or a fluorinated polymer (e.g., Parylene-C modified with fluorochemistry) on the comb fingers. Al₂O₃ is preferred for MEMS due to its hermeticity, resistance to diffusion, and mechanical stability under shock. The thickness should be optimized between 5–15 nm.
+*   **Process Integration:** The coating must be applied *after* the comb structure is formed but *before* packaging. The deposition must be conformal to ensure the coating is present on the sidewalls and top/bottom surfaces of the fingers. Critical to this implementation is ensuring the coating does not clog the gap between the fingers. The gap size must be larger than twice the coating thickness plus a safety margin to maintain the intended capacitance and force balance.
+*   **Structural Adjustment:** To compensate for the reduced surface area effect on capacitance (if using dielectric-coated electrodes), the gap might need slight widening, or the finger length might need to be increased to maintain the required sensitivity. However, the primary goal is to prevent the *gap* from closing permanently.
+
+**3. Measures It Relies On**
+*   **Reduction of Adhesion Force:** The coating lowers the interfacial energy, reducing the capillary and van der Waals forces by orders of magnitude compared to bare silicon/metal.
+*   **Prevention of Capillary Bridges:** The hydrophobic (or low-energy) nature of the coating prevents water menisci from forming in the narrow gaps during shock-induced compression, which is a primary cause of stiction.
+*   **Reversibility:** The force required to pull the coated surfaces apart during the shock recovery phase becomes significantly smaller than the restoring force of the mechanical suspension (springs) and the electrostatic bias (if any), ensuring the proof mass returns to zero-g.
+*   **Durability:** The coating must withstand the 10,000g shock without delamination. ALD-grown Al₂O₃ is highly robust and resistant to mechanical fatigue, unlike some organic coatings which might fracture under extreme stress.
+
+**4. Falsifying Test**
+To falsify this approach, conduct a **Shock-Induced Stiction Test** under the following conditions:
+1.  **Sample:** Fabricate a batch of MEMS capacitive accelerometers with the proposed anti-adhesion coating and a control batch without coating.
+2.  **Shock Application:** Subject both batches to 10,000 g half-sine shock pulses in +X, -X, +Y, -Y, +Z, and -Z axes at a rate that allows for cooling between shocks. Perform at least 100 shocks per axis per device to simulate reliability.
+3.  **Measurement:** After each shock, apply a known, sub-threshold AC signal to the capacitance bridge and measure the zero-g offset (static bias). Also, measure the pull-in voltage (Vpi) to detect any change in the effective gap due to stiction.
+4.  **Falsification Criteria:** If the coated devices exhibit a permanent zero-g offset exceeding 50 mg after the shock sequence, or if the pull-in voltage shifts by more than 10% indicating a permanent reduction in the operational gap due to stiction, the mitigation is falsified. If the uncoated control devices show stiction (offset > 50 mg or gap closure) while the coated devices do not, it validates the approach. If *both* show stiction, the approach is insufficient under these constraints.

@@ -1,0 +1,82 @@
+{
+ "problem_id": "v17-02-choke-erosion",
+ "domain": "oil-gas-wellhead",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P40",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P40",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:5b0db8fc1f8d": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:c0232b8258a9": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "abrasion_erosion",
+   "winner_measure_class": "geometry",
+   "winner_principle_id": "P40",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "abrasion_erosion",
+     "admitted": true,
+     "rank": 1,
+     "basis": "geometry is admitted class #2 for the abrasion_erosion failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:08:19Z",
+ "attempts_n": 1,
+ "row_wall_s": 6.8,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MATERIAL UPGRADE (trim made from hard-faced alloys or ceramic) to resist abrasion.\nMechanism departure: GEOMETRY REDIRECTION; the trim is replaced by a self-sweeping, angled vane cluster that diverts the high-velocity sand-laden jet away from the sealing surface into the main flow stream, eliminating localized stagnation and impact stress.\nFailure physics connection: Erosion is governed by the kinetic energy flux ($\\frac{1}{2}\\rho v^2$) impinging on solid surfaces; by altering the local flow geometry to eliminate the high-velocity impingement zone on the sealing face and redirecting particles into the bulk flow where their impact energy is dissipated across the entire cross-section rather than concentrated on a small trim area, the erosive stress is reduced below the material yield threshold.\n\nPHYSICS CHECK\nGoverning relation: Erosive flux $E \\propto m_{sand} v^n$ (where $n \\approx 2$ for high-velocity impacts).\nMagnitude verification: Standard chokes often have a trim diameter $D_t$ of 50 mm with flow velocity $v_t > 30$ m/s. The impingement stress is localized. By replacing the trim with a vane assembly of effective diameter $D_{vane} \\approx 150$ mm, the velocity in the critical region drops to $v_{vane} = v_t (D_t/D_{vane})^2 \\approx 30 (50/150)^2 = 3.33$ m/s. The kinetic energy per particle drops by a factor of $(30/3.33)^2 \\approx 81$. Even with slightly higher mass flux density due to cross-sectional area changes, the $v^n$ term dominates, reducing erosive stress by more than two orders of magnitude, well below the erosion initiation threshold for standard 17-4PH or 316SS body materials.\n\nIMPLEMENTATION BILL\nComponent: Angular Vane Cluster Assembly (replaces trim).\nGeometry: Three-to-five 316SS or 17-4PH vanes machined at a 15-20 degree angle to the flow axis, forming a spiral channel that guides fluid without sharp turns or dead zones.\nInput Stream: ALREADY-RECORDED Pressure Drop ($\\Delta P$) across the choke.\nReference/Threshold: DERIVED from stated specs. The choke's nominal flow capacity $Q_{nom}$ and required pressure reduction $\\Delta P_{req}$ are stated in the well design. The vane geometry is sized such that at $\\Delta P_{req}$, the velocity through the vane channel remains below 5 m/s (ASSUMPTION: standard erosion limit for non-hardened steel in multiphase flow).\nProcedure: Fabricate vane cluster to fit existing choke body bore. No new instrumentation.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Same class. The vane cluster fits inside the existing choke body; no changes to upstream/downstream connections required.\nOperability: Same class. Operated by the same actuator or manual lever as the original trim.\nMaintenance: Lower burden. Erosion is mitigated, extending life. When maintenance is required, the vane cluster is removable as a unit, similar to the trim.\nCost: Same class. Machining of 3-5 stainless steel vanes is comparable to machining a hard-faced trim insert, but uses cheaper base materials if erosion is reduced.\nWhere heavier: Initial CAD/modeling time to ensure flow guidance without cavitation. Worth it because it eliminates the recurring cost of replacing expensive hard-faced trims.\n\nEXECUTABLE TEST\nProtocol: Compute the maximum velocity in the vane channel using the stated choke flow rate and the vane cross-sectional area.\nInstrument: Flow simulation (CFD) or simple Bernoulli-based hand calculation.\nPass/Fail Threshold: If calculated peak velocity $v_{peak} < 5$ m/s at the design flow rate, the design passes.\nDuration: Hours (calculation).\nKill Criterion: If $v_{peak} > 5$ m/s, the vane cross-section is too small; increase vane diameter or reduce vane count.\n\nCONSTRAINT BIND\nPrimary Indicator: Pressure Drop ($\\Delta P$). The choke's function is defined by its $\\Delta P$ at a given flow rate. The vane geometry must be designed to maintain the same $\\Delta P$-vs-Flow curve as the original trim. The pressure signal is already recorded at the choke inlet/outlet.\nSecondary Indicator: Visual Inspection. Used for post-failure verification only. The mechanism relies on the physics of flow redirection validated by pressure data consistency (i.e., flow rate vs. pressure drop matches the designed curve, indicating no blockage or excessive turbulence).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "98b1b8a682eb02ca"
+}

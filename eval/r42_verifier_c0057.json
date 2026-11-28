@@ -1,0 +1,92 @@
+{
+ "record": "R42_VERIFIER_c0057/1.0.0",
+ "session": "builder-r42s1",
+ "role": "VERIFIER for c-0057 (work holdout-v7-generation, EXECUTOR builder-r20s4, executor id builder-r20s4@holdout-v7-generation)",
+ "verified_tip": "8d30772cf (R42 block 2)",
+ "base": "069a16430 (post-fix tip) with the verifier's own 658b349e8 in between",
+ "at": "2026-11-17T00:57:00Z (sandbox clock)",
+ "method": "zero-LLM recompute from committed bytes only (Art. 13 / Art. 29(c)): the seal recomputed by the canonical-tuple recipe; the serving attestation recomputed from the RAW slice; the machine's full deterministic scan battery re-run over all 12 committed rows under the machine call convention; the events-ledger sha chains and histogram states recomputed; the direction-LLM legs NEVER re-run (one generation per one-shot); the pushed CI read from the check-run API",
+ "legs": {
+  "seal": {
+   "verdict": "EXACT",
+   "evidence": "canonical-tuple projection over the 12 contamination-free problems, sorted by problem_id: recomputed c7b4473c7a55726147be32a62e5cbda0967465bf4ed616f4a6f0cd3fada9f95b == registered selection_sha256 == the run ledger's seal_anchor"
+  },
+  "serving_attestation": {
+   "verdict": "RECOMPUTES_EXACTLY",
+   "evidence": "raw slice: 86 lines = 72 completed calls (status OK, all with requested_model=glm-4-plus AND model=glm-4-plus, zero mismatches) + 7 gateway-side ERROR first-tries (engine retried, succeeded) + 7 RATE_LIMITED_RETRY telemetry lines (no model fields). The v1.0.0->v1.1.0 correction (telemetry miscounted as calls, wrongly voiding the run) is disclosed in the committed supersedes field and recomputes from the UNCHANGED raw slice; the filter fix is in the one-shot script forward-only. Window coverage verified: slice ts 00:12:22.901Z-00:34:08.405Z inside the attested window 00:12:15.013Z-00:34:08.414Z"
+  },
+  "call_arithmetic": {
+   "verdict": "RECONCILES_EXACTLY",
+   "evidence": "72 OK = 48 generation calls (12 rows x [draft+repair_1+repair_2+repair_3]) + 24 direction-LLM calls (6 interventions x 4 attempts); transport_tries in the events ledger is the ATTEMPT index (1..4), not a retry count; 7 ERROR lines are the retried first-tries; the R-REQID forward-only correction is live (all 72 requests carry glm-4-plus — v6's legacy request string is gone)"
+  },
+  "rows": {
+   "verdict": "12_OF_12_VERIFIED",
+   "evidence": "ids and question types match the sealed packet exactly (6 intervention-proposal + 6 predictor-design); no empty answers; one executor id across all rows; machine descriptor uniform (V7.7 frozen, V77_REQUEST_MODEL=glm-4-plus); sha256_16 == sha(a1_answer) on all 12"
+  },
+  "events_ledger": {
+   "verdict": "DURABLE_AND_CONSISTENT",
+   "evidence": "12 events, one per problem, each exactly [draft, repair_1, repair_2, repair_3] (the frozen machine's internal budget — ONE generation per problem, no batch re-run); last-attempt sha == final sha == row sha on all 12; per-row histogram_before/after states present for the diversity-cap audit"
+  },
+  "diversity_cap": {
+   "verdict": "HELD_ON_DECLARED_ROWS",
+   "evidence": "3 of 6 interventions declared a MECHANISM CLASS (thermal-hysteresis demand defrost; programmable current-density modulation**; dynamic pressure-damping feedback control — 1 each, cap <=2 trivially held); 3 shipped WITHOUT the declaration (MECHANISM_CLASS_UNSTATED x3, disclosed residuals). Observed cosmetic artifact: HO7-05's declaration carries a trailing markdown '**' (the declared_template parse does not strip emphasis) — disclosed here, no gating impact"
+  },
+  "direction_legs": {
+   "verdict": "COMMITTED_READS_6_OF_6_CORRECT",
+   "evidence": "the direction-LLM final verdicts on all 6 intervention rows read CORRECT (committed bytes; NOT re-run per Art. 29(c) — one generation per one-shot). HO7-04 ADDITIONALLY carries PHYSICS_DIRECTION_UNSTATED from the deterministic span-scan (the bill lacks the signed governing-relation statement) — a disclosed residual the auditor weighs. The authoritative direction read remains the PRIVATE-rubric scoring"
+  },
+  "full_battery_residual_recompute": {
+   "verdict": "FAITHFUL_ZERO_MISMATCHES",
+   "evidence": "the machine's ENTIRE deterministic battery (base_scan, constraint-fit, catalog, standard-bill, operational-loss, conversion, allowed-class, physics-direction-span, direction-lexicon, input-availability, duty-cycle-pricing, mechanism-template — intervention branch; base_scan + constraint-fit + predictor-violations + input-availability — predictor branch) re-run over all 12 committed rows under the machine call convention: 30 finding-field comparisons, ZERO mismatches — every residual finding recomputes exactly (nothing suppressed, nothing inflated)"
+  },
+  "residual_inventory_for_scoring": {
+   "verdict": "DISCLOSED_FAITHFULLY",
+   "totals": {
+    "BILL_UNTAGGED": 84,
+    "ALLOWED_ROW_OUTSIDE": 7,
+    "INPUT_UNAVAILABLE": 8,
+    "UNPRICED_DUTY_CYCLE": 4,
+    "MECHANISM_CLASS_UNSTATED": 3,
+    "PHYSICS_DIRECTION_UNSTATED": 1,
+    "APPARATUS_ROW": 1
+   },
+   "rows_affected": {
+    "ALLOWED_ROW_OUTSIDE": ["HO7-01", "HO7-04", "HO7-05", "HO7-06"],
+    "INPUT_UNAVAILABLE": ["HO7-01", "HO7-05", "HO7-06", "HO7-07", "HO7-08", "HO7-09", "HO7-12"],
+    "UNPRICED_DUTY_CYCLE": ["HO7-01", "HO7-02", "HO7-03", "HO7-06"],
+    "MECHANISM_CLASS_UNSTATED": ["HO7-01", "HO7-02", "HO7-03"]
+   },
+   "note": "these are the machine's own deterministic self-reads, recomputed faithful — they are INPUTS to the auditor's PRIVATE-rubric scoring, not verdicts. The F54-frontier classes are all present as residuals (unavailable inputs on 7 rows; allowed-list wordform firings on 4; unpriced duty cycles on 4; unstated mechanism classes on 3). Whether each firing is a true violation or a wordform false positive (e.g. 'a metering pump' parsed as a required input signal; 'standard surfactant' vs the allowed-class stems) is the rubric's adjudication, not the verifier's"
+  },
+  "claim_before_problem_read": {
+   "verdict": "HELD",
+   "evidence": "c-0057 committed and pushed in fd28fecb6 (2026-11-16T23:58:28Z) BEFORE the generation window started (00:12:15Z); the one-shot driver reads the problems ONLY from audit/holdout_v7/holdout_v7_problems.json at the fetched audit ref and does not name the PRIVATE rubric path anywhere (code-read verified); this verifier has not read the rubric either"
+  },
+  "judge_independence": {
+   "verdict": "STRUCTURAL",
+   "evidence": "the critic is a deterministic rule battery (Nyquist/question-type/signals/labels/arithmetic/mechanism-category/copper-potential/electronic-seal/modality/energy-flow/duration checks) — not an LLM judge; the generator is glm-4-plus via the loop gateway; the direction checker is a separate typed call on the same transport (disclosed; the auditor's rubric is the independent scorer)"
+  },
+  "run_ledger_gates": {
+   "verdict": "RECOMPUTE_TRUE",
+   "evidence": "n_rows_12, seal_recompute_exact, serving_12_of_12, one_executor_id, one_generation_no_batch_rerun — all recomputed TRUE from committed bytes; run_verdict VALID stands"
+  },
+  "secret_grep": {
+   "verdict": "0_FINDINGS",
+   "evidence": "token-pattern grep over 658b349e8..8d30772cf: zero matches; the v6 rows and run artifacts byte-frozen (zero files touched by the diff)"
+  },
+  "pushed_ci": {
+   "verdict": "SUCCESS_API_READ",
+   "evidence": "check-run API at 8d30772cf: surface completed/success (read 2026-11-17T00:54:27Z via scripts/r41_remote_ci_read.py)"
+  }
+ },
+ "verifier_notes": [
+  "VERIFIER METHOD ERRORS DISCLOSED (self-caught, Art. 5): this verifier's first two recomputes applied intervention-branch scans to predictor rows and omitted base_scan — producing phantom 'mismatches' that were the VERIFIER's own call-convention errors, not machine defects; the corrected full-battery recompute (machine call convention, all scans) yields ZERO mismatches. The repo bytes were never at fault.",
+  "The uniform 4-attempt pattern (every row exhausted the 3-repair budget with residuals remaining, critic CLEAN throughout) matches the executor's machine-tightness disclosure — the repair loop drives style CLEAN but does not clear the bind findings; the binds therefore disclose rather than block (the V7.7 contract's designed semantics: residual findings ship typed in row meta; the auditor scores).",
+  "This verification does NOT score the run. The acceptance bar (mean >=3.0/4 AND 0 allowed-measures violations AND 0 inverted-direction AND 0 unavailable-input rows AND run_verdict VALID) is decided by the auditor's PRIVATE-rubric scoring (prereg step 4). The recomputed residual inventory above is filed so the scoring starts from verified numbers."
+ ],
+ "registry_actions_by_this_verifier": [
+  "c-0057 flipped OPEN->DONE with this record as the verifier attribution (the c-0046 precedent)",
+  "VERIFIER claim c-0059 filed on work holdout-v7-generation (Art. 29(c))"
+ ],
+ "verdict": "VERIFIED — the holdout-v7 one-shot is run-integrity-VALID and fully recomputable from committed bytes: seal EXACT, 72/72 served==registered==glm-4-plus (requested AND served), one executor, one generation, durable ledgers, green API-read CI, zero secret exposure, v6 byte-frozen. The residual bind findings are faithfully disclosed and recomputed — the acceptance decision now belongs to the auditor's PRIVATE-rubric scoring (prereg step 4), after which BURN (step 5)."
+}

@@ -1,0 +1,155 @@
+{
+ "problem_id": "r125-10-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 51.42,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.71,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 932,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 4.6,
+     "usage": {
+      "prompt_tokens": 1264,
+      "completion_tokens": 1319,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Load Control Using Existing Power and ",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Load Control Using Existing Power and Mass Flow Measurements**\n\n**Mechanism:**\nImplement a dynamic feed-rate limiter that adjusts the feed conveyor speed based on real-time drive power consumption and discharge mass flow, using only the existing main drive power meter and the feed/discharge conveyor scales. The goal is to prevent the main drive from stalling on tough material by ensuring the shredder is never overloaded beyond its mechanical capability, while maximizing throughput by allowing faster feed rates when the load is within safe limits.\n\n**Implementation:**\n1.  **Define Load Limits:** Establish a maximum allowable drive power threshold (P_max) based on the motor’s safe operating range, well below the stall point. Also, establish a minimum required discharge mass flow rate (M_dot_min) to ensure the shredder is processing material effectively and not just idling or stalling without output.\n2.  **Feedback Loop Logic:**\n    *   **Monitor:** Continuously read the instantaneous power from the main drive power meter and the mass flow rates from the feed and discharge conveyor scales (calculated as mass per unit time).\n    *   **Decision Logic:**\n        *   If **Drive Power (P) > P_max** OR **Discharge Mass Flow (M_dot_dis) < M_dot_min** (indicating stall or blockage), immediately **reduce** the feed conveyor speed to decrease the incoming material load on the shredder.\n        *   If **Drive Power (P) < 0.8 * P_max** AND **Discharge Mass Flow (M_dot_dis) >= M_dot_min** (indicating the shredder is underutilized and running efficiently), gradually **increase** the feed conveyor speed to boost throughput.\n        *   If **Drive Power (P)** is between 0.8 * P_max and P_max, maintain the current feed speed to hold the load at an optimal level.\n3.  **Execution:** Send speed setpoint commands to the variable frequency drive (VFD) or adjustable speed drive of the feed conveyor (which must already exist to control feed rate, as implied by the need for mitigation and the use of scales for measurement). If no VFD exists, this mitigation assumes the feed conveyor speed is adjustable via an existing manual or PLC-controlled means; if strictly fixed, this mitigation is not feasible, but the problem implies we can use existing measurements to *propose* a control action, suggesting some means of adjustment is available or the mitigation is to *alert* operators to manually adjust. Given the \"engineer\" persona and \"mitigation\" request, we assume the feed conveyor speed is controllable (e.g., via an existing VFD or manual throttle that can be automated).\n\n**Measures Relied Upon:**\n*   **Main Drive Power Meter:** Provides the direct indicator of mechanical load and proximity to stall. High power indicates high load; sustained high power or a drop in power with low output indicates a stall/binding event.\n*   **Discharge Conveyor Scale:** Provides the direct measure of actual throughput. A falling discharge mass flow while power is high confirms a process issue (e.g., blockage, inefficient shredding due to overload) rather than just a high-load state.\n*   **Feed Conveyor Scale:** While not strictly necessary for the *feedback* loop if discharge flow is the primary throughput metric, it can be used to calculate the overall mass balance (Feed In - Discharge Out - Accumulation/Screen Undersize Losses) to detect significant screen undersize growth or material accumulation in the shredder chamber. If the feed rate is high but discharge rate drops, it confirms material is accumulating or being screened out, supporting the need to reduce feed.\n\n**Outcome:**\nThis approach directly addresses the \"main drive stalls on tougher feed\" by preventing the load from reaching the stall threshold through proactive feed reduction. It addresses \"throughput has fallen\" by allowing feed to increase when the shredder is operating in a safe, low-power regime, thus maximizing safe throughput. It addresses \"discharge conveyor runs lighter than rated\" by ensuring the feed rate is matched to the shredder’s actual processing capacity, preventing the discharge from being starved due to upstream stalls or excessive screening losses caused by overload (which can push material through screens prematurely if the shredder isn’t working effectively). The growth in screen undersize is a symptom of inefficient shredding under load; by maintaining optimal load, the shredding action becomes more consistent, potentially reducing excessive fines if the load is stabilized.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Load Control Using Existing Power and Mass Flow Measurements**\n\n**Mechanism:**\nImplement a dynamic feed-rate limiter that adjusts the feed conveyor speed based on real-time drive power consumption and discharge mass flow, using only the existing main drive power meter and the feed/discharge conveyor scales. The goal is to prevent the main drive from stalling on tough material by ensuring the shredder is never overloaded beyond its mechanical capability, while maximizing throughput by allowing faster feed rates when the load is within safe limits.\n\n**Direction of Effect:**\nThe driving variable for the control action is the **Main Drive Power (P)** relative to the threshold **P_max** and the **Discharge Mass Flow (M_dot_dis)** relative to **M_dot_min**. \n- **Direction 1 (Overload/Stall Risk):** If **P > P_max** OR **M_dot_dis < M_dot_min**, the mechanism acts to **decrease** the feed conveyor speed. This reduces the mass input rate, lowering the mechanical load on the main drive, allowing power to drop below the stall threshold and discharge flow to recover as the shredder clears the accumulated material.\n- **Direction 2 (Underutilization):** If **P < 0.8 * P_max** AND **M_dot_dis >= M_dot_min**, the mechanism acts to **increase** the feed conveyor speed. This raises the mass input rate, increasing the mechanical load and drive power toward the optimal operating range, thereby boosting throughput.\n- **Direction 3 (Stable Operation):** If **0.8 * P_max <= P <= P_max** AND **M_dot_dis >= M_dot_min**, the mechanism **maintains** the current feed conveyor speed.\n\n**Implementation Bill:**\n1.  **Sensor Input Mapping:**\n    *   **P (Drive Power):** Read directly from the existing **Main Drive Power Meter**.\n    *   **M_dot_feed (Feed Mass Flow):** Derived from the **Feed Conveyor Scale**. Formula: $M\\_dot\\_feed = \\frac{\\Delta Mass_{feed}}{\\Delta Time}$, calculated over a fixed rolling window (e.g., 10 seconds) using the scale’s mass readings at time $t$ and $t-\\Delta Time$.\n    *   **M_dot_dis (Discharge Mass Flow):** Derived from the **Discharge Conveyor Scale**. Formula: $M\\_dot\\_dis = \\frac{\\Delta Mass_{dis}}{\\Delta Time}$, calculated over the same fixed rolling window.\n    *   **P_max:** Pre-set constant defined in the controller logic, based on the motor’s nameplate limits and observed stall conditions. No sensor required.\n    *   **M_dot_min:** Pre-set constant defined in the controller logic, based on historical minimum effective throughput data. No sensor required.\n2.  **Control Logic (PLC/DCS):**\n    *   **Input Processing:** Calculate $M\\_dot\\_feed$ and $M\\_dot\\_dis$ every control cycle using the formulas above.\n    *   **Decision Logic:**\n        *   If **P > P_max** OR **M_dot_dis < M_dot_min**: Output command to **reduce** feed conveyor speed setpoint by a predefined decrement (e.g., -5% or -0.5 m/s).\n        *   If **P < 0.8 * P_max** AND **M_dot_dis >= M_dot_min**: Output command to **increase** feed conveyor speed setpoint by a predefined increment (e.g., +5% or +0.5 m/s).\n        *   Otherwise: Hold current feed conveyor speed setpoint.\n3.  **Execution:** Send speed setpoint commands to the existing variable frequency drive (VFD) or adjustable speed drive of the feed conveyor. If the VFD does not support remote setpoint adjustment, use an existing analog or digital output from the PLC to a manual speed controller if available; otherwise, issue an operator alert to manually adjust feed rate based on the displayed P and M_dot_dis values.\n\n**Measures Relied Upon (Explicit Mapping):**\n*   **Main Drive Power Meter:** Provides **P**. This is the primary indicator of mechanical load. High P indicates high load; P approaching P_max indicates risk of stall. Low P with low M_dot_dis indicates stall or blockage.\n*   **Discharge Conveyor Scale:** Provides **M_dot_dis** (derived). This is the direct measure of actual throughput. A falling M_dot_dis while P is high or low confirms a process issue (e.g., blockage, inefficient shredding, or starved feed).\n*   **Feed Conveyor Scale:** Provides **M_dot_feed** (derived). Used for mass balance diagnostics: If $M\\_dot\\_feed > M\\_dot\\_dis + M\\_dot\\_undersize$ (where undersize is not directly measurable but inferred from accumulated chamber mass if scale has chamber weight, or simply by trend), it confirms accumulation. In this implementation, M_dot_feed is used to verify that feed rate adjustments are responding as expected and to calculate the mass balance error $E = M\\_dot\\_feed - M\\_dot\\_dis$ for logging and operator alerts, but the primary control signals are P and M_dot_dis.\n\n**Outcome:**\nThis approach directly addresses the \"main drive stalls on tougher feed\" by preventing the load from reaching the stall threshold through proactive feed reduction when P exceeds P_max. It addresses \"throughput has fallen\" by allowing feed to increase when the shredder is operating in a safe, low-power regime (P < 0.8 * P_max) and discharge flow is healthy, thus maximizing safe throughput. It addresses \"discharge conveyor runs lighter than rated\" by ensuring the feed rate is matched to the shredder’s actual processing capacity, preventing the discharge from being starved due to upstream stalls or excessive screening losses caused by overload. The growth in screen undersize is a symptom of inefficient shredding under load; by maintaining optimal load via P and M_dot_dis feedback, the shredding action becomes more consistent, potentially reducing excessive fines if the load is stabilized.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Sensor Input Mapping:**",
+     "*   **P (Drive Power):** Read directly from the existing **Main Drive Power Meter**.",
+     "*   **M_dot_feed (Feed Mass Flow):** Derived from the **Feed Conveyor Scale**. Formula: $M",
+     "*   **M_dot_dis (Discharge Mass Flow):** Derived from the **Discharge Conveyor Scale**. Fo",
+     "*   **P_max:** Pre-set constant defined in the controller logic, based on the motor’s name",
+     "*   **M_dot_min:** Pre-set constant defined in the controller logic, based on historical m",
+     "2.  **Control Logic (PLC/DCS):**",
+     "*   **Input Processing:** Calculate $M\\_dot\\_feed$ and $M\\_dot\\_dis$ every control cycle u",
+     "*   **Decision Logic:**",
+     "*   If **P > P_max** OR **M_dot_dis < M_dot_min**: Output command to **reduce** feed conve",
+     "*   If **P < 0.8 * P_max** AND **M_dot_dis >= M_dot_min**: Output command to **increase** ",
+     "*   Otherwise: Hold current feed conveyor speed setpoint.",
+     "3.  **Execution:** Send speed setpoint commands to the existing variable frequency drive (",
+     "*   **Main Drive Power Meter:** Provides **P**. This is the primary indicator of mechanica",
+     "*   **Discharge Conveyor Scale:** Provides **M_dot_dis** (derived). This is the direct mea",
+     "*   **Feed Conveyor Scale:** Provides **M_dot_feed** (derived). Used for mass balance diag"
+    ],
+    "APPARATUS_ROW": [
+     "*   **P_max:** Pre-set constant defined in the controller logic, based on the motor’s nameplate limits and obs",
+     "*   **M_dot_min:** Pre-set constant defined in the controller logic, based on historical minimum effective thr",
+     "*   **Feed Conveyor Scale:** Provides **M_dot_feed** (derived). Used for mass balance diagnostics: If $M\\_dot\\"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.64,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 566,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 6.42,
+     "usage": {
+      "prompt_tokens": 898,
+      "completion_tokens": 551,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\"corrected_proposal\": \"Mechanism:\\nImplement a software-based \\u201cPower-Limited Feed Strategy\\u20",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Feed Rate Limitation via Drive Power Feedback and Mass Balance**\n\n**Mechanism:**\nImplement a software-based \"Power-Limited Feed Strategy\" that uses the existing main drive power meter to dynamically cap the feed conveyor rate, preventing the drive from stalling on tough material. Simultaneously, use the difference between feed and discharge conveyor scales (mass balance) to detect when the shredder is processing too much undersized material (which bypasses effective shredding and causes power spikes or inefficient operation), allowing operators to adjust the screen or upstream pre-screen if available, or more likely, to simply reduce feed to maintain stable drive power. Since no new sensors are allowed, this relies on correlating the power meter's reading with the feed/discharge scale rates to infer process state.\n\n**Implementation:**\n1.  **Primary Control (Power Limiter):** Configure the main drive's variable frequency drive (VFD) or controller to enforce a maximum power threshold (e.g., 90% of rated power). If the power meter reading exceeds this limit for a set duration, the system automatically reduces the feed conveyor speed (via its existing drive/speed controller) until power returns to the target range. This prevents stalling on tough feed.\n2.  **Secondary Monitoring (Mass Balance Alert):** Continuously calculate the \"shredding efficiency indicator\" as the difference between the feed conveyor scale's flow rate and the discharge conveyor scale's flow rate. A sustained positive deviation (material accumulating inside the shredder) indicates the shredder is clogged or processing overly tough material that isn't being discharged quickly enough. A sustained negative deviation or a low discharge rate relative to feed despite acceptable power may indicate excessive undersize bypassing (screen issue).\n3.  **Operator Interface Actionable Alert:** When the mass balance deviation exceeds a predefined threshold, generate an alert on the existing HMI indicating \"Check Screen Undersize or Reduce Feed.\" This prompts the operator to manually inspect the screen or reduce feed further to alleviate the screen load, addressing the \"screen undersize has grown\" symptom by reducing the load on the screen via lower throughput.\n\n**Measures it Relies On:**\n*   **Main Drive Power Meter:** Used as the primary feedback signal for the closed-loop power limiter to prevent stalling.\n*   **Feed Conveyor Scale:** Provides the input mass flow rate for mass balance calculations.\n*   **Discharge Conveyor Scale:** Provides the output mass flow rate for mass balance calculations.\n*   **Existing Conveyor Speed Controllers:** Required to implement the automatic feed rate reduction when power limits are reached.\n*   **No New Sensors:** All signals are derived from already installed instruments. The mitigation is purely a control strategy change using existing hardware.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "Mechanism:\nImplement a software-based “Power-Limited Feed Strategy” that uses the existing main drive power meter to dynamically cap the feed conveyor rate, preventing the drive from stalling on tough material. Simultaneously, use the difference between feed and discharge conveyor scales (mass balance) to detect when the shredder is processing too much undersized material, allowing operators to reduce feed to maintain stable drive power.\n\nDirection-of-Effect:\nDriving Variable: Main Drive Power Reading.\nDirection: If the main drive power reading exceeds the target threshold, the mechanism reduces the feed conveyor rate.\nResulting Effect: The shredder load decreases, preventing stalls and maintaining stable power levels.\nSecondary Variable: Mass Balance Deviation (Feed Rate minus Discharge Rate).\nDirection: A sustained positive deviation triggers an alert to reduce feed further or inspect the screen.\nResulting Effect: Prevents internal accumulation and addresses screen undersize issues by lowering throughput.\n\nImplementation Bill:\n1. Control Logic Update: Configure the main drive’s variable frequency drive (VFD) or controller to enforce a maximum power threshold (e.g., 90% of rated power) using the main drive power meter as the input. \n2. Actuator Mapping: Map the power threshold breach to a command that reduces the feed conveyor speed via its existing speed controller.\n3. Mass Balance Calculation: Program the existing HMI or PLC to calculate the difference between the feed conveyor scale flow rate and the discharge conveyor scale flow rate.\n4. Alert Configuration: Configure the HMI to generate a specific alert when the mass balance deviation exceeds a predefined threshold, instructing the operator to “Check Screen Undersize or Reduce Feed.”\n\nInputs and Derivations:\n*   **Main Drive Power Meter:** Source of the primary feedback signal. Used directly as the driving variable for the power limiter.\n*   **Feed Conveyor Scale:** Source of the input mass flow rate. Used directly in the mass balance formula.\n*   **Discharge Conveyor Scale:** Source of the output mass flow rate. Used directly in the mass balance formula.\n*   **Shredding Efficiency Indicator (Derived):** Formula: Feed Conveyor Scale Flow Rate − Discharge Conveyor Scale Flow Rate. This derived value is used for the secondary monitoring alert.\n*   **Feed Conveyor Speed Command (Derived):** Formula: If (Main Drive Power Meter > Threshold) THEN Reduce (Feed Conveyor Speed Setpoint). This derived command is sent to the existing conveyor drive.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1. Control Logic Update: Configure the main drive’s variable frequency drive (VFD) or cont",
+     "2. Actuator Mapping: Map the power threshold breach to a command that reduces the feed con",
+     "3. Mass Balance Calculation: Program the existing HMI or PLC to calculate the difference b",
+     "4. Alert Configuration: Configure the HMI to generate a specific alert when the mass balan",
+     "*   **Main Drive Power Meter:** Source of the primary feedback signal. Used directly as th",
+     "*   **Feed Conveyor Scale:** Source of the input mass flow rate. Used directly in the mass",
+     "*   **Discharge Conveyor Scale:** Source of the output mass flow rate. Used directly in th",
+     "*   **Shredding Efficiency Indicator (Derived):** Formula: Feed Conveyor Scale Flow Rate −",
+     "*   **Feed Conveyor Speed Command (Derived):** Formula: If (Main Drive Power Meter > Thres"
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 'directly as the driving variable' shares no allowed-list stem (Use only existing sensors and existing measurements: the main drive power meter ...)"
+    ],
+    "APPARATUS_ROW": [
+     "*   **Shredding Efficiency Indicator (Derived):** Formula: Feed Conveyor Scale Flow Rate − Discharge Conveyor "
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Load Control Using Existing Power and Mass Flow Measurements**\n\n**Mechanism:**\nImplement a dynamic feed-rate limiter that adjusts the feed conveyor speed based on real-time drive power consumption and discharge mass flow, using only the existing main drive power meter and the feed/discharge conveyor scales. The goal is to prevent the main drive from stalling on tough material by ensuring the shredder is never overloaded beyond its mechanical capability, while maximizing throughput by allowing faster feed rates when the load is within safe limits.\n\n**Direction of Effect:**\nThe driving variable for the control action is the **Main Drive Power (P)** relative to the threshold **P_max** and the **Discharge Mass Flow (M_dot_dis)** relative to **M_dot_min**. \n- **Direction 1 (Overload/Stall Risk):** If **P > P_max** OR **M_dot_dis < M_dot_min**, the mechanism acts to **decrease** the feed conveyor speed. This reduces the mass input rate, lowering the mechanical load on the main drive, allowing power to drop below the stall threshold and discharge flow to recover as the shredder clears the accumulated material.\n- **Direction 2 (Underutilization):** If **P < 0.8 * P_max** AND **M_dot_dis >= M_dot_min**, the mechanism acts to **increase** the feed conveyor speed. This raises the mass input rate, increasing the mechanical load and drive power toward the optimal operating range, thereby boosting throughput.\n- **Direction 3 (Stable Operation):** If **0.8 * P_max <= P <= P_max** AND **M_dot_dis >= M_dot_min**, the mechanism **maintains** the current feed conveyor speed.\n\n**Implementation Bill:**\n1.  **Sensor Input Mapping:**\n    *   **P (Drive Power):** Read directly from the existing **Main Drive Power Meter**.\n    *   **M_dot_feed (Feed Mass Flow):** Derived from the **Feed Conveyor Scale**. Formula: $M\\_dot\\_feed = \\frac{\\Delta Mass_{feed}}{\\Delta Time}$, calculated over a fixed rolling window (e.g., 10 seconds) using the scale’s mass readings at time $t$ and $t-\\Delta Time$.\n    *   **M_dot_dis (Discharge Mass Flow):** Derived from the **Discharge Conveyor Scale**. Formula: $M\\_dot\\_dis = \\frac{\\Delta Mass_{dis}}{\\Delta Time}$, calculated over the same fixed rolling window.\n    *   **P_max:** Pre-set constant defined in the controller logic, based on the motor’s nameplate limits and observed stall conditions. No sensor required.\n    *   **M_dot_min:** Pre-set constant defined in the controller logic, based on historical minimum effective throughput data. No sensor required.\n2.  **Control Logic (PLC/DCS):**\n    *   **Input Processing:** Calculate $M\\_dot\\_feed$ and $M\\_dot\\_dis$ every control cycle using the formulas above.\n    *   **Decision Logic:**\n        *   If **P > P_max** OR **M_dot_dis < M_dot_min**: Output command to **reduce** feed conveyor speed setpoint by a predefined decrement (e.g., -5% or -0.5 m/s).\n        *   If **P < 0.8 * P_max** AND **M_dot_dis >= M_dot_min**: Output command to **increase** feed conveyor speed setpoint by a predefined increment (e.g., +5% or +0.5 m/s).\n        *   Otherwise: Hold current feed conveyor speed setpoint.\n3.  **Execution:** Send speed setpoint commands to the existing variable frequency drive (VFD) or adjustable speed drive of the feed conveyor. If the VFD does not support remote setpoint adjustment, use an existing analog or digital output from the PLC to a manual speed controller if available; otherwise, issue an operator alert to manually adjust feed rate based on the displayed P and M_dot_dis values.\n\n**Measures Relied Upon (Explicit Mapping):**\n*   **Main Drive Power Meter:** Provides **P**. This is the primary indicator of mechanical load. High P indicates high load; P approaching P_max indicates risk of stall. Low P with low M_dot_dis indicates stall or blockage.\n*   **Discharge Conveyor Scale:** Provides **M_dot_dis** (derived). This is the direct measure of actual throughput. A falling M_dot_dis while P is high or low confirms a process issue (e.g., blockage, inefficient shredding, or starved feed).\n*   **Feed Conveyor Scale:** Provides **M_dot_feed** (derived). Used for mass balance diagnostics: If $M\\_dot\\_feed > M\\_dot\\_dis + M\\_dot\\_undersize$ (where undersize is not directly measurable but inferred from accumulated chamber mass if scale has chamber weight, or simply by trend), it confirms accumulation. In this implementation, M_dot_feed is used to verify that feed rate adjustments are responding as expected and to calculate the mass balance error $E = M\\_dot\\_feed - M\\_dot\\_dis$ for logging and operator alerts, but the primary control signals are P and M_dot_dis.\n\n**Outcome:**\nThis approach directly addresses the \"main drive stalls on tougher feed\" by preventing the load from reaching the stall threshold through proactive feed reduction when P exceeds P_max. It addresses \"throughput has fallen\" by allowing feed to increase when the shredder is operating in a safe, low-power regime (P < 0.8 * P_max) and discharge flow is healthy, thus maximizing safe throughput. It addresses \"discharge conveyor runs lighter than rated\" by ensuring the feed rate is matched to the shredder’s actual processing capacity, preventing the discharge from being starved due to upstream stalls or excessive screening losses caused by overload. The growth in screen undersize is a symptom of inefficient shredding under load; by maintaining optimal load via P and M_dot_dis feedback, the shredding action becomes more consistent, potentially reducing excessive fines if the load is stabilized.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

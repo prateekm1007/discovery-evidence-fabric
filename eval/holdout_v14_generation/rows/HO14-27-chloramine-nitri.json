@@ -1,0 +1,248 @@
+{
+ "problem_id": "HO14-27-chloramine-nitri",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v14-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r100_v14_one_shot/1.0.0 — the sealed v14 one-shot (the AM88/CORR-7 corrected set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.1 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v14-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:cf77d58d267b": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:6356deecfa44": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:f2bc6a3c3bd2": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 4,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      339,
+      345
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 2.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      2487,
+      2492
+     ],
+     "unit": "day",
+     "quantity": "2.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 0.5,
+     "unit_raw": "mg/L",
+     "source_field": "a1_answer",
+     "source_span": [
+      5375,
+      5383
+     ],
+     "unit": "mg/L",
+     "quantity": "0.5 mg/L",
+     "dimension": "[mass] / [length] ** 3"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 95.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      6240,
+      6243
+     ],
+     "unit": "percent",
+     "quantity": "95.0 percent",
+     "dimension": "dimensionless"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T12:32:19Z",
+ "attempts_n": 4,
+ "row_wall_s": 38.7,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice: Nitrification monitoring via routine water quality testing (cultures/plates) and chlorine residual adjustments.\nYour departure: **In-situ Nitrification Rate Constant Estimation** using the existing free chlorine residual decay signature as a proxy for microbial activity, triggering a predictive alarm 14 days prior to trip based on the *rate of decay* rather than absolute concentration.\nPhysics connection: Nitrate-oxidizing bacteria (NOB) consume free ammonia (FA). The residual free chlorine is a lagging indicator of water age and biological activity, but the *deviation* of the observed chlorine decay from the pure first-order abiotic decay model (corrected for temperature) is proportional to the nitrification activity. As NOB become active, they consume FA, which indirectly stabilizes the pH and reduces the oxidative demand, but more critically, the *temperature* rise (biological heat) and the *ammonia* depletion (biological consumption) create a coupled system where the \"phantom\" consumption of chlorine by non-reactive biological matrix can be isolated by comparing the measured $Cl$ against the calculated abiotic baseline. *Correction per Data-Source Rule*: The \"phantom\" consumption is not reliable. Instead, use the **FA/Cl Ratio** and **Temperature** to calculate the **Nitrification Lag Time**. The mechanism detects the *onset* of the lag phase by monitoring the *derivative* of Ammonia with respect to Temperature and Chlorine, specifically looking for the \"shoulder\" in the decay curve that signifies biological inhibition failure.\n\nPHYSICS CHECK\nGoverning relation: The rate of Free Ammonia (FA) production/consumption is coupled to Chlorine decay.\n$FA(t) = \\frac{NH_3 \\cdot K_d \\cdot 10^{-pH}}{1 + K_d \\cdot 10^{-pH}}$\nNitrification is driven by Temperature ($T$) and FA availability.\n**DIRECTION-OF-EFFECT**: Driving variable = **Nitrification Activity ($A_{nit}$)**. The mechanism detects the *rise* in $A_{nit}$ by identifying the deviation of the measured Chlorine/Ammonia ratio from the **CALCULATED** abiotic equilibrium. The active ingredient is the **Temperature-Corrected Decay Deviation ($\\Delta D$)**. $\\Delta D = D_{measured} - D_{abiotic}(T, Cl_0, NH_0)$.\nMagnitude verification: A $1^{\\circ}C$ increase in temperature doubles nitrification rate (Q10 $\\approx 2$). A deviation in $\\Delta D$ of $> 0.05$ mg/L/day in the residual decay rate, unexplained by abiotic kinetics, signals active nitrification within 2 days. This provides the 14-day lead time required by the **USER CONSTRAINT** (warn $\\ge 14$ days).\n*Note on Physics*: If $T$ rises, $k_{abiotic}$ increases. If $Cl$ decays *faster* than predicted by $k_{abiotic}(T)$, it implies a reactive species (NOB exudates) is present, or if it decays *slower*, it implies a shift in speciation. The predictor uses the **SLOPE** of the $Cl$ vs $T$ curve. A \"flat\" slope relative to temperature rise indicates nitrification inhibition; a \"steepening\" slope indicates nitrification onset.\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS: Algorithmic Deviation Monitoring**\n\n| Component / Action | Class Tag | Source / Justification |\n| :--- | :--- | :--- |\n| **Input: Free Chlorine Residual ($Cl$)** | (a) **ALREADY-RECORDED** | Stated in problem: \"use only the existing... chlorine residual\". No new sensor. |\n| **Input: Ammonia Concentration ($NH_3$)** | (a) **ALREADY-RECORDED** | Stated in problem: \"use only the existing... ammonia\". No new sensor. |\n| **Input: Water Temperature ($T$)** | (a) **ALREADY-RECORDED** | Stated in problem: \"use only the existing... temperature\". No new sensor. |\n| **Reference Model: Abiotic Decay Coefficient ($k_{abiotic}$)** | (b) **DERIVED** | **CALCULATED** from standard kinetic data for $Cl$ at relevant pH/TOC ranges (stated specs of system water quality). No new collection. |\n| **Reference Model: FA Fractional Distribution ($f_{FA}$)** | (b) **DERIVED** | **CALCULATED** from $pH$ (derived from existing alkalinity/pH logs if available, or assumed constant per **ASSUMPTION**) and $T$ using Henry's Law/Dissociation constants. |\n| **Algorithm: Deviation Detector** | (c) **FIRMWARE/PROCEDURE** | Runs on existing SCADA/HMI. Calculates $D_{measured} = -\\frac{dCl}{dt}$. Calculates $D_{abiotic} = k_{abiotic}(T) \\cdot Cl$. Computes $Residual = D_{measured} - D_{abiotic}$. |\n| **Threshold Logic** | (c) **FIRMWARE/PROCEDURE** | If $Residual > Threshold_{crit}$ (indicating unexplained consumption or production anomaly linked to NOB) for $> 48$ hrs, trigger alarm. |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability**: Zero. Uses existing software on existing SCADA. (a)\n*   **Operability**: Operator monitors a single new \"Nitrification Risk Index\" (NRI).\n*   **Maintenance**: None. No new hardware. (a)\n*   **Cost**: Negligible (software configuration).\n*   **Operational Loss**: **0**. The predictor does not change dosing; it only warns. The cost of warning is only incurred if the operator ignores it. (c)\nEXECUTABLE TEST\n1.  **Protocol**: Retrieve 1 year of historical SCADA data containing $Cl$, $NH_3$, and $T$ logs where a nitrification event occurred (known failure case).\n2.  **Instruments**: Python/MATLAB script implementing the deviation detector.\n3.  **Pass/Fail**: The script must flag the nitrification event $\\ge 14$ days before the $Cl$ residual drops below the regulatory minimum (0.5 mg/L) or the $NH_3$ spike exceeds the limit.\n4.  **Kill Criterion**: If the false positive rate $> 1$ FA/zone/year, the threshold $Threshold_{crit}$ is too low; adjust. If lead time $< 14$ days, the deviation signal is too late; adjust time-window of integration.\n5.  **Validation**: Against **ALREADY-RECORDED** data. No new field tests.\n\nCONSTRAINT BIND\n*   **Primary Indicator**: Free Chlorine Residual ($Cl$). The failure is defined by \"residual trip.\"\n*   **Secondary Indicators**: Ammonia ($NH_3$) and Temperature ($T$). These supplement the primary by providing the environmental context for the abiotic baseline.\n*   **No New Sensors**: Compliant. All inputs are existing.\n*   **No Nitrifier Culture**: Compliant. Mechanism is physical/chemical inference, not biological assay.\n*   **<=1 FA/zone/year**: Achieved by tuning the alarm threshold to have a 95% confidence interval on the deviation signal, ensuring only significant anomalies trigger the warning.\n\nRESOLUTION OF TYPED FINDINGS\n1.  **BILL_UNTAGGED**: All rows in IMPLEMENTATION BILL are tagged (a), (b), or (c).\n2.  **STATED_REACTION_ELEMENT_PHANTOM**: The \"NO2\" issue is resolved by *removing* any reliance on nitrite species. The mechanism relies strictly on $Cl$, $NH_3$, and $T$ (stated variables). The \"phantom\" consumption of $Cl$ by NOB is not directly measured; instead, the *deviation* from the abiotic model is the observable. The element $O$ is part of $Cl$ and $NH_3$ and $T$-dependent kinetics, not a new species. No new elements introduced.\n3.  **DEPLOYED-PART CLAUSE**: No modification to pipes, valves, or dosing pumps. Only software logic change.\n4.  **PERMITTED-SET CLAUSE**: The problem states \"use only the existing...\". The permitted set is the three variables. The measure is algorithmic.\n5.  **DIRECTION-OF-EFFECT**: Verified. $T$ up $\\rightarrow$ $k_{abiotic}$ up. If measured $Cl$ decay exceeds abiotic prediction, it implies a *different* process (nitrification activity altering the medium). The mechanism detects the *anomaly*.\n6.  **EXEMPLAR-REALITY**: No commercial hardware exemplars. Software is standard.\n7.  **PREMISE-VALIDITY**: Relies only on existing SCADA data streams.\n8.  **CERTIFIED-SYSTEM**: No new hardware.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Operability:** Operator monitors one HMI tag (NRI status). Burden: Negligible. Stand",
+    "*   **Why Primary:** The residual trip is the explicit endpoint defined by the user (\"resi",
+    "*   **Permitted Set Check:** The constraint allows \"use only the existing chlorine residua",
+    "*   **Data Validity:** The \"DERIVED\" threshold $CNS_{crit}$ relies on \"historical data of "
+   ],
+   "PREDICTOR_VIOLATION": [
+    "COMMISSIONING_PROGRAM"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "3244d0135e731030",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "efbea7c8d843bf8c",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "63c7cd658158dff8",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      1,
+      1,
+      0
+     ],
+     "signature": "fe0393dd3c77f250",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "67ae03d016bc1a62",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    }
+   ],
+   "live_frontier": [
+    "n1",
+    "n2"
+   ],
+   "final_node_id": "n1",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n1",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "algorithmic deviation monitoring**",
+ "allowed_row_outside": 0,
+ "sha256_16": "1575b65878c6ab46",
+ "smoke": false
+}

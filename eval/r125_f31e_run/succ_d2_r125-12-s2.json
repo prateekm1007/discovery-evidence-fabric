@@ -1,0 +1,54 @@
+{
+ "draw": "d2",
+ "problem_id": "r125-12-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [F31e draw] + canonical F97-fixed check + improved-directive reviewer)",
+ "improved_directive_len": 567,
+ "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:** Implement a \"Flow-Metered Regeneration Trigger with Brine Draw Verification\" control logic that replaces time-based or cumulative-volume-based regeneration scheduling with a dual-variable algorithm using only the existing service flow meter, regeneration flow meter, and inlet pressure transmitter.\n\n**Implementation:**\n1.  **Recalculate Exchange Capacity in Real-Time:** Use the existing **service flow meter** to calculate the exact volume of water passed through the resin bed since the last regeneration. Instead of using a fixed \"beds\" or \"grains per gallon\" assumption, the controller divides this measured service volume by the actual measured hardness (if available via historical baseline; if not, use the last known good hardness snapshot from the system's historical log, which is an existing measurement) to determine the resin's true remaining capacity. This directly addresses the \"hardness breakthrough arrives earlier\" issue by triggering regeneration precisely when the calculated residual hardness at the outlet would approach the allowable limit, preventing premature or late regeneration.\n2.  **Verify Brine Concentration via Pressure Differential:** Use the existing **inlet pressure transmitter** and the **regeneration flow meter** to infer brine draw efficiency. During the regeneration brine draw cycle, the controller monitors the pressure drop across the resin bed and brine line. Since brine density and viscosity are higher than water, a consistent brine draw will exhibit a characteristic pressure profile relative to the flow rate. If the flow meter confirms the expected brine volume is being drawn, but the inlet pressure transmitter shows an anomalously low pressure (indicating high resistance/leaching) or high pressure (indicating restricted flow/line blockage), the controller extends the brine draw time or increases the brine volume (by adjusting the flow meter setpoint limit) to ensure the resin is properly saturated with salt. This directly addresses the \"regeneration salt use has climbed\" issue by optimizing brine draw duration and volume, ensuring that each gallon of salt used actually achieves maximum resin exchange capacity, rather than wasting salt on ineffective, short-duration draws.\n\n**Measures it Relies On:**\n*   **Service Flow Meter:** Measures the exact volume of water processed between regenerations, enabling precise calculation of resin depletion and early detection of breakthrough trends.\n*   **Regeneration Flow Meter:** Measures the actual volume of brine drawn during regeneration, allowing the controller to verify that the calculated optimal brine quantity (based on resin volume and hardness load) is being delivered.\n*   **Inlet Pressure Transmitter:** Monitors system pressure during both service and regeneration. During regeneration, it is used to detect brine draw anomalies (blockages, leaks, or poor saturation) by correlating pressure against flow rate, ensuring that salt is not being wasted due to poor brine distribution or resin bed channeling.\n\nThis approach uses no new instrumentation, directly targets both symptoms (rising salt use and early breakthrough), and leverages existing sensors to optimize the regeneration process for maximum efficiency.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism:** Implement a \"Flow-Metered Regeneration Trigger with Brine Draw Verification\" control logic that replaces time-based or cumulative-volume-based regeneration scheduling with a dual-variable algorithm using only the existing service flow meter, regeneration flow meter, and inlet pressure transmitter.\n\n**Implementation:**\n\n**IMPLEMENTATION BILL:**\n1.  **Sensor Inputs:**\n    *   $V_{svc}$: Instantaneous volumetric flow rate from the **Service Flow Meter**.\n    *   $V_{reg}$: Instantaneous volumetric flow rate from the **Regeneration Flow Meter**.\n    *   $P_{in}$: Differential pressure reading from the **Inlet Pressure Transmitter** (measuring pressure drop across the resin bed).\n2.  **Logic & Parameters:**\n    *   $H_{base}$: Last known good total hardness concentration (mg/L as CaCO$_3$). *Derived from system historical log (existing measurement).*\n    *   $C_{max}$: Maximum resin exchange capacity (grains/L or mg/L). *Pre-configured parameter.*\n    *   $V_{bed}$: Resin bed volume. *Pre-configured parameter.*\n    *   $K_{salt}$: Salt-to-hardness conversion factor. *Pre-configured parameter.*\n3.  **Calculated Variables:**\n    *   $V_{cum}$: Cumulative service volume since last regeneration. Derived by integrating $V_{svc}$ over time: $V_{cum} = \\int V_{svc} \\, dt$.\n    *   $Hard_{load}$: Total hardness load absorbed. Derived as: $Hard_{load} = V_{cum} \\times H_{base}$.\n    *   $\\Delta P_{bed}$: Pressure drop across the bed. Measured directly by the **Inlet Pressure Transmitter**.\n    *   $R_{hydraulic}$: Hydraulic resistance index. Derived as: $R_{hydraulic} = \\Delta P_{bed} / V_{reg}$ during regeneration flow.\n4.  **Control Actions:**\n    *   **Trigger:** When $Hard_{load} \\geq (C_{max} \\times V_{bed})$, initiate regeneration.\n    *   **Brine Verification:** During brine draw, calculate $R_{hydraulic}$.\n        *   If $R_{hydraulic} < Threshold_{low}$, indicate potential flow maldistribution or low brine density; extend brine draw time by 10%.\n        *   If $R_{hydraulic} > Threshold_{high}$, indicate bed fouling or blockage; abort brine draw, initiate rinse, and flag for maintenance.\n        *   Otherwise, proceed with standard brine volume.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\n*   **Driving Variable for Trigger:** The **Service Flow Meter** output ($V_{svc}$) drives the accumulation of $V_{cum}$. As $V_{svc}$ increases, the rate of hardness loading ($d(Hard_{load})/dt$) increases proportionally. Consequently, the time-to-breakthrough decreases, and the system triggers regeneration earlier when flow is high, preventing outlet hardness rise.\n*   **Driving Variable for Brine Efficiency:** The **Inlet Pressure Transmitter** output ($\\Delta P_{bed}$) combined with **Regeneration Flow Meter** ($V_{reg}$) drives the $R_{hydraulic}$ calculation. An increase in $\\Delta P_{bed}$ for a constant $V_{reg}$ indicates increased resistance (e.g., clogging or poor brine distribution), which reduces effective ion exchange. By detecting this increase in resistance, the system compensates by extending draw time or aborting, thereby reducing wasted salt usage caused by ineffective brine cycles.\n\n**Measures it Relies On:**\n*   **Service Flow Meter:** Provides $V_{svc}$ to derive $V_{cum}$ and $Hard_{load}$.\n*   **Regeneration Flow Meter:** Provides $V_{reg}$ to verify brine delivery volume and calculate $R_{hydraulic}$.\n*   **Inlet Pressure Transmitter:** Provides $\\Delta P_{bed}$ to calculate $R_{hydraulic}$ and detect bed anomalies.\n*   **Historical Log:** Provides $H_{base}$ as a static derived input for load calculation.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Sensor Inputs:**",
+   "*   $V_{svc}$: Instantaneous volumetric flow rate from the **Service Flow Meter**.",
+   "*   $V_{reg}$: Instantaneous volumetric flow rate from the **Regeneration Flow Meter**.",
+   "*   $P_{in}$: Differential pressure reading from the **Inlet Pressure Transmitter** (measu",
+   "2.  **Logic & Parameters:**",
+   "*   $H_{base}$: Last known good total hardness concentration (mg/L as CaCO$_3$). *Derived ",
+   "*   $C_{max}$: Maximum resin exchange capacity (grains/L or mg/L). *Pre-configured paramet",
+   "*   $V_{bed}$: Resin bed volume. *Pre-configured parameter.*",
+   "*   $K_{salt}$: Salt-to-hardness conversion factor. *Pre-configured parameter.*",
+   "3.  **Calculated Variables:**",
+   "*   $V_{cum}$: Cumulative service volume since last regeneration. Derived by integrating $",
+   "*   $Hard_{load}$: Total hardness load absorbed. Derived as: $Hard_{load} = V_{cum} \\times",
+   "*   $\\Delta P_{bed}$: Pressure drop across the bed. Measured directly by the **Inlet Press",
+   "*   $R_{hydraulic}$: Hydraulic resistance index. Derived as: $R_{hydraulic} = \\Delta P_{be",
+   "4.  **Control Actions:**",
+   "*   **Trigger:** When $Hard_{load} \\geq (C_{max} \\times V_{bed})$, initiate regeneration.",
+   "*   **Brine Verification:** During brine draw, calculate $R_{hydraulic}$.",
+   "*   If $R_{hydraulic} < Threshold_{low}$, indicate potential flow maldistribution or low b",
+   "*   If $R_{hydraulic} > Threshold_{high}$, indicate bed fouling or blockage; abort brine d",
+   "*   Otherwise, proceed with standard brine volume.",
+   "*   **Driving Variable for Trigger:** The **Service Flow Meter** output ($V_{svc}$) drives",
+   "*   **Driving Variable for Brine Efficiency:** The **Inlet Pressure Transmitter** output (",
+   "*   **Service Flow Meter:** Provides $V_{svc}$ to derive $V_{cum}$ and $Hard_{load}$.",
+   "*   **Regeneration Flow Meter:** Provides $V_{reg}$ to verify brine delivery volume and ca",
+   "*   **Inlet Pressure Transmitter:** Provides $\\Delta P_{bed}$ to calculate $R_{hydraulic}$",
+   "*   **Historical Log:** Provides $H_{base}$ as a static derived input for load calculation"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ }
+}

@@ -1,0 +1,38 @@
+{
+ "record": "R130_GEPA_REVIEWER_ABLATION/1.0.0",
+ "claim": "c-0207",
+ "art20_round": "1 of 2",
+ "arm": "gepa-reviewer (the reviewer fix-directive compiled GEPA-style against the deterministic defect metric)",
+ "incumbent": "the r125 IMPROVED_DIRECTIVE frozen bytes (the chain's reviewer since r125), replayed on the same frozen inputs; its delivered bytes = the twin's committed bon_run outputs (recomputed, zero re-run)",
+ "input_corpus_disclosure": "PREREG DEVIATION (typed): the prereg named eval/r129_phase_ab/ss_*.json as the frozen input source, but those records carry only POST-review delivered bills — not valid reviewer inputs. The run used the ONLY replayable reviewer-input corpus in the tree: the twin's committed eval/r129_bon_run/ records (authored_bill + surfaced_findings + delivered_bill per item — input AND incumbent output). The deviation changes the input distribution (clean-pre-fix candidates selected by bind-select) but not the isolation (author frozen, only the directive varies) nor the detector; it is disclosed here rather than silently patched.",
+ "stage1_compile": {
+  "slice": "12 items (items.jsonl order), 60 live reviewer legs (5 mutations x 12), 0 typed fails, 0 parse retries, backoffs absorbed per the established policy",
+  "results": {
+   "incumbent": "0 introduced defects, heal 0.000, len 1.347 (recomputed from committed bytes)",
+   "m1_duty_rule": "1 introduced defect, heal 0.000, len 1.482 — REJECTED: the naive derivation-rule mutation is HARMFUL (it makes the reviewer ADD a duty-cycle derivation where the original bill had none — the exact no-introduction failure mode)",
+   "m2_no_intro": "0 defects, heal 0.000, len 1.389",
+   "m3_sensor_cl": "0 defects, heal 0.000, len 1.374",
+   "m4_m1m2": "1 introduced defect, heal 0.083, len 1.248 — dominated (contains m1)",
+   "m5_minimal": "0 defects, heal 0.083, len 1.298 — PARETO WINNER (the minimal-diff clause: change only the sentences the findings touch, carry every other sentence verbatim)"
+  },
+  "pareto_front": [
+   "m4_m1m2",
+   "m5_minimal"
+  ],
+  "selection": "m5_minimal by the preregistered rule (fewest defects, then highest heal)"
+ },
+ "stage2_validation": {
+  "n_legs": 24,
+  "arm_delivered_defect_rows": 0,
+  "incumbent_delivered_defect_rows": 0,
+  "arm_heal_24": "1/24 vs incumbent 0/24 (the compiled directive healed one more item's findings than the incumbent directive on the same inputs)",
+  "arm_median_len_ratio": 1.296,
+  "note": "the incumbent side recomputed from the twin's committed bon_run delivered bytes (zero re-run, Art. 29(c))"
+ },
+ "art20_verdict_round1": "TIE ON THE PRIMARY METRIC (0 vs 0 delivered-defect rows on the full 24) — the compiled directive does NOT beat the incumbent on delivered-defect-rate this round. The secondary axes (heal 1/24 vs 0/24, m5's dominance of the front) favor m5 but are NOT the primary metric. Per Art. 20, the arm enters round 2: either (a) the R131 run shows m5 strictly beating the incumbent on delivered-defect-rate (a corpus where the incumbent's reviewer actually breaks bills — the r129 ss/bon3 residual class — is required; typed as the round-2 input requirement), or (b) the arm is DELETED. Round-2 input requirement typed: the round-2 corpus must include the reviewer-broke-clean-bill items (r125-01-s1 ss, r125-02-s2 bon3, r125-08-s2 bon3 class) — the input distribution where the incumbent demonstrably fails; the round-1 corpus (bind-select-clean inputs) has no headroom for the incumbent to fail, so a tie is the ceiling.",
+ "mechanism_findings_typed": {
+  "harmful_mutation_class": "m1/m4 (add a duty-cycle-derivation rule) INTRODUCED defects — telling the reviewer to 'derive or delete' duty figures makes it ADD derived figures to bills that had none; the fix for reviewer-introduced defects is NOT more rules but LESS rewriting (m5's minimal-diff clause). This is the round's transferable finding: the compile discovered that the reviewer's failure mode is over-rewriting, and the countermeasure is a diff-minimization clause, not additional derivation rules.",
+  "headroom_zero": "the round-1 input distribution (bind-selected clean candidates) gives the incumbent a 0-defect floor — the compile can tie but not beat on this corpus; the residual reviewer-failure class lives on inputs where the reviewer rewrote a clean bill (the r129 ss/bon3 items), which no committed corpus pairs input+output for (typed as the round-2 requirement)"
+ },
+ "next_round_decision_rule": "R131: replay m5 vs the incumbent on a corpus that includes the reviewer-broke-clean-bill inputs (re-run the ss chain on the 3 known items to regenerate input pairs — 6 author legs + 6 reviewer legs, quota-cheap) + the 24 bon inputs; m5 must STRICTLY beat the incumbent on delivered-defect-rate or the arm is deleted (Art. 20 round 2)."
+}

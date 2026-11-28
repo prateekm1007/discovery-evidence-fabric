@@ -1,0 +1,34 @@
+**Mitigation Proposal: Duty-Cycle-Adjusted Pull-Down Verification Using Existing Runtime Counters and Suction Temperature Drift Rate**
+
+**Mechanism:**
+The core issue is that pull-down time has lengthened and suction temperature drifts upward at a constant duty, indicating a loss of effective cooling capacity (likely due to refrigerant charge loss, oil degradation, or heat exchanger fouling). The compressors are over-cycling to compensate. The mitigation involves creating a **real-time performance degradation index** that compares the *actual* thermal response against the *historical baseline* for the same duty cycle, using only existing sensors. Instead of just maintaining room temperature (reactive), the control logic actively monitors the *rate of change* of suction temperature during the compression phase relative to the compressor's runtime fraction. A rising suction temperature drift per unit of compressor runtime is a direct indicator of declining coefficient of performance (COP) or reduced mass flow rate. By quantifying this drift and correlating it with increased cycling frequency (from runtime counters), the system can detect the degradation and trigger a protective or corrective operational adjustment (e.g., extending off-time to allow subcooling to recover, or flagging for maintenance) before the room temperature becomes uncontrollable.
+
+**Implementation:**
+1.  **Baseline Establishment (Offline/Initialization):**
+    *   Use the **existing runtime counters** to log historical compressor on/off cycles and associated **suction temperature transducer** readings during stable, low-humidity periods.
+    *   Calculate a baseline "Suction Temperature Drift Coefficient" (SDC) for the current load profile: `SDC_baseline = ΔT_suction_per_hour_of_compressor_runtime` during the initial 10-15 minutes of pull-down.
+    *   Store this baseline in the PLC/controller memory.
+
+2.  **Real-Time Monitoring Loop (Online):**
+    *   In each operational cycle, when the **room thermostat array** calls for cooling and the compressor starts:
+        *   Reset a local timer and record the initial **suction temperature**.
+        *   As the compressor runs, use the **runtime counter** delta to calculate the precise elapsed on-time (in minutes/hours).
+        *   Simultaneously, track the current **suction temperature**.
+    *   Calculate the *actual* SDC for the current cycle: `SDC_actual = (T_suction_current - T_suction_start) / (Δ_runtime_counter)`.
+
+3.  **Degradation Index Calculation:**
+    *   Compute a normalized index: `Index = SDC_actual / SDC_baseline`.
+    *   If the index exceeds a threshold (e.g., >1.15), it confirms that the suction temperature is rising faster than expected for the given duty, validating the failure mode.
+    *   Correlate this index with the **compressor cycling frequency** (derived from runtime counters over a rolling 2-hour window). A high cycling frequency combined with a high degradation index confirms that the compressors are working harder (more frequent starts) but less effectively (higher suction temp drift per runtime unit).
+
+4.  **Corrective Action (Within Constraint):**
+    *   If the degradation index persists above the threshold for consecutive cycles, the control logic will **proactively extend the compressor off-time** between cycles. This is not to let the room temperature rise, but to allow the condenser to dissipate heat more fully and the suction line to stabilize, preventing excessive discharge temperatures (monitored by the existing **discharge temperature transducer**) and reducing wear from short-cycling.
+    *   More critically, the system will generate a **maintenance alert** based on the persistent high index and high cycling rate, explicitly stating "Suspected capacity loss: Suction drift rate elevated at constant duty." This directs human intervention (checking refrigerant charge, cleaning coils) which is the root cause fix, but the *automated mitigation* is to prevent thermal runaway and mechanical stress by modulating the operating pattern based on the derived index, rather than just reacting to room temperature.
+
+**Measures It Relies On:**
+*   **Suction Temperature Transducer:** Provides the primary input for calculating the drift rate (`ΔT_suction`). An upward drift per unit runtime is the key symptom of reduced capacity.
+*   **Discharge Temperature Transducer:** Used as a safety interlock. If the mitigation (extended off-time) fails to stabilize, a rising discharge temperature will trigger a shutdown or hard alert, preventing compressor damage.
+*   **Room Thermostat Array:** Determines *when* the compressor should start, ensuring the monitoring loop is only active during requested cooling periods.
+*   **Compressor Runtime Counters:** Provide the precise denominator for the drift rate calculation and the data for calculating cycling frequency. This allows the system to distinguish between "normal" high-room-temperature operation (which might cause high suction temp but *low* drift rate because the compressor is running continuously at stable load) and the *failure* mode (where suction temp drifts upward *even as* the compressor cycles more frequently, indicating the machine is less efficient per hour of operation).
+
+This approach transforms existing passive sensors into an active diagnostic tool that identifies the specific failure signature (drift per runtime unit) and uses it to adjust operational parameters (off-time) to protect the equipment and signal the need for physical repair, all without adding new instrumentation.

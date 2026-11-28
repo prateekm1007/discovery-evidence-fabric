@@ -1,0 +1,25 @@
+**Mitigation Proposal: Closed-Loop Blower Recirculation Valve Control via Ammeter-Based Flow Balancing**
+
+**Mechanism**
+Since total blower output is at its mechanical maximum and airflow is unevenly split, the immediate constraint is not total capacity but distribution efficiency. The proposed mitigation is to implement a **split-flow balancing control strategy** that uses the existing blower motor ammeters as a surrogate for airflow to detect train imbalance, and commands the **existing blower recirculation valves** (or damper settings, if available and already instrumented via position feedback or assumed static map) to equalize airflow across trains. This increases the effective mass transfer coefficient (kLa) on the starved trains, directly addressing the local DO sag without requiring new total airflow.
+
+If no manual valves are available for control, the mechanism is a **feedforward-feedback DO trim on the blower VFD speed setpoint within its available range**, but since output is "near maximum," the primary actionable lever is **valve throttling to redistribute flow** or **accepting the limit and optimizing aeration distribution to minimize total oxygen demand** by shifting aeration emphasis to the front end of the basin (where organic load is highest) using the existing airflow meters to verify distribution.
+
+*Refined Mechanism (Strictly using existing sensors & assuming standard aeration valve presence):*
+**Differential Flow Balancing via Ammeter Comparison and Manual/Automatic Valve Throttling.**
+The core insight is that blower ammeters correlate strongly with airflow. Uneven ammeters indicate uneven airflow. Throttling the *over-supplied* train’s inlet valve (if valves exist) redirects flow to the *under-supplied* train, leveraging the blower’s pressure-flow curve to redistribute the fixed total volume more effectively, raising DO in the sagging zone.
+
+**Implementation**
+1.  **Establish Baseline:** Record baseline ammeter readings (A1, A2... An) for each aeration train and corresponding DO probe averages per zone.
+2.  **Control Logic (Operator or Basic PLC):**
+    *   Calculate the average ammeter reading for each train.
+    *   Identify the train with the **lowest** ammeter reading (indicating lowest airflow) that is also associated with the **lowest** DO reading or the greatest DO sag.
+    *   Simultaneously identify the train with the **highest** ammeter reading.
+    *   **Action:** Instruct operators to **throttle down** the air distribution valve on the highest-flow train by a small increment (e.g., 5–10%) and/or **open** the valve on the lowest-flow train, if independent control is possible. The goal is to equalize ammeter readings across trains, assuming the blower is at its maximum volume and any saved capacity on the over-supplied train can be redirected or the pressure drop adjusted to favor the under-supplied train.
+    *   *Note:* If valves are not individually controllable, the mitigation is **sequential throttling of all trains to the minimum airflow that maintains DO setpoint in the most critical zone**, using the DO probes as the primary limit and ammeters to ensure no train is starved of the redistributed flow.
+3.  **Verification:** Monitor DO probes. The target is to raise the minimum DO value in the basin while maintaining or slightly lowering the maximum DO value, achieving a tighter DO distribution and eliminating the sag.
+
+**Measures Relied Upon**
+*   **Blower Motor Ammeters:** Used as a real-time proxy for relative airflow per train. The assumption is that ammeters are consistent across trains of identical design and that the correlation between current and airflow is known or can be calibrated on-site. A significant divergence in ammeter readings directly indicates uneven airflow split, which is the root cause of the localized DO sag when total output is fixed.
+*   **Dissolved Oxygen (DO) Probes:** Used as the feedback variable to validate that the redistribution of airflow is successfully raising the DO in the previously sagging zones. They provide the endpoint check for the mitigation.
+*   **Existing Air Distribution Valves (Mechanical Component):** While not a sensor, the mitigation *requires* the actuation of existing physical valves to redistribute the fixed airflow. The *control decision* is derived solely from the ammeters and DO probes. If no valves are available for adjustment, this mitigation is not feasible, and the only remaining option would be to accept the DO sag as a consequence of reaching the physical limit of the blower and airflow distribution system, potentially requiring a change in process operating conditions (e.g., reducing organic load upstream) rather than aeration control.

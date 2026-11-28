@@ -1,0 +1,21 @@
+{
+ "record": "R114S2_KEY_CUSTODY/1.0.0",
+ "session": "builder-r114s2-c9c03209",
+ "at": "2026-11-21T19:40:00Z (sandbox clock, TRUE UTC)",
+ "trigger": "sandbox reprovision #5 (VAULT_LOST class, the 4th+ reprovision event the auditor typed): .env.keys absent at window open; the owner re-delivered BOTH credentials in-channel in the R114 verdict message (GH_PAT + HF token, env-only, digests-only per the standing rule)",
+ "custody_decision": {
+  "github_pat": "stored as GITHUB_PAT in the repo-root gitignored vault .env.keys (0600, gitignore line verified live) + the out-of-repo copy /home/z/my-project/.env.keys (0600, gitignored line 57); digest-only custody sha256[:12] f1ebca5f9b62 — BYTE-IDENTICAL to the r59 committed gh_pat_owner_digest / r108s2 (COMMITTED_RECORD_MATCH, NOT a rotation)",
+  "hf_token": "stored as HF_TOKEN in the same vault; digest 33bc7af22c62 — the v3.3.0 Art. 17 master-token reference digest (COMMITTED_RECORD_MATCH); the owner re-delivered the MASTER class this round (not the r108 public-read b5aaf542b2fd)",
+  "agnes_xkiro": "ABSENT (vault-managed, owner-side): the r77 general restore re-probed live this window with the master token — typed exit 2, HTTP 429 Too Many Requests on the private vault dataset (prateekm1/operator-keys-vault); AGNES_API_KEY / AGNES_API_KEY_2 / XKIRO_API_KEY remain unwritten; the engine-bare fresh run (dir 4) stays TYPED BLOCKED; the owner may re-deliver AGNES in-channel (env-only) to bypass the 429, or the cron watch / AWS host path unblocks it later",
+  "credential_helper": "/home/z/.git-vault-cred.sh (0600) restored from the committed design scripts/git_cred_helper_vault.sh with the r108s2 typed deviation (pinned out-of-repo primary path) + ONE R114 addition: the ordered fallback list [my-project/.env.keys, queue-wt/.env.keys] — the r77 restore target covered; remote URL carries no embedded token (F33)",
+  "no_values": "values never printed, logged, or committed; this record carries digests only"
+ },
+ "vault_restore_probe": {
+  "command": "HF_TOKEN=<env-only> python3 scripts/r77_vault_restore.py",
+  "exit_code": 2,
+  "typed": "HTTPError 429 Too Many Requests — fail-closed, zero vault bytes written, .env.keys untouched by the restore (the bootstrap keys stand)",
+  "consequence": "the GitHub push (dir 2) is UNAFFECTED (GITHUB_PAT in-channel); only the HF-hosted legs (vault AGNES/XKIRO + SPECTER2 weights) are blocked — exactly the R114 auditor's gate separation"
+ },
+ "files_touched_with_secrets": [],
+ "zero_llm_zero_quota": "custody only; zero LLM calls, zero quota, zero sealed bytes; NO acceptance/score claims"
+}

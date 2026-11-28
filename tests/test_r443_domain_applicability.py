@@ -447,12 +447,11 @@ def medical_package():
 
 
 def _pdf_text(pkg_dir):
-    import fitz
+    from pypdf import PdfReader
     texts = []
     for p in sorted(Path(pkg_dir).glob("*.pdf")):
-        doc = fitz.open(p)
-        texts.append("\n".join(page.get_text() for page in doc))
-        doc.close()
+        r = PdfReader(str(p))
+        texts.append("\n".join((pg.extract_text() or "") for pg in r.pages))
     return "\n".join(texts)
 
 

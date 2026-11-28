@@ -1,0 +1,28 @@
+**Mitigation Proposal: Drive Power-Limited Feed Rate Control with Undersize Accumulation Buffering**
+
+**Mechanism**
+The failure mode indicates that the shredder is operating at the edge of its torque capability, causing stalls on tough feed, which reduces throughput and increases screen bypass (undersize). The discharge conveyor running light confirms a mass balance deficit. Since new sensors are prohibited, we will implement a **closed-loop feed rate control** that uses the **main drive power meter** as a proxy for shredder load and the **feed/discharge conveyor scales** to enforce a global mass balance, preventing the shredder from being overloaded.
+
+**Implementation**
+1.  **Primary Control Law (Load-Limited Feeding):**
+    *   Map the main drive power meter (kW) to a maximum allowable feed rate. Establish a *Power-to-Feed Limit Curve* ($P_{max} \rightarrow \dot{m}_{feed,max}$). For instance, if power reaches 90% of the stall threshold, the feed conveyor speed (or gate position, if controlled) is throttled back.
+    *   Invert this logic for control: The setpoint for the feed conveyor speed is dynamically adjusted in real-time to keep drive power below the 90% threshold. If power spikes (indicating tough feed), the feed rate is automatically reduced to prevent stall.
+
+2.  **Secondary Control Law (Mass Balance & Undersize Compensation):**
+    *   Continuously calculate the cumulative mass balance: $M_{balance} = \int (\dot{m}_{feed} - \dot{m}_{discharge}) dt$ using the existing feed and discharge conveyor scales.
+    *   Detect the "light discharge" condition: If $\dot{m}_{discharge}$ drops below a set threshold for a sustained period (e.g., 5 minutes) *while* $\dot{m}_{feed}$ remains high or stable, it indicates either shredder underperformance (stalls) or excessive undersize bypass.
+    *   **Action:** If $M_{balance}$ accumulates positive error (material building up in the shredder/screen) and drive power is high, further reduce $\dot{m}_{feed}$ to zero until discharge scale readings normalize. This prevents screen blinding and allows the shredder to recover torque.
+
+3.  **Tertiary Rule (Undersize Management via Discharge Signal):**
+    *   Since screen undersize has grown, the discharge conveyor scale will show lower average density or mass flow rate per unit time for a given feed rate.
+    *   Correlate the ratio $\frac{\dot{m}_{discharge}}{\dot{m}_{feed}}$ to feed quality. A persistent drop in this ratio (efficiency < 1.0, accounting for moisture/losses) signals increased bypass.
+    *   When this ratio falls below a setpoint, tighten the Power-to-Feed Limit Curve (i.e., require lower power for the same feed rate, effectively reducing load) to prioritize throughput consistency over maximum volume, allowing the screen to perform better.
+
+**Measures Relied Upon**
+*   **Main Drive Power Meter:** Used as the real-time load indicator and primary control input for feed rate limitation.
+*   **Feed Conveyor Scale:** Provides $\dot{m}_{feed}$ input for mass balance calculation and as the actuator variable (if the conveyor speed is variable) or control input for gate adjustment.
+*   **Discharge Conveyor Scale:** Provides $\dot{m}_{discharge}$ input for mass balance calculation and detection of throughput loss/undersize effects.
+*   **No New Instrumentation:** All data sources are pre-existing; the mitigation is purely a control logic change (software/PLC update) leveraging these signals.
+
+**Expected Outcome**
+By tying feed rate directly to drive power, stalls are prevented. By monitoring the mass balance between feed and discharge, the system detects when the shredder is underperforming and automatically backs off feeding, reducing screen bypass and stabilizing discharge mass flow. This restores nominal throughput and prevents drive trips.

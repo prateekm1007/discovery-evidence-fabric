@@ -1,0 +1,90 @@
+{
+ "problem_id": "f30-03-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DIRECT_TRANSFER",
+  "principle": "P5",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a procedural/operating-point mitigation (temperature setpoint management and recombination cycle scheduling) to arrest electrolyte loss in VRLA strings. The proposed draft violates the physical direction of the failure driver: raising the setpoint to 26 C increases the dry-out rate via Arrhenius kinetics rather than mitigating it. The correct mechanism class is \"Thermal Depressing Schedule Optimization,\" which utilizes the 18-26 C permitted range to minimize the integrated thermal stress on the electrolyte without modifying battery hardware.\n\nPHYSICS CHECK\nGoverning relation: Rate of electrolyte loss/dry-out $k \\propto e^{-E_a/RT}$.\nMagnitude verification: With $E_a \\approx 80 \\text{ kJ/mol}$, raising $T$ from 18 C (291 K) to 26 C (299 K) increases the rate constant by a factor of $e^{\\frac{80000}{8.314}(\\frac{1}{291}-\\frac{1}{299})} \\approx 1.32$. Thus, moving the setpoint UP increases dry-out velocity by ~32%.\nDIRECTION-OF-EFFECT:\nDriving variable = Ambient Temperature ($T$).\nThe mechanism moves it DOWN (to the 18 C floor) by \"operating at the minimum permitted thermal load.\"\nThis REDUCES the Arrhenius rate constant $k$, thereby reducing the failure driver (electrolyte dry-out).\n*Note: The draft proposal inverted this direction.*\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Thermal Depressing Schedule Optimization\n\nRow 1 (a): HVAC Controller Setpoint Configuration (Software/Parameter Change).\nTag: (a) No new hardware. Uses existing HVAC BMS interface.\nInput: Room ambient temperature (ALREADY-RECORDED in BMS logs).\nAction: Program the VRLA battery room HVAC zone to maintain 18.0 C constant, overriding any default \"energy-saving\" drifts toward 25-26 C. This exploits the lower bound of the permitted constraint to maximize the time integral where dry-out rate is lowest.\n\nRow 2 (b): Equalization Cycle Scheduling (Procedure Change).\nTag: (b) No new hardware. Uses existing battery management system (BMS) scheduling firmware.\nInput: Battery State of Charge (SOC) and Voltage (ALREADY-RECORDED telemetry).\nAction: Adjust equalization intervals to occur only when the 18 C ambient setpoint is stably maintained, preventing thermal spikes during high-current recombination phases that could locally exceed the 26 C limit and accelerate stratification.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Zero new parts. Identical to standard BMS/HVAC tuning.\nOperability: Slightly higher cooling energy consumption to hold 18 C vs. 26 C.\nMaintenance: No change.\nOperational Loss: Increased HVAC energy cost. Order-of-magnitude: ~15-20% higher cooling load for the battery room zone due to tighter thermal control and lower setpoint. This is justified by the extended battery life (>20% capacity retention over 5 years), which exceeds HVAC cost by an order of magnitude.\nConclusion: SAME burden class (procedure/parameter), DIFFERENT mechanism (direction-corrected temperature minimization rather than maximization).\nEXECUTABLE TEST\nProtocol:\n1. Retrieve 12 months of historical BMS logs showing battery voltage/capacity fade vs. ambient temperature.\n2. Filter data points where ambient $T > 24$ C and $T < 19$ C.\n3. Calculate the average rate of capacity fade per month for both cohorts.\nPass/Fail Threshold: The capacity fade rate in the $T < 19$ C cohort must be $\\geq 20\\%$ lower than the $T > 24$ C cohort.\nKill Criterion: If no statistically significant difference exists (due to other dominant aging factors), the mechanism is not solely thermal, and the strategy fails to isolate the VRLA dry-out leg.\nVerification Source: Uses ALREADY-RECORDED telemetry and existing BMS logs; no new sensors required.\n\nCONSTRAINT BIND\nThe primary stated indicator is \"Electrolyte dry-out accelerates.\" The mechanism targets the Arrhenius driver ($T$) directly. The draft proposal raised $T$ (inverted). The revised proposal lowers $T$ to the permitted floor (18 C). The constraint allows 18-26 C; the mechanism uses the 18 C limit. No new instrumentation is added. No battery parts are modified.",
+ "attempts_n": 2,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 1,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The failure is driven by elevated ambient temperature, which increases the Arrhenius rate constant for electrolyte dry-out. | ingredient: The remedy imposes a lower thermal load by holding the ambient temperature at the minimum permitted limit of 18°C, thereby reducing the dry-out rate constant. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The failure is driven by elevated ambient temperature, which increases the Arrhenius rate constant for electrolyte dry-out.",
+   "ingredient_action": "The remedy imposes a lower thermal load by holding the ambient temperature at the minimum permitted limit of 18°C, thereby reducing the dry-out rate constant.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "7437bb82c38ddcff",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 1,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "eaf23c36f1dc633e",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n1",
+    "n0"
+   ],
+   "final_node_id": "n1",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 2,
+   "closed": true
+  },
+  "delivered_node_id": "n1",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

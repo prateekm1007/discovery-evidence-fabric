@@ -1,0 +1,23 @@
+{
+ "problem_id": "bench-p04-pump-cavitation",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_WB_WEIGHT_BOUND_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT_WB verbatim (AM16 D1 weight-bound contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 9.6,
+   "chars": 3658
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:57:18.978931Z",
+ "a1_answer": "### NOVELTY STATEMENT (INTERVENTION)\n**What is being proposed:** A micro-textured surface treatment on the impeller vane leading edges that creates stable micro-gas pockets to dampen cavitation bubble collapse energy.  \n**Standard practice:** Polished or smooth vane surfaces that provide no protection against cavitation bubble collapse.  \n**Your mitigation:** A departure from standard practice by introducing controlled surface features that transform destructive bubble collapse into less damaging micro-scale events.  \n**Adjacent-technique clearance:** The closest existing practice is laser surface texturing for friction reduction, but this differs by targeting cavitation suppression through gas entrapment rather than tribological improvement.  \n**Mechanism:** The micro-textures trap micro-gas pockets that cushion bubble collapse, reducing localized pressure peaks and material erosion by dissipating energy through micro-compression rather than micro-jetting.\n\n### PHYSICS CHECK\nThe governing relation is the cavitation erosion rate ∝ (P_max - P_vapor)^n, where P_max is the peak pressure during bubble collapse. The micro-textures reduce P_max by creating compressible gas cushions that limit pressure rise. For a typical cavitation event, peak pressure can exceed 1000 MPa; with 10% gas volume in micro-pockets, pressure peaks are reduced by ~40% (from ideal gas law: ΔP ∝ 1/V_gas). This reduces erosion rate by a factor of ~5-10 (assuming n=2-3), extending vane life beyond 5 years at 85% flow.\n\n### IMPLEMENTATION BILL\n| Component | Standard Practice | Proposed Intervention |\n|-----------|-------------------|----------------------|\n| Impeller material | AISI 304 stainless steel | AISI 304 stainless steel (no change) |\n| Surface finish | Polished (Ra < 0.8 μm) | Laser-textured (Ra = 5-10 μm controlled pattern) |\n| Texturing equipment | None | Standard industrial laser marker (procured) |\n| Texturing pattern | None | 50-100 μm diameter dimples, 20% coverage, 100-200 μm spacing |\n| Texturing process | None | Single-pass laser ablation (existing CNC capability) |\n| Inspection | Visual + CMM | Visual + CMM (no new equipment) |\n| Installation | Standard fit | Standard fit (no change) |\n| Cost | $X | $X + $0.50/impeller for texturing |\n\n### BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n| Burden Category | Standard Practice | Proposed Intervention | Difference |\n|-----------------|-------------------|----------------------|------------|\n| Material cost | $Y | $Y | 0 |\n| Equipment cost | $Z | $Z + $0 (existing laser) | 0 |\n| Labor cost | $A | $A + $0.50 (texturing time) | +0.50/impeller |\n| Maintenance | $B | $B | 0 |\n| Inspection | $C | $C | 0 |\n| **Total Burden** | **$Y+Z+A+B+C** | **$Y+Z+A+B+C+0.50** | **+0.50/impeller** |\n\nThe burden is effectively same-class ($0.50/impeller is negligible in industrial context). No new hardware classes required; texturing uses existing laser equipment.\n\n### EXECUTABLE TEST\n**Protocol:**  \n1. Test two identical pumps: one with standard impeller, one with micro-textured impeller.  \n2. Operate at 85% best-efficiency flow with NPSH margin = 1.5 m.  \n3. Measure head delivery weekly and inspect vane leading edges monthly for erosion.  \n**Instruments:** Pressure transducers, flow meter, optical profilometer, CMM.  \n**Pass/Fail:** Pass if textured impeller maintains >95% original head after 5 years and shows <0.1 mm erosion; fail if it drops below 95% head or exceeds 0.1 mm erosion.  \n**Duration:** 5 years or equivalent accelerated testing (1000 hours at 2x cavitation intensity).  \n**Kill Criterion:** Immediate stop if head drops >5% in any month or erosion exceeds 0.05 mm in 6 months."
+}

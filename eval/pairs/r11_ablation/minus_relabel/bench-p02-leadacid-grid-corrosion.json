@@ -1,0 +1,141 @@
+{
+ "a0plus_version": "r7_a0plus/3.1.0",
+ "ablation_variant": "minus_relabel",
+ "problem_id": "bench-p02-leadacid-grid-corrosion",
+ "baseline_source": "committed audited pair bytes, unmodified",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '0e914506080e17227cb20f45ff2d1830f8af1f189edb5d2e6bae6e4818d37a57', 'baseline_answer_sha256': 'b2ddd6807c8a7edbda41177e93914436660e9107774fb4339875964c7f0e4681', 'evidence_sha256': 'ab35c845ed0074bccad94ccb4c2693a9ba1470aa723c138b4e4dc424c468f4ea', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 32,
+ "arm_contract": {
+  "repair_policy": "at_most_one_repair_call",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 1,
+  "total_budget_s": 300
+ },
+ "constraint_audit": {
+  "state": "CHECK_UNPARSEABLE",
+  "n_violations": 0,
+  "violations": [],
+  "wall_s": 5.8
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "typed_note": "the minus_relabel ablation arm: the deterministic strict relabel is SKIPPED for the ablation measurement only"
+ },
+ "consistency_first_pass": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_first_pass": {
+  "valid": false,
+  "n_violations": 3,
+  "violations": [
+   "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+   "intervention contract: falsification test states no test temperature (a real protocol states its conditions, e.g. 60 C ambient or the operating temperature)",
+   "intervention contract: falsification test states no sample size n"
+  ]
+ },
+ "repair_rounds": [
+  {
+   "round": 1,
+   "wall_s": 6.2,
+   "applied": true,
+   "mode": "surgical_test",
+   "post_relabel": 0
+  }
+ ],
+ "repair_call": {
+  "applied": true,
+  "n_rounds": 1
+ },
+ "delivery_header": "PROVENANCE HEADER: every EVIDENCE-BACKED parameter below was verified verbatim against its cited record.\nUnsupported labels found by the constraint audit were repaired before delivery; the design substance is unchanged.",
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": false,
+   "violations": [
+    "intervention contract: EVIDENCE-BACKED source id not found in evidence packet"
+   ],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 13,
+    "assumption": 0,
+    "unbound_numbers": 12,
+    "all_numbers": 25,
+    "claims": []
+   }
+  }
+ },
+ "completion_gate": {
+  "provenance_resolved": true,
+  "contract_valid": false,
+  "consistency_state": "CONSISTENCY_PASS",
+  "complete": false
+ },
+ "result": "INCOMPLETE_CONTRACT",
+ "full_pipeline_answer": "CONTRACT-INVALID COMPOSITION (deterministic answer-shape contract violations: intervention contract: EVIDENCE-BACKED source [doi:10.1051/e3sconf/202018501058] does not jointly support its parameter (unrelated_source) | intervention contract: EVIDENCE-BACKED source [doi:10.58837/chula.the.2014.1033] does not jointly support its parameter (value_not_in_source) | intervention co)\n\nRECOMMENDED INTERVENTION\nImplement a positive grid alloy modification to calcium-silver (Ca-Ag) combined with optimized gel electrolyte formulation to stabilize grid cross-section and prevent thermal runaway.\n\nPARAMETERS\nFLOAT VOLTAGE \u2014 2.27 V/cell \u2014 ASSUMPTION (User constraint; must be maintained to balance water loss vs corrosion).\nANTIMONY CONTENT \u2014 0.00-0.20% \u2014 EVIDENCE-BACKED [doi:10.1051/e3sconf/202018501058] (Explicitly below 2% limit).\nGEL ELECTROLYTE BINDER \u2014 Graphene-Polyaniline Composite \u2014 EVIDENCE-BACKED [doi:10.58837/chula.the.2014.1033].\nSERVICE TEMPERATURE \u2014 25\u00b0C \u2014 ASSUMPTION (Baseline for 15-year life extrapolation).\n\nEXPECTED EFFECT\nThis intervention mitigates the specific failure mode of positive electrode plate corrosion, which directly reduces service life and induces fire via thermal runaway. EVIDENCE-BACKED [doi:10.1051/e3sconf/202018501058]. The Ca-Ag alloy provides the mechanical stability required to maintain grid cross-section during extended float charge, preventing the increase in internal resistance that leads to capacity failure. The gel electrolyte with graphene-polianiline composite enhances ionic conductivity and acid stratification control, which helps manage the electrochemical environment causing corrosion. EVIDENCE-BACKED [doi:10.58837/chula.the.2014.1033]. By stabilizing the positive plate, the battery achieves the 15-year float service life without exceeding the antimony constraint.\n\nCONSTRAINT RESPECT\nThe design achieves 15-year float service life at 2.27 V/cell. EVIDENCE-BACKED [doi:10.1109/intlec.1995.498933] (References accelerated testing for VRLA life). The antimony content is kept at 0.00-0.20%, strictly below the 2% limit. EVIDENCE-BACKED [doi:10.1051/e3sconf/202018501058]. The device remains a valve-regulated lead-acid battery positive plate. EVIDENCE-BACKED [doi:10.1016/b978-044450746-4/50008-8]. The primary failure addressed is corrosion. EVIDENCE-BACKED [doi:10.1109/intlec.1995.498976].\n\nFALSIFICATION TEST\n1. Accelerated Corrosion Test: Age test cells at 2.27 V/cell in a 40\u00b0C thermal chamber for 90 days (equivalent to ~2 years at 25\u00b0C by Arrhenius rule). Measure positive plate grid cross-section loss via X-ray tomography. If cross-section loss exceeds 15% ASSUMPTION, the Ca-Ag alloy formulation is insufficient.\n2. Thermal Runaway Verification: Apply a 10% overcharge to the VRLA cell. If the cell temperature rises >50\u00b0C above ambient in <30 minutes, the fire prevention scheme fails. EVIDENCE-BACKED [doi:10.1051/e3sconf/202018501058].\n3. Antimony Verification: Perform ICP-MS on the alloy. If antimony content >2%, the constraint is violated.\n\nEVIDENCE BASE\nThe recommendation is supported by the direct correlation between positive plate corrosion and fire in VRLA batteries [doi:10.1051/e3sconf/202018501058], the specific impact of grid corrosion on standby float service [doi:10.1109/intlec.1995.498976], and the development of advanced gel electrolytes using graphene-polianiline composites to improve VRLA performance [doi:10.58837/chula.the.2014.1033]. The approach to defining life via accelerated testing supports the 15-year projection [doi:10.1109/intlec.1995.498933].",
+ "full_pipeline_source": "eval/pairs/dev12_fresh (committed)",
+ "baseline_answer": "### Proposed Design Intervention: Lattice-Stabilized Calcium-Silicon (Ca-Si) Alloys\n\nTo achieve a 15-year float life at 2.27 V/cell while keeping antimony content below 2%, the engineering solution is to replace antimony-doped positive grids with a high-purity **Calcium-Silicon (Ca-Si) alloy** incorporating a stabilizer, such as **Bismuth (Bi)** or **Tellurium (Te)**.\n\n1.  **Grid Alloy Modification:** The positive plate should utilize a cast or wrought Ca-Si alloy (e.g., Ca 0.05\u20130.1%, Si 0.05\u20130.15%, Bi 0.02\u20130.05%). Antimony ($Sb$) must be restricted to <0.05% (trace impurity levels) to strictly satisfy the \"no antimony content above 2 percent\" constraint (interpreted here as a strict exclusion of the traditional 3\u20134% Sb standard).\n2.  **Electrochemical Stabilization:** Pure Ca-Si grids corrode faster than Sb-lead grids at high float potentials. Adding small amounts of Bi or Te stabilizes the PbO\u2082 lattice, reducing the rate of grid corrosion without introducing the heavy grid-thickening required by antimony.\n3.  **Process Optimization:** To counteract the inherently higher corrosion of non-antimony grids at 2.27 V, the design must include:\n    *   **Thicker Grids:** Increase grid thickness to 1.0\u20131.2 mm to provide a larger \"corrosion buffer\" (sacrificial cross-section).\n    *   **Gel Electrolyte:** Use a silica-polymer composite gel (as evidenced in *[crossref] Development of Gel Electrolyte*) to prevent water loss and maintain oxygen recombination, which supports the VRLA design.\n    *   **Charge Control:** Implement a precise float charge algorithm (per *[openaire] Improved charge algorithms*) to avoid overcharging, which accelerates corrosion.\n\n### Expected Measurable Effect\n\n*   **Increased Time-to-Failure:** The primary metric is extending the \"time to capacity loss\" (80% Ah capacity) to >15 years (131,400 hours) at 25\u201330\u00b0C.\n*   **Slower Resistance Rise:** The internal resistance (IR) of the cell should increase at a rate of <0.1 \u00b5\u03a9/month. With antimony, the grid cross-section erodes uniformly, but with Ca-Si, the active material (PbO\u2082) often detaches before the grid fully corrodes. The stabilizer (Bi/Te) mitigates this detachment, keeping the active material adhered to the grid for longer.\n*   **Failure Mode Shift:** Instead of \"grid consumption\" (catastrophic short or open), the failure mode shifts to \"active material loss\" (shelving), which is a gradual capacity fade that can be monitored.\n\n### Falsification Test\n\nTo falsify this approach, perform an **Accelerated Corrosion Test** using the methodology outlined in *[openaire] Defining the life of valve-regulated lead-acid batteries*.\n\n1.  **Protocol:** Construct 20 Ah VRLA cells with:\n    *   **Sample A (Proposed):** Ca-Si-Bi grids (Sb <0.05%), 1.0 mm thickness, gel electrolyte, floated at 2.27 V/cell and 30\u00b0C.\n    *   **Sample B (Control):** Standard Sb-3% grids, floated at 2.27 V/cell and 30\u00b0C.\n2.  **Measurement:** Monitor:\n    *   Capacity (Ah) at 10-minute monthly intervals.\n    *   Internal Resistance (IR) via EIS (Electrochemical Impedance Spectroscopy).\n    *   Visual inspection of grid thinning (X-ray tomography every 6 months).\n3.  **Falsification Criterion:**\n    *   If **Sample A** fails to reach 80% of its initial capacity within 131,400 hours (or",
+ "a0plus_answer": "PROVENANCE HEADER: every EVIDENCE-BACKED parameter below was verified verbatim against its cited record.\nUnsupported labels found by the constraint audit were repaired before delivery; the design substance is unchanged.\n\n### Proposed Design Intervention: Lattice-Stabilized Calcium-Silicon (Ca-Si) Alloys\n\nTo achieve a 15-year float life at 2.27 V/cell while keeping antimony content below 2%, the engineering solution is to replace antimony-doped positive grids with a high-purity **Calcium-Silicon (Ca-Si) alloy** incorporating a stabilizer, such as **Bismuth (Bi)** or **Tellurium (Te)**.\n\n1. **Grid Alloy Modification:** The positive plate should utilize a cast or wrought Ca-Si alloy (e.g., Ca 0.05\u20130.1%, Si 0.05\u20130.15%, Bi 0.02\u20130.05%). Antimony ($Sb$) must be restricted to <0.05% (trace impurity levels) to strictly satisfy the \"no antimony content above 2 percent\" constraint (interpreted here as a strict exclusion of the traditional 3\u20134% Sb standard).\n2. **Electrochemical Stabilization:** Pure Ca-Si grids corrode faster than Sb-lead grids at high float potentials. Adding small amounts of Bi or Te stabilizes the PbO\u2082 lattice, reducing the rate of grid corrosion without introducing the heavy grid-thickening required by antimony.\n3. **Process Optimization:** To counteract the inherently higher corrosion of non-antimony grids at 2.27 V, the design must include:\n * **Thicker Grids:** Increase grid thickness to 1.0\u20131.2 mm to provide a larger \"corrosion buffer\" (sacrificial cross-section).\n * **Gel Electrolyte:** Use a silica-polymer composite gel (as evidenced in *[crossref] Development of Gel Electrolyte*) to prevent water loss and maintain oxygen recombination, which supports the VRLA design.\n * **Charge Control:** Implement a precise float charge algorithm (per *[openaire] Improved charge algorithms*) to avoid overcharging, which accelerates corrosion.\n\n### Expected Measurable Effect\n\n* **Increased Time-to-Failure:** The primary metric is extending the \"time to capacity loss\" (80% Ah capacity) to >15 years (131,400 hours) at 25\u201330\u00b0C.\n* **Slower Resistance Rise:** The internal resistance (IR) of the cell should increase at a rate of <0.1 \u00b5\u03a9/month. With antimony, the grid cross-section erodes uniformly, but with Ca-Si, the active material (PbO\u2082) often detaches before the grid fully corrodes. The stabilizer (Bi/Te) mitigates this detachment, keeping the active material adhered to the grid for longer.\n* **Failure Mode Shift:** Instead of \"grid consumption\" (catastrophic short or open), the failure mode shifts to \"active material loss\" (shelving), which is a gradual capacity fade that can be monitored.\n\n### Falsification Test\n\nTo falsify this approach, perform an **Accelerated Corrosion Test** using the methodology outlined in *[openaire] Defining the life of valve-regulated lead-acid batteries*.\n\n1. **Protocol:** Construct 20 Ah VRLA cells with:\n * **Sample A (Proposed):** Ca-Si-Bi grids (Sb <0.05%), 1.0 mm thickness, gel electrolyte, floated at 2.27 V/cell and 30\u00b0C.\n * **Sample B (Control):** Standard Sb-3% grids, floated at 2.27 V/cell and 30\u00b0C.\n2. **Measurement:** Monitor:\n * Capacity (Ah) at 10-minute monthly intervals.\n * Internal Resistance (IR) via EIS (Electrochemical Impedance Spectroscopy).\n * Visual inspection of grid thinning (X-ray tomography every 6 months).\n3. **\n\nFALSIFICATION TEST:\n**FALSIFICATION TEST:** To falsify the proposed **Lattice-Stabilized Calcium-Silicon (Ca-Si) Alloys** design, conduct an accelerated life test at **60\u00b0C ambient** for **10,000 hours** with **n = 12 cells** (6 with Bi-stabilized Ca-Si grids, 6 with Te-stabilized Ca-Si grids). The test must maintain a **2.35 V float voltage** (10% overpotential to accelerate corrosion) while monitoring **grid cross-sectional loss**. The design fails if **>20% of the initial grid thickness (1.0\u20131.2 mm) is eroded** before 10,000 hours, confirming that the stabilizer (Bi/Te) cannot compensate for the inherent corrosion rate of Ca-Si alloys at high float potentials. Secondary failure criteria include **capacity fade exceeding 20% (Ah loss)** or **internal resistance (IR) rise >0.5 \u00b5\u03a9/month**, indicating active material detachment or grid degradation.",
+ "per_call_timeline": [
+  {
+   "purpose": "a0plus_constraint_audit",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 2455,
+   "ttfb_ms": 2455,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a0plus_repair",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 2746,
+   "ttfb_ms": 2746,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 2,
+ "work_time_s": 5.2,
+ "hang_time_s": "NOT_MEASURED",
+ "n_provider_attempts": 2,
+ "n_retries": 0,
+ "e2e_wall_s": 12.0,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ },
+ "call_accounting": {
+  "baseline_generation": {
+   "n_calls": 1,
+   "latency_s": 11.3,
+   "route": {
+    "provider": "agnes",
+    "model": "agnes-3.0-flash"
+   },
+   "source": "committed run tree baseline_record.json"
+  },
+  "a0plus_calls": 2,
+  "note": "reported separately per the owner R10 directive; never summed"
+ }
+}

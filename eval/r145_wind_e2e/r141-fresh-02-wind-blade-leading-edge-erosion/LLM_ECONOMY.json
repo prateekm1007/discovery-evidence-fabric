@@ -1,0 +1,53 @@
+{
+ "instrument": "llm_economy/1.0",
+ "cache_mode": "off",
+ "store_root": ".llm_cache",
+ "counters": {
+  "cache_hits": 0,
+  "cache_misses": 0,
+  "cache_writes": 0,
+  "cache_blocked_ro": 0,
+  "governor_healthy": 12,
+  "governor_retries": 3,
+  "governor_stops": 3,
+  "breaker_opens": 1,
+  "breaker_refusals": 2,
+  "stage_memo_hits": 0,
+  "stage_memo_writes": 0
+ },
+ "governor": {
+  "enabled": true,
+  "scope": "engine:r145-wind-e2e",
+  "healthy_calls": 12,
+  "retry_attempts": 3,
+  "stops": [
+   {
+    "kind": "HEALTHY_CALL_CAP_EXCEEDED",
+    "key": "d7923d15ac0d",
+    "at_healthy": 12
+   },
+   {
+    "kind": "HEALTHY_CALL_CAP_EXCEEDED",
+    "key": "6932c68dcbd7",
+    "at_healthy": 12
+   },
+   {
+    "kind": "HEALTHY_CALL_CAP_EXCEEDED",
+    "key": "5ef0314bb919",
+    "at_healthy": 12
+   }
+  ],
+  "healthy_call_cap": 12,
+  "retry_cap": 6
+ },
+ "breakers": [
+  {
+   "provider": "agnes",
+   "open": true,
+   "half_open": false,
+   "consecutive_transient_failures": 3,
+   "cooldown_s": 60.0
+  }
+ ],
+ "breaker_threshold": 3
+}

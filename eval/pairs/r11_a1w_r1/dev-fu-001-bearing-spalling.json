@@ -1,0 +1,23 @@
+{
+ "problem_id": "dev-fu-001-bearing-spalling",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.5,
+   "chars": 2849
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT — The standard practice delivers a vibration amplitude monitoring scheme (class: MONITORING/INDICATION) that triggers when overall vibration exceeds a fixed threshold. Our departure is a same-class mechanism that monitors the evolution of vibration harmonics specific to bearing defect frequencies rather than overall amplitude, detecting incipient spalling before it generates significant overall vibration increase.\n\nPHYSICS CHECK — The governing physical relation is the modulation of bearing defect frequencies by the shaft rotation frequency: f_mod = n × f_shaft ± f_defect, where n is the modulation order. For a bearing with ball pass frequency inner race (BPFI) of 150 Hz and shaft speed of 30 Hz, the first modulation sideband appears at 180 Hz (150 + 30) and 120 Hz (150 - 30). The magnitude verification shows that incipient spalling creates these sidebands at levels 10-15 dB below the main defect frequency, detectable with 1 kHz sampling.\n\nIMPLEMENTATION BILL — \n1. Same-class vibration sensor (existing 1 kHz accelerometer) — USER CONSTRAINT: problem states existing sensor\n2. Signal processing module (off-the-shelf FFT analyzer) — SAME CLASS as standard practice's vibration monitoring equipment\n3. Algorithm implementation (software running on existing SCADA system) — SAME CLASS as standard practice's monitoring system\n4. Defect frequency calculator (bearing geometry database) — ASSUMPTION: bearing geometry is available in maintenance records\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installability: SAME (uses existing sensor and SCADA infrastructure)\n- Operability: SAME (no additional operator training required beyond standard vibration monitoring)\n- Maintenance: SAME (no additional maintenance requirements)\n- Cost class: SAME (no new hardware required, only software implementation)\n- Conclusion: SAME burden class, different mechanism (harmonic evolution vs. amplitude threshold)\n\nEXECUTABLE TEST — \nProtocol: \n1. Install test bearing with seeded inner-race defect in 350 kW fan drive\n2. Monitor vibration at 1 kHz sampling rate while logging 1 Hz SCADA data\n3. Record time-to-failure and time-to-alarm for both standard amplitude threshold and harmonic evolution method\n4. Repeat for 10 bearing tests to establish statistical reliability\n\nInstruments: \n- 1 kHz vibration accelerometer (existing)\n- SCADA logging system (existing)\n- Bearing defect frequency calculator\n\nPass/Fail Threshold: \n- Must detect defect at least 14 days before failure (USER CONSTRAINT)\n- Maximum 2 false alarms per year (USER CONSTRAINT)\n\nDuration: \n- Test until bearing failure or 30 days of operation, whichever comes first\n\nKill Criterion: \n- Failure to achieve 14-day warning in any of 10 tests\n- More than 2 false alarms in cumulative test time\n- Implementation requires new hardware beyond existing sensor and SC"
+}

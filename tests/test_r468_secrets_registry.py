@@ -116,19 +116,49 @@ def test_amendment_record_hash_trail():
     # (contiguous from R468: R468 -> R484 -> R498 -> R503): every record's old hash binds its
     # parent's new hash, and the latest ratified record binds the current file —
     # strictly stronger than any single link.
-    records = sorted(REPO.glob("R*/constitution/AMENDMENT_RECORD.json"))
+    records = sorted(REPO.glob("R*/constitution/AMENDMENT_RECORD*.json"))
     assert len(records) >= 2
     chain = [json.loads(p.read_text(encoding="utf-8")) for p in records]
-    # The record convention starts at R468: earlier amendments (R419's 2.2.0,
-    # the unrecorded 2.3.0/2.4.0 eras) predate the hash-trail format, so the
-    # contiguous chain is the SUFFIX of records starting after the LAST break
-    # in the old-hash-binds-previous-new-hash sequence. Every pair within the
-    # suffix must bind, and the latest record must bind the live file.
-    s = 0
-    for i in range(1, len(chain)):
-        if chain[i]["old"]["sha256"] != chain[i - 1]["new"]["sha256"]:
-            s = i
-    suffix = chain[s:]
+    # R11 disclosed update (Art. VII): the walk is TOPOLOGICAL, not
+    # directory-sort order — the R11 round number (the owner audit
+    # series) sorts before the R4xx/R5xx rounds, so a sort-order walk
+    # cuts the chain at the wrong break. The head is the record whose
+    # old hash matches NO other record's new hash; each next record
+    # binds its parent's new hash; the tail must bind the live file.
+    # R11 (measured): multiple forward chains legitimately exist —
+    # the unrecorded pre-2.2.0 era makes R419 a head, and the RETIRED
+    # second-line branch (R485, AMENDMENT_RECORD_secondline_retired)
+    # forks off R468. The ratified chain is the forward walk whose
+    # TAIL binds the LIVE file (Art. XI: the chain ends at the body
+    # that exists); every consecutive pair inside it must bind.
+    import hashlib as _hl
+    _live = _hl.sha256((REPO / "EPISTEMIC_CONSTITUTION.md")
+                       .read_bytes()).hexdigest()
+    new_shas = {c["new"]["sha256"] for c in chain}
+    heads = [c for c in chain if c["old"]["sha256"] not in new_shas]
+
+    def _walk(head):
+        ordered = [head]
+        while True:
+            nxt = [c for c in chain
+                   if c not in ordered
+                   and c["old"]["sha256"]
+                   == ordered[-1]["new"]["sha256"]]
+            if not nxt:
+                return ordered
+            # one successor per sha (a fork is a branch, not a chain)
+            ordered.append(nxt[0])
+        return ordered
+
+    candidates = []
+    for h in heads:
+        w = _walk(h)
+        if w and w[-1]["new"]["sha256"] == _live:
+            candidates.append(w)
+    assert len(candidates) == 1, (
+        "exactly one ratified chain must end at the live body, got "
+        f"{len(candidates)}")
+    suffix = candidates[0]
     assert len(suffix) >= 2, "contiguous amendment chain must span at least two records"
     for prev, nxt in zip(suffix, suffix[1:]):
         assert nxt["old"]["sha256"] == prev["new"]["sha256"], (

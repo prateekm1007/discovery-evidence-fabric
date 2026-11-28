@@ -1,0 +1,59 @@
+{
+ "record": "R133_PANEL_PREREG/1.0.0",
+ "claim": "c-0212",
+ "base": "697ac00ba",
+ "typed_at": "2026-11-23 (sandbox clock; no false Z suffix — the DIR-7 rule)",
+ "authority": "the R133 directions DIR 2 (TOP) + the R132 adjudication (honest negative verified; levers accepted)",
+ "judges": [
+  {
+   "model": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "family": "qwen",
+   "lever": "larger rung (probed callable+funded post-tally R132)"
+  },
+  {
+   "model": "deepseek-ai/DeepSeek-V3.2",
+   "family": "deepseek",
+   "lever": "best R132 accuracy (0.7); retained"
+  },
+  {
+   "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "family": "meta-llama",
+   "lever": "larger rung (429 at R132 probe; paced this window)"
+  },
+  {
+   "model": "meta-llama/Llama-3.3-70B-Instruct",
+   "family": "meta-llama",
+   "lever": "margin judge (answered 20/20 R132)"
+  }
+ ],
+ "judge_exclusion": "all families != the generator family (agnes/z-ai) AND the two meta-llama rungs count as ONE family toward the >=2-families bar (distinct models, same family — the P4 spec counts families, not rungs)",
+ "the_three_levers": {
+  "a_swap_robust_vote": "the r9 parity-drawn order (sha256(pid::pair) parity) is THE voting order; the mirror order is a consistency check recorded per leg (swap_instability typed) — it NEVER splits the vote. The R132 order-majority rule (split=tie) is RETIRED for the tally",
+  "b_tie_policy_prompt": "the judge prompt's prefer contract is AMENDED to: 'prefer: \"A\" | \"B\" (you MUST choose A or B — a tie is not available; if the answers are genuinely equal, choose the one with fewer fabrication risks)'. The TIE lazy-out is REMOVED from the schema. The auditor's r5 labels carry no ties, so a tie-capable judge schema was mis-calibrated against a never-tie ground truth",
+  "c_larger_rungs": "Qwen3-235B-A22B (callable+funded) + Llama-4-Maverick (paced 90s+) join DeepSeek-V3.2; Llama-3.3-70B rides as margin"
+ },
+ "corpora": "UNCHANGED from R132: the auditor's r5 per-axis labels (10 pairs, audit-branch bytes) for R-CAL; the auditor's PUBLIC gold set (6 BAD vs 4 GOOD) for the AUC axis. No unexposed holdout is touched (DIR 5's v16 stays the auditor's sealed lane)",
+ "protocol": {
+  "engine_routing": "the judging path runs through discovery_fabric/engine/blind_panel.py (blind prompt building, canary scan, rating parse) + the NEW discovery_fabric/engine/panel_agreement.py (R-CAL qualification, swap-robust vote, kappa, AUC — the tally logic IN THE ENGINE; R132-F1 closed); scripts/r133_panel_driver.py is a thin driver (transport pacing + record writing only)",
+  "transport": "hf_router_chat (route_adapter/2.1.0); one parse retry per leg; raw logged per record; paced (>=20s between calls, 90s+ for Llama-4-Maverick)",
+  "order": "R-CAL first (4 judges x 10 pairs x 2 orders = 80 legs); qualification computed by the ENGINE module; only qualified judges proceed to the panel tally (agreement/kappa/AUC)"
+ },
+ "gate_preregistered": {
+  "rcal_qualify": "per judge: acc >= 0.8 on the 10 r5 prefer labels (exact match, forced-choice — no ties available) AND answered_rate >= 0.9 (VALID / legs)",
+  "panel": ">=3 qualified judges from >=2 distinct non-agnes families; panel agreement vs the auditor >=0.7; pairwise Cohen's kappa on prefer >=0.6 (mean over qualified pairs); AUC >=0.8 on the gold set (panel mean novelty, GOOD > BAD)",
+  "independence": "ALL gate numbers computed by scripts/r133_panel_recompute.py — an INDEPENDENT script reading ONLY the raw records (auditor Art. 13); the engine module and the recompute script are DIFFERENT code paths that must agree (a built-in cross-check)",
+  "no_bar_lowering": "the thresholds are the P4 spec's own; if <3 judges qualify the gate is typed NOT_MET again — honestly, with the diagnosis"
+ },
+ "artifacts": [
+  "eval/r133_panel/<family>__<model-tag>__<pid>__<tag>.json (raw per-leg records)",
+  "eval/r133_panel_calibration.json (the independent recompute's gate record)",
+  "discovery_fabric/engine/panel_agreement.py (the tally engine)",
+  "scripts/r133_panel_driver.py (the thin driver)"
+ ],
+ "frozen": [
+  "the r5 labels + gold set (audit-branch bytes)",
+  "the r9 parity convention",
+  "the P4 thresholds"
+ ],
+ "power_note": "auditor Art. 14: n=10 pairs is the P4-spec'd calibration slice; per-judge qualification on 10 labels is the spec's own power (0.8 acc on 10 items = 8+ exact matches); the production rung pre-registers its own n"
+}

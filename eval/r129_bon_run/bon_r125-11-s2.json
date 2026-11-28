@@ -1,0 +1,136 @@
+{
+ "problem_id": "r125-11-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 48.8,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.09,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 561,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 2.6,
+     "usage": {
+      "prompt_tokens": 893,
+      "completion_tokens": 704,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Speed-Pressure Damping via Encoder and",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Speed-Pressure Damping via Encoder and Melt Pressure Transducer**\n\n**Mechanism:**\nImplement a real-time feedback control loop that modulates the extruder line speed (via the existing line-speed encoder and drive controller) in inverse proportion to the oscillating melt pressure. The widening gauge variation is a direct consequence of die pressure oscillations causing inconsistent melt flow distribution. By actively damping these pressure oscillations through speed adjustments, the melt front stabilizes, reducing the transient flow surges and stagnations that cause gauge variation. The control law targets a stable melt pressure setpoint, using the pressure transducer as the error sensor and the line-speed encoder as the reference for the control input.\n\n**Implementation:**\n1.  **Signal Processing:** Configure the existing PLC or DCS to sample the melt pressure transducer at a rate sufficient to capture the dominant oscillation frequency (typically 1–10 Hz for extruder pressure waves). Apply a low-pass filter to remove high-frequency noise but preserve the oscillatory component.\n2.  **Control Algorithm:** Implement a Proportional-Integral (PI) or simple gain-based controller where the error is defined as (Measured Melt Pressure – Target Pressure Setpoint). The controller output is mapped to a variable speed command that is added to the base rated speed setpoint. The gain is tuned such that when melt pressure rises (indicating a blockage or surge), the line speed decreases slightly to reduce flow demand and allow pressure to equalize; when pressure drops, speed increases to maintain throughput.\n3.  **Integration:** Route the calculated speed correction signal to the extruder drive controller (which already interfaces with the line-speed encoder for feedback). The correction amplitude is limited (e.g., ±5% of rated speed) to prevent process disturbances while sufficiently damping the pressure oscillations.\n\n**Measures Relied On:**\n*   **Melt Pressure Transducer:** Provides the real-time pressure signal indicative of flow stability and gauge consistency. Oscillations in this signal correlate directly with die pressure fluctuations that cause gauge variation.\n*   **Line-Speed Encoder:** Provides the feedback loop for the drive system and serves as the actuator reference. Modulating the speed setpoint based on pressure feedback allows the system to \"ride out\" pressure waves by adjusting mass flow rate, thereby stabilizing the melt front and reducing trim scrap.\n*   **Existing Control System (PLC/DCS):** No new hardware is required; the solution leverages the already-installed transducers and encoder by reconfiguring the control logic to link pressure feedback to speed modulation. This directly addresses the root cause (pressure oscillations) using only available measurements, stabilizing gauge without adding sensors.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Speed-Pressure Damping via Encoder and Melt Pressure Transducer**\n\n**Mechanism:**\nImplement a real-time feedback control loop that modulates the extruder line speed (via the existing line-speed encoder and drive controller) in inverse proportion to the oscillating melt pressure. The widening gauge variation is a direct consequence of die pressure oscillations causing inconsistent melt flow distribution. By actively damping these pressure oscillations through speed adjustments, the melt front stabilizes, reducing the transient flow surges and stagnations that cause gauge variation. The control law targets a stable melt pressure setpoint, using the pressure transducer as the error sensor and the line-speed encoder as the reference for the control input.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\nThe driving variable is the **deviation of melt pressure from its target setpoint** (specifically, an upward deviation indicating a pressure surge). The mechanism acts by **decreasing the line-speed setpoint** (negative speed correction) in response to this upward pressure deviation. This reduction in line speed lowers the mass flow rate demand through the die, which physically reduces the melt residence time and allows the pressurized melt to decompress, thereby damping the oscillation and stabilizing the gauge.\n\n**Implementation:**\n1.  **Signal Processing:** Configure the existing PLC or DCS to sample the melt pressure transducer at a rate sufficient to capture the dominant oscillation frequency (typically 1–10 Hz for extruder pressure waves). Apply a low-pass filter to remove high-frequency noise but preserve the oscillatory component.\n2.  **Control Algorithm:** Implement a Proportional-Integral (PI) or simple gain-based controller where the error is defined as (Measured Melt Pressure – Target Pressure Setpoint). The controller output is mapped to a variable speed command that is added to the base rated speed setpoint. The gain is tuned such that when melt pressure rises (indicating a blockage or surge), the line speed decreases slightly to reduce flow demand and allow pressure to equalize; when pressure drops, speed increases to maintain throughput.\n3.  **Integration:** Route the calculated speed correction signal to the extruder drive controller (which already interfaces with the line-speed encoder for feedback). The correction amplitude is limited (e.g., ±5% of rated speed) to prevent process disturbances while sufficiently damping the pressure oscillations.\n\n**Measures Relied On:**\n*   **Melt Pressure:** Derived directly from the **Melt Pressure Transducer**. This sensor is explicitly permitted by the constraints.\n*   **Line Speed:** Measured by the **Line-Speed Encoder** (permitted). This serves as the feedback for the drive system and the reference for the actuator. The control input is derived from this measurement via the formula: $Speed_{command} = Speed_{rated} + K_{ctrl} \\times (P_{measured} - P_{target})$.\n*   **Melt Temperature:** Measured by the **Melt Temperature Transducer** (permitted). While not directly manipulated in the speed loop, this measurement is used to verify that the melt viscosity remains within the expected range for the assumed flow behavior, ensuring the pressure-speed correlation holds. No new instrumentation is added; all inputs are derived from the existing, permitted sensor suite.",
+   "post_review_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.31,
+     "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 674,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 5.76,
+     "usage": {
+      "prompt_tokens": 1040,
+      "completion_tokens": 1258,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Model-Based Adaptive Die Gap Control via Pressure ",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Model-Based Adaptive Die Gap Control via Pressure Feedback**\n\n**Mechanism**\nImplement a real-time feedback control loop that dynamically adjusts the die gap actuator positions (or equivalent metering screw settings on extruders, if gap is fixed) to compensate for the oscillating melt pressure, stabilizing the film gauge. Since the failure is characterized by pressure oscillations leading to gauge variation, the core mechanism is to treat the measured melt pressure as a direct proxy for local flow resistance and use it to modulate the extrusion output or die opening to maintain a constant mass flow rate through the die sections, thereby flattening the gauge profile.\n\n**Implementation**\n1.  **Signal Processing:** Create a high-pass filter on the existing melt pressure transducer signals to isolate the oscillatory component from the steady-state baseline. This separates the dynamic disturbance (causing variation) from the setpoint.\n2.  **Control Law:** Develop a gain-scheduled PID controller for the die gap actuators (or metering screws). The setpoint for the controller is the *desired* steady-state melt pressure profile corresponding to a uniform gauge. The error signal is the difference between the measured instantaneous pressure (smoothed by a low-pass filter to retain the trend) and the target pressure profile, minus the filtered oscillatory component identified in step 1 (which will be actively damped).\n3.  **Actuation:** The controller output drives the existing die gap actuators. If the pressure in a specific die section spikes (indicating a narrowing gap or increased viscosity/flow restriction), the controller opens that section slightly to reduce pressure and maintain flow continuity, and vice versa. If no adjustable gap exists, the controller modulates the metering screw speed of the associated extruder zone to change throughput, keeping the mass balance constant across the web width.\n4.  **Speed Constraint:** The line-speed encoder is used only to lock the residence time in the die; if pressure oscillations correlate with specific line-speed windows, the controller can add a feed-forward term based on line speed to pre-empt pressure changes. The line continues to run at rated speed, satisfying the constraint.\n\n**Measures Relied Upon**\n*   **Melt Pressure Transducers:** Provide the real-time disturbance measurement. Their spatial distribution across the die allows for multi-variable control, addressing the \"across the web\" variation. The oscillation in these signals is the primary input for damping.\n*   **Melt Temperature Transducers:** Used to calculate a local viscosity correction factor (via a pre-loaded Arrhenius or WLF-type model). This allows the pressure-to-gap flow model to be updated in real-time, ensuring the controller does not over- or under-compensate when temperature drifts, which can exacerbate pressure oscillations.\n*   **Line-Speed Encoder:** Ensures that the mass flow rate control is synchronized with the draw ratio. It also provides the time-base for the filtering and control algorithm. It confirms that the machine is operating at the rated speed, isolating the root cause to the die/pressure dynamics rather than line throughput issues.\n\nThis approach uses only existing instrumentation to implement a closed-loop pressure compensation strategy, directly addressing the oscillating die pressure that is causing the gauge variation and scrap.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Model-Based Adaptive Die Gap Control via Pressure Feedback**\n\n**Mechanism**\nImplement a real-time feedback control loop that dynamically adjusts the die gap actuator positions (or equivalent metering screw settings on extruders, if gap is fixed) to compensate for the oscillating melt pressure, stabilizing the film gauge. Since the failure is characterized by pressure oscillations leading to gauge variation, the core mechanism is to treat the measured melt pressure as a direct proxy for local flow resistance and use it to modulate the extrusion output or die opening to maintain a constant mass flow rate through the die sections, thereby flattening the gauge profile.\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** Deviation of the high-pass filtered melt pressure oscillation from zero (i.e., the dynamic pressure disturbance $\\Delta P_{osc}$) and the error between the low-pass filtered steady-state pressure and the target profile ($e_{P,dc}$).\n*   **Direction of Effect on Actuator:** \n    *   If $\\Delta P_{osc} > 0$ (local pressure spike indicating excessive resistance/narrowing), the control law drives the actuator signal to **increase** the die gap opening (or **decrease** metering screw speed if actuating throughput), reducing flow resistance and damping the pressure oscillation.\n    *   If $\\Delta P_{osc} < 0$ (local pressure dip indicating reduced resistance/widening), the control law drives the actuator signal to **decrease** the die gap opening (or **increase** metering screw speed), increasing resistance and restoring the target pressure baseline.\n    *   The steady-state error $e_{P,dc}$ biases the mean gap position to maintain the target mass flux.\n\n**Implementation**\n1.  **Signal Processing:** Create a high-pass filter on the existing melt pressure transducer signals to isolate the oscillatory component ($\\Delta P_{osc}$) from the steady-state baseline. Simultaneously, apply a low-pass filter to retain the trend/steady-state component ($P_{dc}$).\n2.  **Control Law:** Develop a gain-scheduled PID controller for the die gap actuators (or metering screws). The setpoint for the controller is the *desired* steady-state melt pressure profile corresponding to a uniform gauge. The total error signal is $e_{total} = e_{P,dc} - K_{damp} \\cdot \\Delta P_{osc}$, where $K_{damp}$ is the damping gain. The controller output is the integral of this error, driving the actuators to counteract both drift and oscillation.\n3.  **Actuation:** The controller output drives the existing die gap actuators. If the pressure in a specific die section spikes, the controller opens that section slightly to reduce pressure and maintain flow continuity, and vice versa. If no adjustable gap exists, the controller modulates the metering screw speed of the associated extruder zone to change throughput, keeping the mass balance constant across the web width.\n4.  **Speed Constraint:** The line-speed encoder is used to lock the residence time in the die; if pressure oscillations correlate with specific line-speed windows, the controller can add a feed-forward term based on line speed to pre-empt pressure changes. The line continues to run at rated speed, satisfying the constraint.\n\n**IMPLEMENTATION BILL**\n*   **Throughput Impact:** **No loss.** The system is designed to maintain rated line speed. Any transient adjustment of metering screw speed is instantaneous and self-correcting, with no net reduction in hourly output. The primary benefit is a 50% reduction in trim scrap (based on the problem statement), which directly improves effective yield and net throughput value.\n*   **Energy Impact:** **Neutral to Negative Slight Increase.** Modulating die gap or screw speed to dampen pressure oscillations may slightly increase pump/motor torque variability, potentially causing a minor (<1%) increase in specific energy consumption (kWh/ton) due to non-steady-state motor inefficiencies. However, this is negligible compared to the cost of scrap.\n*   **Availability/Maintenance:** **No Downtime.** The control loop is implemented in the existing PLC/SCADA environment. No new hardware sensors are required. Actuators are cycled within their normal operational envelope, so no additional wear or maintenance intervals are triggered beyond standard schedule.\n\n**Measures Relied Upon**\n*   **Melt Pressure Transducers:** Provide the real-time disturbance measurement. \n    *   *Input:* $P_{measured}$ (directly from transducers).\n    *   *Derived Signals:* $P_{dc}$ (low-pass filter of $P_{measured}$), $\\Delta P_{osc}$ (high-pass filter of $P_{measured}$).\n    *   These signals are used to calculate the control error and drive the actuator direction as defined in the DIRECTION-OF-EFFECT section.\n*   **Melt Temperature Transducers:** Used to calculate a local viscosity correction factor (via a pre-loaded Arrhenius or WLF-type model). \n    *   *Input:* $T_{measured}$ (directly from transducers).\n    *   *Derived Signal:* Viscosity model parameter $\\eta(T)$.\n    *   This parameter updates the gain schedule in the control law, ensuring the pressure-to-gap flow model accounts for thermal drift.\n*   **Line-Speed Encoder:** Provides the linear velocity $v_{line}$ (directly from encoder pulse frequency/count). \n    *   *Derived Signal:* Residence time $t_{res} = L_{die} / v_{line}$ (where $L_{die}$ is a known constant).\n    *   This signal confirms the machine is operating at rated speed and serves as a feed-forward input for speed-correlated pressure dynamics.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Throughput Impact:** **No loss.** The system is designed to maintain rated line spee",
+     "*   **Energy Impact:** **Neutral to Negative Slight Increase.** Modulating die gap or scre",
+     "*   **Availability/Maintenance:** **No Downtime.** The control loop is implemented in the ",
+     "*   **Melt Pressure Transducers:** Provide the real-time disturbance measurement.",
+     "*   *Input:* $P_{measured}$ (directly from transducers).",
+     "*   *Derived Signals:* $P_{dc}$ (low-pass filter of $P_{measured}$), $\\Delta P_{osc}$ (hig",
+     "*   These signals are used to calculate the control error and drive the actuator direction",
+     "*   **Melt Temperature Transducers:** Used to calculate a local viscosity correction facto",
+     "*   *Input:* $T_{measured}$ (directly from transducers).",
+     "*   *Derived Signal:* Viscosity model parameter $\\eta(T)$.",
+     "*   This parameter updates the gain schedule in the control law, ensuring the pressure-to-",
+     "*   **Line-Speed Encoder:** Provides the linear velocity $v_{line}$ (directly from encoder",
+     "*   *Derived Signal:* Residence time $t_{res} = L_{die} / v_{line}$ (where $L_{die}$ is a ",
+     "*   This signal confirms the machine is operating at rated speed and serves as a feed-forw"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Speed-Pressure Damping via Encoder and Melt Pressure Transducer**\n\n**Mechanism:**\nImplement a real-time feedback control loop that modulates the extruder line speed (via the existing line-speed encoder and drive controller) in inverse proportion to the oscillating melt pressure. The widening gauge variation is a direct consequence of die pressure oscillations causing inconsistent melt flow distribution. By actively damping these pressure oscillations through speed adjustments, the melt front stabilizes, reducing the transient flow surges and stagnations that cause gauge variation. The control law targets a stable melt pressure setpoint, using the pressure transducer as the error sensor and the line-speed encoder as the reference for the control input.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\nThe driving variable is the **deviation of melt pressure from its target setpoint** (specifically, an upward deviation indicating a pressure surge). The mechanism acts by **decreasing the line-speed setpoint** (negative speed correction) in response to this upward pressure deviation. This reduction in line speed lowers the mass flow rate demand through the die, which physically reduces the melt residence time and allows the pressurized melt to decompress, thereby damping the oscillation and stabilizing the gauge.\n\n**Implementation:**\n1.  **Signal Processing:** Configure the existing PLC or DCS to sample the melt pressure transducer at a rate sufficient to capture the dominant oscillation frequency (typically 1–10 Hz for extruder pressure waves). Apply a low-pass filter to remove high-frequency noise but preserve the oscillatory component.\n2.  **Control Algorithm:** Implement a Proportional-Integral (PI) or simple gain-based controller where the error is defined as (Measured Melt Pressure – Target Pressure Setpoint). The controller output is mapped to a variable speed command that is added to the base rated speed setpoint. The gain is tuned such that when melt pressure rises (indicating a blockage or surge), the line speed decreases slightly to reduce flow demand and allow pressure to equalize; when pressure drops, speed increases to maintain throughput.\n3.  **Integration:** Route the calculated speed correction signal to the extruder drive controller (which already interfaces with the line-speed encoder for feedback). The correction amplitude is limited (e.g., ±5% of rated speed) to prevent process disturbances while sufficiently damping the pressure oscillations.\n\n**Measures Relied On:**\n*   **Melt Pressure:** Derived directly from the **Melt Pressure Transducer**. This sensor is explicitly permitted by the constraints.\n*   **Line Speed:** Measured by the **Line-Speed Encoder** (permitted). This serves as the feedback for the drive system and the reference for the actuator. The control input is derived from this measurement via the formula: $Speed_{command} = Speed_{rated} + K_{ctrl} \\times (P_{measured} - P_{target})$.\n*   **Melt Temperature:** Measured by the **Melt Temperature Transducer** (permitted). While not directly manipulated in the speed loop, this measurement is used to verify that the melt viscosity remains within the expected range for the assumed flow behavior, ensuring the pressure-speed correlation holds. No new instrumentation is added; all inputs are derived from the existing, permitted sensor suite.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED"
+}

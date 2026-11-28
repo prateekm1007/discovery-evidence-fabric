@@ -132,6 +132,15 @@ ACCOUNT_DOMAIN_VOCAB = (
     "OWNER_INCEPTION_ACCOUNT",  # Mercury 3 (Inception Labs) — owner decision
     # 2026-11-10: free (FREE_TIER_API, dated); flash-class authorized
     # for DEV only (record true tier).
+    # R11 credential round 2026-11-14: the TENTH router — crowllm
+    # (crowllm.com, owner-supplied key). A DISTINCT economic account
+    # (the owner's 2026-11-14 directive: deepseek v4.1 flash "also
+    # use", free :free catalog rungs; measured 2026-11-14: catalog 200
+    # with 76 models; deepseek-v4-flash:free serves at $0; the two
+    # v4.1 ids answer 503 DEAD_UPSTREAM — per-model upstream gating on
+    # one account, so congestion/depletion advances the cascade,
+    # never a bill).
+    "OWNER_CROWLLM_ACCOUNT",
     "UNDECLARED",                 # honest unknown — never guessed
 )
 

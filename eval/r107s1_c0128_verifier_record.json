@@ -1,0 +1,82 @@
+{
+  "record_type": "verifier-record",
+  "claim": "c-0131",
+  "verifies": "c-0128 (builder-r105s2, work_id p3-engine-integration-d1d2d3)",
+  "verifier_session": "builder-r103s1",
+  "at": "2026-11-20T06:10:00Z (sandbox clock, TRUE UTC)",
+  "base_sha": "1840b2637",
+  "method": "Art. 29(c) - the recompute, NEVER a re-run. Zero quota, zero LLM calls, zero sealed bytes, zero re-serves. Every number below is recomputed from the COMMITTED BYTES at 1841b2637 by the verifier's own code in a pristine worktree (tests rerun with the physics libraries ACTUALLY INSTALLED: pint 0.26.2, fluids 1.3.1, CoolProp 8.0.0, ht 1.2.0, cantera 3.2.0 - verifier-installed for this verification; the executor's sandbox bytes were not trusted).",
+  "recompute": {
+    "D1_triz_matrix_wiring": {
+      "code_read": "tp.matrix_cell_for_family (deterministic scan: the matrix cell whose recommendation list's FIRST entry is the family seed[0], ties prefer seed[1] - no invented classical pairings) + tp.matrix_seeded_pool (best cell + up to 5 more cells containing seed[0]; the family seeds always survive) + enumerate_plans sources BOTH the operator plans and the knowledge-first pool from matrix cells in the engine P-namespace, every plan tagged principle_source + matrix_cell.",
+      "matrix_sourced_share_dev_corpus": {
+        "corpus": "eval/problems_dev12.json (the 12-problem committed DEV corpus, 3 plans each)",
+        "total_plans": 36,
+        "tagged": 36,
+        "matrix_sourced": 36,
+        "share": 1.0,
+        "auditor_test": ">= 0.80 of interventions get principles from matrix cells",
+        "verdict": "PASS (measured on the principle_source tags, not assumed)"
+      },
+      "family_derivation_recompute": "12/12 CONTRADICTION_MAP families: the verifier's independent reimplementation of the derivation rule reproduces the executor's (improving, worsening) cell EXACTLY (thermal-load relief 13_32, surface-condition 9_37, suction-side 2_11, dynamic-load 37_21, interface-isolation 4_13, moisture-phase 3_18, surface-durability 6_14, transient-energy 22_27, containment 4_25, energy-path 21_25, contamination 31_26, thermal-field 4_17)",
+      "negative_control": "a problem matching NO keyword family tags the knowledge-first plan class_fallback (source tag honest; the two operator plans still tag triz_matrix_cell - correct: operator-class principles resolve through the matrix independent of problem text)",
+      "invariants": "distinct-principles and the schedule cap hold on all 12 DEV problems (verifier-recomputed, zero violations)",
+      "regression": "plan-layer suites green: test_engine_integration, test_r7_seeded_plan, test_triz_data, test_article3_degenerate_inputs, test_physics_checks = 92 passed / 1 skipped",
+      "ablation_leg": "TYPED PENDING (the auditor's 'next ablation shows no mean drop' is the quota-consuming matched-budget ablation - the executor typed it for the next sealed run with the committed pool-level ablation guard as the deterministic proxy; the verifier confirms the typing is honest, the leg is NOT claimed)"
+    },
+    "D2_physics_libraries_engine_native": {
+      "module": "discovery_fabric/engine/physics_library_checks.py (257 lines)",
+      "tests": "tests/test_physics_library_checks.py 8/8 PASS with the libraries installed (verifier-run)",
+      "sign_contract_attack": "the verifier fed CORRECT and INVERTED claims to all four checks with the real libraries: equilibrium_direction (cantera gri30, CO/CO2 vs CO2/H2/N2 at 900->1300 K: computed increases; claim-increases -> improves, claim-decreases -> worsens), pipe_pressure_drop (fluids, D 0.05->0.03 m: rel +0.8695; correct -> improves, inverted -> worsens), fluid_property_direction (CoolProp water density 300->350 K: rel -0.0229; correct -> improves, inverted -> worsens), convective_htc_direction (ht, v 1.0->2.5 m/s: rel +1.1854; correct -> improves, inverted -> worsens). The direction_of_effect is the SIGN of the computed result on every check - the contract holds under attack.",
+      "typed_refused": "bad claimed values refuse typed; PropsSI domain errors refuse typed (T=0 K refused by CoolProp itself)",
+      "lazy_import_unavailable": "the verifier blocked cantera/fluids/CoolProp/ht imports and confirmed all four checks return typed UNAVAILABLE with direction unavailable (never fabricated)"
+    },
+    "D3_notice_attribution": {
+      "coverage_check": "tests/test_notice_import_coverage.py PASS (AST scan of every import in discovery_fabric/, scripts/, tests/, top-level packages against NOTICE rows via an explicit mapping table with its own staleness test). The verifier's INDEPENDENT sweep of discovery_fabric imports vs NOTICE finds ZERO missing rows (the one apparent miss, mapie, is present as 'MAPIE' - case-insensitive hit).",
+      "deleted_rows": "thermo, chemicals, tespy rows DELETED from NOTICE (unimported - the auditor's delete direction executed; verified absent at 1840b2637)",
+      "added_rows": "AIDE (dedicated row), pint, scikit-learn, numpy, scipy, pandas, matplotlib, pytest, PyTorch, transformers, huggingface_hub, Chronos/Chronos-Bolt, Sundial, cadquery, OCP, sfepy, trimesh, rdkit, reportlab, Pillow, pypdf - all present; CoolProp/fluids/ht/Cantera rows updated to cite the engine-native checks + suites",
+      "license_spot_checks": "CoolProp MIT (installed classifier), ht MIT, sklearn BSD (installed), numpy BSD (installed), scipy BSD (PyPI), reportlab BSD (installed), transformers Apache-2.0 (PyPI), huggingface_hub Apache-2.0 (PyPI), chronos Apache-2.0 (PyPI) - all match the NOTICE claims",
+      "pymupdf": "typed as the AGPL-3.0 LICENSE-RULE CONFLICT it actually is (imported by package_quality_gate; disclosed, removal direction typed, row NOT claimed clean) - honest Art. 5 disclosure",
+      "auditor_list_check": "AIDE/Chronos/pint/scikit-learn rows ADDED by c-0128; BigPatent/baber-uspto_raw/MOOSE-Chem2/PatentChem rows already carried by c-0127 (verified present); PaECTER row carries the byte-verified apache-2.0 with the discrepancy vs the verdict's CC-BY naming typed for auditor re-adjudication",
+      "paecter_fresh_read": "re-verified live 2026-11-20 with the R107-delivered HF token (vault digest-only custody, sha256[:12] b5aaf542b2fd): HF api/models/mpi-inno-comp/paecter -> tags ['license:apache-2.0'], cardData license 'apache-2.0'. The model card license is apache-2.0 (byte-read twice, two sessions, two tokens)."
+    },
+    "art27_engine_share": {
+      "executor_claim": "~40%",
+      "verifier_recompute": "git diff --numstat 17563c091..1840b2637: engine lines 377, other 341, total 718, engine share 0.525",
+      "verdict": "PASS (>= 0.30; the verifier's number is HIGHER than the executor's claim)"
+    },
+    "trailers_and_secrets": {
+      "trailers": "Session: builder-r105s2 + Work-Id: p3-engine-integration-d1d2d3 present on 1840b2637",
+      "secret_scan": "verifier regex scan of the 17563c091..1840b2637 diff: ZERO token-pattern hits"
+    }
+  },
+  "findings": [
+    {
+      "id": "VF-1",
+      "severity": "P1 - the auditor's Art. 3 typed-refusal contract is violated on 6 degenerate-input classes in the NEW D2 module",
+      "finding": "physics_library_checks.py degenerate inputs raise UNCAUGHT library exceptions instead of typed REFUSED: pipe_pressure_drop with rho=0 / mu=0 / v=0 / D=0 -> ZeroDivisionError inside fluids (Re=0 -> 64/Re); convective_htc_direction with v=0 -> ValueError math domain error, mu=0 -> ZeroDivisionError; equilibrium_direction with X={} or an unknown species -> CanteraError. The v3.2.0 Art. 3 battery (tests/test_article3_degenerate_inputs.py) covers ONLY the physics_checks CHECKS registry - the new module's 4 relations are OUTSIDE it, so CI cannot catch this class.",
+      "fix_path": "wrap the library-call sites in try/except -> typed REFUSED (verdict REFUSED, direction unavailable, reason 'library error: ...'), and extend the degenerate battery (or register the 4 new relations in it) so the class is CI-enforced. The auditor's D2 test text ('every NOTICE library has at least one engine import and one test') is met, but the Art. 3 convention the repo already enforces elsewhere is not."
+    },
+    {
+      "id": "VF-2",
+      "severity": "P3 - doc/code mismatch (disclosure-class)",
+      "finding": "the module docstring claims 'a pint-unit discipline' but the four checks accept bare floats; _UREG is instantiated and never used. The pint discipline lives in physics_checks.py, not here. No fabricated number results (the checks are direction-sign checks), but the docstring overstates."
+    },
+    {
+      "id": "VF-3",
+      "severity": "P2 - the FULL local battery is RED at both 2081e56eb and 1840b2637; the queue-surface CI subset does not include the failing suite",
+      "finding": "tests/test_secret_scanning.py::test_no_hardcoded_secrets FAILS on a pristine worktree at 2081e56eb AND 1840b2637: two R58-era fixture literals in tests/test_all_refs_secret_scan.py (line 206 'sk-or-v1-ZzzzNotHex1234567890abcdef12345678' matches sk-or-v1-[A-Za-z0-9]{30,}; line 55 the synthetic AKIA-class fixture) are NOT in the scanner's ALLOWED_FILES. The queue-surface CI workflow does NOT run test_secret_scanning.py (it runs test_all_refs_secret_scan.py, the fixture's own suite), so curated CI-green coexists with a red full battery.",
+      "correction": "CORR-10 (Art. 9, this record): the c-0127 status record's chunked-battery quote '4,980 passed / 107 skipped / 0 failed' is NOT reproducible as a full-battery state at 2081e56eb - the correct full-battery state there includes >=1 failing suite (this one). The chunked run either excluded or skipped tests/test_secret_scanning.py (the previous window cannot be reconstructed; the skip path requires git-ls-files failure, which the current pristine worktree does not exhibit). The score-9 MEASUREMENT bytes and their quoted queue-surface CI check-run (135938664183 SUCCESS @ 6565d6877) are UNAFFECTED - the curated subset does not include the failing suite. The c-0127 record's battery line is hereby corrected to 'chunk-subset green; full-battery state at 2081e56eb includes the pre-existing test_secret_scanning failure (VF-3, R58 fixture class, unrelated to the score-9 lanes)'.",
+      "fix_path": "add tests/test_all_refs_secret_scan.py to ALLOWED_FILES in tests/test_secret_scanning.py (it is a fixture-carrying scanner suite - the same class as the already-allowed tests/test_secret_scanning.py and tests/test_r425_worker_env_boundary.py), or move the synthetic literals behind non-matching constructors as line 191 already does."
+    },
+    {
+      "id": "VF-4",
+      "severity": "P1 - the Art. 29 registry CI check is RED at tip (the queue-surface check-run failing)",
+      "finding": "the c-0128/c-0129/c-0130 claims carry kind 'integration', which is OUT OF ENUM (KINDS = measurement/one_shot/task) and unregistered in claim_kind_violations[] -> tests/test_article29_parallel_coordination.py FAILS (4 tests) at 17563c091 and 1840b2637. shields.io byte-read 2026-11-20 ~05:55Z: queue/dev12_r7 checks = FAILING (red). The verifier's local recompute identifies the failing suite; the per-check-run API read is blocked by the shared-IP GitHub rate limit (the same limit the auditor hit).",
+      "remediation_by_verifier": "this push registers the three F42 forward-only disclosures (claim_kind_violations[] entries: wrong_kind 'integration', correct_kind 'task' - the 81ac43073 c-0123 precedent of a kind correction by the other session). The historical claim bytes are NOT rewritten (Art. 4). Expected effect: the Art. 29 suite returns green on the next CI run.",
+      "ci_read_note": "the auditor's checklist item 'CI re-read on 2081e56eb once the rate limit clears': the shared-IP API limit is STILL exhausted at 06:00Z (403 on every api.github.com read from this sandbox); the shields.io aggregate for the branch is the committed evidence (failing at tip 1840b2637). The per-check-run reads for 44c55ac8f / 6565d6877 / 2081e56eb / 1840b2637 retry on this lease as the limit clears."
+    }
+  ],
+  "honest_state": "D1 verified PASS on the >=80% leg (100% on the committed DEV corpus, negative control honest, derivations exact 12/12, invariants held, no regression); the ablation leg is TYPED PENDING the next quota-consuming matched-budget run (not claimed). D2 verified on the sign contract (all four checks attacked with inverted claims; UNAVAILABLE path real) with VF-1 (degenerate-input typed-refusal gap, 6 classes) and VF-2 (docstring) standing as findings. D3 verified (coverage complete, licenses spot-checked, deletions executed, PyMuPDF conflict honestly typed, PaECTER apache-2.0 re-read live). Art. 27 PASS (52.5%). VF-3 (pre-existing full-battery red, now corrected per Art. 9 as CORR-10) and VF-4 (registry kind CI red, remediated by this push's F42 registrations) are the round's operational findings. NO acceptance/score claims - the auditor scores from committed bytes.",
+  "zero_claims": "this record verifies executor work; it claims no acceptance bar, no score, and no direction completion on the auditor's checklist."
+}

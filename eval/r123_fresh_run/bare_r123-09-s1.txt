@@ -1,0 +1,17 @@
+**Mitigation Proposal: Closed-Loop Tension Balance via Amperometric Drift Correction**
+
+**Mechanism:**
+The drift of the belt to the drive side indicates a net longitudinal force pulling the belt toward the drive, likely due to uneven tension or friction asymmetry. The rising drive motor amps confirm the system is working against this parasitic drag. The mitigation uses the **drive motor ammeter** and the **belt-speed encoder** to estimate the instantaneous longitudinal tension imbalance (drift force) and modulate the **tail motor ammeter** reading (used as a proxy for tail-pull or tensioning load) to actively correct the drift during operation, rather than relying solely on periodic tensioning cycles.
+
+**Implementation:**
+1.  **Drift Detection:** Create a "Drift Index" signal defined as the normalized deviation of the **drive motor ammeter** current from its baseline no-load value at a given belt speed (derived from the **belt-speed encoder**). Specifically, compute `ΔI_drive = I_drive_actual - f(I_tail, Belt_Speed)`, where `f` is a pre-calibrated relationship between tail tension (inferred from tail motor amps) and expected drive load at a specific speed. A sustained positive `ΔI_drive` indicates the belt is drifting toward the drive side (excess tension/drag).
+2.  **Control Logic:** Implement a PI controller in the existing PLC/Drive system that uses the **Drift Index** as its error signal. The controller output modulates the **tail motor** setpoint (via its ammeter-controlled torque or position limit). If the drive amps trend high (belt drifting to drive), the controller slightly increases the tail motor pulling effort (or reduces drive-side take-up force if controllable) to shift the belt back toward the tail side.
+3.  **Constraint Adherence:** No new sensors are used. The system relies exclusively on:
+    -   **Drive Motor Ammeter:** Provides feedback on total load and drift indication.
+    -   **Tail Motor Ammeter:** Provides a measurable variable for active tensioning adjustment.
+    -   **Belt-Speed Encoder:** Normalizes the amperage readings for speed-dependent load variations, ensuring the "drift" signal is not confounded by production rate changes.
+
+**Measures it Relies On:**
+-   **Amperometric Proxy for Tension:** Assumes that at a constant belt speed (from the encoder), deviations in drive motor current directly correlate to changes in belt tension and alignment drift.
+-   **Tail Motor as Actuator:** Assumes the tail motor (or tensioning mechanism driven by it) can be modulated dynamically via its current/torque command, using its ammeter as the feedback signal for the adjustment magnitude.
+-   **Baseline Calibration:** Requires a one-time calibration to establish the relationship between drive amps, tail amps, and belt speed to accurately isolate drift from normal load variations.

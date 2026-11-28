@@ -1,0 +1,119 @@
+{
+ "problem_id": "HO9-14-centrifuge-scroll-wear",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    18,
+    1,
+    31
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:63c1dbdf3be4": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:63650e499870": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:37:28.113054Z",
+ "attempts_n": 4,
+ "a1_answer": "### NOVELTY STATEMENT (INTERVENTION)\n\n**Intervention Proposed:** A combined operational intervention utilizing **Feed-Rate Dipping** (procedure) and **Differential-Speed Retuning** (parameter change) to manage the sludge loading per revolution, thereby keeping the torque load on the scroll below the vibration threshold.\n\n**Standard Practice:** Standard practice operates the decanter at a fixed feed rate for throughput consistency and fixed differential speeds (scroll vs. bowl) optimized for nominal solids concentration. This results in variable torque spikes when sludge loading fluctuates or builds up, leading to scroll contact with the bowl (vibration) and accelerated wear.\n\n**My Mitigation (The Departure):** The departure is the **duty-split arrangement**: specifically, decoupling the *throughput* objective from *scroll protection* by introducing a low-frequency, automated \"dipping\" cycle in the feed rate synchronized with the differential speed setpoint. While standard practice treats feed and differential as independent steady-state variables, this mechanism treats them as a coupled control pair where the feed rate is dynamically reduced to \"unload\" the scroll torque when it trends high, and the differential speed is tuned to maintain clearance, rather than allowing the scroll to ride on the bowl.\n\n**Adjacent-Technique Clearance:** The closest practice in other industries is \"torque limiting\" in extruders (stopping the motor when torque hits a cap). My mitigation differs because it does not stop or drastically alter the primary process; it uses a *proportional, periodic reduction* in feed (a procedure change) combined with a *fine-tuned* differential speed (a parameter change) to keep the system in the \"floating scroll\" regime, avoiding the binary stop/start damage and wear of hard torque limits.\n\n**Mechanism:** The driving physics is the **tangential shear stress** and **normal contact force** exerted by the sludge layer on the scroll. When sludge loading (mass per revolution) increases, the torque required to push the sludge through the scroll channels increases. This torque causes the scroll to \"ride\" on the bowl wall due to the gyroscopic effect of the differential speed. By reducing the feed rate (lowering mass per revolution) and fine-tuning the differential speed (optimizing the gyroscopic vector to lift the scroll), the normal force is reduced, eliminating the vibration and the abrasive wear mechanism.\n\n### PHYSICS CHECK\n\n**Governing Relation:**\nThe scroll rides on the bowl when the gyroscopic lift force ($F_g$) is less than or equal to the weight of the scroll plus the sludge load ($W_{load}$).\n$$ F_g = m_{scroll} \\cdot (\\omega_{bowl} - \\omega_{scroll}) \\cdot \\Omega_{bowl} \\cdot r $$\nWhere $m_{scroll}$ is scroll mass, $\\omega$ are angular velocities, $\\Omega$ is bowl speed, and $r$ is radius.\nThe sludge load $W_{load}$ is proportional to the feed rate ($Q$) and sludge density ($\\rho$).\nVibration occurs when $F_g \\leq W_{load}$, leading to contact and wear.\n\n**Direction-of-Effect:**\n*   **Driving Variable:** Normal Contact Force ($F_{contact} = W_{load} - F_g$).\n*   **Mechanism Action:** The mechanism moves $W_{load}$ **down** by reducing the feed rate ($Q$) via the dipping procedure. It moves $F_g$ **up** (or holds it optimal) via differential speed retuning to maximize the gyroscopic term for the current load.\n*   **Result:** This **reduces** the Normal Contact Force to near zero, eliminating the contact that causes vibration and wear.\n\n**Magnitude Verification:**\nA 10% reduction in feed rate ($Q$) reduces the sludge mass per revolution by 10%. If the scroll is currently vibrating (contacting), this reduction is sufficient to drop $W_{load}$ below $F_g$ (assuming the system was tuned for 5-10% margin). The differential retuning ensures $F_g$ is not over-compensated (which would cause other issues) but optimized for the new lower load.\n\n### IMPLEMENTATION BILL\n\n**MECHANIC CLASS:** Operational Procedure and Parameter Adjustment (Zero Hardware Addition).\n\n*Standard Practice Bill (Reference):*\n1. Feed pump control system (existing).\n2. Variable Frequency Drive (VFD) for scroll motor (existing).\n3. Operator manual (existing).\n\n**Intervention Bill (All rows tagged):**\n\n1.  **Parameter Change (c):** Reset the Scroll Differential Speed Setpoint.\n    *   *Where:* VFD HMI/SCADA screen.\n    *   *Action:* Increase the differential speed ratio (e.g., from +2.0 rpm to +2.5 rpm relative to bowl) to increase gyroscopic lift for a slightly reduced load.\n    *   *Tag:* **(c)** (Parameter change to stated equipment).\n\n2.  **Procedure Change (c):** Implement \"Feed Dipping\" Procedure.\n    *   *Where:* Feed Pump Control Logic (existing PLC/HMI).\n    *   *Action:* Configure a manual or semi-automatic procedure to reduce feed pump flow by 10-15% for 5-minute intervals when vibration sensors (if available) or operator observation indicates scrolling contact. If no vibration sensor exists, implement a scheduled 10% feed reduction every 4 hours for 10 minutes to prevent sludge build-up.\n    *   *Tag:* **(c)** (Procedural change to stated equipment).\n\n3.  **No Hardware Rows:**\n    *   No new sensors, no new pumps, no new materials.\n    *   *Tag:* N/A (0 new items).\n\n### BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n\n*   **Installation:** **Zero**. No physical installation required. Only HMI/PLC parameter entry and operator training.\n*   **Commissioning:** **Minimal**. Verifying that the new setpoints do not trip alarms and that the feed pump can handle the 10% reduction without cavitation.\n*   **Operation:** **Unchanged Infrastructure**. Uses existing VFDs and PLCs.\n*   **Operational Loss Pricing (Clause L):**\n    *   *Throughput Loss:* The scheduled 10-minute dipping every 4 hours results in a ~0.4% reduction in daily throughput.\n    *   *Wear Savings:* Prevents major scroll replacement (cost: $5,000-$10,000 per scroll, downtime 2-3 days) and reduces vibration-related bearing failures.\n    *   *Net Positive:* The 0.4% throughput loss is negligible compared to the cost of downtime for scroll replacement. The trade nets positive.\n\n### EXECUTABLE TEST\n\n**Protocol:**\n1.  **Baseline:** Record baseline vibration levels (using existing motor current signature or visual observation of scroll position if available) and wear rate (estimated from historical service intervals).\n2.  **Intervention 1 (Differential):** Increase differential speed by 0.5 rpm. Run for 24 hours. Monitor for any change in torque stability (VFD current).\n3.  **Intervention 2 (Feed Dipping):** Implement the 10-minute/4-hour feed reduction. Run for 7 days.\n4.  **Measurement:**\n    *   *Vibration:* If no dedicated vibration sensor is allowed/available, use **Motor Current Signature Analysis** (existing VFD data) to detect torque ripple fluctuations which correlate with scroll contact.\n    *   *Wear:* Inspect scroll after 30 days vs. historical 30-day wear marks.\n5.  **Pass/Fail:**\n    *   *Vibration:* Torque ripple standard deviation decreases by >50% compared to baseline.\n    *   *Wear:* Visual inspection shows no new metal-to-metal contact marks on scroll tips.\n6.  **Kill Criterion:** If increasing differential speed causes unstable torque (chaotic current fluctuations) or if feed dipping causes sludge settling in the pipe (blocking), stop immediately and revert.\n\n### FEASIBILITY & CONSTRAINT CHECK\n\n*   **Constraint Fit:** The intervention uses **only** \"differential-speed setpoint retuning\" and \"feed-rate procedure.\" It does **not** use polymer flocculant dosing (which was allowed but not needed here). It does **not** modify the bowl or scroll.\n*   **Deployment Part Clause:** The scroll and bowl are **unmodified**. They are run at different speeds and different loads.\n*   **Permitted Set:** The mechanism is drawn entirely from the permitted set (parameter/procedure). No physical measures are installed.\n*   **Premise Validity:** The system has a variable speed scroll drive and a variable speed feed pump (standard for decanters). The topology allows for feed reduction.\n*   **Input Availability:** The mechanism relies on time (procedure) and setpoints (parameter). It does not require new sensors. If vibration is not directly measured, the \"dipping\" is scheduled (time-based), not sensor-based, ensuring no new instrumentation is needed.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Feed pump control system (existing).",
+    "2. Variable Frequency Drive (VFD) for scroll motor (existing).",
+    "3. Operator manual (existing).",
+    "*   *Where:* VFD HMI/SCADA screen.",
+    "*   *Action:* Increase the differential speed ratio (e.g., from +2.0 rpm to +2.5 rpm relat",
+    "*   *Where:* Feed Pump Control Logic (existing PLC/HMI).",
+    "*   *Action:* Configure a manual or semi-automatic procedure to reduce feed pump flow by 1",
+    "3.  **No Hardware Rows:**",
+    "*   No new sensors, no new pumps, no new materials.",
+    "*   *Tag:* N/A (0 new items).",
+    "*   **Installation:** **Zero**. No physical installation required. Only HMI/PLC parameter ",
+    "*   **Commissioning:** **Minimal**. Verifying that the new setpoints do not trip alarms an",
+    "*   **Operation:** **Unchanged Infrastructure**. Uses existing VFDs and PLCs.",
+    "*   **Operational Loss Pricing (Clause L):**",
+    "*   *Throughput Loss:* The scheduled 10-minute dipping every 4 hours results in a ~0.4% re",
+    "*   *Wear Savings:* Prevents major scroll replacement (cost: $5,000-$10,000 per scroll, do",
+    "*   *Net Positive:* The 0.4% throughput loss is negligible compared to the cost of downtim",
+    "1.  **Baseline:** Record baseline vibration levels (using existing motor current signature",
+    "2.  **Intervention 1 (Differential):** Increase differential speed by 0.5 rpm. Run for 24 ",
+    "3.  **Intervention 2 (Feed Dipping):** Implement the 10-minute/4-hour feed reduction. Run ",
+    "4.  **Measurement:**",
+    "*   *Vibration:* If no dedicated vibration sensor is allowed/available, use **Motor Curren",
+    "*   *Wear:* Inspect scroll after 30 days vs. historical 30-day wear marks.",
+    "5.  **Pass/Fail:**",
+    "*   *Vibration:* Torque ripple standard deviation decreases by >50% compared to baseline.",
+    "*   *Wear:* Visual inspection shows no new metal-to-metal contact marks on scroll tips.",
+    "6.  **Kill Criterion:** If increasing differential speed causes unstable torque (chaotic c",
+    "*   **Constraint Fit:** The intervention uses **only** \"differential-speed setpoint retuni",
+    "*   **Deployment Part Clause:** The scroll and bowl are **unmodified**. They are run at di",
+    "*   **Permitted Set:** The mechanism is drawn entirely from the permitted set (parameter/p",
+    "*   **Premise Validity:** The system has a variable speed scroll drive and a variable spee",
+    "*   **Input Availability:** The mechanism relies on time (procedure) and setpoints (parame"
+   ],
+   "APPARATUS_ROW": [
+    "2.  **Intervention 1 (Differential):** Increase differential speed by 0.5 rpm. Run for 24 hours. Monitor for a",
+    "*   **Input Availability:** The mechanism relies on time (procedure) and setpoints (parameter). It does not re"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "3530d42f35bff81d",
+ "smoke": false
+}

@@ -1,0 +1,27 @@
+**Mitigation Proposal: Active Thermal Management via High-Setpoint Regulation**
+
+**Mechanism**
+Implement a closed-loop cooling control strategy that regulates the battery room ambient temperature to the upper limit of the permitted constraint range (26°C), utilizing the thermal mass of the battery string as a buffer against rapid transient spikes. By maintaining the baseline ambient temperature at 26°C rather than a lower setpoint (e.g., 18–20°C), we optimize the cooling system’s duty cycle to handle peak loads effectively, while ensuring that the sustained operating temperature is kept strictly below any threshold that would trigger a positive feedback loop in heat generation. However, a more precise mitigation within the "engineer" persona, leveraging the Arrhenius constraint, is to **shift the operating point to the coolest reliable temperature (18°C)** if the cooling infrastructure allows, or more realistically, to **implement a "cool-bias" control logic** that prioritizes 18°C during periods of sustained high load, acknowledging that the Arrhenius law dictates an exponential reduction in water loss rate at lower temperatures.
+
+Given the constraint "setpoints may be adjusted within 18-26 C" and the Arrhenius dependence (Ea ~ 80 kJ/mol), the most effective mitigation is **Cool-Bias Thermal Regulation**:
+
+1.  **Setpoint Adjustment:** Lower the air conditioning setpoint for the battery room from the nominal 22–24°C to the minimum allowable limit of **18°C**.
+2.  **Control Logic:** Implement a PID-controlled HVAC system that aggressively maintains this 18°C baseline, especially when battery temperature sensors indicate operation above 30°C (internal cell temp will be higher than ambient due to self-heating during charge/discharge).
+
+**Implementation**
+*   **HVAC Recalibration:** Retune the battery room HVAC controllers to target 18°C. Ensure sufficient dehumidification capacity is co-deployed to prevent condensation at the lower dew point associated with cooler air, which could cause surface corrosion.
+*   **Sensor Feedback Loop:** Install RTDs (Resistance Temperature Detectors) inside the battery string (representative cells) rather than relying solely on room ambient sensors. Use these internal temps to modulate HVAC output. If internal cell temp > 35°C, force HVAC to maximum cooling toward the 18°C room target.
+*   **Equalization Schedule Adjustment:** While the prompt focuses on thermal mitigation, the mitigation indirectly supports the existing equalization schedule by reducing the baseline aging rate, thereby slowing the "capacity fade between equalizations."
+
+**Measures Relied Upon**
+*   **Arrhenius Kinetics:** The water loss rate (dry-out) follows an Arrhenius relationship: $k \propto e^{-Ea/RT}$.
+    *   Let $T_1 = 295$ K (22°C) and $T_2 = 291$ K (18°C).
+    *   $Ea = 80$ kJ/mol.
+    *   Ratio of rates: $\frac{k_1}{k_2} = \exp\left(\frac{Ea}{R} \left(\frac{1}{T_2} - \frac{1}{T_1}\right)\right)$
+    *   $\frac{k_1}{k_2} = \exp\left(\frac{80000}{8.314} \left(\frac{1}{291} - \frac{1}{295}\right)\right) \approx \exp\left(9622 \times 0.0000466\right) \approx \exp(0.448) \approx 1.56$
+    *   **Result:** Operating at 18°C instead of 22°C reduces the dry-out rate by approximately **36%**, significantly extending the time between capacity fades and equalizations.
+*   **Thermal Inertia:** The battery string acts as a thermal mass; maintaining a cooler ambient (18°C) increases the delta-T between cell internals and the room, enhancing convective heat transfer away from the cells during high-current events.
+*   **Humidity Control:** At 18°C, the relative humidity of the same absolute moisture content is higher. The system must rely on precise hygrometer-based humidification/dehumidification to keep RH within the VRLA manufacturer’s recommended range (typically 30–70%) to avoid condensation, which is a critical secondary measure.
+
+**Conclusion**
+By adjusting the setpoint to **18°C**, we exploit the exponential sensitivity of the Arrhenius dry-out leg to temperature, reducing water loss rates by ~35–40% compared to typical 22°C operations, thereby mitigating accelerated dry-out and slowing capacity fade between equalizations.

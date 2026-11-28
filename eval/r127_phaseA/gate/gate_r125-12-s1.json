@@ -1,0 +1,75 @@
+{
+ "problem_id": "r125-12-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 4.79,
+   "usage": {
+    "prompt_tokens": 241,
+    "completion_tokens": 864,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.8,
+   "usage": {
+    "prompt_tokens": 1240,
+    "completion_tokens": 1476,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal\\n\\n**Mechanism:**\\nImplement a **Service-Volume-Tri",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a **Service-Volume-Triggered Regeneration** logic that dynamically adjusts the regeneration trigger point based on the cumulative treated volume (service flow) since the last regeneration, while simultaneously verifying the inlet pressure to detect potential media compaction or channeling that causes early breakthrough.\n\nThe core issue is that the current regeneration schedule is likely time-based or static volume-based, ignoring the actual demand and potential performance degradation indicators available from existing sensors. Hardness breakthrough arriving early suggests the resin bed is either exhausted faster than expected (due to high water usage or degraded resin efficiency) or is suffering from flow distribution issues (channeling), which is often correlated with pressure drop changes.\n\n**Implementation:**\n\n1.  **Dynamic Trigger Calculation:**\n    *   Use the **existing service flow meter** to calculate the total volume of water treated ($V_{service}$) since the last successful regeneration cycle.\n    *   Establish a baseline \"Max Allowed Service Volume\" ($V_{max}$) for a standard regeneration cycle under normal operating conditions (derived from historical data of service life between regenerations when salt use was normal).\n    *   Modify the PLC/controller logic: Instead of regenerating on a fixed timer, trigger the regeneration cycle only when $V_{service} \\geq V_{trigger}$.\n\n2.  **Pressure-Based Efficiency Correction:**\n    *   Use the **existing inlet pressure transmitter** to monitor the pressure drop across the softener bed ($\\Delta P = P_{inlet} - P_{outlet}$, assuming outlet is near atmospheric or using a known reference if available, or simply monitoring absolute inlet pressure for trends if backwash/reverse flow is involved).\n    *   If the inlet pressure shows a significant **increase** compared to historical averages at the same flow rate, it indicates resin compaction, media settling, or clogging. Compacted resin leads to poor flow distribution and channeling, causing early breakthrough.\n    *   **Adjustment Rule:** If $\\Delta P$ is above a set threshold (indicating compaction), reduce $V_{trigger}$ by a percentage (e.g., 20-30%) to force a more frequent regeneration and backwash, which will re-fluff the resin and restore proper flow distribution. This addresses the \"early breakthrough\" symptom directly.\n    *   Conversely, if pressure is normal but breakthrough is still early, it confirms the resin has degraded or is undersized for the demand, prompting a reduction in $V_{trigger}$ to prevent any hardness leakage.\n\n3.  **Regeneration Flow Meter Validation:**\n    *   Use the **existing regeneration flow meter** to ensure that when a regeneration is triggered (either by the new volume trigger or a minimum time safety limit), the brine draw volume is sufficient.\n    *   Implement a check: If the regeneration flow rate is low (indicating potential clogging in the brine line or low tank level), the system should not count the regeneration as \"complete\" or should extend the regeneration time to ensure the same mass of salt is processed. This prevents the \"climbing salt use\" from being wasted due to ineffective regeneration cycles.\n\n**Measures It Relies On:**\n*   **Service Flow Meter:** Measures $V_{service}$ to determine actual water usage, replacing arbitrary time-based triggers. This ensures regeneration is needed only when the resin's exchange capacity is likely exhausted.\n*   **Inlet Pressure Transmitter:** Monitors $\\Delta P$ to detect resin bed compaction or channeling. A rising pressure at constant flow is a key indicator of poor bed expansion and early breakthrough. This allows for preemptive adjustment of the service volume trigger.\n*   **Regeneration Flow Meter:** Verifies the integrity of the regeneration process itself, ensuring that the salt draw is effective and not compromised by low flow rates, which would otherwise require more salt to achieve the same regeneration state.\n\nThis approach uses only the specified sensors to shift from a passive, time-based maintenance schedule to a proactive, performance-based one, directly targeting the root causes of early breakthrough (flow distribution issues) and inefficient salt use (unneeded or ineffective regenerations).",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "REASONING_THRASH_LEAK: Correction:**",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "Correction:**"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal\n\n**Mechanism:**\nImplement a **Service-Volume-Triggered Regeneration** logic that dynamically adjusts the regeneration trigger point based on the cumulative treated volume (service flow) since the last regeneration, while simultaneously verifying the inlet pressure to detect potential media compaction or channeling that causes early breakthrough.\n\nThe core issue is that the current regeneration schedule is likely time-based or static volume-based, ignoring the actual demand and potential performance degradation indicators available from existing sensors. Hardness breakthrough arriving early suggests the resin bed is either exhausted faster than expected (due to high water usage or degraded resin efficiency) or is suffering from flow distribution issues (channeling), which is often correlated with pressure drop changes.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the **cumulative service volume** ($V_{service}$). As $V_{service}$ increases, the resin’s exchange capacity decreases, leading to a **positive direction** toward hardness breakthrough. Simultaneously, an **increase** in inlet pressure ($P_{inlet}$) at constant flow indicates media compaction or clogging, which **negatively impacts** flow distribution and accelerates breakthrough. The mechanism responds by **decreasing** the $V_{trigger}$ threshold (shortening the service cycle) to force earlier regeneration, thereby **reducing** the risk of hardness leakage and **optimizing** salt usage by ensuring regeneration only occurs when necessary and effective.\n\n**Implementation:**\n\n1.  **Dynamic Trigger Calculation:**\n    *   Use the **existing service flow meter** to calculate the total volume of water treated ($V_{service}$) since the last successful regeneration cycle.\n    *   Establish a baseline \"Max Allowed Service Volume\" ($V_{max}$) for a standard regeneration cycle under normal operating conditions (derived from historical data of service life between regenerations when salt use was normal).\n    *   Modify the PLC/controller logic: Instead of regenerating on a fixed timer, trigger the regeneration cycle only when $V_{service} \\geq V_{trigger}$.\n\n2.  **Pressure-Based Efficiency Correction:**\n    *   Use the **existing inlet pressure transmitter** to monitor the pressure at the inlet. Since only the inlet pressure transmitter is permitted (no outlet or differential sensor), derive an indicator of bed resistance by correlating $P_{inlet}$ with the service flow rate from the service flow meter.\n    *   Derive a normalized pressure index: $P_{norm} = P_{inlet} / (Flow_{service} \\times \\text{Constant})$. An increase in $P_{inlet}$ disproportionate to the service flow rate indicates resin compaction, media settling, or clogging.\n    *   **Adjustment Rule:** If $P_{inlet}$ is significantly higher than the expected baseline for the current service flow rate (indicating compaction), reduce $V_{trigger}$ by a percentage (e.g., 20-30%) to force a more frequent regeneration and backwash, which will re-fluff the resin and restore proper flow distribution. This addresses the \"early breakthrough\" symptom directly.\n    *   Conversely, if pressure is normal but breakthrough is still early, it confirms the resin has degraded or is undersized for the demand, prompting a reduction in $V_{trigger}$ to prevent any hardness leakage.\n\n3.  **Regeneration Flow Meter Validation:**\n    *   Use the **existing regeneration flow meter** to ensure that when a regeneration is triggered, the brine draw volume is sufficient.\n    *   Implement a check: If the regeneration flow rate is low (indicating potential clogging in the brine line or low tank level), the system should not count the regeneration as \"complete\" or should extend the regeneration time to ensure the same mass of salt is processed. This prevents the \"climbing salt use\" from being wasted due to ineffective regeneration cycles.\n\n**Inputs and Derivations:**\n*   **$V_{service}$:** Directly measured by the **existing service flow meter** (integration of flow over time).\n*   **$P_{inlet}$:** Directly measured by the **existing inlet pressure transmitter**.\n*   **$Flow_{service}$:** Directly measured by the **existing service flow meter**.\n*   **Pressure Compaction Indicator ($P_{norm}$):** Derived from $P_{inlet}$ and $Flow_{service}$ using the relationship $P_{inlet} \\propto Flow_{service}^2$ (for turbulent flow through a packed bed). A deviation of $P_{inlet}$ from the expected curve (based on historical $Flow_{service}$ vs. $P_{inlet}$ data) indicates compaction.\n*   **$V_{regen}$ (Brine Volume):** Directly measured by the **existing regeneration flow meter** (integration of flow over time during regeneration).\n\n**IMPLEMENTATION BILL**\n*   **Labor:** 4 hours for PLC logic modification and HMI updates for pressure normalization alarms.\n*   **Software:** No new hardware costs. Utilization of existing sensors: Service Flow Meter, Inlet Pressure Transmitter, Regeneration Flow Meter.\n*   **Operational Cost Impact:**\n    *   **Salt Throughput:** Expected to **decrease** by 10-15% by eliminating unnecessary regenerations (time-based) and ensuring effective brine contact (via flow validation). The duty cycle of regeneration is modulated by $V_{trigger}$; pricing this modulation shows that fewer, more targeted cycles reduce total salt consumption.\n    *   **Energy/Availability:** Negligible direct energy cost for the logic. Availability is improved by preventing hardness breakthrough (product quality loss) and preventing resin channeling (premature resin failure). The cost of early breakthrough (customer complaints, potential warranty) is avoided.\n    *   **Maintenance:** Reduced frequency of media replacement due to proactive compaction detection.\n\n**Measures It Relies On:**\n*   **Service Flow Meter:** Measures $V_{service}$ to determine actual water usage, replacing arbitrary time-based triggers. This ensures regeneration is needed only when the resin's exchange capacity is likely exhausted.\n*   **Inlet Pressure Transmitter:** Monitors $P_{inlet}$ to detect resin bed compaction or channeling when correlated with service flow. A rising pressure at constant flow is a key indicator of poor bed expansion and early breakthrough. This allows for preemptive adjustment of the service volume trigger.\n*   **Regeneration Flow Meter:** Verifies the integrity of the regeneration process itself, ensuring that the salt draw is effective and not compromised by low flow rates, which would otherwise require more salt to achieve the same regeneration state.\n\nThis approach uses only the specified sensors to shift from a passive, time-based maintenance schedule to a proactive, performance-based one, directly targeting the root causes of early breakthrough (flow distribution issues) and inefficient salt use (unneeded or ineffective regenerations).",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Labor:** 4 hours for PLC logic modification and HMI updates for pressure normalizati",
+   "*   **Software:** No new hardware costs. Utilization of existing sensors: Service Flow Met",
+   "*   **Operational Cost Impact:**",
+   "*   **Salt Throughput:** Expected to **decrease** by 10-15% by eliminating unnecessary reg",
+   "*   **Energy/Availability:** Negligible direct energy cost for the logic. Availability is ",
+   "*   **Maintenance:** Reduced frequency of media replacement due to proactive compaction de",
+   "*   **Service Flow Meter:** Measures $V_{service}$ to determine actual water usage, replac",
+   "*   **Inlet Pressure Transmitter:** Monitors $P_{inlet}$ to detect resin bed compaction or",
+   "*   **Regeneration Flow Meter:** Verifies the integrity of the regeneration process itself"
+  ],
+  "REASONING_THRASH_LEAK": [
+   "Correction:**"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Inlet Pressure Transmitter:** Monitors $P_{inlet}$ to detect resin bed compaction or channeling when cor"
+  ]
+ },
+ "wall_clock_s": 17.61,
+ "status": "DELIVERED_REVIEWED"
+}

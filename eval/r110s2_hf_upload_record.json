@@ -1,0 +1,45 @@
+{
+ "record": "R110S2_HF_UPLOAD/2.0.0",
+ "at": "2026-11-20T12:52:01Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s2 (resumed after reprovision)",
+ "claim": "c-0148 item (2)",
+ "repo": "prateekm1/xjtu-sy-bearing-rar",
+ "fix_forward": [
+  "v1 crashed at the first commit (create_commit returns CommitInfo.oid, not .sha) \u2014 one commit (30841cf2f3, 51 files under the zip-relative layout) had landed; this run deleted those files as the one-canonical-artifact fix-forward (bytes byte-identical to the prior session's flat copies)",
+  "layout collision typed: the prior session's 124 custody batches established the FLAT per-bearing layout; v1's zip-relative resume filter missed it and began a byte-identical duplicate upload \u2014 v2 resumes on flat"
+ ],
+ "mirror_total_bytes": 5447931446,
+ "n_canonical_files": 9216,
+ "pre_existing": 9216,
+ "uploaded_this_run": 0,
+ "deleted_v1_collision": 0,
+ "manifest_files": 9216,
+ "manifest_sha_sources": {
+  "inflated_bytes_at_upload": 0,
+  "downloaded_repo_bytes": 9216
+ },
+ "crc_mismatches": 0,
+ "peak_local_buffer_bytes": 0,
+ "disk_discipline": "zero extraction to sandbox disk; peak = one span buffer (<=32MB) + one commit batch (<=64MB) + one downloaded file at a time during manifest completion",
+ "commits": [
+  {
+   "action": "manifest_upload",
+   "commit_id": "33f87e9a8779b2402363745eba8b58b2f5081278"
+  }
+ ],
+ "wall_clock_s": 527.2,
+ "crc_mismatch_resolution": {
+  "incident": "the first hash pass (v2c) ran while the rootfs was 100% full (the session's own pip installs + stale /tmp junk from prior instances); 79 hf_hub downloads were silently truncated \u2014 a full-disk failure mode the download path does not guard",
+  "evidence": "byte-diff probe on Bearing1_1/39.csv: the stored repo bytes were byte-identical to the mirror member (sha faed01f00f29 == zip member sha) while the first pass had recorded a truncated hash (size 1331419 vs 1331653)",
+  "n_corrected": 42,
+  "n_still_bad": 37
+ },
+ "crc_mismatch_first_pass_list_len": 79,
+ "repair": {
+  "n_repaired": 37,
+  "n_still_bad": 0,
+  "repair_commit": "1e55dcc43cb258be138364665b83f8de0fceadeb",
+  "cause_typed": "the prior session's custody batches truncated ~5-6 trailing rows on 37 Bearing3_1 members (the range-fetch truncation class); the mirror zip is the verified source (bytes over claims) and the repair re-fetched each member with a crc32 assert against the zip CD"
+ },
+ "repair_manifest_commit": "85b3ec19133c04e9e02810277e4a894389e83128"
+}

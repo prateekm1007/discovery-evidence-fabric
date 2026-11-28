@@ -1,0 +1,65 @@
+{
+ "draw": "d1",
+ "problem_id": "r125-03-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [F31e draw] + canonical F97-fixed check + improved-directive reviewer)",
+ "improved_directive_len": 567,
+ "authored_bill": "Mitigation Proposal: Closed-Loop Water Adjustment via Aggregate Moisture Inference\n\nMechanism\nDeploy a shift-to-shift adaptive control law that continuously infers the free-moisture content of incoming aggregates and automatically trims the plant water dosing to keep the concrete slump/consistency constant, despite drift.\n\nImplementation\n- Inputs (existing only): batch scale records (mass of each aggregate and cement), mixer motor current meter (time-series torque/load during mixing), plant air thermometer (ambient temperature).\n- Baseline calibration: For a few initial batches at a known reference water-to-cement ratio (w/c), record the steady-state mixing current (average over the mixing cycle) and the total water metered from the plant. Use these to establish a lookup table mapping “expected mixing current” to “expected aggregate moisture” for the given aggregate mass and air temperature.\n- Real-time inference: For each new batch, compute the observed mixing current signature (e.g., average current during the homogenization phase, normalized by batch mass). Compare it to the baseline lookup at the current air temperature and aggregate masses.\n- Adjustment rule: Calculate a moisture correction factor ΔM = f(observed current – expected current, air temperature). Reduce or increase the plant water dose by k*ΔM, where k is a gain tuned to maintain target consistency. Log every adjustment.\n- Shift continuity: Carry forward the learned correction offset across shifts; update the baseline weekly using validated slump tests from the existing quality checks.\n\nMeasures It Relies On\n- Mixer current as a proxy for mixing resistance: Higher free moisture in aggregates lowers mixing torque; lower moisture raises it. The irregular current profile directly reflects inconsistent moisture.\n- Batch scale records: Provide exact aggregate masses, enabling normalization of current per unit mass to remove batch-size effects.\n- Plant air thermometer: Compensates for temperature-dependent water loss/evaporation and viscosity changes, reducing false drift signals.\n- Existing quality-control slump tests: Used to periodically validate the current-to-moisture model and recalibrate the gain k without adding new sensors.\n\nOutcome\nBy closing the loop on water dosing using only existing instrumentation, the mitigation stops the growing water additions, restores consistent mixing behavior (regular current profile), and stabilizes concrete consistency across shifts and aggregate deliveries.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Water Adjustment via Aggregate Moisture Inference**\n\n**Mechanism**\nImplement a shift-to-shift adaptive control law that infers the free-moisture content of incoming aggregates from the mixer motor current profile and automatically trims the plant water dosing to keep the concrete consistency constant. The system uses the deviation of the observed normalized mixing current from the temperature-corrected baseline as the error signal for water dose adjustment.\n\n**Implementation Bill**\n\n1.  **Sensor Derivation and Logic Signal Definitions:**\n    *   $m_{agg}$: Total mass of aggregates (kg). *Source: Sum of individual aggregate masses from batch scale records.*\n    *   $m_{cem}$: Mass of cement (kg). *Source: Batch scale record for cement.*\n    *   $m_{water,raw}$: Raw water mass added by the plant dosing system. *Source: Batch scale record for water (existing plant measurement).*\n    *   $I_{avg}$: Average mixer motor current during the homogenization phase (A). *Source: Time-series data from the mixer motor current meter, averaged over the defined mixing cycle interval.*\n    *   $T_{air}$: Ambient air temperature ($\\degree C$). *Source: Plant air thermometer.*\n    *   $I_{norm}$: Normalized current ($A/kg$). *Derivation: $I_{norm} = I_{avg} / m_{agg}$.*\n    *   $I_{base}(T_{air}, m_{agg})$: Expected baseline current. *Derivation: Interpolated from the pre-established lookup table (generated during calibration) using current $T_{air}$ and $m_{agg}$.*\n    *   $\\Delta I$: Current error (A). *Derivation: $\\Delta I = I_{avg} - I_{base}(T_{air}, m_{agg})$.*\n\n2.  **Control Logic:**\n    *   Calculate moisture correction factor: $\\Delta M = \\alpha \\cdot \\Delta I + \\beta \\cdot (T_{air} - T_{ref})$, where $\\alpha$ and $\\beta$ are empirical gains determined during calibration.\n    *   Calculate water adjustment: $\\Delta W = -k \\cdot \\Delta M$, where $k$ is the tuned water-dose gain.\n    *   Apply adjusted water dose: $m_{water,target} = m_{water,raw} + \\Delta W$.\n    *   The dosing controller receives $m_{water,target}$ as the setpoint for the current batch.\n\n3.  **Calibration and Maintenance:**\n    *   **Initial Calibration:** For the first $N$ batches at a fixed reference water-to-cement ratio, record $I_{avg}$, $T_{air}$, and $m_{agg}$. Construct the lookup table mapping $(T_{air}, m_{agg})$ to $I_{base}$.\n    *   **Weekly Recalibration:** Use results from existing quality-control slump tests (which are part of standard operations and not new instrumentation) to validate the model. If slump deviation exceeds tolerance, update the lookup table or adjust gain $k$.\n    *   **Shift Continuity:** The learned correction offset and updated lookup table are persisted across shifts.\n\n**Direction-of-Effect**\n*   **Driving Variable:** The observed normalized mixer motor current deviation ($\\Delta I$).\n*   **Direction of Effect:** When aggregates have **higher** free moisture, the mixing resistance decreases, causing the mixer motor current to **drop** below the baseline expectation ($\\Delta I < 0$). The control law interprets this drop as an excess of water already present in the aggregates and triggers a **reduction** in the plant-added water dose ($\\Delta W < 0$). Conversely, when aggregates are **drier**, mixing resistance increases, causing the current to **rise** above baseline ($\\Delta I > 0$), triggering an **increase** in the plant-added water dose ($\\Delta W > 0$). This negative feedback loop drives the total water content toward the target consistency.\n\n**Measures It Relies On**\n*   **Mixer Motor Current Meter:** Provides the primary signal ($I_{avg}$) acting as a proxy for mixing resistance. Higher free moisture in aggregates lowers mixing torque, lowering current; lower moisture raises torque and current. The irregular profile reflects inconsistent moisture, and the deviation from baseline quantifies the correction needed.\n*   **Batch Scale Records:** Provide the necessary normalization factors ($m_{agg}$, $m_{cem}$, $m_{water,raw}$) to remove batch-size effects from the current signal and to log the actual water used for validation.\n*   **Plant Air Thermometer:** Provides $T_{air}$ to compensate for temperature-dependent changes in concrete viscosity and water evaporation, ensuring the baseline current expectation $I_{base}$ is accurate for the current environmental conditions.\n*   **Existing Quality-Control Slump Tests:** Used solely for periodic model validation and gain tuning. No new sensors are added; these are existing operational checkpoints.\n\n**Operational Cost and Availability Analysis**\n*   **Throughput Impact:** The control loop operates in real-time during the mixing phase, which is a fixed portion of the batch cycle. The inference calculation is trivial for plant PLCs. **No reduction in batch cycle time** is incurred. Throughput remains unchanged.\n*   **Energy Impact:** The modulation adjusts the water dose. While changing water content slightly affects mixing torque, the primary objective is consistency correction, not energy minimization. The energy variance is negligible and bounded by the standard operating range of the mixer. **No significant change in energy cost** is projected.\n*   **Availability:** The system relies on existing hardware (sensors and PLCs). The only new component is the software logic for the control law, which can be deployed without downtime (during planned maintenance windows). **No reduction in plant availability** is expected due to hardware changes. The risk of failure is limited to software logic errors, mitigated by the \"fail-safe\" mode where the system reverts to the last known good water dose if the current sensor reports a fault.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Sensor Derivation and Logic Signal Definitions:**",
+   "*   $m_{agg}$: Total mass of aggregates (kg). *Source: Sum of individual aggregate masses ",
+   "*   $m_{cem}$: Mass of cement (kg). *Source: Batch scale record for cement.*",
+   "*   $m_{water,raw}$: Raw water mass added by the plant dosing system. *Source: Batch scale",
+   "*   $I_{avg}$: Average mixer motor current during the homogenization phase (A). *Source: T",
+   "*   $T_{air}$: Ambient air temperature ($\\degree C$). *Source: Plant air thermometer.*",
+   "*   $I_{norm}$: Normalized current ($A/kg$). *Derivation: $I_{norm} = I_{avg} / m_{agg}$.*",
+   "*   $I_{base}(T_{air}, m_{agg})$: Expected baseline current. *Derivation: Interpolated fro",
+   "*   $\\Delta I$: Current error (A). *Derivation: $\\Delta I = I_{avg} - I_{base}(T_{air}, m_",
+   "2.  **Control Logic:**",
+   "*   Calculate moisture correction factor: $\\Delta M = \\alpha \\cdot \\Delta I + \\beta \\cdot ",
+   "*   Calculate water adjustment: $\\Delta W = -k \\cdot \\Delta M$, where $k$ is the tuned wat",
+   "*   Apply adjusted water dose: $m_{water,target} = m_{water,raw} + \\Delta W$.",
+   "*   The dosing controller receives $m_{water,target}$ as the setpoint for the current batc",
+   "3.  **Calibration and Maintenance:**",
+   "*   **Initial Calibration:** For the first $N$ batches at a fixed reference water-to-cemen",
+   "*   **Weekly Recalibration:** Use results from existing quality-control slump tests (which",
+   "*   **Shift Continuity:** The learned correction offset and updated lookup table are persi",
+   "*   **Driving Variable:** The observed normalized mixer motor current deviation ($\\Delta I",
+   "*   **Direction of Effect:** When aggregates have **higher** free moisture, the mixing res",
+   "*   **Mixer Motor Current Meter:** Provides the primary signal ($I_{avg}$) acting as a pro",
+   "*   **Batch Scale Records:** Provide the necessary normalization factors ($m_{agg}$, $m_{c",
+   "*   **Plant Air Thermometer:** Provides $T_{air}$ to compensate for temperature-dependent ",
+   "*   **Existing Quality-Control Slump Tests:** Used solely for periodic model validation an",
+   "*   **Throughput Impact:** The control loop operates in real-time during the mixing phase,",
+   "*   **Energy Impact:** The modulation adjusts the water dose. While changing water content",
+   "*   **Availability:** The system relies on existing hardware (sensors and PLCs). The only "
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'solely' shares no allowed-list stem (Use only existing sensors and existing measurements: the batch scale records, th...)"
+  ],
+  "APPARATUS_ROW": [
+   "1.  **Sensor Derivation and Logic Signal Definitions:**"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ }
+}

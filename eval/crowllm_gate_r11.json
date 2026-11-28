@@ -1,0 +1,69 @@
+{
+ "record": "CROWLLM_GATE/1.0.1",
+ "at": "2026-11-14T14:20:00Z",
+ "model": "deepseek-v4-flash:free",
+ "provider": "crowllm",
+ "transport": {
+  "requirement": "Chrome User-Agent (Cloudflare browser-signature check bans the default python urllib UA with 403)",
+  "measured": "urllib default UA -> 403 Forbidden on every endpoint; Chrome UA -> 200 OK; carried in spec.extra_headers (same class as xkiro, transport plumbing only)"
+ },
+ "congestion_class": {
+  "codes": {
+   "200": "served",
+   "429": "free-pool rate limit (clears ~18 s)",
+   "500": "free-pool burst (bursts of 3-4, then clears)",
+   "503": "free-pool overflow"
+  },
+  "distribution_tiny_calls": [
+   {
+    "n": 10,
+    "result": {
+     "200": 1,
+     "429": 5,
+     "500": 3,
+     "503": 1
+    }
+   },
+   {
+    "n": 8,
+    "result": {
+     "200": 5,
+     "503": 2,
+     "429": 1
+    }
+   }
+  ],
+  "recovery_429_s": 18,
+  "burst_shape": "4 consecutive 500s then unassisted recovery; logical-call retry ladder (immediate/+10s/+25s) clears it in the caller"
+ },
+ "gate_result": {
+  "question": "does the REAL full-length judge prompt (7786 chars) serve complete verdict JSONs?",
+  "trials": 3,
+  "pacing_s": 8,
+  "valid": 3,
+  "walls_s": [
+   4.1,
+   2.8,
+   5.4
+  ],
+  "chars_out": [
+   105,
+   107,
+   107
+  ],
+  "verdict_json_all": true,
+  "gate": "PASS"
+ },
+ "other_rungs_typed": {
+  "deepseek-v4.1-flash:free": "503 DEAD_UPSTREAM (both stream and non-stream, measured)",
+  "deepseek-v4.1-flash-uncensored:free": "503 DEAD_UPSTREAM (measured)",
+  "ernie-5.5-flash-preview:free": "tiny OK but full-length verdict starves (2/3 calls returned 4 chars, no verdict JSON) — TYPED DEAD for the judge role (EmptyContentAtCap); never enters JUDGE_CANDIDATES",
+  "qwen-3.6-27b:free": "90 s timeout x1 (typed, not retried — the deepseek rung already passed the gate)",
+  "qwen-3.5-397b-a17b:free": "90 s timeout x1 (same)",
+  "agnes-2.5-flash:free": "500 during a burst window (same congestion class; not judge-role relevant)"
+ },
+ "judge_role_eligibility": {
+  "independent_family": "DeepSeek family — different provider AND family from the agnes/agnes-3.0-flash generator rung (the R3 A1 generator)",
+  "gate": "PASS — wired into JUDGE_CANDIDATES after the 30-pair live calibration (threshold 0.8) runs"
+ }
+}

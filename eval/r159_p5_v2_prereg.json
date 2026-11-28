@@ -1,0 +1,42 @@
+{
+ "record": "R159_P5_V2_PREREG/1.0.0",
+ "claim": "c-0264 (P5 v2)",
+ "work_id": "r159-p5-rediscovery-v2",
+ "session": "builder-r159s2",
+ "at": "2026-11-26 09:42 UTC",
+ "corpus": {
+  "path": "eval/r159_p5_v2_corpus/sampled_items.jsonl",
+  "sha256_16": "c9670d8dd4b55c0c",
+  "n_items": 30,
+  "from_date": "2025-10-15",
+  "seed": 20261126,
+  "provenance": "Crossref works API (chemistry, journal-article, has-abstract, from-pub-date 2025-10-15, polite pool); item fields authored by z-ai glm; served-leak asserted per-item; DISJOINT from the r106 first-attempt corpus by DOI"
+ },
+ "seats": {
+  "G0_generator": "tokenrouter deepseek-v4.1-flash-1017-free (probe VALID this session)",
+  "J1_recovery_judge": "z-ai glm (r158 seat, unchanged)",
+  "J2_recovery_judge": "ctai openai/gpt-6-astra (AM52 re-seat 2026-11-27; was cent-ai hy4-flash:free, 403 day-2; budget 4000; family openai != generator deepseek, F2-clean)",
+  "Jt2_support_judge": "z-ai glm (SUPPORT-rating task — non-generator family; F2-clean: the generator is deepseek)",
+  "author_seat": "z-ai glm (corpus authoring only)"
+ },
+ "t2_design": {
+  "v1_keyword_bar": "RETIRED (r159s2+r160s1 calibration evidence: sensitivity 0.0 on ground truth, 0/18 under v2 normalization, vocabulary mismatch real)",
+  "tier_a_known_item": "DOI resolves via Crossref AND the resolved title matches a registered prior-art title at ratio >= 0.82 (the known-item registry: the item's own served inspiration titles, title-mapped to DOIs at seal time)",
+  "tier_b_judge_support": "DOI resolves AND the independent judge (glm, non-generator family) rates the paper's title+abstract as SUPPORTING the generated key_mechanism as stated",
+  "item_pass": "every citation resolves AND >=1 citation passes tier A or B"
+ },
+ "g0_v2": "coverage-mandate addendum (r160s1 scaffold, verbatim): answer every background sub-question; each causal step names its measurable quantity",
+ "acceptance": ">=40% RECOVERED (min 12/30), 0 canary hits, >=1 T1 valid, >=1 T2 valid, 0 interventions, ONE unattended run with byte-resume checkpoint",
+ "fail_closed": "GEN_FAILED -> NOT_RECOVERED; judge failure -> PARTIAL; canary hit -> CONTAMINATED (excluded from the bar)",
+ "resume_command": "cd /home/z/my-project/discovery-evidence-fabric && set -a && . ./.env.keys && set +a && python3 scripts/r159_p5_v2_run.py",
+ "amendments": [
+  {
+   "id": "AM52-RESEAT-1",
+   "date": "2026-11-27",
+   "authority": "AM52 (DELEGATED OWNER, ledger V135): 'Authorize a SEALED J2 availability re-seat: hy4 -> a LIVE ctai judge (gpt-6-astra preferred, unspent), qualified for the P5 support-rating task (judge != G0 tokenrouter generator, F2-clean)'",
+   "change": "seats.J2_recovery_judge: cent-ai hy4-flash:free (403 day-2) -> ctai openai/gpt-6-astra (probe 200 live this session, engine ctai_chat, budget 4000 unchanged)",
+   "reason": "availability only — hy4-flash:free is 403 Forbidden day-2 (auditor-confirmed); NOT tuning; the substitute judge family openai != the G0 generator family deepseek (F2-clean)",
+   "integrity": "corpus c9670d8dd4b55c0c FROZEN (unchanged); the 21/30 infra-terminal archived (never overwritten); bars unchanged; fail-closed rules unchanged; Art.3/7/8 respected"
+  }
+ ]
+}

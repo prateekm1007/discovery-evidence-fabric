@@ -1,0 +1,29 @@
+{
+ "problem_id": "HO-05-bridge-deck-chloride-corrosion",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 8.2,
+   "chars": 3772
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 6.7,
+   "chars": 3037,
+   "findings_disclosed": [
+    "TEST_DURATION_REALTIME"
+   ]
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "bd046a9969b7ac4d",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVEL-AND-FEASIBLE IDEATION\n\nSTEP 1 — INVENT THE OBSERVABLE:\nStandard practice tracks concrete resistivity and chloride content at discrete points. My observable is the spatial gradient of chloride concentration in the cover concrete, which captures the penetration front's advance rate and directionality rather than just localized values.\n\nSTEP 2 — MAKE THE IMPLEMENTATION BORING:\nThis observable is computable from existing core sampling data using standard finite difference methods, requiring no new sensors or infrastructure beyond what's already used for condition assessment.\n\nNOVELTY STATEMENT:\nStandard practice tracks absolute chloride content at discrete points, which provides a snapshot but misses the dynamic penetration process. My observable, the spatial chloride gradient, directly relates to the diffusion physics (Fick's second law) and reveals the rate and direction of chloride ingress, allowing prediction of when the critical threshold will be reached at the reinforcement depth.\n\nPHYSICS CHECK:\nThe governing relation is Fick's second law: ∂C/∂t = D∇²C, where C is chloride concentration, t is time, and D is the diffusion coefficient. The spatial gradient ∇C determines the flux J = -D∇C (Fick's first law). For 40 mm cover with typical D = 1×10^-12 m²/s, a gradient of 0.5%/mm would indicate a flux of ~1.6×10^-8 kg/m²/s, which is consistent with literature values for chloride penetration in concrete.\n\nIMPLEMENTATION BILL:\n- Core drilling equipment (existing bridge assessment tools)\n- Concrete coring bits (diamond-tipped, 50 mm diameter)\n- Portable X-ray fluorescence analyzer (for chloride content measurement)\n- Data processing software (standard spreadsheet or mathematical computing package)\n- Procedure: Extract cores at 5 mm intervals from deck surface to reinforcement depth; measure chloride content at each depth; compute gradient between adjacent points.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: Same as standard practice (core sampling already required)\n- Operability: Same equipment, same personnel, same safety protocols\n- Maintenance: No additional maintenance burden (equipment already maintained for condition assessment)\n- Cost: Comparable to standard practice (additional lab time offset by reduced sampling frequency)\n- Conclusion: Same deployment burden, different observable that provides earlier warning of failure progression\n\nEXECUTABLE TEST:\nProtocol: Extract cores from 20 locations across the bridge deck at 5 mm intervals from surface to 40 mm depth. Measure chloride content using XRF. Compute spatial gradient at each location. Average the gradients across all locations.\nInstruments: Core drill, diamond coring bits, portable XRF analyzer, digital calipers\nPass threshold: Average gradient < 0.3%/mm\nFail threshold: Average gradient > 0.5%/mm\nDuration: 3 days (including sample collection and analysis)\nKill criterion: If any single location shows gradient > 0.8%/mm, the test fails immediately as it indicates accelerated penetration at a critical point."
+}

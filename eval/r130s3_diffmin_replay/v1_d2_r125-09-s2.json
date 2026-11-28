@@ -1,0 +1,16 @@
+{
+ "pid": "r125-09-s2",
+ "tag": "v1",
+ "ok": true,
+ "delivered": "MITIGATION PROPOSAL: CLOSED-LOOP EXHAUST DAMPER MODULATION VIA ZONE THERMAL EQUILIBRIUM\n\nMECHANISM:\nMechanism: The root cause of uneven curing is the static exhaust damper position creating localized high-velocity air flow at the corners, causing higher convective heat loss than in the center. This results in a spatial temperature gradient where corner parts cure slower than center parts.\n\nDIRECTION-OF-EFFECT STATEMENT:\nDriving Variable: Spatial temperature gradient between corner and center zones (Delta_T).\nDirection of Effect: An increase in exhaust damper opening increases air velocity and convective heat loss, lowering zone temperatures and potentially widening the gradient if corners lose more heat. A decrease in exhaust damper opening reduces air velocity and heat loss, allowing corner temperatures to rise relative to the center, thereby narrowing the positive gradient (center hotter than corners).\n\nIMPLEMENTATION BILL:\nInputs:\n1. T_corner_avg: Average temperature of corner zone thermocouples (TC-C1, TC-C4). Source: Existing Oven Zone Thermocouples.\n2. T_center_avg: Average temperature of center zone thermocouples (TC-C2, TC-C3). Source: Existing Oven Zone Thermocouples.\n3. Delta_T: Calculated gradient T_center_avg - T_corner_avg. Derived: Arithmetic subtraction of Input 2 and Input 1.\n4. Damper_Position_FB: Actual physical position of the exhaust damper. Source: Existing Exhaust Damper Position Feedback Sensor.\n5. Soak_Window_Active: Boolean state indicating the active control phase. Source: Existing Cycle Timer, derived by comparing elapsed time against programmed soak start and end parameters.\n\nActions:\n1. Calculate Delta_T continuously.\n2. If Soak_Window_Active is TRUE:\n   a. If Delta_T > 5C (Corners colder): Command Damper_Position_FB actuator to move towards CLOSED state (decrease opening) to reduce air velocity and heat loss at corners.\n   b. If Delta_T < 0C (Corners hotter): Command Damper_Position_FB actuator to move towards OPEN state (increase opening) to increase air velocity and heat loss at corners.\n   c. If 0C <= Delta_T <= 5C: Hold Damper_Position_FB at current position or baseline setpoint.\n3. If Soak_Window_Active is FALSE: Hold Damper_Position_FB at neutral/closed position to prevent thermal shock during cool-down.\n\nConstraint Adherence:\nNo new instrumentation is added. All inputs are derived from existing zone thermocouples, the cycle timer, and exhaust damper position feedback. The remedy (modulating damper position to alter heat loss) is distinct from the failure driver (static damper position causing uneven heat loss), addressing the physical root cause rather than compensating with extended cycle time.",
+ "transport_attempts": 1,
+ "latency_s": 2.9,
+ "parse_first_try": true,
+ "arm": "v1",
+ "draw": "d2",
+ "work_id": "r130s3-diffmin-fold",
+ "score": {
+  "defects": [],
+  "healed": false
+ }
+}

@@ -1,0 +1,16 @@
+{
+  "record": "R67S1_RUN_LOST_PARTIAL/1.0.0",
+  "session": "builder-r60s1",
+  "date": "2026-11-18",
+  "incident_class": "RUN_LOST_SANDBOX_RESET (the VAULT_LOST_SANDBOX_REPROVISION class, applied to the sealed run's durable bytes)",
+  "what_happened": "builder-r64s4's keyed session executed the sealed v9 run under the c-0082 lock (their typed path (b): 'the keyed parallel session executes; the c-0082 claim push is the lock') and reached rows_done=23 (21 CLEAN, 2 FLAG: HO9-19-pump-impeller-cavitation, HO9-21-gearbox-bearing-spall) before their turn was cut off. The run-state snapshot (bfaab8511) committed the RECORD ONLY - the 23 row files, the events ledger, and the gateway log stayed sandbox-local at /home/z/my-project/discovery-evidence-fabric and were never pushed.",
+  "loss_verification_this_session": "byte-checked this machine (the same host, 2026-11-18T08:1xZ): no r60_v9_one_shot process alive, no /tmp/v9run.log, /home/z/my-project/discovery-evidence-fabric present but STALE (an older clone: UUID-message commits, no eval/holdout_v9_generation/, its gateway log ends 2026-11-17T18:03 glm-4-plus era). The 23 rows and their gateway window are LOST - the resume heartbeats (Art. 29(d) durable per-row files) died with the sandbox reset.",
+  "governance_reading": [
+    "the one-shot lock (c-0082) binds ONE EXECUTOR and ONE logical run lane - the resume-safe instrument design (durable per-row files, Art. 29(d) partial-row heartbeats) explicitly anticipates multi-invocation completion; a sandbox loss is the extreme interruption case, not a second run lane",
+    "the lost 23 rows were never pushed, never attested, never scored - no byte of them enters the evidence base; the scorer sees exactly one committed run window (this session's)",
+    "the burn semantics: the packet burns on USE; the use that COUNTS is the committed, attested window. The lost draws produced no committed artifact",
+    "the executor disclosure obligation stands: the adoption/attestation record credits the c-0082 lock-holder (builder-r60s1's claim, 5b47d4cb0), discloses builder-r64s4 as the first executor (23 rows, lost) and builder-r60s1 (this keyed session) as the completing executor, AM60/R66 as the authorization basis with the AM61/registration chain"
+  ],
+  "completion_path": "this keyed session (builder-r60s1, the lock-holder's own sandbox - the c-0082 claim is builder-r60s1's) completes the SAME logical run: fresh 30/30 from the sealed audit-branch packet (seal re-verified by the machine at load, fail-closed), ZAI_GATEWAY_UPSTREAM=agnes (the 132b97947 registration, contract-fit evidence r64s4_contract_fit_probe + this session's convergent falsification eval/r67s1_transport_falsification.json), chunked foreground execution under the sandbox's background-process reaper (offsets recorded per chunk; the full gateway window reassembled faithfully from the append-only log for the Art. 29(c) attest recompute - every byte genuine, assembly disclosed)",
+  "disclosure_to_auditor": "this record is the incident disclosure; the auditor's next round owns the ratification call (AM62-class) on both the registration chain and the lost-run completion"
+}

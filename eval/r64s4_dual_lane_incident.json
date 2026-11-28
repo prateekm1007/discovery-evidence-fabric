@@ -1,0 +1,36 @@
+{
+ "record": "R64S4_DUAL_LANE_INCIDENT/1.0.0",
+ "session": "builder-r64s4 (continuation session)",
+ "date": "2026-11-18",
+ "class": "F25_DUAL_EXECUTOR_LANE_CAUGHT_BY_PUSH_GATE",
+ "caught_how": "the Art. 29(e) diff-against-remote gate: while the r64s4 completion commit (3425e3e3f, LOCAL-ONLY, in reflog) was being finalized, origin/queue/dev12_r7 advanced d0c18d940 -> f82dea546 (builder-r60s1's R67s2 heartbeat: a FRESH generation of the same sealed packet, window start 2026-11-18T08:15:32.731545Z, 12/30 rows, stalled on a per-key 429 and resuming with the owner's second key). Same work_id, non-fast-forward -> push REFUSED, executor role stood down to VERIFIER per Art. 29(e). No duplicate artifacts entered the pushed evidence base.",
+ "typed_correction_art4": {
+  "corrects": "eval/r67s1_run_lost_partial.json (715e887e3): 'the 23 rows and their gateway window are LOST'",
+  "bytes_found": "the run was NEVER lost. The builder-r64s4 sandbox retained the full state and the same-lane resume (Art. 29(d) multi-invocation completion) completed 30/30 at 2026-11-18T08:02:23Z - roughly 10 minutes BEFORE r60s1's 08:1xZ loss-check and ~13 minutes BEFORE lane B started its fresh window at 08:15:32Z. The LOST determination was made from a different clone's viewport (no holdout dir, gateway log ending 2026-11-17T18:03 glm-4-plus era): local state is not repository state (epistemic Art. 7).",
+  "lane_A_window_digests_sha256_16": {
+   "attestation.json": "6136e81ff8e44022",
+   "events.json": "8aac64f00261f0a3",
+   "gateway_slice.txt": "54ac0acdce8f91b2",
+   "rows_set_30": "e9a3edba25a2dbe6"
+  },
+  "lane_A_recompute": "26/26 checks PASS (scripts/r64s4_verify_holdout_v9.py): 30 rows, 27 CLEAN / 3 FLAG typed (HO9-19, HO9-21, HO9-25; findings_disclosed inline), 178 completed gateway calls ALL served==requested==registered agnes-3.0-flash, 8 typed RATE_LIMITED_RETRY telemetry lines, selection order == sealed packet order, prereg seal 502e93d8 unchanged",
+  "custody": "the lane-A window is quarantined sandbox-local at eval/r64s4_completed_window_quarantine/ + the local commit 3425e3e3f (reflog). Per Art. 1 these bytes are UNPUSHED and do NOT count as evidence; they are re-pushable ONLY on explicit auditor instruction (which would itself constitute the ratification of a swapped canonical window - the auditor's call, never the builder's). The quarantine dies with this sandbox (Art. 18 fragility disclosed)."
+ },
+ "stand_down_declaration": {
+  "rule": "epistemic Art. 29(e): same-work_id non-fast-forward => stand down to verifier, never rebase a duplicate",
+  "canonical_window": "lane B (builder-r60s1, the c-0082 claim holder, window start 08:15:32Z, heartbeat 12/30 at f82dea546, per-key-rotation resume rows 13-30)",
+  "r64s4_role_now": "VERIFIER (Art. 29(b)/(c)): on lane B completion, every attestation number is recomputed from the committed bytes and a typed verifier record is filed; the recompute tooling is committed beside this record (scripts/r64s4_verify_holdout_v9.py)"
+ },
+ "quota_disclosure": {
+  "fact": "two generations of the same sealed one-shot packet were drawn: lane A (178 completed calls, window 07:18-08:02) and lane B (12+ rows as of the heartbeat, window from 08:15). The free-user per-key quota exhaustion at 08:24:01Z that stalled lane B occurred AFTER lane A had already drawn its full window.",
+  "cost": "a real quota double-burn, typed here per Art. 5; the burn semantics both records already use ('the use that COUNTS is the committed, attested window') keep the evidence base single-window: the scorer sees exactly lane B's committed window, and lane A produced no committed bytes (Art. 1).",
+  "root_cause": "the RUN_LOST call raced the actual completion: the turn cut-off ambiguity made two sessions both believe they held the live lane. The claim/execute/verify machinery (claim-before-work, heartbeat push, diff-against-remote) caught the collision BEFORE any duplicate entered the pushed evidence base - the mechanism worked as designed; the viewport error (epistemic Art. 7) is the finding to carry."
+ },
+ "disjoint_work_in_this_commit": {
+  "key_rotation_custody": "eval/r64s4_key_rotation_custody.json + scripts/r64s4_key_rotation_custody.py: the owner's second agnes key admitted (digest 5c4dffd28fe4), probed 200/10 models, registered AGNES_API_KEY_2 in the gitignored 0600 .env.keys, Art. 17 custody extended into the private HF vault (token digest 33bc7af22c62 == recorded master; 5 pre-existing entries byte-unchanged; post-upload digest verified; a variable-shadowing bug in two prior vault commits disclosed and remediated inside the record). CONVERGENT with builder-r60s1's independent admission of the SAME second key (identical digest, eval/r67s2_agnes_second_key_custody.json) - two sessions, same owner delivery, same identification; the vault final state (6 keys, every entry digest-consistent) was re-verified after both sessions' writes.",
+  "smoke_session_quarantine": "eval/r64s4_smoke_session/ + MANIFEST.json: the r64s4 keyed session's own pre-run smoke artifacts (2/2 rows CLEAN, window 07:14Z) quarantined out of the canonical paths held by c8cc5deb2's committed smoke (F36-pattern avoidance; digests in the MANIFEST)",
+  "verifier_tooling": "scripts/r64s4_verify_holdout_v9.py: the Art. 13/29(c) recompute tool (read-only; env-overridable output path + subject for the lane-B verification record)"
+ },
+ "not_pushed_and_why": "the lane-A artifact set (30 rows + events + slice + attestation) is deliberately NOT in this commit: pushing it would create a second committed window for the same sealed work_id (Art. 29(e) duplicate + double attestation). The digests above + the quarantined bytes are the disclosure; the auditor decides whether lane A is ever ratified into evidence.",
+ "trailers_note": "commit carries Session: builder-r64s4 / Work-Id: holdout-v9-generation per Art. 29(a)"
+}

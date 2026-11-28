@@ -1,0 +1,33 @@
+{
+ "judge": "dsv32",
+ "family": "deepseek",
+ "model": "deepseek-ai/DeepSeek-V3.2",
+ "pid": "rcal-11-heat-exchanger-fouling",
+ "pass": "mir",
+ "a_is": "a1",
+ "blind_order_parity": false,
+ "outcome": "VALID",
+ "parsed": {
+  "axes": {
+   "N_A": 5,
+   "N_B": 1,
+   "F_A": 4,
+   "F_B": 5,
+   "T_A": 5,
+   "T_B": 2,
+   "C_A": 5,
+   "C_B": 5
+  },
+  "prefer": "A"
+ },
+ "raw_tail": " is vague and lacks a specific pass/fail threshold → **T_B=2**.\n\n- **Constraint-compliance:**  \n  **A** respects all stated constraints (device: process; failure: fouling drops U, raises pumping power) and answers the forced choice → **C_A=5**.  \n  **B** also respects the constraints but is the generic default → **C_B=5**.\n\n**Expert weighting:** Novelty and testability dominate. **A** is genuinely novel and highly testable, while **B** is the standard practice with low novelty and vague testability. Both are feasible and constraint-compliant, so gates are passed. **A** is the better engineering answer despite being less trivial to implement.\n\n**Forced choice:** prefer **A**.\n\n```json\n{\n  \"N_A\": 5, \"F_A\": 4, \"T_A\": 5, \"C_A\": 5,\n  \"N_B\": 1, \"F_B\": 5, \"T_B\": 2, \"C_B\": 5,\n  \"prefer\": \"A\"\n}\n```",
+ "attempts": [
+  {
+   "attempt": 1,
+   "budget": 4000,
+   "latency_s": 13.1,
+   "error": null
+  }
+ ],
+ "wall_s": 13.1
+}

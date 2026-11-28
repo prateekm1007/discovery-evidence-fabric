@@ -1,0 +1,16 @@
+**Mitigation Proposal: Closed-Loop Fouling Compensation via Inlet Flow Rate Modulation**
+
+**Mechanism:**
+Since outlet temperature ($T_{out}$) is the primary indicator of fouling (creeping up as heat transfer coefficient $U$ degrades), and new sensors are prohibited, the system must utilize the existing flow meter and thermocouples to actively counteract the thermal degradation. The mechanism is a **feedback control loop that modulates the brine inlet flow rate** to maintain a target outlet temperature. As fouling increases, the heat transfer capacity drops; by reducing the flow rate, the residence time of the brine in the tubes increases, compensating for the lower $U$ and stabilizing $T_{out}$ at the desired setpoint for a longer duration between chemical cleanings.
+
+**Implementation:**
+1.  **Control Algorithm:** Implement a PID (Proportional-Integral-Derivative) controller in the existing PLC or DCS. The process variable (PV) is the measured brine outlet temperature ($T_{out}$). The setpoint (SP) is the target outlet temperature. The controlled variable (CV) is the brine flow rate ($\dot{m}$), adjusted by modulating an existing control valve upstream of the cooler.
+2.  **Fouling Index Estimation:** To prevent the flow modulation from masking a critical fouling level (where even minimal flow cannot maintain temperature), use the existing data to estimate a real-time "Fouling Factor" ($R_f$). Calculate the actual overall heat transfer coefficient $U_{actual}$ using:
+    $$U_{actual} = \frac{\dot{m} c_p (T_{in} - T_{out})}{A \cdot LMTD}$$
+    Where $LMTD$ is the Log Mean Temperature Difference calculated from $T_{in}$, $T_{out}$, and the known brine/glycol temperatures at the ends of the shell side (assumed constant or measured by existing sensors). Compare $U_{actual}$ to the clean baseline $U_{clean}$ to derive $R_f = \frac{1}{U_{actual}} - \frac{1}{U_{clean}}$.
+3.  **Constraint Handling:** The flow rate is only modulated within a safe operational band (e.g., 80%–120% of nominal flow). If the required flow to maintain $T_{out}$ falls below the lower limit, an alarm is triggered indicating that fouling has exceeded the compensable range, prompting a scheduled cleaning rather than risking over-pumping or temperature excursion.
+
+**Measures it Relies On:**
+*   **Brine Inlet/Outlet Thermocouples:** Provide $T_{in}$ and $T_{out}$, which are essential for calculating the duty ($Q = \dot{m} c_p \Delta T$) and the LMTD, enabling the estimation of $U_{actual}$ and the detection of thermal drift.
+*   **Flow Meter:** Provides $\dot{m}$, which is both the controlled variable (to be adjusted by the valve) and a critical input for the energy balance calculation. Without accurate flow measurement, the relationship between flow rate and heat duty is undefined, making closed-loop temperature control via flow modulation impossible.
+*   **Existing Control Valve:** Implicitly assumed to be present for flow control; if not, this mitigation requires verifying actuator availability. If no valve exists, the mitigation shifts to **variable speed drive (VSD) control** of the brine pump, assuming one is present, using the same flow/temperature logic.

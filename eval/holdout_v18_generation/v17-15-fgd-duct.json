@@ -1,0 +1,147 @@
+{
+ "problem_id": "v17-15-fgd-duct",
+ "domain": "corrosion_chemical",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:d8e33ca43f53": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:aded41514e9a": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "corrosion_chemical",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "corrosion_chemical",
+   "n_analogies": 2,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:19:22Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.8,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a passive material or coating barrier (barrier_coating_upgrade or material_selection_upgrade) that physically blocks acid condensate flux but requires periodic reapplication or expensive alloy replacement.\nMy mechanism departs by using cathodic_protection_sizing: it shifts the electrochemical potential of the carbon-steel duct wall below the corrosion threshold via distributed sacrificial anodes, neutralizing the electrochemical driver of pitting rather than merely blocking the chemical attack.\nFailure-physics connection: Acid condensate corrosion in flue-gas desulfurization (FGD) ducts is an electrochemical process where local pH drops below ~4 create anodic sites; cathodic protection suppresses this by driving the local potential into the immunity range, independent of coating defects or condensate film thickness.\n\nPHYSICS CHECK\nGoverning physical relation: The driving voltage for electrochemical corrosion is the difference between the potential of the anodic site ($E_{anode}$) and the protective potential required to stop metal dissolution ($E_{corr}$). For carbon steel in acidic environments, the protection threshold is approximately -0.85 V to -0.95 V vs. Cu/CuSO4 (CSE).\nMagnitude verification: ASSUMPTION: The condensate film thickness is 0.5 mm (typical for intermittent wetting). The electrical resistivity of the acid condensate is assumed to be 10 Ω·cm (approx. 0.1 M sulfuric acid). The voltage drop across the film is $V = I \\cdot \\rho \\cdot L / A$. For a current density of 10 mA/cm² (typical CP requirement), $L = 0.05$ cm, $\\rho = 10$ Ω·cm, the drop is $10 \\cdot 10 \\cdot 0.05 / 1 = 5$ mV, which is negligible compared to the 200–300 mV protection margin. Therefore, the potential at the steel surface will effectively match the anode potential, ensuring protection.\n\nIMPLEMENTATION BILL\n1.  Sacrificial Anodes (ALREADY-RECORDED/DERIVED):\n    -   Input: Standard FGD duct geometry (Assumed: 2m x 2m rectangular duct).\n    -   Action: Install 4x Magnesium or Zinc anodes per 10m of duct length.\n    -   Material: ASSUMPTION: Magnesium anodes selected because the electrolyte (condensate) has low conductivity and high pH variability; Mg drives potentials to -1.6 V vs. SHE, providing ample margin below the -0.85 V CSE threshold.\n    -   Connection: Galvanic contact with duct wall via welded straps; no external power source.\n2.  Anode Sizing (DERIVED):\n    -   Derivation: Total wetted surface area of duct = $4 \\times (2 \\times 10) = 80 m^2$. Required current density for protection in acidic condensate = ASSUMPTION: 10 mA/m² (low due to intermittent wetting and passivation potential). Total required current = $800 mA$.\n    -   Anode Design: Using standard Mg anode output of 100 mA each (datasheet value), require 8 anodes total. Bill: 8 Mg anodes (1 kg each).\n3.  Monitoring Points (ALREADY-RECORDED):\n    -   Signal: Existing pH and conductivity sensors in the FGD spray area upstream of the duct.\n    -   Use: These sensors already record the chemical environment. No new instrumentation is added to the duct itself; the intervention is purely the installation of the anodes. The pH/conductivity data serves as the boundary condition for verifying that the condensate acidity is within the range where Mg anodes remain active (pH > 1.5).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: SAME as coating application. Coating requires surface prep and curing; anode installation requires welding straps. Both are non-disruptive if planned.\nOperability: BETTER than coatings. Coatings degrade silently; anodes degrade visibly and replace-ably. No power supply, no control unit.\nMaintenance: LOWER. Anodes are replaced every 5-10 years based on mass loss. Coatings require inspection for defects every 1-2 years and risk of under-film corrosion.\nRough Cost Class: LOWER. Mg anodes cost ~$50 each. Coating a 2m x 2m duct section with high-performance epoxy/glass flake costs ~$5,000 per meter run and requires shut-down.\nWhy it is worth it: The mechanism shifts the burden from \"perfect surface preparation and constant vigilance for defects\" (coating) to \"bulk material consumption\" (anode), which is more predictable and less sensitive to localized condensate pooling.\n\nEXECUTABLE TEST\nProtocol: Install a coupon block (3 pieces of same grade carbon steel, 2 with Mg anodes, 1 bare reference) in the FGD duct for 6 months. Measure mass loss (grams) of each coupon.\nPass/Fail Thresholds:\n-   Reference coupon mass loss: > 100 mg/cm² (indicating active corrosion).\n-   Protected coupons mass loss: < 10 mg/cm² (indicating protection).\n-   Potential measurement: Verify protected coupons are at -0.90 V CSE or more negative.\nKill Criterion: The mechanism is FALSIFIED if the mass loss of the anode-protected coupons does not decrease by at least 90% (mg/cm²) compared to the bare reference coupon within the 6-month window.\nApparatus: Gravimetric mass-loss coupons and a millivoltmeter with Cu/CuSO4 reference electrode.\nValidation: The test validates against the already-recorded pH/conductivity data by confirming that the condensate pH remains < 4 during the test period (proving the acid attack was active in the reference coupon), while the protected coupons remain in the immunity range.\n\nDESIGN_POINT\nThe mechanism acts through the electrochemical potential shift.\nExplicit Magnitude: The protective potential threshold is -0.85 V vs. CSE (ASSUMPTION: standard NACE criterion for carbon steel). The Mg anode open-circuit potential is -1.6 V vs. SHE (ASSUMPTION: datasheet value). The driving voltage is therefore $V_{drive} = E_{anode} - E_{threshold} \\approx (-1.51 V) - (-0.85 V) = -0.66 V$ (approximate conversion CSE to SHE). This 0.66 V margin ensures current flow sufficient to suppress corrosion even if the local condensate conductivity varies by ±50%. The required anode area is 8 anodes x 0.1 m² surface area each = 0.8 m² total anode surface for 80 m² duct surface, a ratio of 1:100, which is CALCULATED from the 10 mA/m² demand.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "protection current demand (j=20 mA/m^2 anchor)",
+  "predicted_value": "I = 1.60 ampere A for 80 m^2",
+  "calc_trace": "0.02 A/m^2 x 80.0 m^2 = 1.60 ampere A",
+  "falsifier": "the measured pipe-to-electrolyte potential must stay below -0.80 V (Ag/AgCl) in the coupon potential survey; the opposite result falsifies the invention",
+  "route": "class-generic:corrosion_chemical"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "cathodic_protection_sizing",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The failure is caused by the acidic condensate creating a highly conductive, low-pH electrolyte that allows the carbon steel to act as an anode in a galvanic cell, driving net oxidation and mass loss of the metal. | ingredient: The sacrificial magnesium anodes impose a cathodic potential on the duct wall by being more electronegative (having a more negative open-circuit potential) than the carbon steel, thereby shifting the steel's electrochemical potential below its corrosion threshold and inhibiting t | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The failure is caused by the acidic condensate creating a highly conductive, low-pH electrolyte that allows the carbon steel to act as an anode in a galvanic cell, driving net oxidation and mass loss of the metal.",
+   "ingredient_action": "The sacrificial magnesium anodes impose a cathodic potential on the duct wall by being more electronegative (having a more negative open-circuit potential) than the carbon steel, thereby shifting the steel's electrochemical potential below its corrosion threshold and inhibiting t",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  Sacrificial Anodes (ALREADY-RECORDED/DERIVED):",
+    "-   Input: Standard FGD duct geometry (Assumed: 2m x 2m rectangular duct).",
+    "-   Action: Install 4x Magnesium or Zinc anodes per 10m of duct length.",
+    "-   Material: ASSUMPTION: Magnesium anodes selected because the electrolyte (condensate) h",
+    "-   Connection: Galvanic contact with duct wall via welded straps; no external power sourc",
+    "2.  Anode Sizing (DERIVED):",
+    "-   Derivation: Total wetted surface area of duct = $4 \\times (2 \\times 10) = 80 m^2$. Req",
+    "-   Anode Design: Using standard Mg anode output of 100 mA each (datasheet value), require",
+    "3.  Monitoring Points (ALREADY-RECORDED):",
+    "-   Signal: Existing pH and conductivity sensors in the FGD spray area upstream of the duc",
+    "-   Use: These sensors already record the chemical environment. No new instrumentation is "
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "f8811efff6d46753"
+}

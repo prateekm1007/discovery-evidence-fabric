@@ -1,0 +1,251 @@
+{
+ "eval_version": "holdout-v2",
+ "authored_at": "2026-11-15",
+ "author": "independent auditor (owner-delegated authorization 2026-11-15: end-to-end AI loop, no further owner gating)",
+ "provenance": "SEALED HOLDOUT v2: one-shot scoring set for the type-aware machine. Do not tune/inspect/iterate. Burned (becomes DEV) after the scored run. Builder receives problems ONLY, one-shot, under claim-before-work; rubric stays auditor/owner.",
+ "n_problems": 12,
+ "selection_sha256": "67671fd6542fbdb21d861880cd7f2e391e174da4b3ecdc20e12794d55bc4b4e2",
+ "selection_hash_basis": "sha256 over canonical tuples (problem_id,device,failure,question,question_type,user_variables) of FRESH problems sorted by problem_id, identical to eval/validate_problems.py",
+ "problems": [
+  {
+   "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+   "device": "planar solid-oxide fuel cell stack with ferritic-steel interconnect and LSCF cathode",
+   "failure": "chromium volatilized from the interconnect deposits at the cathode triple-phase boundary and raises polarization resistance, cutting power ~20% in 5000 h",
+   "failure_mode": "interconnect-chromium-poisoning",
+   "constraint": "retrofit only: no change to interconnect alloy or cell footprint; power decay <5% over 10000 h at 750 C; any coating must stay conductive and adhere under thermal cycling",
+   "domain": "fuel-cells",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "retrofit only: no change to interconnect alloy or cell footprint; power decay <5% over 10000 h at 750 C; any coating must stay conductive and adhere under thermal cycling",
+    "device of record: planar solid-oxide fuel cell stack with ferritic-steel interconnect and LSCF cathode",
+    "failure to address: interconnect-chromium-poisoning"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-02-perovskite-module-degradation",
+   "device": "glass-glass perovskite solar module (formamidinium-lead-iodide) in rooftop deployment",
+   "failure": "moisture ingress and UV exposure decompose the perovskite and delaminate the encapsulant, dropping output >20% in 2 years",
+   "failure_mode": "perovskite-moisture-uv-degradation",
+   "constraint": "retain module efficiency within 2% of nameplate; edge-seal and encapsulant changes only, no cell redesign; pass IEC 61215 damp-heat 1000 h and UV 60 kWh/m2",
+   "domain": "photovoltaics",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "retain module efficiency within 2% of nameplate; edge-seal and encapsulant changes only, no cell redesign; pass IEC 61215 damp-heat 1000 h and UV 60 kWh/m2",
+    "device of record: glass-glass perovskite solar module (formamidinium-lead-iodide) in rooftop deployment",
+    "failure to address: perovskite-moisture-uv-degradation"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-03-lead-service-line-release",
+   "device": "lead service lines connecting a municipal main to homes, low-alkalinity corrosive water",
+   "failure": "corrosion of the lead line releases particulate and dissolved lead at the tap above the action level",
+   "failure_mode": "lead-service-line-corrosion-release",
+   "constraint": "no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustment only; tap lead <5 ppb at 90th percentile within 12 months; keep disinfection byproduct compliance",
+   "domain": "drinking-water",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustment only; tap lead <5 ppb at 90th percentile within 12 months; keep disinfection byproduct compliance",
+    "device of record: lead service lines connecting a municipal main to homes, low-alkalinity corrosive water",
+    "failure to address: lead-service-line-corrosion-release"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-04-gt-compressor-fouling",
+   "device": "industrial gas-turbine axial compressor in coastal/industrial intake air",
+   "failure": "salt and hydrocarbon aerosol deposit on blades, reducing flow and efficiency and raising heat rate ~5% between overhauls",
+   "failure_mode": "compressor-aerosol-fouling",
+   "constraint": "no blade redesign or coating change; inlet filtration/coalescer and online water-wash schedule only; recover >=3% heat rate; wash must not cause erosion or corrosion",
+   "domain": "turbomachinery",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no blade redesign or coating change; inlet filtration/coalescer and online water-wash schedule only; recover >=3% heat rate; wash must not cause erosion or corrosion",
+    "device of record: industrial gas-turbine axial compressor in coastal/industrial intake air",
+    "failure to address: compressor-aerosol-fouling"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-05-ev-busbar-fretting",
+   "device": "EV battery pack busbar-to-cell-tab bolted joints under road vibration",
+   "failure": "micro-slip fretting corrodes the contact interface, raising contact resistance and local heating, risking thermal runaway",
+   "failure_mode": "busbar-fretting-corrosion",
+   "constraint": "no new harness or cell redesign; joint interface treatment and preload retention only; contact-resistance drift <10% over 1000 h vibration; maintain torque spec",
+   "domain": "ev-battery",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no new harness or cell redesign; joint interface treatment and preload retention only; contact-resistance drift <10% over 1000 h vibration; maintain torque spec",
+    "device of record: EV battery pack busbar-to-cell-tab bolted joints under road vibration",
+    "failure to address: busbar-fretting-corrosion"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-06-sewer-crown-corrosion",
+   "device": "concrete sewer trunk with H2S headspace and intermittent flow",
+   "failure": "sulfur-oxidizing bacteria convert H2S to sulfuric acid on the crown, dissolving the cement matrix and thinning the crown",
+   "failure_mode": "sewer-crown-biogenic-sulfuric-corrosion",
+   "constraint": "no relining or replacement; ventilation, chemical dosing and surface treatment only; crown loss <1 mm/yr; maintain structural section",
+   "domain": "civil-infrastructure",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "intervention-proposal",
+   "question": "What engineering change, intervention, or design would prevent or mitigate the stated failure under the stated constraint, and what concrete test would falsify the proposed approach?",
+   "user_variables": [
+    "no relining or replacement; ventilation, chemical dosing and surface treatment only; crown loss <1 mm/yr; maintain structural section",
+    "device of record: concrete sewer trunk with H2S headspace and intermittent flow",
+    "failure to address: sewer-crown-biogenic-sulfuric-corrosion"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-09-oltc-contact-erosion",
+   "device": "on-load tap-changer diverter switch in a power transformer, oil-immersed",
+   "failure": "repeated arcing erodes the diverter contacts, raising contact resistance until a failed tap change causes an outage",
+   "failure_mode": "oltc-diverter-contact-erosion",
+   "constraint": "use only existing OLTC motor-current and vibro-acoustic signatures per operation; warn >=30 days before a failed change; <=1 false alarm per 20 transformers/yr; no new sensors",
+   "domain": "power-transformers",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing OLTC motor-current and vibro-acoustic signatures per operation; warn >=30 days before a failed change; <=1 false alarm per 20 transformers/yr; no new sensors",
+    "device of record: on-load tap-changer diverter switch in a power transformer, oil-immersed",
+    "failure to address: oltc-diverter-contact-erosion"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-10-pump-cavitation-erosion",
+   "device": "centrifugal charge pump in boiler feed service, variable speed",
+   "failure": "incipient cavitation erodes the impeller leading edge, degrading head and efficiency until failure",
+   "failure_mode": "pump-cavitation-erosion",
+   "constraint": "use only existing discharge pressure, vibration and motor current; warn >=14 days before head drops 5%; <=2 false alarms per pump/yr; no new sensors",
+   "domain": "rotating-machinery",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing discharge pressure, vibration and motor current; warn >=14 days before head drops 5%; <=2 false alarms per pump/yr; no new sensors",
+    "device of record: centrifugal charge pump in boiler feed service, variable speed",
+    "failure to address: pump-cavitation-erosion"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-11-blade-leading-edge-erosion",
+   "device": "onshore wind-turbine rotor blade composite leading edge in rain/sand",
+   "failure": "rain and particle impact erode the leading-edge coating, roughening the surface and cutting AEP ~3-5%",
+   "failure_mode": "blade-leading-edge-erosion",
+   "constraint": "use only existing SCADA power-curve and nacelle acoustic/vibration; warn >=30 days before AEP loss 2%; <=1 false alarm per turbine/yr; no new sensors",
+   "domain": "wind-energy",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing SCADA power-curve and nacelle acoustic/vibration; warn >=30 days before AEP loss 2%; <=1 false alarm per turbine/yr; no new sensors",
+    "device of record: onshore wind-turbine rotor blade composite leading edge in rain/sand",
+    "failure to address: blade-leading-edge-erosion"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-12-crude-preheat-fouling",
+   "device": "shell-and-tube crude preheat exchanger train in a refinery",
+   "failure": "crude-side fouling (asphaltene/salt deposition) raises thermal resistance and furnace duty, cutting efficiency",
+   "failure_mode": "crude-preheat-fouling",
+   "constraint": "use only existing T/P/flow on both sides; warn >=7 days before duty loss 5%; <=1 false alarm per exchanger/yr; no new sensors",
+   "domain": "process-heat-transfer",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing T/P/flow on both sides; warn >=7 days before duty loss 5%; <=1 false alarm per exchanger/yr; no new sensors",
+    "device of record: shell-and-tube crude preheat exchanger train in a refinery",
+    "failure to address: crude-preheat-fouling"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-13-rail-wheel-rcf",
+   "device": "railway vehicle wheel tread under repeated contact stress",
+   "failure": "rolling-contact fatigue initiates head-checks and shelling, risking tread failure",
+   "failure_mode": "rail-wheel-rolling-contact-fatigue",
+   "constraint": "use only existing wayside wheel-impact/load detectors and vehicle vibration; warn >=30 days before tread defect grade 3; <=1 false alarm per 100 wheels/yr; no new sensors",
+   "domain": "railway",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing wayside wheel-impact/load detectors and vehicle vibration; warn >=30 days before tread defect grade 3; <=1 false alarm per 100 wheels/yr; no new sensors",
+    "device of record: railway vehicle wheel tread under repeated contact stress",
+    "failure to address: rail-wheel-rolling-contact-fatigue"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  },
+  {
+   "problem_id": "HO2-15-robot-gearbox-wear",
+   "device": "industrial robot RV/cycloidal speed reducer at a joint",
+   "failure": "grease degradation and raceway wear raise backlash and torque ripple, degrading path accuracy until failure",
+   "failure_mode": "robot-reducer-wear",
+   "constraint": "use only existing motor current/torque and encoder; warn >=30 days before path error exceeds spec; <=1 false alarm per 100 robots/yr; no new sensors",
+   "domain": "industrial-robotics",
+   "source": "auditor_holdout_v2",
+   "contamination_tag": null,
+   "question_type": "predictor-design",
+   "question": "Propose the most cost-effective measurable leading indicator (predictor) for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+   "user_variables": [
+    "use only existing motor current/torque and encoder; warn >=30 days before path error exceeds spec; <=1 false alarm per 100 robots/yr; no new sensors",
+    "device of record: industrial robot RV/cycloidal speed reducer at a joint",
+    "failure to address: robot-reducer-wear"
+   ],
+   "clarification_answer": null,
+   "followup_finding": null,
+   "split": "HOLDOUT"
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+ "record": "R67S2_AGNES_SECOND_KEY_CUSTODY/1.0.0",
+ "session": "builder-r60s1 (continuation; channel zai-web, session web-4ba18cb7-7a0a-4f07-9eab-bf6b23029a14)",
+ "date": "2026-11-18T08:40Z",
+ "owner_delivery": {
+  "channel": "in-channel (owner), verbatim structure: base URL + two keys",
+  "base_url": "https://apihub.agnes-ai.com/v1 (byte-identical to the standing AGNES_BASE_URL)",
+  "keys": [
+   {"slot": "AGNES_API_KEY", "digest": "d0c666a3842f", "custody": "MATCHES the R59/R60 committed custody (eval/r59_credential_custody_r59s1.json) — the SAME original key re-delivered, already in the restored vault; digest re-verified byte-exact this turn"},
+   {"slot": "AGNES_API_KEY_2", "digest": "5c4dffd28fe4", "custody": "NEW — second key, admitted this turn per probe-before-admit (R36/R455 discipline)"}
+  ],
+  "digest_method": "sha256(value)[:12] (CORR-3 convention, scripts/r11_vault_pat_rotate.py:25)"
+ },
+ "triggering_fact": "the c-0082 sealed v9 one-shot (executor builder-r60s1, registered route agnes-3.0-flash via ZAI_GATEWAY_UPSTREAM=agnes) stalled at 12/30 rows on a free-user 429: gateway log entry 2026-11-18T08:24:01.180Z, upstream=agnes, http_status=429, body 'You\u2019ve reached the API rate limit for free users' — the per-key quota was exhausted mid-window. The owner's two-key delivery (key 1 re-delivered + key 2 new) is the measured load-spread remedy: the free-user quota bucket is PER KEY.",
+ "live_probe": {
+  "at": "2026-11-18T08:29Z",
+  "method": "direct POST {base}/chat/completions, model agnes-3.0-flash, temp 0, 16 max tokens, keys read from the vault (zero key bytes in any output)",
+  "results": [
+   {"key": "AGNES_API_KEY", "key_id": "d0c666a3842f", "http": 200, "served_model": "agnes-3.0-flash", "finish_reason": "stop", "latency_s": 0.45, "note": "the 08:24Z 429 window had cleared by probe time"},
+   {"key": "AGNES_API_KEY_2", "key_id": "5c4dffd28fe4", "http": 200, "served_model": "agnes-3.0-flash", "finish_reason": "stop", "latency_s": 0.58}
+  ],
+  "verdict": "both keys LIVE and serving the registered id exact (served==requested==registered)"
+ },
+ "gateway_change": {
+  "file": "scripts/zai_gateway.mjs (INFRA, not frozen — the 61d94b2a9 class; the registered route and every engine gate unchanged)",
+  "change": "the alternate-upstream config table gains ordered key lists (keyEnvs): xkiro [XKIRO_API_KEY], agnes [AGNES_API_KEY, AGNES_API_KEY_2]. altComplete rotates to the NEXT key IMMEDIATELY on 429 (a separate per-key quota bucket — no sleep), and only when every key is exhausted does the pre-existing bounded 30 s single retry fire (restarting from key 0), then the typed failure to the engine's own ladder. Every alternate-path call log entry now carries key_id = sha256(key)[:12] (the CORR-3 custody digest class) and 429 entries carry rotated_to_key_id — the per-key served-call distribution is auditor-verifiable against the custody records. Zero key bytes in any log, tracked file, or commit (Art. 17).",
+  "verification": [
+   {"kind": "live happy path", "result": "11/12 tiny calls through the patched gateway (upstream=agnes) returned 200; every OK log entry carries key_id=d0c666a3842f + model=agnes-3.0-flash; one call hit a connection reset (curl 000, no upstream effect). Test calls logged to a TEMP log via ZAI_GATEWAY_LOG; the canonical ENGINE_RUNS/zai_gateway_calls.jsonl verified byte-size UNCHANGED (58327 before and after) — zero test pollution of the attestation-relevant append-only log."},
+   {"kind": "deterministic rotation (mock transport)", "result": "node --require preload hook intercepting https.request to the real hostname: bearer key1 -> 429, bearer key2 -> 200. One gateway call: log shows RATE_LIMITED_RETRY {key_id=key1_digest, rotated_to_key_id=key2_digest, http_status=429} then OK {key_id=key2_digest, model=agnes-3.0-flash}; caller received 200 with no sleep. PASS."},
+   {"kind": "deterministic exhaustion ladder (mock transport)", "result": "all bearers -> 429: log shows rotate(key1->key2), 429(key2), 30 s bounded sleep, retry(key1->key2), 429(key2) -> UPSTREAM_ERROR typed; caller received the typed 500 after exactly 30 s elapsed (one bounded sleep, not a storm). PASS."},
+   {"kind": "test-artifact custody", "result": "the mock hook + test logs live OUTSIDE the repo (/home/z/r67s2_test/ and /tmp) — no mock code enters the evidence tree; the gateway file itself is the only changed repo byte"}
+  ]
+ },
+ "supervisor_fix_forward": {
+  "file": "mini-services/v9-supervisor/index.ts (sandbox-local supervised-run tooling, previously untracked)",
+  "defect": "the spawn hardcoded ZAI_GATEWAY_UPSTREAM=\"xkiro\" — a stale falsification-era value contradicting the registered route (agnes-3.0-flash via ZAI_GATEWAY_UPSTREAM=agnes, commits 132b97947/d0c18d940). Dormant (no supervised run fired through it; .env.local carried only a health-check cmd) but a live attestation hazard had it fired.",
+  "fix": "the spawn now INHERITS the caller env (no silent override); the run command sets the upstream explicitly. Disclosed here per Art. 5."
+ },
+ "art17_compliance": "both keys live ONLY in the gitignored 0600 .env.keys vault; tracked files carry digests only; the vault header records the new custody line; zero key bytes in gateway logs, test logs, this record, or any commit.",
+ "disposition": "the c-0082 run resumes under the same lock (executor builder-r60s1, first-executor r64s4 disclosed in 715e887e3): 12/30 rows committed as this stage's heartbeat push (events.json preserves the TRUE window start 2026-11-18T08:15:32.731545Z — later chunks rewrite the field to their own run_start; the full-window slice reassembly reads the committed bytes), remaining rows execute as chunked foreground with per-key rotation live, the registered route unchanged (agnes-3.0-flash), the frozen machine byte-untouched.",
+ "constitution_reads": {
+  "note": "standing FULL reads remain valid (epistemic v3.2.0 md5 9a5ae1cd @ dade20f9c; auditor v1.3.0 md5 d40a92a1 — plus the v3.3.0 Art. 17 extension @ 7323750f4); zero constitution bytes touched this stage"
+ }
+}

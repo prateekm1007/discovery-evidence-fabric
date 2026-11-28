@@ -1,0 +1,223 @@
+{
+ "problem_id": "HO12-22-screw-compressor",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v12-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r97_v12_one_shot/1.0.0 — the sealed v12 one-shot: the frozen V7.7 expansion loop byte-mirrored with the two AM82 controller insertions ([c-0109] tool_grounded_critic post-generation correction — the machine's own base_scan as contract oracle; [c-0110] the aide_tree_search best-first population controller, budget-matched; NOTICE-attributed pattern copies, zero upstream code bytes); ALL FIVE BINDS = the frozen battery, byte-identical",
+ "run": "holdout-v12-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    40,
+    4,
+    16
+   ],
+   "P1"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "geometry",
+   "geometry"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b5732eb3430c": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 3,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 5.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      1456,
+      1458
+     ],
+     "unit": "percent",
+     "quantity": "5.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 45.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      1753,
+      1759
+     ],
+     "unit": "day",
+     "quantity": "45.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 45.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      4048,
+      4054
+     ],
+     "unit": "day",
+     "quantity": "45.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T06:58:51Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice for screw compressor rotor wear delivers a MONITORING/INDICATION scheme using a dedicated rotor-wear probe or efficiency test (the primary stated indicator) to detect the efficiency trip.\nMy mechanism departs by using a firmware-only analysis of ALREADY-EXISTING signals (interstage pressure, discharge temperature, motor current) to infer the internal leakage that drives rotor wear, without any new hardware or rotor probe.\nFailure-physics connection: Rotor wear increases internal clearances, which causes increased gas leakage from high-pressure to low-pressure sides, altering the interstage pressure relationship and discharge temperature relative to motor current (work input). The mechanism detects the shift in this multi-variable signature to predict wear progression before the efficiency trip.\n\nPHYSICS CHECK\nDIRECTION-OF-EFFECT: driving variable = rotor wear (clearance increase); the mechanism moves monitoring sensitivity UP by analyzing leakage signatures; this RAISES the early warning lead time, thus reducing the risk of unanticipated failure.\nGoverning relation: Internal leakage rate $Q_{leak}$ is proportional to rotor clearance. The specific power input $P_s = P_{mech} / \\dot{m}$ is proportional to $P_{dis}/P_{suc}$. As wear increases, for a fixed discharge pressure and mass flow, the machine must work harder or the interstage pressure drops due to internal recycle.\nMagnitude verification: A 5% increase in specific power (detectable via motor current and power factor if available, or inferred from $P_{mech}$ estimate vs. $\\dot{m}$ estimate) correlates with wear progression. The signal-to-noise ratio in existing pressure/temperature/current channels is sufficient to detect drift over 45 days.\nSigned statement: The mechanism monitors the drift in the $P_{inter}$ vs. $P_{dis}$ ratio (normalized by $T_{dis}$) which drifts DOWN with wear (leakage); detecting this downward drift predicts the wear integral accumulation.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Firmware-only signature analysis on existing SCADA/PLC data.\n\nRow 1: Algorithm module: \"Leakage-Wear Correlator\"\n(a) Software: Deploy logic to compute $I_{leak} = \\frac{P_{inter}}{P_{dis}} \\cdot f(T_{dis}, I_{motor})$ from existing tags.\n(b) Source: Existing PLC/SCADA historian data (ALREADY-RECORDED).\n(c) Procurement: None (internal IT/controls resource).\n\nRow 2: Threshold Logic\n(a) Logic: Set alert at $I_{leak}$ deviation $> 2\\sigma$ from rolling 90-day median.\n(b) Source: Derived from stated physics of leakage vs. wear (CALCULATED from historical stable baseline if available, or fixed ratio limits from OEM specs).\n(c) Procurement: None.\n\nRow 3: Validation Protocol\n(a) Procedure: Compare $I_{leak}$ trend against next scheduled efficiency test or overhaul.\n(b) Source: Existing maintenance records.\n(c) Procurement: None.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: 0 hardware change (vs. 1-2 probes + wiring for standard).\nOperability: 0 user interaction (vs. periodic probe calibration).\nMaintenance: 0 (vs. probe calibration/cleaning).\nRough Cost Class: Internal software hours (Negligible) vs. Sensor + Wiring + Calibration ($$$).\nOperational Loss: 0 throughput loss, 0 energy penalty (vs. potential bypass/derate for some mechanical monitors).\nParity: SAME burden class (low), DIFFERENT mechanism (analysis vs. physical probe).\nEXECUTABLE TEST\nProtocol:\n1. Retrieve 12 months of existing data (interstage P, discharge T, motor I) for 3 identical compressors.\n2. Identify 1 compressor that underwent rotor overhaul 6 months ago (wear reset).\n3. Compute $I_{leak}$ signature for all 3.\n4. Pass criterion: The post-overhaul compressor's $I_{leak}$ stabilizes at a distinct level lower than pre-overhaul; the other 2 show upward drift.\n5. Kill criterion: If $I_{leak}$ does not differentiate between fresh and worn rotors with SNR > 2, mechanism is invalid.\nFalsification: If the drift is not correlated with wear (e.g., due to oil viscosity changes masking leakage), the predictor fails to warn 45 days before trip.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: Motor current (proxy for power input) and Interstage Pressure (proxy for leakage).\nWhy: The problem states \"use only existing interstage pressure, discharge temperature and motor current.\" The efficiency trip is driven by rising specific power (wear). Motor current is the direct proxy for mechanical power input. Interstage pressure is the direct proxy for internal leakage.\nPermitted Set Check: The constraint allows \"no new sensors.\" This bill uses only existing signals. No physical intervention on rotor.\nDeployed-Part Clause: No modification to rotor. Only firmware on existing PLC/SCADA.\nDirection-Of-Effect: Correct (monitoring drift to predict failure).\nInput-Availability: All inputs (P, T, I) are stated to exist.\nCost-Pricing: No setpoint modulation, so no operational cost.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "f99b0487002d6ed5",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "17263136bbeccfb3",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "fc1260f85c0c351e",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      0,
+      1,
+      0
+     ],
+     "signature": "b809a2c396f00efe",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n2"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "firmware-only signature analysis on existing scada/plc data.",
+ "allowed_row_outside": 0,
+ "sha256_16": "63fa291110976d9e",
+ "smoke": false
+}

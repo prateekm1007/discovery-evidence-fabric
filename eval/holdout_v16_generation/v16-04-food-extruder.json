@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-04-food-extruder",
+ "domain": "food",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:ade17225da15": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:49854e746e7a": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:9df753a97e28": "reject-duplicate"
+  }
+ },
+ "generated_at": "2026-11-23T22:21:04Z",
+ "attempts_n": 1,
+ "row_wall_s": 6.8,
+ "a1_answer": "STANDARD PRACTICE: Prevents extruder surge by installing a mechanical metering hopper with vibratory de-aerating/compacting plates to homogenize feed bulk density before the barrel inlet.\nMECHANISM DEPARTURE: Replaces the mechanical density-compaction element with a feedback-driven variable-height gate (shim stack) that adjusts the free-flow cross-sectional area of the feed chute in real-time to maintain a constant mass flow rate regardless of upstream bulk density fluctuations.\nFAILURE-PHYSICS CONNECTION: Surging is driven by fluctuations in the mass flow rate ($\\dot{m}$) caused by $\\rho_b$ variations; maintaining $\\dot{m}$ constant via $A$ modulation decouples the extruder screw dynamics from the feed stock property variance.\n\nPHYSICS CHECK: Mass flow rate through a gravity feed chute is $\\dot{m} = A \\cdot \\rho_b \\cdot v_{fall}$. Assuming $v_{fall}$ is constant for the specific hopper geometry (Stokes' regime for granular solids), $\\dot{m} \\propto A \\cdot \\rho_b$. To keep $\\dot{m}$ constant when $\\rho_b$ varies, $A$ must vary inversely with $\\rho_b$. A variable-height gate (modulating $A$) provides the necessary inverse proportionality without relying on a compaction mechanism to alter $\\rho_b$ itself.\n\nIMPLEMENTATION BILL:\n- COMPONENT: Variable-height gate assembly at the extruder feed inlet.\n- MATERIALS: Standard food-grade stainless steel gate plates; existing actuator hardware.\n- INSTRUMENTS: Existing downstream pressure transducer (P1, P2) and screw rotation speed sensor (already recorded in SCADA).\n- PROCEDURE: Install the gate assembly; configure the PLC logic to calculate the required gate opening $A_{set}$ from the ratio of measured pressure to a baseline reference pressure.\n- INPUT STREAM 1: Downstream barrel pressure ($P$) — ALREADY-RECORDED (stated in problem as the primary monitoring signal for surge detection).\n- INPUT STREAM 2: Screw rotational speed ($N$) — ALREADY-RECORDED (stated in problem as the second signal used in standard monitoring).\n- REFERENCE/BASELINE: Baseline pressure $P_{ref}$ corresponding to nominal bulk density $\\rho_{ref}$ — DERIVED from existing historical SCADA logs of stable operation (stated problem implies historical data exists for commissioning standard monitoring).\n- THRESHOLD: $\\Delta P = |P - P_{ref}| > P_{surge}$ (stated surge threshold) triggers gate adjustment; $A_{set} = A_{max} \\cdot (P_{ref} / P)$ — CALCULATED from the mass-flow physics relation.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- INSTALLABILITY: Same as standard (mechanical hardware at the same location); slightly higher complexity due to actuator, but avoids the high-maintenance vibratory plate wear issues.\n- OPERABILITY: Fully automated; no operator intervention for density variations; standard for PLC-controlled lines.\n- MAINTENANCE: Lower than standard (no vibratory mechanisms, fewer moving parts subject to clogging/wear compared to high-speed vibrating plates).\n- COST: Similar material cost (stainless steel); actuator cost is offset by reduced maintenance and downtime associated with clogged vibratory plates. SAME burden class, DIFFERENT mechanism (feedback geometric modulation vs. active mechanical compaction).\n\nEXECUTABLE TEST:\n- PROTOCOL: Introduce batches of feed stock with known varying bulk densities ($\\rho_{low}, \\rho_{high}$) into the hopper. Monitor the extruder pressure $P(t)$ and mass flow $\\dot{m}(t)$ during steady-state operation.\n- INSTRUMENTS: Existing pressure transducers, existing flow meters.\n- PASS/FAIL THRESHOLD: The standard deviation of the extruder pressure signal $\\sigma(P)$ over a 10-minute window must remain below the stated surge threshold $P_{surge}$.\n- DURATION: 30 minutes of continuous operation with alternating density batches.\n- KILL CRITERION: If $\\sigma(P)$ exceeds $P_{surge}$ or if the gate actuator reaches its mechanical limits while $\\Delta P$ persists, the mechanism fails to decouple density from flow.\n- VALIDATION: Verified against the physical relation $\\dot{m} \\propto A \\cdot \\rho_b$ using the already-recorded pressure baseline $P_{ref}$ to confirm that the gate area modulation inversely tracks the pressure deviation, thereby stabilizing $\\dot{m}$.\n\nCONSTRAINT BIND: The monitored indicator is the primary stated indicator: extruder pressure (surge detection). The screw speed is a secondary indicator used to normalize the pressure reading for process load, supplementing the primary signal. The solution does not introduce new sensors; it uses existing pressure and speed signals to drive a mechanical change.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "97925977d79ce513"
+}

@@ -1,0 +1,282 @@
+{
+ "record": "R43_scan_labels/1.0.0",
+ "purpose": "The labelled control corpus for the V8 structured-extraction scans and generation binds (the R42 verdict D1/D2/D5 acceptance). Every label carries its byte-verified provenance; the corpus mixes REAL committed rows (burned holdout bytes) with LABELLED FIXTURES (mechanics-proving per Art. 22; each fixture is typed FIXTURE and never counts as a fresh-problem capability measurement).",
+ "precision_recall_convention": "The precision/recall acceptance (F57: >= 0.9 both) is computed per scan class over the LABELLED entries only; entries typed ADJUDICATION-PENDING are excluded from the denominator (the in-band R42 verdict says the 7 ALLOWED_ROW_OUTSIDE are 'mostly' wordform/apparatus false positives — the per-finding adjudication lives in the auditor's PRIVATE score record, not read; the 4 unambiguous parsing artifacts are labelled NEGATIVE by construction, the 3 apparatus/wordform ones stay PENDING).",
+ "classes": {
+  "input_availability": {
+   "negatives": [
+    {
+     "row": "eval/v7_run/rows/HO7-01-zinc-ew-acid-mist.json",
+     "finding_that_was": "derived feature input 'a metering pump' (hardware, not a signal)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "R42 in-band verdict: 'The machine's 8 INPUT_UNAVAILABLE are ALL false positives (prose-parsing flags words/concepts/specs as inputs)'"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-05-cu-ew-nodulation.json",
+     "finding_that_was": "derived feature input 'existing PLC control infrastructure'",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-06-ge-turbo-surge.json",
+     "finding_that_was": "derived feature input 'controlled bypass flow, reducing the pressure ratio...'",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-07-gearbox-oil-varnish.json",
+     "finding_that_was": "required online signal 'mechanism' + derived feature '30-day lead time (0...'",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-08-conveyor-splice-fatigue.json",
+     "finding_that_was": "derived feature input 'periodic visual splice inspection' (a maintenance procedure)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-09-chiller-condenser-fouling.json",
+     "finding_that_was": "derived feature input 'energy efficiency decline' (a physics concept)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-12-digester-foaming.json",
+     "finding_that_was": "derived feature input 'stated spec: mesophilic 38C...' (a spec value)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same"
+    }
+   ],
+   "positives": [
+    {
+     "row": "eval/pairs/holdout_v6_generation/HO6-12-dhx-scaling.json",
+     "problem": "holdout_v6 (committed problem fields inline)",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "INPUT_UNAVAILABLE",
+     "provenance": "AM37 D2 design basis (auditor-adjudicated TRUE class): 'a saturation index via ion activity products under temperature/flow-only meters' — the stated relation consumes unpermitted water-chemistry quantities",
+     "problem_fields": {
+      "problem_id": "HO6-12-dhx-scaling",
+      "question_type": "predictor-design",
+      "device": "district-heating plate heat exchanger substation",
+      "failure": "scaling (calcium-carbonate deposition) degrades approach temperature",
+      "constraint": "use only the existing four plate-HX port temperatures and the primary/secondary flow meters; warn at least 21 days before approach temperature degrades 3 K; at most 1 false alarm per substation per year; no new sensors"
+     }
+    },
+    {
+     "kind": "FIXTURE",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "INPUT_UNAVAILABLE",
+     "fixture": {
+      "question_type": "predictor-design",
+      "constraint": "use only the existing coolant inlet and outlet temperature and the pump flow meter; no new sensors",
+      "answer": "PHYSICS CHECK\nGoverning relation: fouling rate rises with fluid viscosity at the channel wall.\nDIRECTION OF EFFECT: as viscosity rises, the failure driver (wall fouling rate) rises because the wall shear drops.\n\nIMPLEMENTATION BILL\nINPUT INVENTORY:\n- online viscosity — source: NEW (inline process viscometer)\n- coolant inlet temperature — source: ALREADY-RECORDED(existing coolant inlet temperature)\n\nEXECUTABLE TEST\nLog viscosity daily; flag when the index exceeds baseline."
+     },
+     "provenance": "authored control: a NEW-tagged unpermitted online signal under a temperature/flow-only constraint (mechanics-proof per Art. 22; labelled FIXTURE)"
+    },
+    {
+     "kind": "FIXTURE",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "INPUT_UNAVAILABLE",
+     "fixture": {
+      "question_type": "intervention-proposal",
+      "constraint": "no redesign of the mill; allowed measures: roll force and speed setpoint retuning only",
+      "answer": "NOVELTY STATEMENT (INTERVENTION) — A vibration-based chatter detection interlock stops the mill when chatter begins.\nMECHANISM CLASS: detection interlock\nCANDIDATE CLASSES\n- roll force/speed setpoint schedule — moves the mill away from the chatter resonance band\n- vibration detection interlock — stops the mill on chatter onset\n- lubricant film modulation — chemistry class\nSELECTED: vibration detection interlock — fastest response to the failure driver\n\nIMPLEMENTATION BILL\n- (b) Commercial piezoelectric accelerometer — mounted on the roll housing\nSIGNALS USED: online acoustic-emission signature (source: new piezoelectric sensor)\nOPERATIONAL COST: zero (interlock stop during coil change, non-producing)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Same as standard practice.\n\nEXECUTABLE TEST\nProtocol: run 10 coils; count chatter events."
+     },
+     "provenance": "authored control: SIGNALS USED declares an unpermitted online signal with a NEW source under a setpoint-retuning-only constraint (mechanics-proof; labelled FIXTURE)"
+    }
+   ]
+  },
+  "allowed_rows": {
+   "negatives": [
+    {
+     "row": "eval/v7_run/rows/HO7-01-zinc-ew-acid-mist.json",
+     "finding_that_was": "added measure 'standard surfactant' (the REPLACED old item)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "R42 in-band verdict: the 7 ALLOWED_ROW_OUTSIDE are 'mostly wordform/apparatus false positives'; this one is a parsing artifact by construction (the old item parsed as the added measure)"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-04-freezer-demand-defrost.json",
+     "finding_that_was": "added measure 'vs. standard practice uses no additional hardware' (comparative prose)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same verdict; parsing artifact by construction (burden/comparative echo parsed as a measure)"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-06-ge-turbo-surge.json",
+     "finding_that_was": "added measure 'consumables or maintenance' (burden-ledger prose)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same verdict; parsing artifact by construction"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-06-ge-turbo-surge.json",
+     "finding_that_was": "added measure 'and pressure transducer' (mid-sentence fragment)",
+     "label": "FALSE_POSITIVE",
+     "provenance": "same verdict; parsing artifact by construction (fragment span)"
+    }
+   ],
+   "pending": [
+    {
+     "row": "eval/v7_run/rows/HO7-01-zinc-ew-acid-mist.json",
+     "finding_that_was": "added measure 'Standard mechanical timer' (schedule apparatus)",
+     "label": "ADJUDICATION-PENDING",
+     "provenance": "the verdict's 'mostly' leaves the apparatus-class adjudication to the auditor's score record; excluded from the denominator"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-04-freezer-demand-defrost.json",
+     "finding_that_was": "added measure 'Commercial NTC temperature probe' (new sensing hardware under a logic-change-only set)",
+     "label": "ADJUDICATION-PENDING",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-05-cu-ew-nodulation.json",
+     "finding_that_was": "added measure 'Standard commercial PLC with analog output module' (control hardware)",
+     "label": "ADJUDICATION-PENDING",
+     "provenance": "same"
+    }
+   ],
+   "positives": [
+    {
+     "row": "eval/holdout_v4_generation/HO4-04-glass-furnace-crown-drip.json",
+     "problem_fields": {
+      "problem_id": "HO4-04-glass-furnace-crown-drip",
+      "question_type": "intervention-proposal",
+      "constraint": "no cold rebuild this campaign; allowed measures: crown temperature profile and burner-firing retuning, or batch-moisture/cullet-ratio adjustment only"
+     },
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "ALLOWED_ROW_OUTSIDE",
+     "provenance": "AM29 basis (auditor-adjudicated TRUE): 'HO4-04 span: profile + retuning + adjustment, only -> fires on the shield/support/exhaust-cooler COMPONENT rows' — the param-exhaustive permitted set admits no physical change; the committed row's shield/support/exhaust-cooler rows are outside the class"
+    },
+    {
+     "row": "eval/holdout_v4_generation/HO4-05-blade-root-bolt-fatigue.json",
+     "problem_fields": {
+      "problem_id": "HO4-05-blade-root-bolt-fatigue",
+      "question_type": "intervention-proposal",
+      "constraint": "no blade or hub redesign; allowed measures: torque/preload retensioning interval and procedure, or pitch-control load-limiting parameter retuning only"
+     },
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "ALLOWED_ROW_OUTSIDE",
+     "provenance": "AM29 basis: 'HO4-05 span: retensioning interval/procedure + parameter retuning, only -> fires on the washer COMPONENT row'"
+    }
+   ]
+  },
+  "duty_pricing": {
+   "positives": [
+    {
+     "row": "eval/v7_run/rows/HO7-01-zinc-ew-acid-mist.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "UNPRICED_DUTY_CYCLE",
+     "provenance": "the R42 verdict's F54 frontier: 'leaves costs unpriced (HO7-03 pricing positive control FAILED)'; the verifier's recomputed inventory carries UNPRICED_DUTY_CYCLE on HO7-01/02/03/06 as faithful residuals and the verdict credits no pricing fix"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-02-rubber-extruder-scorch.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "UNPRICED_DUTY_CYCLE",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-03-hydro-partload-cavitation.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "UNPRICED_DUTY_CYCLE",
+     "provenance": "same — the designed pricing positive control FAILED (the bill modulates the operating zone without a quantified cost)"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-06-ge-turbo-surge.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding": "UNPRICED_DUTY_CYCLE",
+     "provenance": "same"
+    }
+   ],
+   "negatives": [
+    {
+     "kind": "FIXTURE",
+     "label": "TRUE_NEGATIVE",
+     "fixture_answer": "NOVELTY STATEMENT (INTERVENTION) — A pulsed dosing schedule on the permitted additive reduces mist carryover.\nMECHANISM CLASS: dosing schedule of a permitted consumable\nCANDIDATE CLASSES\n- dosing schedule of the permitted additive — collapses aged foam\n- foam-blanket chemistry via the permitted stabilizer — renews the blanket\n- electrolyte filtration arrangement — removes foam nuclei\nSELECTED: dosing schedule — attacks foam aging directly\n\nIMPLEMENTATION BILL\n- (c) Parameter change: timer set to 15 min on / 2 h off on the existing dosing pump.\nSIGNALS USED: none (open-loop timer)\nOPERATIONAL COST: 4.2 percent of dosing throughput during the 15-min windows (0.7 t/h average); nets positive against the 40-60% aerosol reduction.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Same as standard practice.\n\nEXECUTABLE TEST\nProtocol: 72 h side-by-side.",
+     "provenance": "authored control: a QUANTIFIED OPERATIONAL COST line (number + unit) prices the duty cycle (mechanics-proof; labelled FIXTURE)"
+    },
+    {
+     "kind": "FIXTURE",
+     "label": "TRUE_NEGATIVE",
+     "fixture_answer": "NOVELTY STATEMENT (INTERVENTION) — A night-window reset schedule removes the daily accumulation.\nMECHANISM CLASS: maintenance schedule\nCANDIDATE CLASSES\n- night-window reset schedule — clears accumulation off-production\n- mechanical abrasion removal — attacks the deposit directly\n- chemistry dissolution via a permitted solvent — dissolves the deposit\nSELECTED: night-window reset schedule — zero production impact\n\nIMPLEMENTATION BILL\n- (c) Parameter change: reset cycle runs 02:00-04:00 nightly.\nSIGNALS USED: none (open-loop)\nOPERATIONAL COST: zero (night window, non-producing interval; no throughput given up)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Same as standard practice.\n\nEXECUTABLE TEST\nProtocol: 14-day run.",
+     "provenance": "authored control: an EXPLICIT ZERO with the off-production reason prices the duty cycle (mechanics-proof; labelled FIXTURE)"
+    }
+   ]
+  },
+  "mechanism_class_cap": {
+   "undeclared_rows": [
+    {
+     "row": "eval/v7_run/rows/HO7-01-zinc-ew-acid-mist.json",
+     "label": "UNDECLARED",
+     "provenance": "verifier c-0057 recomputed inventory: MECHANISM_CLASS_UNSTATED on HO7-01/02/03 (3 of 6 interventions shipped without the declaration — the F58 cap bypass)"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-02-rubber-extruder-scorch.json",
+     "label": "UNDECLARED",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-03-hydro-partload-cavitation.json",
+     "label": "UNDECLARED",
+     "provenance": "same"
+    }
+   ],
+   "declared_rows": [
+    {
+     "row": "eval/v7_run/rows/HO7-04-freezer-demand-defrost.json",
+     "declared": "thermal-hysteresis demand defrost",
+     "provenance": "verifier c-0057: 3 of 6 declared (1 each, cap <=2 trivially held)"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-05-cu-ew-nodulation.json",
+     "declared": "programmable current-density modulation**",
+     "note": "the declaration carries the trailing markdown '**' the R42 delete list names — the V8 parse strips emphasis",
+     "provenance": "same"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-06-ge-turbo-surge.json",
+     "declared": "dynamic pressure-damping feedback control",
+     "provenance": "same"
+    }
+   ],
+   "acceptance": "the counted class (declared when present, INFERRED otherwise) of the three UNDECLARED v7 intervention rows must reproduce a histogram in which the schedule/duty class reaches 3 — the cap fires on the third; an omitted declaration no longer escapes (F58)"
+  },
+  "predictor_direction": {
+   "positives": [
+    {
+     "row": "eval/v7_run/rows/HO7-09-chiller-condenser-fouling.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding_any": [
+      "PREDICTOR_DIRECTION_FRAMING",
+      "PREDICTOR_DIRECTION_UNSTATED"
+     ],
+     "provenance": "R42 verdict D5: 'HO7-09/10/12 conflate detection with intervention' — HO7-09's line reads 'the mechanism raises it by maintaining dT_cond via compressor power increase, which reduces the fouling driver' (an intervention action on a detector)"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-10-desiccant-dryer-breakthrough.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding_any": [
+      "PREDICTOR_DIRECTION_FRAMING",
+      "PREDICTOR_DIRECTION_UNSTATED"
+     ],
+     "provenance": "same verdict"
+    },
+    {
+     "row": "eval/v7_run/rows/HO7-12-digester-foaming.json",
+     "label": "TRUE_POSITIVE",
+     "expect_finding_any": [
+      "PREDICTOR_DIRECTION_FRAMING",
+      "PREDICTOR_DIRECTION_UNSTATED"
+     ],
+     "provenance": "same verdict"
+    }
+   ],
+   "negatives": [
+    {
+     "kind": "FIXTURE",
+     "label": "TRUE_NEGATIVE",
+     "fixture_answer": "NOVELTY STATEMENT\n- Standard practice delivers a monitoring scheme using approach temperature.\n- Departure: a COP-degradation index computed from existing signals.\n\nPHYSICS CHECK\nGoverning relation: COP = Q_cooling / P_compressor with Q_cooling from the measured temperatures and flow.\nDIRECTION OF EFFECT: as compressor power rises at constant cooling load, the failure driver (condenser fouling resistance) rises because the fouled surface forces more compressor work per unit of delivered cooling; COP degradation precedes the approach-temperature rise.\n\nIMPLEMENTATION BILL\nINPUT INVENTORY:\n- condenser-water inlet temperature — source: ALREADY-RECORDED (the problem's existing condenser-water inlet temperature sensor)\n- condenser-water outlet temperature — source: ALREADY-RECORDED (the existing outlet sensor)\n- condenser-water flow rate — source: ALREADY-RECORDED (the existing flow meter)\n- compressor input power — source: ALREADY-RECORDED (the existing power meter)\n- COP degradation index — source: DERIVED (from the four permitted signals above; stated physics)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: same (software on the existing historian).\n\nEXECUTABLE TEST\nProtocol: 30-day validation against the historian.",
+     "provenance": "authored control: a DETECTION-framed direction line (as the detected variable moves, the driver moves) with a complete INPUT INVENTORY on permitted sources (mechanics-proof; labelled FIXTURE)"
+    }
+   ]
+  }
+ }
+}

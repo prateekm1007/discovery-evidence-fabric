@@ -1,0 +1,70 @@
+{
+ "record": "seeded_specimens_authorship_contract_r12/1.0.0",
+ "at": "2026-11-15T09:35:00Z",
+ "written_by": "builder session (AM12 round) — PRE-REGISTERED AUTHORSHIP CONTRACT for OA1 (round 10, escalated). This contract is committed BEFORE any specimen exists so the owner and the auditor review the design first (Art. XIX: principled, pre-registered instruments; Art. XXVII: no threshold or route invention after the fact)",
+ "purpose": "activate auditor Art. 7 (sealed instruments): place the seeded specimens that calibrate the deterministic intervention-gate instruments — catch rate on seeded defect classes, false-kill rate on clean controls — via scripts/r6_seeded_sweep.py, the R6-circularity-fixed sweep that consumes specimens NOT authored by the gate author's hand",
+ "execution_state": "BLOCKED_ON_CROWLLM_KEY (typed, eval/r12_session_census.json): the owner attached the CROWLLM key to the OA1 directive; the authorship route is an owner-named parameter and is not silently swapped (Art. XXVII). Everything below is staged so placement completes within one session turn of the key arriving",
+ "authorship_independence_design": {
+  "the_R6_lesson": "the retired r6_seeded_defects.py hand-wrote defects matched to the gate's own vocabulary — instrument and fixtures from the same hand (Art. XIX/LXIV). The fix is not only 'owner-held bytes' (10 rounds of waiting proved that path does not converge); the owner's AM12 directive delegates authorship to an INDEPENDENT model route with the coder authoring ONLY this contract, never the specimen texts",
+  "author": "a crowllm-hosted model (NOT the coder, NOT the gate implementation) writing each specimen from (a) the committed problem definition and (b) the natural-language class semantics below",
+  "authorship_model_ladder": [
+   "gemini-3-flash:free (primary — measured full-length PASS 1.9 s in eval/crowllm_requalification_r11_r8.json stage 2; distinct rung from the battery judge for role separation)",
+   "qwen-3.8-max:free (fallback — measured full-length PASS 2.0 s, same record; the gates are deterministic code so judge/specimen model overlap carries no scoring conflict, disclosed anyway)",
+   "anything else: typed BLOCKED, never a silent third choice"
+  ],
+  "prompt_discipline_BLOCKING": [
+   "the authorship prompt contains ONLY: the problem definition (committed bytes), the class semantics in natural engineering language (this contract, verbatim), the output JSON schema, and a no-meta-comment instruction",
+   "the prompt NEVER contains: the intervention_gate.py source, any gate regex or threshold constant, the gate check names, prior sweep results, the CLEAN_CLASSES token list, or any hint about what the gates detect",
+   "the class semantics are phrased as ENGINEERING failure modes of candidate proposals (e.g. 'a proposal that only adds monitoring'), never as instrument-covering instructions (e.g. never 'make the not_an_intervention regex fire')",
+   "the coder does NOT edit, curate, filter, or regenerate any specimen text; a specimen that fails schema parsing is DISCARDED with a typed count (never hand-repaired into shape)"
+  ],
+  "provenance_per_specimen": "model id, the verbatim prompt, wall, timestamp, and the raw generation are committed alongside the specimens file so the auditor can re-derive every row"
+ },
+ "defect_class_taxonomy_pre_registered": {
+  "monitor_only_proposal": "SEED class: the proposal's entire content is to monitor, measure, study, trend, or analyze the system — no design change to the artifact itself",
+  "function_removal": "SEED class: the proposal removes or weakens a function the problem's constraint mandates — lowers a mandated floor, raises a mandated ceiling, narrows a mandated operating range, or eliminates a mandated element",
+  "constraint_restatement": "SEED class: the proposal's mechanism is a paraphrase of the requirement itself — the constraint text dressed as the invention, with no mechanism of its own",
+  "off_domain_anchor": "SEED class: the proposal anchors its evidence or mechanism to a mismatched technical domain with no stated shared mechanism linking it to the problem",
+  "legit_intervention": "CLEAN CONTROL class (the sweep's false-kill metric): a genuine engineering intervention that plausibly satisfies the constraint and does not commit any seeded class above",
+  "counts_default": "8 per SEED class x 4 classes = 32 seeded + 16 clean controls = 48 specimens (owner-adjustable at contract review; per-instrument denominators at n>=8 give 0.125 rate resolution)",
+  "problem_assignment_deterministic": "specimens are assigned to committed problem ids by strided round-robin over the sorted eval/problems.json list (no cherry-picking; the assignment is reproducible from this contract alone)"
+ },
+ "specimen_schema": {
+  "fields": [
+   "problem_id",
+   "defect_class",
+   "intervention",
+   "mechanism"
+  ],
+  "types": [
+   "str (committed problem id)",
+   "str (one taxonomy class above, verbatim)",
+   "str (the candidate proposal text, 40..2000 chars)",
+   "str or null (the stated mechanism when the class calls for one)"
+  ],
+  "denylist_compliance": "no field name contains key/rubric/answer/expected/gold/label/truthy/verdict (word-level, the sweep's enforced NEVER-READ denylist); the authorship prompt enforces exactly these four keys",
+  "sweep_consumption": "intervention -> the text under judgment; problem_id -> the constraint + domain context for the measurable checks; mechanism -> the restates-check third argument; defect_class -> the per-class aggregates and the per-instrument denominators"
+ },
+ "placement_plan": {
+  "files": [
+   "eval/seeded_specimens_v1.json — the specimens array as authored (one write, no post-editing)",
+   "eval/seeded_specimens_v1.sha256 — the FULL 64-hex sha256 of the exact file bytes"
+  ],
+  "integrity_mode": "FULL-HASH (64-hex) — the queue runner auto-selects full-match mode at len==64, which the sweep itself documents as STRONGER than the owner-prefix mode (audit G: prefix < full hash)",
+  "supersession_disclosure": "the R6 owner-declared prefix c0aeb715 bound an owner-authored selection that was never placed (10 rounds). This contract's placement is a NEW selection under full-hash integrity of the actual bytes, pre-registered here for owner review BEFORE authorship — the review of this contract is the new binding. The prefix mode and DECLARED_PREFIX check remain live code for any future owner-authored placement",
+  "sweep_invocation": "placement makes scripts/r7_queue_runner.py build_plan() schedule the seeded item automatically; equivalently direct: python3 scripts/r6_seeded_sweep.py --specimens eval/seeded_specimens_v1.json --expected-selection-sha256 $(cat eval/seeded_specimens_v1.sha256) --output-dir ENGINE_RUNS/seeded_r12",
+  "outputs": "per-class catch/false-kill AGGREGATES + per-instrument (FKR over measured clean rows, TPR over measured seeded rows, coverage, parse) CANDIDATE measurement records under the pinned registry names — committed as eval/seeded_sweep_r12_report.json; per-specimen rows stay in gitignored scratch (the NEVER-READ rule)",
+  "threshold_verdicts": "PENDING_OWNER_SEAL by construction: the sweep derives verdicts ONLY from owner-sealed pre-registered bars (fpr_max/tpr_min/coverage_min/parse_completeness_min per instrument); the coder never invents bars (Art. XXVII). The owner seals in the same turn as the placement review or a later one — the sweep emits PENDING_OWNER_SEAL until then"
+ },
+ "what_this_contract_does_NOT_do": [
+  "it does not touch the gate code, the judge, the battery, or any problem definition (Art. LXXIX: battery problems untouched)",
+  "it does not assert any calibration result — the sweep's aggregates will say what they say (Art. XXV)",
+  "it does not execute the authorship: BLOCKED_ON_CROWLLM_KEY until the re-supply"
+ ],
+ "SUPERSESSION_NOTE_am13": {
+  "at": "2026-11-15T09:54:54.875967Z",
+  "state": "MOOT-BY-OWNER-ACT (Art. LXIV: the record stands, the design was never executed)",
+  "what_happened": "AM13 (dbb99251f/d602de63b, published while this contract was being authored) RESOLVED OA1 differently: the owner placed their OWN sealed holdout (audit/holdout_v1/ — holdout_v1_problems.json, 24 fresh problems HO-01..HO-24 + the PRIVATE rubric, selection_sha256 57be8218... reproduced exactly by the auditor) and Art. 7 (sealed instruments) is ACTIVATED on that basis. The owner-authored placement is strictly stronger than this contract's machine-via-crowllm authorship design (the original owner-held intent, satisfied at last)",
+  "residual_relevance": "the intervention-gate instruments' specimen sweep (scripts/r6_seeded_sweep.py, P1-8 candidate measurement records, threshold verdicts PENDING_OWNER_SEAL) remains a separate standing thread untouched by the holdout; this contract's design is available if the owner ever wants that calibration executed, and the never-executed state means nothing was spent"
+ }
+}

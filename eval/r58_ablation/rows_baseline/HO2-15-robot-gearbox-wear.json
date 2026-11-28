@@ -1,0 +1,55 @@
+{
+ "problem_id": "HO2-15-robot-gearbox-wear",
+ "arm": "baseline",
+ "dev_source": "v2-burned",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:30:13.722817Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme via vibration analysis (harmonic distortion of torque/current).  \n- Same-class mechanism departure: Kinematic error reconstruction from encoder position inconsistency under constant commanded velocity.  \n- Failure physics connection: Raceway wear increases free play, causing cycloidal element wobble; this manifests as encoder position micro-oscillations during steady motion, which correlate with increasing backlash before torque ripple dominates.  \n\n**PHYSICS CHECK**  \n- Governing relation: Encoder position error = ∫(actual velocity - commanded velocity) dt. Raceway wear increases mechanical compliance, causing actual velocity to fluctuate around the commanded value during steady-state motion.  \n- DIRECTION-OF-EFFECT: Driving variable = mechanical compliance; the mechanism detects rising compliance (up) by quantifying position error variance; this raises the observed position error, which is a precursor to failure.  \n- Magnitude verification: A 0.1° position error variance (CALCULATED from encoder resolution ±0.01° over 1k samples) corresponds to ~0.05mm backlash (ASSUMPTION: cycloidal pitch = 1mm), which is 10% of typical failure threshold (ASSUMPTION: failure at 0.5mm backlash).  \n\n**IMPLEMENTATION BILL**  \n- MECHANISM CLASS: Kinematic error reconstruction  \n- (a) Existing motor current sensor (ALREADY-RECORDED; \"motor current/torque\" per constraint)  \n- (b) Existing joint encoder (ALREADY-RECORDED; \"encoder\" per constraint)  \n- (c) Signal processing module (e.g., PLC or edge device firmware update, catalog class: industrial data acquisition module)  \n- (d) Threshold calculation: Position error variance threshold = 0.1° (CALCULATED from encoder resolution and failure physics; derived from stated spec: encoder resolution ±0.01°)  \n- (e) Alert logic: Variance > threshold for 7 consecutive days (ASSUMPTION: daily monitoring; duration ensures 30-day warning margin)  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: Same as standard practice (no hardware changes; firmware update only).  \n- Operability: No additional operator training (uses existing HMI alerts).  \n- Maintenance: Zero added maintenance (existing sensor calibration covers all inputs).  \n- Cost class: $0 (software-only update; same burden as standard practice).  \n\n**EXECUTABLE TEST**  \n- Protocol: Command joint to move at 50% max velocity for 10 minutes; record encoder position and motor current. Repeat daily for 60 days.  \n- Instruments: Existing encoder and current sensor (no new hardware).  \n- Pass/fail: Variance > 0.1° for ≥7 consecutive days = pass (predicts failure within 30 days). Variance < threshold for 60 days = fail (no predictive capability).  \n- Duration: 60 days (covers 30-day warning margin + 30-day baseline).  \n- Kill criterion: False alarm rate > 1/100 robots/yr (calculated as alerts in healthy robots over 1 year).  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Path error (per problem statement, threshold defines failure).  \n- Supplement: Encoder position variance (correlates with backlash before path error exceeds spec).  \n- Rationale: Path error is the ultimate failure metric; encoder variance is a leading indicator that rises earlier due to mechanical play.  \n\n**INPUT-AVAILABILITY CLAUSE**  \n- Required signals: Encoder position (ALREADY-RECORDED; \"encoder\" per constraint), motor current (ALREADY-RECORDED; \"motor current/torque\" per constraint).  \n- Derivation: Both signals are permitted and already recorded.  \n\n**COST-PRICING CLAUSE**  \n- Operational cost: Zero (no throughput/energy trade; firmware-only update).  \n- Net benefit: Prevents unexpected downtime (cost of failure >> update cost).  \n\n**MECHANISM-DIVERSITY CLAUSE**  \n- MECHANISM CLASS: Kinematic error reconstruction (distinct from torque harmonic analysis).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- MECHANISM CLASS: Kinematic error reconstruction",
+    "- (d) Threshold calculation: Position error variance threshold = 0.1° (CALCULATED from enc",
+    "- (e) Alert logic: Variance > threshold for 7 consecutive days (ASSUMPTION: daily monitori",
+    "- Installability: Same as standard practice (no hardware changes; firmware update only).",
+    "- Operability: No additional operator training (uses existing HMI alerts).",
+    "- Maintenance: Zero added maintenance (existing sensor calibration covers all inputs).",
+    "- Cost class: $0 (software-only update; same burden as standard practice).",
+    "- Protocol: Command joint to move at 50% max velocity for 10 minutes; record encoder posit",
+    "- Instruments: Existing encoder and current sensor (no new hardware).",
+    "- Pass/fail: Variance > 0.1° for ≥7 consecutive days = pass (predicts failure within 30 da",
+    "- Duration: 60 days (covers 30-day warning margin + 30-day baseline).",
+    "- Kill criterion: False alarm rate > 1/100 robots/yr (calculated as alerts in healthy robo",
+    "- Primary indicator: Path error (per problem statement, threshold defines failure).",
+    "- Supplement: Encoder position variance (correlates with backlash before path error exceed",
+    "- Rationale: Path error is the ultimate failure metric; encoder variance is a leading indi",
+    "- Required signals: Encoder position (ALREADY-RECORDED; \"encoder\" per constraint), motor c",
+    "- Derivation: Both signals are permitted and already recorded.",
+    "- Operational cost: Zero (no throughput/energy trade; firmware-only update).",
+    "- Net benefit: Prevents unexpected downtime (cost of failure >> update cost).",
+    "- MECHANISM CLASS: Kinematic error reconstruction (distinct from torque harmonic analysis)"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "required online signal 'vibration' is not among the permitted measures/signals",
+    "derived feature input 'vibration analysis' is not derivable from the permitted signals"
+   ]
+  }
+ },
+ "declared_template_prose": "kinematic error reconstruction",
+ "allowed_row_outside": 0,
+ "sha256_16": "b3e0659f183c0f9c",
+ "smoke": false
+}

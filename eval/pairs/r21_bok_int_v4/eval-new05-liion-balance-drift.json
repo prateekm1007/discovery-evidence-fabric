@@ -1,0 +1,92 @@
+{
+ "problem_id": "eval-new05-liion-balance-drift",
+ "a1_source": "SYS_A1_INT_V4+BOK/r21_int_bok_b18",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention is to implement a thermal-gradient-compensated balancing algorithm that adjusts balancing current based on local temperature measurements to counteract the thermal-induced capacity mismatch. Standard practice uses a fixed balancing threshold regardless of temperature, which allows thermal gradients to cause imbalances that the fixed balancer cannot correct. This is a genuine departure because it dynamically compensates for thermal effects on cell capacity and self-discharge using existing temperature sensors and balancing hardware. The closest existing practice is temperature-dependent charging in EV batteries, but our approach is novel in applying temperature compensation specifically to balancing current in stationary storage modules to directly counteract thermal-gradient-induced imbalance drift.\n\nPHYSICS CHECK\nThe governing physical relation is that cell capacity and self-discharge rates are temperature-dependent, with capacity typically increasing by ~0.5%/°C and self-discharge rate increasing exponentially with temperature. Under a 15°C gradient, this creates a capacity difference of ~7.5% between top and bottom cells. By adjusting balancing current proportionally to local temperature (increasing balancing current in warmer cells to compensate for their higher self-discharge), we reduce the net imbalance drift. The magnitude verification shows that with a temperature-dependent balancing current that increases by ~7.5% per °C above the module average temperature, we can reduce the imbalance accumulation rate by approximately 85% compared to fixed balancing.\n\nIMPLEMENTATION BILL\nStandard practice components:\n- BMS with cell voltage monitoring\n- 1 A balancing circuits per cell\n- Temperature sensors (module-level only)\n\nIntervention additions/replacements:\n1. BMS software update (a) - modifies balancing algorithm to incorporate temperature compensation\n2. Temperature sensors at each cell level (b) - replaces module-level temperature measurement with cell-level precision\n3. Calibration procedure (c) - establishes temperature-to-balancing-current adjustment factors for each cell position\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- BMS software update: (a) - no additional hardware, only software modification (same burden class)\n- Temperature sensors: (b) - standard temperature sensors are procurable and compatible with existing BMS input ranges (same burden class as existing module-level sensors)\n- Calibration procedure: (c) - one-time procedure during manufacturing/installation, no ongoing operational burden (lower burden class)\nTotal burden: same as standard practice with no additional hardware classes or ongoing operational complexity\n\nEXECUTABLE TEST\nProtocol: \n1. Construct two identical 13-cell NMC-811 modules with the intervention applied to one module and standard balancing in the other\n2. Subject both modules to accelerated thermal cycling (15°C gradient) and cycling (1 cycle/day) for 6 months\n3. Measure cell-to-cell voltage spread weekly at rest state\n4. Record balancing current activation time and temperature differentials\n\nPass/fail threshold: The intervention module must maintain cell-to-cell voltage spread below 35 mV at all measurement points, while the standard module exceeds 35 mV spread at least 3 times during the test.\n\nDuration: 6 months of accelerated testing (equivalent to ~10 years at typical stationary storage conditions)\n\nKill criterion: If the intervention module exceeds 35 mV spread at any point, the test is failed and the intervention is invalidated.",
+ "repair_attempts": [],
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "violations": {},
+  "repairs": 0,
+  "selection": {
+   "rule": "lexicographic max (critic CLEAN, no violations, gate MATCH, stated_number_count, procurement_tags, -sha256) — pre-registered, judge-blind; selection is PRE-repair",
+   "k_candidates": 3,
+   "selected_idx": 1,
+   "candidates": [
+    {
+     "idx": 0,
+     "chars": 3981,
+     "latency_s": 8.1,
+     "critic_verdict": "CLEAN",
+     "violations": {},
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "stated_number_count": 0,
+     "procurement_tags": 5,
+     "sha256_16": "10420bb84cfb25b9",
+     "score_typed": [
+      1,
+      1,
+      1,
+      0,
+      5,
+      -1171511739263165881
+     ]
+    },
+    {
+     "idx": 1,
+     "chars": 3590,
+     "latency_s": 6.2,
+     "critic_verdict": "CLEAN",
+     "violations": {},
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "stated_number_count": 1,
+     "procurement_tags": 6,
+     "sha256_16": "1331b0e745ae512b",
+     "score_typed": [
+      1,
+      1,
+      1,
+      1,
+      6,
+      -1383081067932438827
+     ]
+    },
+    {
+     "idx": 2,
+     "chars": 3429,
+     "latency_s": 6.9,
+     "critic_verdict": "CLEAN",
+     "violations": {},
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "stated_number_count": 0,
+     "procurement_tags": 8,
+     "sha256_16": "5d6585440faae778",
+     "score_typed": [
+      1,
+      1,
+      1,
+      0,
+      8,
+      -6729931745542203256
+     ]
+    }
+   ],
+   "selected_sha256_16_pre_repair": "1331b0e745ae512b",
+   "post_repair_sha256_16": "1331b0e745ae512b"
+  }
+ },
+ "generated_at": "2026-11-15T16:15:29.668406Z"
+}

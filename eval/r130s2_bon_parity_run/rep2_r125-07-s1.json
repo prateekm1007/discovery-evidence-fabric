@@ -1,0 +1,156 @@
+{
+ "problem_id": "r125-07-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 169.57,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.7,
+     "usage": {
+      "prompt_tokens": 255,
+      "completion_tokens": 595,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 2,
+     "latency_s": 126.64,
+     "usage": {
+      "prompt_tokens": 967,
+      "completion_tokens": 1243,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Thermal Load-Modulated Duty Cycling**\\n\\n**Mechani",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Thermal Load-Modulated Duty Cycling**\n\n**Mechanism:**\nImplement a control logic that dynamically limits the maximum allowable reservoir temperature by correlating it with the accumulated thermal load of the system, rather than using a static temperature cutoff. This approach prevents the oil from reaching the viscosity-degradation threshold that causes pressure drop at the end of the stroke, while maximizing production time during cooler, lower-load periods.\n\n**Implementation:**\n1.  **Data Logging:** Configure the existing hour-run counter to log total operating hours since the last maintenance window. Use the pump motor ammeter to calculate instantaneous power draw (as a proxy for hydraulic load) and integrate this over time to create a \"thermal stress index.\"\n2.  **Dynamic Thresholding:** Establish a baseline maximum temperature limit ($T_{max\\_base}$) for the reservoir, as indicated by the existing reservoir thermometer. Define a dynamic limit $T_{limit}$ using the formula:\n    $$T_{limit} = T_{max\\_base} - k \\cdot (\\text{Hour-Run Counter} \\times \\text{Average Ammeter Draw}_{recent})$$\n    Where $k$ is a tuning constant determined during a calibration phase. As the hour-run counter increases and/or the ammeter shows sustained high loads (indicating high heat generation and potential internal wear/heat accumulation), $T_{limit}$ decreases conservatively.\n3.  **Control Action:** The control system monitors the reservoir thermometer. If the temperature reaches $T_{limit}$, it triggers a \"soak\" pause, where the pump runs at idle (minimum pressure) to allow heat to dissipate through the reservoir and manifold thermometers' associated cooling paths, before resuming the full duty cycle. If the temperature exceeds a hard safety limit (fixed value), it triggers a full shutdown.\n\n**Measures It Relies On:**\n*   **Reservoir Thermometer:** Provides the real-time temperature feedback for the dynamic limit check.\n*   **Manifold Thermometers:** Used to verify that heat is not trapping in the high-pressure circuit; if the manifold temperature lags significantly behind the reservoir during pauses, the system extends the pause time.\n*   **Pump Motor Ammeter:** Provides the load signal. A rising trend in current at constant pressure indicates increased fluid viscosity or internal leakage (common in worn pumps), which generates excess heat. The ammeter trend informs the rate at which $T_{limit}$ should be lowered.\n*   **Hour-Run Counter:** Provides the aging/thermal fatigue context. Long cumulative hours without a \"full cool-down\" event (reservoir near ambient) warrant a more conservative thermal limit to prevent oil breakdown and pressure loss at stroke end.\n\nThis strategy uses only existing sensors to proactively manage thermal stress, preventing the hot-running conditions that cause the end-of-stroke pressure drop, without adding new instrumentation.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Thermal Load-Modulated Duty Cycling**\n\n**Mechanism:**\nImplement a control logic that dynamically limits the maximum allowable reservoir temperature by correlating it with the accumulated thermal load of the system, rather than using a static temperature cutoff. This approach prevents the oil from reaching the viscosity-degradation threshold that causes pressure drop at the end of the stroke, while maximizing production time during cooler, lower-load periods.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\n*   **Driving Variable:** The dynamic temperature threshold $T_{limit}$.\n*   **Direction of Effect:** As the driving variable ($T_{limit}$) decreases (becomes more conservative) due to high thermal load or aging, the duration of the mandatory \"soak\" pause increases, and the maximum allowed continuous operating temperature decreases. This directly results in a reduction of peak fluid viscosity degradation, which restores pressure stability at the end of the stroke, albeit at the cost of reduced overall cycle throughput.\n*   **Mechanism:** Lowering $T_{limit}$ forces the system to enter idle/soak states earlier and more frequently, dissipating heat before it causes significant viscosity changes or pressure drop.\n\n**Implementation:**\n1.  **Data Logging:** Configure the existing hour-run counter to log total operating hours since the last maintenance window. Use the pump motor ammeter to calculate instantaneous power draw (as a proxy for hydraulic load) and integrate this over time to create a \"thermal stress index.\"\n2.  **Dynamic Thresholding:** Establish a baseline maximum temperature limit ($T_{max\\_base}$) for the reservoir, as indicated by the existing reservoir thermometer. Define a dynamic limit $T_{limit}$ using the formula:\n    $$T_{limit} = T_{max\\_base} - k \\cdot (HRC \\times I_{avg})$$\n    Where:\n    *   $HRC$ is the current value of the **Hour-Run Counter** (measured in hours).\n    *   $I_{avg}$ is the rolling average of the **Pump Motor Ammeter** draw over the last duty cycle, measured in Amperes.\n    *   $k$ is a tuning constant with units of $^\\circ C/(h \\cdot A)$, determined during a calibration phase.\n    *   **Derivation Note:** The product $HRC \\times I_{avg}$ serves as a proxy for cumulative thermal energy input. While strict physics integration of power ($V \\cdot I$) over time would require a voltmeter (which is not explicitly listed as a standalone sensor in the permitted list, though voltage is implied to be constant in AC motor systems, or derived if the controller is known), this formula relies explicitly on the permitted **Hour-Run Counter** and **Pump Motor Ammeter**. If voltage is constant, Power $\\propto$ Current. The term represents a proxy for heat accumulation.\n3.  **Control Action:** The control system monitors the **Reservoir Thermometer**. If the temperature reaches $T_{limit}$, it triggers a \"soak\" pause, where the pump runs at idle (minimum pressure) to allow heat to dissipate through the reservoir and manifold thermometers' associated cooling paths, before resuming the full duty cycle. If the temperature exceeds a hard safety limit (fixed value), it triggers a full shutdown.\n\n**IMPLEMENTATION BILL:**\n*   **Operational Cost Impact:**\n    *   **Throughput/Availability:** The modulation of $T_{limit}$ introduces variable pause times. During high-heat/low-ambient conditions or high-hour-counts, the duty cycle availability will decrease by an estimated 10-20% compared to static cooling, as the system spends more time in the \"soak\" state to protect the fluid. This is the primary operational cost.\n    *   **Energy:** The idle \"soak\" state consumes minimal energy (pump at minimum load), significantly less than the active press cycle. The total energy cost per part may increase slightly due to extended cycle time, but pump wear and oil replacement costs decrease.\n*   **Hardware/Sensor Costs:** $0. All logic uses existing **Reservoir Thermometer**, **Manifold Thermometer**, **Pump Motor Ammeter**, and **Hour-Run Counter**.\n*   **Software/Logic Cost:** Minimal update to the PLC/Controller logic to implement the $T_{limit}$ calculation and pause sequencing. No new instrumentation.\n*   **Maintenance Cost Reduction:** Proactive management prevents oil breakdown, extending oil life and preventing premature pump failure, resulting in net long-term savings that offset the throughput loss.\n\n**Measures It Relies On:**\n*   **Reservoir Thermometer:** Source of $T_{current}$. Used to check if $T_{current} \\ge T_{limit}$.\n*   **Pump Motor Ammeter:** Source of $I_{current}$ and $I_{avg}$. Used to calculate the load component of the $T_{limit}$ formula.\n*   **Hour-Run Counter:** Source of $HRC$. Used to calculate the aging/fatigue component of the $T_{limit}$ formula.\n*   **Manifold Thermometers:** Used as a verification signal. If Manifold Temp $>$ Reservoir Temp during a pause, the pause is extended (logic extension, not part of the primary $T_{limit}$ formula but part of the control action). This prevents trapping heat in the high-pressure circuit.\n*   **Excluded Inputs:** No new sensors. The formula does not rely on ambient temperature, fluid level, or pressure transducers, as these are either not permitted or not part of the specified dynamic logic derivation. The logic is derived strictly from the thermal state (thermometers), electrical load (ammeter), and operational history (hour counter).",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Operational Cost Impact:**",
+     "*   **Throughput/Availability:** The modulation of $T_{limit}$ introduces variable pause t",
+     "*   **Energy:** The idle \"soak\" state consumes minimal energy (pump at minimum load), sign",
+     "*   **Hardware/Sensor Costs:** $0. All logic uses existing **Reservoir Thermometer**, **Ma",
+     "*   **Software/Logic Cost:** Minimal update to the PLC/Controller logic to implement the $",
+     "*   **Maintenance Cost Reduction:** Proactive management prevents oil breakdown, extending",
+     "*   **Reservoir Thermometer:** Source of $T_{current}$. Used to check if $T_{current} \\ge ",
+     "*   **Pump Motor Ammeter:** Source of $I_{current}$ and $I_{avg}$. Used to calculate the l",
+     "*   **Hour-Run Counter:** Source of $HRC$. Used to calculate the aging/fatigue component o",
+     "*   **Manifold Thermometers:** Used as a verification signal. If Manifold Temp $>$ Reservo",
+     "*   **Excluded Inputs:** No new sensors. The formula does not rely on ambient temperature,"
+    ],
+    "APPARATUS_ROW": [
+     "*   **Software/Logic Cost:** Minimal update to the PLC/Controller logic to implement the $T_{limit}$ calculati",
+     "*   **Excluded Inputs:** No new sensors. The formula does not rely on ambient temperature, fluid level, or pre"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.57,
+     "usage": {
+      "prompt_tokens": 255,
+      "completion_tokens": 637,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.61,
+     "usage": {
+      "prompt_tokens": 1009,
+      "completion_tokens": 899,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"Mitigation Proposal: Temperature-Indexed Pressure Drop Alarm and Duty Cyc",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Temperature-Indexed Pressure Drop Alarm and Duty Cycle Limiting**\n\n**Mechanism:**\nInstead of adding hardware, implement a software- or PLC-based logic layer that correlates the existing **reservoir/manifold thermometer readings** with the **pump motor ammeter** readings during the final 20% of the stroke (identified via the hour-run counter timestamping or cycle counting). The logic detects a specific failure signature: a positive correlation between rising temperature and a negative slope in motor current (proxy for pump pressure drop, assuming constant speed drive) specifically at the end of the stroke. When this correlation exceeds a threshold, the system automatically enforces a \"cool-down pause\" between cycles or reduces the allowable cycle frequency, preventing the thermal mass from accumulating to the point where cavitation or viscosity loss causes pressure loss.\n\n**Implementation:**\n1.  **Data Acquisition:** The existing PLC (or a simple microcontroller interfacing with the existing sensors) samples the reservoir and manifold thermometers and the pump motor ammeter at high frequency during each stroke.\n2.  **Baseline Modeling:** Use the hour-run counter to log baseline current profiles at known \"good\" temperatures (e.g., <60°C). Establish the expected current at the end-of-stroke under normal thermal conditions.\n3.  **Fault Detection Logic:**\n    *   If Manifold Temperature > Threshold T1 (e.g., 75°C) AND End-of-Stroke Current < Expected_Current - Delta_I, flag the cycle as \"Thermally Stressed.\"\n    *   Count consecutive \"Thermally Stressed\" cycles using the hour-run counter's cycle count function.\n4.  **Actuation (Constraint-Compliant):**\n    *   If the count of consecutive stressed cycles > N, the PLC inserts a timed pause (e.g., 30–60 seconds) before initiating the next cycle. This pause allows heat to dissipate via the reservoir surface and cooling jacket (if present) without needing a new cooler.\n    *   Simultaneously, log the event to the hour-run counter for maintenance review to identify if ambient conditions or workpiece heat load are driving the thermal drift.\n\n**Measures It Relies On:**\n*   **Reservoir/Manifold Thermometers:** Provides the real-time thermal state of the fluid, which is the root cause of the viscosity change and potential cavitation leading to pressure drop.\n*   **Pump Motor Ammeter:** Serves as a proxy for pump hydraulic load/pressure. A drop in current at the end of the stroke, when pressure is typically high due to back-pressure or seal friction, indicates a loss of hydraulic head (pressure fall-off) without requiring a new pressure transducer.\n*   **Hour-Run Counter:** Provides the timestamp for cycle duration and allows for logging the frequency of thermal stress events to distinguish between transient hot spots and sustained overload, enabling the adaptive pause logic.\n*   **Existing Sensors Only:** No new sensors are added; only the data processing and control logic are enhanced using the installed instrumentation.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal: Temperature-Indexed Pressure Drop Alarm and Duty Cycle Limiting\n\n**Mechanism:**\nInstead of adding hardware, implement a software- or PLC-based logic layer that correlates the existing reservoir/manifold thermometer readings with the pump motor ammeter readings during the final 20% of the stroke. The logic detects a specific failure signature: a positive correlation between rising temperature and a negative slope in motor current (proxy for pump pressure drop, assuming constant speed drive) specifically at the end of the stroke. When this correlation exceeds a threshold, the system automatically enforces a \"cool-down pause\" between cycles or reduces the allowable cycle frequency, preventing the thermal mass from accumulating to the point where cavitation or viscosity loss causes pressure loss.\n\n**Direction-of-Effect:**\nThe driving variable is the fluid temperature (T), which increases during duty cycles. As T rises, the mechanism causes the hydraulic pressure (P) at the end of the stroke to decrease (negative direction) due to reduced fluid viscosity and increased cavitation risk. This pressure drop is reflected as a decrease in pump motor current (I), which the logic monitors to confirm the direction of the failure signature.\n\n**Implementation:**\n1. Data Acquisition: The existing PLC samples the reservoir and manifold thermometers and the pump motor ammeter at high frequency during each stroke.\n2. Baseline Modeling: Use the hour-run counter to log baseline current profiles at known \"good\" temperatures (e.g., <60°C). Establish the expected current at the end-of-stroke under normal thermal conditions.\n3. Fault Detection Logic:\n   *   If Manifold Temperature > Threshold T1 (e.g., 75°C) AND End-of-Stroke Current < Expected_Current - Delta_I, flag the cycle as \"Thermally Stressed.\"\n   *   Count consecutive \"Thermally Stressed\" cycles using the hour-run counter’s cycle count function.\n4. Actuation (Constraint-Compliant):\n   *   If the count of consecutive stressed cycles > N, the PLC inserts a timed pause (e.g., 30–60 seconds) before initiating the next cycle. This pause allows heat to dissipate via the reservoir surface and cooling jacket (if present) without needing a new cooler.\n   *   Simultaneously, log the event to the hour-run counter for maintenance review to identify if ambient conditions or workpiece heat load are driving the thermal drift.\n\n**Implementation Bill:**\n*   **Operational Cost Impact:** \n    *   Throughput: The enforced 30–60 second pause reduces maximum cycles per hour by approximately 2–5% during thermal stress events. Baseline throughput loss is negligible outside of fault conditions.\n    *   Energy: No additional energy consumption for actuation, as the pause is idle time for the pump motor. Energy cost is flat or slightly reduced due to fewer full-load cycles per unit time during faults.\n    *   Availability: System remains available for operation; no downtime for maintenance or hardware replacement. Reduced availability only occurs as a percentage drop in production rate during prolonged thermal stress, estimated at <5% annualized.\n*   **Development Cost:** $0 for new hardware. Labor cost for PLC logic programming: 8–12 hours engineering time.\n\n**Measures It Relies On:**\n*   Reservoir/Manifold Thermometers: Provides the real-time thermal state of the fluid. Permitted Sensor 1.\n*   Pump Motor Ammeter: Provides the electrical load signal. Permitted Sensor 2.\n*   Hour-Run Counter: Provides cycle count and duration. Permitted Sensor 3.\n*   End-of-Stroke Position: Derived from the Hour-Run Counter’s cycle duration measurement. The final 20% of the stroke duration is calculated as: T_stroke_duration * 0.8 to T_stroke_duration * 1.0. This is a time-domain identification of the stroke phase, not a new physical position sensor.\n*   Expected_Current - Delta_I: Derived from baseline Ammeter readings (Permitted Sensor 2) logged via the Hour-Run Counter (Permitted Sensor 3) under stable thermal conditions (derived from Permitted Sensor 1).",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Operational Cost Impact:**",
+     "*   Throughput: The enforced 30–60 second pause reduces maximum cycles per hour by approxi",
+     "*   Energy: No additional energy consumption for actuation, as the pause is idle time for ",
+     "*   Availability: System remains available for operation; no downtime for maintenance or h",
+     "*   **Development Cost:** $0 for new hardware. Labor cost for PLC logic programming: 8–12 ",
+     "*   Reservoir/Manifold Thermometers: Provides the real-time thermal state of the fluid. Pe",
+     "*   Pump Motor Ammeter: Provides the electrical load signal. Permitted Sensor 2.",
+     "*   Hour-Run Counter: Provides cycle count and duration. Permitted Sensor 3.",
+     "*   End-of-Stroke Position: Derived from the Hour-Run Counter’s cycle duration measurement",
+     "*   Expected_Current - Delta_I: Derived from baseline Ammeter readings (Permitted Sensor 2"
+    ],
+    "APPARATUS_ROW": [
+     "*   End-of-Stroke Position: Derived from the Hour-Run Counter’s cycle duration measurement. The final 20% of t",
+     "*   Expected_Current - Delta_I: Derived from baseline Ammeter readings (Permitted Sensor 2) logged via the Hou"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "**Mitigation Proposal: Thermal Load-Modulated Duty Cycling**\n\n**Mechanism:**\nImplement a control logic that dynamically limits the maximum allowable reservoir temperature by correlating it with the accumulated thermal load of the system, rather than using a static temperature cutoff. This approach prevents the oil from reaching the viscosity-degradation threshold that causes pressure drop at the end of the stroke, while maximizing production time during cooler, lower-load periods.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\n*   **Driving Variable:** The dynamic temperature threshold $T_{limit}$.\n*   **Direction of Effect:** As the driving variable ($T_{limit}$) decreases (becomes more conservative) due to high thermal load or aging, the duration of the mandatory \"soak\" pause increases, and the maximum allowed continuous operating temperature decreases. This directly results in a reduction of peak fluid viscosity degradation, which restores pressure stability at the end of the stroke, albeit at the cost of reduced overall cycle throughput.\n*   **Mechanism:** Lowering $T_{limit}$ forces the system to enter idle/soak states earlier and more frequently, dissipating heat before it causes significant viscosity changes or pressure drop.\n\n**Implementation:**\n1.  **Data Logging:** Configure the existing hour-run counter to log total operating hours since the last maintenance window. Use the pump motor ammeter to calculate instantaneous power draw (as a proxy for hydraulic load) and integrate this over time to create a \"thermal stress index.\"\n2.  **Dynamic Thresholding:** Establish a baseline maximum temperature limit ($T_{max\\_base}$) for the reservoir, as indicated by the existing reservoir thermometer. Define a dynamic limit $T_{limit}$ using the formula:\n    $$T_{limit} = T_{max\\_base} - k \\cdot (HRC \\times I_{avg})$$\n    Where:\n    *   $HRC$ is the current value of the **Hour-Run Counter** (measured in hours).\n    *   $I_{avg}$ is the rolling average of the **Pump Motor Ammeter** draw over the last duty cycle, measured in Amperes.\n    *   $k$ is a tuning constant with units of $^\\circ C/(h \\cdot A)$, determined during a calibration phase.\n    *   **Derivation Note:** The product $HRC \\times I_{avg}$ serves as a proxy for cumulative thermal energy input. While strict physics integration of power ($V \\cdot I$) over time would require a voltmeter (which is not explicitly listed as a standalone sensor in the permitted list, though voltage is implied to be constant in AC motor systems, or derived if the controller is known), this formula relies explicitly on the permitted **Hour-Run Counter** and **Pump Motor Ammeter**. If voltage is constant, Power $\\propto$ Current. The term represents a proxy for heat accumulation.\n3.  **Control Action:** The control system monitors the **Reservoir Thermometer**. If the temperature reaches $T_{limit}$, it triggers a \"soak\" pause, where the pump runs at idle (minimum pressure) to allow heat to dissipate through the reservoir and manifold thermometers' associated cooling paths, before resuming the full duty cycle. If the temperature exceeds a hard safety limit (fixed value), it triggers a full shutdown.\n\n**IMPLEMENTATION BILL:**\n*   **Operational Cost Impact:**\n    *   **Throughput/Availability:** The modulation of $T_{limit}$ introduces variable pause times. During high-heat/low-ambient conditions or high-hour-counts, the duty cycle availability will decrease by an estimated 10-20% compared to static cooling, as the system spends more time in the \"soak\" state to protect the fluid. This is the primary operational cost.\n    *   **Energy:** The idle \"soak\" state consumes minimal energy (pump at minimum load), significantly less than the active press cycle. The total energy cost per part may increase slightly due to extended cycle time, but pump wear and oil replacement costs decrease.\n*   **Hardware/Sensor Costs:** $0. All logic uses existing **Reservoir Thermometer**, **Manifold Thermometer**, **Pump Motor Ammeter**, and **Hour-Run Counter**.\n*   **Software/Logic Cost:** Minimal update to the PLC/Controller logic to implement the $T_{limit}$ calculation and pause sequencing. No new instrumentation.\n*   **Maintenance Cost Reduction:** Proactive management prevents oil breakdown, extending oil life and preventing premature pump failure, resulting in net long-term savings that offset the throughput loss.\n\n**Measures It Relies On:**\n*   **Reservoir Thermometer:** Source of $T_{current}$. Used to check if $T_{current} \\ge T_{limit}$.\n*   **Pump Motor Ammeter:** Source of $I_{current}$ and $I_{avg}$. Used to calculate the load component of the $T_{limit}$ formula.\n*   **Hour-Run Counter:** Source of $HRC$. Used to calculate the aging/fatigue component of the $T_{limit}$ formula.\n*   **Manifold Thermometers:** Used as a verification signal. If Manifold Temp $>$ Reservoir Temp during a pause, the pause is extended (logic extension, not part of the primary $T_{limit}$ formula but part of the control action). This prevents trapping heat in the high-pressure circuit.\n*   **Excluded Inputs:** No new sensors. The formula does not rely on ambient temperature, fluid level, or pressure transducers, as these are either not permitted or not part of the specified dynamic logic derivation. The logic is derived strictly from the thermal state (thermometers), electrical load (ammeter), and operational history (hour counter).",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED",
+ "replication": 2,
+ "work_id": "r130s2-bon2-parity"
+}

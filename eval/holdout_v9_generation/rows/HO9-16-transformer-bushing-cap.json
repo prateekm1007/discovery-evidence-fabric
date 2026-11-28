@@ -1,0 +1,140 @@
+{
+ "problem_id": "HO9-16-transformer-bushing-cap",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    30,
+    33,
+    7
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:bf9ddfc8f362": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:1853485a6d1e": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:a7d0d99a27a3": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:51:00.881212Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT —\n*   **Standard Practice Deliverable:** A SCHEDULED OFFLINE POWER-FACTOR (PF) TEST (outage) to measure bushing capacitance ($C$) and loss tangent ($\\tan\\delta$) directly, triggering replacement when thresholds are crossed.\n*   **My Same-Class Departure:** An ONLINE INDUCTIVE THERMAL-INERTIA MONITORING scheme that infers the change in parallel conductance ($G_p$) and capacitance ($C_p$) from the *transient* response of the existing **leakage current** and **load current** signals to grid frequency/phase variations, calibrated against the **top-oil temperature** to decouple thermal drift. This avoids the outage and offline test requirement.\n*   **Failure-Physics Connection:** Bushing degradation (oil breakdown, paper delamination) increases $\\tan\\delta$ (losses) and alters $C$ (geometry/dielectric constant changes). These changes manifest as a deviation in the phase and magnitude of the leakage current relative to the load current, which is a function of system voltage and temperature. The standard practice measures this in a static, offline state. My mechanism infers it from the *dynamic* operational signature (load variations) already present in the recorded data.\n\nPHYSICS CHECK —\n*   **Governing Relation:** The bushing is modeled as a parallel $RC$ network. The leakage current $I_{leak}$ is given by:\n      $$ I_{leak} = V_{system} \\cdot \\sqrt{ (G_p + j\\omega C_p)^2 } = V_{system} \\cdot \\sqrt{ G_p^2 + (\\omega C_p)^2 } $$\n      Where $G_p \\approx C_p \\tan\\delta$. As insulation degrades, $\\tan\\delta$ increases, causing $G_p$ to rise. $C_p$ may also shift slightly due to moisture absorption (increasing dielectric constant) or physical delamination (decreasing effective area).\n*   **Magnitude Verification:** For a 145 kV bushing, $C_p$ is typically 200–400 pF. $\\omega = 377$ rad/s. $X_c \\approx 1.5–2.5$ M$\\Omega$. At healthy state, $\\tan\\delta < 0.005$, so $G_p$ is negligible compared to $\\omega C_p$. As it degrades, $\\tan\\delta$ rises to $>0.01–0.02$, making $G_p$ comparable to or dominating the reactive term. The leakage current magnitude increases significantly, and the phase angle relative to the system voltage shifts. The top-oil temperature $T_{oil}$ allows normalization of $C_p$ and $\\tan\\delta$ (both are T-dependent).\n*   **DIRECTION-OF-EFFECT:** Driving variable = **Insulation Loss Tangent ($\\tan\\delta$)**. The mechanism **monitors** the upward drift of $\\tan\\delta$ by detecting the increase in the in-phase component of the leakage current ($G_p \\propto \\tan\\delta$). This **raises** the inferred conductance value, which is the direct indicator of failure. The predictor warns *before* the integral of loss exceeds the failure threshold.\n\nIMPLEMENTATION BILL —\n*   **MECHANISM CLASS:** DATA-DRIVEN THERMAL-NORMALIZED INDUCTANCE INFERENCE.\n*   **Input Signals (All ALREADY-RECORDED per constraint):**\n    1.  **Bushing Leakage Current:** Explicitly stated in user variables (\"existing bushing leakage current\"). *Source:* Existing CT or instrument on the bushing flange/terminal. Tag: **ALREADY-RECORDED**.\n    2.  **Top-Oil Temperature:** Explicitly stated in user variables. *Source:* Existing PT100/RTD in the transformer tank. Tag: **ALREADY-RECORDED**.\n    3.  **Load Current:** Explicitly stated in user variables. *Source:* Existing main current transformers (CTs) at the transformer HV/LV terminals. Tag: **ALREADY-RECORDED**.\n*   **Derived Reference/Threshold (CALCULATED):**\n    1.  **Healthy Baseline:** Derived from the **stated physics** of a new 145 kV condenser bushing. Manufacturer nameplate data typically specifies initial $\\tan\\delta < 0.002$ and $C$ within $\\pm 10\\%$ of nominal. The *derivation* uses the manufacturer’s stated capacitance tolerance and loss tangent limit as the \"healthy\" boundary. No new data collection is required; the reference is the **stated spec** of the installed part.\n    2.  **Failure Threshold:** Defined as $\\tan\\delta > 0.01$ or 2.5x the baseline drift. This is a **stated industry standard** for condenser bushing failure prediction (typically cited in IEEE or IEC guidelines for PF testing). The threshold is **CALCULATED** as a fixed multiplier of the nameplate healthy value.\n    3.  **Temperature Normalization Coefficient:** $\\alpha$ (temp coeff for $\\tan\\delta$ and $C$) is **DERIVED** from the manufacturer’s published temperature correction factors for condenser bushings (standard physics data for oil-impregnated paper). No calibration campaign needed.\n*   **Software/Algorithm:**\n    *   Continuous stream processor (Edge Gateway or SCADA block) applying the $I_{leak}(V, T)$ model.\n    *   Computes real-time $\\tan\\delta_{est}(t)$ and $C_{est}(t)$ by decoupling the thermal component using $T_{oil}(t)$.\n    *   Compares $C_{est}(t)$ to $C_{est}(t-365d)$ to detect drift.\n    *   Compares $\\tan\\delta_{est}(t)$ to the threshold.\n*   **Bill Rows (Procurement Tags):**\n    1.  **Algorithm License/Configuration:** Software module for the existing DCS/SCADA. *Tag:* (a) Standard software license/configuration time. No new hardware.\n    2.  **Data Historian Tag Configuration:** Ensure leakage current, oil temp, and load current tags are enabled in the existing historian. *Tag:* (b) Engineering labor hours. No new sensors.\n    3.  **Alarm Logic:** Setpoint alarm for $\\Delta C > 5\\%$ or $\\tan\\delta > 0.01$. *Tag:* (c) Configuration labor. No new hardware.\n    4.  **No New Sensors:** Constraint explicitly forbids new sensors. The bill contains **zero** new instrumentation hardware.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —\n*   **Standard Practice:**\n    *   **Outage:** 6–12 hours of transformer downtime.\n    *   **Equipment:** Mobile PF test set (rental/purchase), HV DC source, cables.\n    *   **Labor:** Two qualified electricians + one tester, 8 hours.\n    *   **Cost Class:** High (outage cost + rental + labor). ~$1,000–$2,000 per test.\n    *   **Frequency:** Annual or bi-annual.\n*   **My Solution:**\n    *   **Outage:** **Zero**. Continuous online monitoring.\n    *   **Equipment:** **Zero** new hardware. Uses existing SCADA/DCS.\n    *   **Labor:** One-time configuration (~4–8 hours engineering).\n    *   **Cost Class:** Low (one-time engineering labor ~$500–$1,000). No recurring hardware cost.\n    *   **Frequency:** Continuous.\n*   **Parity Conclusion:** My solution is **LIGHTER** in burden. It eliminates the outage cost and recurring test costs. The operational loss is **ZERO** (no throughput/energy given up). It is strictly beneficial. The \"burden\" is only the initial software configuration, which is negligible compared to the outage cost.\n\nEXECUTABLE TEST —\n*   **Protocol:**\n    1.  **Simulated Degradation (Offline Validation):** Using historical data from a known failed bushing (if available in the dataset) or a synthetic data model based on the physics equations.\n    2.  **Synthetic Data Generation:**\n        *   Generate $V_{system}(t)$ (nominal 145 kV, $\\pm 5\\%$ fluctuation).\n        *   Generate $T_{oil}(t)$ (diurnal variation, 60–80°C).\n        *   Generate \"Healthy\" $I_{leak}^{healthy}(t)$ using nameplate $C_0$ and $\\tan\\delta_0$ with temp coefficients.\n        *   Generate \"Degraded\" $I_{leak}^{degraded}(t)$ using $\\tan\\delta = 0.005, 0.008, 0.01$ and $C = 0.9 C_0$ (drift).\n    3.  **Run Predictor:** Feed synthetic streams into the algorithm.\n    4.  **Check:**\n        *   Does it output $\\tan\\delta_{est}$ within $\\pm 10\\%$ of the input synthetic value?\n        *   Does it trigger a \"Drift Warning\" when $C_{est}$ drops by $5\\%$ or $\\tan\\delta_{est}$ exceeds $0.01$?\n    5.  **Real-World Validation (First 30 Days):**\n        *   Deploy algorithm to live data.\n        *   Compare output $\\tan\\delta_{est}$ to the *next scheduled* offline PF test result (when it happens for other reasons).\n        *   **Pass Criterion:** Correlation $R^2 > 0.9$ between predicted and measured $\\tan\\delta$ at a single point-in-time.\n        *   **Kill Criterion:** If $R^2 < 0.7$, the thermal decoupling model is insufficient; fall back to standard scheduled tests.\n*   **Falsification:** If the predictor fails to distinguish between a load-induced thermal rise and a true insulation degradation drift (i.e., it triggers a false positive during a simple load ramp-up that changes oil temp), the mechanism is falsified. The thermal normalization coefficient must be verified against the manufacturer's data sheet.\n\nCONSTRAINT BIND —\n*   **Primary Stated Indicator:** **Bushing Leakage Current** (and implicitly Load Current and Top-Oil Temp as modifiers).\n*   **Why Primary:** The failure is \"capacitance/tan-delta drift.\" The leakage current is the *direct electrical signature* of the parallel $RC$ branch. Load current provides the reference magnitude for the voltage (via transformer regulation) and the \"in-phase\" component for power loss calculation. Top-oil temperature is the *essential modifier* to normalize the temperature-sensitive parameters.\n*   **Constraint Adherence:**\n    *   \"No new sensors\": **Met.** Uses existing CTs, PTs, RTDs.\n    *   \"No offline power-factor test\": **Met.** The predictor operates online; it *replaces* the need for the offline test for early warning.\n    *   \"Use only existing bushing leakage current, top-oil temperature and load current\": **Met.** These are the three inputs.\n\nDEPLOYED-PART CLAUSE —\n*   **Stated Device:** Power transformer condenser bushing, 145 kV.\n*   **Modification:** **None.** The bushing is used AS-IS. No machining, coating, or modification.\n*   **New Catalog Parts:** **None.** The solution is purely a **software/algorithmic change** on the surrounding SCADA/DCS system. The \"new catalog parts\" are the algorithm configuration files and license keys, which are non-physical in terms of the transformer itself. They are installed on the existing control system hardware.\n\nPERMITTED-SET CLAUSE —\n*   **Permitted Set:** The constraint states \"use only the existing bushing leakage current, top-oil temperature and load current; no new sensors.\"\n*   **Measure Class:** This is an **exhaustive parameter/data set**. It explicitly forbids new physical sensors. Therefore, the measure class is **PURE DATA/ALGORITHMIC ANALYSIS** on the stated signals. No physical intervention on the bushing is permitted or needed. The mechanism is a **change in operating procedure/monitoring logic**, not a hardware change.\n\nDIRECTION-OF-EFFECT CLAUSE —\n*   **Driving Variable:** Insulation Loss Tangent ($\\tan\\delta$).\n*   **Mechanism Action:** The algorithm **detects** the upward drift of $\\tan\\delta$.\n*   **Effect on Failure Driver:** By detecting the rise in $\\tan\\delta$ early (60 days before failure), the mechanism **lowers** the probability of catastrophic failure by allowing for planned replacement. It does not *reduce* $\\tan\\delta$ itself (that would require physical repair), but it **reduces the risk integral** by providing early warning. The direction is correct: it monitors the driver's approach to the failure threshold.\n\nEXEMPLAR-REALITY CLAUSE —\n*   **No Named Commercial Exemplars:** The bill does not name any commercial hardware exemplars because no new hardware is purchased. It references standard software components (DCS/SCADA blocks), which are ubiquitous and not \"stocked SKUs\" in the same way as a specific sensor part number. The \"class\" is \"standard industrial software configuration.\"\n\nPREMISE-VALIDITY CLAUSE —\n*   **Stated Topology:** The problem states the existence of \"existing bushing leakage current, top-oil temperature and load current.\" This implies the sensors exist and are recorded. The topology *has* these data streams. The mechanism does not require any new ports, spaces, or fluid paths. It is valid.\n\nCERTIFIED-SYSTEM-AS-SOLD CLAUSE —\n*   **No New Hardware:** The solution adds no new hardware to the certified system (the transformer). It only changes the logic on the existing control system, which is standard practice and does not affect the transformer's certification.\n\nBILL_UNTAGGED RES",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** DATA-DRIVEN THERMAL-NORMALIZED INDUCTANCE INFERENCE.",
+    "*   **Input Signals (All ALREADY-RECORDED per constraint):**",
+    "1.  **Bushing Leakage Current:** Explicitly stated in user variables (\"existing bushing le",
+    "2.  **Top-Oil Temperature:** Explicitly stated in user variables. *Source:* Existing PT100",
+    "3.  **Load Current:** Explicitly stated in user variables. *Source:* Existing main current",
+    "*   **Derived Reference/Threshold (CALCULATED):**",
+    "1.  **Healthy Baseline:** Derived from the **stated physics** of a new 145 kV condenser bu",
+    "2.  **Failure Threshold:** Defined as $\\tan\\delta > 0.01$ or 2.5x the baseline drift. This",
+    "3.  **Temperature Normalization Coefficient:** $\\alpha$ (temp coeff for $\\tan\\delta$ and $",
+    "*   **Software/Algorithm:**",
+    "*   Continuous stream processor (Edge Gateway or SCADA block) applying the $I_{leak}(V, T)",
+    "*   Computes real-time $\\tan\\delta_{est}(t)$ and $C_{est}(t)$ by decoupling the thermal co",
+    "*   Compares $C_{est}(t)$ to $C_{est}(t-365d)$ to detect drift.",
+    "*   Compares $\\tan\\delta_{est}(t)$ to the threshold.",
+    "*   **Bill Rows (Procurement Tags):**",
+    "4.  **No New Sensors:** Constraint explicitly forbids new sensors. The bill contains **zer",
+    "*   **Standard Practice:**",
+    "*   **Outage:** 6–12 hours of transformer downtime.",
+    "*   **Equipment:** Mobile PF test set (rental/purchase), HV DC source, cables.",
+    "*   **Labor:** Two qualified electricians + one tester, 8 hours.",
+    "*   **Cost Class:** High (outage cost + rental + labor). ~$1,000–$2,000 per test.",
+    "*   **Frequency:** Annual or bi-annual.",
+    "*   **My Solution:**",
+    "*   **Outage:** **Zero**. Continuous online monitoring.",
+    "*   **Equipment:** **Zero** new hardware. Uses existing SCADA/DCS.",
+    "*   **Labor:** One-time configuration (~4–8 hours engineering).",
+    "*   **Cost Class:** Low (one-time engineering labor ~$500–$1,000). No recurring hardware c",
+    "*   **Frequency:** Continuous.",
+    "*   **Parity Conclusion:** My solution is **LIGHTER** in burden. It eliminates the outage ",
+    "*   **Protocol:**",
+    "1.  **Simulated Degradation (Offline Validation):** Using historical data from a known fai",
+    "2.  **Synthetic Data Generation:**",
+    "*   Generate $V_{system}(t)$ (nominal 145 kV, $\\pm 5\\%$ fluctuation).",
+    "*   Generate $T_{oil}(t)$ (diurnal variation, 60–80°C).",
+    "*   Generate \"Healthy\" $I_{leak}^{healthy}(t)$ using nameplate $C_0$ and $\\tan\\delta_0$ wi",
+    "*   Generate \"Degraded\" $I_{leak}^{degraded}(t)$ using $\\tan\\delta = 0.005, 0.008, 0.01$ a",
+    "3.  **Run Predictor:** Feed synthetic streams into the algorithm.",
+    "4.  **Check:**",
+    "*   Does it output $\\tan\\delta_{est}$ within $\\pm 10\\%$ of the input synthetic value?",
+    "*   Does it trigger a \"Drift Warning\" when $C_{est}$ drops by $5\\%$ or $\\tan\\delta_{est}$ ",
+    "5.  **Real-World Validation (First 30 Days):**",
+    "*   Deploy algorithm to live data.",
+    "*   Compare output $\\tan\\delta_{est}$ to the *next scheduled* offline PF test result (when",
+    "*   **Pass Criterion:** Correlation $R^2 > 0.9$ between predicted and measured $\\tan\\delta",
+    "*   **Kill Criterion:** If $R^2 < 0.7$, the thermal decoupling model is insufficient; fall",
+    "*   **Falsification:** If the predictor fails to distinguish between a load-induced therma",
+    "*   **Primary Stated Indicator:** **Bushing Leakage Current** (and implicitly Load Current",
+    "*   **Why Primary:** The failure is \"capacitance/tan-delta drift.\" The leakage current is ",
+    "*   **Constraint Adherence:**",
+    "*   \"No new sensors\": **Met.** Uses existing CTs, PTs, RTDs.",
+    "*   \"No offline power-factor test\": **Met.** The predictor operates online; it *replaces* ",
+    "*   \"Use only existing bushing leakage current, top-oil temperature and load current\": **M",
+    "*   **Stated Device:** Power transformer condenser bushing, 145 kV.",
+    "*   **Modification:** **None.** The bushing is used AS-IS. No machining, coating, or modif",
+    "*   **New Catalog Parts:** **None.** The solution is purely a **software/algorithmic chang",
+    "*   **Permitted Set:** The constraint states \"use only the existing bushing leakage curren",
+    "*   **Measure Class:** This is an **exhaustive parameter/data set**. It explicitly forbids",
+    "*   **Driving Variable:** Insulation Loss Tangent ($\\tan\\delta$).",
+    "*   **Mechanism Action:** The algorithm **detects** the upward drift of $\\tan\\delta$.",
+    "*   **Effect on Failure Driver:** By detecting the rise in $\\tan\\delta$ early (60 days bef",
+    "*   **No Named Commercial Exemplars:** The bill does not name any commercial hardware exem",
+    "*   **Stated Topology:** The problem states the existence of \"existing bushing leakage cur",
+    "*   **No New Hardware:** The solution adds no new hardware to the certified system (the tr"
+   ]
+  }
+ },
+ "declared_template_prose": "** data-driven thermal-normalized inductance inference.",
+ "allowed_row_outside": 0,
+ "sha256_16": "a1df90effe7e9438",
+ "smoke": false
+}

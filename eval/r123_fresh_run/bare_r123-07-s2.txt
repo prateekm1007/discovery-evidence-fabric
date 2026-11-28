@@ -1,0 +1,18 @@
+**Mitigation Proposal: Adaptive Pulse-Cleaning Intensity Control**
+
+**Mechanism:**
+Implement a logic rule that dynamically reduces the duration or number of pulses in the next cleaning cycle based on the *incremental* rise in differential pressure (ΔDP) observed between the end of the previous cleaning and the start of the next. The core principle is to move from a fixed-time cleaning schedule to a need-based schedule. Since the DP is climbing *after* cleaning, it suggests the current pulse energy is insufficient to fully dislodge the accumulated cake, or that the pulse interval is too short, allowing the cake to re-settle and harden before the next clean. By reducing the aggressive over-cleaning (which can cause blinding or fiber damage) and optimizing the energy delivery only when the ΔDP threshold is exceeded, we prevent the cumulative "blinding" effect and stop the runaway increase in air consumption.
+
+**Implementation:**
+1.  **Baseline Calibration:** Record the baseline stable DP ($DP_{stable}$) after a successful clean and the maximum allowable DP ($DP_{max}$) before airflow restriction becomes critical.
+2.  **Logic Definition:** Use the existing **Baghouse DP Taps** to calculate the post-clean DP value ($DP_{post}$). Calculate the delta from the previous stable baseline: $\Delta DP_{rise} = DP_{post} - DP_{stable}$.
+3.  **Control Action:**
+    *   If $\Delta DP_{rise}$ is small (indicating good cleaning), extend the time until the next cleaning pulse or reduce the number of pulses in the next cycle.
+    *   If $\Delta DP_{rise}$ is large (indicating poor cleaning), increase the *next* pulse duration slightly or shorten the inter-pulse wait time to ensure complete cake removal.
+    *   **Crucially:** Use the **Compressed-Air Pressure Regulator Gauge** to ensure the pulsing manifold pressure is at the OEM-specified optimal level. If the gauge shows low pressure, the controller should alert for maintenance, as low pressure leads to ineffective cleaning and more frequent attempts (increasing consumption).
+4.  **Opacity Verification:** Use the existing **Clean-Air Plume Opacity Meter** as a feedback validation. If DP is stable but opacity rises during the "hold" period, it indicates fines are breaking through the filter, requiring a more aggressive clean. If opacity is low but DP rises rapidly, it indicates blinding (surface layer blocking), requiring *less* aggressive but *more frequent* shallow pulses rather than deep high-pressure blasts.
+
+**Measures Relied Upon (Existing Sensors Only):**
+*   **Baghouse DP Taps:** Provides the primary variable for calculating the effectiveness of the last clean (post-clean DP) and the accumulation rate (slope of DP rise). This allows the system to distinguish between "cake is hardening" (needs more energy/frequency) and "system is blinding" (needs gentler, more frequent cleaning).
+*   **Compressed-Air Pressure Regulator Gauge:** Ensures that the air source for the pulses is healthy. A rising air consumption with stable pressure indicates valve inefficiency or leak; stable pressure with rising DP indicates filter media issue. This gauge prevents the mitigation from blindly increasing pulse counts when the air supply is weak.
+*   **Clean-Air Plume Opacity Meter:** Acts as the "ground truth" for separation efficiency. It prevents the DP-based control from over-cleaning (which increases wear) when the actual dust collection is already optimal, or under-cleaning (which causes emission violations) when the DP is falsely low due to instrument drift.

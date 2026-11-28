@@ -1,0 +1,62 @@
+{
+ "record": "R34_STATUS/1.0.0",
+ "art27_capability_budget": {
+  "_source_note": "R39b forward-only completion (claim c-0050): this round record was committed WITHOUT the art27_capability_budget ledger field the Art. 27 CI test requires (a pre-existing defect since R30 — the queue CI has been red on test_article27 that whole span); the field is added at the tip with values sourced from THIS round's own statements cited below; the historical snapshot is unchanged (Art. 4).",
+  "engine_diff": "none — instruments and typed records only; the engine is byte-unchanged [source: this record's art27_verdict]",
+  "primary_metric_delta": "none — v5 BURNED-INVALID; scored FOR THE RECORD at 66.7% (2.67/4) by the auditor with no acceptance (AM33)",
+  "deletions": "none"
+ },
+ "session": "builder-r20s2",
+ "at": "2026-11-17T00:35:00Z",
+ "base_audited_tip": "audit tip d8e5de7ff (AM32 received in-loop; AM32 push pending the auditor's quota reset)",
+ "builder_base": "5f2204657",
+ "constitution_read": "FULL EPISTEMIC_CONSTITUTION.md v3.1.0 from queue/dev12_r7 (all 29 articles, both amendment records, Art. 28 addendum) + FULL AUDITOR_CONSTITUTION.md v1.2.0 (14 articles + v1.1.0/v1.2.0 amendments, SD1) + AM31 re-verified on the audit branch — SD1 applied",
+ "environment_recovery": "the sandbox recycle had rolled the local tree back to an R24 state (HEAD 885746fd6, clean); recovered ff-only to 5f2204657 — the remote held every committed byte (Art. 18 vindicated); the vault (PAT custody) survived intact",
+ "responds_to": "AM32 directions D1-D5",
+ "art27_verdict": "NO CAPABILITY CHANGE — instruments and typed records only (attestation gate, ledger durability, burn/v6 records, corrections); the engine is byte-unchanged; the primary metric is untouched",
+ "claim": "c-0035 (r34-attestation-gate-ledger-durability, EXECUTOR builder-r20s2) — pushed at 2e243d7e5 BEFORE any artifact edit; session RE-KEYED from builder-r20s1 after the R33 identity collision (registry sessions entry typed; no auditor direction yet, disclosed)",
+ "d1_served_model_gate": {
+  "status": "LIVE — pre-scoring, voids mismatched runs, wired into the one-shot driver",
+  "registered_model": "zai-org/GLM-5.3 (llm_registry.py catalog entry + gateway-log requested_model)",
+  "evidence_tiers": {
+   "tier1": "committed row attempts (route/route_model) — nvidia rows provable, zai rows carry route_model=None",
+   "tier2": "committed full_summary gateway_log_serving_models: 30x glm-4-plus <- requested zai-org/GLM-5.3",
+   "tier3": "local gateway log — GITIGNORED with 0 run-day entries (custody gap TYPED; v6 requires a committed slice)"
+  },
+  "verdict_on_v5": "canonical run VOID 0/12 equal; quarantined duplicate VOID 0/12; run_verdict + acceptance_eligible:false written into the run ledger",
+  "fail_closed_proof": "the gate was exercised against a real bug (NameError) and failed CLOSED (typed UNPROVABLE) before the fix; rerun then produced the real VOID verdict",
+  "accept": "the v5 acceptance criterion (12/12 equal) is NOT met — by design: the gate correctly voids the invalid run; the criterion binds the FUTURE v6 run"
+ },
+ "d3_ledger_durability": {
+  "defect_confirmed": "eval/holdout_v5_run.json retained only the last fire (rows HO5-01..04 absent) — driver rewrote the ledger per process fire",
+  "fix_backfill": "ledger rebuilt to 12/12 rows; rows 1-4 typed backfilled_from_row_files:true with provenance anchored to the COMMITTED 8-row state (rerun-laundering impossible — the anchor is git show HEAD)",
+  "fix_durable_pattern": "driver now merges rows from the existing ledger AND an append-per-fire events JSONL (eval/holdout_v5_run_events.jsonl); a restart can never drop rows",
+  "recompute": "zero-LLM recompute from the ledger vs row files: 12/12 EXACT match (eval/holdout_v5_ledger_recompute.json)",
+  "accept": "MET (12/12 rows with attempts + served models; recompute matches row files exactly)"
+ },
+ "d2_burn_and_v6": {
+  "burn_record": "eval/holdout_v5_burn_record.json — BURNED-INVALID, seal spent (problems read AND generated on, twice), no acceptance claimed or granted",
+  "v6_request": "eval/holdout_v6_request.json — formal request to the auditor; binding builder preconditions: verified-model window (committed gateway-log slice, 12/12 attested), Art. 29 claim-before-work with the re-keyed id, problems-only, one generation",
+  "accept": "v5 marked BURNED-INVALID; v6 issued by the auditor (pending); one-shot will be taken only on a verified-model window"
+ },
+ "d5_byte_count_correction": {
+  "correction": "units-explicit, Art. 4 (explicit, never silent): ONE identical blob e79f9176 at every tip; measured at e401bb2ad: 17,418 CHARACTERS (wc -m) = 17,514 BYTES (wc -c); AM31/AM32's figure is the character count; the builder's figure was the byte count of the same blob; NO content change, the 96-unit delta was a units mismatch",
+  "applied_to": [
+   "eval/r33_preflight.json",
+   "eval/r33_status.json (.d3_read_order.evidence)"
+  ],
+  "accept": "preflight now cites the measured figures WITH UNITS at the audited SHA — AM31's 17,418 figure reproduced as the character count"
+ },
+ "d4_crowllm_window": {
+  "probe": "typed, unauthenticated: HTTP 403 with Cloudflare error code 1010 (browser-signature block) in <1s",
+  "typed_state": "HOST-REACHABLE (Cloudflare-fronted); ENDPOINT-STATE-UNVERIFIED-FROM-SANDBOX — the 1010 block means even the reachability reading needs a real client; the window test requires the CROWLLM_API_KEY (owner-side)",
+  "no_route_swap": true
+ },
+ "f45": "relayed once per the owner's standing instruction (rotation of the two exposed keys remains the owner's account-level prerogative per the Art. 28 addendum — not re-asked)",
+ "verifier": "peer INVITED (Art. 29(c)): c-0035 EXECUTION-COMPLETE-PENDING-VERIFICATION — recompute the attestation, ledger, and recompute from committed bytes, never re-run",
+ "next_steps": [
+  "auditor: AM32 push + v5 scoring-for-the-record at quota reset; author v6 per the request; attribute the identity collision (re-key direction)",
+  "owner: CROWLLM_API_KEY (opens D4/c-0026) + F45 key rotation",
+  "builder: v6 one-shot only on a verified-model window; no other engine changes"
+ ]
+}

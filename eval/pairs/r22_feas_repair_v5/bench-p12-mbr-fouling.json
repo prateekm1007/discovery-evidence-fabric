@@ -1,0 +1,83 @@
+{
+ "problem_id": "bench-p12-mbr-fouling",
+ "a1_source": "SYS_A1_INT_V4+V5-repair-leg/r22_feas_repair_b18",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The question-answered sentence is: Implement a pulsed backwash with air scouring to prevent microbial product and extracellular polymeric substance layer consolidation on membrane fibers. Standard practice uses continuous backwashing with fixed air scouring, which provides steady but insufficient shear force to disrupt the fouling layers. This intervention introduces pulsed backwashing with variable air scouring intensity, creating periodic high-shear events that disrupt the consolidation process before it becomes irreversible. The closest existing practice is conventional periodic backwashing in membrane systems, but our approach differs by dynamically varying air scouring intensity to match the fouling consolidation rate, rather than using fixed parameters. This directly attacks the driving physics of fouling consolidation by applying time-varying shear forces that prevent the reorganization of microbial products into a dense, impermeable layer.\n\nPHYSICS CHECK — The governing physical relation is the shear stress (τ) required to disrupt fouling layers: τ = μ(du/dy), where μ is the dynamic viscosity of the mixed liquor and du/dy is the velocity gradient at the membrane surface. Pulsed backwashing with variable air scouring creates peak shear stresses 3-5 times higher than continuous backwashing at equivalent average energy input. At mixed liquor suspended solids of 8 g/L, the viscosity μ is approximately 0.002 Pa·s. The velocity gradient du/dy during pulsed air scouring reaches 500 s⁻¹ (vs. 150 s⁻¹ in continuous systems), creating peak shear stress of 1.0 Pa, which exceeds the 0.3 Pa threshold required to disrupt early-stage fouling consolidation.\n\nIMPLEMENTATION BILL:\n- (a) Submerged hollow-fiber membrane bioreactor (existing equipment)\n- (a) Air scouring system (existing equipment)\n- (c) Modify backwash controller to implement pulsed backwash cycle (configuration change)\n- (c) Program variable air scour intensity based on transmembrane pressure (duty change)\n- (b) Programmable logic controller (same class as existing control equipment)\n- (c) Update backwash procedure to include pulsed air scouring (procedure change)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Standard practice uses: membrane bioreactor, air scouring system, fixed backwash controller, standard backwash procedure\n- Our intervention adds: programmable logic controller (replaces existing controller of same class), configuration changes to backwash controller, duty changes to air scour intensity, procedure changes\n- Burden class: Same as standard practice. All changes are to existing equipment or replace components of the same class without additional major hardware. The programmable logic controller is a standard catalog item in the same class as existing control equipment.\n\nEXECUTABLE TEST:\n- Protocol: Install two identical submerged hollow-fiber membrane bioreactors with identical operating conditions. Implement the pulsed backwash with air scouring intervention in one unit while maintaining standard continuous backwashing in the control unit. Monitor transmembrane pressure (TMP) and normalized flux continuously at mixed liquor suspended solids of 8 g/L.\n- Instruments: Pressure transducers, flow meters, data logging system\n- Pass/fail threshold: Test passes if the intervention unit maintains TMP increase rate <0.5 kPa/day and sustains net flux >18 LMH for >6 months without chemical cleaning, while the control unit requires chemical cleaning within 6 months.\n- Duration: 6 months minimum, extended to 12 months if no chemical cleaning is required\n- Kill criterion: Test fails if either unit experiences a TMP increase >50 kPa within the test period or if flux drops below 18 LMH at any point without chemical cleaning.\n\nFEASIBILITY AUDIT (V5):\n- Submerged hollow-fiber membrane bioreactor - (a) - stated equipment\n- Air scouring system - (a) - stated equipment\n- Backwash controller modification - (c) - configuration change to existing equipment\n- Variable air scour intensity programming - (c) - duty change to existing equipment\n- Programmable logic controller - (b) - standard catalog item of same class as existing control equipment\n- Updated backwash procedure - (c) - procedure change to existing protocol",
+ "meta": {
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice uses: membrane bioreactor, air scouring system, fixed backwash control",
+    "- Our intervention adds: programmable logic controller (replaces existing controller of sa",
+    "- Burden class: Same as standard practice. All changes are to existing equipment or replac",
+    "- Protocol: Install two identical submerged hollow-fiber membrane bioreactors with identic",
+    "- Instruments: Pressure transducers, flow meters, data logging system",
+    "- Pass/fail threshold: Test passes if the intervention unit maintains TMP increase rate <0",
+    "- Duration: 6 months minimum, extended to 12 months if no chemical cleaning is required",
+    "- Kill criterion: Test fails if either unit experiences a TMP increase >50 kPa within the "
+   ]
+  },
+  "audit_block": true,
+  "final_sha256_16": "d3f3250f06e4d356",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3725,
+    "latency_s": 43.4,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Hollow-fiber membrane module",
+      "- Aeration system for scouring",
+      "- Chemical cleaning system (CIP)",
+      "- Standard practice: Membrane module + Aeration system + Chemical cleaning system",
+      "- Intervention: Membrane module (modified) + Aeration system (retained) + Chemical cleanin",
+      "- Burden comparison: Same burden class. The intervention adds electrical components but el"
+     ]
+    },
+    "sha256_16": "42f4192e868fd5a4"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 4724,
+    "latency_s": 24.4,
+    "critic_verdict": "CLEAN",
+    "scan": {
+     "BILL_UNTAGGED": [
+      "1. Install two identical submerged hollow-fiber membrane bioreactors with identical operat",
+      "2. Implement the pulsed backwash with air scouring intervention in one reactor (test unit)",
+      "3. Operate both units at constant flux of 18 LMH for 180 days.",
+      "4. Measure transmembrane pressure (TMP) daily in both units.",
+      "5. Pass criterion: Test unit maintains TMP increase < 20% over initial value for 180 days ",
+      "6. Kill criterion: If test unit requires chemical cleaning before 180 days or shows TMP in"
+     ]
+    },
+    "sha256_16": "b8b7ad09cf0fba49"
+   },
+   {
+    "stage": "repair_2",
+    "chars": 4278,
+    "latency_s": 20.0,
+    "critic_verdict": "CLEAN",
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Standard practice uses: membrane bioreactor, air scouring system, fixed backwash control",
+      "- Our intervention adds: programmable logic controller (replaces existing controller of sa",
+      "- Burden class: Same as standard practice. All changes are to existing equipment or replac",
+      "- Protocol: Install two identical submerged hollow-fiber membrane bioreactors with identic",
+      "- Instruments: Pressure transducers, flow meters, data logging system",
+      "- Pass/fail threshold: Test passes if the intervention unit maintains TMP increase rate <0",
+      "- Duration: 6 months minimum, extended to 12 months if no chemical cleaning is required",
+      "- Kill criterion: Test fails if either unit experiences a TMP increase >50 kPa within the "
+     ]
+    },
+    "sha256_16": "d3f3250f06e4d356"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T17:19:19.502648Z"
+}

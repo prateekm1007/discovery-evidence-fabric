@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-11-glass-furnace",
+ "domain": "glass",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:8cfce9251307": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:1ce4b87b3a56": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:57fa4028ebc9": "reject-duplicate"
+  }
+ },
+ "generated_at": "2026-11-23T22:22:25Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.1,
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a DESIGN CHANGE (maintenance procedure) by forcing a physical blow-through or flushing with air/steam to dislodge loose checker stones. My departure is a CONFIGURATION CHANGE (flow path geometry) that uses the existing flue gas pressure differential to induce a controlled micro-turbulence and reverse-flow oscillation at the plugging initiation point, preventing adhesion without external energy input.\n\nPHYSICS CHECK — The governing relation is the boundary layer separation pressure gradient $\\frac{dp}{dx}$ across the checker matrix. In a standard straight-channel regenerator, dust settles when local gas velocity $v < v_{settle}$ (settling velocity of particulates). Standard magnitude: typical regenerator gas velocity is 1.5–2.0 m/s, but near 90-degree bends or blockages, local velocity drops to 0.2–0.5 m/s, allowing 50–100 μm glass ash dust to settle. My mechanism creates a \"vortex shedding\" frequency $f_s = St \\cdot \\frac{v}{D}$ (Strouhal number $St \\approx 0.2$ for turbulent flow) around a specific geometric protrusion. By placing a tapered wedge at the 45-degree diagonal of the checker, I ensure that the local velocity $v_{local}$ remains $> v_{settle} \\cdot 1.5$ (margin factor). Calculation: If $v_{local} \\approx 0.8$ m/s and $v_{settle} \\approx 0.05$ m/s, the ratio is 16, ensuring entrainment. No external pressure is needed because the pressure drop $\\Delta P \\propto v^2$ in the narrowed channel provides the force; the standard operating pressure (already recorded in the plant log) is sufficient.\n\nIMPLEMENTATION BILL — \n1. Component: A series of hardened ceramic (alumina) tapered wedges, machined to a 15-degree half-angle, installed at the geometric center of the checker bed. \n   - Input stream: \"flow_rate\" (ALREADY-RECORDED: Plant DCS gas flow controller setpoint and actual value). \n   - Input stream: \"pressure\" (ALREADY-RECORDED: Upstream flue gas pressure transducer P1 and downstream P2 in the control system).\n   - Reference/Threshold: DERIVED (Stated physics): The threshold for plugging is derived from the pressure drop per meter $\\Delta P/m$. Standard spec limits $\\Delta P/m < 0.5 \\text{ Pa/m}$ for clean checkers. The wedges are sized such that the *baseline* (clean) pressure drop is CALCULATED to be exactly at this 0.5 Pa/m limit when installed, ensuring any increase in resistance is immediately visible against the existing \"pressure\" log data without new sensors.\n   - Material: High-purity alumina (Al2O3), resistant to glass ash fusion at 1000°C.\n2. Procedure: Install wedges during scheduled shutdown. No new instrumentation.\n   - Trust source: The \"pressure\" signal is already recorded in the historical logbook. The mechanism works by shifting the *shape* of the pressure drop curve from linear (laminar/low-resistance) to a sharper, non-linear signature (vortex-induced). The reference is DERIVED from the stated physics of vortex shedding in restricted orifices (standard fluid dynamics texts).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installability: Same class as standard practice. Requires a furnace shutdown to open the checker channel. Standard practice also requires shutdown for major cleaning or stone replacement. No new penetrations.\n- Operability: Zero burden. No operators required. The system runs on existing flue gas flow.\n- Maintenance: Lower than standard practice. Standard practice requires periodic high-pressure air blowing (wear on blowers, noise). My design is passive; the wedges are self-cleaning due to turbulence. Maintenance is reduced to visual inspection at next major shutdown.\n- Cost: SAME burden class. The wedges are off-the-shelf ceramic parts. No new control systems.\n- Where heavier: Initial installation is more complex than just opening a valve for blowing, as it requires precise placement in the checker matrix. This is worth it because it eliminates the recurring operational burden of blow-through cycles and reduces fuel consumption by preventing the pressure drop that restricts gas flow.\n\nEXECUTABLE TEST — \n- Protocol: During the next scheduled shutdown, install the wedges. Upon relighting, monitor the existing \"pressure\" (P1, P2) and \"flow_rate\" (Q) DCS tags for 72 hours.\n- Pass/Fail Thresholds: \n  1. Baseline Pressure Drop: The $\\Delta P$ at the nominal flow rate $Q_{nominal}$ must be within 5% of the CALCULATED target value (derived from the wedge geometry and standard gas properties). \n  2. Plugging Detection: The system triggers a \"cleaning\" alarm if $\\Delta P / Q^2$ exceeds a DERIVED threshold (constant $k$ based on the wedge geometry). Standard practice triggers on $\\Delta P$ alone, which is flow-dependent. My threshold isolates the geometric resistance change.\n  3. Kill Criterion: If $\\Delta P / Q^2$ increases by >15% over 7 days without a corresponding change in fuel gas composition, the wedges have been coated with ash. The test fails if the \"pressure\" log does not show the expected non-linear resistance signature compared to the pre-installation \"pressure\" log (ALREADY-RECORDED).\n- Validation: Compare the new \"pressure\" signature against the historical \"pressure\" data from the last clean period (ALREADY-RECORDED). The test validates the mechanism by confirming that the geometric resistance is stable and distinct from the fouling signature.\n\nCONSTRAINT BIND — \n- Primary Stated Indicator: \"pressure\" (specifically, the differential pressure across the regenerator/checker). This is the indicator whose threshold defines the failure (excessive resistance).\n- Secondary Indicator: \"flow_rate\" is used only to normalize the pressure drop ($\\Delta P/Q^2$) to distinguish between high-flow conditions and actual plugging. It supplements the primary indicator but does not replace it. The failure is defined by the pressure rise at a given flow, not by flow alone.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "423bb198550b5767"
+}

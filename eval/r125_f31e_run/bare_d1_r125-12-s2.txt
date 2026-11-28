@@ -1,0 +1,29 @@
+**Mitigation Proposal: Implement a Fixed-Volume, Inverse-Pressure-Adjusted Regeneration Protocol**
+
+**Mechanism:**
+The failure mode (increased salt consumption with earlier breakthrough) under the constraint that service flow is constant and no new sensors are available indicates that the resin bed is likely suffering from channeling, poor displacement, or incomplete regeneration due to inconsistent rinse/brine contact time. Since service flow is stable, the *demand* on the resin capacity is predictable. However, the *regeneration efficiency* is degrading. The mitigation relies on the fact that while we cannot measure resin capacity directly, we *can* infer operational health and optimize regeneration intensity using the existing **inlet pressure transmitter** and **flow meters**.
+
+High inlet pressure often correlates with resin bed compression, fouling, or inadequate backwash efficiency, which can trap fines and create channels. Conversely, low pressure may indicate poor displacement. By strictly tying the regeneration **salt solution volume and flow rate** to the current **inlet pressure** (a proxy for bed condition) and enforcing a **minimum rinse volume** calculated from service flow, we can restore consistent resin-to-brine contact without new instrumentation.
+
+**Implementation:**
+1.  **Pressure-Adjusted Regeneration Flow Profile:**
+    *   Use the existing **inlet pressure transmitter** reading taken immediately before regeneration (during the last service cycle) as a control input for the regeneration step.
+    *   Establish a lookup table or simple algorithm:
+        *   **If Inlet Pressure > Baseline + 10%:** Increase regeneration brine flow rate by 15–20% for the first 20% of the brine cycle to displace fines and improve channeling, then return to standard flow. Increase total brine volume by 10% to compensate for reduced mass transfer efficiency.
+        *   **If Inlet Pressure < Baseline - 10%:** Maintain standard brine flow but increase total brine volume by 15% to ensure sufficient contact time, as low pressure may indicate poor displacement or expanded bed.
+        *   **If Pressure is within ±5% of Baseline:** Standard regeneration volume and flow.
+    *   This uses the **inlet pressure transmitter** to modulate the **regeneration flow meter** settings.
+
+2.  **Service-Flow-Scaled Rinse Volume:**
+    *   Use the most recent **service flow meter** average (or totalizer delta) to calculate a mandatory post-regeneration rinse volume.
+    *   Set the rinse step volume to be at least **1.5x the last service cycle’s flow volume**. This ensures the ion-exchange zones are fully displaced and no high-concentration brine remains in the service flow path, which is a common cause of early breakthrough. This relies on the **service flow meter** data.
+
+3.  **Strict Timing Control:**
+    *   Enforce a minimum regeneration duration. Even if pressure and flow suggest optimal conditions, do not shorten the cycle. Use the **regeneration flow meter** to confirm the exact calculated volume has been delivered. Do not rely on time-only timers; use volumetric control from the flow meter to guarantee salt dose integrity.
+
+**Measures Relied On:**
+*   **Inlet Pressure Transmitter:** Used as an indicator of resin bed hydraulic condition (fouling, compression, or displacement quality) to adjust brine intensity.
+*   **Service Flow Meter:** Used to determine the volumetric demand for rinsing, ensuring the system is flushed appropriately after regeneration to prevent breakthrough.
+*   **Regeneration Flow Meter:** Used to precisely control and verify the actual volume of brine used, enabling the pressure-adjusted dosing strategy and preventing under- or over-dosing.
+
+This protocol directly addresses the climbing salt use (by optimizing brine volume based on bed condition rather than increasing it uniformly) and early breakthrough (by ensuring proper displacement via service-flow-scaled rinsing and pressure-adjusted brine profiles), using only the specified existing sensors.

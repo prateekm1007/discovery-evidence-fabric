@@ -1,0 +1,106 @@
+{
+ "record": "R111_SCORE9_RERUN/1.0.0",
+ "executor": "builder-r111s1",
+ "claim": "c-152 (r111-score9-rerun, measurement; ONE generation run — the checkpoint's run_id is typed below)",
+ "checkpoint_run_id": "r106-score9-30batch",
+ "corpus": "eval/r106_score9_corpus_postcutoff/sampled_items.jsonl (the 30 post-cutoff items; the peer's re-authored corpus lineage)",
+ "generator": "agnes-3.0-flash (the registered route; api_key from the Art. 17 vault, never in code)",
+ "harness": "Inspect AI 0.3.291 (the harness-of-record; the task scripts/r106_score9_inspect_task.py unchanged)",
+ "interventions": 0,
+ "usage": {
+  "agnes_calls": 35,
+  "agnes_tokens": 21067,
+  "xkiro_calls": 29,
+  "xkiro_tokens": 21024,
+  "zai_calls": 29,
+  "agnes_repair_calls": 5
+ },
+ "recompute": {
+  "source": "the committed eval-log bytes (read via the harness's own reader) + the engine's DETERMINISTIC acceptance module; zero LLM calls",
+  "all_30_conservative": {
+   "n_items": 30,
+   "recovered": 5,
+   "partial": 24,
+   "not_recovered": 1,
+   "recovery_rate": 0.1667,
+   "bar": 0.4,
+   "recovery_bar_met": false,
+   "min_hits": 12,
+   "agent_validated": true,
+   "recovery_rate_wilson95": [
+    0.0734,
+    0.3356
+   ]
+  },
+  "evaluated_subset": {
+   "n_items": 30,
+   "recovered": 5,
+   "partial": 24,
+   "not_recovered": 1,
+   "recovery_rate": 0.1667,
+   "bar": 0.4,
+   "recovery_bar_met": false,
+   "min_hits": 12,
+   "agent_validated": true,
+   "n_evaluated": 30,
+   "recovery_rate_wilson95": [
+    0.0734,
+    0.3356
+   ]
+  },
+  "parse_exhausted_items": []
+ },
+ "gate": {
+  "bar": 0.4,
+  "met": false,
+  "note": ">=0.40 -> the score-9 gate; a miss files the typed RCA (this record + the honest_note)"
+ },
+ "typed_rca": {
+  "finding": "the 0.40 score-9 bar is NOT met on the post-cutoff corpus: 5/30 RECOVERED = 0.1667, CI95 [0.0734, 0.3356]",
+  "cross_corpus_caveat": "the r106 run's 0.30 was the m2 corpus (per_item ids m2-00.., the MOOSE-Chem2 curated GTs); THIS run is the post-cutoff corpus (pc-01..pc-30, abstract-authored GTs) — the two rates are NOT a like-for-like delta (the corpus provenance's own typed caveat in eval/r105s2_score9_postcutoff_status.json); the direction's 're-authored' items are this post-cutoff lineage",
+  "distribution": {
+   "RECOVERED": 5,
+   "PARTIAL": 24,
+   "NOT_RECOVERED": 1
+  },
+  "root_causes": [
+   "the two-judge adjudication degrades to PARTIAL unless BOTH judges rate RECOVERED (the protocol's fail-closed rule) — 24/30 rows landed PARTIAL, so the RECOVERED rate is a both-agreement rate, structurally below any single-judge rate",
+   "the post-cutoff ground truths are authored from publisher abstracts (the c-0129 typed caveat): the task calibration differs from the curated m2 GTs — the bar's calibration class is the m2 lineage",
+   "zero parse exhaustions this run (5/30 in r106): the strict-JSON contract + the parse-repair retry held — the generator-side failure mode is gone; the miss is a genuine recovery miss, not an infrastructure one"
+  ],
+  "pooled_estimate_guard": "a pooled two-run rate is NOT computed: the runs are on different corpora"
+ },
+ "per_item": {
+  "pc-01": "PARTIAL",
+  "pc-02": "PARTIAL",
+  "pc-03": "PARTIAL",
+  "pc-04": "PARTIAL",
+  "pc-05": "PARTIAL",
+  "pc-06": "PARTIAL",
+  "pc-07": "PARTIAL",
+  "pc-08": "PARTIAL",
+  "pc-09": "PARTIAL",
+  "pc-10": "PARTIAL",
+  "pc-11": "PARTIAL",
+  "pc-12": "PARTIAL",
+  "pc-13": "PARTIAL",
+  "pc-14": "NOT_RECOVERED",
+  "pc-15": "PARTIAL",
+  "pc-16": "PARTIAL",
+  "pc-17": "RECOVERED",
+  "pc-18": "PARTIAL",
+  "pc-19": "PARTIAL",
+  "pc-20": "RECOVERED",
+  "pc-21": "RECOVERED",
+  "pc-22": "RECOVERED",
+  "pc-23": "RECOVERED",
+  "pc-24": "PARTIAL",
+  "pc-25": "PARTIAL",
+  "pc-26": "PARTIAL",
+  "pc-27": "PARTIAL",
+  "pc-28": "PARTIAL",
+  "pc-29": "PARTIAL",
+  "pc-30": "PARTIAL"
+ },
+ "no_acceptance_claims": true
+}

@@ -1,0 +1,698 @@
+{
+ "problem_id": "HO10-02-phosphoric-evaporator-scaling",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r85s1@holdout-v10-generation",
+ "machine": "r85_v10_one_shot/1.1.0 (AM75 re-freeze) — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; the AM75 identity binding asserts the request id 'agnes-3.0-flash'; the frozen module file constant 'agnes-3.0-flash' is untouched — the freeze guard pins it)",
+ "run": "holdout-v10-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   [
+    3,
+    34,
+    31
+   ]
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "duty_cycle"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DIRECT_TRANSFER:b88bc3d3ebb0": "borderline-judge"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": "scaling",
+  "applicable_checks": [
+   "langelier_lsi",
+   "fouling_u_degradation"
+  ],
+  "engine_candidates": {
+   "runs": [
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.8691679070321383,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ROW_CLAIM",
+       "claim_id": "nc-1",
+       "unit": "degC"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [
+      "temp_degC"
+     ],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [
+      "nc-1"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    },
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.8691679070321383,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ROW_CLAIM",
+       "claim_id": "nc-1",
+       "unit": "degC"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [
+      "temp_degC"
+     ],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "cand:MS:DIRECT_TRANSFER:b88bc3d3ebb0"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [
+      "nc-1"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "cand:MS:DIRECT_TRANSFER:b88bc3d3ebb0"
+    },
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.8691679070321383,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ROW_CLAIM",
+       "claim_id": "nc-1",
+       "unit": "degC"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [
+      "temp_degC"
+     ],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l"
+     ],
+     "unbound_row_claims": [],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [
+      "nc-1"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere",
+     "candidate_id": "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b"
+    }
+   ],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 3,
+    "assumption_inputs": 21
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 13,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 10.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      225,
+      228
+     ],
+     "unit": "percent",
+     "quantity": "10.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 90.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1469,
+      1473
+     ],
+     "unit": "degC",
+     "quantity": "90.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 84.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1478,
+      1482
+     ],
+     "unit": "degC",
+     "quantity": "84.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 6.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1633,
+      1636
+     ],
+     "unit": "degC",
+     "quantity": "6.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-5",
+     "value": 30.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      1697,
+      1700
+     ],
+     "unit": "percent",
+     "quantity": "30.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-6",
+     "value": 10.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      2545,
+      2548
+     ],
+     "unit": "percent",
+     "quantity": "10.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-7",
+     "value": 6.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      2589,
+      2592
+     ],
+     "unit": "degC",
+     "quantity": "6.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-8",
+     "value": 3.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      2641,
+      2643
+     ],
+     "unit": "percent",
+     "quantity": "3.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-9",
+     "value": 6.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      3105,
+      3108
+     ],
+     "unit": "degC",
+     "quantity": "6.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-10",
+     "value": 6.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      4402,
+      4405
+     ],
+     "unit": "degC",
+     "quantity": "6.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-11",
+     "value": 2.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4459,
+      4461
+     ],
+     "unit": "percent",
+     "quantity": "2.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-12",
+     "value": 6.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      4898,
+      4901
+     ],
+     "unit": "degC",
+     "quantity": "6.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-13",
+     "value": 50.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      5207,
+      5210
+     ],
+     "unit": "percent",
+     "quantity": "50.0 percent",
+     "dimension": "dimensionless"
+    }
+   ],
+   "unparseable": [],
+   "runs": [
+    {
+     "check_id": "langelier_lsi",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.8691679070321383,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "tds_mg_l": {
+       "source": "ASSUMPTION",
+       "value": 500.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.tds_mg_l — labelled assumption, Art. 9"
+      },
+      "temp_degC": {
+       "source": "ROW_CLAIM",
+       "claim_id": "nc-2",
+       "unit": "degC"
+      },
+      "ca_hardness_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 80.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.ca_hardness_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "alkalinity_mg_l_caco3": {
+       "source": "ASSUMPTION",
+       "value": 100.0,
+       "unit": "mg/L",
+       "assumption": "committed reference value for langelier_lsi.alkalinity_mg_l_caco3 — labelled assumption, Art. 9"
+      },
+      "ph": {
+       "source": "ASSUMPTION",
+       "value": 7.8,
+       "unit": "dimensionless",
+       "assumption": "committed reference value for langelier_lsi.ph — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [
+      "temp_degC"
+     ],
+     "assumption_inputs": [
+      "alkalinity_mg_l_caco3",
+      "ca_hardness_mg_l_caco3",
+      "ph",
+      "tds_mg_l"
+     ],
+     "unbound_row_claims": [
+      "nc-1",
+      "nc-3",
+      "nc-4",
+      "nc-5",
+      "nc-6",
+      "nc-7",
+      "nc-8",
+      "nc-9",
+      "nc-10",
+      "nc-11",
+      "nc-12",
+      "nc-13"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere"
+    },
+    {
+     "check_id": "fouling_u_degradation",
+     "binding_rule": "BINDING_IS_DIMENSIONAL_ONLY",
+     "verdict": "RUN",
+     "value": 0.7777777777777777,
+     "unit": "dimensionless",
+     "direction_of_effect": "worsens",
+     "input_provenance": {
+      "u_clean_w_m2k": {
+       "source": "ASSUMPTION",
+       "value": 2000.0,
+       "unit": "W/(m**2*K)",
+       "assumption": "committed reference value for fouling_u_degradation.u_clean_w_m2k — labelled assumption, Art. 9"
+      },
+      "rf_after_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0004,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_after_m2k_w — labelled assumption, Art. 9"
+      },
+      "rf_before_m2k_w": {
+       "source": "ASSUMPTION",
+       "value": 0.0002,
+       "unit": "m**2*K/W",
+       "assumption": "committed reference value for fouling_u_degradation.rf_before_m2k_w — labelled assumption, Art. 9"
+      }
+     },
+     "row_claim_inputs": [],
+     "assumption_inputs": [
+      "rf_after_m2k_w",
+      "rf_before_m2k_w",
+      "u_clean_w_m2k"
+     ],
+     "unbound_row_claims": [
+      "nc-1",
+      "nc-2",
+      "nc-3",
+      "nc-4",
+      "nc-5",
+      "nc-6",
+      "nc-7",
+      "nc-8",
+      "nc-9",
+      "nc-10",
+      "nc-11",
+      "nc-12",
+      "nc-13"
+     ],
+     "sign_check": {
+      "claimed": null,
+      "computed": "worsens",
+      "verdict": "DEFERRED"
+     },
+     "computed_from": "the row's own numbers where they bind (ROW_CLAIM); committed reference values as typed ASSUMPTIONS elsewhere"
+    }
+   ]
+  },
+  "answer_bound_inputs": 1,
+  "answer_assumption_inputs": 7,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "triz_principle": "P31",
+  "measure_class": "chemistry",
+  "signals_used": [
+   "ph",
+   "conductivity"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T19:14:18.038809Z",
+ "attempts_n": 4,
+ "a1_answer": "MECHANISM CLASS: Chemistry Dosing\n\nNOVELTY STATEMENT (INTERVENTION)\nProposed Intervention: Continuous dosing of commercial phosphoric acid antiscalant (polyaspartate/polyphosphate blend) into the boiling feed, coupled with a 10% reduction of the evaporation temperature setpoint on existing controllers.\nStandard Practice: Standard practice relies on periodic acid washing (hydrofluoric or phosphoric acid circuits) to remove formed scale, or operates with no chemical treatment, allowing scale to accumulate until tube blockage reduces heat transfer.\nAdjacent-Technique Clearance: The closest existing practice is dosing antiscalant in cooling water systems (circulating water). This departure is specific to the high-temperature, high-silica phosphoric acid medium; it applies antiscalant chemistry not to water hardness ions but to sequestrate silicic acid precursors before they polymerize and deposit at the hot end of the tubes.\nMechanism: The antiscalant introduces a chelating/sequestering agent that lowers the activity of free silicate ions, shifting the equilibrium toward soluble species even at elevated temperatures, thereby reducing the net deposition rate (driving variable) to zero or negative. The setpoint retuning reduces the supersaturation driving force directly.\n\nPHYSICS CHECK\nGoverning Relation: Deposition Rate $\\propto (Supersaturation \\cdot ActivityFactor)^n$.\nMagnitude Verification:\n1.  Setpoint Reduction: Lowering the boiling point from 90°C to ~84°C (via pressure adjustment or controller setpoint change) reduces the solubility limit curve's slope effect, lowering the supersaturation index (SI). A 6°C drop typically reduces the scaling risk index by roughly 20-30% in evaporator systems due to reduced water activity and slower precipitation kinetics.\n2.  Antiscalant Dosing: Commercial phosphoric antiscalants (e.g., polyaspartates) are stocked at dosing rates of 2–5 ppm (mg/L). This stoichiometrically binds silicate precursors. The mechanism moves the \"Free Silicate Activity\" variable DOWN.\nDIRECTION-OF-EFFECT: driving variable = Free Silicate Activity / Supersaturation; the mechanism moves it DOWN by reducing temperature (lowering saturation) and sequestering ions (lowering activity); this REDUCES the net deposition flux.\nINPUT-AVAILABILITY: The mechanism requires online measurement of pH and Conductivity (stated in typed_plan). These are standard parameters for acid systems. The dosing is open-loop or feedback-controlled via these existing signals. No new sensors are added.\nCOST-PRICING: The 10% temperature setpoint reduction (approx. 6°C drop) results in a minor energy loss (approx. 2-3% increase in specific heat demand or slight capacity loss). However, this is offset by the avoidance of downtime for acid washing. The antiscalant chemical cost is negligible (<$0.01/m3 of process water). Net operational benefit is positive due to increased availability.\n\nIMPLEMENTATION BILL\n(a) Parameter Change: Evaporation Temperature Setpoint; Item: Adjust existing PID controller setpoints on the steam pressure/temperature loop; Action: Lower setpoint by 6°C; Tag: (c)\n(b) Chemical Dosing Pump; Item: Standard magnetic drive diaphragm dosing pump (stock catalog item, e.g., 2-3 L/h capacity); Action: Dose commercial phosphoric antiscalant concentrate at 3 ppm into the feed sump; Tag: (b)\n(c) Chemical Supply Tank; Item: Polyethylene (HDPE) chemical dosing tank (stock catalog item, standard 200L size); Action: Store antiscalant concentrate; Tag: (b)\n(d) Procedure Update; Item: Maintenance SOP revision; Action: Add step for daily visual check of dosing line and monthly pH/conductivity log verification; Tag: (c)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard Practice Bill:\n1.  Acid Washing Skid (existing or procured): High burden (corrosive handling, downtime).\n2.  Controller Setpoints (existing): Low burden.\nYour Bill:\n1.  Dosing Pump + Tank (b): Procurement of two standard stock items. Installation is a tap-off into existing piping. Burden: Low. Comparable to replacing a filter element.\n2.  Setpoint Change (c): Zero hardware. Operator input. Burden: Trivial.\nComparison: The burden of installing a standard dosing pump is significantly lower than the burden of performing periodic acid washes (which require chemical procurement, safety protocols, and production stoppage). The setpoint change has zero burden.\nOperational Loss: The 6°C temperature drop reduces evaporation rate slightly (~2% capacity loss). This loss is priced as \"minor throughput reduction\" but is justified by \"zero unplanned downtime for cleaning\". The chemical cost is <$50/month. Parity concluded: Same-or-lower burden class. The new routine is simpler than the old cleaning cycle.\n\nEXECUTABLE TEST\nProtocol:\n1.  Baseline: Measure tube wall temperature approach and heat transfer coefficient for 1 week without dosing.\n2.  Intervention: Lower setpoint by 6°C and start dosing antiscalant at 3 ppm.\n3.  Monitoring: Track pH and Conductivity (existing sensors) daily. Measure heat transfer coefficient weekly via existing steam pressure and feed flow data.\n4.  Duration: 4 weeks.\nPass/Fail Threshold: Heat transfer coefficient degradation rate (slope) must drop by >50% compared to baseline, OR no visible scale formation upon visual inspection during next scheduled minor maintenance.\nKill Criterion: If pH drops below safe operating limit (<1.0) or conductivity spikes indicating uncontrolled polymerization, stop dosing and revert setpoint.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  Acid Washing Skid (existing or procured): High burden (corrosive handling, downtime).",
+    "2.  Controller Setpoints (existing): Low burden."
+   ]
+  }
+ },
+ "declared_template_prose": "chemistry dosing",
+ "allowed_row_outside": 0,
+ "sha256_16": "52da81e7dcd3600c",
+ "smoke": false
+}

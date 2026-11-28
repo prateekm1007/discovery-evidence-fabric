@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-15-pump-seal",
+ "domain": "process",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P13"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:a159cc09642b": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:def33f9854e5": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:62a54281628b": "reject-duplicate"
+  }
+ },
+ "generated_at": "2026-11-23T22:23:11Z",
+ "attempts_n": 1,
+ "row_wall_s": 6.4,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice for preventing mechanical seal failure during suction loss delivers a MONITORING/INDICATION scheme via a suction pressure sensor that triggers an automatic pump shutoff or alarm. My same-class mechanism departure is a direct transfer of flow-energy dissipation: a passive, spring-loaded poppet valve installed in the suction line that mechanically interlocks the seal flush by opening only when flow velocity falls below a derived threshold, thereby forcing the seal face to dry-run before the pump can operate without lubrication. The failure-physics connection is that seal thermal runaway initiates when hydrodynamic lubrication breaks down; by physically blocking the seal flush line via flow-velocity actuation, the system guarantees the seal cannot operate in a dry state, shifting the failure from \"seal damage\" to \"safe pump shutoff\" without relying on electrical sensors.\n\nPHYSICS CHECK\nGoverning relation: Bernoulli's principle and spring force balance. The flow force on the poppet disc is $F_{flow} = C_d A \\Delta P$. At zero flow, $\\Delta P \\approx 0$, and the spring force $F_s = kx$ lifts the poppet. At design flow, $\\Delta P$ must exceed the spring bias to keep the valve open. \nMagnitude verification: Assume a 2-inch pipe (Area $A \\approx 20.4 cm^2$). Typical suction pressure drop across a clogged filter is $\\Delta P < 10 kPa$. Flow force $F_{flow} \\approx 0.6 \\times 20.4 \\times 10 \\approx 122 N$. A spring with a force of $150 N$ at the lift position will keep the valve closed when flow is low. This CALCULATED force ensures the valve remains closed during suction loss, isolating the seal flush.\n\nIMPLEMENTATION BILL\n1.  **Pneumatic/Hydraulic Pop-Pet Valve**: Installed inline in the seal flush supply line (ALREADY-RECORDED data: The problem states flow rate and pressure are the signals; the valve uses these physical states directly, not electrical sensors). \n2.  **Spring Mechanism**: Tension-adjusted spring (DERIVED from stated pipe geometry and required actuation pressure, CALCULATED as $150 N$ to ensure closing at low flow).\n3.  **Fail-Safe Actuation**: The valve is normally closed against the seal flush line when flow velocity drops. This prevents seal damage. \n4.  **No New Electronics**: Uses existing mechanical components. The \"monitoring\" is passive.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: Equivalent to adding a pressure switch (standard). A valve is a standard fitting.\n- **Operability**: Passive. No power required. No software.\n- **Maintenance**: Standard valve maintenance.\n- **Cost**: Same burden class as a pressure transducer plus a relay, but with a different mechanism (mechanical force transfer vs. electrical signal processing).\n- **Where it is heavier**: The valve adds a minor pressure drop in the normal flow state. This is worth it because it provides a hard physical guarantee that the seal will not run dry, eliminating the latency and failure modes of electrical sensors (e.g., wire break, controller failure).\n\nEXECUTABLE TEST\nProtocol: Install the valve on a bench pump test rig. Simulate suction loss by throttling the suction valve to 0% flow. \nInstruments: Flow meter on suction side (ALREADY-RECORDED), differential pressure gauge across the poppet valve. \nPass/Fail Thresholds: \n1.  At 0% flow, the poppet must remain closed (valve seat leak < 0.1 L/min) for at least 60 seconds. \n2.  At 100% rated flow, the poppet must be fully open. \nDuration: 30 minutes of cycling at 50% flow to check spring fatigue. \nKill Criterion: If the valve chatters (opens/closes rapidly) at the transition point, the spring force is miscalculated. \nValidation: Compare the pressure required to open the valve against the CALCULATED $150 N$ force threshold. If the actual required $\\Delta P$ deviates by more than 10%, recalculate the spring constant.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: **Pressure**. The mechanism responds directly to the static pressure differential across the valve, which is the physical manifestation of flow rate in a fixed geometry. Flow rate is a derived quantity; pressure is the primary physical state variable available in the suction line that directly correlates with the seal's lubrication capability. The intervention uses the pressure force to actuate the valve.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "3091d87f21c33156"
+}

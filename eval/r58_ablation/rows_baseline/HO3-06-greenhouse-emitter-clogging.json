@@ -1,0 +1,43 @@
+{
+ "problem_id": "HO3-06-greenhouse-emitter-clogging",
+ "arm": "baseline",
+ "dev_source": "v3-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:44:25.763012Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention proposes a multi-stage flushing schedule using the existing acid-dosing system to mitigate emitter clogging by calcium-phosphate precipitates and root fragments. Standard practice uses periodic manual macro-flushes; this intervention introduces a hybrid schedule of frequent micro-flushes (5 short pulses/day) and a weekly macro-flush, leveraging the existing acid-dosing infrastructure to maintain pH 5.6 while disrupting precipitate formation and dislodging debris. Adjacent-technique clearance: The closest existing practice is automated flushing systems, but those typically use fixed schedules without the hybrid micro/macro pulse structure that targets both nucleation (micro) and consolidation (macro) physics. The mechanism attacks the failure by increasing the shear stress at the emitter inlet during micro-flushes to prevent precipitate adhesion and using the acid-dosed macro-flush to dissolve existing deposits.\n\nPHYSICS CHECK\nDIRECTION-OF-EFFECT: driving variable = precipitate adhesion energy at emitter inlet; the mechanism moves it down by ~30% via repeated micro-flush shear stress pulses; this reduces the nucleation and consolidation rate. Governing relation: Adhesion force ∝ surface energy × contact area; micro-flushes create transient high shear (τ ∝ ΔP/μ × d_h) that disrupts the contact area, while acid dosing lowers the saturation index (SI = log(IAP/Ksp)) to reduce precipitation driving force. Magnitude verification: A 10-sec flush at 1.5× operating pressure (ΔP = 0.5 bar) generates τ ≈ 50 Pa, exceeding the critical shear stress (τ_c ≈ 30 Pa) for precipitate detachment, reducing adhesion by ~30%.\n\nIMPLEMENTATION BILL\n1. Install a standard programmable timer on the acid-dosing system control panel (b: commercial industrial timer, 24-hour programmable, 5-setpoint capability).\n2. Configure timer for 5 micro-flushes/day at 8 AM, 12 PM, 4 PM, 8 PM, 12 AM, each 10 sec duration (c: parameter change to existing timer).\n3. Configure timer for 1 macro-flush weekly at 6 AM Sunday, 120 sec duration (c: parameter change to existing timer).\n4. Set acid-dosing system to maintain pH 5.6 during all flushes (c: parameter change to existing pH controller).\n5. Install a standard check valve on the flush discharge line to prevent backflow (b: standard NRV DN25 PN10).\n6. Install a standard pressure gauge on the flush line pre-emitter (b: standard Bourdon gauge 0-6 bar).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice: Manual macro-flush (2×/week, 5 min each) + acid dosing (pH 5.6).  \nThis intervention:  \n- Timer installation (b): same class as existing controller (procurement parity)  \n- Parameter changes (c): zero added burden (uses existing equipment)  \n- Check valve (b): same class as existing system valves (procurement parity)  \n- Pressure gauge (b): same class as existing system gauges (procurement parity)  \nOperational loss: Zero (flushes scheduled during non-production hours; no throughput impact).  \nTotal burden: Same as standard practice (all rows (b)/(c); no new equipment classes).\n\nEXECUTABLE TEST\nProtocol: Install intervention on 1 hectare test plot; monitor emitter uniformity weekly for 14 weeks using catch-can testing (16 cans/plot).  \nInstruments: Existing pressure gauges, pH meter, and flow sensors (no new hardware).  \nPass/fail: Uniformity ≥90% at week 14 (vs. 85% failure threshold) AND clogging rate ≤4% (vs. 8% baseline).  \nDuration: 14 weeks (full season).  \nKill criterion: If uniformity drops below 85% at any weekly test, intervention fails.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Install a standard programmable timer on the acid-dosing system control panel (b: comme",
+    "2. Configure timer for 5 micro-flushes/day at 8 AM, 12 PM, 4 PM, 8 PM, 12 AM, each 10 sec ",
+    "3. Configure timer for 1 macro-flush weekly at 6 AM Sunday, 120 sec duration (c: parameter",
+    "4. Set acid-dosing system to maintain pH 5.6 during all flushes (c: parameter change to ex",
+    "5. Install a standard check valve on the flush discharge line to prevent backflow (b: stan",
+    "6. Install a standard pressure gauge on the flush line pre-emitter (b: standard Bourdon ga"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "derived feature input 'repeated micro-flush shear stress pulses; this reduces the n' is not derivable from the permitted signals"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "b5879e7c1989a3f3",
+ "smoke": false
+}

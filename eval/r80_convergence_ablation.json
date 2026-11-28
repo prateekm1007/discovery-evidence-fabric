@@ -1,0 +1,102 @@
+{
+ "record": "R80_CONVERGENCE_ABLATION_FIXTURES/1.0.0",
+ "session": "builder-r80s1",
+ "stage": "DETERMINISTIC_FIXTURES (zero LLM, Art. 22 mechanics proof)",
+ "arms": [
+  "baseline (fixed budget 3, no memory, no stop)",
+  "convergence (Reflexion memory + Self-Refine structured stop, budget 3)"
+ ],
+ "matched_budget": true,
+ "rows": {
+  "clean_draft": {
+   "baseline": {
+    "repairs_used": 0,
+    "attempts": 1,
+    "converged": true,
+    "budget_burned_full": false,
+    "memory_entries": 0
+   },
+   "convergence": {
+    "repairs_used": 0,
+    "attempts": 1,
+    "converged": true,
+    "budget_burned_full": false,
+    "memory_entries": 0
+   },
+   "delta_repairs": 0,
+   "regressed": false
+  },
+  "improving": {
+   "baseline": {
+    "repairs_used": 3,
+    "attempts": 4,
+    "converged": false,
+    "budget_burned_full": true,
+    "memory_entries": 0
+   },
+   "convergence": {
+    "repairs_used": 3,
+    "attempts": 4,
+    "converged": false,
+    "budget_burned_full": true,
+    "memory_entries": 3
+   },
+   "delta_repairs": 0,
+   "regressed": false
+  },
+  "nonimproving_repeat": {
+   "baseline": {
+    "repairs_used": 3,
+    "attempts": 4,
+    "converged": false,
+    "budget_burned_full": true,
+    "memory_entries": 0
+   },
+   "convergence": {
+    "repairs_used": 1,
+    "attempts": 2,
+    "converged": false,
+    "budget_burned_full": false,
+    "memory_entries": 1
+   },
+   "delta_repairs": 2,
+   "regressed": false
+  },
+  "churn": {
+   "baseline": {
+    "repairs_used": 3,
+    "attempts": 4,
+    "converged": false,
+    "budget_burned_full": true,
+    "memory_entries": 0
+   },
+   "convergence": {
+    "repairs_used": 3,
+    "attempts": 4,
+    "converged": false,
+    "budget_burned_full": true,
+    "memory_entries": 4
+   },
+   "delta_repairs": 0,
+   "regressed": false
+  }
+ },
+ "aggregate": {
+  "baseline_burned_full": 3,
+  "convergence_burned_full": 2,
+  "baseline_repairs_total": 9,
+  "convergence_repairs_total": 7,
+  "repairs_saved": 2,
+  "rows_regressed": 0
+ },
+ "typed_notes": [
+  "The stop criterion is the CONSERVATIVE rule: stop only on an EXACT failure-signature repeat (same problem set as the immediately prior attempt); an improving or churning sequence always keeps its full budget. The saved budget on the repeat class is provably safe on fixtures; the LLM-stage ablation must confirm it on live rows.",
+  "The early stop is typed as BUDGET-SAVED, not as convergence: the row stays unresolved with its findings disclosed (never hidden, Art. 5) — the auditor sees the identical residual picture.",
+  "The REAL pre-adoption gate (roadmap integration discipline) is the matched-budget LIVE ablation on DEV rows both arms; adoption requires: no mean drop, ALLOWED_ROW_OUTSIDE=0, and the convergence gate (>=50% of rows zero-findings within budget) measured on the NEXT sealed set with the layer wired at the frozen call site under the CI-gated re-freeze discipline."
+ ],
+ "next_steps": [
+  "1. LLM-stage matched-budget DEV ablation (both arms, live rows).",
+  "2. Frozen-side wiring: enrich the frozen machine's repair directive with the reflection note + wire the structured stop, via the non-frozen seam or a typed frozen edit under CI-gated re-freeze.",
+  "3. Re-freeze with the freeze guard; CI-wired immutability test for the frozen bytes."
+ ]
+}

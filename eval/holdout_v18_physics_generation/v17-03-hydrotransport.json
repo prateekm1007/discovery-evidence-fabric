@@ -1,0 +1,147 @@
+{
+ "problem_id": "v17-03-hydrotransport",
+ "domain": "abrasion_erosion",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P40",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P40",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:c2d66e7264ac": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:b44a9f675002": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "abrasion_erosion",
+   "confidence": 1.0,
+   "evidence_span": "erode, erodes",
+   "allowed_mech_classes": [
+    "compliant_elastomer_coating",
+    "surface_hardening_treatment",
+    "micro_texturing",
+    "particle_trajectory_deflection",
+    "sacrificial_replaceable_shield"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "compliant_elastomer_coating",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "geometry",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:34:28Z",
+ "attempts_n": 1,
+ "row_wall_s": 24.6,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice for hydro-transport pipeline bottom erosion delivers a **DESIGN CHANGE** via a harder surface (e.g., hard-facing, high-chrome castings, or thicker pipe walls) that increases resistance to material removal (Archard's law: $V \\propto 1/H$).\nMy mechanism departs by using **COMPLIANT ELASTOMER COATING** (specifically, a low-modulus polyurethane/nylon-polyurethane laminate) to elastically absorb the peak impact stress of sliding bed particles, thereby reducing the local shear stress below the fatigue/erosion threshold of the pipe base metal, rather than increasing the hardness to oppose the abrasive force.\nThe failure-physics connection is that sliding bed load erosion is dominated by transient high-magnitude stress peaks from discrete particle impacts that exceed the static yield strength; a compliant layer increases the contact duration ($\\Delta t$) of each impact, reducing peak stress ($\\sigma_{peak} \\approx \\Delta p / \\Delta t$) and converting brittle fracture energy into hysteresis damping, whereas hard surfaces merely fail faster per unit volume under cyclic high-stress conditions if the impact energy is high enough to exceed the fracture toughness of the hard layer.\n\nPHYSICS CHECK\nThe governing physical relation is the reduction of peak contact stress via increased contact time due to the elasticity of the coating.\nLet $F$ be the impact force of a sliding particle, $k_e$ the effective contact stiffness, and $m^*$ the reduced mass.\nThe peak stress in a hard system is approximated by $\\sigma_{peak, hard} \\approx \\frac{F}{\\pi R^2}$ where the interaction is quasi-static or high-frequency brittle.\nIn a compliant system, the peak force is reduced by the energy absorption capacity of the elastomer. For a Hertzian impact into an elastic layer, the maximum force $F_{max}$ scales with $E^{0.6} m^{0.4} v^{1.2}$ (where $E$ is modulus).\nMagnitude verification:\n- Steel Modulus $E_{steel} \\approx 200$ GPa.\n- Polyurethane Modulus $E_{PU} \\approx 10$ - $30$ MPa (0.01 - 0.03 GPa).\n- Ratio of moduli $\\frac{E_{steel}}{E_{PU}} \\approx 10^4$.\n- The peak stress transmission to the pipe wall is reduced by the impedance mismatch and the longer duration of the pulse. By increasing the contact time $\\Delta t$ by a factor of $\\sqrt{\\frac{E_{steel}}{E_{PU}}} \\approx 100$ (roughly, based on wave speed ratios), the peak stress $\\sigma = F/\\Delta t$ (simplified) is reduced by an order of magnitude. This prevents the cyclic stress from exceeding the fatigue limit of the pipe steel or the cohesive strength of the hard-facing layer, which would be the failure mode in the standard practice.\n\nIMPLEMENTATION BILL\nComponents:\n1.  **Compliant Elastomer Layer**: Polyurethane (PU) or Nylon-PU laminate.\n    *   *Thickness*: 15 mm - 30 mm.\n    *   *Modulus*: 15 MPa (ASSUMPTION: Typical value for high-density PU used in slurry service; chosen to balance elasticity and compressive strength against bed pressure).\n    *   *Adhesion*: Mechanical keying into the pipe wall surface (standard practice for lining).\n2.  **Base Pipe**: Existing carbon steel pipe.\n3.  **Installation Procedure**:\n    *   Clean and blast pipe interior to SA 2.5.\n    *   Apply primer.\n    *   Lay PU sheets with overlap; bond via heat/cure.\n    *   *No new instrumentation required*. The \"monitoring\" is the standard visual inspection and pressure monitoring already stated in the problem context (signals_used: visual_inspection, pressure).\n\nInput Streams (DATA-SOURCE RULE):\n*   **Pressure**: ALREADY-RECORDED (stated in problem `signals_used`). Used to verify flow integrity and check for major breaches, not for erosion prediction.\n*   **Visual Inspection**: ALREADY-RECORDED (stated in problem `signals_used`). Used at maintenance intervals to inspect the *remaining* pipe thickness or the integrity of the elastomer.\n*   **Reference/Threshold**: DERIVED from STATED SPEC. The threshold for failure is the loss of structural integrity of the pipe wall. With the elastomer, the failure threshold shifts to the elastomer's tensile fatigue limit or bulk compression set. We use the **pipe minimum required thickness (MRT)** stated in the original design spec as the baseline. The elastomer must be thicker than the predicted erosion rate over the maintenance interval.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability**: Same class as hard-facing or sacrificial liner. Both require internal access (jacking/launching) and surface preparation. Elastomer lining is often less labor-intensive than hard-facing welds (no welding in confined spaces).\n*   **Operability**: No change in hydraulic performance; the smooth elastomer surface may slightly reduce friction compared to rough corroded steel, potentially improving throughput.\n*   **Maintenance**: **Heavier** in one specific regard: the elastomer is softer and may require more frequent inspection for bulging or delamination than a hard-facing layer requires for hardness loss. However, it is **Lighter** in cost and logistics: PU lining is cheaper than high-chrome castings and can be repaired locally with kits, whereas hard-facing requires extensive grinding and re-welding.\n*   **Cost Class**: Lower than high-chrome castings or HVOF hard-facing.\n\nEXECUTABLE TEST\nProtocol:\n1.  Fabricate two pipe sections (100 m each) with identical geometry.\n    *   Section A: Standard Carbon Steel (Control).\n    *   Section B: Carbon Steel lined with 20 mm PU elastomer (Test).\n2.  Subject both to a continuous slurry flow test in a closed-loop rig matching the problem's particle size distribution and concentration (ASSUMPTION: Use the median particle size $d_{50}$ and solids fraction $\\alpha$ from the problem's operational data).\n3.  Run for a duration $T$ equal to the standard inspection interval (e.g., 6 months or equivalent hours).\n4.  Measure mass loss per unit area ($\\Delta m/A$) for the exposed steel in Section A.\n5.  Measure thickness loss ($\\Delta t_{PU}$) in Section B.\n6.  Calculate the \"Equivalent Steel Erosion\" for Section B by converting $\\Delta t_{PU}$ to $\\Delta m/A$ using the density of PU and assuming the PU erodes at a rate $k_{PU}$ which is empirically determined. Alternatively, simply check if the Section B pipe wall remains at original thickness (zero loss).\n\nPass/Fail Thresholds:\n*   **Pass**: Section B pipe wall thickness loss = 0.0 mm. Section B PU thickness loss < 50% of initial thickness.\n*   **Fail (Falsification)**: If Section B pipe wall thickness loss > 0.0 mm OR if PU thickness loss > 50% within the test duration $T$.\n\nKill Condition:\n\"The mechanism is FALSIFIED if the pipe wall thickness in the lined section does not remain at 100% of initial thickness (i.e., no measurable erosion of the steel) within a 6-month continuous slurry exposure window in a closed-loop rig.\"\n\nNAMED APPARATUS: Closed-loop slurry recirculation rig with instrumented pipe spools and non-destructive thickness gauges (ultrasonic) on the steel wall (visible through thin gaps or at repair ports) and calipers/UT on the PU layer at cut-out points.\n\nCONSTRAINT BIND\nThe primary stated indicator of failure is **pipe wall thickness** (erosion of the bottom).\nMy mechanism (compliant coating) directly prevents this indicator from changing by interposing a sacrificial/compliant layer. The pressure and visual inspection are secondary/supporting. The intervention satisfies the \"geometry/mechanism\" constraint by changing the physical interaction from \"hard-on-hard abrasive cutting\" to \"elastic impact damping.\"\n\nRISK / TENSION\nTension: The `quantitative_testability_bind` requires a worked calculation from problem numbers. The problem provides `user_variables: []` and no specific particle velocity or concentration.\nResolution: I have used **TYPED ASSUMPTIONS** for the modulus and thickness. The \"worked calculation\" is the magnitude verification in PHYSICS CHECK showing the stress reduction factor. The specific \"mg/h\" prediction is bound to the material constants assumed.\nFalsifiable Prediction: \"The peak stress transmitted to the pipe wall will be reduced by a factor of $\\geq 10$ compared to the bare steel surface, measured by high-speed pressure transducers embedded in the pipe wall behind the lining vs. in the bare steel, during impact events.\"\n*Wait, the kill condition must be on the primary indicator (erosion).*\nCorrected Prediction: \"The erosion rate of the pipe wall will be reduced from $\\geq 0.5$ mm/year (ASSUMPTION: typical severe slurry erosion rate for bare steel) to $< 0.1$ mm/year (limited by the slow erosion of the outer PU layer) over a 1-year test period.\"\nKill Condition: \"The mechanism is FALSIFIED if the pipe wall erosion rate does not drop by at least 80% (from 0.5 mm/y to < 0.1 mm/y) within a 1-year continuous slurry exposure window.\"",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Compliant Elastomer Layer**: Polyurethane (PU) or Nylon-PU laminate.",
+    "*   *Thickness*: 15 mm - 30 mm.",
+    "*   *Modulus*: 15 MPa (ASSUMPTION: Typical value for high-density PU used in slurry servic",
+    "*   *Adhesion*: Mechanical keying into the pipe wall surface (standard practice for lining",
+    "2.  **Base Pipe**: Existing carbon steel pipe.",
+    "3.  **Installation Procedure**:",
+    "*   Clean and blast pipe interior to SA 2.5.",
+    "*   Apply primer.",
+    "*   Lay PU sheets with overlap; bond via heat/cure.",
+    "*   *No new instrumentation required*. The \"monitoring\" is the standard visual inspection ",
+    "*   **Pressure**: ALREADY-RECORDED (stated in problem `signals_used`). Used to verify flow",
+    "*   **Visual Inspection**: ALREADY-RECORDED (stated in problem `signals_used`). Used at ma",
+    "*   **Reference/Threshold**: DERIVED from STATED SPEC. The threshold for failure is the lo",
+    "*   **Installability**: Same class as hard-facing or sacrificial liner. Both require inter",
+    "*   **Operability**: No change in hydraulic performance; the smooth elastomer surface may ",
+    "*   **Maintenance**: **Heavier** in one specific regard: the elastomer is softer and may r",
+    "*   **Cost Class**: Lower than high-chrome castings or HVOF hard-facing."
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, the kill condition must be on the primary indicator (erosion).*"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [
+    "generic surface pattern present but a mapped mechanism dominates: ['monitoring dressed as mitigation']"
+   ],
+   "quant_markers": 2,
+   "mapped_mechanism": "compliant_elastomer_coating",
+   "cross_domain": "aerospace"
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "quantity": "droplet-impact erosion intensity ordering (v^5 scaling)",
+    "predicted_value": "relative 1.000 dimensionless vs a 100 m/s reference",
+    "calc_trace": "(100.0 m/s / 100 m/s)^5 = 1.000 dimensionless",
+    "falsifier": "a rain-erosion whirling-arm coupon must track the v^5 curve; a compliant layer's benefit shows as a threshold shift — if the coating does NOT raise the damaging-speed threshold >= 15%, it falsifies",
+    "units_ok": true,
+    "status": "computed",
+    "route": "specific:compliant_elastomer_coating"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "76ab50176a8edab1"
+}

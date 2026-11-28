@@ -1,0 +1,93 @@
+{
+ "problem_id": "r125-08-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 8.58,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 800,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.19,
+   "usage": {
+    "prompt_tokens": 1137,
+    "completion_tokens": 1357,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Cycle Time Extension Triggered by Prod",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Cycle Time Extension Triggered by Product Oxygen Feedback**\n\n**Mechanism**\nThe observed shortening of adsorption cycles is likely an unstable or overly conservative control response that prevents the zeolite bed from reaching the necessary breakthrough point, or it indicates that the current open-loop timing is no longer valid for the current operating conditions. By using the existing product oxygen analyzer, the control system can dynamically extend the adsorption cycle time until the product purity drops to the target specification limit. This ensures the adsorber bed is utilized fully, restoring purity and reducing specific feed-air consumption (Nm³ O₂/Nm³ N₂), which directly addresses the increased air usage.\n\n**Implementation**\n1.  **Signal Acquisition**: Connect the 4–20 mA signal from the existing **Product Oxygen Analyzer** to an available input channel in the existing Programmable Logic Controller (PLC) or dedicated controller.\n2.  **Control Logic Development**: Modify the existing PLC ladder logic or function block program that governs the sequence control. Currently, the sequence likely uses a fixed or semi-fixed timer for the \"Adsorption\" phase. Replace this with a closed-loop control strategy:\n    *   Define a setpoint for the maximum allowable oxygen content in the product nitrogen (e.g., 5 ppmv or 2% depending on spec).\n    *   Implement a PID or simple on/off control loop that adjusts the \"Adsorption Time\" parameter.\n    *   **Logic**: If the measured O₂ concentration is below the specification limit (too pure), slightly *decrease* the adsorption time to optimize energy. If the measured O₂ concentration approaches or exceeds the specification limit (purity slipping), *increase* the adsorption time.\n    *   Since the problem states purity is *slipping below* spec (meaning getting worse) and cycles are *shortening*, the primary action required is to ensure the cycle does not terminate early. The control must be biased to prevent cycle shortening that compromises purity. Therefore, the logic should prioritize extending the cycle if O₂ trends upward.\n3.  **Safety Interlocks**: Use the **Feed-Air Pressure Transmitter** to monitor system health. If air pressure is too low, do not allow the cycle time to extend indefinitely, as this may indicate a compressor fault or filter blockage, which would also degrade performance. Use the **Cycle-Time Counter** to log the adjusted times for trend analysis.\n4.  **Tuning**: Manually tune the control loop gains initially to ensure stable operation without excessive hunting of the cycle time.\n\n**Measures It Relies On**\n*   **Product Oxygen Analyzer**: Provides the real-time feedback variable for nitrogen purity. This is the critical measurement that allows the system to know when the bed is saturated or still effective.\n*   **Existing Control System (PLC/Controller)**: Has the capability to accept the new input and modify the timer parameter for the adsorption phase. No new hardware is added; only existing I/O channels and logic are utilized.\n*   **Feed-Air Pressure Transmitter**: Used as a diagnostic/secondary constraint to ensure that the increased demand for feed-air (implied by the longer cycles or higher consumption) is supported by adequate supply pressure. It helps distinguish between a purity issue and a supply pressure issue.\n*   **Cycle-Time Counter**: Logs the actual cycle times for verification that the mitigation is working (i.e., cycles are stabilizing or lengthening as needed) and for long-term trending.\n\nThis approach directly addresses the \"shortening cycles\" by allowing the system to dynamically determine the correct adsorption time based on actual purity, rather than relying on a fixed timer that may be miscalibrated. It reduces feed-air consumption per unit of nitrogen by ensuring the adsorber bed is not dumped prematurely, thereby improving process efficiency.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Cycle Time Extension Triggered by Product Oxygen Feedback**\n\n**Direction-of-Effect Statement**\n*   **Driving Variable:** Product Oxygen Concentration (measured by Product Oxygen Analyzer).\n*   **Direction of Effect:** An increase in measured oxygen concentration indicates bed saturation/purity loss; this causes the controller to increase (extend) the adsorption cycle time. Conversely, a decrease in oxygen concentration (purity stable/improving) allows the controller to decrease (shorten) the adsorption cycle time toward the minimum safe limit.\n*   **Net Result:** The cycle time dynamically stabilizes at the value that just meets the purity specification, preventing premature cycle termination (shortening) that causes purity slip, and preventing excessive cycle length that wastes energy/feed air.\n\n**Mechanism**\nThe observed shortening of adsorption cycles is likely an unstable or overly conservative control response that prevents the zeolite bed from reaching the necessary breakthrough point, or it indicates that the current open-loop timing is no longer valid for the current operating conditions. By using the existing product oxygen analyzer, the control system can dynamically adjust the adsorption cycle time to maintain product purity at the specification limit. This ensures the adsorber bed is utilized fully, restoring purity and reducing specific feed-air consumption, which directly addresses the increased air usage.\n\n**Implementation Bill**\n*   **Hardware Inputs:**\n    1.  Existing Product Oxygen Analyzer (4–20 mA signal) connected to PLC Analog Input.\n    2.  Existing Feed-Air Pressure Transmitter (4–20 mA signal) connected to PLC Analog Input.\n    3.  Existing Cycle-Time Counter (logic signal) connected to PLC Digital Input.\n*   **Hardware Outputs/Actuators:**\n    1.  PLC Timer/Sequence Logic (Software) controlling valve switching timing.\n*   **Logic Changes:**\n    1.  Modify PLC ladder logic/function blocks to replace fixed-timer adsorption phase with feedback-driven timer.\n    2.  Add safety interlock logic using Feed-Air Pressure.\n*   **No New Sensors Added.**\n\n**Implementation Steps**\n1.  **Signal Acquisition**: Connect the 4–20 mA signal from the existing **Product Oxygen Analyzer** to an available analog input channel in the existing Programmable Logic Controller (PLC). Connect the 4–20 mA signal from the existing **Feed-Air Pressure Transmitter** to another available analog input channel. The **Cycle-Time Counter** signal is already present in the logic system.\n2.  **Control Logic Development**: Modify the existing PLC ladder logic or function block program that governs the sequence control. Currently, the sequence likely uses a fixed or semi-fixed timer for the \"Adsorption\" phase. Replace this with a closed-loop control strategy:\n    *   Define a setpoint for the maximum allowable oxygen content in the product nitrogen (e.g., 5 ppmv or 2% depending on spec).\n    *   Implement a PID or simple on/off control loop that adjusts the \"Adsorption Time\" parameter based on the Oxygen Analyzer input.\n    *   **Logic**: If the measured O₂ concentration is below the specification limit (too pure), slightly *decrease* the adsorption time to optimize energy. If the measured O₂ concentration approaches or exceeds the specification limit (purity slipping), *increase* the adsorption time.\n    *   Since the problem states purity is *slipping below* spec (meaning getting worse) and cycles are *shortening*, the primary action required is to ensure the cycle does not terminate early. The control must be biased to prevent cycle shortening that compromises purity. Therefore, the logic should prioritize extending the cycle if O₂ trends upward.\n3.  **Safety Interlocks**: Use the **Feed-Air Pressure Transmitter** to monitor system health. If air pressure is too low, do not allow the cycle time to extend indefinitely, as this may indicate a compressor fault or filter blockage, which would also degrade performance. Use the **Cycle-Time Counter** to log the adjusted times for trend analysis.\n4.  **Tuning**: Manually tune the control loop gains initially to ensure stable operation without excessive hunting of the cycle time.\n\n**Input/Measurement Source Mapping**\n*   **Product Oxygen Concentration ($O_{2,prod}$):** Derived directly from the **Product Oxygen Analyzer**. This is the primary feedback variable.\n*   **Feed-Air Pressure ($P_{feed}$):** Derived directly from the **Feed-Air Pressure Transmitter**. Used as a secondary constraint/interlock.\n*   **Actual Cycle Time ($T_{actual}$):** Derived directly from the **Cycle-Time Counter**. Used for logging and verification.\n*   **Setpoint ($O_{2,SP}$):** A static configuration value defined in the PLC, not a measured signal.\n*   **Control Output ($T_{ads}$):** Calculated by the PLC control algorithm based on $O_{2,prod}$ and $O_{2,SP}$, subject to limits imposed by $P_{feed}$.\n\n**Measures It Relies On**\n*   **Product Oxygen Analyzer**: Provides the real-time feedback variable for nitrogen purity. This is the critical measurement that allows the system to know when the bed is saturated or still effective.\n*   **Existing Control System (PLC/Controller)**: Has the capability to accept the new input and modify the timer parameter for the adsorption phase. No new hardware is added; only existing I/O channels and logic are utilized.\n*   **Feed-Air Pressure Transmitter**: Used as a diagnostic/secondary constraint to ensure that the increased demand for feed-air (implied by the longer cycles or higher consumption) is supported by adequate supply pressure. It helps distinguish between a purity issue and a supply pressure issue.\n*   **Cycle-Time Counter**: Logs the actual cycle times for verification that the mitigation is working (i.e., cycles are stabilizing or lengthening as needed) and for long-term trending.\n\nThis approach directly addresses the \"shortening cycles\" by allowing the system to dynamically determine the correct adsorption time based on actual purity, rather than relying on a fixed timer that may be miscalibrated. It reduces feed-air consumption per unit of nitrogen by ensuring the adsorber bed is not dumped prematurely, thereby improving process efficiency.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Hardware Inputs:**",
+   "1.  Existing Product Oxygen Analyzer (4–20 mA signal) connected to PLC Analog Input.",
+   "2.  Existing Feed-Air Pressure Transmitter (4–20 mA signal) connected to PLC Analog Input.",
+   "3.  Existing Cycle-Time Counter (logic signal) connected to PLC Digital Input.",
+   "*   **Hardware Outputs/Actuators:**",
+   "1.  PLC Timer/Sequence Logic (Software) controlling valve switching timing.",
+   "*   **Logic Changes:**",
+   "1.  Modify PLC ladder logic/function blocks to replace fixed-timer adsorption phase with f",
+   "2.  Add safety interlock logic using Feed-Air Pressure.",
+   "*   **No New Sensors Added.**",
+   "1.  **Signal Acquisition**: Connect the 4–20 mA signal from the existing **Product Oxygen ",
+   "2.  **Control Logic Development**: Modify the existing PLC ladder logic or function block ",
+   "*   Define a setpoint for the maximum allowable oxygen content in the product nitrogen (e.",
+   "*   Implement a PID or simple on/off control loop that adjusts the \"Adsorption Time\" param",
+   "*   **Logic**: If the measured O₂ concentration is below the specification limit (too pure",
+   "*   Since the problem states purity is *slipping below* spec (meaning getting worse) and c",
+   "3.  **Safety Interlocks**: Use the **Feed-Air Pressure Transmitter** to monitor system hea",
+   "4.  **Tuning**: Manually tune the control loop gains initially to ensure stable operation ",
+   "*   **Product Oxygen Concentration ($O_{2,prod}$):** Derived directly from the **Product O",
+   "*   **Feed-Air Pressure ($P_{feed}$):** Derived directly from the **Feed-Air Pressure Tran",
+   "*   **Actual Cycle Time ($T_{actual}$):** Derived directly from the **Cycle-Time Counter**",
+   "*   **Setpoint ($O_{2,SP}$):** A static configuration value defined in the PLC, not a meas",
+   "*   **Control Output ($T_{ads}$):** Calculated by the PLC control algorithm based on $O_{2",
+   "*   **Product Oxygen Analyzer**: Provides the real-time feedback variable for nitrogen pur",
+   "*   **Existing Control System (PLC/Controller)**: Has the capability to accept the new inp",
+   "*   **Feed-Air Pressure Transmitter**: Used as a diagnostic/secondary constraint to ensure",
+   "*   **Cycle-Time Counter**: Logs the actual cycle times for verification that the mitigati"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'feedback-driven timer' shares no allowed-list stem (Use only existing sensors and existing measurements: the product oxygen analyzer...)",
+   "added measure 'safety interlock logic' shares no allowed-list stem (Use only existing sensors and existing measurements: the product oxygen analyzer...)",
+   "added measure 'a closed-loop control strategy' shares no allowed-list stem (Use only existing sensors and existing measurements: the product oxygen analyzer...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **No New Sensors Added.**",
+   "3.  **Safety Interlocks**: Use the **Feed-Air Pressure Transmitter** to monitor system health. If air pressure",
+   "*   **Actual Cycle Time ($T_{actual}$):** Derived directly from the **Cycle-Time Counter**. Used for logging a",
+   "*   **Product Oxygen Analyzer**: Provides the real-time feedback variable for nitrogen purity. This is the cri"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 21.8,
+ "status": "DELIVERED_REVIEWED"
+}

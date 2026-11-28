@@ -1,0 +1,25 @@
+**Mitigation Proposal: Closed-Loop Tension Drift Compensation via Amperometric Feedback**
+
+**Mechanism:**
+Implement a **real-time drift compensation algorithm** that uses the differential change in drive and tail motor amperes as a proxy for belt tension variation and lateral drift. Since the belt drifts to the drive side, this causes an asymmetry in the effective friction load and belt wrap angle, subtly altering the torque demand on the motors. By continuously monitoring the *delta* (difference) in RMS amperes between the drive and tail motors, the system can detect the onset of drift and tension loss before the belt physically contacts the misalignment sensors (if any exist, though none are specified as new). The algorithm will trigger a **corrective tensioning pulse** or **adjustment of the tail puller motor speed** (if variable speed drives are used, though constraint says existing measurements only, so we assume fixed speed but we can use the tail motor's inherent load to infer position) to counteract the drift. However, a more robust approach using *only* existing sensors (ammeters and speed encoder) is to use the **speed encoder and ammeter combination** to calculate *effective belt speed* and *torque*, and detect anomalies. 
+
+Actually, the most direct mitigation using *only* ammeters and speed encoder is: **Implement a "Tension Health Index" based on the ratio of Drive Motor Amps to Belt Speed, and use this to dynamically schedule and verify tensioning cycles.** 
+
+Wait, the problem is *drift* and *shortening cycles*. Drift is lateral. Tensioning cycles are likely automatic. The issue is that the tensioning system is not compensating for the drift-induced tension changes effectively. 
+
+**Revised Mechanism: Amperometric Drift Detection and Tensioning Trigger Optimization**
+
+Use the **differential amperage between drive and tail motors** as a drift indicator. When the belt drifts to the drive side, the drive side friction increases (more belt contact with the side roller/skirt), while the tail side friction may decrease or the effective tension distribution changes. This creates a measurable shift in the ratio of Drive Motor Amps to Tail Motor Amps. 
+
+**Implementation:**
+1.  **Signal Processing:** Continuously calculate the ratio $R = \frac{I_{drive}}{I_{tail}}$ using the existing ammeters. Also, monitor the belt speed $V_{belt}$ from the encoder to normalize for load changes. Create a normalized metric $M = \frac{I_{drive} - k \cdot I_{tail}}{V_{belt}}$, where $k$ is a calibrated constant.
+2.  **Drift Detection:** Establish a baseline for $M$ during normal, centered operation. When $M$ deviates significantly from the baseline in a specific direction (corresponding to drift to the drive side), interpret this as **excessive lateral friction and tension imbalance**.
+3.  **Mitigation Action:** Instead of relying solely on time-based tensioning cycles, **trigger a tensioning correction cycle when $M$ crosses a predefined threshold**. This ensures that tensioning is applied precisely when the drift-induced tension loss is significant, counteracting the drift by applying corrective tension that helps center the belt. Additionally, if the tail puller motor is adjustable, a brief pulse can be applied to re-center the belt (if the system allows for active centering via tail tension adjustment). If not, the tensioning cycle shortens the effective length, which can help re-center if the drift is consistent.
+4.  **Cycle Extension:** By triggering tensioning only when the drift-induced tension imbalance is detected (via $M$), you avoid unnecessary cycles and allow the tensioning system to work more efficiently. The "shortening of cycles" is a symptom of the system trying to compensate for the drift but failing because it's not addressing the root cause (lateral drift). By correcting the drift-induced tension imbalance, the belt remains centered, reducing the need for frequent, ineffective tensioning.
+
+**Measures it Relies On:**
+*   **Existing Ammeters:** Provide real-time current data for drive and tail motors.
+*   **Existing Belt-Speed Encoder:** Provides normalization for load changes and confirms the belt is moving (preventing false positives during stops).
+*   **Correlation:** There is a known physical correlation between lateral belt drift to the drive side and the differential torque demand on the drive vs. tail motors due to changes in belt wrap angle, skirt board friction, and tension distribution.
+
+This approach uses only existing sensors to detect the *condition* causing the frequent tensioning (drift) and applies corrective action (tensioning) at the optimal time, thereby mitigating the shortening of tensioning cycles and the upward trend in drive motor amps.

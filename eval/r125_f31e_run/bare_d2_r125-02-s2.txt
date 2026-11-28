@@ -1,0 +1,40 @@
+### Mitigation Proposal
+
+**Mechanism:**
+Implement a **"Dynamic Current-Slope Speed Cap"** logic layer using the existing PLC. This mechanism uses the rate of change of the finish block's motor current (amperage) to dynamically lower the setpoint of the line-speed encoder, effectively throttling the drawing speed specifically during the finish block operation to prevent excessive strain that leads to wire breaks.
+
+**Implementation:**
+1.  **Signal Conditioning (Existing Sensors):**
+    *   Acquire the raw signal from the **finish block's motor ammeter** (0–20 mA or 4–20 mA).
+    *   Acquire the current speed signal from the **line-speed encoder**.
+    *   Acquire the pulse train from the **break counter** (or its derived status flag) to detect immediate stoppages.
+
+2.  **Control Logic (PLC Program):**
+    *   **Calculate Current Slope ($dI/dt$):** In a fixed scan cycle (e.g., 100ms), compute the difference between the current ammeter reading and the previous scan's reading. Normalize this by the scan time to get the rate of change in amperes per second (A/s).
+    *   **Define Thresholds:** Establish a "Safe Slope Threshold" (e.g., >2 A/s indicates rapid load increase due to wire hardening or friction).
+    *   **Speed Limiting Algorithm:**
+        *   Initialize a `Speed_Multiplier` at 1.0 (100% of original setpoint).
+        *   **IF** `dI/dt` > `Safe Slope Threshold` **AND** `Current Ammeter Reading` > `Base Operating Current` (to avoid false triggers at low load):
+            *   Decrement `Speed_Multiplier` by a fixed step (e.g., 0.95).
+            *   The new line-speed setpoint = `Original Speed Setpoint` * `Speed_Multiplier`.
+            *   Send this new setpoint to the line-speed drive (encoder feedback loop remains active for closed-loop control).
+        *   **ELSE IF** `dI/dt` < `Recovery Slope Threshold` **AND** `Current Ammeter Reading` < `Safe Current Limit`:
+            *   Increment `Speed_Multiplier` by a smaller step (e.g., 0.02) to gradually restore speed.
+            *   *Constraint:* Do not exceed 1.0.
+    *   **Break Counter Reset/Recovery:**
+        *   When the **break counter** registers a new event (count increment), the PLC must immediately drive `Speed_Multiplier` to a "Restart Low" value (e.g., 0.5) and hold the line-speed setpoint at this low value for a defined "Re-thread Delay" (e.g., 10 seconds). This allows the wire to pass through the finish block at a reduced speed before the normal slope-based control resumes, reducing the chance of immediate re-breakage due to residual friction or hardening.
+
+3.  **HMI/Alarming:**
+    *   Display the current `Speed_Multiplier` value on the operator screen.
+    *   Set a high-priority alarm if `Speed_Multiplier` drops below 0.7 for more than 30 seconds, indicating persistent excessive load on the finish block (suggesting die wear or contamination, even if gauge is in spec).
+
+**Measures It Relies On (Existing Only):**
+*   **Per-block motor ammeters:** Provides the real-time load signal (current) essential for detecting the *rate* of load increase before it exceeds absolute limits.
+*   **Line-speed encoder:** Used as the feedback element for the closed-loop speed control; the proposed logic modifies the *setpoint* sent to this loop, not the feedback itself.
+*   **Break counter:** Provides the trigger for the "Re-thread Low Speed" recovery sequence, ensuring the mitigation actively responds to the reported failure mode (wire breaks).
+
+**Why This Mitigates the Failure:**
+*   The climbing motor current indicates increasing resistance (likely due to work hardening, die friction, or minor misalignment not yet affecting final gauge).
+*   By reducing speed when the *rate* of current increase is high, the system reduces the tensile stress on the wire (stress is proportional to speed in drawing) and reduces thermal input (less friction heat per unit length), thereby preventing the over-stress that causes breaks.
+*   Since the final gauge is still in spec, the reduction in speed does not compromise product quality, only throughput. This is acceptable as a safety mitigation for breakage.
+*   No new sensors are added; the logic uses only the already-installed ammeters, encoder, and break counter.

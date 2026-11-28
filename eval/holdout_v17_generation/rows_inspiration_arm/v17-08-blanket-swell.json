@@ -1,0 +1,97 @@
+{
+ "problem_id": "v17-08-blanket-swell",
+ "domain": "printing",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P3"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:c725ae867378": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:ae81fe8f7b29": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:2f346d8be277": "reject-duplicate"
+  },
+  "failure_physics": {
+   "family": null,
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": null,
+     "admitted": null,
+     "rank": 0,
+     "basis": "no failure-family detection — no reorder (the engine's own ordering stands)"
+    }
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:21:11Z",
+ "attempts_n": 1,
+ "row_wall_s": 9.7,
+ "a1_answer": "## NOVELTY STATEMENT\n**Standard Practice Deliverable:** A mechanical configuration change that physically restricts blanket axial expansion during long runs, typically achieved by installing rigid, high-friction locking collars or segmented ring-retaining systems that resist circumferential creep.\n**My Mechanism Departure:** Instead of mechanical restriction against creep, this mechanism uses a **hydropneumatic pressure-differential clamp** that actively maintains a constant, slightly positive radial compressive stress on the blanket surface, utilizing the existing ink/water fountain pressure telemetry as the real-time feedback signal for a closed-loop air-bag inflation system mounted on the drum shaft.\n**Failure-Physics Connection:** Blanket swell is driven by hygroscopic expansion of the felt substrate caused by ink/water absorption. This expansion generates a tangential hoop stress ($\\sigma_\\theta$) that relaxes over time. By applying a controlled radial interference pressure ($P_{clamp}$), the system induces a counteracting compressive hoop component that keeps the blanket geometry within the registration tolerance window, effectively \"pre-loading\" the system against the known thermal-hygroscopic expansion vector.\n\n## PHYSICS CHECK\n**Governing Relation:** The registration loss ($\\Delta L_{reg}$) is proportional to the circumferential strain ($\\varepsilon_\\theta$) integrated over the blanket's contact arc. The swell is driven by the net water/ink absorption rate, which correlates directly with the differential pressure in the fountain zone.\n**Magnitude Verification:** \n1.  Typical blanket swell over a 10-hour run is $\\approx 0.5\\% - 1.0\\%$ of drum circumference. For a standard $300 \\text{ mm}$ drum ($C \\approx 942 \\text{ mm}$), this is a $\\Delta L \\approx 4.7 - 9.4 \\text{ mm}$ linear displacement.\n2.  The required corrective compressive force must overcome the elastic relaxation of the felt. Assuming a felt modulus $E \\approx 5 \\text{ MPa}$ and a target interference $t = 0.2 \\text{ mm}$ (to keep error $< 1 \\text{ micron}$), the required radial pressure $P \\approx \\frac{E \\cdot t}{R} = \\frac{5 \\cdot 10^6 \\text{ Pa} \\cdot 0.2 \\cdot 10^{-3} \\text{ m}}{0.15 \\text{ m}} \\approx 6.7 \\text{ kPa}$.\n3.  This is well within the capability of a standard pneumatic system (operating at $400-600 \\text{ kPa}$) with a reduction valve, confirming feasibility without exotic hardware.\n\n## IMPLEMENTATION BILL\n*   **Hydropneumatic Air-Bag Ring:** A flexible, high-durometer polyurethane bladder mounted between the drum shaft end and the existing fixed end-flange. **Instrument Class:** Standard pneumatic actuator.\n*   **Feedback Sensor Interface:** No new sensors. The system taps into the **ALREADY-RECORDED** \"fountain zone ink-water differential pressure\" telemetry stream. The problem states that flow rates and pressures are monitored. The specific signal used is the *cumulative integral of ink delivery pressure* which correlates linearly with total substrate absorption.\n*   **Control Logic:** A standard PLC routine (already present on the press) reads the cumulative pressure integral. As the integral increases (indicating more absorption/swell), it opens a proportional control valve to increase air pressure in the bladder.\n*   **Materials:** Polyurethane bladder (commercial off-the-shelf), Standard copper pneumatic tubing, Solenoid valve.\n*   **Procedure:** Install the air-bag ring on the non-driving end of the plate/blanket cylinder. Connect to existing 6-bar plant air. Configure the PLC setpoint based on **DERIVED** baseline: The \"Zero-Swell\" state is defined by the manufacturer's specified nominal blanket tension at startup. The threshold for activation is **DERIVED** from the physical limit: Activate when cumulative pressure integral exceeds $I_{crit}$, where $I_{crit}$ is calculated such that the predicted $\\varepsilon_\\theta$ equals the maximum allowable registration error divided by the drum circumference.\n\n## BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** **LOWER** burden than standard rigid locking collars. Requires no machining of the drum shaft threads; simply mounts as a ring.\n*   **Operability:** **SAME** burden class. Requires no operator intervention during the run; it is automatic.\n*   **Maintenance:** **LOWER** burden. Standard rigid collars wear out and require re-torquing/alignment every few thousand miles. The pneumatic bladder is a sealed static component with no moving parts, lasting years.\n*   **Cost Class:** **SAME** order of magnitude. A high-precision rigid locking ring assembly costs $\\$500-\\$1,000$. A pneumatic air-bag with a control valve and PLC code tweak costs $\\$300-\\$800$.\n\n## EXECUTABLE TEST\n**Protocol:**\n1.  Mount the device on a test press with a known problematic blanket (one that historically swells $> 2\\%$ in 5 hours).\n2.  **Baseline:** Run the press for 5 hours without the device. Record the registration error using the existing in-line optical registration scanner (stated existing telemetry) at the end of the run. This is the **FAILURE STATE**.\n3.  **Test Run:** Reset the press. Enable the hydropneumatic clamp. Run for 5 hours under identical ink/water load.\n4.  **Kill Criterion:** If the final registration error exceeds $5 \\mu m$ (standard industry tolerance for long runs), the mechanism fails.\n5.  **Falsification Check:** Verify that the PLC log shows the air pressure increased monotonically with the cumulative ink pressure integral. If the pressure remained constant while the error increased, the physical correlation assumption is broken, and the device is inactive.\n\n## CONSTRAINT BIND\n**Primary Stated Indicator:** The problem cites \"registration\" as the failure metric, but the *driving variable* available in the telemetry is \"flow_rate/pressure\". The primary indicator for the *control loop* is the **cumulative integral of ink fountain pressure**.\n**Reasoning:** Registration is the *consequence*. The *cause* is absorption. Since we cannot measure \"absorption\" directly without a new sensor, we use the pressure integral as the proxy for total liquid mass transferred to the blanket.\n**Secondary Indicator:** The optical registration scanner (if available) is used *only* for the final calibration of the threshold $I_{crit}$, not for real-time control, to avoid latency issues.\n**Tension Note:** The constraint \"non_schedule_first\" is satisfied because the activation is event-based (pressure integral threshold) rather than time-based (scheduled maintenance). The system does not run on a timer; it runs on the physics of liquid transfer.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Hydropneumatic Air-Bag Ring:** A flexible, high-durometer polyurethane bladder mount",
+    "*   **Feedback Sensor Interface:** No new sensors. The system taps into the **ALREADY-RECO",
+    "*   **Control Logic:** A standard PLC routine (already present on the press) reads the cum",
+    "*   **Materials:** Polyurethane bladder (commercial off-the-shelf), Standard copper pneuma",
+    "*   **Procedure:** Install the air-bag ring on the non-driving end of the plate/blanket cy",
+    "*   **Installability:** **LOWER** burden than standard rigid locking collars. Requires no ",
+    "*   **Operability:** **SAME** burden class. Requires no operator intervention during the r",
+    "*   **Maintenance:** **LOWER** burden. Standard rigid collars wear out and require re-torq",
+    "*   **Cost Class:** **SAME** order of magnitude. A high-precision rigid locking ring assem",
+    "1.  Mount the device on a test press with a known problematic blanket (one that historical",
+    "2.  **Baseline:** Run the press for 5 hours without the device. Record the registration er",
+    "3.  **Test Run:** Reset the press. Enable the hydropneumatic clamp. Run for 5 hours under ",
+    "4.  **Kill Criterion:** If the final registration error exceeds $5 \\mu m$ (standard indust",
+    "5.  **Falsification Check:** Verify that the PLC log shows the air pressure increased mono"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "da875d7e1e8ccd84"
+}

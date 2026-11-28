@@ -1,0 +1,29 @@
+{
+ "problem_id": "HO-11-pex-chlorine-embrittlement",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.4,
+   "chars": 3297
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 6.6,
+   "chars": 2977,
+   "findings_disclosed": [
+    "TEST_DURATION_REALTIME"
+   ]
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "5af6051908a0f229",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVEL-AND-FEASIBLE IDEATION\n\nSTEP 1 — INVENT THE OBSERVABLE:\nStandard practice tracks pipe wall thickness and pressure test results for leaks. My observable is the rate of change of pipe elastic modulus, calculated from ultrasonic wave propagation velocity through the pipe wall, which directly correlates with polymer chain scission from oxidative degradation before visible cracks form.\n\nSTEP 2 — MAKE THE IMPLEMENTATION BORING:\nThe observable is computable from existing ultrasonic thickness gauges and pressure sensors using standard wave velocity-to-elasticity conversion equations, requiring only software modification to the existing data acquisition system.\n\nNOVELTY STATEMENT:\nStandard practice tracks wall thickness and pressure as indicators of structural integrity, while my observable measures the rate of polymer degradation through elastic modulus change, which occurs before visible cracks form and directly relates to the chemical failure mechanism of oxidative chain scission.\n\nPHYSICS CHECK:\nThe elastic modulus (E) relates to ultrasonic wave velocity (v) and material density (ρ) by E = ρv². For PEX-a at 70°C, the expected elastic modulus is approximately 800 MPa. A 10% reduction in velocity (v) corresponds to a 19% reduction in E, which is detectable before catastrophic failure. This relationship holds for the viscoelastic polymer in the temperature range of interest.\n\nIMPLEMENTATION BILL:\n- Existing ultrasonic thickness gauge with time-of-flight measurement capability (USER CONSTRAINT)\n- Existing pressure sensors (USER CONSTRAINT)\n- Data acquisition system (USER CONSTRAINT)\n- Software modification to calculate elastic modulus from wave velocity and temperature compensation (ASSUMPTION: standard industrial control systems can be programmed for this calculation)\n- Calibration standards for ultrasonic velocity measurement (ASSUMPTION: available from gauge manufacturer)\n- Installation procedure for ultrasonic transducer on press-fitted pipe (ASSUMPTION: standard ultrasonic transducer mounting techniques apply)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: Same as standard practice - transducer mounts on existing pipe access points\n- Operability: Same - uses existing control room interfaces\n- Maintenance: Same - transducer maintenance identical to standard thickness gauges\n- Cost: 15% increase (software development and calibration) - under 20% constraint\n- Conclusion: Same deployment burden, different observable that detects failure earlier\n\nEXECUTABLE TEST:\nProtocol: Install ultrasonic transducers on 10 test pipes and 10 control pipes in identical conditions. Measure elastic modulus weekly for 6 months. Increase chlorine dioxide to 0.5 mg/L for test pipes after 3 months.\nInstruments: Ultrasonic thickness gauge, pressure sensors, data logger\nPass/Fail Threshold: Test pipes showing >5% reduction in elastic modulus vs. controls fail\nDuration: 6 months\nKill Criterion: Any visible cracks in test pipes at any time"
+}

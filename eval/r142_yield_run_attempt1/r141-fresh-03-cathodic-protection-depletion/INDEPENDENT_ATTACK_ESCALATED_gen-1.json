@@ -1,0 +1,108 @@
+{
+ "generation": 1,
+ "invention_id": "inv:0b95cb81f5:gen1",
+ "escalation": {
+  "gate_version": "attacker_calibration/1.1.0",
+  "instrument": "independent_attack/3.0.0",
+  "calibration_state": "NOT_CALIBRATED",
+  "terminal_kill_admissible": false,
+  "measured": {
+   "coverage": 1.0,
+   "parse_completeness": 1.0,
+   "tpr_scoped": 1.0,
+   "fpr_known_good": 0.75,
+   "n_cases_attacked": 22,
+   "attacker_ring": {
+    "provider": "zai",
+    "model": "zai-org/GLM-5.3",
+    "ring_pin": "zai",
+    "serving": "22 cases; per-provider {\"zai\": 22}",
+    "pin_violations": [],
+    "note": "R491: the calibration is (rules x ring) — the R488 measured lesson; the gate binds terminal kill authority to THIS ring at consumption"
+   }
+  },
+  "sealed_thresholds": {
+   "provenance": "REUSED from the R412 sealed bars (r412_calibration_seal.json, pre-registered 2026-09-05); NO new threshold invented (Art. XXVII)",
+   "tpr_min": 0.75,
+   "fpr_max": 0.3,
+   "coverage_min": 0.875,
+   "parse_completeness_min": 0.875,
+   "scope": "TPR is measured over the TRUE-POSITIVES cohort; FPR/TNR over the TRUE-NEGATIVES cohort; the additional cohorts (near-miss, scope-conflict, evidence-contradicted, malformed-missing-evidence) are measured and reported as category disciplines, not folded into the headline TPR/FPR"
+  },
+  "measurement_path": "discovery_fabric/engine/calibration_records/r487_attacker_v3_measurement.json",
+  "measurement_sha256": "2a6a7d6d4166b35a15d6976097574863c63810c6951e42642f727f45b60d5fc0",
+  "reason": "measured FPR 0.75 > sealed bar 0.3 (Art. L: the attacker is measured non-selective; its KILL is inadmissible as a terminal verdict and is escalated with the objection preserved)",
+  "rule": "the instrument's KILL is measured non-selective (FPR above the sealed bar); the objection is preserved verbatim and ESCALATED for adjudication — the candidate is NOT killed by this attack alone (Art. L); the deterministic gates are unchanged",
+  "reviewer_provenance": "AI_REVIEW (Art. LXVII)"
+ },
+ "preserved_objections": [
+  {
+   "attack_class": "BOUNDARY_CONDITION_FAILURE",
+   "basis": "The intervention violates the **no trenching** constraint by implicitly requiring **underground anode bed preparation** (4 kg magnesium anodes at 6 m depth demand backfilled soil with controlled resistivity, which cannot be achieved without excavation or pre-drilling). The claim \"no trenching\" is **false**—deep-drive anodes require **soil displacement or compaction**, which alters local resistivity and invalidates the \"no exposure\" premise. GROUNDED_IN: RECORD \"Install two deep-drive magnesium anode grounds (4 kg each, 6 m deep)\" | SCOPE <boundary condition explicitly forbids trenching/exposur",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Protection-Oriented Assessment of Machine Learning-Based Fault Detection in Power Systems' (strong overlap: false, with)",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'drive magnesium anode grounds' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"Install two deep-drive magnesium anode grounds (4 kg each, 6 m deep)\" | SCOPE <boundary condition explicitly forbids trenching/exposure, but deep-drive anodes require soil modification>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "BASELINE_EQUIVALENCE",
+   "basis": "The baseline (status quo) already employs **test stations for potential monitoring**—the candidate’s intervention **adds no new capability** beyond what exists. The claim that \"local anodes supply only the holiday-drain deficit\" is **circular**: if the deficit is unknown, the anode placement (30 m from terminals) is **arbitrary** and could **worsen protection** by creating **undermatched current zones**. The <15% rectifier current increase is **indistinguishable from natural variation** in CP systems without A/B testing. GROUNDED_IN: RECORD \"connected in parallel to the existing negative bus v",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: defect, from, potential, protection)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['30', '15']",
+      "verified": true
+     },
+     {
+      "binding": "record",
+      "ground": "verbatim span 'in parallel to the' (field: intervention)",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "RECORD \"connected in parallel to the existing negative bus via existing test stations\" | COMPUTATION <no comparison to baseline current draw or defect mapping provided>",
+    "absence_ground": false
+   }
+  },
+  {
+   "attack_class": "IMPLEMENTATION_IMPOSSIBILITY",
+   "basis": "Magnesium anodes (4 kg each) in **parallel** will **rapidly deplete** due to **galvanic competition**, especially in **low-resistivity soils** (common near pipelines). The candidate provides **no anode life modeling**—industry standards (NACE SP0169) require **sacrificial anode life >20 years**; magnesium anodes in parallel **fail in <5 years** under high current demand. The 6 m depth is **insufficient** for deep-drive anodes in **clay-rich soils** (resistivity <10 Ω·m), where **anode bed collapse** or **passivation** occurs. GROUNDED_IN: COMPUTATION <no anode life calculation; 4 kg Mg in para",
+   "grounding": {
+    "grounded": true,
+    "bindings": [
+     {
+      "binding": "evidence",
+      "ground": "bundle item 'Effects of cathodic polarization and coating defect size on SRB biofilm-associated corrosion of Q355 steel.' (strong overlap: under, with)",
+      "verified": true
+     },
+     {
+      "binding": "computation",
+      "ground": "numeric relation over ['4', '0169', '20', '5', '6', '10']",
+      "verified": true
+     }
+    ],
+    "claimed_ground": "COMPUTATION <no anode life calculation; 4 kg Mg in parallel violates NACE SP0169 life expectancy> | SCOPE <boundary condition \"no trenching\" conflicts with required anode bed stability>",
+    "absence_ground": false
+   }
+  }
+ ]
+}

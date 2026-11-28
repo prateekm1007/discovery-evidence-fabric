@@ -1,0 +1,21 @@
+### Mitigation Proposal
+
+**Mechanism:**
+Implement **pH-Independent Predictive Volume Limiting** (PIL) for the caustic dosing pump. This mechanism shifts the control strategy from reactive (based on drifting pH probes) to proactive (based on mass balance and hydraulic head). It calculates the maximum allowable dose volume required to maintain the desired buffering capacity *before* scale precipitation occurs, rather than relying on a real-time pH setpoint. Since the pH probe cannot be used for control, the system relies on a static, conservative "Safe Dose Ceiling" derived from water chemistry limits, enforced strictly by the dosing pump stroke rate.
+
+**Implementation:**
+1.  **Retune Dosing Pump Stroke Rate Logic:** Reprogram the Variable Speed Drive (VSD) or stroke controller of the caustic dosing pump. Instead of modulating the stroke rate to meet a pH target, the stroke rate is governed by a **flow-proportional base limit** with a **time-based dose window**.
+2.  **Establish a Conservative Dose Ceiling (Mass Balance):** Calculate the maximum theoretical mass of carbonate present in the feed water (using influant total alkalinity and conductivity, which are stable proxies for carbonate potential). Determine the stoichiometric maximum volume of caustic that can be added *per volume of feed* without exceeding the precipitation threshold for calcium carbonate at the highest expected temperature.
+3.  **Implement "Feed-Forward Cutoff":** The dosing pump stroke rate is set to a constant, low flow-proportional value that is strictly less than 80% of this calculated "Safe Dose Ceiling." The controller does not increase stroke rate even if the pH probe reads low (assuming drift). The only way the dose increases is if the feed flow rate *decreases* significantly (which reduces total mass input), but the absolute dose rate is capped to ensure that, even at minimum flow, the concentration does not exceed the scale threshold.
+4.  **Hardware Interlock:** Install a hardware limit switch or software hard-stop on the stroke rate actuator that physically prevents the stroke rate from exceeding the pre-calculated maximum safe rate. This bypasses any software bugs in the PID loop.
+
+**Measures It Relies On:**
+*   **Feed Water Flow Rate:** Accurate measurement via an electromagnetic flow meter (high reliability, no drift issues compared to pH probes).
+*   **Total Alkalinity/Carbonate Concentration:** Periodic offline laboratory analysis or use of a stable, non-drifting surrogate parameter (e.g., conductivity or turbidity trends) to re-validate the "Safe Dose Ceiling" calculation monthly. The control loop itself does not *use* these for real-time modulation, but they define the static safety limit.
+*   **Dosing Pump Stroke Rate:** The single permitted control variable. The mitigation works by *limiting* this variable to a conservative, pre-calculated maximum rather than actively controlling it to a setpoint.
+*   **Assumption of Conservative Margin:** The system relies on the fact that under-dosing caustic is safer (pH remains below 10.5, no scale) than over-dosing. The mitigation accepts a potential slight pH deficit (e.g., operating at pH 9.8 instead of 10.0) to guarantee that pH never exceeds 10.5 due to overshoot.
+
+**Why This Works Under the Constraint:**
+*   It **only uses the dosing-pump stroke rate** as the control variable (specifically, its upper limit).
+*   It **does not use inlet pH** as a control input; the pH probe is ignored for logic purposes, only for monitoring/alarm if it drifts wildly.
+*   It **mitigates overshoot** by physically and logically capping the dose rate below the threshold that causes scale precipitation, eliminating the risk of a PID loop hunting and overshooting due to probe drift or lag.

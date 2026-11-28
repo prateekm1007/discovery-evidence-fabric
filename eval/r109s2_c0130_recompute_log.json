@@ -1,0 +1,98 @@
+{
+ "record_type": "verifier-recompute-log",
+ "claim": "c-0138",
+ "verifies": "c-0130 (builder-r105s2, work_id p3-datasets-model-d7d8)",
+ "verifier_session": "builder-r109s2",
+ "checks": [
+  {
+   "name": "D8_cross_record_bolt_numbers",
+   "verdict": "PASS",
+   "detail": "FD001 0.887==0.887, FD002 0.8982==0.8982, ms 4996.2==4996.2"
+  },
+  {
+   "name": "D8_cwru_exact_fractions",
+   "verdict": "PASS",
+   "detail": "8/8 legs recompute exactly: coverage = round(hits/n_walk, 4) and alarms_per_1000 = round(1000*alarms/n_walk, 3) with integral hits (93/102, 97/101, 185/202, 117/151, 181/202, 111/152, 180/202, 117/152)"
+  },
+  {
+   "name": "D8_winner_tie_rule",
+   "verdict": "PASS",
+   "detail": "FD001 gap 0.1714 >= 0.02 -> Bolt wins (as typed); FD002 gap 0.0081 < 0.02 with same gate state (both < 0.90) -> TIE (as typed); both gate flags correctly false at 0.7156/0.8901/0.887/0.8982 < 0.90"
+  },
+  {
+   "name": "D8_matched_budget_unit_sets",
+   "verdict": "TYPED",
+   "detail": "code-read evidence: stage-3 and stage-4 filter units at the SAME n>=2*96+20=212 floor, FD001 runs ALL eligible units in both (37), FD002 draws random.Random(17).sample(range(92), 40) as the FIRST rng call in both -> identical unit sets GIVEN the same raw C-MAPSS bytes (deterministic loader). The raw unit channels are sandbox-local: UNVERIFIED-FROM-COMMIT beyond the code identity + the n_units match (37/37, 40/40)."
+  },
+  {
+   "name": "D8_census_threshold_analysis",
+   "verdict": "TYPED",
+   "detail": "stage-4 census {FD001: 37, FD002: 92} counts the n>=212 filter (code-read); stage-3's census prose (62/100, 152/260) counts n>=192 under the mislabeled key 'n_eligible_ge_2ctx_plus20' (the actual >=212 counts are 37/92) -> VF-1"
+  },
+  {
+   "name": "D8_wallclock_definition_mismatch",
+   "verdict": "TYPED",
+   "detail": "Sundial inference_ms_median 2022.9 = arm.last_ms (the LAST predict_batch call per unit/walk — a per-call metric, code-read); bolt_stage3_ms_median 4996.2 is stage-3's timing around the FULL sliding_walk (2 predict_batch calls + overhead) mislabeled 'inference_batched_call_ms_median' (a per-walk metric). The '2.5x faster' claim compares per-call vs per-walk -> VF-2; the honest same-definition ratio is NOT derivable from committed bytes (Bolt per-call timings uncommitted)."
+  },
+  {
+   "name": "D7_listing_lives_recompute",
+   "verdict": "PASS",
+   "detail": "independent re-parse: 7707 csv entries, 9.51 GiB, lives B3_1 2538 / B3_2 2496 — exact match to the record's archive_lives {'Bearing3_1': 2538, 'Bearing3_2': 2496}"
+  },
+  {
+   "name": "D7_attribution_ambiguity_structure",
+   "verdict": "PASS",
+   "detail": "the archive time SETS overlap at ['12:03'] (B3_1 11:56..12:03, B3_2 12:03..12:10) — range-disjointness is FALSE; the load-bearing property is per-minute: 0 minute indices carry EQUAL archive times for both bearings (mtime cannot discriminate there); ZERO of the 173 attributed minutes are in that set -> the executor's 0-ambiguous assertion is CONSISTENT with the committed listing for every attributed file (its mtime matched exactly one bearing's archive time at its minute; the file mtimes themselves are sandbox-local — the 0/0 counts are trusted-from-record, the structure is verifier-recomputed)"
+  },
+  {
+   "name": "D7_attribution_integrity",
+   "verdict": "PASS",
+   "detail": "173/173 entries resolve into the committed listing (0 bad, 0 duplicate minute indices); counts 73/100; first/last (47, 2538) / (1, 2484)"
+  },
+  {
+   "name": "D7_cadence_recompute",
+   "verdict": "PASS",
+   "detail": "Bearing3_1: median 27 range [25,55] over 72 steps; Bearing3_2: median 23 range [7,119] over 99 steps — exact match to the record (the sorted[len//2] median definition re-derived from the code)"
+  },
+  {
+   "name": "D7_coverage_exact_fractions",
+   "verdict": "PASS",
+   "detail": "B3_1: n_walk 73-36=37, sliding/static cov 30/37=0.8108, 1 alarm -> 27.027/1000 (both legs equal, as recorded); B3_2: n_walk 100-50=50, sliding 33/50=0.66 + 3 alarms -> 60.0, static 28/50=0.56 + 4 alarms -> 80.0 — the sliding remedy +0.10 coverage / -1 alarm on the real degradation leg, as recorded"
+  },
+  {
+   "name": "D7_ctx_adaptation_math",
+   "verdict": "PASS",
+   "detail": "B3_1: 73 < 212 (typed violation, verbatim error recorded), CTX=min(96,(73-20)//2)=26, 73>=2*26+20=72 KEPT; B3_2: 100 < 212, CTX=min(96,(100-20)//2)=40, 100>=2*40+20=100 KEPT (exactly at the floor) — the committed inequality holds on both adapted legs, the walk-function bytes untouched (module constants re-set per leg, disclosed in-record)"
+  },
+  {
+   "name": "D7_rms_ratio_recompute",
+   "verdict": "PASS",
+   "detail": "mean(last5)/mean(first5) recomputed from the committed endpoint arrays: B3_1 6.5473 (x6.5), B3_2 2.0115 (x2.0) — exact match; the full RMS series is NOT committed (sandbox-local sample) — the ratios verify, the series itself is UNVERIFIED-FROM-COMMIT beyond these endpoints"
+  },
+  {
+   "name": "D7_effective_window",
+   "verdict": "TYPED",
+   "detail": "code-read: the sliding buffer (deque maxlen=K=100) never fills on the adapted legs — B3_1 priming 36-26=10 + walk 37 = 47 max; B3_2 50-40=10 + 50 = 60 max; the priming is 10 residuals on BOTH legs (min_prime=20 is kept only as the inequality floor). 'k_kept: 100' and 'min_prime_kept: 20' are NOMINAL (the deque cap / the inequality parameter), not the effective window. On the C-MAPSS legs (n>=212) the buffer does reach 100 mid-walk — cross-dataset comparability of the sliding leg is affected; the within-XJTU sliding-vs-static comparison is not (both legs share the channel) -> VF-4"
+  },
+  {
+   "name": "D7_mtime_bucket_precision",
+   "verdict": "TYPED",
+   "detail": "the mtime match validates the BEARING exactly (disjoint ranges) but the minute index only to HH:MM-bucket granularity: B3_1 has 8 distinct HH:MM buckets each covering 129-376 minute indices, B3_2 8 buckets of 76-380 — an intra-bucket minute shift would pass the same check; the stems-as-minute-indices are sampler-trusted, corroborated bucket-level only -> VF-5"
+  },
+  {
+   "name": "D7_degradation_span",
+   "verdict": "PASS",
+   "detail": "both ratios (6.5473 / 2.0115) exceed the script's own 1.05 degradation-onset flag threshold — the record's unstated no-flag state matches the code path; the last-5 RMS of B3_1 (11.54 at minute 2538 = end of archive life) is consistent with 'degradation onset spanned'"
+  },
+  {
+   "name": "D7_extraction_census_provenance",
+   "verdict": "TYPED",
+   "detail": "the commit-message census (re-fetched set '7650 csv', 'the older 6141 listing', 4.2G gdown) exists in NO committed artifact (verifier grep: zero hits in eval/); the re-fetched parts' hashes were not recorded against the stage-1 manifest before deletion; the committed listing is the only verifiable census basis (7707 csv, 14 bearing folders, 9.51 GiB, B3_5 absent = the partiality) -> VF-6. The ATTRIBUTION is unaffected (it matched against the committed listing)."
+  }
+ ],
+ "summary": {
+  "pass": 11,
+  "fail": 0,
+  "typed": 6
+ }
+}

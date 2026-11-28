@@ -43,9 +43,28 @@ ANSWER_CONSISTENCY_VERSION = "answer_consistency/1.0.0"
 #: the falsification-test marker vocabulary (mirrors the answer
 #: contract's own test detection — one split authority, Art. X)
 _TEST_MARKER_RE = re.compile(
-    r"(?:falsification\s+test|falsifies|kill\s+criteria?|"
-    r"validation\s+(?:protocol|test)|pass\s+criteria?)\s*:",
+    r"(?:falsification\s+\w+|kill\s+criteria?|"
+    r"validation\s+(?:protocol|test)|pass\s+criteria?|"
+    r"test\s+parameters?)\**\s*:",
     re.IGNORECASE)
+#: R9 P0 (measured live shape, v2 p02 attempt 3): the repair model
+#: writes the complete protocol under 'Falsification Criterion:' —
+#: temperature, duration, n and the numeric pass/fail all present —
+#: but the old marker set only recognized 'Falsification Test:' and
+#: reported CHECK_ABSENT on a COMPLETE section (a measurement defect
+#: masquerading as an answer defect). The marker set admits the
+#: MEASURED LIVE SHAPES: 'Falsification Criterion:' and 'Test
+#: Parameters:' (with optional markdown '**' before the colon);
+#: 'falsification\s+\w+' admits the family (test/criterion/criteria...).
+#: MEASURED EXCLUSION: a BARE 'protocol:' marker was also admitted for
+#: one p02 shape and it BROKE the committed new07 regression — the
+#: candidate-free factor-mismatch catch — by splitting the answer at
+#: the THRESHOLD's calibration protocol ('PROTOCOL: Collect 15-minute
+#: resolution data...'), which is not the falsification test. Bare
+#: 'protocol' is therefore NOT a marker (the arm's surgical mode
+#: writes the exact 'FALSIFICATION TEST:' heading it needs). The
+#: marker SPLITS the answer: everything after it is the test section
+#: the spec-check evaluates.
 #: the lead DESIGN segment markers (PARAMETER is deliberately absent:
 #: a quantity line is the design's own spec, never a second design)
 _LEAD_SEGMENT_RE = re.compile(
@@ -53,7 +72,10 @@ _LEAD_SEGMENT_RE = re.compile(
     r"RECOMMENDATION)\s*:", re.IGNORECASE)
 _THING_MARKERS_RE = re.compile(
     r"\b(?:INDICATOR|THRESHOLD|PROTOCOL|VALIDATION(?:\s+PROTOCOL)?|"
-    r"PARAMETER|INTERVENTION)\s*:", re.IGNORECASE)
+    r"PARAMETERS?|INTERVENTION|MECHANISM|"
+    r"DEPARTURE(?:\s+FROM\s+STANDARD)?|"
+    r"LABELED(?:\s+PARAMETERS)?|TEST(?:\s+PROTOCOL)?)\s*:",
+    re.IGNORECASE)
 
 #: generic engineering scaffolding — never a design discriminator
 _GENERIC_TOKENS = frozenset({
@@ -169,6 +191,17 @@ def _lead_segment(text: str) -> str:
     return (m.group(0) + seg).strip()
 
 
+def _test_factor_toks(text: str) -> set:
+    """The COMPARED factor vocabulary of the falsification-test section:
+    what the test actually varies/compares (the A-vs-B subjects). The
+    measured new07 shape: the test compares nanofluid-enhanced vs
+    conventional transformers while the proposal's factor is a thermal
+    indicator — the test varies a DIFFERENT factor than the design
+    states (owner directive 2026-11-13, item 3)."""
+    _, test = _split_test(text)
+    return _content_tokens(test)
+
+
 def _split_test(answer: str) -> Tuple[str, str]:
     """(proposal_section, test_section) split at the falsification-test
     marker; when no COLON marker exists, the sentence that ANNOUNCES
@@ -213,6 +246,52 @@ def consistency_check(answer: str,
     ans_toks = _content_tokens(text)
     prop_toks = _content_tokens(proposal)
     test_toks = _content_tokens(test)
+
+    # ---- CANDIDATE-FREE RULES (run with or without candidates; the
+    # owner's measured defect: called with none, the old check returned
+    # PASS on the committed new07 bytes because EVERY design rule lived
+    # inside `if cands:` — the answer must stand on its own bytes).
+    lead = _lead_segment(proposal)
+    # R11 (the structured predictor shape, measured live on the A1
+    # arm): when the answer declares an explicit INDICATOR: line,
+    # THAT line is the design's stated monitored factor — the check
+    # reads the INDICATOR segment, not the first thing-marker (in the
+    # structured shape the MECHANISM section precedes it, and its
+    # vocabulary is the failure physics — the test legitimately tests
+    # the INDICATOR, not the physics prose). The intervention shape
+    # (no INDICATOR: line) keeps the current first-marker behavior.
+    _ind_m = re.search(r"\bINDICATOR\s*:", proposal, re.IGNORECASE)
+    if _ind_m:
+        _lead_ind = _lead_segment(proposal[_ind_m.start():])
+        if _lead_ind:
+            lead = _lead_ind
+    if lead:
+        lead_toks = _content_tokens(lead)
+        test_toks_f = _test_factor_toks(text)
+        # the factor-variation check: the falsification test must vary
+        # the SAME factor the INDICATOR/INTERVENTION line states. RAW
+        # content-token comparison (generic scaffolding already
+        # excluded): the problem's own constraint/user_variables are
+        # NOT subtracted — the new07 problem statement itself hands the
+        # thermal indicator to the pipeline, so subtracting the
+        # problem's vocabulary erased the design's factor words and
+        # hid the defect (measured 2026-11-13); an honest test names
+        # the indicator quantity it tests, so an honest answer shares
+        # the factor token and passes (all 11 committed single-design
+        # answers measured PASS under the raw rule).
+        if lead_toks and test_toks_f and not (lead_toks & test_toks_f):
+            violations.append({
+                "type": "TEST_FACTOR_MISMATCH",
+                "detail": ("the falsification test varies a DIFFERENT "
+                           "factor than the stated design: the "
+                           "INDICATOR/INTERVENTION factor vocabulary "
+                           f"({', '.join(sorted(lead_toks)[:5])}) and the "
+                           "test's compared-factor vocabulary "
+                           f"({', '.join(sorted(test_toks_f)[:5])}) share "
+                           "nothing — the test does not test the "
+                           "stated factor"),
+                "lead_tokens": sorted(lead_toks)[:6],
+                "test_tokens": sorted(test_toks_f)[:6]})
 
     if cands:
         primary = cands[0]
@@ -260,10 +339,9 @@ def consistency_check(answer: str,
         #    PARAMETER lines are deliberately NOT lead segments: a
         #    quantity line is the design's own spec, never a second
         #    design (the measured live p02 shape).
-        lead = _lead_segment(proposal)
         if lead:
-            lead_toks = _content_tokens(lead)
-            if lead_toks and not (lead_toks & p_toks) \
+            lead_toks2 = _content_tokens(lead)
+            if lead_toks2 and not (lead_toks2 & p_toks) \
                     and (p_toks & prop_toks):
                 violations.append({
                     "type": "TWO_DESIGNS_IN_PROPOSAL",
@@ -289,3 +367,14 @@ CONSISTENCY_CAVEAT_LINE = (
     "different proposals; verify that the mechanism, the measured "
     "quantity and the falsification test all describe one and the "
     "same design.")
+
+#: R9 P0 (owner round 2026-11-13): the companion caveat for CHECK_ABSENT
+#: — a missing falsification-test section is NOT a passed check, and an
+#: answer whose check could not run must carry that fact to the reader.
+#: CHECK_ABSENT must never silently become a pass (the measured defect:
+#: the composer loop treated only CONSISTENCY_VIOLATIONS as bad, so a
+#: missing check terminated the repair loop without the check passing).
+CONSISTENCY_ABSENT_CAVEAT_LINE = (
+    "Note: this answer carries no falsification-test section, so its "
+    "one-design consistency check could not run; the check is NOT a "
+    "pass — treat the design's internal consistency as unverified.")

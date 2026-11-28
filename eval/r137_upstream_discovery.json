@@ -1,0 +1,73 @@
+{
+ "record": "R137_UPSTREAM_DISCOVERY/1.0.0 (DIR 6 — English+Chinese discovery, the four named leads)",
+ "claim": "c-0218",
+ "at": "2026-11-23 (sandbox clock)",
+ "the_rule": "an imported module is not an integrated module: every candidate needs its exact repo, licence, commit/provenance, integration point, production invocation, test coverage and a MEASURABLE benefit to the user-facing discovery result; nothing is adopted for popularity. No integration was executed this window — this is the DISCOVERY record; integrations need their own claim + ablation arm (Art. 20).",
+ "leads": [
+  {
+   "name": "ModelScope/Awesome-Vibe-Research",
+   "repo": "https://github.com/modelscope/awesome-vibe-research",
+   "verified": {
+    "default_branch": "main",
+    "pushed_at": "2026-11-11T08:40:29Z",
+    "stars": 478,
+    "license": "Apache-2.0",
+    "archived": false,
+    "source": "GitHub API, read this window"
+   },
+   "class": "DISCOVERY INDEX (China-oriented, bilingual EN+ZH) — agents, skills, workflows, literature/experiment tools. NOT production code.",
+   "integration_point": "NONE (an index has no invocation). Value = a bilingual lead source for the ongoing discovery sweep: mine its lists for candidate tools that DO have a production invocation, then evaluate those on their own merits.",
+   "measurable_benefit": "deferred — an index cannot improve a user-facing result directly.",
+   "action": "queued as a lead-mining source for the next discovery round (the ZH-language tooling space is otherwise under-sampled in the current inventory)."
+  },
+  {
+   "name": "PQAI (Patent Quality AI) search server",
+   "repo": "https://github.com/pqaidevteam/pqai",
+   "verified": {
+    "default_branch": "master",
+    "pushed_at": "2026-10-21T10:19:19Z",
+    "stars": 140,
+    "license": "MIT",
+    "archived": false,
+    "source": "GitHub API, read this window"
+   },
+   "class": "PRIOR-ART SEARCH IMPLEMENTATION (MIT). The directions ask: compare against the existing Google Patents/Lens retrieval stack.",
+   "existing_stack": "discovery_fabric/source_registry/connectors/patents.py — GooglePatentsConnector + LensConnector, both over the prior_art_v2 wrapper (the _PaV2Wrapper bridge, collision_resolution state machine). The stack is LIVE in the production per-candidate collision path (run.py::_collision_for_candidate).",
+   "comparison": "PQAI bundles its own patent index + semantic search server (a deployment dependency: embeddings, a patent corpus, an API service). The existing stack is zero-deployment HTTP connectors. Integrating PQAI = standing up and maintaining a search service for a marginal recall delta that has NOT been measured. The honest comparison needs a measurable-benefit arm: same candidates, PQAI vs Google+Lens collision results, delta in prior-art collisions found — which is a quota-consuming measurement, not a code drop.",
+   "integration_point": "IF adopted: a third ConnectorBase subclass beside GooglePatents/Lens in connectors/patents.py behind the same _PaV2Wrapper — but ONLY after the measured-benefit arm justifies it.",
+   "measurable_benefit": "NOT YET MEASURED (the comparison run is the prerequisite; deferred to its own claim).",
+   "action": "typed DEFERRED-WITH-PREREQUISITE: no integration without the measured recall delta."
+  },
+  {
+   "name": "Microsoft MatterGen",
+   "repo": "https://github.com/microsoft/mattergen",
+   "verified": {
+    "default_branch": "main",
+    "pushed_at": "2026-08-27T16:29:17Z",
+    "stars": 1871,
+    "license": "MIT",
+    "archived": false,
+    "source": "GitHub API, read this window; the Nature paper s41586-025-08628-5"
+   },
+   "class": "GENERATIVE INORGANIC MATERIALS DESIGN (diffusion over crystal structures — composition + property-conditioned novel materials).",
+   "assessment": "the directions' own framing is exact: materials-SPECIFIC invention, not generic mechanism generation. The engine's mechanism space is CAUSAL-MECHANISM-level (device -> failure -> intervention physics); MatterGen generates CRYSTAL STRUCTURES (unit cells, lattice parameters). The only honest integration is a MATERIALS-DOMAIN plugin: when a fresh problem's domain is materials-synthesis AND the intervention needs a candidate composition, MatterGen could enumerate candidate structures for the engineering-evaluation stage. That is a new domain module (domains.py pattern), heavy (model weights + inference), and zero of the current five R137-fresh domains are composition-discovery problems.",
+   "integration_point": "NONE THIS WINDOW — no current problem class exercises it; adopting it now would be popularity-driven (the exact failure mode the directions forbid).",
+   "measurable_benefit": "NOT MEASURABLE on the current problem distribution (typed honestly).",
+   "action": "typed REVISIT-WHEN-A-MATERIALS-PROBLEM-CLASS-EXISTS: the honest trigger is a fresh problem set where >=3 problems need composition-space search."
+  },
+  {
+   "name": "Awesome-Science-Agents (the bilingual scientific-agent index)",
+   "repo": "https://github.com/TJUNLP-xxy/Awesome-AI-Science-and-Innovation (the located AI-science index; several 'awesome science agents' lists exist — the search located this + K-Dense-AI/scientific-agent-skills as the nearest matches)",
+   "verified": {
+    "note": "the exact repo the directions named was not uniquely resolvable from the search results this window; the nearest match (TJUNLP-xxy's index) is an AI-science+innovation curation list. NOT API-verified this window.",
+    "source": "web search results, read this window"
+   },
+   "class": "DISCOVERY INDEX (agents + benchmarks curation). Same class as Awesome-Vibe-Research: no production invocation.",
+   "integration_point": "NONE (index).",
+   "measurable_benefit": "deferred — lead-mining only.",
+   "action": "queued as a lead source; the exact-repo disambiguation is typed OPEN."
+  }
+ ],
+ "the_honest_bottom_line": "zero integrations this window — all four leads are either indexes (no invocation) or need a measured-benefit prerequisite (PQAI) or have no matching problem class (MatterGen). The Chinese-language discovery continued (the ModelScope index located + verified); the module inventory was NOT extended because nothing earned an entry — an entry without a production invocation would be exactly the 'imported != integrated' failure the directions call out.",
+ "no_score_claims": true
+}

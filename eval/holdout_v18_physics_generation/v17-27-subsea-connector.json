@@ -1,0 +1,137 @@
+{
+ "problem_id": "v17-27-subsea-connector",
+ "domain": "leakage_sealing",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:dbdb63774276": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:3b063ea6e7b6": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:6af934173956": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "leakage_sealing",
+   "confidence": 1.0,
+   "evidence_span": "leak",
+   "allowed_mech_classes": [
+    "seal_geometry_reload",
+    "double_isolation_barrier",
+    "self_healing_elastomer_seal"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:46:06Z",
+ "attempts_n": 1,
+ "row_wall_s": 7.6,
+ "a1_answer": "SUBSEA HYDRAULIC CONNECTOR SEAL REDESIGN: THERMALLY ENERGIZED METAL-TO-METAL LIP\n\nNOVELTY STATEMENT\nStandard practice delivers: a static elastomeric O-ring seal relying on initial interference fit to maintain contact pressure against leakage.\nMy mechanism departure: replacing the passive elastomer with a thermally driven, self-energizing metal-to-metal lip seal that generates contact pressure via differential thermal expansion between the lip and the body during thermal cycling.\nFailure-physics connection: Under thermal cycling, the temperature difference between the lip and the body creates a differential radial expansion. This differential expansion generates a normal contact force that increases as the internal pressure and temperature rise, directly counteracting the seal face relaxation and preventing leakage.\n\nPHYSICS CHECK\nGoverning relation: Differential thermal expansion force\nF = (Δα * ΔT * E * A_eff) / (1 - ν)\nwhere Δα is the difference in linear thermal expansion coefficients, ΔT is the temperature differential, E is the elastic modulus of the lip material, A_eff is the effective contact area, and ν is Poisson's ratio.\n\nMagnitude verification:\nAssume a steel lip (α_steel = 12e-6 /K) and an Invar-like body (α_body = 1.5e-6 /K).\nΔα = 10.5e-6 /K.\nAssume a temperature differential ΔT = 50 K (lip hotter than body due to friction or flow).\nE_steel = 200 GPa.\nAssume effective contact area A_eff = 50 mm² (5 mm width × 10 mm height).\nν_steel = 0.3.\nF = (10.5e-6 /K * 50 K * 200e9 Pa * 50e-6 m²) / (1 - 0.3)\nF = (10.5e-6 * 50 * 200e9 * 50e-6) / 0.7\nF = (525,000,000 * 50e-6) / 0.7  (Calculation: 10.5e-6 * 50 = 5.25e-4; 5.25e-4 * 200e9 = 105e6; 105e6 * 50e-6 = 5250 N)\nWait, let's re-calculate carefully.\nΔα * ΔT = 10.5e-6 * 50 = 5.25e-4 (strain)\nStress σ = E * ε = 200e9 Pa * 5.25e-4 = 105e6 Pa = 105 MPa.\nForce F = σ * A_eff = 105e6 Pa * 50e-6 m² = 5250 N.\nContact Pressure P = F / A = 105 MPa.\nThis pressure is sufficient to maintain metal-to-metal sealing against typical hydraulic pressures (< 50 MPa) and prevent leakage by keeping the lips tightly closed during thermal excursions.\n\nIMPLEMENTATION BILL\nComponents:\n1. Metallic lip seal ring (ASSUMPTION: Stainless Steel 316L because it must withstand subsea corrosion and thermal cycling; ALREADY-RECORDED: standard material for subsea connectors).\n2. Invar body sleeve (ASSUMPTION: Invar 36 because its low CTE creates the necessary differential expansion; DERIVED from stated physics requirement for Δα).\n3. Retaining clips (ALREADY-RECORDED: standard fasteners for subsea connector assembly).\nInputs:\n- Temperature differential ΔT (ALREADY-RECORDED: derived from stated thermal cycling conditions and material CTEs).\n- Pressure (ALREADY-RECORDED: stated system operating pressure).\nReference/Threshold:\n- Minimum seal pressure P_seal = 50 MPa (DERIVED: from stated hydraulic system maximum working pressure, ensuring seal pressure exceeds internal pressure to prevent leakage).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Same footprint as standard O-ring, no new porting or flange changes required.\nOperability: No active components; relies on passive thermal dynamics.\nMaintenance: Metal-to-metal seals have longer lifespan than elastomers in high-temperature/high-pressure environments; no periodic elastomer replacement needed.\nCost Class: Slightly higher material cost (Invar) but lower lifecycle cost due to increased reliability and reduced maintenance.\n\nEXECUTABLE TEST\nProtocol: Bench rig testing the seal under thermal cycling and pressure.\nInstruments: High-pressure chamber, thermocouples, leak detection mass flow meter.\nPass/Fail Thresholds: Leak rate < 10^-6 L/min at 50 MPa and 80°C.\nDuration: 100 thermal cycles (20°C to 80°C).\nKill Criterion: The mechanism is FALSIFIED if the measured leak rate does not decrease by at least 90% (from baseline O-ring performance) within 100 thermal cycles on the bench rig.\n\nCONSTRAINT BIND\nPrimary stated indicator: Leak rate (measured flow rate under pressure).\nSecondary indicator: Temperature differential (used to drive the mechanism, but the failure is defined by leakage).\nThe scheme monitors the primary indicator (leak rate) to validate the mechanism's performance, and the mechanism itself is driven by the thermal state, which is a stated condition of the failure mode (thermal cycling).\n\nM. DELIVERABLE-CLASS BIND\nF75 complied.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. Metallic lip seal ring (ASSUMPTION: Stainless Steel 316L because it must withstand subs",
+    "2. Invar body sleeve (ASSUMPTION: Invar 36 because its low CTE creates the necessary diffe",
+    "3. Retaining clips (ALREADY-RECORDED: standard fasteners for subsea connector assembly).",
+    "- Temperature differential ΔT (ALREADY-RECORDED: derived from stated thermal cycling condi",
+    "- Pressure (ALREADY-RECORDED: stated system operating pressure).",
+    "- Minimum seal pressure P_seal = 50 MPa (DERIVED: from stated hydraulic system maximum wor"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, let's re-calculate carefully."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'thermal cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'thermal cycling' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: Thermal cycling causes differential expansion and contraction that relaxes the static seal contact pressure, allowing internal fluid pressure to overcom"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "seal_geometry_reload",
+   "cross_domain": ""
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "required seal contact pressure (1.5x rule)",
+    "predicted_value": "p_contact >= 157.5 bar bar",
+    "calc_trace": "1.5 x 105.0 bar bar",
+    "falsifier": "the leak rate at 1.5x margin must stay within the tightness class in the pressurized bench test; the opposite result falsifies the invention",
+    "route": "class-generic:leakage_sealing"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "b32a0d7a851a6544"
+}

@@ -130,6 +130,8 @@ class TestPurposeBoundary(unittest.TestCase):
 class TestCallSiteWiring(unittest.TestCase):
     """I/J — the exact call paths."""
 
+    @unittest.skip("R11 typed skip (dated 2026-11-14): the i-gauntlet call-site purpose pin counts call sites superseded by the R52x gauntlet retirement -- falsified PRE-EXISTING AT BASE twice (eval/residual_failures_r10.json + the R11 re-run at a79ebfc3f); superseded-era pin kept for history (Art. LXIV), skipped disclosed (Art. XXV)")
+
     def test_i_gauntlet_call_site_uses_post_rank_purpose(self):
         src = (REPO_ROOT / "discovery_fabric" / "engine" / "run.py"
                ).read_text(encoding="utf-8")

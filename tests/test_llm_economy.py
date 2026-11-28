@@ -341,13 +341,19 @@ def test_flavor_breaker_aborts_storm_and_refuses_next_call(
 
     monkeypatch.setattr(lr, "_post_json", fake_post)
     spec = _Spec()
-    # the threshold-crossing failure is re-raised as the TYPED breaker
-    # state (the caller/generate walk records CIRCUIT_BREAKER_OPEN)
+    # OWNER ROUND 2026-11-13 item 2: the same-rung ladder is ONE
+    # immediate retry (2 attempts per call) — the breaker threshold (3)
+    # is crossed ACROSS calls: call 1 arms the breaker at 2/3 and its
+    # typed _HTTP429 propagates (no sleep between the two attempts)
+    with pytest.raises(_HTTP429):
+        lr._call_openai_flavor(spec, [{"role": "user", "content": "p"}],
+                               5, 64)
+    assert posted["n"] == 2
+    # the NEXT call's first failure crosses the threshold (3): the
+    # ladder aborts IMMEDIATELY with the TYPED breaker state
     with pytest.raises(econ.BreakerOpen):
         lr._call_openai_flavor(spec, [{"role": "user", "content": "p"}],
                                5, 64)
-    # the breaker opens ON the threshold-th consecutive failure and the
-    # ladder aborts immediately: exactly 3 requests, not the old storm
     assert posted["n"] == 3
     assert econ.breaker_state("prov-a")["open"] is True
     # the NEXT call is refused with ZERO provider requests

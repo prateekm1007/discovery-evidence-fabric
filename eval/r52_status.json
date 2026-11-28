@@ -1,0 +1,94 @@
+{
+ "record": "R52_BUILDER_STATUS/1.0.0",
+ "session": "builder-r52s1",
+ "work_id": "r52-p13-engine-migration",
+ "claim": "c-0069",
+ "base_sha": "e44ba36f0",
+ "round": "R52 (roadmap 4->9: P1.3 engine migration/integration \u2014 the F63 remedy; physics registry to 6; P1.4 regression; git-mode scan)",
+ "protocol": [
+  "FULL constitution reads: byte-identity re-verified at the pinned commits (EPISTEMIC @ e44ba36f0 md5 525536896f8000a17fab124fac845ca0; AUDITOR @ 4b5e5454c md5 abe1c4127bfc9e53b0f29c16e14892d5) \u2014 identical bytes to the prior FULL reads, which stand; no re-read of identical bytes is a semantic no-op and the identity check is the verification",
+  "auditor artifacts read IN FULL: audit/ROADMAP_4_TO_9_DETAILED.md (all 6 phases + risks), eval/r52_auditor_verification.json (R51/R50/R47-cont VERIFIED; F63 opened), the AM46-governed phase rules in the roadmap header",
+  "claim-before-work: session builder-r52s1 registered in work_claims.json sessions[] BEFORE c-0069 referenced it (the R51 Art. 29(a) lesson, applied)",
+  "secret-grep staged diff: run before the push (quoted in remote_ci note)"
+ ],
+ "vault_anomaly": {
+  "typed": "NVIDIA_API_KEY disappeared from the gitignored vault mid-session: the round-open read counted 2 protocol keys, the post-pull read counts 1 (GH_PAT present; no NVIDIA line). This session did not touch the file (mtime stale/skewed; gitignored; credential files are never rewritten by a builder). Consistent with an upstream rotation of one of the Aug-18 keys \u2014 exactly what the P0.1 escalation asks the owner to do \u2014 but unverifiable from here. R52's work is zero-LLM deterministic; no capability was blocked. Flagged to the owner in escalation #3."
+ },
+ "art27_capability_budget": {
+  "engine_diff": "MIGRATED INTO THE ENGINE (F63 remedy): scripts/triz_principles.py -> discovery_fabric/engine/triz_principles.py (89 lines, shim left in scripts/); scripts/v82_novelty_gate.py -> engine/novelty_gate.py (141 lines, shim); scripts/v82_typed_population.py logic -> engine/population_search.py (185 lines + the P1.4 declared-domain clamp, ~60 lines). NEW engine code: engine/engine_route.py (~170 lines \u2014 the integrated path: knowledge_first_item anchor -> typed plans -> assemble_candidate 1.0.0 -> extend_to_1_1 enums-from-plan -> validate_candidate_schema -> physics_checks sign-of-result -> novelty gate). physics_checks.py expanded 3 -> 6 relations (+~150 lines: NPSH cavitation margin, Magnus dewpoint/frost margin, Larson-Miller creep comparator). Behavior preservation PROVEN: the migrated CLI re-ran and reproduced the committed eval/v82_dev_plan_population.json byte-identically (pre-clamp); the clamped semantics go to a NEW artifact (eval/r52_dev_plan_population.json, 108 plans, 9 domain-clamped, schedule bar met, 0 outside) \u2014 the committed 1.0.0 artifact stays untouched.",
+  "primary_metric_delta": "NOT CLAIMED \u2014 the P1.4 regression is the metric gate this round (PASS 0/0/0, below); the D2d matched-budget ablation and the v9 sealed acceptance remain the metric events.",
+  "deletions": "ZERO physical deletions this round \u2014 the Art. 16 ledger lands the RETIRED_FROM_MEASURED_PATH entry for the prose scanners (effective: the integrated route never calls them, proven structurally); the physical deletion of the scanner functions is gated on the R53 machine-battery migration (r45_machine_v81 + test_v81_binds import them today). Typed in the ledger entry, not silently deferred.",
+  "engine_line_share": "filled at record-finalize time from git numstat (see engine_line_share_measured)"
+ },
+ "engine_line_share_measured": "numstat at finalize: engine +732/-4; total +4,412/-427. RAW basis 16.6% \u2014 diluted by the two generated artifacts (2,996 pretty-printed JSON lines, now compacted to single-line machine JSON: 54,704 + 6,383 bytes; the compaction is itself typed here). CODE basis (excluding generated JSON artifacts) = 736/1,843 = 39.9% \u2014 the F63 rule's basis (where capability logic is HOUSED) is met this round on the code basis; both numbers quoted for re-measurement. Cumulative catch-up: 1,072 engine lines landed across R47-cont/R50/R51/R52 (0+193+147+732); R52 is the first round clearing the 30% code-basis rule; the F63 correction continues with the R53 machine-battery migration.",
+ "P1_3_integration": {
+  "modules": [
+   "discovery_fabric/engine/triz_principles.py (migrated)",
+   "discovery_fabric/engine/novelty_gate.py (migrated)",
+   "discovery_fabric/engine/population_search.py (migrated + domain clamp)",
+   "discovery_fabric/engine/engine_route.py (NEW \u2014 the wiring)",
+   "discovery_fabric/engine/physics_checks.py (3 -> 6 relations)"
+  ],
+  "tests": "test_engine_route.py 5/5 (schema-from-plan, 1.0.0 hash untouched, physics RUN-only-with-inputs + PENDING_INPUTS, row novelty, contract legality); test_novelty_gate_engine.py 2/2 (the pre-registered bands, former script self-test); test_physics_checks.py 15/15 (six relations, sign-of-result on known answers, garbage REFUSED); test_candidate_schema.py 7/7; all wired into the CI step-2 block",
+  "script_shims": "scripts/triz_principles.py + scripts/v82_novelty_gate.py re-export from the engine; r45_machine_v81, r45_round_record, r45_claims, test_v81_binds keep their import surface unchanged"
+ },
+ "P1_4_regression": {
+  "file": "eval/r52_labelled_regression.json",
+  "corpus": "the 12 burned v7 problems (6 declare allowed measures) + the labelled scan fixtures (7 FALSE_POSITIVE input-availability rows re-checked)",
+  "gate": "PASS 0/0/0: 0 allowed-measures violations; 0 false input-flags on the labelled negatives; 0 prose-sourced direction fields",
+  "found_and_fixed_during_regression": "the pre-clamp enumeration produced OUTSIDE-DOMAIN plans on 6/6 declaring v7 rows \u2014 a REAL gap the regression caught; fixed by the deterministic declared-domain clamp in enumerate_plans (keyword table -> domain class set; outside plans demoted to the first declared class, flagged domain_clamped; undeclared rows carry no clamp, Art. XXV). Post-fix: 0 outside on v7 AND on the DEV corpus (0 allowed_row_outside, 9/108 clamped)."
+ },
+ "physics_registry": {
+  "relations": [
+   "arrhenius_rate_ratio",
+   "fouling_u_degradation",
+   "langelier_lsi",
+   "npsh_margin",
+   "dewpoint_frost_margin",
+   "larson_miller_lmp"
+  ],
+  "direction_rule": "direction-of-effect = SIGN of the computed result on every relation; missing inputs -> PENDING_INPUTS/REFUSED, never fabricated",
+  "disclosure": "the R50 record said '1 relation' but the committed module already carried 3 (Arrhenius, fouling-U, LSI) \u2014 the auditor's r52 verdict repeated the '1 relation' count; the true pre-R52 state is 3, R52 adds 3 -> 6"
+ },
+ "gitleaks_gitmode": {
+  "file": "eval/r52_gitleaks_gitmode.json",
+  "method": "gitleaks SEMANTICS via provider-format regexes (the binary is unavailable here \u2014 typed gap, the CI-wired gitleaks step stays queued) over every commit message in --all history + every added patch line (STREAMED \u2014 the buffered variant was OOM-killed at 137, typed) + exact vault-value presence per-ref; values never printed (4-char masked prefixes)",
+  "F64_NEW_FINDING": "CONFIRMED: the vault's own OPENROUTER_API_KEY (sk-or- format, 73 chars) sits plaintext in the INITIAL commit message ('feat: episte...') \u2014 a THIRD live credential class exposed in public history, beyond the F45 PAT (2 paths on r448/visual-lab) and the auditor-named Aug-18 commit-message keys. Exact-value match verified in-process; the value is never printed.",
+  "patch_line_findings": "17 patch-line format-hits: 15 ghp_ inside R451 CREDENTIAL_SCAN_PRE/POST_SCRUB.json audit records (the scrub's own recorded evidence \u2014 audit-record provenance, not necessarily live tokens) + 2 AKIA format-hits in a pre-A2-migration-era blob (skills/design template; most likely the canonical AWS example key \u2014 provenance commit d42cc215b typed; verify before remediation)",
+  "vault_value_history": "FINAL: 4 credential-value hits \u2014 BOTH GitHub credentials (GH_PAT AND GITHUB_TOKEN) sit plaintext at the SAME two paths on origin/r448/visual-lab (scripts/r447_canonical_space_record.py + scripts/r447_hf_deploy.py); the CROWLLM_BASE_URL matches are a URL endpoint, typed as non-credential provenance. The first scan run raced an edit and used a broken `git grep val --all` form (silently searched a PATH named --all) \u2014 found, fixed, re-run from the fixed per-ref method; typed here.",
+  "verdict": "FINDINGS PRESENT \u2014 remediation stays the P0.1 owner act (rotation + scrub), now covering F45 + F60 + F64 (two GitHub credentials + one OpenRouter key + rubric custody)"
+ },
+ "P0_1_owner_escalation": {
+  "escalation_n": 3,
+  "cadence": "once per round until done (risk register)",
+  "asks": [
+   "rotate the GitHub PAT (F45: vault value plaintext at origin/r448/visual-lab:scripts/r447_canonical_space_record.py + scripts/r447_hf_deploy.py)",
+   "NEW (F64): rotate BOTH GitHub credentials and the OpenRouter key \u2014 the vault's GH_PAT and GITHUB_TOKEN values sit plaintext at the same two r448/visual-lab paths (F45), and the vault's OPENROUTER_API_KEY sits plaintext in the INITIAL commit message; treat every credential that touched public history as burned (this also covers the 2 Aug-18 keys the auditor placed in commit messages)",
+   "move/encrypt every *_PRIVATE.json to private custody + scrub public history (F60 still PUBLIC: unauth 200, 8385 bytes on the audit branch, re-verified by the auditor this round); the v8 gate stays CLOSED until the verbatim custody-restored statement",
+   "vault anomaly: NVIDIA_API_KEY vanished from the vault mid-R52 \u2014 if this was an upstream rotation, confirm so the round protocol can re-verify the 2-key gate"
+  ]
+ },
+ "claims_flipped": {
+  "c-0067": "OPEN -> DONE (attribution: eval/r52_auditor_verification.json \u2014 auditor-verified across R50/R51 spans)",
+  "c-0068": "OPEN -> DONE (same attribution)"
+ },
+ "art16_ledger": "retirement #3 landed: the prose-regex scanners RETIRED_FROM_MEASURED_PATH (effective \u2014 the integrated route never calls them; P1.4 0/0/0 is the proof); physical deletion R53-scoped with the exact cascade named (machine battery migration + test_v81_binds rewrite + map/flags)",
+ "remote_ci": {
+  "pushed_sha": "2de5c388a",
+  "remote_ci_conclusion": "success",
+  "read_at": "2026-11-17T15:45:00Z",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success"
+   }
+  ],
+  "note": "quoted from the check-runs API read (GET /commits/2de5c388a/check-runs -> surface=success). Green on the FIRST push this round (the session-registration fix + full-CI-after-every-edit procedure held). detect-secrets on the R52 commits post-install: 7 hex-high-entropy findings, all the scan's own masked samples and sha256 identity hashes (baseline-class, not secrets). The record-close commit re-triggers CI; its conclusion lands in R53's record per the D2 procedure."
+ },
+ "next_round": [
+  "R53 machine-battery migration: r45_machine_v81's battery reads schema-sourced checks (mechanism_class enum field for the F58 cap; schema findings for input availability), test_v81_binds rewritten, THEN the physical prose-scanner deletion completes the Art. 16 entry",
+  "D2d matched-budget DEV ablation on eval/r52_dev_plan_population.json (clamped plans; novelty bands 0.85/0.70 pre-registered; adopt iff schedule-share <=17%, ALLOWED_ROW_OUTSIDE=0, mean no drop)",
+  "the CI-wired gitleaks step when the binary is available",
+  "P0.1 escalation #4 if the owner act still hasn't landed (now covering F45 + F60 + F64 + the vault anomaly)"
+ ]
+}

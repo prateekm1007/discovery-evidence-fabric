@@ -1,0 +1,32 @@
+{
+ "record": "R118_AUTHORING_BIND_VALUE_PREREG/1.0.0 (PRE-REGISTRATION — committed BEFORE any authoring-run byte)",
+ "claim": "c-0175 (work id r118-authoring-bind-value-prereg)",
+ "session": "builder-r118s1-7c91b2e4",
+ "at": "2026-11-22T14:10:00Z (sandbox clock, TRUE UTC)",
+ "authority": "the R118 adjudication (5b5e54054afd): 'the proper bind-value test is the AUTHORING task (bare authors + binds check/repair) measured on DELIVERED-DEFECT-RATE, not catch-rate (catch-rate is confounded by the ceremony creating defects). The delivered-answer leg corrected 12/12 seeded defects + preflight 12/12 -> the binds catch real defects; a clean bare+binds delivered-quality measurement is the live bind-value proof.'",
+ "the_instrument": {
+  "name": "AUTHORING-TASK DELIVERED-DEFECT-RATE (F31a)",
+  "the_task": "AUTHOR an intervention bill from the scenario (device/failure/constraint) — the machine's native question_type intervention-proposal (the draft-review type was the R117 off-design mistake; authoring is the on-design task)",
+  "the_set": "the SAME 12 pair-scenarios as the F30 v1.1.0 battery (brine cooler / clarifier / VRLA / MF caustic / screen deck / pasteurizer; 2 per scenario), the SAME 6 adjudicated defect classes, the same sealed key spans as the detectors' ground truth — but the items are REKEYED for authoring: question_type=intervention-proposal, question='Propose a mitigation for <failure> under <constraint>' (the v15 problem shape, no draft embedded); the arms author FRESH bills",
+  "the_arms": {
+   "bare_only": "agnes-3.0-flash, ONE call per item, the minimal authoring directive (the same bytes the engine arm's generator prompt carries), the raw completion committed verbatim — NO binds, NO repair",
+   "bare_plus_binds": "the working configuration the R118 verdict named: the SAME one-call bare authoring, then the BIND CHECK layer over the authored bill (the five binds' deterministic scans) and the machine's own repair loop (V77_REPAIR_DIRECTIVE + regeneration through the same generator, REPAIR_BUDGET 3 — the frozen machine's repair semantics unchanged; the binds check/repair text the bare model wrote, never re-author from scratch)"
+  },
+  "n_items": "24 (12 scenarios x 2 seeds — the pair structure preserved for the paired bootstrap)",
+  "scoring": {
+   "delivered_defect_rate_PRIMARY": "per arm, the fraction of the 24 delivered bills carrying >=1 defect of ANY of the 6 adjudicated classes, detected by the SAME deterministic class detectors as the F30 preflight/scoring (the committed preflight logic; zero LLM); the repair leg's output is what scores for the bare_plus_binds arm (the DELIVERED bill after check/repair)",
+   "secondary": "defects-per-bill (per-class table); repair-leg behavior (findings fired, repairs applied)",
+   "paired_bootstrap": "per-item defect indicator, bare_only minus bare_plus_binds, percentile bootstrap 10k, seed 118",
+   "gates": "BIND VALUE PROVEN iff the paired CI excludes 0 with bare_plus_binds LOWER (fewer delivered defects) AND the bind layer's damage gate holds: the repair leg must not INTRODUCE a new defect class into a clean bill in more than 25% of the clean-bare items (the Art. 14 feasibility number, the same FA gate class as F30); else TYPED_NEGATIVE + the bind-retirement question with the per-class table"
+  },
+  "quota_budget": "HONEST RE-ESTIMATE (the prereg's own contingency clause applied at write time, before commit): the machine's repair leg IS LLM-transported (V77_REPAIR_DIRECTIVE feeds back through _gen_fb — one regeneration per repair round, REPAIR_BUDGET 3) — so bare_only = 24 calls; bare_plus_binds = 24 x (1 + repairs, budget-capped 3) ≈ 24-96 calls; TOTAL ~48-120 worst case on the 2-key rotation, the same wall-tolerance as F30 (byte-skip resume, typed 429 backoff). If the quota probe fails at window open, the run defers and the claim stays OPEN (typed INFRA_QUOTA_WALL).",
+  "leakage_controls": "the sealed key never enters any prompt; both arms receive byte-identical scenario JSON; the detectors are the committed preflight's own logic; the judge calls (0 needed: the detectors are deterministic) — zero judge calls in this instrument",
+  "wall_tolerance": "byte-skip resume per item per arm (one generation per item per arm, ever); typed 429 backoff through the 2-key rotation"
+ },
+ "the_score9_axis_enactment_proposal": {
+  "trigger": "the R118 adjudication: 'AUDITOR: the bind-value axis is NOT dead — the review-task was off-design; enact the AUTHORING-task delivered-defect-rate axis (bare+binds vs bare-only) as the live score-9 capability axis.'",
+  "the_proposed_gate": "score-9 binds to the authoring-task axis: the engine's bare_plus_binds arm achieves delivered-defect-rate <= 0.25 (the Art. 14 feasibility class: at most a quarter of delivered bills carry any adjudicated defect class) AND the paired CI excludes 0 below bare_only (real value over the cheapest arm, the Art. 20 discipline) AND the damage gate <= 0.25 — all three; the numbers are Art. 9 LABELLED ASSUMPTIONS with the per-class sensitivity path; the AUDITOR enacts (this file proposes; the adjudication adopts)",
+  "ordering_guarantee": "this prereg commits BEFORE any authoring-run byte exists (the claim registers before the run claim; the detectors are committed logic; the set builder is deterministic zero-LLM)"
+ },
+ "invalidates": "NOTHING from F30 (the review-task negative stands as measured); this instrument is the on-design successor the adjudication ordered. No new guards (dir 8): the detectors reuse the committed preflight logic; the repair leg is the frozen machine's own."
+}

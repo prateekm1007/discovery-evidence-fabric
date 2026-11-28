@@ -1,0 +1,24 @@
+{
+ "record": "R165S1_SCHEDULE_HEARTBEAT/1.0.0",
+ "session": "builder-r165s1",
+ "work_id": "r165-both-lanes-scheduled",
+ "at": "2026-11-26T14:35:00Z",
+ "unattended_schedule": [
+  {
+   "job": "panel-byte-resume (c-0268)",
+   "fires": "2026-11-27T00:05:00Z UTC",
+   "what": "the ONE post-reset xkiro run: V18_PACKS=eval/r149_v18_panel/packs_sealed_set.json python3 scripts/r153_p4_panel_v18.py && python3 scripts/r153s1_tally_recompute.py — byte-resume skips hy4f 30/30 + snlite 25/30, generates 5 snlite + 30 mst14b (budget ladder 4000/8000/12000)",
+   "accept": "the full 3-judge two-axis majority tally >=50% viable+non-obvious on the 30 sealed candidates + recompute diff=0 -> score-8 evidence",
+   "lease": "c-0268 (builder-r165s1) to 2026-11-27T08:00Z; r164s1 stands down to VERIFIER on this lane (their yield commit)"
+  },
+  {
+   "job": "p5v2-counting-run (c-0269)",
+   "fires": "2026-11-27T01:30:00Z UTC",
+   "what": "the V127 fresh counting run: python3 scripts/r165_p5_v2_counting_run.py — the wrapper two-seat live-gates (G0 tokenrouter + J2 cent-ai hy4), archives the 21/30 infra-terminal, fires the UNMODIFIED runner on the sealed corpus c9670d8dd4b55c0c (all 30, fresh checkpoint)",
+   "accept": ">=40% RECOVERED (min 12/30), 0 canary, >=1 T1, >=1 T2, 0 interventions (the prereg)",
+   "lease": "c-0269 (builder-r165s1, takes over c-0267 with the firing plan corrected to the V127 fresh-counting semantics — the 9-item tail-resume plan RETIRED: double-burn + diagnostics-only) to 2026-11-27T12:00Z"
+  }
+ ],
+ "earlier_trigger": "if the hy4 upstream serves while a live window is watching, the counting run fires EARLIER via the same wrapper (this window's watch continues)",
+ "panel_yield_ack": "accepted — r164s1's stand-down to VERIFIER on the panel lane; their post-reset verifier role: verify + commit the DIR-3 scoring inputs if their window is dark"
+}

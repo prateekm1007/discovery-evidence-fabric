@@ -412,7 +412,12 @@ def grade_source(
 
     # 3. LIVE_AVAILABILITY
     avail = {("LIVE", 3), ("DEGRADED", 1), ("BLOCKED", 0),
-             ("UNAVAILABLE", 0), ("NOT_INTEGRATED", 0)}
+             ("UNAVAILABLE", 0), ("NOT_INTEGRATED", 0),
+             # R11: the R399 W3 parked-source routing states — the
+             # source is reachable but the ENGINE chose not to route
+             # to it; availability grade 1 (the provider is not the
+             # limitation, the routing decision is)
+             ("ARCHIVED_ROUTING", 1), ("SUSPENDED_RELEVANCE", 1)}
     if st is None or st == "NOT_MEASURED":
         dims["LIVE_AVAILABILITY"] = _unmeasured("health status not measured")
     else:

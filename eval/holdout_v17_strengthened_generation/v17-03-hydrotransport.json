@@ -1,0 +1,201 @@
+{
+ "problem_id": "v17-03-hydrotransport",
+ "domain": "abrasion_erosion",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P40",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P40",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:c2d66e7264ac": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:b44a9f675002": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "abrasion_erosion",
+   "confidence": 1.0,
+   "evidence_span": "erode, erodes",
+   "allowed_mech_classes": [
+    "compliant_elastomer_coating",
+    "surface_hardening_treatment",
+    "micro_texturing",
+    "particle_trajectory_deflection",
+    "sacrificial_replaceable_shield"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "compliant_elastomer_coating",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "geometry",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 5,
+    "top_class": "compliant_elastomer_coating",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "a harder/thicker surface: apply a hard-facing or add material at the wear site"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:14:41Z",
+ "attempts_n": 1,
+ "row_wall_s": 18.4,
+ "a1_answer": "**NOVELTY STATEMENT**\n1.  **Standard Practice Delivery:** The field-standard practice for hydro-transport pipeline erosion delivers a **DESIGN CHANGE** via **surface_hardening_treatment** (e.g., HVOF tungsten carbide or ceramic hard-facing) to increase surface hardness ($H$) and resist material removal.\n2.  **Mechanism Departure:** My proposal delivers the same outcome class (erosion mitigation) via **compliant_elastomer_coating**. The physical departure is shifting the mechanism from *resistance to cutting* (high modulus, hard surface) to *absorption of impact stress* (low modulus, high damping). Standard hard-facing fails when particle kinetic energy exceeds the substrate's fatigue limit or when thermal spalling occurs; the elastomer layer extends the stress pulse duration, reducing peak contact stress below the erosion initiation threshold.\n3.  **Failure-Physics Connection:** The governing physics for normal-impingement erosion of ductile/hard surfaces is often described by the **Springer** or **Fiebig** relations where erosion rate $E \\propto \\frac{1}{H} K (\\frac{\\rho_p v_p^2}{\\rho_s})^n$ (for $v > v_{crit}$). For ductile materials, the critical velocity $v_{crit}$ is low, and wear is dominated by plastic deformation and crack initiation. By introducing a compliant layer with low modulus $E_{coating}$ and high damping factor $\\zeta$, the impact force is reduced via impulse spreading: $F_{peak} \\approx \\frac{\\Delta p}{\\Delta t}$. Increasing $\\Delta t$ (contact time) by 5-10x via elastic deformation reduces $F_{peak}$ proportionally. If $F_{peak}$ drops below the yield strength of the coating or the substrate's fatigue threshold, material removal shifts from abrasive cutting to reversible indentation/rebound, effectively halting erosion.\n\n**PHYSICS CHECK**\nThe governing relation is the **Impact Stress Reduction via Compliant Layer**.\nFor a particle of mass $m_p$, velocity $v_p$, striking a compliant surface, the contact time $\\Delta t$ scales with the coating thickness $d_c$ and wave speed $c_c \\approx \\sqrt{E/\\rho}$.\nAssume:\n- Particle velocity $v_p = 10$ m/s (ASSUMPTION: typical slurry transport velocity).\n- Particle size $d_p = 1$ mm, density $\\rho_p = 2650$ kg/m³ (ASSUMPTION: standard sand/mineral slurry).\n- Coating modulus $E_c = 50$ MPa (ASSUMPTION: standard polyurethane).\n- Coating thickness $d_c = 10$ mm.\n\nThe natural frequency of the coating \"spring\" $f_c \\approx \\frac{1}{2\\pi}\\sqrt{\\frac{E_c}{\\rho_c d_c^2}}$.\n$\\rho_c \\approx 1100$ kg/m³.\n$f_c \\approx \\frac{1}{2\\pi}\\sqrt{\\frac{50 \\times 10^6}{1100 \\times (0.01)^2}} \\approx \\frac{1}{2\\pi}\\sqrt{4.5 \\times 10^8} \\approx 3300$ Hz.\nContact time $\\Delta t \\approx \\frac{1}{f_c} \\approx 300$ $\\mu$s.\n\nCompare to hard steel ($E \\approx 200$ GPa): $f_{steel} \\approx \\sqrt{4000} \\times 3300 \\approx 208,000$ Hz. $\\Delta t_{steel} \\approx 5$ $\\mu$s.\nThe compliant layer increases contact time by a factor of ~60.\nConsequently, Peak Force $F_{peak}$ decreases by a factor of ~60.\nIf the initial peak stress on hard surface is $\\sigma_{hard}$, the stress on the compliant system is $\\sigma_{comp} \\approx \\sigma_{hard} / 60$.\nIf $\\sigma_{hard}$ causes erosion (fatigue initiation), $\\sigma_{comp}$ must fall below the elastic limit of the coating/substrate interface to prevent material removal.\n\n**IMPLEMENTATION BILL**\n*   **Component:** Compliant Elastomer Liner.\n*   **Material:** High-density Polyurethane (HDPU) or Thiokol, Shore A 70-90, bonded to pipe interior.\n*   **Procedure:**\n    1.  **Surface Prep:** Standard practice (sandblast to white metal) to ensure adhesion.\n    2.  **Application:** Spray-application of dual-component elastomer to a thickness of 10-15 mm on the pipeline bottom and upper quadrant (0°-360° if flow is turbulent, else 0°-180° bottom).\n    3.  **Curing:** In-situ curing for 24-48 hours before pressure test.\n*   **Input Streams (ALREADY-RECORDED):**\n    *   **Pressure Differential ($\\Delta P$):** Stated in problem \"pressure\" signal. Used to monitor blockage or gross flow changes, but NOT as the primary erosion indicator.\n    *   **Visual Inspection:** Stated in problem \"visual_inspection\". Used to verify coating integrity and adhesion after installation.\n    *   **Particle Data (ASSUMPTION):** Slurry particle size distribution (PSD) and concentration $C_s$ are assumed available from standard process control logs (stated as \"slurry\" implies known media).\n*   **Reference/Thresholds (DERIVED):**\n    *   **Critical Velocity $v_{crit}$:** Derived from standard erosion correlations for steel (e.g., $v_{crit} = \\frac{20.4 (1-10^{-12})}{C_s^{0.5}}$ m/s, modified for particle size). For $C_s = 0.4$ (typical), $v_{crit} \\approx 10$ m/s.\n    *   **Design Threshold:** The coating is designed for operation at $v_{op} < 0.8 \\times v_{crit}$ to ensure impact energies remain below the coating's damage threshold. This threshold is CALCULATED from the standard erosion formula using the ASSUMED $C_s$.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice:** HVOF Tungsten Carbide Coating.\n    *   **Installability:** Requires specialized thermal spray equipment, strict surface prep, and post-spray machining/inspection. High burden.\n    *   **Operability:** Rigid; risk of spalling if thermal shock or overpressure occurs. No self-repair.\n    *   **Maintenance:** Periodic NDT (Ultrasonic) to check for delamination/spalling. High cost.\n*   **Proposed Practice:** Elastomer Coating.\n    *   **Installability:** Spray application, similar to standard epoxy linings. Lower equipment burden than HVOF.\n    *   **Operability:** Rigid-to-Compliant transition. Absorbs minor flow disturbances. Lower risk of catastrophic spalling.\n    *   **Maintenance:** Visual inspection (stated signal) is sufficient for coating integrity (cracks/blisters are visible). Lower cost.\n*   **Comparison:** The burden is LOWER or SAME class. The mechanism is DIFFERENT (Energy Absorption vs. Hardness Resistance). The cost is likely lower (HDPU is cheaper than HVOF tungsten).\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  **Coupon Test:** Fabricate 3 test pipes (1m diameter, 10m length).\n        *   Pipe A: Bare steel (Control).\n        *   Pipe B: HVOF Tungsten Carbide (Standard Practice).\n        *   Pipe C: 10mm HDPU Elastomer Coating (Proposed).\n    2.  **Run Test:** Pump slurry with $C_s = 0.4$, $d_{50} = 0.5$ mm, at $v = 10$ m/s for 100 hours.\n    3.  **Measurement:** Measure mass loss of coupons or use ultrasonic thickness gauging at 5 points per pipe before and after.\n*   **Instruments:** Ultrasonic Thickness Gauge (UTG), Balance (mass).\n*   **Pass/Fail Thresholds:**\n    *   **Pipe A (Control):** Expected erosion > 100 $\\mu$m (Reference).\n    *   **Pipe C (Proposed):** Pass if erosion depth $\\leq 10 \\mu$m (90% reduction).\n    *   **Falsification:** The mechanism is falsified if Pipe C erosion exceeds 50% of Pipe A's erosion (i.e., > 50 $\\mu$m) within the 100-hour window.\n*   **Duration:** 100 hours.\n*   **Kill Criterion:** If the elastomer coating spalls or delaminates during the test (visible inspection), the mechanism fails due to adhesion/compatibility, not erosion resistance.\n\n**CONSTRAINT BIND**\n*   **Primary Indicator:** The problem states \"visual_inspection\" and \"pressure\".\n    *   **Pressure:** A secondary indicator. A change in pressure differential can indicate blockage, but it does *not* directly indicate wall erosion thickness. It is used here to ensure flow stability during operation, not as the erosion metric.\n    *   **Visual Inspection:** The primary indicator for *coating integrity*. For the *erosion depth* itself, the standard industry metric is **wall thickness** (measured by UTG during shutdowns). However, the problem *only* lists \"visual_inspection\" and \"pressure\" as signals.\n    *   **Resolution:** Since \"wall thickness\" is not a stated signal, and \"add_monitoring\" is FORBIDDEN, I must use the stated signals. **Visual Inspection** is the primary indicator for the *health* of the proposed mechanism (checking for cracks, blisters, or delamination which are precursors to failure). The *erosion* itself is mitigated by the design; the *failure* is the degradation of the mitigation. Therefore, the monitored indicator is **Visual Integrity of Coating**.\n    *   **Why Primary:** Visual inspection can detect the specific failure mode of the elastomer (crazing, cracking) that leads to loss of protection. Pressure changes are non-specific (could be flow control, not failure).\n\n**WORKED CALCULATION (Quantitative Testability Bind)**\n*   **Formula:** Springer Erosion Model for Hard Surface vs. Compliant Reduction Factor.\n    *   Hard Surface Erosion Rate: $E_{hard} = K (\\frac{\\rho_p v_p^2}{\\rho_s})^n$\n    *   Let's use a simplified Energy Absorption Ratio $R_{abs} = \\frac{E_{elastic}}{E_{impact}}$.\n    *   Alternatively, use the **Critical Velocity** shift.\n    *   Let's calculate the **Impact Energy** absorbed.\n    *   Input:\n        *   $v_p = 10$ m/s (ASSUMPTION: from typical slurry pump data).\n        *   $d_p = 0.5$ mm (ASSUMPTION: from typical slurry PSD).\n        *   $\\rho_p = 2650$ kg/m³ (ASSUMPTION).\n        *   $C_s = 0.4$ (ASSUMPTION: standard cut-off concentration).\n    *   **Hard Surface (Steel):**\n        *   $v_{crit, steel} \\approx 10$ m/s (Standard rule of thumb: $v_{crit} \\propto 1/C_s^{0.5}$).\n        *   At $v=10$, $v_{op} = v_{crit}$. Erosion is at threshold.\n    *   **Compliant Surface (Elastomer):**\n        *   The compliant layer increases the effective stopping distance $\\Delta x$ from $\\sim 1 \\mu m$ (metal deformation) to $\\sim 10 mm$ (coating thickness).\n        *   Work-Energy Theorem: $F_{avg} \\Delta x = \\frac{1}{2} m v^2$.\n        *   $F_{avg, hard} \\propto \\frac{E_k}{1 \\mu m}$.\n        *   $F_{avg, comp} \\propto \\frac{E_k}{10 mm} = \\frac{E_k}{10,000 \\mu m}$.\n        *   Force Reduction Factor = $10,000$.\n        *   Stress = Force / Area. Area increases slightly with deformation.\n        *   Predicted Peak Stress Reduction: $\\geq 100$x.\n    *   **Numeric Result:**\n        *   Peak Stress on Hard Surface $\\approx 500$ MPa (Yield limit).\n        *   Peak Stress on Compliant Surface $\\approx 5$ MPa.\n        *   5 MPa is well below the damage threshold of HDPU (typically > 20 MPa for permanent set).\n        *   **Conclusion:** The coating remains elastic; no material removal occurs.\n\n**FALSIFIABLE PREDICTION**\n*   **Metric:** Erosion Depth (micrometers).\n*   **Direction:** Reduction.\n*   **Magnitude:** $\\geq 90\\%$ reduction in erosion depth compared to bare steel control.\n*   **Observation Window:** 100 hours of continuous slurry flow at 10 m/s.\n*   **Measurement:** Ultrasonic Thickness Gauge (UTG) readings taken at 5-point cross-sections, averaged.\n\n**KILL CONDITION**\n*   The mechanism is falsified if the measured erosion depth of the elastomer-coated pipe is **not** at least **90% lower** than the bare steel control pipe after **100 hours** of exposure to slurry at **10 m/s**. (i.e., if erosion depth is > 10% of the control's erosion depth,",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component:** Compliant Elastomer Liner.",
+    "*   **Material:** High-density Polyurethane (HDPU) or Thiokol, Shore A 70-90, bonded to pi",
+    "*   **Procedure:**",
+    "1.  **Surface Prep:** Standard practice (sandblast to white metal) to ensure adhesion.",
+    "2.  **Application:** Spray-application of dual-component elastomer to a thickness of 10-15",
+    "3.  **Curing:** In-situ curing for 24-48 hours before pressure test.",
+    "*   **Input Streams (ALREADY-RECORDED):**",
+    "*   **Pressure Differential ($\\Delta P$):** Stated in problem \"pressure\" signal. Used to m",
+    "*   **Visual Inspection:** Stated in problem \"visual_inspection\". Used to verify coating i",
+    "*   **Particle Data (ASSUMPTION):** Slurry particle size distribution (PSD) and concentrat",
+    "*   **Reference/Thresholds (DERIVED):**",
+    "*   **Critical Velocity $v_{crit}$:** Derived from standard erosion correlations for steel",
+    "*   **Design Threshold:** The coating is designed for operation at $v_{op} < 0.8 \\times v_",
+    "*   **Standard Practice:** HVOF Tungsten Carbide Coating.",
+    "*   **Installability:** Requires specialized thermal spray equipment, strict surface prep,",
+    "*   **Operability:** Rigid; risk of spalling if thermal shock or overpressure occurs. No s",
+    "*   **Maintenance:** Periodic NDT (Ultrasonic) to check for delamination/spalling. High co",
+    "*   **Proposed Practice:** Elastomer Coating.",
+    "*   **Installability:** Spray application, similar to standard epoxy linings. Lower equipm",
+    "*   **Operability:** Rigid-to-Compliant transition. Absorbs minor flow disturbances. Lower",
+    "*   **Maintenance:** Visual inspection (stated signal) is sufficient for coating integrity",
+    "*   **Comparison:** The burden is LOWER or SAME class. The mechanism is DIFFERENT (Energy ",
+    "*   **Protocol:**",
+    "1.  **Coupon Test:** Fabricate 3 test pipes (1m diameter, 10m length).",
+    "*   Pipe A: Bare steel (Control).",
+    "*   Pipe B: HVOF Tungsten Carbide (Standard Practice).",
+    "*   Pipe C: 10mm HDPU Elastomer Coating (Proposed).",
+    "2.  **Run Test:** Pump slurry with $C_s = 0.4$, $d_{50} = 0.5$ mm, at $v = 10$ m/s for 100",
+    "3.  **Measurement:** Measure mass loss of coupons or use ultrasonic thickness gauging at 5",
+    "*   **Instruments:** Ultrasonic Thickness Gauge (UTG), Balance (mass).",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Pipe A (Control):** Expected erosion > 100 $\\mu$m (Reference).",
+    "*   **Pipe C (Proposed):** Pass if erosion depth $\\leq 10 \\mu$m (90% reduction).",
+    "*   **Falsification:** The mechanism is falsified if Pipe C erosion exceeds 50% of Pipe A'",
+    "*   **Duration:** 100 hours.",
+    "*   **Kill Criterion:** If the elastomer coating spalls or delaminates during the test (vi",
+    "*   **Primary Indicator:** The problem states \"visual_inspection\" and \"pressure\".",
+    "*   **Pressure:** A secondary indicator. A change in pressure differential can indicate bl",
+    "*   **Visual Inspection:** The primary indicator for *coating integrity*. For the *erosion",
+    "*   **Resolution:** Since \"wall thickness\" is not a stated signal, and \"add_monitoring\" is",
+    "*   **Why Primary:** Visual inspection can detect the specific failure mode of the elastom",
+    "*   **Formula:** Springer Erosion Model for Hard Surface vs. Compliant Reduction Factor.",
+    "*   Hard Surface Erosion Rate: $E_{hard} = K (\\frac{\\rho_p v_p^2}{\\rho_s})^n$",
+    "*   Let's use a simplified Energy Absorption Ratio $R_{abs} = \\frac{E_{elastic}}{E_{impact",
+    "*   Alternatively, use the **Critical Velocity** shift.",
+    "*   Let's calculate the **Impact Energy** absorbed.",
+    "*   Input:",
+    "*   $v_p = 10$ m/s (ASSUMPTION: from typical slurry pump data).",
+    "*   $d_p = 0.5$ mm (ASSUMPTION: from typical slurry PSD).",
+    "*   $\\rho_p = 2650$ kg/m³ (ASSUMPTION).",
+    "*   $C_s = 0.4$ (ASSUMPTION: standard cut-off concentration).",
+    "*   **Hard Surface (Steel):**",
+    "*   $v_{crit, steel} \\approx 10$ m/s (Standard rule of thumb: $v_{crit} \\propto 1/C_s^{0.5",
+    "*   At $v=10$, $v_{op} = v_{crit}$. Erosion is at threshold.",
+    "*   **Compliant Surface (Elastomer):**",
+    "*   The compliant layer increases the effective stopping distance $\\Delta x$ from $\\sim 1 ",
+    "*   Work-Energy Theorem: $F_{avg} \\Delta x = \\frac{1}{2} m v^2$.",
+    "*   $F_{avg, hard} \\propto \\frac{E_k}{1 \\mu m}$.",
+    "*   $F_{avg, comp} \\propto \\frac{E_k}{10 mm} = \\frac{E_k}{10,000 \\mu m}$.",
+    "*   Force Reduction Factor = $10,000$.",
+    "*   Stress = Force / Area. Area increases slightly with deformation.",
+    "*   Predicted Peak Stress Reduction: $\\geq 100$x.",
+    "*   **Numeric Result:**",
+    "*   Peak Stress on Hard Surface $\\approx 500$ MPa (Yield limit).",
+    "*   Peak Stress on Compliant Surface $\\approx 5$ MPa.",
+    "*   5 MPa is well below the damage threshold of HDPU (typically > 20 MPa for permanent set",
+    "*   **Conclusion:** The coating remains elastic; no material removal occurs.",
+    "*   **Metric:** Erosion Depth (micrometers).",
+    "*   **Direction:** Reduction.",
+    "*   **Magnitude:** $\\geq 90\\%$ reduction in erosion depth compared to bare steel control.",
+    "*   **Observation Window:** 100 hours of continuous slurry flow at 10 m/s.",
+    "*   **Measurement:** Ultrasonic Thickness Gauge (UTG) readings taken at 5-point cross-sect",
+    "*   The mechanism is falsified if the measured erosion depth of the elastomer-coated pipe "
+   ],
+   "APPARATUS_ROW": [
+    "*   **Pressure Differential ($\\Delta P$):** Stated in problem \"pressure\" signal. Used to monitor blockage or g",
+    "*   **Resolution:** Since \"wall thickness\" is not a stated signal, and \"add_monitoring\" is FORBIDDEN, I must u"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: The dominant physical driver for erosion in sliding bed load (turbulent slurry flow) is abrasive wear caused by high-frequency particle impacts and mech"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 3,
+   "mapped_mechanism": "compliant_elastomer_coating",
+   "cross_domain": "aerospace"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "quantity": "droplet-impact erosion intensity ordering (v^5 scaling)",
+    "predicted_value": "relative 0.000 dimensionless vs a 100 m/s reference",
+    "calc_trace": "(10.0 m/s / 100 m/s)^5 = 0.000 dimensionless",
+    "falsifier": "a rain-erosion whirling-arm coupon must track the v^5 curve; a compliant layer's benefit shows as a threshold shift — if the coating does NOT raise the damaging-speed threshold >= 15%, it falsifies",
+    "units_ok": true,
+    "status": "computed",
+    "route": "specific:compliant_elastomer_coating"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "bf502eafb83991f1"
+}

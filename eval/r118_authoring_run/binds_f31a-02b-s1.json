@@ -1,0 +1,91 @@
+{
+ "problem_id": "f31a-02b-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Adaptive Duty Cycling of the Spray-Defoamer Based on Surface Foam Accumulation**\n\n**Mechanism**\nInstead of a continuous or fixed-interval dosing schedule, implement a closed-loop adaptive duty cycle for the spray-defoamer pump. The system utilizes the existing control architecture to modulate the pump’s On/Off state based on real-time visual confirmation of foam accumulation on the clarifier surface. By dosing defoamer only when foam reaches a critical threshold, the system prevents the buildup that leads to solids carryover over the effluent weir, while minimizing unnecessary chemical usage during periods of low foam generation. This directly addresses the root cause (excess surface tension/film stability caused by high organic load) without altering the physical clarifier geometry.\n\n**Implementation**\n1.  **Sensor Integration:** Utilize a camera-based foam detection unit (or level sensor) positioned above the clarifier surface to monitor foam coverage area and height.\n2.  **Control Logic Update:** Modify the PLC/SCADA logic for the spray-defoamer dosing pump. Replace the timer-based schedule with a conditional trigger:\n    *   **State A (Idle):** If Foam Coverage < 15% of surface area, Pump OFF.\n    *   **State B (Active):** If Foam Coverage > 15% for a sustained period (e.g., 30 seconds to avoid noise), Pump ON for a fixed dosing time (e.g., 5 seconds) or until Foam Coverage drops below 10%.\n    *   **Safety Interlock:** Add a minimum dosing frequency limit (e.g., max 2 doses per minute) to prevent mechanical wear or over-dosing due to sensor flicker.\n3.  **Data Logging:** Log each dosing event with timestamp and pre-dose foam percentage for performance tracking.\n\n**Operational Cost Statement**\n*   **Baseline:** Continuous dosing at 0.5 L/hr (24/7) = 12 L/day.\n*   **Projected Savings:** Under high organic load scenarios, foam is typically episodic. Assume foam exceeds the 15% threshold for only 30% of the operational day.\n*   **Adaptive Dosing:**\n    *   Average dose volume: 0.2 L (5-second pulse at 0.5 L/min pump speed).\n    *   Dosing frequency: Once every 15 minutes during foam events (4 doses/hour).\n    *   Hourly volume: 0.2 L × 4 = 0.8 L/hr during active foam periods.\n    *   Daily volume: 0.8 L/hr × 24 hrs × 0.3 (duty factor) = 5.76 L/day.\n*   **Cost Reduction:**\n    *   Reduction in Defoamer Usage: (12 L/day - 5.76 L/day) / 12 L/day = **52% reduction** in chemical consumption.\n    *   *Note:* Actual savings depend on local defoamer price (per litre) and actual foam duty cycle. This method ensures chemical spend is directly proportional to actual foam load, avoiding wasteful over-dosing during low-foam periods.",
+ "delivered_bill": "### NOVELTY STATEMENT (INTERVENTION)\n**Intervention Proposed:** Replace the standard continuous or timer-based defoamer dosing schedule with a **high-frequency micro-dosing duty cycle** (pulsed dosing) delivered by the existing spray-defoamer pump, specifically timed to inject defoamer **upstream** of the sludge return zone or during peak load transients, rather than into the center of the basin.\n\n**Standard Practice vs. Mitigation:**\n*   **Standard Practice:** Continuous dosing or infrequent batch dosing of antifoam into the clarifier center, leading to over-dosing (sludge destabilization) or under-dosing (foam breakthrough).\n*   **Your Mitigation:** A novel **duty-cycle arrangement** of the *existing* pump. The departure is the **schedule parameterization**: instead of a steady flow rate $Q_{def}$, the pump operates in a \"choppy\" high-frequency mode (e.g., 1-second on / 59-seconds off) such that the *instantaneous* concentration spike at the injection point is sufficient to break foam, while the *time-averaged* mass input is reduced by 50–80%. This exploits the non-linear threshold nature of foam coalescence: high local spikes break foam instantly; low steady states cause excessive dosing.\n\n**Adjacent-Technique Clearance:**\n*   **Closest Existing Practice:** \"Pulse dosing\" in water treatment is typically used for coagulants or chlorine to maintain residual levels.\n*   **Difference:** Your mechanism applies pulse dosing not to maintain a bulk water quality parameter (like residual chlorine), but to exploit the **local shear-foam interaction physics** at the injection point. The novelty is the **arrangement of the duty cycle** specifically to minimize the total volume of defoamer while maintaining instantaneous effectiveness, a scheduling strategy not standard for antifoams.\n\n**Mechanism:**\nThe driving mechanism of failure is **foam accumulation** due to insufficient local defoamer concentration at the point where gas-liquid-solid interactions occur. By increasing the *frequency* of injection events while decreasing the *volume* per event, you maintain the peak local concentration above the critical foam-breaking threshold more frequently, preventing bubble coalescence, while drastically reducing the total chemical mass transfer to the sludge blanket (where it degrades sludge settling).\n\n### PHYSICS CHECK\n**Governing Relation:**\nThe rate of foam disappearance $R_{decay}$ is proportional to the local concentration of defoamer $C_{loc}(t)$ above a critical threshold $C_{crit}$, multiplied by the available interfacial area $A_{int}$.\n$$ R_{decay}(t) \\propto \\max(0, C_{loc}(t) - C_{crit}) \\cdot A_{int} $$\n\n**Magnitude Verification:**\nStandard continuous dosing maintains $C_{loc} \\approx C_{target}$ (slightly above $C_{crit}$).\nPulsed dosing maintains $C_{loc}(t)$ oscillating between $0$ and $C_{peak}$, where $C_{peak} \\gg C_{crit}$, and the time-averaged concentration $\\bar{C} \\ll C_{target}$.\nSince foam formation is a threshold process (bubbles only coalesce/stabilize if local surfactant/defoamer balance is wrong), the *instantaneous* spike $C_{peak}$ ensures $R_{decay}$ is maximal during the pulse. The duty cycle $D = t_{on}/t_{cycle}$ is set such that $\\bar{C} = D \\cdot C_{peak} < C_{target}$.\n**Reduction in Chemical Load:** If standard practice uses $V_{std}$ L/hr, pulsed dosing uses $V_{pulsed} = D \\cdot V_{std}$. With $D=0.3$ (30% duty cycle), chemical usage drops by 70%, while peak effectiveness is maintained by ensuring $C_{peak}$ remains above the coalescence inhibition limit.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving variable:** Total Mass of Defoamer in Sludge Blanket ($M_{def, sludge}$).\n*   **Mechanism moves it:** DOWN by 70% via reduced time-averaged dosing rate.\n*   **Effect:** This REDUCES the destabilization of the sludge blanket (preventing \"pinning\" or lightening of sludge which causes carryover) while the instantaneous peak concentration maintains the reduction of foam accumulation at the surface.\n\n### IMPLEMENTATION BILL\n**MECHANISM CLASS:** Dosing Schedule Optimization (Duty-Cycle Modification)\n\n| Item | Description | Tag |\n| :--- | :--- | :--- |\n| 1. **Defoamer Dosing Pump** | Existing spray-defoamer dosing pump. **No hardware change.** | (a) |\n| 2. **Pump Controller/PLC** | Existing control system. **Configuration change:** Rewrite the dosing setpoint from \"Constant Flow\" to \"Timed Pulse\" mode. Define $t_{on}=10s$, $t_{off}=90s$ (10% duty cycle initially, adjustable). | (c) |\n| 3. **Injection Point** | Existing spray nozzle location. **No change.** The physics relies on the local turbulence of the existing spray, not a new injector. | (a) |\n| 4. **Calibration Log** | Standard operating procedure update: Log dosing volumes instead of flow rates. | (c) |\n\n### BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installation:** Zero new hardware. The bill consists solely of a software/configuration change to the existing controller ((c)) and use of existing equipment ((a)).\n*   **Operational Cost Statement (Constraint Compliance):**\n    *   **Standard Cost:** Let $P_{L}$ be the price per litre of defoamer. Standard volume $V_{std}$ L/day. Cost$_{std} = P_{L} \\cdot V_{std}$.\n    *   **Proposed Cost:** With a 30% duty cycle (30% on, 70% off), $V_{pulsed} \\approx 0.3 \\cdot V_{std}$. Cost$_{new} = P_{L} \\cdot 0.3 \\cdot V_{std}$.\n    *   **Savings:** 70% reduction in chemical procurement cost.\n    *   **Operational Loss:** Zero production loss. The duty cycle does not impact clarifier throughput or effluent quality provided the peak concentration $C_{peak}$ is sufficient (verified by pilot). The \"loss\" is strictly in chemical expenditure, which is a *reduction* in cost, not an operational penalty.\n*   **Parity Conclusion:** Burden is **LOWER** than standard practice due to 70% chemical savings and zero new hardware installation.\n\n### EXECUTABLE TEST\n**Protocol:**\n1.  **Baseline:** Operate pump at standard constant flow $Q_0$ for 48 hours. Record effluent TSS (Total Suspended Solids) and foam height.\n2.  **Pulsed Dosing:** Switch controller to pulse mode: $Q_{pulse} = 2.0 \\cdot Q_0$ (doubled flow rate to ensure peak concentration) for $t_{on}=15$ seconds, $t_{off}=45$ seconds. This maintains a 33% average volume reduction while doubling peak local concentration.\n3.  **Duration:** 7 days.\n\n**Instruments:**\n*   Existing effluent sampling port (TSS measurement).\n*   Existing foam level observation (visual or ultrasonic sensor if present, otherwise visual log).\n*   Pump flow meter (existing).\n\n**Pass/Fail Thresholds:**\n*   **Pass:** Effluent TSS remains within regulatory limit AND foam height is reduced by >50% relative to baseline AND total defoamer consumption is reduced by >40%.\n*   **Fail:** Effluent TSS exceeds limit OR foam persists/breakthrough occurs during the \"off\" cycle (indicating $t_{off}$ is too long or $Q_{pulse}$ not high enough to maintain residual effect).\n\n**Kill Criterion:**\nIf foam breakthrough occurs at the weir during the off-cycle, the mechanism fails (physics premise of \"instantaneous breaking\" is insufficient; residual foam stabilizes). Revert to constant dosing.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 2691,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 6222,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installation Burden: Standard practice installs and calibrates a fixed-dose pump. The pr",
+     "- Operational Cost: Standard practice uses $V_{total}$ litres/day. Proposed intervention u",
+     "- Operational Loss Pricing: The mechanism does not curtail primary treatment throughput. T",
+     "- Parity Conclusion: The bill adds no new hardware. The procedure change (re-scheduling) i"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 7161,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Installation Burden:** Standard practice installs and calibrates a fixed-dose pump. ",
+     "*   **Operational Cost:**",
+     "*   **Chemical Cost:** The total daily volume of defoamer is identical to standard practic",
+     "*   **Waste/Sludge Cost:** By reducing sludge carryover, the intervention reduces the soli",
+     "*   **Operational Loss Statement:** The duty cycle moves the high-flow injection windows t",
+     "*   **Parity Conclusion:** The intervention is strictly lighter burden than standard pract"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 7122,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Operational Cost Statement (Constraint Compliance):**",
+     "*   **Standard Cost:** Let $P_{L}$ be the price per litre of defoamer. Standard volume $V_",
+     "*   **Proposed Cost:** With a 30% duty cycle (30% on, 70% off), $V_{pulsed} \\approx 0.3 \\c",
+     "*   **Savings:** 70% reduction in chemical procurement cost.",
+     "*   **Operational Loss:** Zero production loss. The duty cycle does not impact clarifier t",
+     "*   **Parity Conclusion:** Burden is **LOWER** than standard practice due to 70% chemical ",
+     "1.  **Baseline:** Operate pump at standard constant flow $Q_0$ for 48 hours. Record efflue",
+     "2.  **Pulsed Dosing:** Switch controller to pulse mode: $Q_{pulse} = 2.0 \\cdot Q_0$ (doubl",
+     "3.  **Duration:** 7 days.",
+     "*   Existing effluent sampling port (TSS measurement).",
+     "*   Existing foam level observation (visual or ultrasonic sensor if present, otherwise vis",
+     "*   Pump flow meter (existing).",
+     "*   **Pass:** Effluent TSS remains within regulatory limit AND foam height is reduced by >",
+     "*   **Fail:** Effluent TSS exceeds limit OR foam persists/breakthrough occurs during the \""
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Operational Cost Statement (Constraint Compliance):**",
+    "*   **Standard Cost:** Let $P_{L}$ be the price per litre of defoamer. Standard volume $V_",
+    "*   **Proposed Cost:** With a 30% duty cycle (30% on, 70% off), $V_{pulsed} \\approx 0.3 \\c",
+    "*   **Savings:** 70% reduction in chemical procurement cost.",
+    "*   **Operational Loss:** Zero production loss. The duty cycle does not impact clarifier t",
+    "*   **Parity Conclusion:** Burden is **LOWER** than standard practice due to 70% chemical ",
+    "1.  **Baseline:** Operate pump at standard constant flow $Q_0$ for 48 hours. Record efflue",
+    "2.  **Pulsed Dosing:** Switch controller to pulse mode: $Q_{pulse} = 2.0 \\cdot Q_0$ (doubl",
+    "3.  **Duration:** 7 days.",
+    "*   Existing effluent sampling port (TSS measurement).",
+    "*   Existing foam level observation (visual or ultrasonic sensor if present, otherwise vis",
+    "*   Pump flow meter (existing).",
+    "*   **Pass:** Effluent TSS remains within regulatory limit AND foam height is reduced by >",
+    "*   **Fail:** Effluent TSS exceeds limit OR foam persists/breakthrough occurs during the \""
+   ]
+  }
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "record": "R136S2_F31F_PREREG/1.0.0 (PRE-REGISTRATION — committed BEFORE any run byte)",
+ "claim": "c-0217 (work id r136-f31f-replication)",
+ "session": "builder-r134s2",
+ "authority": "R136 directions dir 6: 'Run the F31e replication on a non-builder set using your existing scaffold, now unblocked by direction 1. Test: item-clustered interval, treated rate <=0.25, damage <=0.25, and at least 3 defect classes with nonzero bare rates.'",
+ "the_set": {
+  "path": "eval/r136s2_f31f_set/items.jsonl",
+  "contents": "the 12 benchmark problems bench-p01..p12 (eval/problems.json: pemfc dehydration, lead-acid grid corrosion, PHE biofouling, pump cavitation, bridge bearing aging, water biofilm, CGM biofouling, MEMS stiction, packaging barrier, PV PID, spindle thermal drift, MBR fouling) x 1 seed, carried in the exact F31e set field shape (problem_id/device/failure/question/question_type/constraint/user_variables)",
+  "non_builder_provenance": "the benchmark corpus predates the dev12 builder lanes (owner/benchmark-lane authored) — the F31e set by contrast was builder-authored (r125_build_f31e_set.py derived healthy-twin scenarios); THIS is the typed reading of 'a non-builder set'",
+  "detector_freshness": "no bench-p* bill was ever in the F31c/F97 detector-calibration corpora (those corpora are f31* authoring-battery bills); all F31f bills are fresh under the canonical detector's calibration-exclusion rule"
+ },
+ "protocol": {
+  "scaffold": "BYTE-FAITHFUL REUSE: scripts/r136s2_f31f_run.py imports the committed scripts/r125_f31e_run.py and re-points ONLY its SET/OUT constants — the same frozen authoring directive bytes (r118 AUTHORING_DIRECTIVE), the same improved-directive + M5 diff-min fold (c-0209), the same quota probe + INFRA_QUOTA_WALL typed refusal, the same byte-resume, the same typed-fail records, the same arms",
+  "arms": "BARE_ONLY x 2 independent draws (d1/d2, one agnes-3.0-flash call per item per draw) + SUCCESSOR per item per draw (canonical F97-fixed check_layer -> improved-directive reviewer ONLY on findings; a no-findings bare bill delivers ITSELF, zero calls, typed reviewer_skipped)",
+  "generator": "agnes-3.0-flash (the registered model; 2-key rotation via the restored vault)",
+  "n_calls_expected": "24 bare + reviewers-on-findings (upper bound 48 total legs)"
+ },
+ "frozen_before_any_leg": [
+  "the set bytes (eval/r136s2_f31f_set/items.jsonl)",
+  "the authoring directive + improved-directive + M5 fold bytes (the committed scaffold's own imports, untouched)",
+  "the detector (scripts/r121_successor_score.py bill_defect_classes, 4 classes: input_availability, duty_pricing, constraint_violation, physics_direction_inversion)",
+  "the scoring + clustering convention (r125_f31e_score.py + the r128 item-clustered bootstrap, seed lineage fresh-set 131)",
+  "the gates below"
+ ],
+ "acceptance_gates": {
+  "treated_rate": "succ delivered-defect rate <= 0.25",
+  "damage": "the loop must not break clean bare bills: damage <= 0.25 (the r128 convention: succ classes not in bare classes, over bare-clean items)",
+  "class_coverage": "at least 3 of the 4 canonical defect classes show NONZERO bare rates on the F31f corpus (the F31e corpus fired only duty_pricing — 13 bare/2 succ — so this gate measures whether the class-restriction was corpus-specific)",
+  "interval": "the paired bare-vs-succ diff reported with the ITEM-CLUSTERED bootstrap CI (n_items=12 clusters, 2 draws per item) — the interval is REPORTED whatever it shows; the class-coverage gate is the acceptance surface this replication adds, not a superiority gate"
+ },
+ "honesty": "a typed negative either way: if the treated rate or damage exceed their bars, or fewer than 3 classes fire, the record says so with the per-class table and the set is NOT claimed as a clean confirmation; no score claims; the Art. 27 share of this window is computed at close from the diff",
+ "coordination": "the twin's c-0216 (panel v2) stays untouched; this claim is additive (counter c-0217); the v2 panel run (dir 4) stays GATED on the twin's implementation landing",
+ "no_score_claims": true
+}

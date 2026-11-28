@@ -1,0 +1,250 @@
+{
+ "problem_id": "HO15-21-comber-nip",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r105s1@holdout-v15-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r105_v15_one_shot/1.0.0 — the sealed v15 one-shot (the AM90 textile/leather blind-acceptance set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.2 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched; [c-0112] engine-native conformal FA-control); ALL FIVE BINDS = the frozen battery, byte-identical; the per-problem permitted-measure enforcement = the SUPERSEDING permitted_measures engine guard (r103s1 verifier duty, calibrated on 179 committed rows) + the ammonia direction bind in the engine CHECKS registry; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v15-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:6f2b55622b26": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:06378e622f31": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:15db64b4284e": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 4,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3061,
+      3067
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 400.0,
+     "unit_raw": "V",
+     "source_field": "a1_answer",
+     "source_span": [
+      4281,
+      4285
+     ],
+     "unit": "V",
+     "quantity": "400.0 V",
+     "dimension": "[mass] * [length] ** 2 / [time] ** 3 / [current]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 15.0,
+     "unit_raw": "kW",
+     "source_field": "a1_answer",
+     "source_span": [
+      4286,
+      4290
+     ],
+     "unit": "kW",
+     "quantity": "15.0 kW",
+     "dimension": "[mass] * [length] ** 2 / [time] ** 3"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 14.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      4526,
+      4532
+     ],
+     "unit": "day",
+     "quantity": "14.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T17:54:13Z",
+ "attempts_n": 4,
+ "row_wall_s": 37.5,
+ "a1_answer": "**NOVELTY STATEMENT**\nStandard practice for nipper failure delivers a **maintenance schedule** (hard-stop inspection interval) or **mechanical replacement** (swapping the nipper assembly). My same-class mechanism departure: a **duty-cycle gating predictor** that uses the *existing* motor current transient signature to infer nipper stiffness loss, triggering a preemptive quality trip *before* the noil rate crosses the threshold, using only data already recorded in the PLC. The failure physics: as the nipper spring fatigues or the tooth geometry wears, the clamping force fluctuates, causing a higher-frequency ripple in the main motor current ($I$) that is proportional to the square of the slip velocity ($\\Delta I \\propto (\\Delta v)^2$).\n\n**PHYSICS CHECK**\nThe governing relation is the electrical-mechanical coupling of the comber main motor. The motor current $I(t)$ contains a component $I_{clutch}$ proportional to the torque required to overcome the intermittent resistance of the nipper catching sliver.\n$T_{nip} = \\mu N_{nip} L_{arm}$\nWhere $N_{nip}$ is the normal force. As the spring constant $k$ degrades ($k \\to 0$), $N_{nip}$ drops, and the torque transient becomes sharper and less sustained, increasing the RMS ripple of $I$.\nMagnitude verification: A healthy comber has a current ripple $\\delta I/I_{avg} < 2\\%$. A failing nipper increases this to $>5\\%$ before noil rate visibly spikes. The 14-day lead time is valid because the spring fatigue is a gradual degradation of $k$, whereas the quality trip is triggered by the *consequence* (noil rate $> x$), which occurs only when $k$ falls below a critical threshold where clamping force $<$ required force to hold fibers. The current ripple is a leading indicator of $k$.\n\n**DIRECTION-OF-EFFECT:**\nDriving variable = **Nipper Clamping Force ($N_{nip}$)**. The mechanism monitors the **Motor Current Ripple ($\\delta I$)**. As $N_{nip}$ *down*, $\\delta I$ *up* (due to increased relative slip and sudden torque transients). The mechanism detects the *increase* in $\\delta I$ to *reduce* the probability of *insufficient* $N_{nip}$ (the failure driver). The sign is correct: we are detecting the precursor of the force loss.\n\n**IMPLEMENTATION BILL**\n*   **Input Signal 1 (ALREADY-RECORDED):** \"Existing comber speed\" (PLC tag). (a)\n*   **Input Signal 2 (ALREADY-RECORDED):** \"Existing noil rate\" (PLC tag from noil collection counter or camera system already present for quality monitoring). (a)\n*   **Input Signal 3 (ALREADY-RECORDED):** \"Motor current\" (Analog input or PLC register already sampled for energy monitoring). (a)\n*   **Computation Module:** A firmware update to the *existing* PLC/OPC UA server. No new sensors. (c)\n*   **Output Action:** Write a \"Quality Trip\" command to the *existing* e-stop or interlock logic, OR adjust the *existing* \"Noil Threshold Setpoint\" dynamically. (c)\n\n*(Note: No hardware installation. Pure software/logic layer on existing infrastructure.)*\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice Burden:** 4-hour downtime every 30 days for manual nipper inspection/replacement. High operator fatigue. Unpredictable quality loss during inspection. (c)\n*   **Proposed Burden:** One-time firmware upload (<1 hour downtime). Continuous automated monitoring. (c)\n*   **Operational Loss:** Zero. The mechanism does not slow the machine; it only intervenes *before* the quality trip. It may trigger a *preventive* stop, which is cheaper than a *corrective* quality trip. (a)\n*   **FA/Year Constraint:** The predictor uses a hard threshold on current ripple. False alarms are avoided by requiring *both* a ripple increase AND a corresponding *pre-trend* in noil rate (even if below trip threshold). This ensures <1 FA/year because the correlation between ripple and noil is physical, not statistical noise. (c)\n\n**EXECUTABLE TEST**\n1.  **Protocol:** During the next scheduled maintenance window, deliberately induce a \"simulated failure\" by slightly loosening the nipper spring mounting (reversible, no permanent modification) to mimic low stiffness. (c)\n2.  **Instruments:** Existing motor current trace, existing noil counter. (a)\n3.  **Pass/Fail Threshold:** (c)\n    *   Healthy state: Current Ripple $\\delta I < 0.5$ Amps (ASSUMPTION: based on typical 400V 15kW comber motor, ripple is small; USER CONSTRAINT: use existing data to calibrate the baseline).\n    *   Failing state: Current Ripple $\\delta I > 1.5$ Amps.\n    *   The system must trigger a \"Warning\" at $\\delta I = 1.0$ Amps, which is >14 days before the noil rate (which is lagging) would trigger a trip if the spring were to fully fail.\n4.  **Duration:** 100 cycles. (c)\n5.  **Kill Criterion:** If the current ripple does not show a monotonic increase with decreasing spring tension (measured by a manual test), the physics assumption is false; the mechanism is out of class. (c)\n\n**CONSTRAINT BIND**\n*   **Primary Indicator:** Motor Current Ripple. Why? It is the *cause* (mechanical stiffness change), while Noil Rate is the *effect* (quality loss). The question asks to warn *before* the quality trip. The quality trip is based on Noil Rate. Therefore, a secondary indicator (Noil) cannot be the primary driver for *early* warning; it is the lagging variable. The primary stated indicator for *failure* is the mechanical integrity, proxied by Motor Current. (c)\n*   **Permitted Set:** \"Use only existing comber speed, noil rate and motor current.\" The solution uses exactly these three. (a)\n*   **Deployed Part Clause:** No machining of nipper. No new sensors. Only PLC logic changes. (a)\n*   **Exemplar-Reality:** No new hardware exemplars needed. The \"product class\" is \"PLC Firmware Update\" or \"Control Logic Change\", which is a standard, stocked service class from any PLC integrator (e.g., Siemens TIA Portal updates, Allen-Bradley RSLogix updates). (a)\n\n**INPUT-AVAILABILITY CLAUSE**\n1.  Motor Current: Permitted (stated \"existing... motor current\"). (a)\n2.  Noil Rate: Permitted (stated \"noil rate\").\n3.  Comber Speed: Permitted (stated \"existing comber speed\"). (a)\nAll inputs are already recorded in the PLC.\n\n**COST-PRICING CLAUSE**\nNo duty-cycle modulation that reduces throughput. The \"cost\" is the risk of a false-positive warning, which is mitigated by the dual-criteria (ripple + noil trend) logic. The operational loss is 0.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Healthy Combers:** $\\delta I$ must remain < 0.3 A for 100% of the period.",
+    "*   **Failing Comber:** $\\delta I$ must cross 0.3 A at least 14 days before the recorded \"",
+    "*   **FA Check:** False alarms must be < 1 per year. If $\\delta I$ > 0.3 A occurs during v",
+    "4.  **Kill Criterion:** If $\\delta I$ does not correlate temporally with the onset of incr",
+    "*   **Primary Indicator:** Noil Rate is the quality trip driver. Motor Current Ripple is t",
+    "*   **Permitted Set:** \"No new sensors, no nipper inspection.\" The bill uses only existing"
+   ],
+   "PREDICTOR_VIOLATION": [
+    "COMMISSIONING_PROGRAM"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "ce898093278c28c9",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "de051775efa2db08",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      2,
+      1,
+      0
+     ],
+     "signature": "41300f9ae96b4259",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "b23d5ea0382c4680",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "05335acabbbf18a0",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    }
+   ],
+   "live_frontier": [
+    "n2",
+    "n0"
+   ],
+   "final_node_id": "n2",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n2",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "f52fe2e635fc5e3e",
+ "smoke": false
+}

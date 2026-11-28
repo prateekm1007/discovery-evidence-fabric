@@ -1,0 +1,23 @@
+**Mitigation Proposal: Closed-Loop Melt Pressure Stabilization via Adaptive Line-Speed Modulation**
+
+**Mechanism:**
+The root cause of the oscillating die pressure and resulting gauge variation is likely an unstable interaction between the extruder feed rate (implicitly tied to line speed if the extruder is mechanically coupled or poorly decoupled) and the die backpressure. The constraint prohibits adding sensors, but it allows using *existing* measurements. The proposed mitigation uses the existing **melt pressure transducer** signal as a feedback control input to modulate the **line-speed encoder** setpoint. By dynamically adjusting the take-up speed in real-time to damp pressure oscillations, the system stabilizes the melt flow rate through the die, thereby reducing gauge variation across the web. This is a "pressure-locked" speed control strategy.
+
+**Implementation:**
+1.  **Signal Processing:** Implement a real-time calculation on the existing PLC or DCS that computes the rate of change (derivative) of the melt pressure signal (`dP/dt`) over a short, fixed time window (e.g., 1–2 seconds) to filter out noise while capturing oscillation dynamics.
+2.  **Control Law:** Create a PI (Proportional-Integral) controller loop where:
+    *   The **error signal** is the deviation of the instantaneous melt pressure from a nominal target pressure (`P_setpoint - P_current`).
+    *   The **output** of this controller is a speed correction factor (`ΔV`), scaled by a tuned gain.
+    *   The **correction** is applied additively to the base line-speed setpoint: `V_new = V_base + ΔV`.
+    *   *Critical Tuning:* The controller must be tuned to be **negative feedback**: if pressure rises above `P_setpoint` (indicating potential flow restriction or excess volume), the line speed (`V`) is *increased* to pull material off the die faster, lowering backpressure. If pressure drops, speed is *decreased* to build up pressure. The integral term must be weak to avoid windup during long-term drifts.
+3.  **Safety Limiting:** Hard-code upper and lower limits on `ΔV` (e.g., ±2% of rated speed) to prevent violent speed changes that could break the film or damage the extruder. Also, include a "lockout" that reverts to the original base speed if the pressure signal goes invalid or drifts beyond a safe operating band.
+
+**Measures It Relies On:**
+*   **Existing Melt Pressure Transducer:** Provides the real-time feedback necessary to detect oscillations and gauge the state of the die backpressure. This is the primary sensor for the new control loop.
+*   **Existing Line-Speed Encoder:** While not directly measured for control *input* in the same way, the encoder’s data is used to *verify* that the commanded speed changes (`ΔV`) are actually being executed by the drive system (i.e., confirming the actuator path is working). More importantly, the encoder’s position data is used to calculate the actual line speed for the setpoint calculation.
+*   **Implicit Melt Temperature Stability:** This mitigation assumes that the existing **melt temperature transducer** readings are stable within normal operating parameters. If temperature is fluctuating wildly, the pressure-speed loop will be less effective because viscosity is changing. Therefore, this mitigation relies on the *assumption* that temperature control is already adequate, or that the pressure oscillations are primarily due to flow dynamics rather than thermal viscosity swings. The temperature transducer is used as a *watchdog*: if temperature deviates beyond its own control band, the pressure-speed mitigation can be temporarily disabled to prevent interference.
+
+**Why This Works Under Constraints:**
+*   No new hardware is installed.
+*   It uses the two most critical existing signals (pressure and speed) to create a new, more robust control loop that directly addresses the symptom (pressure oscillation causing gauge variation).
+*   It stabilizes the process at the source (die backpressure) rather than just trimming the result (scrap), thereby reducing the variation in film thickness across the web.

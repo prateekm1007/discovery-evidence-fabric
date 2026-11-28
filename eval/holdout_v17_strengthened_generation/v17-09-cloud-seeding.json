@@ -1,0 +1,142 @@
+{
+ "problem_id": "v17-09-cloud-seeding",
+ "domain": "nucleation_phase_change",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:5eb6590103b0": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:97b7e881f355": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:1e537e21cad1": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "nucleation_phase_change",
+   "confidence": 1.0,
+   "evidence_span": "nucleation, supercool",
+   "allowed_mech_classes": [
+    "controlled_nucleation_sites",
+    "acoustic_ultrasonic_nucleation",
+    "dissolved_gas_management",
+    "superheat_pressure_path_control",
+    "nucleation_inhibitor_dosing"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "controlled_nucleation_sites",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 5,
+    "top_class": "controlled_nucleation_sites",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "add insulation or heat to keep the material away from the phase boundary"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:16:47Z",
+ "attempts_n": 2,
+ "row_wall_s": 20.3,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme (flight-level temperature/pressure logs used to trigger passive seeding) or a DESIGN CHANGE (switching to silver iodide flares for margin). My mechanism delivers a DESIGN CHANGE: **acoustic_ultrasonic_nucleation** via a high-intensity focused ultrasound (HIFU) transducer array integrated into the seeding aircraft payload, replacing stochastic passive nucleation with on-demand sononucleation. The departure is the physical coupling: instead of relying on the collision probability of supercooled droplets with passive ice nuclei (which scales poorly at marginal supercooling due to the vanishingly small contact time and high activation energy of heterogeneous nucleation on foreign surfaces), the mechanism uses radiation pressure and cavitation dynamics to create controlled micro-shockwaves that lower the kinetic barrier for ice formation directly within the droplet bulk, enabling nucleation at temperatures significantly warmer than the natural homogeneous limit.\n\nPHYSICS CHECK\nGoverning relation: The acoustic cavitation threshold for inertial collapse generating nucleation shockwaves is governed by the Rayleigh-Plesset equation simplified for static pressure $P_{stat}$ and acoustic pressure amplitude $P_a$. The minimum pressure amplitude required to initiate stable cavitation bubbles that subsequently collapse to trigger nucleation is approximately $P_{min} \\approx 0.5 \\times P_{stat}$ (in absolute units) for short-pulse high-frequency ultrasound.\nMagnitude verification: At 10,000 m altitude, $P_{stat} \\approx 26.5$ kPa. Therefore, the required peak negative acoustic pressure $P_{neg}$ to drive cavitation is roughly $P_{neg} \\approx P_{stat} + \\Delta P_{cav}$. For a robust effect, $\\Delta P_{cav} \\approx 50$ kPa is targeted. Total $P_{peak} \\approx 76.5$ kPa. This is within the capability of medical-grade HIFU transducers operating at 1 MHz.\n\nIMPLEMENTATION BILL\n- **Component:** Array of piezoelectric ceramic transducers (PZT-5A). **Status:** ASSUMPTION (off-the-shelf industrial HIFU components; no new material required).\n- **Input 1:** Aircraft altitude and static pressure. **Status:** ALREADY-RECORDED (standard flight data recorder / ADI telemetry). **Usage:** Used to calculate required $P_{peak}$ in real-time.\n- **Input 2:** Ambient air temperature. **Status:** ALREADY-RECORDED (standard flight data recorder / OAT sensor). **Usage:** Primary gate for activation.\n- **Reference/Threshold:** Activation Temperature $T_{act} = -5^{\\circ}C$. **Status:** DERIVED (Stated physics: Ice nucleation efficiency on standard silver iodide drops sharply above -5°C; -5°C is the empirical \"marginal\" threshold where passive seeding fails to yield rapid glaciogenesis. The acoustic mechanism targets this specific gap).\n- **Procedure:** When $T_{OAT} > -5^{\\circ}C$ and $P_{stat} < 30$ kPa, activate HIFU burst mode at 1 MHz with calculated $P_{peak}$.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability:** High burden. Requires integration of a transducer array into the seeding tank or fuselage belly. Standard practice (flares/iodide generators) is modular and drop-in. *Worth it because:* It eliminates the consumption of physical seed agents, reducing recurring operational costs and logistical weight of iodide stock.\n- **Operability:** Low burden. Automated trigger via existing OAT/Pressure sensors.\n- **Maintenance:** Medium burden. Periodic inspection of HIFU focal spot integrity (standard medical equipment maintenance).\n- **Cost Class:** Same class as high-end seeding systems (capital intensive, low OPEX) compared to standard flare deployment (low capital, high OPEX per run). The acoustic solution shifts cost from consumables to capital electronics.\n\nEXECUTABLE TEST\n- **Protocol:** Flight test at 10,000 m.\n- **Instruments:** Onboard cloud radar (detecting ice crystal growth rate) and post-flight ice particle analysis (count crystals per m³).\n- **Pass/Fail Threshold:** Ice crystal concentration $N_{ice}$ must increase by $>1000$ crystals/m³ within 30 seconds of HIFU activation when OAT is between -3°C and -5°C.\n- **Duration:** 10-minute window.\n- **Kill Criterion:** The mechanism is falsified if $N_{ice}$ does not increase by at least 1000 crystals/m³ within 30 seconds of activation at -3°C. If no significant increase is observed, cavitation is not generating sufficient shockwaves to lower the nucleation barrier in the ambient pressure regime.\n\nCONSTRAINT BIND (predictor)\nThe monitored indicator is the **OAT (Outside Air Temperature)** relative to the -5°C threshold. This is the primary stated indicator for \"marginal supercooling\" in cloud physics. The HIFU activation is gated by this temperature. A secondary indicator (Ice Crystal Number Concentration from cloud radar) supplements the primary indicator to confirm efficacy but does not replace the temperature trigger.\n\nDESIGN POINT (RUNNABLE)\n- **Governing Relation:** $P_{required} = P_{static}(h) + P_{cav\\_margin}$\n- **Inputs:**\n  - $h = 10,000$ m (ASSUMPTION: standard seeding altitude).\n  - $P_{static} = 26.5$ kPa (CALCULATED from standard atmosphere table at 10,000 m).\n  - $P_{cav\\_margin} = 50$ kPa (ASSUMED: typical HIFU peak negative pressure amplitude for inertial cavitation in gas/liquid interfaces, based on standard HIFU physics).\n- **Substitution:** $P_{required} = 26.5 \\text{ kPa} + 50 \\text{ kPa} = 76.5 \\text{ kPa}$.\n- **Numeric Result:** The transducer must deliver a peak negative pressure of **76.5 kPa**.\n- **Falsification Test Numeric Threshold:** As stated in Executable Test: $\\Delta N_{ice} \\ge 1000 \\text{ crystals/m}^3$ within 30 s.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Component:** Array of piezoelectric ceramic transducers (PZT-5A). **Status:** ASSUMPTI",
+    "- **Input 1:** Aircraft altitude and static pressure. **Status:** ALREADY-RECORDED (standa",
+    "- **Input 2:** Ambient air temperature. **Status:** ALREADY-RECORDED (standard flight data",
+    "- **Reference/Threshold:** Activation Temperature $T_{act} = -5^{\\circ}C$. **Status:** DER",
+    "- **Procedure:** When $T_{OAT} > -5^{\\circ}C$ and $P_{stat} < 30$ kPa, activate HIFU burst",
+    "- **Installability:** High burden. Requires integration of a transducer array into the see",
+    "- **Operability:** Low burden. Automated trigger via existing OAT/Pressure sensors.",
+    "- **Maintenance:** Medium burden. Periodic inspection of HIFU focal spot integrity (standa",
+    "- **Cost Class:** Same class as high-end seeding systems (capital intensive, low OPEX) com"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_UNPROVEN": [
+    "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "controlled_nucleation_sites",
+   "cross_domain": "pharmaceutical processing"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "required seal contact pressure (1.5x rule)",
+    "predicted_value": "p_contact >= 1.1 bar bar",
+    "calc_trace": "1.5 x 0.8 bar bar",
+    "falsifier": "the leak rate at 1.5x margin must stay within the tightness class in the pressurized bench test; the opposite result falsifies the invention"
+   },
+   "machine_scan": {},
+   "demand": {
+    "fired": true,
+    "first_state": {
+     "computed": false,
+     "quant_test_missing": true,
+     "generic_status": "insufficient_parameters"
+    },
+    "retry_computed": true,
+    "retry_quant_test_missing": false,
+    "retry_accepted": true,
+    "demand_block_sha16": "e122d7eff4717008"
+   }
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "e56864bc2bec7239"
+}

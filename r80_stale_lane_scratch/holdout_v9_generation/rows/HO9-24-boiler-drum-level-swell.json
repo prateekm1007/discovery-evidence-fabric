@@ -1,0 +1,104 @@
+{
+ "problem_id": "HO9-24-boiler-drum-level-swell",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:6dd0e687a82a": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:5a848bf1f622": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:8cc60ff8b0ed": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:49:43.194601Z",
+ "attempts_n": 4,
+ "a1_answer": "### NOVELTY STATEMENT\n**Standard Practice Deliverable:** The field-standard practice for drum level swell/shrink instability at high steam flow delivers a **MONITORING/INDICATION scheme** (specifically, a predictive trend analysis or threshold alert) that warns of impending instability. It relies on the *mechanism* of direct level transducer readings or steam-side conductivity/pressure compensation to detect the vapor bubble fraction (swell) or its collapse (shrink).\n**My Same-Class Mechanism Departure:** My proposal delivers the **SAME class of outcome** (a warning >=14 days before trip) but uses a genuinely different physical mechanism: **Thermodynamic State Reconstruction via DCS Data Correlation**. Instead of measuring the level itself or adding a conductivity probe, I infer the *driving energy imbalance* (swell driver) using only **existing** Drum Level, Steam Flow, and Feedwater Flow signals. The novelty lies in using the *rate-of-change* of the mass balance (Feed - Steam) as a leading indicator of the *integral* energy imbalance that causes swell, rather than waiting for the level transducer to react to the physical bubble expansion.\n**Failure-Physics Connection:** Swell is driven by the net energy input to the drum water mass exceeding the energy carried away by the steam flow. If Feedwater flow < Steam Flow (net mass loss), the drum pressure/temperature drops, expanding the vapor fraction (swell). If Feedwater > Steam Flow (net mass gain/pressure rise), the vapor collapses (shrink). The \"predictor\" calculates the *time-to-trip* based on the current *rate* of this imbalance, extrapolating the linear trend to the trip setpoint. This is a **CALCULATED** leading indicator of the physical state, not a new sensor measurement.\n\n### PHYSICS CHECK\n**Governing Physical Relation:**\nThe dominant instability driver for swell/shrink in a high-pressure boiler is the **Net Mass Imbalance** ($ \\dot{m}_{net} $) which drives the drum pressure/temperature change ($ \\frac{dP}{dt} $ or $ \\frac{dT}{dt} $).\n$$ \\dot{m}_{net} = \\dot{m}_{feed} - \\dot{m}_{steam} $$\nWhen $ \\dot{m}_{net} < 0 $, the drum is \"starved\" of mass relative to its heat input, causing pressure to drop and water to swell.\nThe level swell fraction $ \\delta $ is proportional to the vapor volume fraction. The time to reach the high-level trip $ t_{trip} $ is approximately:\n$$ t_{trip} = \\frac{L_{trip} - L_{current}}{\\frac{dL}{dt}} $$\nHowever, $ \\frac{dL}{dt} $ during a swell event is dominated by the *rate* of pressure change, which is driven by $ \\dot{m}_{net} $.\n**Magnitude Verification:**\nAt 150 bar, a small change in pressure/temperature causes a large change in specific volume of steam. A sustained $ \\dot{m}_{net} $ deficit of even 5% of rated steam flow for 30 minutes will drive the drum into the swell regime. The \"14-day\" warning is **NOT** based on extrapolating a 30-minute trend. It is based on detecting **chronic operating-point drift** or **sustained load-following errors** in the DCS logs that *precede* the acute instability.\n*Correction/Refinement:* The prompt asks for a warning >=14 days before *level trip*. Swell/shrink is often an *acute* event during load changes. A 14-day lead time implies predicting that the *operating envelope* will cross into a region where instability is likely, OR that a slow degradation (e.g., controller tuning drift, sustained imbalance bias) is accumulating.\n**Revised Physics Interpretation:** The \"failure\" is the *instability* itself. The predictor must identify when the **cumulative imbalance error** over a rolling window (e.g., 24h) exceeds a threshold that *guarantees* a trip within 14 days if the current trend continues. This is a **statistical drift detection** on the $ \\dot{m}_{net} $ signal.\n**DIRECTION-OF-EFFECT:**\nDriving variable = $ \\dot{m}_{net} $ (Net Mass Flow Imbalance).\nThe mechanism does NOT *change* $ \\dot{m}_{net} $ (it is a predictor, not a control actuator). It *monitors* the *integral* of $ \\dot{m}_{net} $ over time.\nThe \"remedy\" is the **early warning**. The warning allows the operator to *adjust* the feedwater controller setpoint *before* the acute swell event occurs.\nTherefore, the mechanism moves the **operator's action** (controller bias correction) *up* (anticipating the need) by **CALCULATED** magnitude (the required bias correction to return $ \\dot{m}_{net} $ to zero). This *reduces* the *probability* of the failure driver (sustained imbalance) persisting into the acute trip state.\n**Signed Statement:**\nThe driving quantity is the **cumulative mass imbalance** $ I(t) = \\int_{t-24h}^{t} (\\dot{m}_{feed} - \\dot{m}_{steam}) dt $.\nThe mechanism's active ingredient is the **thresholding** of $ I(t) $.\nThe sign imposed is: If $ I(t) $ is trending *down* (negative), it indicates a *net mass deficit* which *drives* the drum pressure down, *causing* swell.\nBy warning 14 days ahead, the mechanism allows the operator to *increase* the feedwater setpoint *before* $ I(t) $ crosses the critical threshold that causes acute swell.\nThis *lowers* the *integral of the instability risk* over the duty cycle.\n\n### IMPLEMENTATION BILL\n*Note: No new hardware. Pure software/algorithm on existing DCS.*\n\n| Component/Action | Tag | Source/Specification | Procurement Tag |\n| :--- | :--- | :--- | :--- |\n| **DCS Software Algorithm Module** | (a) | **New catalog part:** A predictive algorithm block (e.g., in IEC 61131-3 ST/LD) configured to calculate $ I(t) = \\int_{t-24h}^{t} (\\dot{m}_{feed} - \\dot{m}_{steam}) dt $. | (a) - Firmware/Software update to existing DCS controller (no new I/O cards). |\n| **Data Historian Query** | (b) | **Existing service:** DCS historical tag database access for `Drum_Level`, `Steam_Flow`, `Feedwater_Flow`. | (b) - Standard DCS licensing, no new hardware. |\n| **Operator HMI Alert** | (b) | **Existing interface:** New alarm banner in the existing DCS HMI: \"Drum Level Instability Risk High - Cumulative Imbalance Exceeds 14-Day Threshold\". | (b) - Configuration change to existing HMI server. |\n| **Threshold Configuration** | (c) | **Derived Reference:** Threshold for $ I(t) $ is **CALCULATED** from the *stated* drum volume and *stated* trip setpoints. $ V_{drum} $ is known from plant specs. Trip level $ L_{trip} $ is known. The threshold is set such that if the *current* $ \\dot{m}_{net} $ trend continues, $ L $ will hit $ L_{trip} $ in <=14 days. | (c) - Engineering study, no hardware. |\n\n**Input Availability Clause Check:**\n- `Steam_Flow`: **ALREADY-RECORDED** (stated in problem).\n- `Feedwater_Flow`: **ALREADY-RECORDED** (stated in problem).\n- `Drum_Level`: **ALREADY-RECORDED** (stated in problem, though not strictly needed for the *integral* calculation, it is used for *confirmation* of the drift direction).\n- **No new sensors** are used. No conductivity probe.\n\n### BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n**Standard Practice:** Typically, operators monitor instantaneous level and flow. If instability occurs, they manually adjust feed. There is no *systematic* predictor. The \"standard\" for *prevention* is often just \"stay within load limits.\"\n**My Solution:** Adds a **software** layer.\n- **Installability:** **SAME** (Zero hardware installation).\n- **Operability:** **LIGHTER** (Automated calculation vs. manual mental integration).\n- **Maintenance:** **SAME** (Algorithm runs automatically; no physical parts to wear).\n- **Rough Cost Class:** **LOWER** (Only engineering hours for algorithm development and HMI configuration).\n- **Operational Loss:** **ZERO** (No change in duty cycle or throughput; only a new alarm).\n- **False Alarm Rate:** The constraint is **<=1 FA/boiler/year**.\n    - To achieve this, the threshold is set conservatively. The \"14-day\" lead time is long enough to filter out transient load-following spikes (which last minutes/hours) but short enough to catch chronic drift. The *falsification test* ensures that only *sustained* imbalances trigger the alert.\n\n### EXECUTABLE TEST\n**Protocol:**\n1.  **Historical Data Validation:** Pull 1 year of DCS data for `Steam_Flow`, `Feedwater_Flow`, and `Drum_Level`.\n2.  **Identify Past Incidents:** Mark all times in the past year where a \"Level Trip\" or \"Swelling Event\" was logged in the plant history.\n3.  **Back-Test:** Run the algorithm's $ I(t) $ calculation on the historical data.\n4.  **Pass/Fail Criteria:**\n    -   **Warning Accuracy:** For every past trip, did the algorithm trigger the \"14-Day Warning\" at least 14 days *before* the trip time?\n    -   **False Alarm Rate:** Count the number of times the algorithm triggered a warning that did *not* lead to a trip within the next 14 days.\n    -   **Constraint Check:** If FA/boiler/year <= 1, pass.\n    -   **Kill Criterion:** If the algorithm fails to predict a single past trip within the 14-day window, the mechanism is **OUT OF CLASS** (recompose).\n\n### CONSTRAINT BIND\n**Primary Stated Indicator:** The problem states \"warn >=14 days before level trip.\" The *primary indicator* of the trip is the **Drum Level** crossing its setpoint.\n**My Indicator:** I am NOT using Drum Level as the *primary driver* of the prediction (because by the time it is high, the 14-day window is gone). I am using **Net Mass Imbalance ($ \\dot{m}_{feed} - \\dot{m}_{steam} $)** as the *primary driving variable* for the *cause* of the trip.\n**Supplementary Indicator:** **Drum Level** is used as a *confirmation* signal. If $ I(t) $ indicates drift, but $ L_{drum} $ is stable, the predictor may suppress the alert (to avoid FAs). However, the *trigger* for the 14-day lead time is the **cumulative imbalance**, which is the *physics-driven* precursor to the level trip.\n**Why this satisfies the constraint:** The constraint requires a *predictor*. A predictor must use *leading* data. Level is a *lagging* variable (it reacts to imbalance). Flow is the *leading* variable (imbalance precedes level change). Therefore, the \"primary stated indicator\" of the *failure mechanism* is the flow imbalance. The \"primary stated indicator\" of the *failure event* is the level trip. My predictor links the two via physics.\n\n### FINAL NOTES ON OBLIGATIONS\n- **Deployed Part:** No modification to the boiler drum.\n- **Permitted Set:** Use of DCS flows (existing data) is within the \"no new sensors\" constraint. The \"measure\" is a software algorithm.\n- **Direction of Effect:** The mechanism *detects* the *negative* trend in $ \\dot{m}_{net} $ (mass deficit) which *drives* the *pressure drop* which *causes* swell. The warning *prevents* the operator from being caught by surprise.\n- **Exemplar-Reality:** No commercial exemplars are named because this is a *software* implementation on *existing* DCS hardware. The \"catalog part\" is the *algorithm block*, which is a standard IEC 61131-3 function block.\n- **Premise-Validity:** All data sources (`Steam_Flow`, `Feedwater_Flow`) are explicitly stated to exist in the problem.\n- **Certified-System:** No new hardware.\n- **Cost-Pricing:** No operational cost.\n- **Mechanism-Diversity:** \"MECHANISM CLASS: Thermodynamic State Reconstruction via DCS Data Correlation.\" This is a single, distinct class. No other mechanisms are in the bill.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- `Steam_Flow`: **ALREADY-RECORDED** (stated in problem).",
+    "- `Feedwater_Flow`: **ALREADY-RECORDED** (stated in problem).",
+    "- `Drum_Level`: **ALREADY-RECORDED** (stated in problem, though not strictly needed for th",
+    "- **No new sensors** are used. No conductivity probe.",
+    "- **Installability:** **SAME** (Zero hardware installation).",
+    "- **Operability:** **LIGHTER** (Automated calculation vs. manual mental integration).",
+    "- **Maintenance:** **SAME** (Algorithm runs automatically; no physical parts to wear).",
+    "- **Rough Cost Class:** **LOWER** (Only engineering hours for algorithm development and HM",
+    "- **Operational Loss:** **ZERO** (No change in duty cycle or throughput; only a new alarm)",
+    "- **False Alarm Rate:** The constraint is **<=1 FA/boiler/year**.",
+    "- To achieve this, the threshold is set conservatively. The \"14-day\" lead time is long eno",
+    "1.  **Historical Data Validation:** Pull 1 year of DCS data for `Steam_Flow`, `Feedwater_F",
+    "2.  **Identify Past Incidents:** Mark all times in the past year where a \"Level Trip\" or \"",
+    "3.  **Back-Test:** Run the algorithm's $ I(t) $ calculation on the historical data.",
+    "4.  **Pass/Fail Criteria:**",
+    "-   **Warning Accuracy:** For every past trip, did the algorithm trigger the \"14-Day Warni",
+    "-   **False Alarm Rate:** Count the number of times the algorithm triggered a warning that",
+    "-   **Constraint Check:** If FA/boiler/year <= 1, pass.",
+    "-   **Kill Criterion:** If the algorithm fails to predict a single past trip within the 14",
+    "- **Deployed Part:** No modification to the boiler drum.",
+    "- **Permitted Set:** Use of DCS flows (existing data) is within the \"no new sensors\" const",
+    "- **Direction of Effect:** The mechanism *detects* the *negative* trend in $ \\dot{m}_{net}",
+    "- **Exemplar-Reality:** No commercial exemplars are named because this is a *software* imp",
+    "- **Premise-Validity:** All data sources (`Steam_Flow`, `Feedwater_Flow`) are explicitly s",
+    "- **Certified-System:** No new hardware.",
+    "- **Cost-Pricing:** No operational cost.",
+    "- **Mechanism-Diversity:** \"MECHANISM CLASS: Thermodynamic State Reconstruction via DCS Da"
+   ]
+  }
+ },
+ "declared_template_prose": "thermodynamic state reconstruction via dcs data correlation.\" this is a single,",
+ "allowed_row_outside": 0,
+ "sha256_16": "e04158e43bbc9fa5",
+ "smoke": false
+}

@@ -1,0 +1,59 @@
+{
+ "record": "R170S1_POSTRESET_PROBE_RECORD/1.0.0",
+ "session": "builder-r170s1",
+ "claim": "c-0271",
+ "at": "2026-11-27T10:46:00Z",
+ "probe_scripts": [
+  "scripts/r170s1_postreset_probe.py",
+  "scripts/r170s1_probe_followup.py",
+  "scripts/r170s1_judge_census.py"
+ ],
+ "burn": "ZERO corpus legs; 4 non-corpus 8-token probes (xkiro snlite pool probe, xkiro aya32b callable probe, and the cantrustai allowlist rejections which burn 0 tokens — rejected pre-model) — the typed probe class the prior windows used",
+ "cron_verification": {
+  "typed_conclusion": "NO EVIDENCE cron 550745 (the AM51 sequence) fired",
+  "evidence": [
+   "builder cron tool surface: 0 scheduled jobs visible (scope=all, 2026-11-27T10:46Z) — the platform cronjob-gateway is typed NOT-VERIFIABLE from this sandbox's toolset (the r166s1 finding reproduced)",
+   "git: zero commits on queue/dev12_r7 after 68cf02dba (Nov 26 18:14Z); no eval/r168_am51_seal/ markers at the tip",
+   "infra: xkiro free pool ALIVE at 10:50Z (snlite probe HTTP 200 'OK', 10.7h post-reset) — the 24-leg aya32b qualification + panel legs would have exhausted the pool (every prior window saw the pool dead within hours of use)",
+   "the auditor's V133 adjudication (pushed 10:37Z today, AFTER the scheduled fire) still types the panel post-reset PENDING"
+  ]
+ },
+ "xkiro": {
+  "models_status": 200,
+  "catalog_count": 82,
+  "aya32b_present": true,
+  "aya32b_callable": "HTTP 200, content 'OK' (8-token probe, 10:52Z)",
+  "mistral_family_absent": true,
+  "sensenova_present": true,
+  "pool_probe": "HTTP 200 'OK' (snlite, 8-token, 10:50Z)",
+  "implication": "the AM51 lane is EXECUTABLE: pool live + substitute callable"
+ },
+ "cantrustai_owner_transport": {
+  "typed_conclusion": "auth-VALID but NOT-USABLE as a judge transport today",
+  "vault_state": "CTAI_API_KEY (sha256_12=3779a467bb9a) + CTAI_BASE_URL (sha256_12=73be3c3b31e0) ALREADY vault-managed in prateekm1/operator-keys-vault — 0 digest diff vs the owner's bytes this window; r77_vault_restore.py restores 11/11 vault keys",
+  "auth": "VALID (all errors are allowlist-class, never 401/403)",
+  "models_endpoint": "404 (GET /v1/models and /models both)",
+  "allowlist_census": {
+   "rejected_judge_ids": [
+    "cohere/aya-expanse-32b",
+    "aya-expanse-32b",
+    "mistralai/ministral-14b",
+    "mistralai/mistral-small-2603",
+    "sensenova/sensenova-6.8-flash-lite",
+    "hy4-flash:free"
+   ],
+   "rejected_common_names": ["gpt-4o-mini", "claude-3-5-haiku-20241022", "deepseek-chat", "glm-4-flash"],
+   "error_class": "500 {\"error\":{\"message\":\"queries[0].model not in allowlist: <id>\"}} — rejected pre-generation, zero token burn"
+  },
+  "owner_ask": "the allowlist model ids (or a models-list endpoint) — without them the transport cannot carry ANY judge leg",
+  "f45": "CTAI added to the rotation list (history-exposed in directions, like the other 5)"
+ },
+ "cent_ai": {
+  "models_endpoint": "200 with EMPTY body (anomaly — previously 50 models)",
+  "hy4_flash_free_chat": "404 with an HTML app page (not the API 404 class) — the J2 seat typed DOWN/anomalous",
+  "implication": "the P5 v2 two-seat gate fails closed today (hy4 down); the score-8 panel is UNAFFECTED (hy4f's 30/30 VALID legs stand, zero hy4f calls needed)"
+ },
+ "tokenrouter": {
+  "note": "TOKENROUTER_BASE_URL absent from .env.keys (the vault manages the KEY only, digest c148574f6215); the G0 probe was out of this window's typed scope — the P5 lane's own wrapper probes G0 at fire time"
+ }
+}

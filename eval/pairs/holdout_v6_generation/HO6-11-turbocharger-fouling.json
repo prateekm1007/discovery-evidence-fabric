@@ -1,0 +1,168 @@
+{
+ "problem_id": "HO6-11-turbocharger-fouling",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a MONITORING/INDICATION scheme using scavenge-air pressure deviation as the primary indicator.  \nMy departure: A fouling-rate indicator derived from the time-derivative of scavenge-air pressure normalized by turbocharger speed, detecting incipient fouling before pressure drops 8%.  \nThis works because fouling deposits accumulate nonlinearly, causing accelerating pressure loss; the derivative amplifies early warning.  \n\nPHYSICS CHECK  \nGoverning relation: Fouling-induced pressure loss ∝ (deposit thickness × flow resistance).  \nDIRECTION-OF-EFFECT: driving variable = deposit thickness; the mechanism moves it DOWN by early detection (enabling cleaning); this REDUCES flow resistance.  \nMagnitude verification: At 8% pressure drop (ΔP/P = 0.08), fouling-rate threshold = 0.008/day (CALCULATED from 10-day warning window).  \n\nIMPLEMENTATION BILL  \n(a1) Scavenge-air pressure sensor (ALREADY-RECORDED: \"existing scavenge-air pressure signal\")  \n(a2) Turbocharger speed sensor (ALREADY-RECORDED: \"existing turbocharger speed signal\")  \n(a3) Engine load sensor (ALREADY-RECORDED: \"existing engine load signal\")  \n(b1) Signal processing unit (calculates d(P_scavenge)/dt and normalizes by turbocharger speed)  \n(c1) Alarm logic module (triggers when normalized pressure rate > 0.008/day at reference load)  \nReference threshold: 0.008/day (CALCULATED from 10-day warning window and 8% failure threshold)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: SAME (uses existing sensors; no new hardware)  \n- Operability: SAME (no operator intervention; automated rate calculation)  \n- Maintenance: SAME (no additional maintenance; software update only)  \n- Cost class: SAME (no new sensors; only signal processing logic)  \n- Operational loss: Zero (early warning prevents efficiency loss)  \n\nEXECUTABLE TEST  \nProtocol: Log scavenge-air pressure, turbocharger speed, and engine load at 1-hour intervals for 30 days. Pass if: (1) Normalized pressure rate exceeds 0.008/day at least 10 days before any 8% pressure drop, and (2) ≤1 false alarm/year (threshold = 0.008/day).  \nKill criterion: ≥2 false alarms or failure to trigger 10 days before 8% pressure drop.  \nDuration: 30 days (covers multiple fouling cycles).  \nValidation: Uses ALREADY-RECORDED data from prior fouling events.  \n\nCONSTRAINT BIND  \nPrimary indicator: Scavenge-air pressure (per problem statement; threshold defines failure).  \nSupplement: Normalized pressure rate (derivative) for early warning.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installability: SAME (uses existing sensors; no new hardware)",
+    "- Operability: SAME (no operator intervention; automated rate calculation)",
+    "- Maintenance: SAME (no additional maintenance; software update only)",
+    "- Cost class: SAME (no new sensors; only signal processing logic)",
+    "- Operational loss: Zero (early warning prevents efficiency loss)"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3228,
+   "latency_s": 9.8,
+   "transport_tries": 1,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Inputs (ALREADY-RECORDED)**:",
+     "- Scavenge-air pressure (P_scav) – \"existing scavenge-air pressure signal\"",
+     "- Turbocharger speed (N_tc) – \"existing turbocharger speed signal\"",
+     "- Engine load (L_engine) – \"existing engine load signal\"",
+     "- **Indicator Calculation**:",
+     "- Fouling index (FI) = (P_scav_ref / N_tc_ref²) / (P_scav_current / N_tc_current²), where ",
+     "- **Threshold**:",
+     "- DERIVED: FI < 0.92 (predicts 8% P_scav drop at reference load) – calculated from \"stated",
+     "- **Warning Trigger**:",
+     "- FI < 0.92 for 3 consecutive days at reference load (DERIVED from \"stated physical relati",
+     "- **Installability**: SAME – uses existing signals, no new hardware.",
+     "- **Operability**: SAME – real-time computation, no operator intervention.",
+     "- **Maintenance**: SAME – no calibration; thresholds derived from physics.",
+     "- **Cost Class**: SAME – no new sensors or infrastructure; software update only.",
+     "- **False Alarm Control**: SAME – 1/year max via load-dependent baseline (DERIVED from \"st"
+    ]
+   },
+   "sha256_16": "21b069ae2bd46d7d"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2723,
+   "latency_s": 9.9,
+   "transport_tries": 2,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (uses existing signals, no new hardware).",
+     "- Operability: SAME (calculates from existing telemetry, no operator intervention).",
+     "- Maintenance: SAME (no moving parts, calibration-free).",
+     "- Cost class: SAME (software-only change vs. standard practice’s pressure monitoring).",
+     "- Operational loss: CALCULATED (zero; no downtime or parts).",
+     "- Protocol: Record P_scav, speed, and load at reference load for 30 days. Calculate ΔP_sca",
+     "- Pass threshold: ΔP_scav/Δt < 0.5%/day for 30 days (no false alarms).",
+     "- Fail criterion: ΔP_scav/Δt ≥ 0.5%/day on any day (false alarm).",
+     "- Duration: 30 days (covers 10-day warning window × 3).",
+     "- Validation: Uses ALREADY-RECORDED data from prior fouling events (stated data).",
+     "- Primary indicator: Scavenge-air pressure (per problem statement; threshold defines failu",
+     "- Supplemental role: Turbocharger speed and load ensure reference-load consistency (second"
+    ]
+   },
+   "sha256_16": "81bcbe23fc1da20c",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: SAME (uses existing signals, no new hardware).; - Operability: SAME (calculates from existin"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 3877,
+   "latency_s": 12.7,
+   "transport_tries": 3,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- (a1) Scavenge-air pressure sensor (ALREADY-RECORDED: \"existing scavenge-air pressure sig",
+     "- (a2) Turbocharger speed sensor (ALREADY-RECORDED: \"existing turbocharger speed signal\")",
+     "- (a3) Engine load sensor (ALREADY-RECORDED: \"existing engine load signal\")",
+     "- (b1) None (no new hardware or consumables)",
+     "- (c1) Firmware update for engine control unit (CALCULATED: from stated existing signals, ",
+     "- (c2) Algorithm implementation (CALCULATED: threshold derived from physics, no new data c",
+     "- Primary indicator: Turbocharger speed deviation at constant load (primary because it dir",
+     "- Threshold: +2.5% speed deviation at reference load (CALCULATED: from 8% scavenge pressur",
+     "- Secondary indicator: Scavenge-air pressure (used only to confirm fouling if speed thresh",
+     "- Installability: SAME (uses existing signals, no new hardware).",
+     "- Operability: SAME (calculates from existing signals; no operator intervention).",
+     "- Maintenance: SAME (no additional maintenance; firmware update is software-only).",
+     "- Cost class: SAME (no new hardware; only software development cost, negligible vs. standa",
+     "- Operational loss: ZERO (no downtime or fuel penalty; early warning prevents failure).",
+     "- Protocol:",
+     "1. Record baseline turbocharger speed, scavenge pressure, and load at 100% reference load ",
+     "2. Introduce controlled fouling simulation (e.g., soot injection) to achieve 8% scavenge p",
+     "3. Monitor speed deviation continuously.",
+     "- Pass/fail:",
+     "- PASS: Speed deviation exceeds +2.5% at least 10 days before scavenge pressure drops 8%.",
+     "- FAIL: Speed deviation does not trigger before scavenge pressure drop, or false alarm occ",
+     "- Duration: 10 days (matches warning window).",
+     "- Kill criterion: Speed deviation threshold breached <10 days before pressure drop, or >1 ",
+     "- Validation: Uses existing sensor data; no new data collection.",
+     "- Primary indicator: Turbocharger speed deviation at constant load (directly linked to eff",
+     "- Secondary indicator: Scavenge-air pressure (used only for confirmation, not prediction)."
+    ]
+   },
+   "sha256_16": "daf1e3452d25662f",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - (a1) Scavenge-air pressure sensor (ALREADY-RECORDED: \"existing scavenge-air pressure sig; - (a2) Turbocharge"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 2522,
+   "latency_s": 6.8,
+   "transport_tries": 4,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (uses existing sensors; no new hardware)",
+     "- Operability: SAME (no operator intervention; automated rate calculation)",
+     "- Maintenance: SAME (no additional maintenance; software update only)",
+     "- Cost class: SAME (no new sensors; only signal processing logic)",
+     "- Operational loss: Zero (early warning prevents efficiency loss)"
+    ]
+   },
+   "sha256_16": "eb54f1eba1e946a3",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: SAME (uses existing sensors; no new hardware); - Operability: SAME (no operator intervention"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T16:13:38Z"
+}

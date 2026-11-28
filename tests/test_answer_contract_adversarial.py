@@ -61,7 +61,7 @@ def test_calibration_rule_without_window_or_method_rejected():
 def test_calibration_rule_defined_passes():
     ans = ("INDICATOR: bearing vibration RMS. "
            "THRESHOLD: 4.5 mm/s — baseline + 3σ measured from 21 days of "
-           "healthy-fleet telemetry; sigma recalculated weekly. "
+           "healthy-fleet telemetry over 14 days; sigma recalculated weekly. "
            "PROTOCOL: n=12 machines; pass if RMS rises above threshold "
            "before a maintenance-needed flag; fail otherwise.")
     res = validate_answer(ans, "predictor-design", packet=PKT,

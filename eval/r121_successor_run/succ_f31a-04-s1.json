@@ -1,0 +1,51 @@
+{
+ "problem_id": "f31a-04-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [committed bytes] + bind check + bare reviewer fixes)",
+ "authored_bill": "**Mitigation Proposal: Adaptive Stroke-Rate Feedforward Control Based on Upstream Conductivity and Flow**\n\n**Mechanism:**\nImplement a decoupled feedforward control loop that modulates the dosing-pump stroke rate based on upstream water quality and flow metrics, rather than relying on downstream pH. The core mechanism is to dynamically adjust the caustic dose to maintain a target carbonate alkalinity stability without exceeding the pH threshold. By using **Upstream Conductivity** (as a proxy for total dissolved solids and alkalinity load) and **Upstream Flow Rate** as the control inputs, the system can predict the required caustic volume to neutralize acidic components or maintain a stable alkaline buffer *before* the water reaches the membrane inlet. This prevents the \"overshoot\" caused by lagging pH feedback, effectively holding the pH below 10.5 by ensuring the dose is only as high as needed for the specific incoming water matrix, rather than a static setpoint that may over-correct during low-load periods.\n\n**Implementation:**\n1.  **Input Sensors:** Install high-accuracy upstream conductivity probes and electromagnetic flow meters at the inlet to the caustic dosing point (ahead of the mixing chamber).\n2.  **Control Logic:** Replace the static setpoint with a PID-like algorithm where the **Setpoint = f(Conductivity, Flow Rate)**. \n    *   *Example Logic:* Higher conductivity (indicating higher alkalinity/bicarbonate load) requires *less* caustic to reach a target neutralization or buffering state, or conversely, if the goal is to maintain a specific pH range for scaling inhibition, the dose is scaled inversely with conductivity to avoid pushing the system into the high-pH precipitation zone. \n    *   *Critical Constraint Check:* Since the goal is to prevent pH > 10.5, the algorithm should be designed to **cap** the stroke rate when conductivity is low (high demand for caustic to reach pH 7-8, but low capacity to buffer) and **reduce** stroke rate when conductivity is high (water is already buffered, less caustic needed to prevent overshoot into supersaturation).\n3.  **Actuation:** The calculated dose value directly drives the variable-speed drive or stroke-length controller of the diaphragm pump. No pH probe is used in the loop.\n\n**Measures Relied Upon:**\n*   **Upstream Conductivity:** Serves as the primary indicator of water matrix stability and scaling potential. It allows the controller to anticipate the buffering capacity of the water, preventing the static dosing from pushing the system past the alkaline limit.\n*   **Upstream Flow Rate:** Normalizes the dose to volumetric throughput, ensuring that flow surges do not cause under-dosing (which might trigger other issues) or flow drops do not cause over-dosing (which causes pH overshoot).\n*   **Stroke Rate Limiting:** Hardware interlocks that impose an absolute maximum stroke rate, physically preventing the pump from delivering enough caustic to push pH beyond 10.5 even if the control logic miscalculates. This acts as a safety margin against the control variable itself.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "CONSTRAINT_EXCLUSION: excluded stem 'input' in: by using **upstream conductivity** (as a proxy for total dissolved solids and alkali",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "CONSTRAINT_EXCLUSION": [
+   "excluded stem 'input' in: by using **upstream conductivity** (as a proxy for total dissolved solids and alkalinity load) and **upstream ",
+   "excluded stem 'input' in: **input sensors:** install high-accuracy upstream conductivity probes and electromagnetic flow meters at the i",
+   "excluded stem 'inputs' in: by using **upstream conductivity** (as a proxy for total dissolved solids and alkalinity load) and **upstream ",
+   "excluded stem 'used' in: no ph probe is used in the loop.\n\n**measures relied upon:**\n*   **upstream conductivity:** serves as the prima"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Adaptive Stroke-Rate Feedforward Control Based on Upstream Conductivity and Flow**\n\n**Mechanism:**\nImplement a decoupled feedforward control loop that modulates the dosing-pump stroke rate based on upstream water quality and flow metrics, rather than relying on downstream pH. The core mechanism is to dynamically adjust the caustic dose to maintain a target carbonate alkalinity stability without exceeding the pH threshold. By utilizing **Upstream Conductivity** (as a proxy for total dissolved solids and alkalinity load) and **Upstream Flow Rate** as the control inputs, the system can predict the required caustic volume to neutralize acidic components or maintain a stable alkaline buffer *before* the water reaches the membrane inlet. This prevents the \"overshoot\" caused by lagging pH feedback, effectively holding the pH below 10.5 by ensuring the dose is only as high as needed for the specific incoming water matrix, rather than a static setpoint that may over-correct during low-load periods.\n\n**Direction of Effect:**\nThe driving variable is the calculated **Stroke Rate** derived from upstream conductivity and flow. The direction of the mechanical effect is **reductive** regarding the risk of carbonate precipitation: increasing upstream conductivity triggers a **decrease** in the dosing-pump stroke rate, which lowers the caustic mass flow rate, thereby preventing the local pH spike that drives the supersaturation of carbonate scale. Conversely, decreasing conductivity triggers a proportional increase in stroke rate to maintain minimum necessary alkalinity, but strictly within limits that keep pH below the 10.5 threshold.\n\n**Implementation Bill:**\n1.  **Hardware:**\n    *   (2) Industrial-grade upstream conductivity probes (range 0–100 mS/cm) installed at the caustic dosing inlet.\n    *   (1) Electromagnetic flow meter (matched to line diameter) installed upstream of the dosing point.\n    *   (1) Variable-frequency drive (VFD) or stroke-length actuator retrofit for the existing diaphragm dosing pump.\n    *   (1) Safety interlock hardware (hard-stop limit switch or software-enforced maximum frequency limit) to cap maximum stroke rate.\n2.  **Control Logic:**\n    *   Configure the PLC/controller with a feedforward function block: `Setpoint_Stroke_Rate = G(Conductivity, Flow_Rate)`.\n    *   Implement inverse scaling: As Conductivity increases, the multiplier applied to the base dose decreases.\n    *   Implement flow normalization: Dose is divided by Flow Rate to ensure constant mass concentration regardless of volumetric throughput.\n    *   Apply hard limits: Maximum Stroke Rate is capped at a value calculated to theoretically produce pH 10.4 under the worst-case low-conductivity, low-flow scenario.\n3.  **No pH Input:** Ensure the control algorithm does not accept pH sensor data as a feedback loop input, in compliance with probe drift constraints.\n\n**Measures Relied Upon:**\n*   **Upstream Conductivity:** Serves as the primary indicator of water matrix stability and scaling potential. It allows the controller to anticipate the buffering capacity of the water, preventing the static dosing from pushing the system past the alkaline limit.\n*   **Upstream Flow Rate:** Normalizes the dose to volumetric throughput, ensuring that flow surges do not cause under-dosing (which might trigger other issues) or flow drops do not cause over-dosing (which causes pH overshoot).\n*   **Stroke Rate Limiting:** Hardware interlocks that impose an absolute maximum stroke rate, physically preventing the pump from delivering enough caustic to push pH beyond 10.5 even if the control logic miscalculates. This acts as a safety margin against the control variable itself.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Hardware:**",
+   "*   (2) Industrial-grade upstream conductivity probes (range 0–100 mS/cm) installed at the",
+   "*   (1) Electromagnetic flow meter (matched to line diameter) installed upstream of the do",
+   "*   (1) Variable-frequency drive (VFD) or stroke-length actuator retrofit for the existing",
+   "*   (1) Safety interlock hardware (hard-stop limit switch or software-enforced maximum fre",
+   "2.  **Control Logic:**",
+   "*   Configure the PLC/controller with a feedforward function block: `Setpoint_Stroke_Rate ",
+   "*   Implement inverse scaling: As Conductivity increases, the multiplier applied to the ba",
+   "*   Implement flow normalization: Dose is divided by Flow Rate to ensure constant mass con",
+   "*   Apply hard limits: Maximum Stroke Rate is capped at a value calculated to theoreticall",
+   "3.  **No pH Input:** Ensure the control algorithm does not accept pH sensor data as a feed",
+   "*   **Upstream Conductivity:** Serves as the primary indicator of water matrix stability a",
+   "*   **Upstream Flow Rate:** Normalizes the dose to volumetric throughput, ensuring that fl",
+   "*   **Stroke Rate Limiting:** Hardware interlocks that impose an absolute maximum stroke r"
+  ],
+  "CONSTRAINT_EXCLUSION": [
+   "excluded stem 'input' in: by utilizing **upstream conductivity** (as a proxy for total dissolved solids and alkalinity load) and **upstr",
+   "excluded stem 'inputs' in: by utilizing **upstream conductivity** (as a proxy for total dissolved solids and alkalinity load) and **upstr"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ }
+}

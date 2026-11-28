@@ -1,0 +1,72 @@
+{
+ "record": "R109_D4_GATE_STAGING/1.0.0 (STAGING ONLY — the v16 definition is the auditor's)",
+ "at": "2026-11-20T07:46:03Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s1",
+ "claim": "c-0136 (r109-lane-d4-gate-staging; the R108 direction 4)",
+ "basis": "eval/r106_core_mechanism_gate_run.json (committed verdict bytes; deterministic SPECTER2 stack; zero generation)",
+ "failure_anatomy": {
+  "known_novel_anchor_dist": 0.10399,
+  "known_obvious_anchor_dist": 0.069696,
+  "prior_p95_heterogeneous": 0.158496,
+  "margin_leg_threshold (obvious + margin)": 0.119696,
+  "anchor_vs_p95_leg": {
+   "passes": false,
+   "gap": -0.054506
+  },
+  "anchor_vs_margin_leg": {
+   "passes": false,
+   "gap": -0.015706
+  },
+  "evaluated_rows": {
+   "n": 30,
+   "min": 0.037168,
+   "median": 0.058551,
+   "max": 0.095697,
+   "beyond_p95_count": 0,
+   "beyond_margin_count": 0,
+   "n_novel_gate_output": 0
+  }
+ },
+ "v16_candidate_definitions_staged": {
+  "(a) within_domain_p95": {
+   "definition": "the p95 leg recomputes over a DOMAIN-MATCHED prior subset (the textile/leather prior rows of v1-v14) instead of the full heterogeneous 192-row corpus",
+   "staged_evidence": {
+    "nearest_prior_version_composition_of_30_rows": [
+     "v10",
+     "v11",
+     "v12",
+     "v13",
+     "v14",
+     "v9"
+    ],
+    "reading": "every evaluated row's nearest prior lands in v9-v14 and the evaluated distances (0.037-0.096) sit far below the heterogeneous p95 (0.158) — the heterogeneous corpus disperses across domains it does not share with the evaluated set, inflating the leg's threshold beyond ANY same-domain row"
+   },
+   "v16_execution_needs": "the deterministic core-mechanism extraction + SPECTER2 re-embed over the domain-matched prior subset (committed bytes, zero quota); the domain tag source must be pre-registered with the definition"
+  },
+  "(b) robust_mad_z": {
+   "definition": "the leg normalizes distances by the PRIOR corpus' median/MAD (robust center/scale) instead of the raw p95: row_novel iff z_prior(row) > z_prior(anchor_novel) + k for a pre-registered k",
+   "staged_evidence": {
+    "evaluated_side_median": 0.058551,
+    "evaluated_side_MAD": 0.007085000000000001,
+    "evaluated_rows_z_range": [
+     -3.02,
+     5.24
+    ],
+    "known_novel_anchor_z_on_eval_scale": 6.41,
+    "reading": "on the evaluated scale the anchor sits ABOVE every evaluated row (a workable separation) — the degenerate input is the PRIOR corpus' cross-domain scale, so the MAD must be taken over the prior corpus' own within-domain structure, not the pooled 18336 pairs"
+   },
+   "v16_execution_needs": "the prior corpus' per-row distances recomputed (deterministic; the 192-row embed set) — its median/MAD are the normalizers; k pre-registered before scoring"
+  },
+  "(c) margin_without_p95": {
+   "definition": "drop the p95 leg entirely: row_novel iff dist > dist(known_obvious_anchor) + margin",
+   "staged_evidence": {
+    "anchor_fails_even_this_leg": true,
+    "anchor_gap": -0.015706,
+    "evaluated_rows_beyond": 0,
+    "reading": "the margin leg ALONE still misclassifies the known-novel anchor (0.104 < 0.1197): the obvious-anchor distance + 0.05 exceeds the novel anchor — margin-only is NOT sufficient unless the margin shrinks below the anchor separation (0.0343) or the anchor calibration itself is re-authored"
+   },
+   "v16_execution_needs": "an auditor decision: re-author the anchor pair (a tighter obvious anchor or a nearer novel anchor) or re-magnitude the margin — both are instrument-authoring acts"
+  }
+ },
+ "typed_conclusion": "the R108 diagnosis is reproduced from bytes: the known-novel anchor (0.104) sits below the heterogeneous prior p95 (0.158) AND below the margin leg (0.1197), while all 30 evaluated rows (max 0.096) sit below BOTH legs — the gate is degenerate on heterogeneous priors. Candidate (a) fixes the threshold's reference class; candidate (b) fixes the scale; candidate (c) alone still misclassifies the anchor. The choice + the anchor re-authoring stay the auditor's v16 authoring act; the builder executes under claim-before-work"
+}

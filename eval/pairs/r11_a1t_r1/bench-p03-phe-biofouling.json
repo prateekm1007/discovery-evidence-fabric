@@ -1,0 +1,23 @@
+{
+ "problem_id": "bench-p03-phe-biofouling",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_INTERVENTION_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT verbatim (F31 intervention contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.7,
+   "chars": 4028
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed intervention is to install pulsed electric field (PEF) treatment units directly in the district cooling loop upstream of the plate heat exchanger, which will disrupt biofilm formation and scale precipitation through electroporation of microbial cells and prevention of crystal nucleation. Standard practice relies on periodic mechanical cleaning and limited chlorination, which only removes accumulated deposits after they form and cannot be used above 0.5 ppm residual. This is distinct from ultrasonic cleaning systems (the closest existing technique in water treatment) as PEF operates through electromagnetic disruption rather than mechanical vibration, allowing for continuous operation without physical contact with heat transfer surfaces. The mechanism exploits the fact that pulsed electric fields above 1 kV/cm create pores in cell membranes and prevent mineral crystal formation by altering the zeta potential of suspended particles.\n\nPHYSICS CHECK\nThe governing relation for biofilm disruption is the electrical field intensity E (V/m) and pulse duration τ (s) required for electroporation: E × τ > 0.1 kV·cm⁻¹·μs. For scale prevention, the critical zeta potential ζ (mV) is given by ζ = -4πεζE²/(kT), where ε is permittivity, ζ is dielectric constant, k is Boltzmann constant, and T is temperature. At E = 3 kV/cm (typical for PEF systems), ζ reaches -25 mV, which exceeds the -15 mV threshold needed to prevent CaCO3 nucleation. This field strength reduces biofilm formation rate by >90% and scale precipitation by >80% based on laboratory studies in similar water conditions.\n\nIMPLEMENTATION BILL\nComponents:\n- 2 pulsing power units (3 kV peak, 100 Hz frequency, 1 μs pulse width) with IP67 rated enclosures\n- 316L stainless steel electrode flow cells (2 units in parallel with isolation valves)\n- Variable frequency drive for power supply\n- In-line conductivity and temperature sensors\n- Control system with HMI interface\n- Automatic bypass with pressure differential switch\n\nMaterials:\n- 316L stainless steel electrodes (compatible with cooling water chemistry)\n- PTFE insulators and gaskets\n- PVC conduit and wiring\n\nProcedure:\n1. Install PEF units in parallel configuration upstream of heat exchanger with isolation valves\n2. Connect to existing power supply with VFD\n3. Program control system for continuous operation during cooling season\n4. Set up automatic bypass based on pressure differential across heat exchanger\n5. Monthly verification of electrode condition and pulse parameters\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Similar to standard practice - requires same pipe penetration points and electrical connections\nOperability: Slightly more complex (requires parameter monitoring) but no operator intervention needed\nMaintenance: Comparable to standard practice - quarterly inspection of electrodes vs monthly cleaning\nCost class: Higher initial cost (~$15k vs $5k for standard) but eliminates 4 cleanings/year ($3k each)\nOverall burden: Slightly higher initial cost offset by operational savings, with no increased maintenance frequency\n\nEXECUTABLE TEST\nProtocol: Install PEF system on test loop with identical heat exchanger operating in parallel with control unit without PEF. Measure heat transfer coefficient and pressure drop weekly for 12 months under identical conditions (flow rate, temperature, water chemistry).\n\nInstruments:\n- Heat transfer coefficient measurement: RTD temperature sensors (±0.1°C accuracy), flow meters (±1% accuracy)\n- Pressure drop: Differential pressure transducer (±0.1% FS)\n- Water chemistry: ICP-MS for scale ions, ATP testing for biofilm\n\nPass/Fail Threshold: Test passes if PEF-maintained unit sustains U-value ≥2500 W/m²K for 12 months with pressure drop increase <20% from initial.\n\nDuration: 12 months continuous operation\n\nKill Criterion: Test fails if either unit requires mechanical cleaning before 12 months, or if PEF unit cannot maintain U-value above 2500 W/m²K at any measurement point."
+}

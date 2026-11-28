@@ -1,0 +1,37 @@
+{
+  "record": "r146_off_target_recompute/1.0.0 — the off-target recompute on the r146 v17 novelty-strength rows, with the invocation-shape calibration against the SEALED r144 set (the auditor's sealed verdict is 0/30 off-target; both check shapes are disclosed, no cherry-pick)",
+  "instrument": "discovery_fabric.generation.mechanism_map.select_mechanism(problem_arg, answer) — two invocation shapes: (a) domain-shape: the row's domain field as the problem arg; (b) problem-text-shape: the full problem statement as the problem arg",
+  "calibration": {
+    "r144_sealed_domain_shape": {"off_target": 0, "n": 30},
+    "r144_sealed_problem_text_shape": {"off_target": 11, "n": 30},
+    "r146_novelty_domain_shape": {"off_target": 1, "n": 30},
+    "r146_novelty_problem_text_shape": {"off_target": 12, "n": 30},
+    "typed_note": "the domain shape is the shape that reproduces the sealed 0/30 on the r144 set; under it the r146 rows read 29/30 on-physics (1 flagged) — a one-row delta vs the sealed set, disclosed. The problem-text shape is STRICTER and flags 11/30 on the SEALED r144 rows too (the problem statement itself carries mechanism-flavored words that shift the expected-class match); under that shape the two sets are statistically indistinguishable (+1 row). The runner's per-row generation_checks.off_target recorded the STRICT problem-text shape; the raw rows are untouched post-hoc — this file is the recompute disclosure."
+  },
+  "verdict": {
+    "sealed_comparable_shape_domain": "29/30 on-physics (1 off-target: v17-06-solar-backlash)",
+    "strict_shape_problem_text": "18/30 on-physics (12 flagged; the same shape reads 11/30 flagged on the sealed r144 rows)",
+    "regression_claim": "NONE vs the sealed instrument (a one-row delta); the strict-shape delta vs the sealed rows is +1 row",
+    "auditor_role": "the SEALED off-target verification stays the AUDITOR's act (Art. 7/28-addendum); these are builder-side recomputes, typed PENDING-AUDITOR-VERIFY"
+  },
+  "quant_generation_time": {
+    "computed_at_generation": 30, "n": 30, "quant_test_missing": 0,
+    "typed_note": "the quant record (emit_prediction_generic) was computed IN-PROCESS at row-write time, from the row's own stated design point only; 0 invented numbers; the runner demanded the DESIGN_POINT block at generation (the design_point_bind)",
+    "verdict": "DIR 3 (R145-F3) ACHIEVED on this run: 30/30 pint-computed at generation time, 0 QUANT_TEST_MISSING"
+  },
+  "novelty_gate_pre_signal": {
+    "strong": 5, "weak": 25, "strong_pct": 16.7,
+    "typed_note": "the builder-side deterministic novelty gate pre-signal (the sealed scoring stays the AUDITOR's); up from the sealed 4/30=13%, below the >=30% bar",
+    "verdict": "DIR 2's >=30% strong bar NOT met by the deterministic pre-signal on this run"
+  },
+  "levers_on_the_measured_path": {
+    "epo_problem_solution_bind": "scripts/r146_v17_novelty_one_shot.py (typed_plan epo_problem_solution_bind)",
+    "moose_chem_inspiration_lever": "scripts/r146_v17_novelty_one_shot.py imports discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration; the analogies + hash-verified evidence spans ride the typed_plan inspiration_conditioning; import-graph evidence: the runner -> inspiration_retrieval -> mechanism_map.FAILURE_CLASSES",
+    "generation_time_quant_contract": "scripts/r146_v17_novelty_one_shot.py calls quant_generic.emit_prediction_generic at row-write time (the import-graph evidence: the runner -> quant_generic)"
+  },
+  "honest_gaps": [
+    "novelty strong pre-signal 16.7% < 30% bar (the sealed scoring may differ; PENDING-AUDITOR-SCORE)",
+    "1 row off-target under the sealed-comparable domain shape (v17-06-solar-backlash) vs the sealed 0/30 — disclosed, PENDING-AUDITOR-VERIFY",
+    "the inspiration lever is integrated with import-graph evidence but its strong-% gain is not yet measured as >=30% (the next sealed one-shot after the class-filtered wiring is the typed follow-up)"
+  ]
+}

@@ -1,0 +1,21 @@
+**Verdict:** Valid. The draft does not violate any constraints, rely on unavailable resources, invert physical direction, or misprice the duty cycle.
+
+**Reasoning:**
+
+1.  **Constraint Compliance:** The problem states that battery room setpoints may be adjusted within 18–26 °C. The draft proposes lowering the setpoint from 24 °C to 20 °C. Since 20 °C falls within the allowed range [18, 26], the proposal respects the physical boundary constraint.
+2.  **Physical Direction:** The Arrhenius equation dictates that reaction rates decrease as temperature decreases. Electrolyte dry-out is a thermal aging process; therefore, lowering the ambient temperature slows the rate of water loss and chemical degradation. The draft correctly identifies that cooling the room slows the failure mode. There is no inversion of physical causality.
+3.  **Arrhenius Calculation Verification:**
+    *   The problem specifies an activation energy $E_a \approx 80 \text{ kJ/mol}$.
+    *   The draft claims a rate ratio of ~0.63 when going from 24 °C (297.15 K) to 20 °C (293.15 K).
+    *   Using the Arrhenius ratio formula $\frac{k_2}{k_1} = \exp\left(-\frac{E_a}{R} \left(\frac{1}{T_1} - \frac{1}{T_2}\right)\right)$:
+        *   $R \approx 8.314 \text{ J/(mol·K)}$
+        *   $E_a = 80,000 \text{ J/mol}$
+        *   $T_1 = 297.15 \text{ K}$, $T_2 = 293.15 \text{ K}$
+        *   $\frac{1}{297.15} - \frac{1}{293.15} \approx -0.00004566 \text{ K}^{-1}$
+        *   Exponent $= -\frac{80000}{8.314} \times (-0.00004566) \approx 0.439$
+        *   Ratio $= e^{0.439} \approx 1.55$ (This is $k_{24}/k_{20}$).
+        *   Conversely, the ratio $k_{20}/k_{24} = 1/1.55 \approx 0.645$.
+    *   The draft cites a ratio of ~0.63. This is consistent with the calculation (0.645 is approximately 0.63–0.65 depending on rounding precision). The direction is correct: the rate at the lower temperature is significantly lower than at the higher temperature.
+4.  **Duty Cycle/Availability:** The proposal relies only on adjusting the HVAC setpoint. It does not require new hardware, specialized chemicals, or operational changes that would alter the charging/discharging duty cycle of the batteries in a way that is undefined or unavailable. The mitigation is purely thermal management via existing building controls.
+
+Therefore, the draft is a sound, constraint-compliant mitigation that correctly applies physics to slow the specific failure mechanism.

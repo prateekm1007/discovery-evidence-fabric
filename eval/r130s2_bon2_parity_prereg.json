@@ -1,0 +1,36 @@
+{
+ "record": "R130S2_BON2_PARITY_PREREG/1.0.0",
+ "claim": "c-0208",
+ "work_id": "r130s2-bon2-parity",
+ "session": "builder-r130s2",
+ "role": "EXECUTOR",
+ "authored_at": "2026-11-22 (sandbox clock)",
+ "base_sha": "6f97f8311",
+ "authority": "the R129 verdict dir 5 (Phase-B elite levers, Art. 20-gated) + the typed next-window slices of BOTH R129 closes: the c-0205 close ('BoN round-2 parity' — the CLASS decision) and the twin's R130 close cross-reference ('BoN round 2 = the twin's lane ... their round 1 WON 0/24 vs 2/48 — cross-referenced, never duplicated, Art. 29(c)'). This lane IS the bon2 lane; the GEPA round 2 stays the twin's lane and is not touched here.",
+ "question": "Does the bon2-bindselect round-1 WIN (0/24 selected rows vs the incumbent 2/48) REPLICATE on an independent second replication such that the POOLED arm (48 rows) strictly beats the incumbent single-shot bare+binds (48 committed rows) on delivered-defect rows — the Art. 20 CLASS decision: ADOPT as the Phase-B selection layer, or DELETE?",
+ "arm_under_test": {
+  "name": "bon2-bindselect (byte-identical to the round-1 arm)",
+  "per_item": [
+   "two INDEPENDENT bare-author calls (byte-identical frozen authoring bytes; the F31e draw mechanics — provider-side sampling gives distinct candidates, no seeds by design)",
+   "the canonical check_layer bind battery on EACH raw candidate (the deterministic verifier, zero LLM)",
+   "reviewer-fix ONLY candidates with surfaced findings (the frozen v1 IMPROVED_DIRECTIVE bytes + the accepted Phase-A one-field FIX_SCHEMA contract)",
+   "post-review defect scoring of EACH delivered candidate via bill_defect_classes (the canonical four defect classes, the byte rule of the accepted scorers)"
+  ],
+  "selection_rule": "the candidate with FEWER bill_defect_classes entries on its delivered bytes is selected; exact tie (including 0-0) -> candidate 1 (the preregistered deterministic tiebreak); a typed-failed candidate (TYPED_CALL_FAIL / TYPED_PARSE_FAIL) scores +inf in selection and is NEVER silently dropped; both candidates typed-fail -> the item is TYPED_CALL_FAIL and is EXCLUDED from the arm tally, COUNTED in the record",
+  "n_candidates": 2,
+  "cost": "96 quota-consuming legs this replication (48 author + <=48 reviewer) on agnes-3.0-flash (the registered generator), workers 2, 8 s spacing, the established transport backoff (4 x 120 s on rate_limited/transport ONLY; auth/missing_key fail immediately; parse failures NEVER retried), byte-resume, per-leg transport_attempts recorded (the r128 dir-5 commitment)"
+ },
+ "pooling_rule": "typed BEFORE the run: POOLED arm rows = 24 (the round-1 SELECTED rows, RE-TALLIED from the committed eval/r129_bon_run bytes by the committed scorer) + 24 (this replication's selected rows, re-tallied from eval/r130s2_bon_parity_run bytes) = 48. The gate reads the POOLED tally only; no partial gate read mid-run.",
+ "incumbent": {
+  "name": "single-shot bare+binds (the cheapest working arm, Art. 20)",
+  "source": "the COMMITTED F31e accepted records (eval/r125_f31e_run/succ_d{1,2}_*.json, 48 rows over the same 24 items) — recomputed from committed bytes by the committed scorer, never assumed",
+  "expected": "pooled delivered-defect rows 2/48 — MUST reproduce from bytes before the gate is read (the byte-consistency pin)"
+ },
+ "precheck_evidence": "scripts/r130s2_byte_precheck.py (committed with this prereg, zero LLM, zero network, exit 0 pre-prereg): incumbent 48 rows -> 2 defect rows (r125-05-s2/d1 + r125-07-s2/d1, both duty_pricing) and round-1 arm 24 rows -> 0 (Art. 3 byte-consistency verified before this prereg was typed)",
+ "primary_metric": "delivered-defect rows on the canonical detector classes (input_availability, duty_pricing, constraint_violation, physics_direction_inversion) via bill_defect_classes on the delivered bill bytes",
+ "gate_art20_round2": "ADOPT (registry entry 15 -> ACTIVE, rounds_without_beating 0, gate_pass true) iff POOLED arm defect rows < incumbent recomputed defect rows (2/48) STRICTLY; EXACT TIE (== 2) or WORSE -> DELETE the arm (Art. 20 auto-retire; the round-1 win typed NON-REPLICATING, entry status RETIRED_ART20, round-1 bytes kept as history). No score claims either way; the item-clustered width on the 48-row parity is REPORTED as descriptive width only (Art. 14) — never a significance claim.",
+ "typed_fail_policy": "a replication item typed-failed on BOTH candidates is EXCLUDED from the arm tally and COUNTED; more than 2 excluded items -> the replication is typed INVALID_COVERAGE and NO gate is read (fail-closed). Parse failures are typed and NEVER retried (the retired repair loop stays retired).",
+ "quota_probe": "one agnes readiness call before the batch (the phaseA/round-1 pattern); fail = typed INFRA_QUOTA_WALL refusal, no run",
+ "variable_isolation": "the authoring bytes, the reviewer directive bytes, the schema contract, the detector bytes, the model pin (agnes-3.0-flash) and the transport policy (workers 2, 8 s spacing, 4 x 120 s typed backoff) are ALL the accepted frozen bytes, byte-identical to round 1; the ONLY variable is the independent replication (provider-side sampling). Zero engine lines: scripts/ + eval/ only (Art. 27 INFRASTRUCTURE/MEASUREMENT disclosure).",
+ "disclosure": "the round-1 scoring producer script listed in c-0205's artifact_paths (scripts/r129_bon_score.py) is NOT in the tree — the round-1 tally stands on the twin's independent byte recompute (Art. 29(c)) + the committed round-1 scoring JSON; the gap heals forward: THIS round's scorer is committed (scripts/r130s2_bon_parity_score.py) and its gate object is a defect_rows/rows DICT so the Art. 20 CI recompute actually bites (the round-1 string gate left that test path vacuous — noted, not silently relied on)."
+}

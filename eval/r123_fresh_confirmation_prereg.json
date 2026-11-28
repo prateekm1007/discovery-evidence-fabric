@@ -1,0 +1,30 @@
+{
+ "record": "R123_FRESH_CONFIRMATION_PREREG/1.0.0 (PRE-REGISTRATION — committed BEFORE any run byte of the fresh held-out confirmation)",
+ "claim": "c-0183 (work id r123-fresh-confirmation-run)",
+ "session": "builder-r117s1",
+ "authority": "the R122 verdict (adjudication @ bcadfb1d6b4b): 'SCORE-9 AXIS ENACTED (gate committed pre-run, met on the seeded battery). Acceptance requires a FRESH held-out confirmation (Art. 6/13) — the seeded F30 battery is calibration, not the acceptance set.' Direction 2: 'build a FRESH engineering set (never tuned, disjoint from the F30 battery), run the successor shape vs bare-only. Accept: successor delivered-defect-rate <= 0.25, paired CI excludes 0 below bare, damage <= 0.25 on the fresh set -> score-9 axis accepted.'",
+ "the_instrument": {
+  "name": "SCORE-9 FRESH HELD-OUT CONFIRMATION (F31c)",
+  "the_set": {
+   "path": "eval/r123_fresh_set/items.jsonl",
+   "n_items": 24,
+   "construction": "12 FRESH failure scenarios (rotary dryer, cooling tower, plant-air compressor, aeration basin, steam boiler, cooling-water pump, baghouse, chiller, overland conveyor, distillation column, wind-turbine gearbox, cold store) x 2 draws; the F31a item schema (intervention-proposal, the standard existing-instrumentation constraint shape, user_variables empty, no draft embedded)",
+   "disjointness": "checked by scripts/r123_build_fresh_set.py at build time: zero domain nouns shared with the F30/F31a families, zero burned problem-id collisions (the manifest committed in key.json)",
+   "no_tuning_guarantee": "NO defect ground truth is authored or seeded for the fresh set — the amendment-1 detectors (the committed logic, imported byte-identical from scripts/r121_successor_score.py) are the ONLY defect definition, exactly as in the F31b scoring; the scenario bytes freeze at this commit and never change after the first run byte (Art. 4)"
+  },
+  "the_arms": {
+   "bare_only": "agnes-3.0-flash, ONE call per item: the r118 AUTHORING_DIRECTIVE bytes + the problem JSON + the question (the F31a bare arm shape, imported from scripts/r118_authoring_run.py); raw completion committed verbatim; NO binds, NO repair, NO reviewer",
+   "successor": "the SAME bare authoring call (one fresh call per item; the bare and successor arms share the item's single authoring draw, byte-identical, like the F31b construction), then (1) the bind CHECK layer over the authored bill (the stripped machine's own deterministic scans, imported from scripts/r121_successor_run.py — zero LLM), (2) the findings SURFACED verbatim to a BARE REVIEWER: ONE agnes-3.0-flash call per item, the r121 FIX_DIRECTIVE bytes (the F30 working-reviewer shape, imported, NOT improved — the dir-3 residual-class lever is a separate instrument and must not confound this confirmation); the reviewer's output is the DELIVERED bill"
+  },
+  "n_calls_budget": "24 authoring + 24 reviewer = 48 calls worst case on the direct transport with the 2-key rotation; byte-skip resume per item per arm (one call per item per leg, ever — Art. 29(c)); typed TYPED_FAIL + 120 s backoff on transport storms; if the quota probe fails at start, the claim stays OPEN typed INFRA_QUOTA_WALL and the run defers",
+  "scoring": {
+   "delivered_defect_rate_PRIMARY": "per arm, the fraction of the 24 DELIVERED bills carrying >= 1 defect class under the AMENDMENT-1 DETECTORS (the machine's own bind scans over (prob, delivered_bill); UNSTATED-only formatting demands excluded; DETECTOR_ERROR fail-closed)",
+   "paired_bootstrap": "per-item defect indicator, bare_only minus successor, percentile bootstrap 10k, seed 123 (pre-registered here, fresh for the fresh set)",
+   "damage_gate": "among items whose bare bill was CLEAN, the fraction where the successor's DELIVERED bill carries a class the bare bill lacked — must be <= 0.25",
+   "score9_acceptance_gates": "the score-9 axis (as enacted by the auditor, R122) is ACCEPTED ON THE FRESH SET iff successor rate <= 0.25 AND the paired CI excludes 0 below bare (lower bound > 0) AND damage <= 0.25; else TYPED_NEGATIVE with the per-class table + the damage rows (the axis question returns to the auditor)"
+  },
+  "leakage_controls": "the sealed key never enters any prompt; the reviewer sees the problem + the bill + the findings ONLY; the detectors are the committed amendment-1 logic; zero judge calls; the set's key.json is never read by the runner or the scorer"
+ },
+ "ordering_guarantee": "this prereg + the frozen set + the claim register in ONE push BEFORE any run byte (no authoring or reviewer call has started; the quota probe is the first transport contact and it precedes only after this push)",
+ "invalidates": "NOTHING (the F31b positive stands as measured on the seeded battery; this is its held-out confirmation). No new guards, no new claim kinds (dir 8); the runner/scorer import the committed instrument bytes, never re-declare them"
+}

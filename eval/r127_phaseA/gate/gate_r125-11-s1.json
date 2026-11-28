@@ -1,0 +1,80 @@
+{
+ "problem_id": "r125-11-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 4.29,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 741,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 128.24,
+   "usage": {
+    "prompt_tokens": 1073,
+    "completion_tokens": 1304,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Adaptive Closed-Loop Die Pressure Stabilization an",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal: Adaptive Closed-Loop Die Pressure Stabilization and Speed-Adjusted Gauge Compensation**\n\n**Mechanism:**\nThe mitigation employs a software-based control algorithm that actively stabilizes the oscillating die pressure using the existing melt pressure transducer and compensates for residual gauge variation by dynamically adjusting the target melt temperature profile (via the temperature transducers) in correlation with the line-speed encoder signal. The core principle is that pressure oscillations drive local melt density and viscosity fluctuations, causing gauge drift; by suppressing the pressure oscillation amplitude and shifting the thermal state to maintain consistent melt viscosity, the web gauge is stabilized without hardware changes.\n\n**Implementation:**\n1.  **Pressure Oscillation Suppression:**\n    *   Implement a Notch Filter or Adaptive Band-Stop filter in the control loop for the melt pressure setpoint. The filter's center frequency is identified in real-time using the Fast Fourier Transform (FFT) of the *existing* melt pressure transducer signal.\n    *   When the oscillator frequency of the die pressure is detected, the controller injects a counter-phase, equal-amplitude signal into the screw torque/pressure setpoint (or extruder temperature setpoint if pressure is thermally coupled) to dampen the specific harmonic causing the oscillation. This prevents the pressure spikes that cause immediate gauge shifts.\n\n2.  **Speed-Compensated Thermal Biasing:**\n    *   Use the line-speed encoder to calculate the current web take-up rate. Establish a baseline ratio of Line Speed to Melt Temperature (from the zone transducers).\n    *   If gauge variation persists after pressure stabilization, implement a slow-acting feedback loop: Measure the standard deviation of the *pressure* signal as a proxy for gauge inconsistency (since pressure and thickness are inversely related in extrusion). If the standard deviation exceeds a threshold, slightly increase the melt temperature in the metering zone. Higher temperature lowers viscosity, allowing the melt to equalize pressure more evenly across the die face, effectively acting as a \"thermal leveling\" mechanism. The temperature adjustment is constrained to a ±2°C range to avoid thermal runaway.\n\n3.  **Trim Scrap Reduction Logic:**\n    *   The control system monitors the *rate of change* of die pressure. When the pressure stabilizes (low derivative), the gauge is considered \"stable.\"\n    *   During unstable periods (high pressure oscillation), the system triggers a \"safe trim\" mode: it widens the target gauge setpoint by a calculated margin (based on historical gauge deviation vs. pressure variance) and instructs the downstream trim units (if they have digital interfaces; if not, this serves as an operator advisory via HMI) to maximize usable web width by trimming less aggressively only when the gauge is verified stable by the pressure sensor. This converts what would be scrap into usable web during stable windows, and ensures safety during unstable windows.\n\n**Measures Relied Upon (Existing Sensors Only):**\n*   **Melt Pressure Transducer:** Primary feedback for detecting oscillation frequency/amplitude and validating pressure stability.\n*   **Melt Temperature Transducers:** Actuators for the \"thermal leveling\" compensation and validation of the thermal state.\n*   **Line-Speed Encoder:** Provides the reference speed to calculate die residence time and adjust the thermal bias ratio; also used to synchronize the trim logic with the actual web output.\n*   **No new sensors:** The gauge itself is *inferred* indirectly through the relationship between pressure, temperature, and speed, rather than measured directly by a new thickness gauge. The \"measure\" is the control stability of these existing variables.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Adaptive Closed-Loop Die Pressure Stabilization and Speed-Adjusted Gauge Compensation**\n\n**Mechanism:**\nThe mitigation employs a software-based control algorithm that actively stabilizes the oscillating die pressure using the existing melt pressure transducer and compensates for residual gauge variation by dynamically adjusting the target melt temperature profile (via the temperature transducers) in correlation with the line-speed encoder signal. The core principle is that pressure oscillations drive local melt density and viscosity fluctuations, causing gauge drift; by suppressing the pressure oscillation amplitude and shifting the thermal state to maintain consistent melt viscosity, the web gauge is stabilized without hardware changes.\n\n**Direction-of-Effect Statement:**\n*   **Driving Variable:** Oscillating Melt Pressure.\n*   **Direction of Effect on Mechanism:** An increase in local melt pressure raises local melt density and viscosity. This increased viscosity resists flow through the die gap, resulting in a local decrease in extruded film gauge (thickness) in that sector. Conversely, a drop in pressure lowers viscosity and increases local flow, resulting in a local increase in gauge. The control mechanism acts to suppress pressure oscillations to flatten this inverse relationship, thereby reducing cross-web gauge variation.\n*   **Driving Variable:** Melt Temperature.\n*   **Direction of Effect on Mechanism:** An increase in melt temperature decreases melt viscosity. Lower viscosity allows the melt to flow more uniformly across the die face, reducing local pressure gradients and stabilizing the gauge. The speed-encoder signal adjusts the thermal setpoint to compensate for changes in residence time, ensuring consistent viscosity at the die exit.\n\n**Implementation:**\n1.  **Pressure Oscillation Suppression:**\n    *   Implement a Notch Filter or Adaptive Band-Stop filter in the control loop for the melt pressure setpoint. The filter's center frequency is identified in real-time using the Fast Fourier Transform (FFT) of the *existing* melt pressure transducer signal.\n    *   When the oscillator frequency of the die pressure is detected, the controller injects a counter-phase, equal-amplitude signal into the screw torque/pressure setpoint (or extruder temperature setpoint if pressure is thermally coupled) to dampen the specific harmonic causing the oscillation. This prevents the pressure spikes that cause immediate gauge shifts.\n\n2.  **Speed-Compensated Thermal Biasing:**\n    *   Use the line-speed encoder to calculate the current web take-up rate. Establish a baseline ratio of Line Speed to Melt Temperature (from the zone transducers).\n    *   If gauge variation persists after pressure stabilization, implement a slow-acting feedback loop: Measure the standard deviation of the *pressure* signal as a proxy for gauge inconsistency (since pressure and thickness are inversely related in extrusion). If the standard deviation exceeds a threshold, slightly increase the melt temperature in the metering zone. Higher temperature lowers viscosity, allowing the melt to equalize pressure more evenly across the die face, effectively acting as a \"thermal leveling\" mechanism. The temperature adjustment is constrained to a ±2°C range to avoid thermal runaway.\n\n3.  **Trim Scrap Reduction Logic:**\n    *   The control system monitors the *rate of change* of die pressure. When the pressure stabilizes (low derivative), the gauge is considered \"stable.\"\n    *   During unstable periods (high pressure oscillation), the system triggers a \"safe trim\" mode: it widens the target gauge setpoint by a calculated margin (based on historical gauge deviation vs. pressure variance) and instructs the downstream trim units (if they have digital interfaces; if not, this serves as an operator advisory via HMI) to maximize usable web width by trimming less aggressively only when the gauge is verified stable by the pressure sensor. This converts what would be scrap into usable web during stable windows, and ensures safety during unstable windows.\n\n4.  **IMPLEMENTATION BILL:**\n    *   **Hardware:** Zero (No new sensors or actuators; uses existing extruder drive, heater controls, and trim drives).\n    *   **Software/Control:** \n        *   Development of FFT-based adaptive notch filter module.\n        *   Development of speed-thermal correlation biasing algorithm.\n        *   HMI updates for \"Safe Trim\" advisory mode.\n    *   **Labor:** \n        *   40 hours Control Engineer: Algorithm design and simulation.\n        *   16 hours Plant Engineer: Integration with existing PLC/DCS.\n        *   8 hours Operator Training: Review of new HMI advisories.\n    *   **Cost Estimate:** Internal labor only; no capital expenditure for instrumentation.\n\n**Measures Relied Upon (Existing Sensors Only):**\n*   **Melt Pressure Transducer:** Primary feedback for detecting oscillation frequency/amplitude and validating pressure stability. Used for FFT analysis (Finding 1.1), Standard Deviation calculation (Finding 2.2), and Rate of Change monitoring (Finding 3.1).\n*   **Melt Temperature Transducers:** Measure current thermal state for baseline calculation. Used as input to the thermal biasing algorithm; their setpoints are adjusted as the actuator signal (Finding 2.1, 2.2).\n*   **Line-Speed Encoder:** Provides the reference speed signal. Used to calculate die residence time and determine the thermal bias ratio (Finding 2.1). Used to synchronize trim logic with actual web output (Finding 3.2).\n*   **Derived Signals:**\n    *   *Oscillator Frequency:* Derived from Melt Pressure Transducer via FFT.\n    *   *Gauge Proxy (Standard Deviation):* Derived from Melt Pressure Transducer via statistical calculation.\n    *   *Thermal Bias Setpoint:* Derived from Line-Speed Encoder and Melt Temperature Transducers via correlation ratio.\n    *   *Stability Indicator:* Derived from Melt Pressure Transducer via derivative calculation.\n*   **No new sensors:** The gauge itself is *inferred* indirectly through the relationship between pressure, temperature, and speed, rather than measured directly by a new thickness gauge. The \"measure\" is the control stability of these existing variables.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Hardware:** Zero (No new sensors or actuators; uses existing extruder drive, heater ",
+   "*   **Software/Control:**",
+   "*   Development of FFT-based adaptive notch filter module.",
+   "*   Development of speed-thermal correlation biasing algorithm.",
+   "*   HMI updates for \"Safe Trim\" advisory mode.",
+   "*   **Labor:**",
+   "*   40 hours Control Engineer: Algorithm design and simulation.",
+   "*   16 hours Plant Engineer: Integration with existing PLC/DCS.",
+   "*   8 hours Operator Training: Review of new HMI advisories.",
+   "*   **Cost Estimate:** Internal labor only; no capital expenditure for instrumentation.",
+   "*   **Melt Pressure Transducer:** Primary feedback for detecting oscillation frequency/amp",
+   "*   **Melt Temperature Transducers:** Measure current thermal state for baseline calculati",
+   "*   **Line-Speed Encoder:** Provides the reference speed signal. Used to calculate die res",
+   "*   **Derived Signals:**",
+   "*   *Oscillator Frequency:* Derived from Melt Pressure Transducer via FFT.",
+   "*   *Gauge Proxy (Standard Deviation):* Derived from Melt Pressure Transducer via statisti",
+   "*   *Thermal Bias Setpoint:* Derived from Line-Speed Encoder and Melt Temperature Transduc",
+   "*   *Stability Indicator:* Derived from Melt Pressure Transducer via derivative calculatio",
+   "*   **No new sensors:** The gauge itself is *inferred* indirectly through the relationship"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 's input' shares no allowed-list stem (Use only existing sensors and existing measurements: the melt pressure and tempe...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Melt Pressure Transducer:** Primary feedback for detecting oscillation frequency/amplitude and validatin"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 140.55,
+ "status": "DELIVERED_REVIEWED"
+}

@@ -1,0 +1,63 @@
+{
+ "problem_id": "r125-06-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 4.12,
+   "usage": {
+    "prompt_tokens": 260,
+    "completion_tokens": 757,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 128.33,
+   "usage": {
+    "prompt_tokens": 1098,
+    "completion_tokens": 1166,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Adaptive Temperature Control Loop Based on Sheet-E",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal: Adaptive Temperature Control Loop Based on Sheet-Entry Temperature Variance**\n\n**Mechanism:**\nThe primary driver of increased dross formation and zinc consumption in a hot-dip galvanizing kettle is often a mismatch between the bath temperature and the incoming sheet temperature. If the sheet entry temperature is lower than optimal, the thermal shock causes a rapid formation of brittle zinc-iron intermetallics (dross) and requires higher bath temperatures to maintain coating fluidity, which accelerates zinc oxidation. Conversely, if the bath temperature is too high relative to the sheet speed/temperature, excessive evaporation and oxidation occur.\n\nThe mitigation involves creating a **closed-loop adjustment of the kettle zone setpoint** based on the real-time correlation between the **sheet-entry pyrometer readings** and the **production counter** (which allows calculation of line speed), using only the existing **kettle thermocouples** to monitor the actual response. This creates a feedback mechanism that dynamically optimizes the thermal differential to minimize dross nucleation.\n\n**Implementation:**\n1.  **Baseline Calculation:** Use the existing **production counter** to determine current line speed. Use the existing **sheet-entry pyrometer** to continuously log incoming strip temperature ($T_{entry}$).\n2.  **Correlation Analysis (Offline/Online):** During a stable production run, observe the **kettle zone thermocouples** ($T_{kettle}$). Establish an empirical \"optimal\" relationship where dross removal frequency is historically lowest. For example, data may show that when $T_{entry}$ drops by 10°C, $T_{kettle}$ must be increased by 5°C to maintain low dross formation.\n3.  **Automated Setpoint Adjustment:** Modify the existing DCS/PLC logic (no new hardware, just programming) to implement a rule-based or simple PID adjustment:\n    *   If $T_{entry}$ decreases (colder coil), automatically increase the $T_{kettle}$ setpoint by a calculated delta to maintain the optimal temperature differential ($\\Delta T = T_{kettle} - T_{entry}$).\n    *   If $T_{entry}$ increases (hotter coil), decrease the $T_{kettle}$ setpoint to prevent excessive evaporation and oxidation.\n4.  **Verification:** Monitor the trend of dross accumulation. Since direct dross sensors are not allowed, use the indirect metric of **dross removal frequency** as the validation KPI. If the thickness of the ash layer still grows too fast, the loop gain is adjusted. The **kettle thermocouples** provide the fast feedback to ensure the bath temperature actually follows the new setpoint without overshoot.\n\n**Measures it Relies On:**\n*   **Sheet-Entry Pyrometer:** Provides the independent variable (input condition) that determines the required thermal energy balance of the bath.\n*   **Kettle Zone Thermocouples:** Provide the feedback variable (output condition) to ensure the bath temperature responds correctly to the setpoint changes and detects any lag or instability.\n*   **Production Counter:** Used to normalize the data. Dross formation is not only temperature-dependent but also time-dependent. By correlating pyrometer data with production counter intervals, operators can distinguish between dross growth due to thermal imbalance vs. dross growth simply due to extended running time at a constant suboptimal temperature. This allows the control system to focus specifically on the *thermal* aspect of mitigation.\n\nThis approach uses only existing sensors to dynamically match the kettle temperature to the variable incoming strip temperature, thereby minimizing the thermal shock that drives excessive dross formation and associated zinc loss.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Adaptive Temperature Control Loop Based on Sheet-Entry Temperature Variance**\n\n**DIRECTION-OF-EFFECT:**\nDriving Variable: Sheet-Entry Temperature ($T_{entry}$).\nDirection of Effect: An **increase** in $T_{entry}$ leads to a **decrease** in required Kettle Temperature Setpoint ($SP_{kettle}$). A **decrease** in $T_{entry}$ leads to an **increase** in $SP_{kettle}$. This inverse relationship maintains the optimal thermal differential ($\\Delta T$) to minimize dross nucleation and zinc oxidation.\n\n**Mechanism:**\n\nThe primary driver of increased dross formation and zinc consumption in a hot-dip galvanizing kettle is often a mismatch between the bath temperature and the incoming sheet temperature. If the sheet entry temperature is lower than optimal, the thermal shock causes a rapid formation of brittle zinc-iron intermetallics (dross) and requires higher bath temperatures to maintain coating fluidity, which accelerates zinc oxidation. Conversely, if the bath temperature is too high relative to the sheet speed/temperature, excessive evaporation and oxidation occur.\n\nThe mitigation involves creating a **closed-loop adjustment of the kettle zone setpoint** based on the real-time correlation between the **sheet-entry pyrometer readings** and the **production counter** (which allows calculation of line speed), using only the existing **kettle thermocouples** to monitor the actual response. This creates a feedback mechanism that dynamically optimizes the thermal differential to minimize dross nucleation.\n\n**Implementation:**\n1.  **Baseline Calculation:** Use the existing **production counter** to determine current line speed. Use the existing **sheet-entry pyrometer** to continuously log incoming strip temperature ($T_{entry}$).\n2.  **Correlation Analysis (Offline/Online):** During a stable production run, observe the **kettle zone thermocouples** ($T_{kettle}$). Establish an empirical \"optimal\" relationship where dross removal frequency is historically lowest. For example, data may show that when $T_{entry}$ drops by 10°C, $T_{kettle}$ must be increased by 5°C to maintain low dross formation.\n3.  **Automated Setpoint Adjustment:** Modify the existing DCS/PLC logic (no new hardware, just programming) to implement a rule-based or simple PID adjustment:\n    *   If $T_{entry}$ decreases (colder coil), automatically increase the $T_{kettle}$ setpoint by a calculated delta to maintain the optimal temperature differential ($\\Delta T = T_{kettle} - T_{entry}$).\n    *   If $T_{entry}$ increases (hotter coil), decrease the $T_{kettle}$ setpoint to prevent excessive evaporation and oxidation.\n4.  **Verification:** Monitor the trend of dross accumulation. Since direct dross sensors are not allowed, use the indirect metric of **dross removal frequency** as the validation KPI. If the thickness of the ash layer still grows too fast, the loop gain is adjusted. The **kettle thermocouples** provide the fast feedback to ensure the bath temperature actually follows the new setpoint without overshoot.\n\n**Implementation Bill:**\n1.  **Software Logic Update:** Update the DCS/PLC control algorithm to read the $T_{entry}$ value and adjust the $SP_{kettle}$ based on the derived control law.\n2.  **Data Logging Configuration:** Configure the HMI/SCADA to log $T_{entry}$, $SP_{kettle}$, and actual $T_{kettle}$ for post-analysis and validation of the correlation model.\n3.  **Operator Procedure Update:** Issue updated Standard Operating Procedures (SOPs) for manual intervention in case the automated loop detects instability, using only the displayed values from the permitted sensors.\n\n**Input Derivations and Permitted Sensor Mapping:**\n*   **$T_{entry}$ (Sheet-Entry Temperature):** Derived directly from the **Sheet-Entry Pyrometer**. This is a permitted sensor.\n*   **$T_{kettle}$ (Actual Kettle Temperature):** Derived directly from the **Kettle Zone Thermocouples**. This is a permitted sensor.\n*   **Line Speed ($v$):** Derived from the **Production Counter** by calculating the change in counter count ($\\Delta N$) over a specific time interval ($\\Delta t$). Formula: $v \\propto \\Delta N / \\Delta t$ (assuming constant gauge length per count). The Production Counter is a permitted sensor.\n*   **Dross Removal Frequency ($f_{dross}$):** Derived from the **Production Counter** combined with operator log of dross removal events. While the removal event is a manual log, the normalization metric (removals per tonne) is derived by taking the ratio of removal events to $\\Delta N$ (production counter increments). This serves as the validation KPI and is derived from the permitted Production Counter.\n*   **$\\Delta T$ (Thermal Differential):** Derived from $T_{kettle}$ (Kettle Zone Thermocouples) minus $T_{entry}$ (Sheet-Entry Pyrometer). Formula: $\\Delta T = T_{kettle} - T_{entry}$.\n\nThis approach uses only existing sensors to dynamically match the kettle temperature to the variable incoming strip temperature, thereby minimizing the thermal shock that drives excessive dross formation and associated zinc loss.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Software Logic Update:** Update the DCS/PLC control algorithm to read the $T_{entry}",
+   "2.  **Data Logging Configuration:** Configure the HMI/SCADA to log $T_{entry}$, $SP_{kettl",
+   "3.  **Operator Procedure Update:** Issue updated Standard Operating Procedures (SOPs) for ",
+   "*   **$T_{entry}$ (Sheet-Entry Temperature):** Derived directly from the **Sheet-Entry Pyr",
+   "*   **$T_{kettle}$ (Actual Kettle Temperature):** Derived directly from the **Kettle Zone ",
+   "*   **Line Speed ($v$):** Derived from the **Production Counter** by calculating the chang",
+   "*   **Dross Removal Frequency ($f_{dross}$):** Derived from the **Production Counter** com",
+   "*   **$\\Delta T$ (Thermal Differential):** Derived from $T_{kettle}$ (Kettle Zone Thermoco"
+  ],
+  "APPARATUS_ROW": [
+   "2.  **Data Logging Configuration:** Configure the HMI/SCADA to log $T_{entry}$, $SP_{kettle}$, and actual $T_{"
+  ]
+ },
+ "wall_clock_s": 140.47,
+ "status": "DELIVERED_REVIEWED"
+}

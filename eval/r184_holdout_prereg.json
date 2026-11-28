@@ -1,0 +1,78 @@
+{
+ "record": "R184_HOLDOUT_PREREG/1.0.0",
+ "kind": "sealed-holdout-preregistration (auditor-authored, AM54 DIR 3 / score-4 gate)",
+ "authored_at": "2026-11-28 (before any generation or judge byte)",
+ "authority": "auditor role (Art. 7 / Art. 28 addendum: sealed holdouts authored, authorized and custodied by the AUDITOR); no owner act required",
+ "work_id": "r184-holdout-one-shot",
+ "claim": "NO new claim registered — the governance freeze forbids new claims until a measured win (AM54 DIR 5)",
+ "corpus": {
+  "n_items": 24,
+  "plaintext_custody": "holdout_secrets/ OUTSIDE the repo, gitignored by location (session temp); only hashes are committed; the auditor custodies the plaintext and burns it after the run",
+  "corpus_hash_sha256": "f824895c723cfbfe83e687e5c341cc74025428e2558db741eb1994cad60ea950",
+  "item_hashes_sha256": [
+   "c974f73ecd2b38c15c2c5a93cddbe2428bca7cebb3576f77f123bf8657bccca0",
+   "0198eed4de643247efe2da9f931583570e702ef538ba83f9d70ef800a391f1bb",
+   "3235345e867f8d6faf508128127f811a365ac833a870f01aceac59e34f0c640b",
+   "afb7253590353d59d919b1fbd31cf8415165aa15c6c4770217d50ea85f890e19",
+   "8683ea31898991498654f8ce571d40a7ea1e94ed268f850d97663255d6360068",
+   "ca58ef067ee9a0ef02d6a4ac6946cce979d113618039d50eee7d9c373b8eae7c",
+   "937760e3a3ea5149f622fd4ff8831e361530cd736cff4ea01a50cd9f4421cfd0",
+   "610e87b6026b62c61cb91f6df0c007fb20b3a703f8cf3ac319e7d732dfab5499",
+   "21784476eee0c361bbd875fe7a321ca31241bd5e3189af40adaeda7ad818a31e",
+   "c6c89fa95eada24d05e3ee6709df0c25736216a3375e2abc66aba8e62c82fb0b",
+   "992a94a5244c74b819a91459cb534c9cd8b9e2a6ba823427d7a9f77c783ae899",
+   "6da4f9c72be088fbe62b5d714e825fee8de0de4c22644dea15964eda11f26210",
+   "16d6b7a016984d06bd601e09a1b56cc569ef2055a637b9f82be73316f8b5533b",
+   "4fad573ed62a9890fa12fbb0e0b7ddcebba011fab56d8d79a15ff6fe09ba9f86",
+   "7dcdd04a97955bed06614d8110b6862b9fabbd9f9d4be5da765e02d6f129de95",
+   "073daa000cb860aab4bcee4c88d370fb6d58e235c02d5f54864fc17b527a5209",
+   "6d48d5b2c2612980a451597cf21fb4ae65f753a9e80c5d398e66d99ca013022d",
+   "3f1d4f25794274306e51106806df01339d08c36b001e2e896bdaa28b024b1eaf",
+   "c8df612fb2935ef1e294c0a5811f6507e69318012cca5d20f3c7c4582724dbda",
+   "0229c15935ca1292deb4b557f50767b2777c505b794fbf199ab0659475b47c8c",
+   "14d836cd93c59fa8da45aee44007f69bafba981d1cad4df47af422af74671eb1",
+   "40078371cfce006edae48d91bffb6dfcfb522772e77c7dea7a1381a9d43fb8c0",
+   "7e061716481e7fb07a2c1d01c75fea239b4603ca54521c22af78baeab250069e",
+   "10b8ed7094aa50d01818ff01b8b806d9dda0b7c9d7d75b80630b40d53cd9f9e2"
+  ],
+  "canonicalization": "json.dumps(sort_keys=True,separators=(',',':'),ensure_ascii=False) per item; corpus = sha256 of the concatenation of canonical item bytes with no separator",
+  "domain_disjointness": "24 domains disjoint from the r176 DEV corpus (batteries, thermoelectrics, desalination, PV, wind, data-centre cooling, steel, cement, transformers, antennas, robotics, machining, bearings, bridges, bone scaffolds, implant power, hypersonics, satellites, ammonia, lithium brine, EMI shields, soft actuators, NDE). New domains: photon sources, gravitational-wave coatings, neutrino scintillation, hydrothermal scale, ice nucleation, microbial electrosynthesis, stomata, insect muscle, coral, bone in microgravity, cardiac pacing, axons, Rubisco, nitrogenase, hydrides, transmons, topological insulators, MRAM, slow light, acoustic metamaterials, radiative textiles, E-jet printing, triboelectric generators, piezocatalysis.",
+  "integrity_check": "the runner recomputes corpus_hash and all 24 item hashes from the plaintext BEFORE any generation; any mismatch is a typed BURN (no run, no re-roll)",
+  "corpus_hash_correction": {
+   "at": "2026-11-28, BEFORE any generation or judge byte (0 pair files verified)",
+   "withdrawn": "f614c31dc97ca2772cdcc7952048bce0d9c476d70928c058cba2e0842fc42ac5",
+   "corrected": "f824895c723cfbfe83e687e5c341cc74025428e2558db741eb1994cad60ea950",
+   "reason": "the authoring helper hashed canon(list-of-items) while this prereg declares sha256 of the concatenation of canonical per-item bytes; the runner recomputed the declared form and fail-closed with HOLDOUT_BURN before any spend. Correction is forward-only (Art. 4/9); item hashes were already correct and unchanged."
+  }
+ },
+ "question": "On a FRESH 24-item invention-shaped holdout, does the SHIPPED recipe (best-of-N + critique + revise + deterministic verifier) beat a COMPUTE-MATCHED single-shot baseline on wins+ties with a Wilson 95% CI LOWER BOUND > 50%?",
+ "arms": {
+  "generator_both_arms": "agnes-3.0-flash direct API (AGNES_BASE_URL; 2-key rotation; 4x120s backoff), identical prompts/temperature/max_tokens; both arms spend exactly 6 generator calls per item (compute-matched)",
+  "baseline": "6 INDEPENDENT plain single-shot draws; champion = longest draw (the r176 selector, unchanged); NO critique, NO revise, NO verifier",
+  "pipeline_shipped": "4 plain draws -> critique -> revise (6 calls) -> DETERMINISTIC VERIFIER: typed rejection when the revised text lacks any falsification-test span OR contains a citation-like pattern (DOI / patent number / author-year); on rejection, fall back to the longest plain draw and record the typed reason. The verifier is never disabled (the kill criterion shipped it as the production path)."
+ },
+ "judging": {
+  "seat": "tr-deepseek (deepseek/deepseek-v4.1-flash-1017-free via TOKENROUTER) — the only live seat measured this session (ctai 429/burned, snlite xkiro-quota-blocked); judge family != generator family (Art. 26)",
+  "protocol": "blind two-pass, order-swapped (XY/YX), structured VERDICT line; WIN only on both-pass agreement for the pipeline; otherwise TIE or LOSS; parse failures typed, no re-rolls",
+  "wins_plus_ties": "WIN or TIE counts; LOSS does not",
+  "machine_scores_are_input": "the machine judgment is the pre-registered instrument for this gate; the auditor recomputes independently from raw pair bytes (Art. 13)"
+ },
+ "gate_score4": {
+  "primary": "Wilson 95% CI LOWER BOUND of (wins+ties)/24 > 0.50",
+  "power_note": "at n=24 the Wilson lower bound exceeds 0.50 at >=17/24 wins+ties; pre-registered, not negotiated after the run",
+  "secondary": "0 fabricated citations in pipeline outputs (citation-pattern scan); typed verification record per item"
+ },
+ "one_shot_integrity": {
+  "run_once": true,
+  "no_tuning": "no prompt, selector, verifier or judge change between items; no re-rolls; typed infra failures recorded",
+  "byte_resume": "per-item pair bytes; a relaunch resumes and never re-runs a completed item",
+  "burn": "plaintext destroyed after the run; ciphertext/hashes and pair bytes remain as the auditable record"
+ },
+ "artifacts": [
+  "eval/r184_holdout_prereg.json",
+  "eval/r184_holdout_run/pair_*.json",
+  "eval/r184_holdout_run/tally.json",
+  "scripts/r184_holdout_run.py",
+  "scripts/r184_holdout_tally.py"
+ ]
+}

@@ -1,0 +1,100 @@
+{
+ "problem_id": "HO9-03-pulp-kappa-uniformity",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:93ce752d4139": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:26d2abc4ca6e": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:21:00.193714Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\n**Question-answered sentence:** The intervention is a procedure-only retuning of the H-factor temperature-time setpoint and the white-liquor alkali charge, synchronized with the chip feed rate, to equalize the cumulative extraction exposure across the chip population in the blow line.\n**Standard practice:** Standard practice operates the continuous digester at a fixed H-factor target (e.g., 1200–1500) and a fixed alkali charge (e.g., 5.0–5.5 kg NaOH/t), assuming a homogeneous chip residence time distribution. Kappa variation arises because the \"blow line\" (the discharge end) contains chips that have experienced higher effective H-factors due to flow maldistribution and thermal lag, while the main bulk is under-extracted, leading to off-spec kappa at the blow-out.\n**Mitigation (Departure):** Instead of monitoring the variation, the mitigation actively decouples the *extraction* phase from the *discharge* phase by retuning the temperature-time profile to a **lower peak temperature with a longer hold time** (increasing the \"hold\" portion of the H-curve) and simultaneously **reducing the alkali charge by 5–10%** while **increasing the liquor circulation rate** (procedure change). This shifts the chemical extraction kinetics from being driven by high-temperature volatility (which causes local hot spots and rapid, uneven delignification in the circulating liquor) to a slower, diffusion-limited regime where the lower alkali concentration minimizes \"over-extraction\" in the stagnant or low-velocity zones of the digester core, while the increased circulation homogenizes the temperature. The novelty is the *arrangement* of the operating points: lowering the alkali-to-chip ratio and H-peak to compensate for the increased residence time homogenization, attacking the driving mechanism of non-uniform delignification caused by thermal/chemical gradients.\n**Adjacent-technique clearance:** The closest existing practice is \"batch digester optimization,\" which adjusts hold time. This is different because it applies to a *continuous* system by exploiting the dynamic response of the blow line to circulation changes, using only standard control loops (flow, temp, setpoints) without redesigning the vessel.\n**Mechanism:** The driving physics is that kappa number variation $\\sigma_\\kappa$ is proportional to the spatial variance of the local extraction factor $E(x,t)$, which is driven by the product of alkali concentration $C_{OH}$ and the temperature integral $\\int T dt$ (H-factor). By lowering $C_{OH}$ and flattening the temperature profile (reducing peak $T$), the gradient in $E$ is reduced, lowering $\\sigma_\\kappa$.\n\nPHYSICS CHECK\n**Governing Relation:**\nThe delignification rate $R$ is approximated by $R = k \\cdot C_{OH}^n \\cdot e^{-E_a/RT}$, where $k$ is a rate constant, $C_{OH}$ is the alkali concentration, and $T$ is temperature. The H-factor $H = \\sum \\Delta t \\cdot 10^{(T-170)/10}$ (or similar empirical H-curve) quantifies the thermal exposure. Kappa variation across the blow line is driven by the variance in the *effective* H-factor experienced by individual chips, which is exacerbated by high $C_{OH}$ sensitivity and sharp temperature peaks.\n**Magnitude Verification:**\nStandard operation: $C_{OH, std} \\approx 5.2 \\text{ kg/t}$, Peak $T \\approx 175^\\circ\\text{C}$.\nProposed: $C_{OH, new} \\approx 4.8 \\text{ kg/t}$ (approx 8% reduction), Peak $T \\approx 170^\\circ\\text{C}$, with extended hold time to maintain the same *average* H-factor.\nBy lowering $C_{OH}$, the relative rate of delignification in high-alkali pockets (common in poor circulation zones) decreases disproportionately compared to low-alkali zones due to the concentration dependence ($n \\approx 1-2$). The temperature reduction lowers the Arrhenius term $e^{-E_a/RT}$, reducing the kinetic spread caused by $\\pm 5^\\circ\\text{C}$ local fluctuations. The increased circulation rate (procedure change) reduces the thermal boundary layer resistance, making $T$ more uniform. The net effect is a reduction in the standard deviation of the extraction factor, thus reducing kappa variation.\n**DIRECTION-OF-EFFECT:** driving variable = *local extraction rate variance* (driven by alkali concentration gradient and temperature gradient); the mechanism moves the alkali concentration *down* and the temperature gradient *down* (by flattening the profile and increasing circulation); this *reduces* the variance in the extraction factor, thereby *reducing* the failure (kappa variation).\n**INPUT-AVAILABILITY:** The remedy requires $C_{OH}$ (alkali charge), $T$ (temperature setpoints), and Circulation Flow Rate. These are all standard process variables stated in the constraint (\"white-liquor alkali charge chemistry retuning, H-factor temperature-time setpoint retuning, or chip-feed/liquor-circulation procedure\"). No new instrumentation is needed; these are existing DCS signals.\n**COST-PRICING:** No operational loss. The H-factor (total extraction) is maintained by adjusting the hold time, so pulp quality (strength) is not degraded. Energy cost is neutral because the average temperature profile is maintained, only the peak is lowered and duration extended.\n\nIMPLEMENTATION BILL\n**MECHANISM CLASS:** Operating Point Retuning (Configuration/Procedure)\n\n1.  **Component:** White Liquor Alkali Charge Setpoint.\n    *   **Attachment:** Existing white liquor dosing system (metering pumps/control loops already installed).\n    *   **Action:** Reduce the alkali charge setpoint from standard 5.2 kg NaOH/t to 4.8 kg NaOH/t.\n    *   **Tag:** (c) Parameter change to existing equipment.\n    *   **Reasoning:** Lowering concentration reduces the kinetic sensitivity to local flow maldistribution.\n\n2.  **Component:** H-Factor Temperature-Time Setpoint Profile.\n    *   **Attachment:** Existing digester steam heating control system and temperature profile management (DCS setpoints).\n    *   **Action:** Retune the temperature profile: Lower the peak temperature setpoint by 3-5°C (e.g., from 175°C to 170°C) and extend the hold time at the upper temperature by 10-15% to maintain the target total H-factor.\n    *   **Tag:** (c) Parameter change to existing equipment.\n    *   **Reasoning:** Flattening the thermal profile reduces the impact of local thermal lags in the chip bed.\n\n3.  **Component:** Liquor Circulation Rate.\n    *   **Attachment:** Existing liquor circulation pump control loop.\n    *   **Action:** Increase the liquor circulation flow rate by 15-20% relative to the chip feed rate (adjusting the circulation-to-feed ratio setpoint).\n    *   **Tag:** (c) Parameter change to existing equipment.\n    *   **Reasoning:** Higher circulation velocity scours the chip bed, reducing stagnant zones where alkali/temperature gradients accumulate.\n\n4.  **Component:** Chip Feed Rate.\n    *   **Attachment:** Existing chip feed conveyor/flow control.\n    *   **Action:** Maintain chip feed rate constant to ensure consistent residence time distribution, while the circulation change alters the *effective* extraction environment.\n    *   **Tag:** (a) Existing equipment operated as-is (or minor (c) adjustment if needed for synchronization).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installation Burden:** Zero. No new hardware, no new sensors, no new plumbing.\n*   **Commissioning Burden:** Zero. All changes are DCS setpoint adjustments.\n*   **Operational Loss:** Zero. The total H-factor (extraction capacity) is preserved by the extended hold time. Energy consumption is neutral because the average temperature is maintained; only the peak is slightly lowered, which may slightly reduce steam demand but is offset by the longer duration.\n*   **Comparison to Standard Bill:** The standard practice already incurs the burden of managing these setpoints. This intervention does not add *any* new burden class. It merely shifts the operating point within the existing control envelope.\n*   **Conclusion:** Same-or-lower burden class (actually lower in terms of risk of over-extraction).\n\nEXECUTABLE TEST\n**Protocol:**\n1.  Run the digester at standard parameters for 24 hours to establish baseline kappa variation (measure standard deviation of kappa numbers across multiple samples from the blow line, or use online NIR if available, or lab analysis of 3 points: head, mid, tail of the blow line).\n2.  Implement the intervention:\n    *   Step down alkali charge to 4.8 kg/t.\n    *   Retune temperature profile: Peak 170°C, hold time increased by 15%.\n    *   Increase circulation flow by 20%.\n3.  Run for 72 hours (steady state).\n4.  Collect samples at the same 3 points.\n5.  Compare the standard deviation of kappa numbers ($\\sigma_\\kappa$) between Baseline and Intervention.\n**Pass/Fail Threshold:**\n*   **Pass:** $\\sigma_{\\kappa, intervention} < 0.8 \\times \\sigma_{\\kappa, baseline}$ (i.e., 20% reduction in variation).\n*   **Kill Criterion:** If the average kappa number rises by more than 1.5 units (indicating under-extraction due to the lower alkali/temperature), or if $\\sigma_\\kappa$ does not decrease, the mechanism is invalid.\n**Instruments:** Standard lab kappa number analyzer (ASTM D1103). No new online instrumentation required for the test; use existing sampling points.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Component:** White Liquor Alkali Charge Setpoint.",
+    "*   **Attachment:** Existing white liquor dosing system (metering pumps/control loops alre",
+    "*   **Action:** Reduce the alkali charge setpoint from standard 5.2 kg NaOH/t to 4.8 kg Na",
+    "*   **Reasoning:** Lowering concentration reduces the kinetic sensitivity to local flow ma",
+    "2.  **Component:** H-Factor Temperature-Time Setpoint Profile.",
+    "*   **Attachment:** Existing digester steam heating control system and temperature profile",
+    "*   **Action:** Retune the temperature profile: Lower the peak temperature setpoint by 3-5",
+    "*   **Reasoning:** Flattening the thermal profile reduces the impact of local thermal lags",
+    "3.  **Component:** Liquor Circulation Rate.",
+    "*   **Attachment:** Existing liquor circulation pump control loop.",
+    "*   **Action:** Increase the liquor circulation flow rate by 15-20% relative to the chip f",
+    "*   **Reasoning:** Higher circulation velocity scours the chip bed, reducing stagnant zone",
+    "4.  **Component:** Chip Feed Rate.",
+    "*   **Attachment:** Existing chip feed conveyor/flow control.",
+    "*   **Action:** Maintain chip feed rate constant to ensure consistent residence time distr",
+    "*   **Installation Burden:** Zero. No new hardware, no new sensors, no new plumbing.",
+    "*   **Commissioning Burden:** Zero. All changes are DCS setpoint adjustments.",
+    "*   **Operational Loss:** Zero. The total H-factor (extraction capacity) is preserved by t",
+    "*   **Comparison to Standard Bill:** The standard practice already incurs the burden of ma",
+    "*   **Conclusion:** Same-or-lower burden class (actually lower in terms of risk of over-ex"
+   ],
+   "APPARATUS_ROW": [
+    "*   **Installation Burden:** Zero. No new hardware, no new sensors, no new plumbing."
+   ]
+  }
+ },
+ "declared_template_prose": "** operating point retuning (configuration/procedure)",
+ "allowed_row_outside": 0,
+ "sha256_16": "f605b02900b1d863",
+ "smoke": false
+}

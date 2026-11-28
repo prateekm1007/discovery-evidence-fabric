@@ -1,0 +1,44 @@
+{
+ "probe_version": "score9-harness-probe/v1",
+ "purpose": "the prereg harness probe: one tiny serve per seat BEFORE the batch; usage tallied into the ONE-RUN quota",
+ "insp_version": "0.3.291",
+ "seats": {
+  "GEN": {
+   "state": "OK",
+   "model_served": "agnes-3.0-flash",
+   "finish": "stop",
+   "latency_s": 1.9,
+   "completion_sha16": "6bc0da1f42f96fc3",
+   "usage": {
+    "in": 84,
+    "out": 6
+   },
+   "note": "the openai-api provider needs the service-prefix form openai-api/agnes/agnes-3.0-flash + GenerateConfig(max_tokens=...) \u2014 typed probe lesson; REAL per-call usage captured from the provider layer (the score-8 VF-3 accounting gap closed)"
+  },
+  "J1": {
+   "state": "OK",
+   "model": "glm-4-plus",
+   "latency_s": 0.4
+  },
+  "J2": {
+   "state": "OK",
+   "model_served": "cohere/command-a",
+   "latency_s": 0.8,
+   "completion_sha16": "2213d6e5ef07b69c",
+   "usage": {
+    "prompt_tokens": 10,
+    "completion_tokens": 10,
+    "total_tokens": 20,
+    "prompt_tokens_details": {
+     "cached_tokens": 10
+    }
+   }
+  }
+ },
+ "probe_lessons": [
+  "the provider form is openai-api/<service>/<model> with base_url + api_key from the vault",
+  "generate() takes config=GenerateConfig(max_tokens, temperature) \u2014 not kwargs",
+  "J2 (xkiro) returns REAL usage bytes (prompt/completion/total + cached details)",
+  "J1 (z-ai CLI glm-4-plus) returns the OpenAI-shaped choices payload; latency ~0.4s"
+ ]
+}

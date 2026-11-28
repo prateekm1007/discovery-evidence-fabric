@@ -1,0 +1,333 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new07-transformer-dga-predictor",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'f51f90520bc4a9f9e9e77641c30dbf2c790902c0524fb7609ddffda1836f3738', 'baseline_answer_sha256': '526e18ee4625a5ef77eb9ff5b401744320a6ef097f6ceaafdf0f639e2f0e6927', 'evidence_sha256': '7cbb98d66e38759dd63b8144231b70f747faee1db67a8be184bdd396f6eba55f', 'judge_route': {'provider': None, 'model': None}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 23,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 14.9,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Nanoparticle-Enhanced Oil with Thermal Conductivity Sensors",
+    "mechanism": "Nanofluids with embedded temperature-sensitive nanoparticles alter thermal conductivity proportional to fault-induced heat.",
+    "failure_link": "Detects incipient thermal faults via localized oil conductivity spikes (linked to partial discharge or overheating).",
+    "cost_to_test": "$5K (lab-scale nanofluid synthesis + 1-week thermal conductivity testing).",
+    "standard_solution": "Standard mineral oil with passive temperature monitoring.",
+    "departure": "Active thermal conductivity mapping via nanoparticle dispersion, enabling sub-region fault localization."
+   },
+   {
+    "lever": "process",
+    "name": "Dynamic DGA Proxy via Online Furan Analysis",
+    "mechanism": "Continuous furan decomposition tracking via UV-Vis spectroscopy correlates with DGA trends (e.g., 2-furaldehyde rise).",
+    "failure_link": "Furan buildup precedes DGA-detectable gas evolution in partial discharge or thermal faults.",
+    "cost_to_test": "$12K (UV-Vis spectrometer retrofit + 2-week calibration against DGA samples).",
+    "standard_solution": "Quarterly DGA sampling with no intermediate chemical proxies.",
+    "departure": "Real-time furan monitoring as a leading indicator for DGA-alerting faults."
+   },
+   {
+    "lever": "design",
+    "name": "Pressure-Wave Acoustic Sensor Array",
+    "mechanism": "High-frequency tank pressure fluctuations (1\u201310 kHz) correlate with partial discharge or arcing events.",
+    "failure_link": "Acoustic emissions from PD/arcing precede gas dissolution and DGA detection.",
+    "cost_to_test": "$8K (4 piezoelectric sensors + 1-week signal validation against PD lab tests).",
+    "standard_solution": "Low-frequency tank pressure monitoring for bulk thermal expansion only.",
+    "departure": "Ultra-high-frequency acoustic sensing for incipient electrical faults."
+   },
+   {
+    "lever": "controls",
+    "name": "Adaptive Load Current Harmonic Analysis",
+    "mechanism": "Increased high-frequency current harmonics (>1 kHz) indicate localized dielectric breakdown or corona.",
+    "failure_link": "Partial discharge generates harmonics detectable via current transformer (CT) before gas evolution.",
+    "cost_to_test": "$3K (existing CT data reprocessing + 1-week harmonic threshold tuning).",
+    "standard_solution": "Load current monitoring for thermal overload only.",
+    "departure": "Spectral analysis of current for early PD/arcing signatures."
+   },
+   {
+    "lever": "operations",
+    "name": "Predictive Top-Oil Temp Gradient Modeling",
+    "mechanism": "Spatial temperature gradients (top-oil vs. winding) exceed thresholds when faults cause localized heating.",
+    "failure_link": "Fault-induced hotspots create detectable gradients before bulk oil temperature rises.",
+    "cost_to_test": "$0 (existing sensors; 2-week gradient threshold calibration).",
+    "standard_solution": "Top-oil temperature monitoring for bulk thermal state only.",
+    "departure": "Gradient-based fault inference using existing sensors."
+   },
+   {
+    "lever": "measurement",
+    "name": "Dissolved Hydrogen Isotope Ratio Tracking",
+    "mechanism": "Hydrogen/deuterium ratio shifts in oil correlate with fault type (thermal vs. PD) before gas saturation.",
+    "failure_link": "Isotopic fractionation occurs early in fault gas generation, detectable via mass spectrometry.",
+    "cost_to_test": "$20K (portable mass spectrometer + 3-week sampling campaign).",
+    "standard_solution": "Total dissolved gas analysis (DGA) without isotopic resolution.",
+    "departure": "Isotope-specific gas monitoring for fault-type differentiation and earlier detection."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "3a0ec8a9000c545a",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Nanoparticle-Enhanced Oil with Thermal Conductivity Sensors\",\n      \"mechanism\": \"Nanofluids with embedded temperature-sensitive nanoparticles alter thermal conductivity proportional to fault-induced heat.\",\n      \"failure_link\": \"Detects incipient thermal faults via localized oil conductivity spikes (linked to partial discharge or overheating).\",\n      \"cost_to_test\": \"$5K (lab-scale nanofluid synthesis + 1-week thermal conductivity testing).\",\n      \"standard_solution\": \"Standard mineral oil with passive temperature",
+  "raw_tail": "me\": \"Dissolved Hydrogen Isotope Ratio Tracking\",\n      \"mechanism\": \"Hydrogen/deuterium ratio shifts in oil correlate with fault type (thermal vs. PD) before gas saturation.\",\n      \"failure_link\": \"Isotopic fractionation occurs early in fault gas generation, detectable via mass spectrometry.\",\n      \"cost_to_test\": \"$20K (portable mass spectrometer + 3-week sampling campaign).\",\n      \"standard_solution\": \"Total dissolved gas analysis (DGA) without isotopic resolution.\",\n      \"departure\": \"Isotope-specific gas monitoring for fault-type differentiation and earlier detection.\"\n    }\n  ]\n}\n```"
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "article": "owner audit 2026-11-14 step 1; anchors Art. L calibration corpus, provenance Art. XXVII",
+  "allowed_signals": [
+   "current",
+   "pressure",
+   "temperature"
+  ],
+  "allowed_clause": "already installed (top-oil temperature, load current, ambient temperature, tank pressure)",
+  "prior_killed_classes": [],
+  "per_candidate": [
+   {
+    "verdict": "VETOED",
+    "kills": [
+     {
+      "anchor": "PREMISE_ENGINEERED_FLUID",
+      "verdict": "PREMISE_VIOLATION",
+      "finding": "the candidate's mechanism requires replacing the working fluid with an engineered fluid (e.g. nanofluid) \u2014 the device as stated does not carry it and the user did not authorize the substitution \u2014 and the constraint declares an installed-only premise",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "owner audit 2026-11-14 (new07: 'assumes nanofluid oil ... the transformer does not have')"
+     },
+     {
+      "anchor": "ALLOWED_SIGNAL_COMPLIANCE",
+      "verdict": "SIGNAL_NOT_ALLOWED",
+      "finding": "the mechanism consumes 'thermal', outside the user's allowed signal set ['current', 'pressure', 'temperature']",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "the user's own constraint text"
+     }
+    ],
+    "flags": [],
+    "basis": [
+     "PREMISE_ENGINEERED_FLUID: assumed fluid the device does not carry under an installed-only premise",
+     "ALLOWED_SIGNAL_COMPLIANCE: 'thermal' not in the allowed set"
+    ],
+    "index": 0,
+    "lever": "materials",
+    "name": "Nanoparticle-Enhanced Oil with Thermal Conductivity Sensors",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "VETOED",
+    "kills": [
+     {
+      "anchor": "ALLOWED_SIGNAL_COMPLIANCE",
+      "verdict": "SIGNAL_NOT_ALLOWED",
+      "finding": "the mechanism consumes 'dga', outside the user's allowed signal set ['current', 'pressure', 'temperature']",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "the user's own constraint text"
+     }
+    ],
+    "flags": [],
+    "basis": [
+     "ALLOWED_SIGNAL_COMPLIANCE: 'dga' not in the allowed set"
+    ],
+    "index": 1,
+    "lever": "process",
+    "name": "Dynamic DGA Proxy via Online Furan Analysis",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "VETOED",
+    "kills": [
+     {
+      "anchor": "PREMISE_SENSOR_ARRAY",
+      "verdict": "PREMISE_VIOLATION",
+      "finding": "the candidate's mechanism depends on a spatial sensor array / distributed sensing the device's stated instrumentation does not include \u2014 flag for the critic to check whether the user authorized the addition \u2014 and the constraint declares an installed-only premise",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "owner audit 2026-11-14 (new07: 'a spatial top-oil sensor array the transformer does not have')"
+     },
+     {
+      "anchor": "ALLOWED_SIGNAL_COMPLIANCE",
+      "verdict": "SIGNAL_NOT_ALLOWED",
+      "finding": "the mechanism consumes 'acoustic', outside the user's allowed signal set ['current', 'pressure', 'temperature']",
+      "provenance_class": "BUYER_DEFINED",
+      "provenance": "the user's own constraint text"
+     }
+    ],
+    "flags": [],
+    "basis": [
+     "PREMISE_SENSOR_ARRAY: assumed array the device does not carry under an installed-only premise",
+     "ALLOWED_SIGNAL_COMPLIANCE: 'acoustic' not in the allowed set"
+    ],
+    "index": 2,
+    "lever": "design",
+    "name": "Pressure-Wave Acoustic Sensor Array",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 3,
+    "lever": "controls",
+    "name": "Adaptive Load Current Harmonic Analysis",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 4,
+    "lever": "operations",
+    "name": "Predictive Top-Oil Temp Gradient Modeling",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 5,
+    "lever": "measurement",
+    "name": "Dissolved Hydrogen Isotope Ratio Tracking",
+    "disconfirming_query": null
+   }
+  ],
+  "vetoed_indexes": [
+   0,
+   1,
+   2
+  ],
+  "flagged_indexes": []
+ },
+ "critique": {
+  "wall_s": 15.8,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "Adaptive Load Current Harmonic Analysis",
+   "Predictive Top-Oil Temp Gradient Modeling",
+   "Pressure-Wave Acoustic Sensor Array (if user authorizes sensor addition)"
+  ],
+  "standard_solution": "Quarterly dissolved-gas analysis (DGA) with 3-month sampling intervals",
+  "raw_sha256": "56f261c71ede6862",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"materials\",\n      \"environment_compatibility\": \"VETOED (premise violation)\",\n      \"magnitude_audit\": \"N/A\",\n      \"scope_audit\": \"N/A\",\n      \"premise_audit\": \"Requires nanofluid oil replacement (not authorized)\",\n      \"signal_compliance\": \"Uses 'thermal conductivity' (not allowed)\",\n      \"plausibility\": \"N/A\",\n      \"constraint_audit\": \"Violates 'installed-only' and 'no fluid substitution'\",\n      \"difference_from_standard\": \"Standard: quarterly DGA; this replaces oil entirely\"\n    },\n    {\n      \"lever\": \"process\",\n      \"environment_compat",
+  "selection_note": "rank_walk_first_survivor (vetoed=[0, 1, 2])"
+ },
+ "chosen": {
+  "lever": "controls",
+  "name": "Adaptive Load Current Harmonic Analysis",
+  "mechanism": "Increased high-frequency current harmonics (>1 kHz) indicate localized dielectric breakdown or corona.",
+  "failure_link": "Partial discharge generates harmonics detectable via current transformer (CT) before gas evolution."
+ },
+ "compose": {
+  "wall_s": 13.6,
+  "transport_ok": true,
+  "answer_sha256": "0ecdc27af1c16ab2"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 25.8
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 19,
+    "assumption": 1,
+    "unbound_numbers": 3,
+    "all_numbers": 23,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "COMPLETE",
+  "a0plus_answer_sha256": "6ff8d5f2021465e1e2c2f00b9496a150a3292b6d2fdb58bed249808756607b07",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **root-mean-square (RMS) of the 1.5\u201310 kHz current harmonic band** (normalized to rated load current) to detect incipient partial discharge (PD) or thermal faults. A threshold of **0.1% RMS harmonic distortion** (relative to rated current) triggers a fault alert, calibrated to precede gas evolution by \u226530 days. This exploits the fact that PD harmonics appear in current signals **months before dissolved-gas concentrations rise** above DGA detection limits.\n\nMECHANISM: Partial discharges generate high-frequency transients (1\u201310 kHz) via localized dielectric breakdown, which propagate through the winding capacitance and induce measurable current harmonics. Thermal faults (e.g., hot spots) also produce harmonics via nonlinear conduction in degraded insulation, though at lower frequencies (<1 kHz). The 1.5\u201310 kHz band isolates PD-dominated signals while minimizing noise from switching or load transients.\n\nDEPARTURE FROM STANDARD: Standard DGA relies on quarterly oil sampling to detect gas evolution; this method **infers fault onset from online current harmonics** using existing CTs, eliminating fluid sampling and reducing false positives from transient load events.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: **harmonic band** = 1.5\u201310 kHz (rationale: PD harmonics peak at 2\u20135 kHz [doi:10.1117/12.3014485], with thermal contributions <1 kHz; upper bound excludes switching noise)\n ASSUMPTION PARAMETER: **threshold sensitivity** = 0.1% RMS (rationale: empirical PD detection in transformers uses 0.05\u20130.2% [doi:10.1038/s41528-022-00215-2], with 0.1% ensuring \u226530-day lead time via conservative calibration)\n ASSUMPTION PARAMETER: **sampling rate** = 15-minute average (rationale: matches user\u2019s installed resolution; suppresses load-cycle noise)\n ASSUMPTION PARAMETER: **rated current baseline** = 1.0 pu (user-stated 40 MVA/33 kV \u2192 715 A; normalized to pu for cross-device applicability)\n\nINDICATOR: RMS current harmonic distortion in the 1.5\u201310 kHz band, expressed as a percentage of rated load current (% RMS).\n\nTHRESHOLD: 0.1% RMS harmonic distortion (ASSUMPTION: calibrated to precede gas evolution by \u226530 days via empirical PD growth curves [doi:10.1038/s41528-022-00215-2]).\n\nVALIDATION PROTOCOL: **n = 10 independent 40 MVA transformers** (5 with PD faults, 5 healthy) over a 12-month data window, comparing harmonic thresholds to DGA results at quarterly intervals. Detection criterion: **\u226530-day advance warning** of DGA-identified faults (hydrogen or hydrocarbon gases \u2265100 ppm) for \u226580% of cases.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 11537,
+   "ttfb_ms": 11536,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 12307,
+   "ttfb_ms": 12307,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 10185,
+   "ttfb_ms": 10185,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 44.4,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

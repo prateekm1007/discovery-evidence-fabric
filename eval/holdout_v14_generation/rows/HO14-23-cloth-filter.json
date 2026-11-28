@@ -1,0 +1,257 @@
+{
+ "problem_id": "HO14-23-cloth-filter",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v14-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r100_v14_one_shot/1.0.0 — the sealed v14 one-shot (the AM88/CORR-7 corrected set): r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction v1.1 with the typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock measured by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v14-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:b8bc10f6e880": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:92b833b6dcef": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:d7efd1562ce4": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 5,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      2050,
+      2056
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 24.0,
+     "unit_raw": "h",
+     "source_field": "a1_answer",
+     "source_span": [
+      2283,
+      2286
+     ],
+     "unit": "hour",
+     "quantity": "24.0 hour",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 20.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      3493,
+      3496
+     ],
+     "unit": "percent",
+     "quantity": "20.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 5.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3557,
+      3562
+     ],
+     "unit": "day",
+     "quantity": "5.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-5",
+     "value": 10.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      3637,
+      3640
+     ],
+     "unit": "percent",
+     "quantity": "10.0 percent",
+     "dimension": "dimensionless"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T12:29:52Z",
+ "attempts_n": 4,
+ "row_wall_s": 39.0,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a monitoring/indication scheme via periodic manual cloth inspection or reactive headloss threshold trips. Your mechanism delivers the same class of outcome (early warning) via a non-schedule-first, flow-modulation-derived blinding coefficient that decouples cake filtration from particle blinding using only existing telemetry.\n\nPHYSICS CHECK\nGoverning relation: Darcy-Forchheimer law for fixed bed filtration. The resistance is sum of clean medium (constant) and accumulated cake (linear in time) plus blinding component (superlinear in solids loading). \nBlinding index B(t) = (dΔP/dt)_high_flow / (dΔP/dt)_low_flow. \nMagnitude verification: In pure cake filtration, headloss is linear in time, so the ratio of slopes at different flow rates is constant (flow-independent). In blinding, pores clog, creating a non-linear headloss dependence on flux. As blinding progresses, high flux regions saturate, reducing the differential response between high and low flows. A rising B(t) relative to a calculated physics-based ceiling indicates blinding.\nDIRECTION-OF-EFFECT: driving variable = flux-induced blinding rate; the mechanism moves it DOWN by detecting the shift to non-linear resistance early and triggering intervention before the trip; this REDUCES the failure integral by preventing the superlinear headloss accumulation that triggers the trip.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Flow-modulation-derived blinding coefficient\n\n1.  **Blinding Coefficiency Calculator**: Firmware update on existing PLC. (a) Catalog part: PLC license/patch. (b) No hardware. (c) Procedure: Write code to calculate ratio of headloss slopes during normal high-flow vs. low-flow (e.g., flow reduction for settling or existing low-flow periods).\n    *   *Input Streams*: Headloss (ALREADY-RECORDED: \"existing headloss\"), Flow rate (ALREADY-RECORDED: \"existing flow\"). (a)\n    *   *Reference/Threshold*: DERIVED from stated physics. Threshold T_B set at 2.0 times the minimum blinding coefficient observed over the last 30 days of known-healthy operation (derived from logged data). (c)\n2.  **Backwash Trigger Logic**: Firmware update on existing PLC. (a) Catalog part: PLC license/patch. (b) No hardware. (c) Procedure: If B(t) > T_B for 2 consecutive 24h intervals, trigger backwash.\n    *   *Input Streams*: B(t) from row 1.\n    *   *Reference/Threshold*: DERIVED from row 1 logic. (c)\n3.  **Data Logger**: Use existing historian. (a) No new part. (b) No hardware. (c) Procedure: Log B(t) and headloss.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability**: Same as standard practice (PLC programming). No new sensors, no new piping. (a)\n*   **Operability**: Zero operator intervention. Automatic trigger. Operational loss: 0 (no throughput reduction required; uses existing flow variations or minor, brief flow modulation if necessary, but primarily relies on logged data trends). (a)\n*   **Maintenance**: Standard PLC maintenance.\n*   **Cost**: Negligible (software engineering). Parity with standard practice (which uses headloss monitors).\n*   **Operational Loss**: 0. The predictor uses existing operational data. No forced flow reductions. (a)\nEXECUTABLE TEST\nProtocol: Retrieve 6 months of historical headloss and flow data for 3 filters known to have blinded and 3 known to have only caked.\nInstruments: Data analysis software (Excel/Python).\nPass/Fail Threshold: For blinded filters, the Blinding Coefficient B(t) must show a significant (>20%) decrease in the ratio of slope_high/slope_low in the final 5 days before backwash trip. For caked filters, B(t) must remain stable within ±10%.\nDuration: Analysis of historical data (2 hours).\nKill Criterion: If B(t) does not distinguish between blinding and caking in historical data, the mechanism is invalid.\n\nCONSTRAINT BIND\nPrimary stated indicator: Headloss. The blinding coefficient is a derived indicator of the *rate of change* of headloss with respect to flow, which is a property of the headloss signal itself. It does not replace headloss monitoring; it enhances the interpretation of existing headloss and flow data to distinguish blinding from caking, satisfying the \"no new sensors\" and \"no cloth inspection\" constraints. The predictor uses ONLY existing headloss, flow, and backwash frequency.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   *Input Streams*: B(t) from row 1.",
+    "*   **Maintenance**: Standard PLC maintenance.",
+    "*   **Cost**: Negligible (software engineering). Parity with standard practice (which uses"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "2e42111c9e021fa1",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      2,
+      1,
+      0
+     ],
+     "signature": "68dac997fda9d0c6",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      2,
+      1,
+      0
+     ],
+     "signature": "b3fe733e620f6318",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "99a283c6e6f320e6",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "4947edb34129cbaf",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n2"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "flow-modulation-derived blinding coefficient",
+ "allowed_row_outside": 0,
+ "sha256_16": "7d74343caa758982",
+ "smoke": false
+}

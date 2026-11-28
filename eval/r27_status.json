@@ -1,0 +1,63 @@
+{
+ "record": "R27_STATUS/1.0.0",
+ "session": "builder-r27s1",
+ "at": "2026-11-16T05:10:00Z",
+ "reads": {
+  "constitution": "EPISTEMIC_CONSTITUTION.md v3.1.0 (29 articles + the Art. 28 addendum) — Arts. 10, 14, 20, 26, 28, 29 re-read in full for this round",
+  "amendment_26": "R11/audit/AUDITOR_VERDICT_R11_AMENDMENT_26_2026-11-15.md @ audit tip a6ca19ed7 + eval/v7_pilot_auditor_score.json + AUDIT_LEDGER.json (open findings re-checked: F36 CLOSED, F30 OPEN-BREAKTHROUGH-DIRECTION)",
+  "verdict": "Gate NOT_MET — feasibility NEAR PARITY for the first time (0.375 vs the 0.25 bar); novelty RESOLVED-PASS (2.125); F36 CLOSED; V7 novelty-relocation is the breakthrough direction; the judge-block is resolved by the loop (the gate is AUDITOR-judged; the machine judge is an input, not the verdict)"
+ },
+ "sandbox_note": "session continuation of the builder lane (fresh sandbox; the repo recloned at queue tip e668d384b; the audit tip a6ca19ed7 fetched and read). Lane topology unchanged: builders push the queue branch; the audit branch converges via the auditor's merges.",
+ "directions_ledger": {
+  "D1": {
+   "direction": "run the full 30-pair V7 battery and tune feasibility to parity (every bill line a catalog part / standard operation; no custom machining like the p04 vane reprofile); accept feasibility |gap| <=0.25 AND novelty delta >=0.5 on >=30 pairs, auditor-judged",
+   "claim": "c-0021 (EXECUTOR builder-r27s1, work_id r26-v7-catalog-battery — the Art. 29(d) takeover of the c-0020 dead lease resumes the SAME work item; filed+pushed BEFORE any LLM call; the work_id was first filed as a new id and corrected when the Art. 29 CI takeover rule caught it, pre-push of the work commits)",
+   "lever": "NOVELTY-RELOCATION (V7 family), R27 V7.1 STANDARD-BILL TUNING — the tuning closes the process-engineering axis the pilot's gap-1 rows exposed: V7's palette rule stopped FICTIONAL catalog items, but novelty still leaked into custom machining (p04 CNC reprofile, p11 machined bracket, eval-new01 milled recess), custom recipes (p08 custom deposition params + extra post-deposition anneal), custom formulations (p09 5 wt% nano-clay film, sofc graded glass-ceramic seal), and bespoke calibration (p01 custom-calibrated wick). V7.1 = V7 + clauses F-I (STANDARD-BILL BIND): every bill line a procurable catalog part at stock grade or a standard operation at rated parameters; the four classes FORBIDDEN; novelty stays on the arrangement axis (bilayer of two standard materials, duty-cycle schedule, standard-part interconnection)",
+   "machine": [
+    "scripts/r27_a1w_v71_contract.py — SYS_A1_INT_V71 = SYS_A1_INT_V7 + the STANDARD-BILL BIND (clauses F-I) + V71_REPAIR_DIRECTIVE (neutral: typed findings + the relocation instruction; no outcome feedback)",
+    "scripts/r27_standard_bill_scan.py — the zero-LLM deterministic leg: CUSTOM_MACHINING / CUSTOM_RECIPE (added-step + same-tool-different-params shapes) / CUSTOM_MATERIAL / BESPOKE_COMPONENT, row-level on the answer's OWN bill (standard-practice quotes excluded; the p11 preamble-mention boundary typed); 15 regression pins GREEN (tests/test_r27_standard_bill_scan.py) on the REAL flagged bytes — the 7 fire, the 11 clean interventions + 12 predictors do not, determinism pinned",
+    "scripts/r27_tune_battery.py — the pre-registered tuning generation: re-draw ONLY the 7 scan-flagged rows (the pin: the scan over the r26 generation flags EXACTLY these), same machine path byte-unchanged in logic (K_GEN=1, judge-blind, repairs budget 2, scans base + constraint-fit + catalog-v2 + the new STANDARD-BILL leg)",
+    "scripts/r27_assemble_battery.py — the final battery + judge packet assembly (zero-LLM)",
+    "scripts/r27_verify_battery.py — the Art. 13/29(c) zero-LLM verifier (10 check families; exit 0 only on full reproduction)"
+   ],
+   "tuning_outcome": "7/7 re-drawn under V7.1 (repairs {p04:0, p09:1, p01:2, p08:2, p11:2, eval-new01:2, sofc-thermal:2}); the final standard-bill read on the 18 interventions: 17/18 CLEAN with ONE disclosed residual — eval-sofc-thermal-cycling relocated its graded seal into a BILAYER but still differentiates the layers by intergranular-phase fraction (5% vs 25%); the repair budget is exhausted, so the residual stands as the honest machine output, disclosed in the battery record and typed in the registry entry. Honest shape notes for the auditor's judgment (not scores — Art. 10): p01 proposes standard commercial membrane module + mechanical water trap + timer (NAMED_VARIANT residual: the real-product membrane grade name); p04 relocates to micro-blast surface finishing (a standard shop service at stock parameters) — scan-clean, but the auditor may read target-roughness spec as process work; p08 relocates to stock-parameter DRIE texturing (scan-clean; the auditor may read a custom-dimple mask as process development); p09/p11/eval-new01 are clean relocations (supplier-spec coating; stock sleeve + standard epoxy; standard desiccant packet).",
+   "frozen_rows": "the 23 unflagged rows stay BYTE-FROZEN in eval/pairs/r26_v7_catalog/ (11 interventions + 12 predictors; their bills already pass the standard-bill scan; per-row provenance in the battery record). No row is re-drawn outside the pre-registered flagged set (Art. 29(c)).",
+   "battery": "eval/battery_v7_1_catalog_r27.json — 30 rows (11 V7 frozen + 7 V7.1 tuned + 12 V5 frozen), per-row stage/contract/path/sha/repairs/residuals, the tuning ledger, the final scan read, summary_intervention_rows with judged fields TYPED PENDING-AUDITOR",
+   "judge_packet": "eval/r27_judge_packet.json — per-pair problem + a1 + baseline + the pre-registered rubric prompt (_rubric_prompt + AXIS_SUFFIX, unchanged from the pre-registered battery protocol), so the auditor's judgment rides the same rubric; scored-fields format referenced to the AM26 pilot-8 score file",
+   "status": "ASSEMBLED + STAGE-VERIFIED — the battery and packet are committed and zero-LLM-verified; the JUDGED read is the auditor's (AM26: the gate is auditor-judged; the builder never scores). The acceptance re-decision lands on the auditor's 30-pair score."
+  },
+  "D2": {
+   "direction": "restore the machine judge as a cross-check when its credential is available (optional, not a gate dependency)",
+   "status": "TYPED BLOCKED — re-checked at R27 assembly: the vault (.env.keys) holds NO CROWLLM_API_KEY in this sandbox (Art. 17: keys are operator-supplied; the loop cannot mint one); the only reachable transport remains the generator's own gateway route — self-judging, forbidden (Art. 10/26). Per AM26 this is NOT a gate dependency; the auditor-judged gate completes the loop. When a vault window opens, the cross-check runs scripts/r26_battery_v7.py's judge path against the frozen r26 rows (cross-check only — the V7.1 battery's authoritative read is the auditor's)."
+  },
+  "D3": {
+   "direction": "author holdout v4 fully auditor-authored (problems + rubric), pre-registered, one-shot, burn",
+   "status": "PENDING-ON-AUDITOR (Art. 28 addendum: sealed holdouts are authored, authorized and custodied by the AUDITOR; the builder executes the one-shot under claim-before-work when the sealed set lands). The D2 acceptance (0 allowed-measures violations on v4) is armed: scan v2's 13 committed regression pins are the builder-side proof (c-0019 DONE)."
+  },
+  "D4": {
+   "direction": "keep F36 scan v2 enforced; wire Art. 4 if it can be byte-checked",
+   "status": "UNCHANGED from the R26 assessment — Art. 4 stays pinned-PROCESS with the typed reason (the authoritative changed-verdict/number records live on the AUDITOR branch; a builder-side byte-check would gate a stale snapshot — a false check is worse than a pinned flag). Scan v2 remains enforced (13 pins in the CI suite + the V7.1 machine path)."
+  },
+  "delete": "nothing new; the three retired generation-side levers stay accounted (ABLATION_REGISTRY); no deleted module this round"
+ },
+ "art29": {
+  "session": "builder-r27s1 (registered in eval/work_claims.json at claim c-0021)",
+  "claims": [
+   "c-0021 r26-v7-catalog-battery EXECUTOR (the takeover claim; this round's work; stage-verified by scripts/r27_verify_battery.py exit 0)",
+   "c-0020 r26-v7-catalog-battery typed SUPERSEDED by c-0021 (generation 30/30 complete + stage-verified 7/7 + pilot-8 auditor-judged PROCEED at AM26; the judged battery continues under c-0021 with the auditor-judged gate)",
+   "holdout-v3-generation stays OPEN on the author's Art. 29(c) verification (unchanged, auditor-owned)"
+  ],
+  "races": "none this window (single active builder session; the queue tip was re-fetched and diffed before every push — Art. 29(e))",
+  "verifier": "scripts/r27_verify_battery.py — the zero-LLM stage verification (run: exit 0); the full-battery VERIFIER record files when the auditor's judgment lands (the finalize recompute)"
+ },
+ "quota_accounting": {
+  "llm_calls": "7 tuning rows x (1 draft + up to 2 repairs) = 19 gateway calls total on the generator transport (the r27 tuning generation ledger carries per-row attempts/latencies); zero judge calls (credential-blocked, typed); zero scoring calls (the builder never scores — Art. 10)",
+  "deviation": "none this round — the pre-registered order held (claim pushed before the first LLM call; the flagged set pinned by test before generation; the budget held; the residual disclosed rather than chased)"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "YES on the machine path, byte-typed: (a) SYS_A1_INT_V71 = SYS_A1_INT_V7 + the STANDARD-BILL BIND (scripts/r27_a1w_v71_contract.py — the intervention contract CHANGES; the predictor contract SYS_A1F_V5 is byte-unchanged); (b) the standard-bill scan as a new deterministic leg on the machine path (scripts/r27_standard_bill_scan.py, wired into scripts/r27_tune_battery.py's machine_generate_v71); (c) the tuning/assembly/verifier instruments (scripts/r27_tune_battery.py, scripts/r27_assemble_battery.py, scripts/r27_verify_battery.py); (d) 15 regression pins (tests/test_r27_standard_bill_scan.py); (e) the ABLATION_REGISTRY V7-entry amendment (metric_citation -> the r27 record; the V71 tuning typed).",
+  "primary_metric_delta": "PENDING-AUDITOR-JUDGMENT — the judged full-battery read (novelty delta / feasibility |gap| means over the 30 pairs) is the auditor's per AM26 (the gate is auditor-judged; the builder never scores its own generation — Art. 10); the pilot-8 direction read stands at AM26's auditor-judged novelty 2.125 / fgap 0.375 PROCEED",
+  "deletions": "none"
+ },
+ "secret_grep": "0 findings (the standard token-pattern families and the vault value grepped over every staged diff; the credential travels via the push URL only, never in tracked bytes)"
+}

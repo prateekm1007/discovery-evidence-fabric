@@ -1,0 +1,11 @@
+**Verdict:** The draft proposal violates the stated constraints.
+
+**Reasoning:**
+
+1.  **Constraint Violation (Control Input):** The problem statement explicitly states: "Inlet pH is monitored but **must not be used as a control input** (the probe drifts)." The draft proposal states: "Close the dosing loop on the inlet pH probe... to hold pH 10.0." This directly uses the prohibited pH probe as the feedback signal for the control loop, violating the primary operational constraint.
+
+2.  **Physical/Operational Mismatch (Direction of Action):** The failure mode is "caustic dosing overshoot." Caustic is a base (high pH). If the system is overshooting, it is adding too much base. The draft proposes trimming the stroke rate to *hold* pH at 10.0. While reducing stroke rate generally reduces dosing, the core issue is the reliance on the drifting probe for the setpoint. If the probe drifts low, the controller will think pH is too low and *increase* dosing, exacerbating the overshoot and scale formation. If the probe drifts high, it may under-dose. The constraint forbids this specific control strategy due to reliability concerns.
+
+3.  **Permitted Variable Adherence:** The draft does use the "dosing-pump stroke rate" as the manipulated variable, which is the only permitted control variable. However, using it in conjunction with the prohibited input (pH probe) renders the proposal invalid.
+
+**Conclusion:** The draft is rejected because it uses the inlet pH probe as a control input, which is explicitly forbidden in the constraints due to probe drift. A valid proposal must use a different control strategy (e.g., feedforward based on flow rate, time-based setpoint adjustments, or monitoring carbonate hardness/conductivity if permitted, though none are specified as available here) or rely on manual retuning of the stroke rate setpoint without closed-loop pH feedback.

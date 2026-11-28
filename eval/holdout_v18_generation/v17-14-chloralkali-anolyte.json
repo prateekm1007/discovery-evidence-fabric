@@ -1,0 +1,142 @@
+{
+ "problem_id": "v17-14-chloralkali-anolyte",
+ "domain": "corrosion_chemical",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P1",
+   "P5"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "geometry",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:040d046b28cf": "borderline-judge",
+   "cand:MS:DIRECT_TRANSFER:fc5ebadd3f71": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "corrosion_chemical",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "corrosion_chemical",
+   "n_analogies": 2,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:19:13Z",
+ "attempts_n": 1,
+ "row_wall_s": 13.2,
+ "a1_answer": "NOVELTY STATEMENT\nStandard Practice: Barrier Coating Upgrade (applying a harder or thicker passive diffusion barrier on the titanium substrate to resist chloride attack).\nMechanism Departure: Cathodic Protection Sizing via Anolyte Potential Management (shifting the local equilibrium potential of the titanium coating to the cathodic branch of the Pourbaix diagram where the passive film is stabilized by hydrogen evolution rather than destroyed by anodic dissolution).\nFailure-Physics Connection: Chlor-alkali anolyte contains high-concentration NaCl, Cl⁻, and often NaOH. The corrosion of titanium (specifically the intermetallic coatings like Ni-Mo or RuO₂ on Ti) in this environment is often driven by local anodic polarization that destabilizes the passive TiO₂ layer or dissolves the noble coating material. By intentionally driving the potential 50-100 mV below the corrosion potential ($E_{corr}$), the mechanism forces the system into a regime where cathodic reduction ($2H_2O + 2e^- \\rightarrow H_2 + 2OH^-$) dominates, kinetically suppressing the anodic dissolution rate ($i_{an}$) of the coating material via the Stern-Geary relationship.\n\nPHYSICS CHECK\nGoverning Relation: The corrosion current density ($i_{corr}$) is inversely related to the polarization resistance ($R_p$), and $R_p$ is maximized when the potential is shifted away from the mixed potential. Specifically, shifting $\\Delta E = 50$ mV cathodically reduces the anodic branch current density $i_a$ by a factor of $10^{\\Delta E/b_a}$ (where $b_a$ is the Tafel slope for anodic dissolution, typically ~120 mV/decade for Ni-Mo on Ti in alkaline/chloride mix).\nMagnitude Verification:\nASSUMPTION: Anodic Tafel slope $b_a = 120$ mV/decade (standard for Ni-Mo/Ti systems in chlor-alkali electrolyte).\nCALCULATED: A 50 mV cathodic shift reduces the anodic partial current density by $10^{(50/120)} \\approx 1.92$ times relative to the local equilibrium.\nRationale: This quantitative drop in the anodic component of the net current prevents the local depletion of protective species and suppresses the dissolution kinetics of the conductive coating.\n\nIMPLEMENTATION BILL\nComponents:\n1.  Localized Impressed Current Anode (ICCA): Small blocks of mixed metal oxide (MMO) coated titanium, positioned adjacent to the main anode mesh but electrically isolated from the main DC supply.\n2.  Potentiostat Controller: A dedicated micro-controller with a reference electrode (Ag/AgCl) and auxiliary counter-electrode input.\n3.  Wiring Harness: Isolated leads connecting the ICCA and Reference to the controller.\n\nInput Streams & References:\nALREADY-RECORDED: System Operating Voltage (V) - Stated in the problem's domain context as the standard variable for chlor-alkali cells.\nALREADY-RECORDED: Cell Temperature (K) - Stated as a standard process variable.\nDERIVED: Reference Potential Setpoint ($E_{ref}$).\nDerivation Source: Stated Physics (Pourbaix Diagram for Ti/NaCl/NaOH).\nCalculation: The passivity threshold for Ti in high-chloride environments is approximately -0.1 V vs SHE. To ensure cathodic stability, we set the control target to -0.3 V vs Ag/AgCl (approx. -0.5 V vs SHE).\nProcedure:\n1.  Install the ICCA and Reference Electrode in the anolyte compartment, physically separated from the main anode mesh by < 1 cm.\n2.  Configure the potentiostat to maintain the Reference Electrode potential at the DERIVED setpoint (-0.3 V vs Ag/AgCl) by modulating the current through the ICCA.\n3.  No new sensors for chemistry (pH/conductivity) are required; the potential itself is the direct indicator of the electrochemical state governing corrosion.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: The ICCA adds ~2 kg of hardware and one small controller per cell. The standard practice (thicker coating) requires re-machining or thicker plates during cell fabrication. The burden is equivalent in assembly complexity.\nOperability: The controller runs autonomously based on the voltage feedback loop; no manual intervention is required during operation.\nMaintenance: The reference electrode requires annual replacement (standard for Ag/AgCl). The ICCA is passive and has a 5-year lifespan. This is lighter than the standard practice of replacing entire anode meshes every 3-5 years due to corrosion failure.\nRough Cost Class: Moderate initial capital (controller + electrodes) vs. High ongoing operational cost (frequent anode replacement and unplanned downtime) in the standard practice. The burden class is SAME (hardware installation), but the mechanism provides active mitigation rather than passive resistance.\n\nEXECUTABLE TEST\nProtocol:\n1.  Fabricate two titanium anode meshes with Ni-Mo coatings.\n2.  Submerge both in a beaker of simulated chlor-alkali anolyte (25% NaCl, 10% NaOH).\n3.  Subject Mesh A (Standard) to normal operating voltage (+1.5 V vs SHE).\n4.  Subject Mesh B (Invention) to normal operating voltage, but apply the localized ICCA to shift its local potential to -0.3 V vs Ag/AgCl.\n5.  Measure mass loss via high-precision microbalance after 72 hours.\nInstruments: High-precision balance (resolution 0.1 mg), Potentiostat, Ag/AgCl Reference Electrode.\nPass/Fail Threshold:\nPASS: Mass loss of Mesh B is $\\geq 40\\%$ lower than Mesh A.\nKILL CRITERION: The mechanism is FALSIFIED if the mass loss of the protected specimen does not decrease by at least 0.5 mg/week relative to the unprotected control within a 7-day accelerated corrosion test window.\n\nDESIGN_POINT\nThe mechanism acts through a potential shift of $\\Delta E = 50$ mV to 100 mV into the cathodic region.\nAssumed Parameter: Anodic Tafel slope $b_a = 120$ mV/decade.\nCalculated Effect: This shift reduces the anodic dissolution current density by a factor of $1.9$ to $3.2$.\nThreshold: The system must maintain the local potential at or below -0.3 V vs Ag/AgCl to stay outside the active dissolution pit of the Ti/Ni-Mo system in high-chloride brine.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "the Archard implied hardness ratio (25% wear cut)",
+  "predicted_value": "H_treated/H_baseline >= 1.33",
+  "calc_trace": "1/(1-0.25) = 1.33 (Archard rate ~ 1/H)",
+  "falsifier": "the measured hardness ratio must reach 1.33 in the microhardness survey + the coupon test; the opposite result falsifies the invention",
+  "route": "implied-claim"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "cathodic_protection_sizing",
+  "off_target": false,
+  "novelty": "strong",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "INVERTED",
+   "reason": "driver: The failure is driven by anodic polarization where the titanium coating undergoes dissolution or destabilization of the passive film due to the high oxidizing potential of the anolyte. | ingredient: The remedy imposes a cathodic potential shift, which in this device class reduces the kinetic anodic dissolution rate (the damage mechanism) by moving the operating point away from the anodic branch, thereby sign-opposite to the damage integral accumulation. | ingredient sign vs driver: SAME -> INVERTED",
+   "established_driver": "The failure is driven by anodic polarization where the titanium coating undergoes dissolution or destabilization of the passive film due to the high oxidizing potential of the anolyte.",
+   "ingredient_action": "The remedy imposes a cathodic potential shift, which in this device class reduces the kinetic anodic dissolution rate (the damage mechanism) by moving the operating point away from the anodic branch, thereby sign-opposite to the damage integral accumulation.",
+   "sign_of_ingredient_vs_driver": "SAME"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  Localized Impressed Current Anode (ICCA): Small blocks of mixed metal oxide (MMO) coat",
+    "2.  Potentiostat Controller: A dedicated micro-controller with a reference electrode (Ag/A",
+    "3.  Wiring Harness: Isolated leads connecting the ICCA and Reference to the controller.",
+    "1.  Install the ICCA and Reference Electrode in the anolyte compartment, physically separa",
+    "2.  Configure the potentiostat to maintain the Reference Electrode potential at the DERIVE",
+    "3.  No new sensors for chemistry (pH/conductivity) are required; the potential itself is t"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: The failure is driven by anodic polarization where the titanium coating undergoes dissolution or destabilization of the passive film due to the high oxi"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "f374572a4660f91a"
+}

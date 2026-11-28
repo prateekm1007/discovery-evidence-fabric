@@ -1,0 +1,96 @@
+{
+ "record": "R136S2_SHARE_RECONCILIATION/1.0.0",
+ "session": "builder-r134s2",
+ "work_id": "r136s2-share-reconcile",
+ "at": "2026-11-23 (sandbox clock)",
+ "responds_to": "R136 directions dir 5 (reconcile the R135 record's 23.4% against the 14.9% old-formula and 17.5% corrected recomputes) + the verifier record's claim-b pointer",
+ "method": "git diff --numstat base..LANDED-close per round; engine = discovery_fabric/engine/; code = engine+scripts+tests+requirements (the committed test's CODE_PATHS); every number in this record recomputes from the diff with the script committed alongside it (scripts/r136s2_share_reconcile.py)",
+ "close_sha_note": "the r135s1_status.json remote_ci.pushed_sha (7a592f621) and its check-run are UNREACHABLE server-side (rewritten by the R135 rebase disclosed in 908c5d446 'CLAIM RECONCILIATION ... rebase conflict resolved CLEAN'); the governing recompute therefore uses the LANDED close 1613e109a (the audit basis: CI green on 2d1170f06, 1613e109a and the three before them); the 23.4% hunt on the pre-rebase bytes is impossible — the object is gone",
+ "rounds": [
+  {
+   "round": "R133",
+   "base": "697ac00ba",
+   "close": "c76a26a59",
+   "close_note": "R133 window-final push (the D2 amendment; base..final-push reproduces the recorded 36.5 and the twin's 57.6 exactly)",
+   "engine_added": 613,
+   "engine_removed": 305,
+   "code_added": 1260,
+   "code_removed": 334,
+   "old_formula_share": 36.5,
+   "corrected_share": 57.6,
+   "recorded_old_formula": 36.5,
+   "twin_corrected": 57.6,
+   "matches_twin_corrected": true,
+   "matches_recorded_old": true
+  },
+  {
+   "round": "R134",
+   "base": "c76a26a59",
+   "close": "3e3a0a00b",
+   "close_note": "landed R134 ROUND-CLOSE",
+   "engine_added": 182,
+   "engine_removed": 16,
+   "code_added": 835,
+   "code_removed": 16,
+   "old_formula_share": 18.9,
+   "corrected_share": 23.3,
+   "recorded_old_formula": 18.9,
+   "twin_corrected": 23.3,
+   "matches_twin_corrected": true,
+   "matches_recorded_old": true
+  },
+  {
+   "round": "R135",
+   "base": "3e3a0a00b",
+   "close": "1613e109a",
+   "close_note": "landed R135 ROUND-CLOSE (recorded pushed_sha 7a592f621 unreachable: pre-rebase, rewritten)",
+   "engine_added": 141,
+   "engine_removed": 1,
+   "code_added": 802,
+   "code_removed": 8,
+   "old_formula_share": 14.9,
+   "corrected_share": 17.5,
+   "recorded_old_formula": 14.9,
+   "twin_corrected": 17.5,
+   "matches_twin_corrected": true,
+   "matches_recorded_old": true
+  }
+ ],
+ "r135_234_hunt": {
+  "recorded_value": 23.4,
+  "source": "eval/r135s1_status.json art27_capability_budget.share_exception_reason",
+  "candidates": [
+   {
+    "candidate": "old formula at close (ea+eb)/(ea+eb+ca+cb)",
+    "value": 14.9
+   },
+   {
+    "candidate": "corrected at close (ea+eb)/(ca+cb)",
+    "value": 17.5
+   },
+   {
+    "candidate": "added-only, engine once (ea)/(ea+ca)",
+    "value": 15.0
+   },
+   {
+    "candidate": "added-only, engine double (ea)/(ea+ea+ca)",
+    "value": 13.0
+   },
+   {
+    "candidate": "added+removed engine over added-only code (ea+eb)/(ea+ca)",
+    "value": 15.1
+   },
+   {
+    "candidate": "old formula at tip 2d1170f06+ (twin's recompute point)",
+    "value": 14.9
+   },
+   {
+    "candidate": "corrected at tip 2d1170f06+",
+    "value": 17.5
+   }
+  ],
+  "reproduced_by": []
+ },
+ "reconciliation_verdict": "the recorded 23.4% reproduces under NO candidate formula or range tried (candidates typed in r135_234_hunt; corrected R135 = 17.5%, old-formula R135 = 14.9%) — it is a hand-typed drift, disclosed here with the diff-recomputed figures as the governing numbers; the 25-point CI tolerance did not catch it because the test ran at a HEAD where the diff differed",
+ "no_score_claims": true
+}

@@ -1,0 +1,16 @@
+**Mitigation Proposal: Adaptive Stroke-Rate Feedforward Control Based on Upstream Conductivity and Flow**
+
+**Mechanism:**
+Implement a decoupled feedforward control loop that modulates the dosing-pump stroke rate based on upstream water quality and flow metrics, rather than relying on downstream pH. The core mechanism is to dynamically adjust the caustic dose to maintain a target carbonate alkalinity stability without exceeding the pH threshold. By using **Upstream Conductivity** (as a proxy for total dissolved solids and alkalinity load) and **Upstream Flow Rate** as the control inputs, the system can predict the required caustic volume to neutralize acidic components or maintain a stable alkaline buffer *before* the water reaches the membrane inlet. This prevents the "overshoot" caused by lagging pH feedback, effectively holding the pH below 10.5 by ensuring the dose is only as high as needed for the specific incoming water matrix, rather than a static setpoint that may over-correct during low-load periods.
+
+**Implementation:**
+1.  **Input Sensors:** Install high-accuracy upstream conductivity probes and electromagnetic flow meters at the inlet to the caustic dosing point (ahead of the mixing chamber).
+2.  **Control Logic:** Replace the static setpoint with a PID-like algorithm where the **Setpoint = f(Conductivity, Flow Rate)**. 
+    *   *Example Logic:* Higher conductivity (indicating higher alkalinity/bicarbonate load) requires *less* caustic to reach a target neutralization or buffering state, or conversely, if the goal is to maintain a specific pH range for scaling inhibition, the dose is scaled inversely with conductivity to avoid pushing the system into the high-pH precipitation zone. 
+    *   *Critical Constraint Check:* Since the goal is to prevent pH > 10.5, the algorithm should be designed to **cap** the stroke rate when conductivity is low (high demand for caustic to reach pH 7-8, but low capacity to buffer) and **reduce** stroke rate when conductivity is high (water is already buffered, less caustic needed to prevent overshoot into supersaturation).
+3.  **Actuation:** The calculated dose value directly drives the variable-speed drive or stroke-length controller of the diaphragm pump. No pH probe is used in the loop.
+
+**Measures Relied Upon:**
+*   **Upstream Conductivity:** Serves as the primary indicator of water matrix stability and scaling potential. It allows the controller to anticipate the buffering capacity of the water, preventing the static dosing from pushing the system past the alkaline limit.
+*   **Upstream Flow Rate:** Normalizes the dose to volumetric throughput, ensuring that flow surges do not cause under-dosing (which might trigger other issues) or flow drops do not cause over-dosing (which causes pH overshoot).
+*   **Stroke Rate Limiting:** Hardware interlocks that impose an absolute maximum stroke rate, physically preventing the pump from delivering enough caustic to push pH beyond 10.5 even if the control logic miscalculates. This acts as a safety margin against the control variable itself.

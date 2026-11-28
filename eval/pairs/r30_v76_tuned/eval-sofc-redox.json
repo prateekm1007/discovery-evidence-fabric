@@ -1,0 +1,151 @@
+{
+ "problem_id": "eval-sofc-redox",
+ "a1_source": "SYS_A1_INT_V72+V76/r30_v76_directive",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention is a steam-eductor-driven anode exhaust recirculation loop that activates only during the 400–650 °C thermal-transient window of start/stop cycles, maintaining a reducing atmosphere (pO₂ < 10⁻¹⁸ atm) at the Ni-YSZ anode without fresh fuel consumption. Standard practice uses inert-gas purge or simple fuel cutoff during shutdown, which still allows air ingress or re-oxidation as the stack cools through the critical 400–650 °C range where Ni→NiO kinetics are fastest. Adjacent-technique clearance: the closest existing practice is anode off-gas recirculation for fuel utilization (SOFC systems) or steam-jet eductors for vacuum priming (chemical plants); neither deploys recirculation as a dedicated, thermally gated redox shield. The departure is the ARRANGEMENT: a single catalog eductor on the exhaust line, driven by existing steam, that automatically establishes recirculation only when the stack temperature (measured by existing thermocouples) is between 650 °C (shutdown) / 400 °C (startup) and 400 °C (shutdown) / 650 °C (startup), creating a passive, zero-fuel redox buffer.\n\nPHYSICS CHECK\nDIRECTION-OF-EFFECT: driving variable = oxygen partial pressure at anode during 400–650 °C thermal transients; the mechanism moves it DOWN by recirculating anode exhaust (H₂/H₂O/CO/CO₂ mixture, equilibrium pO₂ ≈ 10⁻²⁰ atm at 500 °C) via steam-eductor suction; this REDUCES the oxidation driving force (ΔG for Ni + ½O₂ → NiO) by >15 orders of magnitude versus air ingress (pO₂ = 0.21 atm). Magnitude verification: at 500 °C (773 K), Ni/NiO equilibrium pO₂ = exp(−ΔG°/RT) ≈ 10⁻²⁰ atm (ΔG° ≈ −180 kJ/mol). Recirculated anode gas at S/C = 2.5 gives pO₂ ≈ 10⁻¹⁸ atm (H₂/H₂O buffer). Air ingress gives pO₂ = 0.21 atm. The intervention suppresses the thermodynamic driving force for Ni oxidation by a factor of >10¹⁸, reducing NiO formation rate to negligible (parabolic rate constant kₚ ∝ pO₂ⁿ, n ≈ 0.5–1).\n\nIMPLEMENTATION BILL\n| # | Component / Action | Generic Class / Parameter | Tag | Where Attached / Applied | Operating Parameter(s) |\n|---|---|---|---|---|---|\n| 1 | Existing steam supply header | Plant steam system (saturated, 3–10 bar) | (a) | Steam line to reformer (stated infrastructure) | 5 bar, 160 °C, existing flow capacity |\n| 2 | Existing anode exhaust line | High-temp alloy piping (Inconel 600, DN25) | (a) | Anode outlet to condenser (stated infrastructure) | 750 °C operation, 200 °C cool-down |\n| 3 | Steam-jet eductor | Catalog steam-jet eductor, Inconel 600, motive 5 bar, suction 0.1–0.5 bar | (b) | Installed in anode exhaust line, motive from steam header, suction to anode inlet tee | Motive steam 0.5–1.0 kg/h; suction flow 0.2–0.5 kg/h anode gas |\n| 4 | Check valve (eductor suction line) | Catalog spring-loaded check valve, metal-seated, Inconel 600, DN15, 0.05 bar cracking | (b) | Between eductor suction port and anode inlet tee | Opens at >0.05 bar differential (eductor vacuum) |\n| 5 | Tee fitting (anode inlet) | Catalog high-temp pipe tee, Inconel 600, DN25×DN15×DN25 | (b) | Anode inlet line (upstream of cell) | Passive flow split |\n| 6 | Shutdown procedure change | Parameter change: activate steam to eductor at stack T ≤ 650 °C, deactivate at T ≤ 400 °C | (c) | Existing PLC/temperature controller (stated infrastructure) | Steam valve open 650→400 °C cool-down |\n| 7 | Startup procedure change | Parameter change: activate steam to eductor at stack T ≥ 400 °C, deactivate at T ≥ 650 °C | (c) | Existing PLC/temperature controller (stated infrastructure) | Steam valve open 400→650 °C heat-up |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice bill for redox mitigation: (i) nitrogen purge system (bottles, regulator, solenoid valve, piping) — 4 catalog items + procedural sequence; (ii) or fuel-valve sequencing only (procedural). This intervention bill: 3 catalog parts (eductor, check valve, tee) + 2 procedural parameter changes on existing steam valve and PLC. Installation: all parts are standard pipe fittings welded/flanged into existing exhaust line (same trade, same schedule as standard purge piping). Commissioning: verify eductor suction at 5 bar motive (standard steam test). Operation: consumes 0.5–1.0 kg/h steam only during 2–4 h thermal transients per cycle (200 cycles × 3 h = 600 h over 5 years = 300–600 kg steam total, <0.1% of plant steam capacity). Maintenance: eductor and check valve are zero-maintenance catalog items (no moving parts in eductor; check valve standard 5-year inspection). No operational loss: recirculation occurs only during non-producing thermal transients (shutdown/startup); power generation window unchanged. Burden class: SAME as standard nitrogen purge (fewer consumables, same piping/instrument class, lower operating cost).\n\nEXECUTABLE TEST\nProtocol: Accelerated redox cycling on a single-cell test fixture (planar Ni-YSZ/YSZ/LSM, 10×10 cm active area) at 750 °C, 0.7 V, 0.5 A/cm² baseline. Two groups (n=5 each): (A) standard shutdown (fuel off, air ingress) / startup (fuel on); (B) eductor recirculation active 650→400 °C cool-down and 400→650 °C heat-up (steam 5 bar, eductor per bill). Cycle: 2 h at 750 °C → cool to 200 °C (4 h) → heat to 750 °C (3 h) → hold 2 h = 11 h/cycle. Target: 200 cycles (92 days). Instruments: existing cell voltage/current (power density), stack thermocouples (T), steam flow meter, post-test SEM/EDS (anode microstructure, Ni particle size), optical profilometry (electrolyte curvature → interfacial stress). Pass/fail thresholds: (1) Power density at 0.7 V after 200 cycles ≥ 0.35 W/cm² (group B) vs <0.30 W/cm² (group A, expected degradation). (2) Ni mean particle size increase ≤ 20% (group B) vs ≥ 2× (group A). (3) Electrolyte curvature change ≤ 5 μm (group B) vs ≥ 20 μm (group A). Kill criterion: any cell in group B cracks (voltage collapse to 0) or delaminates (impedance rise >50%) before 100 cycles → mechanism falsified. Duration: 92 days continuous.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'cell' in: the intervention suppresses the thermodynamic driving force for ni oxidation by a factor of >10¹⁸, reducing ni",
+    "excluded stem 'cell' in: instruments: existing cell voltage/current (power density), stack thermocouples (t), steam flow meter, post-te",
+    "excluded stem 'cell' in: kill criterion: any cell in group b cracks (voltage collapse to 0) or delaminates (impedance rise >50%) before",
+    "excluded stem 'existing' in: adjacent-technique clearance: the closest existing practice is anode off-gas recirculation for fuel utilizatio"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 6373,
+   "latency_s": 44.5,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cell' in: difference: fuel-flow standby consumes fresh fuel and requires active fuel-supply control; this intervention u",
+     "excluded stem 'cell' in: with loop volume v_loop ≈ 50 cm³ (typical 10×10 cm cell), blower flow 2 slpm, and o₂ in-leakage < 1 sccm (seal",
+     "excluded stem 'cell' in: volume expansion per cycle δv/v < 0.01% (vs 69% for full oxidation), cumulative strain < 0.02% after 200 cycle",
+     "excluded stem 'existing' in: novelty statement (intervention)\nproposed intervention: **anode-offgas recirculation during shutdown using exi"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: SS316 | | 3 | Existing anode loop piping & valves (standard SS316, DN10) | (a) | Connect"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "6f623384b375ba46"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 7403,
+   "latency_s": 132.3,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "FLAG",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "DEV_NEED": [
+     "custom material"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cell' in: novelty statement (intervention)\nthe intervention is a **dual-inert-purge with positive-pressure hold protocol",
+     "excluded stem 'cell' in: residual risk only below 200 °c where kinetics are negligible.\n\nimplementation bill\n| # | component / action |",
+     "excluded stem 'cell' in: no custom machining, custom process, custom material, custom calibration, surface treatment, added process ste",
+     "excluded stem 'cell' in: build two identical single-cell test fixtures (same ni-ysz anode-supported cell, same furnace, same gas panel)"
+    ],
+    "STANDARD_BILL": [
+     "CUSTOM_MACHINING: machining/machined work: Notes: Rows 1, 4, 5 use infrastructure the problem’s standard practice already provides (gas supply, controllers, PLC). Rows 2–3 are procurable catalog parts of",
+     "CUSTOM_RECIPE: custom recipe/process: Notes: Rows 1, 4, 5 use infrastructure the problem’s standard practice already provides (gas supply, controllers, PLC). Rows 2–3 are procurable catalog parts of"
+    ],
+    "CONVERSION": [
+     "ADDED_PROCESS_STEP: bond on a row that does not ride existing/unchanged infrastructure: Notes: Rows 1, 4, 5 use infrastructure the problem’s standard practice already provides (gas supply, controllers, PLC). Rows 2–3 are procurable catalog parts of"
+    ]
+   },
+   "sha256_16": "9c869e25cda2c3a4",
+   "findings_disclosed": [
+    "TEST_DURATION_REALTIME",
+    "DEV_NEED: custom material",
+    "CONSTRAINT_EXCLUSION: excluded stem 'cell' in: novelty statement (intervention)\nthe intervention is a **dual-inert-purge with positi",
+    "STANDARD_BILL: CUSTOM_MACHINING: machining/machined work: Notes: Rows 1, 4, 5 use infrastructure the problem’s standard pract",
+    "CONVERSION: ADDED_PROCESS_STEP: bond on a row that does not ride existing/unchanged infrastructure: Notes: Rows 1, 4, 5 us"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 6414,
+   "latency_s": 73.1,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "DEV_NEED": [
+     "custom material",
+     "requires development"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cell' in: direction-of-effect: driving variable = oxygen partial pressure at anode during 400–600 °c window; the mechani",
+     "excluded stem 'cell' in: cell a (control): standard continuous n₂ purge (5 slpm anode, 5 slpm cathode) throughout thermal transients",
+     "excluded stem 'cell' in: cell b (intervention): n₂ purge outside 400–600 °c window; inside window, 5 s h₂ pulse at 1 slpm every 60 s on",
+     "excluded stem 'cell' in: pass/fail thresholds: (1) cell b power density at 0.7 v after 200 cycles ≥ 0.35 w/cm² (constraint bound); (2) "
+    ]
+   },
+   "sha256_16": "53683e0effcf6cd8",
+   "findings_disclosed": [
+    "DEV_NEED: custom material; requires development",
+    "CONSTRAINT_EXCLUSION: excluded stem 'cell' in: direction-of-effect: driving variable = oxygen partial pressure at anode during 400–6"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 5949,
+   "latency_s": 86.9,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cell' in: the intervention suppresses the thermodynamic driving force for ni oxidation by a factor of >10¹⁸, reducing ni",
+     "excluded stem 'cell' in: instruments: existing cell voltage/current (power density), stack thermocouples (t), steam flow meter, post-te",
+     "excluded stem 'cell' in: kill criterion: any cell in group b cracks (voltage collapse to 0) or delaminates (impedance rise >50%) before",
+     "excluded stem 'existing' in: adjacent-technique clearance: the closest existing practice is anode off-gas recirculation for fuel utilizatio"
+    ]
+   },
+   "sha256_16": "d95ad140b456b2f2",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'cell' in: the intervention suppresses the thermodynamic driving force for ni oxidation by a fac"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T10:42:19.442189Z"
+}

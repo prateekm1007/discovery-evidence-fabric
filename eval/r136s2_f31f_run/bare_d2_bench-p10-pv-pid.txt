@@ -1,0 +1,18 @@
+Mitigation: Replace the standard soda-lime (sodium-bearing) cover glass with low-alkali, high-boron aluminosilicate glass (e.g., chemically strengthened or standard aluminosilicate with Na₂O < 0.5 wt%) while keeping the existing encapsulant and module stack-up unchanged.
+
+Mechanism: The root cause of PID in this configuration is the electrochemical transport of mobile cations (Na⁺) from the glass into the interlayer and onto cell metallization, creating leakage/shunt paths under high negative bias. By drastically reducing the source concentration of mobile sodium at the glass–encapsulant interface, the driving force and available ion reservoir are minimized, suppressing the formation of conductive shunts. This is a “source removal” strategy that does not rely on encapsulant chemistry changes, satisfying the “no encapsulant replacement” constraint.
+
+Implementation:
+1. Select a cover glass formulation with total alkali (Na₂O + K₂O) ≤ 0.5 wt%, verified by ICPE/ICP-MS on the glass surface and bulk.
+2. Specify the glass to have a low coefficient of thermal expansion matched to the existing encapsulant to avoid delamination during temperature cycling.
+3. Manufacture modules with the new glass, maintaining identical interlayer, cell, and backsheet materials.
+4. Perform accelerated PID stress: 85°C/85% RH with -1000 V DC bias across the module for 1000 h, following IEC 62804-5:2020 or equivalent.
+5. Qualification: 25-year field reliability is inferred from the accelerated test result plus long-term ion migration modeling (Fickian diffusion with source boundary concentration set to the new glass’s Na⁺ level).
+
+Measures it relies on:
+- Mass concentration of mobile Na⁺ at the glass interface (source term in the diffusion equation).
+- Ion mobility in the encapsulant (unchanged, but now with a lower boundary concentration).
+- Module-level shunt resistance stability under bias, which maps directly to power loss.
+
+Concrete test to falsify the approach:
+Perform the 1000 h, 85°C/85%RH, -1000 V accelerated PID test on a sample of modules built with the new low-alkali glass. Measure the change in module shunt resistance (Rsh) and power output. If the final power loss is ≥ 0.5% after the test, or if Rsh drops below a specified threshold (e.g., < 5 MΩ) indicating significant shunt formation, the mitigation is falsified and the assumption that reducing the sodium source sufficiently prevents PID is invalid. Additionally, if ion chromatography of the encapsulant after the test shows Na⁺ accumulation at levels comparable to those measured with standard soda-lime glass, the approach is falsified on the mechanism level.

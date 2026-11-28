@@ -1,0 +1,16 @@
+{
+ "record": "R109_D7_DISK_PROBE/1.0.0",
+ "at": "2026-11-20T07:47:37Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s1",
+ "claim": "c-0137 (r109-lane-d7-xjtu-full; the R108 direction 7)",
+ "disk": {
+  "total_gb": 9.8,
+  "used_gb": 3.6,
+  "free_gb": 5.7
+ },
+ "requirement_gb": 11.0,
+ "typed_state": "BLOCKED__INSUFFICIENT_DISK (Art. 15: infrastructure absence typed, never a silent skip)",
+ "reason": "the full 15-bearing extraction needs ~11GB (the R108 direction's own figure); the rootfs offers 5.8GB free with 2.1GB already under /home/z/my-project — the extracted full-set tree cannot fit even with the R105s2 part-streaming precedent (download part -> extract -> delete part), since the extracted total alone exceeds the ceiling",
+ "resume_condition": "when the sandbox disk ceiling reaches >=12GB free, the extraction resumes from the R105s2 validated path (the static 7zz 25.01 binary /home/z/my-project/tools/7zz reads the RAR5 volume set; the gdown 6-part 4.2G source; coverage >=0.90 on >=3 bearings with the matched-budget table)",
+ "alternative_typed": "the 173-file two-bearing SAMPLE (Bearing3_1/3_2) is already committed from R105s2; no new extraction byte is produced this round"
+}

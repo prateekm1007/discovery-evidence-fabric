@@ -1,0 +1,34 @@
+{
+ "record": "R169S1_CTAI_LANE_RECORD/1.0.0",
+ "session": "builder-r169s1",
+ "claim": "c-0270 (amended: lease -> Nov 28 12:00Z; the ctai substitution note)",
+ "at": "2026-11-27T11:10:00Z",
+ "owner_instruction": "https://api.cantrustai.xyz + /v1, the ctai key delivered — 'use it for judges, save it in huggingface vault'",
+ "the_vault_act": {
+  "keys_added": [
+   "CTAI_API_KEY (sha256_12 3779a467bb9a)",
+   "CTAI_BASE_URL (sha256_12 73be3c3b31e0)"
+  ],
+  "verify": "from-scratch rm .env.keys -> r77_vault_restore.py restores 11/11 vault-managed keys",
+  "disclosure": "digests only; the key never prints in any commit"
+ },
+ "the_transport": {
+  "engine": "discovery_fabric/engine/route_adapter.py::ctai_chat — the cent_ai_chat pattern (vault key + base URL, typed refusals)",
+  "typed_classes": "missing_key, degenerate_input, auth, rate_limited, model_not_allowed (the allowlist class — bare names like 'gpt-6-luna' fail HTTP 500 'not in allowlist'; the ids are transport-prefixed: openai/gpt-6-luna, openai/gpt-6-astra, openai/gpt-6.1-sol, sourced from the site's own frontend bundle — no listing endpoint), http_<code>, transport, malformed_response, length_no_content, empty_content",
+  "probe": "all three models serve 200 (the mid-window 502s were TRANSIENT congestion — recovered ~90s; the r135 lesson: the 502/408 classes join the retry-sleep ladders in both the ctai instrument and the panel runner)"
+ },
+ "the_qualification_instrument": "scripts/r169_rcal_ctai.py — byte-identical machinery to r153_rcal_xkiro.py; ONE seam: the ctai_chat transport + the ctai roster (gpt6luna/gpt6astra/gpt6sol); OUT=eval/r169_rcal_ctai; R169_JUDGE env",
+ "the_runner_wiring": "r153_p4_panel_v18.py: CTAI_ROSTER (INERT until a record carries the tag) + the _transport 'ctai' dispatch + the _serving_alpha dirs mapping (the ctai judges' r148 legs live in r169_rcal_ctai) + the roster lookup — transport-seam only, the judging semantics untouched",
+ "the_am51_update": "the wrapper r168_am51_substitution_panel.py now qualifies gpt6luna via the ctai instrument (R169_JUDGE), the bars are THE ENGINE'S OWN rcal_qualification + am47_bias (dry-checked byte-faithful vs snlite 1.0/1.0/0-0) + the serving alpha from snlite+gpt6luna+hy4f leg bytes; the seal amends the RUNNER's record (r153_rcal_xkiro/QUALIFICATION.json: mst14b -> gpt6luna, forward-only); aya32b stays the UNSPENT xkiro fallback (legs=0)",
+ "cron_verification": {
+  "550745_panel": "fired ONCE at 00:05Z Nov 27 (run_count=1) — ZERO artifacts landed (tip still 68cf02dba; no aya32b legs, no seal markers): the fired window's sandbox was recycle-rolled back (this window's own repo opened at bd2ec4f2a, pre-68cf02dba — the same class), its outcome is LOST, not completed",
+  "550250_p5v2": "fired ONCE at 01:30Z Nov 27 (run_count=1) — ZERO artifacts landed (the same class)",
+  "re_arm": "both lanes re-arm manually this window (the pool is LIVE: snlite probe 200 at ~10:40Z, unconsumed all morning because the fired windows failed)"
+ },
+ "the_plan": "commit the wiring baseline (rebased on fc4f348d8) -> run the wrapper (gpt6luna qualification 24 legs on ctai -> engine bars + serving alpha -> PASS: seal -> the panel: snlite 7 remaining xkiro-legs + gpt6luna 30 ctai-legs + hy4f 30 skip-VALID -> tally + recompute diff=0) -> commit the run artifacts",
+ "the_competing_lane_merged": {
+  "r170s1": "claim c-0271 (takes over c-0270) executed the AM51 plan LIVE on aya32b while this window wired the ctai path: 24/24 legs VALID, BARS FAIL acc 0.667 < 0.8 (answered 1.0 PASS, bias 0 PASS, serving alpha 0.6117 PASS) -> typed exit, no seal, no panel; aya32b SPENT+FAILED (Art. 7, never re-rolled); the xkiro free pool has ZERO unspent judge candidates",
+  "their_ctai_finding_resolved": "the r170s1 window typed ctai NOT-USABLE ('all judge ids probed rejected') — its probe list used mistral/sensenova/hy4 names, which were never on the cantrustai allowlist; the ACTUAL ids (openai/gpt-6-luna, openai/gpt-6-astra, openai/gpt-6.1-sol) were recovered from the site's frontend bundle and probe-verified 200 in this window — the owner's delivery stands usable",
+  "claim_lineage": "c-0270 TAKEN_OVER (r170s1) -> c-0271 DONE (aya32b bars-FAIL) -> c-0272 (this window: the ctai third-judge lane, takes over c-0271; counter advanced c-0273)"
+ }
+}

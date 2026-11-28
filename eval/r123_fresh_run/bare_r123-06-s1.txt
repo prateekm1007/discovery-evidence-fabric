@@ -1,0 +1,48 @@
+**Mitigation Proposal: Closed-Loop Impeller Trim Optimization via Ampere-Flow Head Mapping**
+
+**Mechanism:**
+The failure indicates hydraulic inefficiency (head decay at constant flow) causing the motor to work harder (increased amperage) to maintain discharge pressure. Since no new sensors are allowed, we must leverage the existing motor ammeter, which correlates strongly with hydraulic power ($P_{hydraulic} = \rho g Q H / \eta_{hydraulic}$), and the venturi flow meter. The mitigation is to **operational trimming of the pump system via variable speed drive (VSD) frequency adjustment**, assuming a VSD is present (standard for "key" cooling pumps to manage energy). If no VSD exists, the mitigation is **operational throttling adjustment at the discharge valve** to shift the operating point to a more efficient part of the pump curve, compensating for the loss in head.
+
+*However, since the constraint emphasizes using existing sensors for *monitoring/control logic*, and the problem implies a degradation trend, the most robust mitigation using *only* existing sensors is a **Head-Efficiency Restoration via VSD Frequency Downshifting** (if available) or **Discharge Valve Throttling Optimization** (if not). Given the context of "key cooling-water centrifugal pump" and "commissioning baseline," VSD is highly likely. But to be strictly compliant with "existing sensors" and not assume unlisted drives, I will propose **Dynamic Discharge Valve Throttling Optimization** as the primary mechanical mitigation, controlled by a logic based on the ampere-flow ratio.*
+
+*Wait, a better interpretation: The failure is "Developed head has decayed." This usually means the pump is wearing out or clogged. You cannot fix wear with a valve. The mitigation must be a *corrective* action. If we cannot add sensors, how do we mitigate? We use the existing data to *diagnose* and then *act*. The act must be available with existing hardware.*
+
+Let's refine. The problem asks for a mitigation for the *failure*. The failure is head decay. The mitigation is to **restore performance**. If parts are worn, you replace the impeller. But that's not a sensor-based mitigation.
+
+Let's look closer: "Motor draws more amps... to hold discharge pressure." This is the symptom. The cause is head decay. The mitigation using *only* existing sensors is to **implement a control loop that adjusts the discharge valve position to maintain the required discharge pressure while minimizing motor amperage (efficiency)**, effectively shifting the operating point to where the system curve still meets the demand with the least hydraulic loss, acknowledging the degraded pump curve. This is "efficiency optimization under degraded conditions."
+
+**Revised Mechanism:**
+**Discharge Valve Trim Optimization to Compensate for Head Decay.**
+By gradually closing the discharge valve (if the system allows backpressure increase) or opening it (if the pump is overloaded due to recirculation?), no—closing a discharge valve *increases* head, which would make amperage go *down* for a centrifugal pump? No.
+Centrifugal pump: $N \propto P$. $P \propto H$. If $H$ decays, to maintain the same $H_{discharge}$, you must increase flow? No, flow is fixed by demand.
+If flow is fixed and head decays, the pump is not producing enough head. The system pressure drops. To hold discharge pressure, the *system* must be demanding more head? No, "to hold the discharge pressure" implies the control system is trying to maintain a setpoint.
+If the pump's head decayed, and flow is constant, the discharge pressure *would* drop. To hold it, you must increase speed (if VSD) or... you can't do much with a valve. Closing a discharge valve increases head but *reduces* flow. If flow is fixed by the venturi, you can't reduce it.
+
+Let's re-read carefully: "Developed head at the same flow has decayed... motor draws more amps... to hold discharge pressure."
+This implies the pump is struggling. The most direct mitigation using *existing* hardware (no new sensors) is **VSD Frequency Reduction** IF the system curve is such that we can operate at a lower flow? No, flow is "at the same flow."
+Actually, if head decayed at the *same flow*, the pump is less efficient or worn. The motor draws more amps because it's inefficient.
+The mitigation is **Scheduled Impeller Replacement** based on a threshold derived from the Ampere-to-Flow ratio. But that's not a real-time mitigation.
+
+The prompt asks for a *mitigation* proposal.
+If I assume a VSD is present (standard for such pumps), the mitigation is:
+**VSD Frequency Modulation to Maintain Pressure with Minimum Amps.**
+If the head has decayed, the pump requires higher speed to maintain pressure, which drives amps up. There is no "lower speed" mitigation if head is low. You need *more* head.
+So the mitigation is **Increasing VSD Frequency** to compensate for head decay. But that increases amps further, potentially tripping.
+The real mitigation is **Restoring Pump Performance**. Since we can't add sensors, we use the existing amp/flow data to *trigger* a maintenance event (impeller cleaning/replacement).
+
+But "mitigation" often implies a control strategy.
+Let's consider **Recirculation Prevention**. If head decayed, maybe the impeller is loose or there is internal recirculation.
+Let's stick to the most practical engineering answer: **Operational Limit Adjustment via Ampere-Flow Thresholding.**
+
+**Final Proposal Structure:**
+1.  **Mechanism:** Establish a new "healthy" operating envelope by defining a maximum allowable Motor Ampere-to-Flow Ratio ($A/F$). This ratio serves as a real-time proxy for specific energy consumption (kW per unit flow), which is directly tied to hydraulic efficiency. When the ratio exceeds a calculated threshold (derived from commissioning baseline data), automatically trigger a **derating protocol** (reduce flow demand by opening bypass or adjusting downstream valves if system allows) or a **maintenance alarm** for impeller inspection.
+2.  **Implementation:** Create a control logic block (in the DCS/PLC, using existing tags) that calculates $Ratio = \frac{I_{motor}}{Q_{venturi}}$. Compare this against a baseline ratio $R_{base}$ from commissioning. If $Ratio > k \cdot R_{base}$ (where $k$ is a factor >1, e.g., 1.15 for 15% degradation), initiate mitigation.
+3.  **Measures it relies on:** Linearity of amperage with hydraulic power (valid for centrifugal pumps within limits), fixed relationship between Venturi differential and flow (calibrated at commissioning), and the assumption that discharge pressure setpoint is fixed.
+
+**Wait, the prompt says "Propose ONE mitigation... under the stated constraint."**
+The constraint is "Use only existing sensors... No new instrumentation."
+The failure is "Head decayed... amps increased."
+The mitigation is **Automated Discharge Valve Throttling to Optimize Efficiency Point?** No, that hurts head.
+The mitigation is **VSD Speed Ramp-up** to maintain pressure. But that's not a mitigation, that's the symptom.
+The mitigation is **Flow Reduction to Reduce Load**. If the cooling water demand is not critical, slightly reducing flow reduces the head requirement significantly (System Curve: $H \propto Q^2$). By reducing flow, you lower the head demand, which allows the degraded pump to operate at a point where it can still maintain pressure without overloading the motor, or simply reduces the amps.
+*Example:* If head decayed by 10%, and flow is reduced by 5%, the system head requirement drops by ~10% ($0.95^2 \approx 0.9025$). This brings the demand back within the pump's capability, preventing motor overload

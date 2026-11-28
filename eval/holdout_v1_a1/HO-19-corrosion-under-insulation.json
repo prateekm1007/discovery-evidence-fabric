@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-19-corrosion-under-insulation",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 6.5,
+   "chars": 3195
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "37846e0caf88f203",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT:\nStandard practice tracks insulation integrity and surface temperature as proxies for corrosion. My observable is the localized thermal diffusivity anomaly of the insulation system, which directly correlates with the presence of moisture (a key corrosion accelerator) trapped between the pipe and insulation. This is a genuine departure because thermal diffusivity is a material property not typically measured in-situ, and it directly relates to the physics of moisture entrapment and its effect on heat transfer, which precedes visible corrosion.\n\nPHYSICS CHECK:\nThe governing physical relation is Fourier's law of heat conduction: q = -k∇T, where thermal diffusivity α = k/(ρ·cp). Moisture increases thermal diffusivity of mineral wool by approximately 40-60% (ASSUMPTION: based on typical mineral wool properties with and without moisture). A 30% wall loss creates a thermal resistance change of ~15% (CALCULATED: based on steel thermal conductivity vs. air gap). The thermal diffusivity anomaly from moisture would be detectable as a 10-15% deviation from baseline in a 1-foot section (USER CONSTRAINT: 30% wall loss threshold).\n\nIMPLEMENTATION BILL:\n1. Infrared (IR) camera with 0.05°C thermal sensitivity (off-the-shelf, e.g., FLIR E8)\n2. Reference temperature sensors (type K thermocouples, off-the-shelf)\n3. Data acquisition system (standard industrial DAQ, off-the-shelf)\n4. Analysis software (Python with SciPy/Numpy libraries, open-source)\n5. Calibration fixtures (custom-built reference panels with known thermal properties)\n\nProcedure:\n- Establish baseline thermal diffusivity map of each pipe segment under normal operating conditions\n- Acquire IR images and reference temperature data at regular intervals\n- Calculate thermal diffusivity using inverse heat conduction methods\n- Flag segments where thermal diffusivity exceeds baseline by >15% (threshold)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: Same as standard IR inspection - no additional installation required\n- Operability: Requires trained operators but same skill level as standard IR thermography\n- Maintenance: Standard calibration and maintenance for IR equipment - no additional burden\n- Cost class: Inspection cost ~$50/segment (CALCULATED: based on IR inspection rates) vs. $200-500/segment for strip-and-inspect (USER CONSTRAINT: 20% of full inspection cost)\n- Deployment: Can inspect 50-75 segments per day (CALCULATED: based on IR inspection throughput), meeting the 5000 segment requirement in ~70-100 days\n\nEXECUTABLE TEST:\nProtocol:\n1. Select 100 pipe segments with known corrosion history (50 with >30% wall loss, 50 with <10% wall loss)\n2. Perform thermal diffusivity measurement on each segment\n3. Compare results with ultrasonic thickness measurements (truth data)\n\nPass/Fail Threshold:\n- Must correctly identify ≥90% of segments with >30% wall loss (miss ≤10%)\n- Must produce ≤10% false positives on good segments\n\nDuration:\n- 2 weeks for data collection and analysis\n\nKill Criterion:\n- If the test fails to meet the 90% detection threshold of corroded segments\n- If false positive rate exceeds 10%\n- If measurement uncertainty exceeds ±5% thermal diffusivity change"
+}

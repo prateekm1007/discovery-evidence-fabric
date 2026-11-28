@@ -120,7 +120,7 @@ def _compose_llm(prompt, system="", timeout=240, max_tokens=700,
     return {"ok": True, "content": (
         "PARAMETER: sealed joint — compliant buffer — ASSUMPTION\n"
         "INDICATOR: buffer strain. THRESHOLD: 40 MPa — ASSUMPTION. "
-        "PROTOCOL: 100 cycles; fail if delamination before 500."),
+        "VALIDATION PROTOCOL: 100 cycles; fail if delamination before 500."),
         "prompt_hash": "p" * 8, "output_hash": "o" * 8}
 
 
@@ -198,7 +198,13 @@ def test_evaluator_call_failed_delivers_flagged_hypothesis():
         "EVALUATOR_CALL_FAILED"
     assert rec["state"] != "NO_ADMISSIBLE_CANDIDATES"
     assert isinstance(rec["answer"], str) and rec["answer"].strip()
-    assert rec["n_llm_calls"] == 1
+    # R9 P0 (owner round 2026-11-13): CHECK_ABSENT is no longer a
+    # silent pass — the composed answer's test section does not carry a
+    # recognized marker shape, so the repair loop runs (initial + 2
+    # repair rounds, the composer's MAX_REPAIR_ROUNDS) instead of
+    # delivering with the check silently absent. The delivery assertions
+    # above (flagged hypothesis, non-silence) are unchanged.
+    assert rec["n_llm_calls"] == 3
 
 
 @pytest.mark.parametrize("v", INFRASTRUCTURE_DELIVERED_VERDICTS)
@@ -250,7 +256,7 @@ def test_composition_runs_when_admissible():
         return {"ok": True, "content": ("Recommend the compliant buffer "
                                         "joint. INDICATOR: buffer strain. "
                                         "THRESHOLD: 40 MPa — ASSUMPTION. "
-                                        "PROTOCOL: 100 cycles; fail if "
+                                        "VALIDATION PROTOCOL: 100 cycles; fail if "
                                         "delamination before 500."),
                 "prompt_hash": "p" * 8, "output_hash": "o" * 8}
     rec = compose_if_admissible(_env("PASS"), {"device": "glass vessel",
@@ -262,9 +268,15 @@ def test_composition_runs_when_admissible():
                                   "abstract": "a"}],
                                 None, "intervention-proposal",
                                 llm_generate=llm)
-    assert calls["n"] == 1
+    # R9 P0: CHECK_ABSENT is no longer a silent pass — the repair loop
+    # runs (initial + 2 repair rounds) where the pre-R9 composer
+    # delivered with the check silently absent
+    assert calls["n"] == 3
+    # the R9 repair loop's relabeled delivery may arrive DOWNGRADED
+    # (the strict relabel runs on every repaired answer)
     assert rec["state"] in ("COMPOSED_CONTRACT_VALID",
-                            "COMPOSED_CONTRACT_INVALID")
+                            "COMPOSED_CONTRACT_INVALID",
+                            "COMPOSED_CONTRACT_DOWNGRADED")
     assert rec["admitted_candidates"][0]["attack_verdict"] == "PASS"
 
 

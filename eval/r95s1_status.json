@@ -1,0 +1,54 @@
+{
+ "record": "R95_ROUND_STATUS/1.0.0",
+ "session": "builder-r95s1",
+ "date": "2026-11-19",
+ "round_open_protocol": "fetch state first (queue/dev12_r7 @ e660ae71b == origin; audit branch fetched to 9146195e2); FULL-read EPISTEMIC_CONSTITUTION.md v3.3.0 @ e660ae71b (29 articles + amendment records v3.0.0-v3.3.0) and AUDITOR_CONSTITUTION.md v1.3.0 @ 9146195e2 (14 articles + amendments v1.1.0-v1.3.0; the AM82/V82 ledger push carries the verdict) — no selected-article lists; then eval/r94_auditor_verification.json + eval/r93_convergence_ablation_record.json read before any work byte",
+ "custody_first": "Art. 17 v3.3.0: the owner-delivered HF token -> scripts/r77_vault_restore.py (read-only GET, zero LLM) -> .env.keys 0600 gitignored; 6 vault keys restored, digests verified vs committed custody records (AGNES d0c666a3842f / GH_PAT f1ebca5f9b62 / XKIRO f6c09bee9bde COMMITTED_RECORD_MATCH; AGNES_API_KEY_2 5c4dffd28fe4 + AGNES_BASE_URL e592ff32df1f + GITHUB_TOKEN new-in-records); digests only, never values; the git credential helper (header-only) rebuilt from the vault per CORR-3 (the sandbox recycle had lost /home/z/.git-vault-cred.sh)",
+ "art29_event": {
+  "what": "a same-session DUPLICATE CLAIM was caught by the push mutex (the F25 class, caught BEFORE any damage): this window independently staked c-0109+c-0110 at 05:46Z while the recycled sibling context window had already claimed c-0109 at 05:34:29Z and landed the DONE work at c252de328 + the session registration at edbac00bb — the local push failed non-fast-forward",
+  "handling": "Art. 29(e) applied verbatim: same-work_id non-fast-forward => stand down, never rebase a duplicate. The duplicate local claim rows (this window's c-0109 row + duplicate session note, commit ad801a110) were DISCARDED — the remote canonical c-0109 (work_id critic-tool-grounding-dev, DONE) stands untouched; only the DISJOINT item (c-0110, r95-aide-tree-search — no remote commits touch any AIDE/tree-search surface) was re-staked at the remote tip (7b58b5e0d) BEFORE any c-0110 work byte. Typed in scripts/r95_claim_c0110.py. Registry CI check (no two EXECUTOR claims per work_id) green",
+  "verifier_note": "the c-0109 verification stays with the peer/auditor lane — both windows share the session identity builder-r95s1, so a self-filed VERIFIER record would be self-certification (Art. 10); none is filed here"
+ },
+ "the_work": {
+  "what": "AM82/V82 directions 1+2 — the two engine-native controllers the auditor's path-to-6 runs through: the CRITIC tool-grounding corrector (c-0109, the sibling window's canonical work) and the AIDE tree-search controller (c-0110, this window)",
+  "c0109_canonical": "critic-tool-grounding-dev DONE @ c252de328: discovery_fabric/engine/tool_grounded_critic.py — the deterministic corrector (mechanical BILL tagger with the machine's own base_scan as the CI oracle + computed-chemistry leg composing the c-0107 engine + typed CACTUS-free offline surface), 13 CI tests, NOTICE rows (CRITIC microsoft ICLR23 + CriticEval MIT), probe-verified on the committed corpus (424 flagged v11 rows: 102 a + 79 c + 5 b single-class, 238 none/ambiguous typed residual; sealed v9+v10 corpus 901 -> 515 after the tagger = 42.8% mechanically corrected, 48/60 rows improved, zero worse); adoption-gated, machine-side wiring + live ablation are the typed next steps",
+  "c0110_this_window": {
+   "module": "discovery_fabric/engine/aide_tree_search.py (aide_tree_search/1.0.0, engine-native, F63-clean)",
+   "pattern_copy": "WecoAI/aideml MIT — best-first population search over diverse candidates, metric-pruned; pattern copy ONLY, zero upstream code bytes; NOTICE library row updated to name the landed module + pattern-copies row added",
+   "mechanism": "the single-chain repair loop becomes a best-first population search: the metric is the machine's OWN finding surface (residual finding count, critic verdict, type-gate verdict; canonical sorted-key sha256_16 digests); each repair slot refines the lowest-metric live node (ties -> latest); the frontier is metric-pruned to top-2 with typed pruned_reason on every pruned node; each slot carries a DISTINCT process-only structural angle (no repeats within a row; content-seeded rotation via sha256 — never Python hash())",
+   "budget_matched": "the controller adds ZERO LLM calls — the slots are exactly the incumbent's (draft + REPAIR_BUDGET=3); next_slot() returns None once the budget is used (Art. 20 matched-budget discipline, CI-proven)",
+   "parity_mode": "population=False reduces EXACTLY to the frozen single chain (parent always latest, no angle text, chain n0->n1->n2->n3) — the c-0106 invariant-7 pattern, CI-proven",
+   "ci_battery": "tests/test_r95_aide_tree_search.py — 14 deterministic tests, zero LLM, zero network, wired additively into the queue CI surface (r11_queue_surface.yml next to the c-0109 suite): budget cap; best-first selection proven where best != latest; metric-pruning recorded; >=3 distinct candidates on a full-budget row (the AM82 roadmap acceptance surface, CI-encoded); parity proof; degenerate inputs typed (budget 0 -> the draft is the final selection; None scan -> empty surface); cross-hash-seed determinism in fresh subprocesses (PYTHONHASHSEED 1/2, the Art. 15 pattern); order-independent signatures; content-seeded rotation; the composition proof (TOOLS FIRST, TREE SECOND — the c-0109 corrector mechanically corrects a candidate BEFORE scoring and the best-first selection carries the corrected node)"
+  }
+ },
+ "art27_capability_budget": {
+  "engine_diff": "the c-0110 lane (this window, diff vs edbac00bb): +305 engine lines in discovery_fabric/engine/aide_tree_search.py = 34.7% of the 880 changed lines (F63-clean, >=30%); the c-0109 lane adds a further +194 engine lines (tool_grounded_critic.py) on the sibling window's push (round total 499 engine lines across the two lanes)",
+  "primary_metric_delta": "NO live primary-metric delta this round — both controllers are CI-wired DEV-stage prototypes, adoption-gated (the c-0105->c-0106 lane pattern); the live matched-budget measurement is the v12 sealed one-shot (the auditor's path-to-6 gate: CRITIC tool-grounding + AIDE tree search + all five binds on agnes-3.0-flash; mean >=3.25, 0 inverted, CI > 3.0 -> score 6). Typed sequencing decision: quota is NOT spent on a parallel DEV ablation arm before the sealed run (the sealed run is the highest-value quota spend and the acceptance instrument); the CI battery + the c-0109 probe evidence on committed bytes are this round's measured surface",
+  "deletions": "none (nothing removed; the c-0106 convergence layer stays CI-tested at zero cost with adoption refused recorded per the auditor's R94 verdict; no frozen bytes touched anywhere — the frozen machine module r40_machine_v77.py and its freeze guard are untouched)",
+  "engine_line_share_measured": 34.7,
+  "engine_line_share_basis": "this window's c-0110 diff vs edbac00bb: +305 engine lines (discovery_fabric/engine/aide_tree_search.py) of 880 changed lines = 34.7%; the sibling window's c-0109 push adds a further +194 engine lines (tool_grounded_critic.py) measured on its own push",
+  "share_exception_reason": ""
+ },
+ "no_problem_read_before_claim": "the v12 sealed problems do not exist yet (the auditor authors v12); no sealed/holdout problem bytes were read in this round; the CI batteries run on typed fixtures and the committed burned corpora only",
+ "pending_for_next_round": [
+  "the auditor authors v12 (fresh, domain-disjoint, n>=30, confidential) — then the builder runs the sealed one-shot on agnes-3.0-flash with the c-0109 corrector + the c-0110 tree controller + all five binds (the pre-registered path-to-6 gate)",
+  "P3 predictors (MAPIE c-0108 mechanics + Time-MoE/MOMENT FM evals on real datasets C-MAPSS/XJTU-SY/CWRU) per the roadmap",
+  "the stale-claim hygiene (c-0106's OPEN row awaits the peer VERIFIER record per the DONE-without-verifier CI rule; c-0082/c-0100 same lane) — verifier-lane work, not this session's"
+ ],
+ "remote_ci": {
+  "pushed_sha": "7b58b5e0d",
+  "remote_ci_conclusion": "success",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success"
+   }
+  ],
+  "read_at": "2026-11-19T06:02:00Z (check-run API, authenticated)",
+  "round_note": "the last green push carrying bytes (the c-0110 claim push — the Art. 29 lock, registry-only) is quoted: 7b58b5e0d SUCCESS. The FAILURE chain is typed, never hidden: f21fd909b (the c-0110 work push) FAILURE — SELF-CAUGHT BY THE D2 RULE ITSELF: the work push carried eval/r95s1_status.json WITHOUT the remote_ci block AND with the engine-line share in PROSE only (two gate misses in one push, both Art. 27/D2 validator classes); b387dbe04 (the first remediation) fixed the measured share (engine_line_share_measured=34.7) but NOT the missing remote_ci block — still FAILURE, also self-caught by reading the job logs (the c-0055 class, the exact r93 precedent). THIS record is the forward-only remediation: the remote_ci block quotes the last green push; the remediation push's own green is read after landing into eval/r95_remote_ci_reads.json (the R93 pattern); the round-close push's own green is the next preflight's read"
+ },
+ "infra_disclosures": [
+  "the local pre-push gate used a pytest|tail pipeline whose exit code was tail's, not pytest's — the Art. 27 gate failure was swallowed locally before the f21fd909b push; pipefail discipline now rides every gate invocation (typed in the b387dbe04 commit)",
+  "no live LLM calls this round (zero quota spent); the vault was restored first per CORR-3 (6 keys, digests COMMITTED_RECORD_MATCH)"
+ ]
+}

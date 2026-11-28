@@ -1,0 +1,42 @@
+{
+ "problem_id": "HO8-06-pharma-tablet-capping",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip 7c9c8ffb6)",
+ "executor_id": "builder-r44s1@holdout-v8-generation",
+ "machine": {
+  "machine": "V8.0",
+  "base": "V7.7 (r40_machine_v77) with the R42-verdict generation binds (claims c-0060)",
+  "request_model": "glm-4-plus",
+  "repair_budget": 3,
+  "k_gen": 1
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T03:44:05.809480Z",
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**  \nPropose a mitigation for tablet capping/lamination on ejection by introducing a **dwell-time extension via a delayed ejection schedule**. Standard practice uses fixed dwell timing; this intervention extends dwell at main compression by 15° of turret rotation to allow additional elastic recovery before ejection, reducing residual stress that drives capping. Adjacent-technique clearance: Existing dwell adjustments are uniform across all stations; this intervention selectively extends dwell ONLY at the main-compression station, creating a stress-relief window without press redesign. The mechanism attacks the failure driver by increasing time for elastic recovery in the compact, reducing the stored elastic energy that causes lamination upon ejection.\n\n**PHYSICS CHECK**  \nDriving variable = stored elastic energy in the compact during dwell. The mechanism moves it DOWN by ~15% (via 15° dwell extension, increasing dwell time by ~8 ms at 30 rpm). This REDUCES the failure driver by allowing additional stress relaxation before ejection, lowering the elastic rebound that causes capping/lamination. Governing relation: Elastic energy stored ∝ compression stress²; extended dwell reduces stress relaxation rate, lowering stored energy at ejection.\n\n**IMPLEMENTATION BILL**  \n*(Standard practice: Fixed dwell timing at main compression)*  \n| Intervention Component | Tag | Details |  \n|------------------------|-----|---------|  \n| **Dwell extension at main compression** | (c) | Parameter change: Increase dwell angle at main-compression station by 15° (e.g., from 45° to 60° of turret rotation) using existing press control software. |  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n| Standard Practice | Intervention | Burden Comparison |  \n|-------------------|--------------|-------------------|  \n| Fixed dwell timing (no change) | Dwell angle adjustment (parameter change) | **Same burden** (no new hardware; software reconfiguration is standard practice). |  \n\n**EXECUTABLE TEST**  \n**Protocol:** Run 10,000-tablet batches at 30 rpm with and without the intervention (15° dwell extension). Measure capping/lamination rate via visual inspection (pass/fail threshold: <0.1% defect rate).  \n**Instruments:** Existing press throughput counter, tablet defect counter (standard practice equipment).  \n**Duration:** 1 batch per condition (30,000 tablets total).  \n**Kill criterion:** Defect rate exceeds 0.5% in either condition.  \n\n**CANDIDATE CLASSES**  \n1. **Dwell-time extension** — Increases elastic recovery time to reduce stored energy.  \n2. **Binder/lubricant formulation** — Modifies compact elasticity to reduce rebound stress.  \n3. **Precompression force retuning** — Lowers initial stress to reduce elastic energy buildup.  \n**SELECTED:** Dwell-time extension (retuning and formulation require material changes, violating \"no tooling/press redesign\"; dwell extension is pure procedure).  \n\n**MECHANISM CLASS:** Dwell-time modulation  \n\n**SIGNALS USED:** None (open-loop parameter change).  \n\n**OPERATIONAL COST:** Zero (dwell extension occurs during normal press operation; no throughput loss).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Tablet capping/lamination is caused by stored elastic energy in the compact that rebounds upon ejection, creating tensile stresses that exceed the tablet's bond strength. | ingredient: The dwell-time extension allows additional elastic recovery before ejection, reducing the stored elastic energy in the compact. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Tablet capping/lamination is caused by stored elastic energy in the compact that rebounds upon ejection, creating tensile stresses that exceed the tablet's bond strength.",
+   "ingredient_action": "The dwell-time extension allows additional elastic recovery before ejection, reducing the stored elastic energy in the compact.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Dwell-time extension** — Increases elastic recovery time to reduce stored energy.",
+    "2. **Binder/lubricant formulation** — Modifies compact elasticity to reduce rebound stress",
+    "3. **Precompression force retuning** — Lowers initial stress to reduce elastic energy buil"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ]
+  }
+ },
+ "sha256_16": "c6e3833d99e59a37"
+}

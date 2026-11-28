@@ -1,0 +1,65 @@
+{
+ "problem_id": "r125-10-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 123.92,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 650,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 3.78,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 982,
+    "completion_tokens": 1048,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Feed Pacing via Power-Limiting Interlock**\n\n**Mechanism:**\nImplement a \"Power-Limiting Interlock\" logic that automatically reduces the feed conveyor speed based on the main drive\u2019s real-time power consumption. The mechanism operates by treating the main drive power meter as the primary feedback signal for load. When the drive power exceeds a pre-defined threshold (indicating the shredder is nearing its stall point or struggling with tough material), the system commands a reduction in the feed rate to allow the shredder to clear the backlog and restore nominal torque. Conversely, if power drops below the threshold, the feed rate is gradually restored. This prevents the drive from stalling on tough feed, maintains a consistent discharge rate on the conveyor, and stops the accumulation of un-shredded material that causes screen undersize growth and discharge conveyor underflow.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the **Main Drive Power Meter** reading. The direction of effect is that an **increase** in driving power (above threshold) causes a **decrease** in feed conveyor speed, which leads to a **decrease** in shredder load and a subsequent **decrease** in driving power. Conversely, a **decrease** in driving power (below threshold) allows a gradual **increase** in feed conveyor speed, leading to an **increase** in throughput and driving power, stabilizing the system at nominal levels.\n\n**Implementation:**\n1.  **Baseline Calibration:** During a period of healthy operation (nominal discharge weight on the discharge scale), record the average main drive power consumption ($P_{nominal}$). Set the interlock threshold $P_{limit}$ to $1.1 \\times P_{nominal}$ (or a value just below the stall point observed historically).\n2.  **Control Logic:**\n    *   **Trigger:** If $P_{drive} > P_{limit}$ for a sustained period (e.g., 10 seconds), the controller sends a step-down command to the feed conveyor variable frequency drive (VFD) to reduce speed by 10\u201320%.\n    *   **Recovery:** If $P_{drive} < 0.9 \\times P_{limit}$ for a sustained period (e.g., 30 seconds), the controller steps up the feed conveyor speed by 5\u201310% toward its original setpoint.\n    *   **Stall Prevention:** If $P_{drive}$ spikes to near-peak (e.g., 95% of max rated power), immediately cut feed speed to minimum or zero to prevent a hard stall and drive trip.\n3.  **Discharge Verification:** Use the discharge conveyor scale as a supervisory check. If the discharge weight per unit time falls below 80% of the rated value for more than 2 minutes, while the feed scale shows high input, force an immediate 50% reduction in feed rate to clear the bottleneck, regardless of the power signal (acting as a failsafe for material jams that may not yet register as high power but are causing throughput loss).\n4.  **Implementation Bill:**\n    *   **Hardware:** None. Utilize existing PLC/VFD communication ports for interlock logic.\n    *   **Software/Logic:** Configure the PLC to read the Main Drive Power Meter, Feed Conveyor Scale, and Discharge Conveyor Scale. Implement the logic blocks for $P_{limit}$ thresholds and discharge ratio checks as described in the Control Logic section.\n    *   **Calibration:** Perform a one-time baseline calibration during nominal operation to set $P_{nominal}$ and discharge rated values.\n\n**Measures Relied On:**\n*   **Main Drive Power Meter ($P_{drive}$):** Permitted sensor. Used directly as the primary feedback signal for load detection. High power indicates the shredder is struggling with tough feed or is overloaded. No derivation required; direct readout.\n*   **Feed Conveyor Scale:** Permitted sensor. Used to calculate mass flow rate ($\\dot{M}_{feed}$) by differentiating cumulative weight over time ($\\dot{M}_{feed} = \\Delta W_{feed} / \\Delta t$). This derived value is used to verify that the feed rate reduction is actually occurring and to calculate mass balance for diagnostics.\n*   **Discharge Conveyor Scale:** Permitted sensor. Used to calculate mass flow rate ($\\dot{M}_{discharge}$) by differentiating cumulative weight over time ($\\dot{M}_{discharge} = \\Delta W_{discharge} / \\Delta t$). This derived value is used to verify throughput recovery and to detect persistent jams or inefficiencies. The ratio $\\dot{M}_{discharge} / \\dot{M}_{feed}$ is derived from these two permitted measurements for diagnostic purposes, but the control action relies primarily on the power signal and absolute discharge flow rate against the rated value.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Hardware:** None. Utilize existing PLC/VFD communication ports for interlock logic.",
+   "*   **Software/Logic:** Configure the PLC to read the Main Drive Power Meter, Feed Conveyo",
+   "*   **Calibration:** Perform a one-time baseline calibration during nominal operation to s",
+   "*   **Main Drive Power Meter ($P_{drive}$):** Permitted sensor. Used directly as the prima",
+   "*   **Feed Conveyor Scale:** Permitted sensor. Used to calculate mass flow rate ($\\dot{M}_",
+   "*   **Discharge Conveyor Scale:** Permitted sensor. Used to calculate mass flow rate ($\\do"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'directly as the primary feedback signal' shares no allowed-list stem (Use only existing sensors and existing measurements: the main drive power meter ...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Discharge Conveyor Scale:** Permitted sensor. Used to calculate mass flow rate ($\\dot{M}_{discharge}$) b"
+  ]
+ },
+ "wall_clock_s": 128.7,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

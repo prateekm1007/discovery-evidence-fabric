@@ -1,0 +1,98 @@
+{
+ "prereg_version": "score9-prereg/v1.0.0",
+ "immutable": true,
+ "committed_before": "any generation or rating byte (Art. 29(c) one-run rule; the c-0124 score-8 prereg convention)",
+ "claim": {
+  "claim_id": "c-0127",
+  "session_id": "builder-r103s1",
+  "work_id": "score9-postcutoff-rediscovery",
+  "base_sha": "a1186296d",
+  "claim_sha": "ee1515799",
+  "direction": "auditor R106 verdict direction 4: score-9 lane — MOOSE-Chem2 (MIT) rediscovery protocol + PatentChem (MIT) USPTO claim extraction + PaECTER embeddings + AgentScope (Apache-2.0) or Inspect (MIT) unattended 30-batch"
+ },
+ "protocol": {
+  "engine_module": "discovery_fabric/engine/rediscovery_protocol.py",
+  "engine_version": "score9-rediscovery/v1.0.0",
+  "engine_first": "F63: sampling, served-field rule, prompt contracts, parse contracts, adjudication, acceptance arithmetic and checkpoint schema are ALL engine functions; the harness only injects transports and orchestrates the checkpoint loop",
+  "determinism": "random.Random(9851) over a copied list (the blind_panel PANEL_SEED lineage); byte-stable across processes and hash seeds"
+ },
+ "corpus": {
+  "payload": "MOOSE-Chem2 (NeurIPS 2025) — github.com/ZonglinY/MOOSE-Chem2",
+  "license": "MIT (LICENSE byte-read: 'MIT License, Copyright (c) 2025 Zonglin Yang')",
+  "source_commit": "5b289372fe7722df33bfc49c4c329671967f8822",
+  "source_file": "Data/chem_research_2024_finegrained.xlsx (276,676 bytes)",
+  "source_rows": 51,
+  "sampled_items": 30,
+  "sampling_rule": "original order -> row keys m2-00..m2-50 -> fixed_shuffle(seed=9851) -> first 30",
+  "committed_bytes": [
+   "eval/r106_score9_corpus/sampled_items.jsonl",
+   "eval/r106_score9_corpus/sampling_record.json"
+  ],
+  "sampled_items_sha256_16": "f4ed72ae1196882b",
+  "anti_leakage": {
+   "generator_never_sees": ["paper Title", "Main hypothesis", "Finegrained Hypothesis", "Finegrained Experiment", "Experiments to Verify", "Reasoning Process", "Note"],
+   "title_exclusion_typed_reason": "the title frequently IS the finding (leakage channel); the served-field rule is the engine's build_item, asserted in generator_prompt",
+   "strict_variant_preference": "Background Little Survey (strict) / Background Question (strict) served when usable (usable_strict: string, not nan, >=40 chars); else the non-strict variant; the per-item variant used is committed in sampled_items.jsonl"
+  },
+  "post_cutoff_typing": {
+   "corpus_dates": "all sampled items' Public Date is 2024 (asserted from bytes: the year set of the 30 sampled items == {'2024'})",
+   "generator_cutoff_evidence_class": "LABELLED ASSUMPTION (Art. 9 exception) — the served model's training-cutoff date is not owner-verifiable from committed bytes; the recovery claim cites the CORPUS dates (2024) and the assumption row carries the sensitivity path: if the served model's cutoff postdates part of the corpus, the recovery rate is an upper bound on true post-cutoff rediscovery, and the record says so",
+   "corpus_vs_v15": "DISJOINT from every sealed holdout (v1-v15 are water-treatment/engineering problems; this corpus is 2024 chemistry research from a public NeurIPS 2025 dataset)"
+  }
+ },
+ "generation": {
+  "route": "the registered generator (AM75): agnes-3.0-flash, base_url https://apihub.agnes-ai.com/v1 (route_adapter.require_registered_model BEFORE the batch; a silent model swap is forbidden)",
+  "key_rotation": "AGNES_API_KEY -> AGNES_API_KEY_2 ordered rotation on rate_limited/transport refusals (2-key rotation; the R67s2 convention); rotation events tallied, never key values",
+  "temperature": 0.0,
+  "max_tokens_visible": 600,
+  "reasoning_headroom": 512,
+  "max_tokens_served": 1112,
+  "output_contract": "STRICT JSON {hypothesis, key_mechanism, predicted_result}; parse via engine parse_generator_output; typed parse exhaustion on failure",
+  "prompt_contract": "engine generator_prompt(item) — bytes committed with the run record per item"
+ },
+ "judges": {
+  "families": {
+   "J1": {"seat": "z-ai CLI (sdk default model)", "family": "z-ai/glm", "quota_scope": "OUTSIDE the xkiro ceiling (the c-0124 typed convention)", "max_tokens_visible": 512},
+   "J2": {"seat": "xkiro HTTP cohere/command-a", "family": "cohere", "quota_scope": "INSIDE the xkiro ceiling", "max_tokens_visible": 512}
+  },
+  "generator_isolation": "the agnes family serves ZERO judge seats (Art. 26: judge != every generator; Art. 10: no self-certification)",
+  "output_contract": "STRICT JSON {key_mechanism_gt, key_mechanism_gen, recovery, rationale}; recovery in {RECOVERED, PARTIAL, NOT_RECOVERED}; engine parse_judge_output normalizes case",
+  "retry_once": 1,
+  "typed_item_failure": "after retry-once exhaustion the item is ITEM_RATING_FAIL (an infra state, Art. 15) — it EXCLUDES the item from the rate denominator only if BOTH judges failed; a single-seat failure degrades to PARTIAL via the adjudication rule"
+ },
+ "adjudication": {
+  "rule": "engine adjudicate(): RECOVERED iff both judges RECOVERED; NOT_RECOVERED iff both judges NOT_RECOVERED; else PARTIAL (fail closed toward the middle class, never toward the bar)",
+  "machine_score_input": "PaECTER cosine(gen_hyp_text, gt_main_hypothesis) per item — HF mpi-inno-comp/paecter, 1024-dim, sentence-transformers contract — recorded as INPUT_NOT_VERDICT (Art. 14: machine scores are inputs, never the verdict)"
+ },
+ "acceptance": {
+  "recovery_bar": 0.40,
+  "min_hits": 12,
+  "arithmetic": "engine acceptance(): recovery_rate = #RECOVERED/30; bar met iff >= 0.40; agent_validated iff >= 1 adjudicated RECOVERED with both judge rationales present",
+  "panel_valid_floor": "2 judge families (the MIN_FAMILIES_SMOKE floor of the score-8 prereg lineage); the >=3-families score-8 floor does NOT apply here — the verdict's score-9 acceptance names recovery/agent/intervention, not family count",
+  "human_interventions": "MUST be 0 — an intervention is ANY mid-run edit to the protocol, prompts, rubric, seats or sampling (typed in the record); typed infra failures (rate limits, parse exhaustions after retry, transport refusals) are NOT interventions; a checkpoint resume CONTINUES the same logical run and is NOT an intervention"
+ },
+ "quota_budget_preregistration": {
+  "ceiling_tokens_total": 95000,
+  "agnes_generation": "30 items x (600 visible + 512 headroom) = 33,360 requested tokens max (worst case, zero truncation wins)",
+  "xkiro_j2": "30 x 512 x 2 (retry-once worst case) = 30,720 tokens max",
+  "zai_j1": "outside the xkiro ceiling; <= 30,720 tokens worst case",
+  "over_accounting": "per-call usage captured from served bytes where the transport exposes it; arithmetic-only accounting typed where it does not (the score-8 VF-3 disclosure convention)"
+ },
+ "unattended_contract": {
+  "checkpoint": "/tmp/r106_score9_checkpoint.json (score9-checkpoint/v1; completed_items, usage, interventions)",
+  "resume_semantics": "a resume CONTINUES the same logical run (the c-0124 sweep convention); the checkpoint skips completed items so the ONE-RUN rule survives window boundaries — never double-serves",
+  "zero_intervention_definition": "no human enters the loop between the first generation byte and the final record: no prompt/rubric/seat/sampling edits, no manual re-serves; the harness logs interventions=0"
+ },
+ "harness": {
+  "probe_order": ["inspect-ai (MIT) — the eval-native harness; fallback", "agentscope (Apache-2.0)"],
+  "typed_probe": "the install/serve probe record commits BEFORE the batch; the harness-of-record is named in the run record; if NEITHER installs, the typed fallback is the checkpoint harness (the engine + transports direct) with the framework absence typed as an infra state — the lane then reports the acceptance arithmetic WITHOUT the framework claim"
+ },
+ "patentchem_leg": {
+  "payload": "PatentChem (MIT) — github.com/learningmatter-mit/PatentChem",
+  "license": "MIT (LICENSE byte-read: 'Copyright (c) 2022 Kevin Greenman')",
+  "approach": "the USPTO redbook weekly bulk XML -> the engine claim-section extraction rules (discovery_fabric/engine/patent_claim_extract.py) -> numbered-claim segmentation + molecule (SMILES) token mining per keyword query — the PatentChem search.py/select_chem.py approach adopted as engine rules with CI fixtures",
+  "sizing": "the Zenodo bulk mirror (~75GB) and full-year downloads exceed the 6.0GB rootfs free — the leg fetches ONE weekly bulk bundle (bounded), extracts a bounded subset of patent XMLs, deletes the archive after extraction; per-file digests recorded",
+  "typed_if_blocked": "an unbounded download (a multi-GB single-file part), a dead bulk endpoint or a rate-limited fetch is a TYPED infra state — the leg reports the blocked state and the extraction rules still ship with fixture-tested CI coverage"
+ },
+ "no_acceptance_claim": "NO acceptance/score claim in the prereg — the auditor scores from committed bytes; the record carries the arithmetic and the honest state"
+}

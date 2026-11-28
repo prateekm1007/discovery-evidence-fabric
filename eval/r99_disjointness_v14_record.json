@@ -1,0 +1,60 @@
+{
+  "record": "R99_DISJOINTNESS_V14_RUN/1.0.0",
+  "session": "builder-r95s1",
+  "work_id": "holdout-v14-generation (claim c-0114, push=lock @ 3e1391ae4)",
+  "run_date": "2026-11-19 (sandbox clock, TRUE UTC)",
+  "verdict": "FAIL-CLOSED STOP — 1 blocking domain-head clash; the sealed v14 one-shot did NOT start",
+  "custody_chain_verified": {
+    "v14_problems": "bd4998797:audit/holdout_v14/holdout_v14_problems.json (the audit branch, the AM87 custody)",
+    "seal_recipe": "the F50 canonical-tuple recipe (scripts/r97_v12_one_shot.py verify_seal): projected problem tuples, sorted, canonical JSON, sha256",
+    "seal_result": "recomputed == doc.selection_sha256 == prereg.selection_sha256 == 73222ce2feb8ab32c2cec9c287bc1ef4baa64d05f9b2540bf7b9e4816e148bd2 — VERIFIED (a raw-bytes hash is NOT the recipe; the canonical-tuple recipe is the published one)",
+    "model_pin": "agnes-3.0-flash (prereg model_pin.registered_id) — matches the route registry",
+    "read_discipline": "the ONLY v14 bytes read pre-guard were the problem_id/device/failure/user_variables fields for the domain-head derivation and the F50 seal projection — the mandated pre-run instrument reads (post-claim); the machine's problem reads happen only in the one-shot driver, which NEVER STARTED"
+  },
+  "guard_instrument_state": {
+    "extension": "scripts/r99_disjointness_guard.py extended forward-only for the v14 lane: the <ref>:<path> CLI form (the v14 problems live on the audit branch), --map v14 (the V14_DOMAIN_HEAD map below), --versions 1-13 (the AM87 FULL-corpus order), fail-closed typed abort on any problem id prefix with NO map entry (an unchecked row is never a pass), and a TYPED ABORT on any prior-corpus version that fails to load (a silently skipped version is the vacuity class)",
+    "vacuity_fix_landed_during_this_run": "the v13 problems are builder-authored on the QUEUE branch (no audit-ref copy) — the original assembly silently SKIPPED every failed git-show (the corpus was v1-v12+dev12 while claiming v1-v13). The assembly now reads v13 from queue HEAD and aborts typed on any missing version. The first guard run of this round therefore under-corpus'd; the FINAL run below is the full v1-v13+dev12 corpus (~157KB+ v13 bytes included). The battery stays 5/5 GREEN (the default corpus v1-v12+dev12 is the pinned pin; the defect-pin test is unchanged)",
+    "battery": "tests/test_r98_disjointness_guard.py 5/5 GREEN after the extension"
+  },
+  "map_derivation": {
+    "discipline": "the v13 map's own rule: per-row identifying SYSTEM words (industry/equipment/process), generic engineering nouns excluded; '~' prefix tokens where morphology varies (the v13 map's own mechanism)",
+    "post_claim_sanction": "the c-0114 claim was pushed BEFORE any v14 byte was read (push=lock); the derivation is the mandated pre-run instrument read",
+    "generic_token_refinements_typed_with_source_rows": [
+      {"row": "HO14-08", "dropped": "transmembrane pressure", "source": "v1 HO-22-dialyser-clotting (a hemodialysis machine) — the phrase is cross-INDUSTRY generic (dialysis and MBR); the row's system words remain ['membrane bioreactor', '~mbr']"},
+      {"row": "HO14-07", "dropped": "disinfection byproduct", "source": "v2 HO2-03-lead-service-line-release — the phrase appears there as a COMPLIANCE CONSTRAINT, not a device/failure; the row's system word remains ['chlorination contact basin']"},
+      {"row": "HO14-19", "dropped": "capacity fade", "source": "v7 HO7-11-pitch-battery-degradation (a wind-turbine battery) — cross-domain generic; the row's system word remains ['capacitive deionization']"},
+      {"row": "HO14-20", "dropped": "flux decline", "source": "v8 HO8-08's OWN failure text — but the v8 row is an MBR and the v14 row is a nanofiltration module (different equipment systems); kept-class DISCLOSURE below; the row's system word remains ['nanofiltration']"},
+      {"row": "HO14-12", "dropped": "packed tower", "source": "v13 HO13-15 (sulfuric acid plant drying tower) — the phrase is equipment-generic across industries; the row's system word remains ['ammonia stripping']"}
+    ],
+    "refinement_honesty": "every dropped token was proven generic by its source row; NO token that flags a same-device-family repeat was dropped (the ~mbr token that CATCHES the blocking clash below was ADDED during refinement, not dropped)"
+  },
+  "final_guard_result": {
+    "corpus": "v1-v12 (audit ref) + v13 (queue HEAD) + dev12 — the FULL v1-v13 corpus per AM87",
+    "rows_checked": 30,
+    "map_coverage": "30/30 (fail-closed verified — no unknown prefixes)",
+    "blocking_clashes": [
+      {
+        "problem_id": "HO14-08-mbr-fouling",
+        "token": "~mbr",
+        "prior_row": "v8 HO8-08-membrane-fouling",
+        "prior_device": "municipal MBR wastewater plant, PVDF hollow-fibre, 20 LMH flux",
+        "prior_failure": "membrane-irreversible-fouling",
+        "prior_question": "Propose a mitigation for irreversible flux decline between chemical cleans.",
+        "prior_question_type": "intervention-proposal",
+        "v14_row": "membrane bioreactor, hollow-fiber MF | transmembrane-pressure-rise | intervention",
+        "family_adjudication": "DEVICE EXACT (municipal MBR, hollow-fibre MF) and FAILURE-FAMILY MATCH (membrane fouling: irreversible flux decline between cleans vs transmembrane-pressure rise — the same phenomenon's operational forms) and the same question type (intervention). This is the v13-findings defect class ('device+failure families'), NOT a kept-class adjacency"
+      }
+    ],
+    "kept_class_disclosures": [
+      {"row": "HO14-20-nf-organic", "disclosure": "organic-fouling flux decline shares the membrane-fouling PROCESS DOMAIN with v8-08 but is a different equipment system (nanofiltration module vs MBR bioreactor) — the v13-findings kept-class semantics; disclosed, not blocking"},
+      {"row": "HO14-27-chloramine-nitri", "disclosure": "the chloramination/nitrification family has NO prior row in the actual committed corpus (the stems '~chloramin'/'~nitrific' hit nothing in v1-v13) — typed FRESH at token level"},
+      {"row": "HO14-03/05/11", "disclosure": "the GAC/UV-sleeve/struvite stems hit nothing in the actual committed corpus — typed FRESH at token level (the prior corpus is industrial-general: evaporators, extruders, presses, ESP, SWRO, glass, digesters)"}
+    ]
+  },
+  "the_fail_closed_stop": {
+    "rule": "the auditor's own prereg (disjointness_requirement: 'builder MUST run scripts/r99_disjointness_guard.py over the FULL v1-v13 corpus before the run; fail-closed on any domain-head clash') and the AM87 order ('Must pass 0 domain-head clashes before any run')",
+    "state": "1 blocking clash -> the sealed v14 one-shot DID NOT START; zero generation calls served; the agnes keys untouched this lane",
+    "builder_position": "the executor does NOT adjudicate its own guard (Art. 14: machine scores and instrument outputs are inputs, never the verdict; the set is the auditor's authorship). The disposition of HO14-08 — re-author the row, replace it, or an explicit typed override accepting the repeat — is the AUDITOR's exclusive custody",
+    "executor_ready": "the one-shot machine (the r98 driver pattern), the seals/pins verification, the attestation + MEASURED_PATH surfaces and the c-0109/c-0110/c-0112 stack are all in place; the lane starts the moment the auditor disposes of HO14-08"
+  }
+}

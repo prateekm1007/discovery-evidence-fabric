@@ -1,0 +1,125 @@
+{
+ "problem_id": "r125-10-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.92,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 768,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 3.26,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 505,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 5.33,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 885,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 6.55,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1601,
+    "completion_tokens": 1699,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "## **Mitigation Proposal: Closed-Loop Feed Rate Control via Drive Power Hysteresis**\n\n### **Mechanism**\nThe proposed mitigation implements a **load-based feed gating control loop** that uses the main drive power meter as the primary proxy for shredder mechanical load. \n\n*   **Logic:** The core assumption is that the main drive power meter readings correlate positively with the instantaneous torque demand on the shredder rotors. When the shredder encounters tough feed, the resistance to rotation increases, driving the motor into a higher power state to maintain speed. If the power demand exceeds the motor's capacity to deliver torque at the required speed, a stall occurs. Conversely, low power indicates low resistance (easy feed or low feed rate), meaning the shredder is under-loaded.\n*   **Control Action:** The controller applies a **hysteresis band** to the power measurement. If the drive power exceeds a high threshold ($P_{high}$) for a defined duration, the feed conveyor speed is reduced or stopped. This action reduces the mass of material entering the shredder chamber, thereby lowering the torque demand and preventing a stall. If the power drops below a low threshold ($P_{low}$) for a defined duration, the feed conveyor speed is increased to restore throughput. This ensures the shredder operates within its optimal torque range, preventing stalls and stabilizing the discharge mass flow rate.\n\n### **Direction of Effect**\n*   **Driving Variable:** Main Drive Power (kW).\n*   **Direction of Effect:** An **increase** in the main drive power signal indicates an **increase** in mechanical load on the shredder. The control system interprets this increased load as a risk of stalling or processing inefficiency. Consequently, the controller executes a **decrease** in the feed conveyor speed. The physical direction of effect is: High Power $\rightarrow$ Reduce Feed $\rightarrow$ Lower Shredder Load $\rightarrow$ Stable Power. \n*   **Conversely:** A **decrease** in the main drive power signal indicates a **decrease** in mechanical load. The control system interprets this as headroom for more material. Consequently, the controller executes an **increase** in the feed conveyor speed. The physical direction of effect is: Low Power $\rightarrow$ Increase Feed $\rightarrow$ Higher Shredder Load $\rightarrow$ Restored Power.\n\n### **Implementation Bill**\n**Hardware & Signal Connections (Existing Assets Only):**\n1.  **Main Drive Power Meter:** Connect the output signal (4-20 mA or 0-10 V, as specified by the existing meter) to a free analog input channel on the existing PLC/DCS. This signal is the primary feedback variable ($P_{actual}$).\n2.  **Feed Conveyor Drive (VFD/Inverter):** Connect the existing analog output or digital speed command channel from the PLC/DCS to the speed reference input of the feed conveyor VFD. This is the actuator.\n3.  **Discharge Conveyor Scale:** Connect the existing weight output (load cell amplifier signal) to a free analog input channel on the PLC/DCS. This is used for supervisory validation.\n4.  **Feed Conveyor Scale:** Connect the existing weight output to a free analog input channel on the PLC/DCS. This is used for supervisory validation.\n5.  **PLC/DCS Programming:** Configure the control logic (hysteresis timers, threshold comparisons, and output commands) in the existing PLC/DCS software. No new physical hardware (sensors, transmitters, controllers) is required.\n\n### **Control Algorithm (PLC/DCS Program)**\n*   **Initialization:** Define setpoints based on historical data or manufacturer specifications for the specific shredder model.\n    *   $P_{low} = 0.5 \times P_{rated}$\n    *   $P_{high} = 0.85 \times P_{rated}$\n    *   $T_{delay} = 15$ seconds (to avoid rapid oscillation due to transient material spikes).\n*   **Normal Operation Logic:**\n    1.  Read $P_{actual}$ from the Main Drive Power Meter.\n    2.  If $P_{actual} > P_{high}$ for $T_{delay}$: Decrease Feed Conveyor Speed Command by $\frac{1}{\text{Step}}$ (e.g., 5% of base speed). If speed reaches minimum, stop feed conveyor.\n    3.  If $P_{actual} < P_{low}$ for $T_{delay}$: Increase Feed Conveyor Speed Command by $\frac{1}{\text{Step}}$. If speed reaches maximum, hold at maximum.\n    4.  If $P_{low} \text{ } \boxed{<} \text{ } P_{actual} \text{ } \boxed{<} \text{ } P_{high}$: Maintain current feed conveyor speed.\n*   **Stall Recovery Logic:**\n    *   Monitor $P_{actual}$. If a rapid drop in power is detected while the feed conveyor is running (indicating a loss of load due to jam/stall), immediately command the Feed Conveyor to Stop. This prevents material from piling up behind the stalled rotors.\n\n### **Measures Relied Upon and Derivations**\n1.  **$P_{actual}$ (Actual Drive Power):**\n    *   **Source:** Main Drive Power Meter.\n    *   **Derivation:** Directly measured. The sensor output is linearly scaled to represent kW.\n2.  **$P_{rated}$ (Rated Motor Power):**\n    *   **Source:** Static configuration value.\n    *   **Derivation:** Derived from the nameplate rating of the main drive motor. This is a constant input, not a real-time sensor measurement.\n3.  **$P_{low}$ and $P_{high}$ (Thresholds):**\n    *   **Source:** Process engineering parameters.\n    *   **Derivation:** Derived from $P_{rated}$ using fixed coefficients (e.g., $0.5$ and $0.85$) based on operational best practices. These are configurable constants.\n4.  **Feed Conveyor Speed Command:**\n    *   **Source:** PLC/DCS Output.\n    *   **Derivation:** Calculated by the control algorithm based on $P_{actual}$ relative to thresholds. Sent to the Feed Conveyor VFD.\n5.  **Discharge Mass Rate (Supervisory):**\n    *   **Source:** Discharge Conveyor Scale.\n    *   **Derivation:** Calculated by the PLC using the scale weight reading and the conveyor speed (if known) or by integrating the scale output over time to determine instantaneous mass flow. Used for alarm generation if throughput drops significantly.\n6.  **Feed Mass Rate (Supervisory):**\n    *   **Source:** Feed Conveyor Scale.\n    *   **Derivation:** Calculated by the PLC using the scale weight reading. Used for alarm generation if feed rate deviates from command.\n7.  **Specific Energy Consumption (KPI):**\n    *   **Source:** Main Drive Power Meter + Feed Conveyor Scale.\n    *   **Derivation:** Formula: $\\text{Specific Energy} = \\frac{\\int P_{actual} \\, dt}{\\int \\text{Feed Mass Rate} \\, dt}$. This is a derived long-term trend metric, not used for real-time control but for validation.\n\n### **Outcome**\nThis mitigation eliminates the need for new instrumentation by leveraging the existing power and mass flow measurements. It prevents drive stalls by proactively reducing feed load when power approaches danger levels, and stabilizes the discharge conveyor load by ensuring the shredder operates within a consistent torque band, preventing the erratic behavior that leads to lighter discharge and increased undersize material.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Main Drive Power Meter:** Connect the output signal (4-20 mA or 0-10 V, as specified",
+   "2.  **Feed Conveyor Drive (VFD/Inverter):** Connect the existing analog output or digital ",
+   "3.  **Discharge Conveyor Scale:** Connect the existing weight output (load cell amplifier ",
+   "4.  **Feed Conveyor Scale:** Connect the existing weight output to a free analog input cha",
+   "5.  **PLC/DCS Programming:** Configure the control logic (hysteresis timers, threshold com",
+   "*   **Initialization:** Define setpoints based on historical data or manufacturer specific",
+   "*   $P_{low} = 0.5 \times P_{rated}$",
+   "*   $P_{high} = 0.85 \times P_{rated}$",
+   "*   $T_{delay} = 15$ seconds (to avoid rapid oscillation due to transient material spikes)",
+   "*   **Normal Operation Logic:**",
+   "1.  Read $P_{actual}$ from the Main Drive Power Meter.",
+   "2.  If $P_{actual} > P_{high}$ for $T_{delay}$: Decrease Feed Conveyor Speed Command by $",
+   "3.  If $P_{actual} < P_{low}$ for $T_{delay}$: Increase Feed Conveyor Speed Command by $",
+   "4.  If $P_{low} \text{ } \boxed{<} \text{ } P_{actual} \text{ } \boxed{<} \text{ } P_{high}$: Ma",
+   "*   **Stall Recovery Logic:**",
+   "*   Monitor $P_{actual}$. If a rapid drop in power is detected while the feed conveyor is ",
+   "1.  **$P_{actual}$ (Actual Drive Power):**",
+   "*   **Source:** Main Drive Power Meter.",
+   "*   **Derivation:** Directly measured. The sensor output is linearly scaled to represent k",
+   "2.  **$P_{rated}$ (Rated Motor Power):**",
+   "*   **Source:** Static configuration value.",
+   "*   **Derivation:** Derived from the nameplate rating of the main drive motor. This is a c",
+   "3.  **$P_{low}$ and $P_{high}$ (Thresholds):**",
+   "*   **Source:** Process engineering parameters.",
+   "*   **Derivation:** Derived from $P_{rated}$ using fixed coefficients (e.g., $0.5$ and $0.",
+   "4.  **Feed Conveyor Speed Command:**",
+   "*   **Source:** PLC/DCS Output.",
+   "*   **Derivation:** Calculated by the control algorithm based on $P_{actual}$ relative to ",
+   "5.  **Discharge Mass Rate (Supervisory):**",
+   "*   **Source:** Discharge Conveyor Scale.",
+   "*   **Derivation:** Calculated by the PLC using the scale weight reading and the conveyor ",
+   "6.  **Feed Mass Rate (Supervisory):**",
+   "*   **Source:** Feed Conveyor Scale.",
+   "*   **Derivation:** Calculated by the PLC using the scale weight reading. Used for alarm g",
+   "7.  **Specific Energy Consumption (KPI):**",
+   "*   **Source:** Main Drive Power Meter + Feed Conveyor Scale.",
+   "*   **Derivation:** Formula: $\\text{Specific Energy} = \\frac{\\int P_{actual} \\, dt}{\\int \\"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'for real-time control but' shares no allowed-list stem (Use only existing sensors and existing measurements: the main drive power meter ...)"
+  ],
+  "APPARATUS_ROW": [
+   "*   Monitor $P_{actual}$. If a rapid drop in power is detected while the feed conveyor is running (indicating ",
+   "*   **Derivation:** Directly measured. The sensor output is linearly scaled to represent kW.",
+   "*   **Derivation:** Derived from the nameplate rating of the main drive motor. This is a constant input, not a"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 32.26,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

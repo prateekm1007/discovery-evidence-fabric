@@ -1,0 +1,52 @@
+{
+ "record": "R95_REMOTE_CI_READS/1.0.0",
+ "session": "builder-r95s1",
+ "reads": [
+  {
+   "pushed_sha": "edbac00bb",
+   "role": "the round-open base (the sibling window's session-registration push)",
+   "remote_ci_conclusion": "success",
+   "check_runs": [{"name": "surface", "conclusion": "success"}],
+   "read_at": "2026-11-19T06:05:40Z (check-run API, authenticated)",
+   "note": "pre-existing green, re-read this round for the preflight chain"
+  },
+  {
+   "pushed_sha": "7b58b5e0d",
+   "role": "the c-0110 claim push (Art. 29(b) lock — the push is the mutex)",
+   "remote_ci_conclusion": "success",
+   "check_runs": [{"name": "surface", "conclusion": "success"}],
+   "read_at": "2026-11-19T06:02:00Z (check-run API, authenticated)",
+   "note": "the last green push carrying bytes — quoted in eval/r95s1_status.json's remote_ci block per the r93 remediation pattern"
+  },
+  {
+   "pushed_sha": "f21fd909b",
+   "role": "the c-0110 work push (module + 14-test battery + CI wiring + NOTICE + status record)",
+   "remote_ci_conclusion": "failure",
+   "check_runs": [{"name": "surface", "conclusion": "failure"}],
+   "read_at": "2026-11-19T05:59:11Z (check-run API, authenticated; job logs fetched for the failing step)",
+   "note": "SELF-CAUGHT BY THE D2 RULE ITSELF: the push carried eval/r95s1_status.json without the remote_ci block AND with the engine-line share in prose only (two gate misses, both validator classes). Remediated forward-only"
+  },
+  {
+   "pushed_sha": "b387dbe04",
+   "role": "the first remediation (engine_line_share_measured added)",
+   "remote_ci_conclusion": "failure",
+   "check_runs": [{"name": "surface", "conclusion": "failure"}],
+   "read_at": "2026-11-19T05:59:11Z (check-run API, authenticated)",
+   "note": "the share gate fixed, the remote_ci block still missing — the c-0055 class, the exact r93 precedent; remediated in the next push"
+  },
+  {
+   "pushed_sha": "62c624fc1",
+   "role": "the completed D2 remediation (the structured remote_ci block quoting 7b58b5e0d)",
+   "remote_ci_conclusion": "success",
+   "check_runs": [{"name": "surface", "conclusion": "success"}],
+   "read_at": "2026-11-19T06:05:20Z (check-run API, authenticated)",
+   "note": "GREEN — the remote's, not a local pytest run; this file's own push (the round close) carries the next green, which is the next preflight's read (the R91/R93 pattern)"
+  }
+ ],
+ "failure_chain_typed": [
+  "f21fd909b FAILURE: (a) eval/r95s1_status.json lacked the remote_ci block (D2 hard rule, c-0055 class), (b) the Art. 27 gate reads engine_line_share_measured (a number) — the record carried the share in prose only",
+  "b387dbe04 FAILURE: (a) fixed, (b) not fixed — the remediation rode the wrong commit order",
+  "process root cause (typed, never hidden): the local pre-push gate used a pytest|tail pipeline whose exit code is tail's, not pytest's — the failure was swallowed locally; pipefail now rides every gate invocation; the remote CI's own gate is the authoritative read either way",
+  "62c624fc1 SUCCESS: both gates pass; the round-close push (this file) completes the chain"
+ ]
+}

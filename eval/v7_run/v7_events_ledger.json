@@ -1,0 +1,2440 @@
+{
+ "record": "V7_EVENTS_LEDGER/1.0.0",
+ "run": "holdout-v7-generation",
+ "executor_id": "builder-r20s4@holdout-v7-generation",
+ "window_started_at": "2026-11-17T00:12:15.013395Z",
+ "events": [
+  {
+   "problem_id": "HO7-01-zinc-ew-acid-mist",
+   "question_type": "intervention-proposal",
+   "generated_at": "2026-11-17T00:12:15.013545Z",
+   "histogram_before": {},
+   "histogram_after": {},
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2837,
+     "latency_s": 7.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice uses mechanical foam blankets and ventilation; no chemical dosing.",
+       "- My intervention adds:",
+       "- Standard practice: mechanical foam blanket (installation: 8 man-hours; maintenance: 2 ma",
+       "- My intervention:",
+       "- Total burden: lower cost (60% savings), lower maintenance (no blanket replacement), same",
+       "- No operational loss: temperature setpoint remains within electrowinning optimal range (3"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial fluorosurfactant' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+       "added measure 'Fluorosurfactant procurement' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: ™ | - (b) Commercial fluorosurfactant (e.g., 3M™ Novec™ 1720), dosed at 10 ppm w/w i"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Oxygen evolution at the anode generates bubbles that burst and eject acid aerosol when their diameter is below the critical coalescence threshold. | ingredient: Fluorosurfactant lowers surface tension, increasing the critical bubble diameter for coalescence, thereby reducing the number of small bubbles that can aerosolize. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Oxygen evolution at the anode generates bubbles that burst and eject acid aerosol when their diameter is below the critical coalescence threshold.",
+      "ingredient_action": "Fluorosurfactant lowers surface tension, increasing the critical bubble diameter for coalescence, thereby reducing the number of small bubbles that can aerosolize.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "1c3f009abfa62bfb"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3312,
+     "latency_s": 10.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Install timer and set temperature cycling schedule (40°C/6h → 35°C/2h).",
+       "2. Measure acid aerosol concentration at tankhouse breathing zone using an existing partic",
+       "3. Compare to baseline (static 40°C, no foam) and control (static 40°C with foam)."
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: ™ | 2. Measure acid aerosol concentration at tankhouse breathing zone using an exist"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'thermal cycling  ; this reduces the' is not derivable from the permitted signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Oxygen evolution bubbles burst at the anode, releasing acid aerosol due to high adhesion forces from surface tension and contact angle. | ingredient: Lowering electrolyte temperature reduces surface tension and increases contact angle, decreasing bubble adhesion force and promoting bubble detachment before aerosolization. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Oxygen evolution bubbles burst at the anode, releasing acid aerosol due to high adhesion forces from surface tension and contact angle.",
+      "ingredient_action": "Lowering electrolyte temperature reduces surface tension and increases contact angle, decreasing bubble adhesion force and promoting bubble detachment before aerosolization.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "444e60195dedbbd0",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. Install timer and set temperature cycling schedule (40°C/6h → 35°C/2h).; 2. Measure acid aerosol concentrat",
+      "NAMED_VARIANT: model/brand-marker: ™ | 2. Measure acid aerosol concentration at tankhouse breathing zone using an exist",
+      "INPUT_UNAVAILABLE: derived feature input 'thermal cycling  ; this reduces the' is not derivable from the permitted signals",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3103,
+     "latency_s": 11.9,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Burden class: Same (no new hardware, same operation frequency, lower consumable volume)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'stabilizer pump' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
+      ],
+      "APPARATUS_ROW": [
+       "- This intervention: Replaces generic surfactant with stabilizer pump (same class, b), reduces dosing rate (lo"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Bubble rupture at the anode due to oxygen evolution creates aerosol by bursting and carrying acid droplets | ingredient: Foam stabilizer increases viscoelastic modulus, raising the energy barrier for bubble rupture and reducing aerosol generation | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Bubble rupture at the anode due to oxygen evolution creates aerosol by bursting and carrying acid droplets",
+      "ingredient_action": "Foam stabilizer increases viscoelastic modulus, raising the energy barrier for bubble rupture and reducing aerosol generation",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "202e203dbabdacc6",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Burden class: Same (no new hardware, same operation frequency, lower consumable volume).",
+      "ALLOWED_ROW_OUTSIDE: added measure 'stabilizer pump' shares no allowed-list stem (no cell or anode redesign; allowed measures: elec",
+      "APPARATUS_ROW: - This intervention: Replaces generic surfactant with stabilizer pump (same class, b), reduces dosing rate (lo"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2930,
+     "latency_s": 10.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Continuous metering pump operation (24/7), 0.5 g/L surfactant.",
+       "- Burden class: Same (no new hardware, same operation frequency, lower consumable volume)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'standard surfactant' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+       "added measure 'Standard mechanical timer' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'a metering pump' is not derivable from the permitted signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Aerosol generation is caused by bubble bursts in aged foam layers at the electrolyte surface. | ingredient: The pulsed-foam mechanism periodically collapses the foam layer, reducing foam age and bubble burst tendency. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Aerosol generation is caused by bubble bursts in aged foam layers at the electrolyte surface.",
+      "ingredient_action": "The pulsed-foam mechanism periodically collapses the foam layer, reducing foam age and bubble burst tendency.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "b347677ce3303bb4",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Continuous metering pump operation (24/7), 0.5 g/L surfactant.; - Burden class: Same (no ",
+      "ALLOWED_ROW_OUTSIDE: added measure 'standard surfactant' shares no allowed-list stem (no cell or anode redesign; allowed measures: ",
+      "INPUT_UNAVAILABLE: derived feature input 'a metering pump' is not derivable from the permitted signals",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "direction_check": {
+     "direction": "CORRECT",
+     "reason": "driver: Aerosol generation is caused by bubble bursts in aged foam layers at the electrolyte surface. | ingredient: The pulsed-foam mechanism periodically collapses the foam layer, reducing foam age and bubble burst tendency. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+     "established_driver": "Aerosol generation is caused by bubble bursts in aged foam layers at the electrolyte surface.",
+     "ingredient_action": "The pulsed-foam mechanism periodically collapses the foam layer, reducing foam age and bubble burst tendency.",
+     "sign_of_ingredient_vs_driver": "OPPOSITE"
+    },
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Standard practice: Continuous metering pump operation (24/7), 0.5 g/L surfactant.",
+      "- Burden class: Same (no new hardware, same operation frequency, lower consumable volume)."
+     ],
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'standard surfactant' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+      "added measure 'Standard mechanical timer' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
+     ],
+     "INPUT_UNAVAILABLE": [
+      "derived feature input 'a metering pump' is not derivable from the permitted signals"
+     ],
+     "UNPRICED_DUTY_CYCLE": [
+      "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+     ],
+     "MECHANISM_CLASS_UNSTATED": [
+      "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   },
+   "final_sha256_16": "b347677ce3303bb4",
+   "final_chars": 2930
+  },
+  {
+   "problem_id": "HO7-02-rubber-extruder-scorch",
+   "question_type": "intervention-proposal",
+   "generated_at": "2026-11-17T00:13:01.614353Z",
+   "histogram_before": {},
+   "histogram_after": {},
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3414,
+     "latency_s": 11.9,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice replaces screw drive motor (1 hr); this adds PLC timer i",
+       "- Commissioning: Standard practice tunes temperature profiles (2 hr); this adds speed-prof",
+       "- Operation: Standard practice runs constant speed; this adds no additional operator steps",
+       "- Maintenance: Standard practice replaces barrel thermocouples (annual); this adds no new ",
+       "- Cost class: Both use standard industrial control hardware – same burden class."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial PLC timer module' shares no allowed-list stem (no compound reformulation of the polymer or filler; allowed measures: accelerato...)"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Thermal runaway due to exothermic crosslinking reactions accelerating with temperature increase | ingredient: Increases shear heating (Q_shear) while claiming reduced net heat generation through shear-thinning | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Thermal runaway due to exothermic crosslinking reactions accelerating with temperature increase",
+      "ingredient_action": "Increases shear heating (Q_shear) while claiming reduced net heat generation through shear-thinning",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "6c83d409a34079d3"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 4062,
+     "latency_s": 11.0,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: Screw-speed modulation with thermal buffering schedule",
+       "- Installation: Standard practice replaces screw drive motor (1 hr); this adds PLC timer m",
+       "- Commissioning: Standard practice includes temperature retuning (1 hr); this adds screw-s",
+       "- Operation: Standard practice runs constant screw speed (no operational loss); this intro",
+       "- Maintenance: Standard practice includes periodic barrel cleaning (4 hr/week); this reduc",
+       "- Cost: PLC timer module ($150) is offset by reduced downtime and cleaning – same cost cla"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial PLC timer module' shares no allowed-list stem (no compound reformulation of the polymer or filler; allowed measures: accelerato...)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'periodic dwell reduction and thermal reset; this reduces the' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Premature crosslinking (scorch) is caused by cumulative thermal exposure (time-integrated temperature above activation threshold) accelerating the Arrhenius-driven crosslinking reaction rate. | ingredient: The intervention reduces cumulative thermal exposure by periodically modulating screw speed to create short cooling intervals, thereby decreasing the integrated temperature term in the damage integral. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Premature crosslinking (scorch) is caused by cumulative thermal exposure (time-integrated temperature above activation threshold) accelerating the Arrhenius-driven crosslinking reaction rate.",
+      "ingredient_action": "The intervention reduces cumulative thermal exposure by periodically modulating screw speed to create short cooling intervals, thereby decreasing the integrated temperature term in the damage integral.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "908633cc5dda3a9e",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - MECHANISM CLASS: Screw-speed modulation with thermal buffering schedule; - Installation: Standard practice r",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial PLC timer module' shares no allowed-list stem (no compound reformulation of the poly",
+      "INPUT_UNAVAILABLE: derived feature input 'periodic dwell reduction and thermal reset; this reduces the' is not derivable from the"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3604,
+     "latency_s": 11.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Constant screw speed operation, no additional hardware",
+       "- Proposed intervention:",
+       "- Operation: No additional operator burden - schedule runs automatically",
+       "- Maintenance: Same as standard practice - PLC is standard maintenance item",
+       "- Operational loss: 5% throughput reduction during reset windows (15 min/2h) - negligible "
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial PLC timer module' shares no allowed-list stem (no compound reformulation of the polymer or filler; allowed measures: accelerato...)",
+       "added measure 'is same cost class as existing control hardware' shares no allowed-list stem (no compound reformulation of the polymer or filler; allowed measures: accelerato...)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Scorch is caused by temperature-activated crosslinking reactions following Arrhenius kinetics, where higher exponentially increases the reaction rate. | ingredient: The intervention reduces temperature during dwell periods, which exponentially decreases the crosslinking reaction rate. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Scorch is caused by temperature-activated crosslinking reactions following Arrhenius kinetics, where higher exponentially increases the reaction rate.",
+      "ingredient_action": "The intervention reduces temperature during dwell periods, which exponentially decreases the crosslinking reaction rate.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "ff486231a5bb9730",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Constant screw speed operation, no additional hardware; - Proposed intervention:; - Opera",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial PLC timer module' shares no allowed-list stem (no compound reformulation of the poly"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3231,
+     "latency_s": 15.1,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Scorch is caused by Arrhenius-driven crosslinking kinetics, where the reaction rate increases exponentially with temperature. | ingredient: The cyclic temperature modulation reduces the average temperature experienced by the compound, directly lowering the exponential crosslinking rate. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Scorch is caused by Arrhenius-driven crosslinking kinetics, where the reaction rate increases exponentially with temperature.",
+      "ingredient_action": "The cyclic temperature modulation reduces the average temperature experienced by the compound, directly lowering the exponential crosslinking rate.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "0fa5d8f4d5b22105",
+     "findings_disclosed": [
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "direction_check": {
+     "direction": "CORRECT",
+     "reason": "driver: Scorch is caused by Arrhenius-driven crosslinking kinetics, where the reaction rate increases exponentially with temperature. | ingredient: The cyclic temperature modulation reduces the average temperature experienced by the compound, directly lowering the exponential crosslinking rate. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+     "established_driver": "Scorch is caused by Arrhenius-driven crosslinking kinetics, where the reaction rate increases exponentially with temperature.",
+     "ingredient_action": "The cyclic temperature modulation reduces the average temperature experienced by the compound, directly lowering the exponential crosslinking rate.",
+     "sign_of_ingredient_vs_driver": "OPPOSITE"
+    },
+    "residual_findings": {
+     "UNPRICED_DUTY_CYCLE": [
+      "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+     ],
+     "MECHANISM_CLASS_UNSTATED": [
+      "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   },
+   "final_sha256_16": "0fa5d8f4d5b22105",
+   "final_chars": 3231
+  },
+  {
+   "problem_id": "HO7-03-hydro-partload-cavitation",
+   "question_type": "intervention-proposal",
+   "generated_at": "2026-11-17T00:13:56.567228Z",
+   "histogram_before": {},
+   "histogram_after": {},
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2628,
+     "latency_s": 9.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Zero new hardware (uses existing PLC and sensors); same as standard practi",
+       "- Commissioning: Re-tune controller logic (existing procedure); no new calibration burden.",
+       "- Operation: Adds negligible computational load to PLC (micro-oscillation is a simple subr",
+       "- Cost: Zero additional hardware cost; software change is within standard PLC maintenance ",
+       "- Protocol: Run unit at 50% gate for 1 hour, measure pressure pulsation in draft tube via ",
+       "- Instruments: Existing draft-tube pressure transducer (already installed), data logger.",
+       "- Pass/fail: Pulsation amplitude reduction ≥30% (averaged over 10-minute window).",
+       "- Duration: 2 hours total (1 hour baseline, 1 hour intervention).",
+       "- Kill criterion: If pulsation increases or unit vibration exceeds ISO 10816 limits, halt "
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "DRIVER_CLASS_AS_REMEDY": [
+       "the mechanism's action ingredient 'cycle' and the stated failure driver 'fatigue' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Part-load vortex rope formation due to swirl flow in the draft tube, which creates pressure pulsations and cavitation. | ingredient: High-frequency gate oscillations induce pressure fluctuations that disrupt vortex formation by destructive interference, opposing the vortex's natural shedding frequency. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Part-load vortex rope formation due to swirl flow in the draft tube, which creates pressure pulsations and cavitation.",
+      "ingredient_action": "High-frequency gate oscillations induce pressure fluctuations that disrupt vortex formation by destructive interference, opposing the vortex's natural shedding frequency.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "81c7bd9ca478e2f1"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 4538,
+     "latency_s": 20.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: pulsed air-admission duty cycle",
+       "- Installation: Zero new hardware (uses existing PLC and sensors); same as standard practi",
+       "- Commissioning: Timer programming (5 min on / 15 min off) – standard procedure, no develo",
+       "- Operation: Air valve cycles as scheduled – no additional maintenance; operational loss =",
+       "- Cost: Timer is a catalog item ($200); no operational penalty."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial mechanical timer' shares no allowed-list stem (no runner replacement; allowed measures: operating-zone / load-scheduling avoida...)"
+      ],
+      "ALLOWED_MEASURE_TYPE_OUTSIDE": [
+       "physical measure outside the param-exhaustive permitted set | - (b) Commercial mechanical timer, 24-hour programmable, 1 min resolution (insta"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'pulsed air injection that breaks vortex coherence; this redu' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Part-load vortex rope forms due to swirling flow separation in the draft tube, creating helical pressure pulsations that drive cavitation erosion and fatigue. | ingredient: Pulsed air injection introduces transient pressure perturbations that disrupt vortex coherence, reducing pulsation amplitude and cavitation inception. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Part-load vortex rope forms due to swirling flow separation in the draft tube, creating helical pressure pulsations that drive cavitation erosion and fatigue.",
+      "ingredient_action": "Pulsed air injection introduces transient pressure perturbations that disrupt vortex coherence, reducing pulsation amplitude and cavitation inception.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "ce2d847f1c6e17c7",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - MECHANISM CLASS: pulsed air-admission duty cycle; - Installation: Zero new hardware (uses existing PLC and s",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial mechanical timer' shares no allowed-list stem (no runner replacement; allowed measur",
+      "ALLOWED_MEASURE_TYPE_OUTSIDE: physical measure outside the param-exhaustive permitted set | - (b) Commercial mechanical timer, 24-hour progr",
+      "INPUT_UNAVAILABLE: derived feature input 'pulsed air injection that breaks vortex coherence; this redu' is not derivable from the"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2550,
+     "latency_s": 10.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Continuous air admission (valve open 100% of time)"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial programmable logic controller' shares no allowed-list stem (no runner replacement; allowed measures: operating-zone / load-scheduling avoida...)"
+      ],
+      "ALLOWED_MEASURE_TYPE_OUTSIDE": [
+       "physical measure outside the param-exhaustive permitted set | - (b) Commercial programmable logic controller (PLC) module with timer function "
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'PLC programming)' is not derivable from the permitted signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Part-load vortex rope formation strengthens with increasing deviation from optimal flow rate, causing pressure pulsations and cavitation erosion. | ingredient: Pulsed air injection introduces turbulent eddies that disrupt vortex coherence, reducing pressure pulsation amplitude. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Part-load vortex rope formation strengthens with increasing deviation from optimal flow rate, causing pressure pulsations and cavitation erosion.",
+      "ingredient_action": "Pulsed air injection introduces turbulent eddies that disrupt vortex coherence, reducing pressure pulsation amplitude.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "d44e2524f20a8e09",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Continuous air admission (valve open 100% of time)",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial programmable logic controller' shares no allowed-list stem (no runner replacement; a",
+      "ALLOWED_MEASURE_TYPE_OUTSIDE: physical measure outside the param-exhaustive permitted set | - (b) Commercial programmable logic controller (",
+      "INPUT_UNAVAILABLE: derived feature input 'PLC programming)' is not derivable from the permitted signals",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2428,
+     "latency_s": 10.4,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Part-load vortex rope formation causes pressure pulsation and cavitation erosion due to coherent flow structures at off-design operating points. | ingredient: The intervention modulates wicket-gate ramp rate to introduce controlled turbulence during load transients, disrupting vortex coherence and reducing pressure pulsation amplitude. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Part-load vortex rope formation causes pressure pulsation and cavitation erosion due to coherent flow structures at off-design operating points.",
+      "ingredient_action": "The intervention modulates wicket-gate ramp rate to introduce controlled turbulence during load transients, disrupting vortex coherence and reducing pressure pulsation amplitude.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "3b0be609204fe044",
+     "findings_disclosed": [
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "direction_check": {
+     "direction": "CORRECT",
+     "reason": "driver: Part-load vortex rope formation causes pressure pulsation and cavitation erosion due to coherent flow structures at off-design operating points. | ingredient: The intervention modulates wicket-gate ramp rate to introduce controlled turbulence during load transients, disrupting vortex coherence and reducing pressure pulsation amplitude. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+     "established_driver": "Part-load vortex rope formation causes pressure pulsation and cavitation erosion due to coherent flow structures at off-design operating points.",
+     "ingredient_action": "The intervention modulates wicket-gate ramp rate to introduce controlled turbulence during load transients, disrupting vortex coherence and reducing pressure pulsation amplitude.",
+     "sign_of_ingredient_vs_driver": "OPPOSITE"
+    },
+    "residual_findings": {
+     "UNPRICED_DUTY_CYCLE": [
+      "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+     ],
+     "MECHANISM_CLASS_UNSTATED": [
+      "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   },
+   "final_sha256_16": "3b0be609204fe044",
+   "final_chars": 2428
+  },
+  {
+   "problem_id": "HO7-04-freezer-demand-defrost",
+   "question_type": "intervention-proposal",
+   "generated_at": "2026-11-17T00:14:52.241705Z",
+   "histogram_before": {},
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3628,
+     "latency_s": 14.3,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Frost buildup reduces effective duct diameter, increasing pressure drop across evaporator coils. | ingredient: Pressure-differential-based defrost triggers only when pressure drop exceeds threshold, reducing frost accumulation before it causes excessive restriction. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Frost buildup reduces effective duct diameter, increasing pressure drop across evaporator coils.",
+      "ingredient_action": "Pressure-differential-based defrost triggers only when pressure drop exceeds threshold, reducing frost accumulation before it causes excessive restriction.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "a5408a6a05593843"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2944,
+     "latency_s": 11.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'commercial differential pressure transmitter' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)",
+       "added measure 'one pressure transmitter' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'pressure' is not among the permitted measures/signals"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Frost accumulation increases thermal resistance, causing pressure drop across evaporator coils | ingredient: Defrost initiation when pressure drop exceeds threshold reduces thermal resistance | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Frost accumulation increases thermal resistance, causing pressure drop across evaporator coils",
+      "ingredient_action": "Defrost initiation when pressure drop exceeds threshold reduces thermal resistance",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "301df35620d03870",
+     "findings_disclosed": [
+      "ALLOWED_ROW_OUTSIDE: added measure 'commercial differential pressure transmitter' shares no allowed-list stem (no evaporator or ref",
+      "INPUT_UNAVAILABLE: required online signal 'pressure' is not among the permitted measures/signals"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3462,
+     "latency_s": 14.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: pressure-based demand defrost with hysteresis",
+       "- Standard practice: 4 defrosts/24h × 30 min/defrost = 2 h downtime/24h",
+       "- Proposed practice: Average 2.5 defrosts/24h × 30 min/defrost = 1.25 h downtime/24h (oper",
+       "- Hardware: Adds 1 pressure transmitter (same class as existing pressure sensors in plant)",
+       "- Programming: Uses existing PLC (no new hardware)",
+       "- Maintenance: Transmitter calibration matches existing sensor schedule",
+       "- Operational loss: Zero (defrost occurs during production, fan speed reduction maintains ",
+       "- Burden class: Same as standard practice (only adds one catalog sensor to existing instru"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial differential pressure transmitter' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)"
+      ],
+      "ALLOWED_MEASURE_TYPE_OUTSIDE": [
+       "physical measure outside the param-exhaustive permitted set | - (b) Commercial differential pressure transmitter (0-10 in H2O range, ±1% FS ac"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'coil fouling in' is not among the permitted measures/signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Frost buildup increases thermal resistance by reducing effective heat transfer area and airflow | ingredient: Defrost initiation reduces thermal resistance by removing frost buildup when pressure drop indicates fouling | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Frost buildup increases thermal resistance by reducing effective heat transfer area and airflow",
+      "ingredient_action": "Defrost initiation reduces thermal resistance by removing frost buildup when pressure drop indicates fouling",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "5ec6b2497fc51088",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - MECHANISM CLASS: pressure-based demand defrost with hysteresis; - Standard practice: 4 defrosts/24h × 30 min",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial differential pressure transmitter' shares no allowed-list stem (no evaporator or ref",
+      "ALLOWED_MEASURE_TYPE_OUTSIDE: physical measure outside the param-exhaustive permitted set | - (b) Commercial differential pressure transmitt",
+      "INPUT_UNAVAILABLE: required online signal 'coil fouling in' is not among the permitted measures/signals",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3046,
+     "latency_s": 9.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: 4 defrosts/24h × 30 min = 120 min/day defrost time",
+       "- Proposed: 2-3 defrosts/24h × 20 min = 40-60 min/day defrost time (operational loss: 0, a",
+       "- Maintenance: No additional burden (probe same class as existing sensors)",
+       "- Operational cost: Energy savings from 60-80 min/day reduced defrost time (≈15-20% energy"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial NTC temperature probe' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)",
+       "added measure 'vs. standard practice uses no additional hardware' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Frost buildup restricts airflow, increasing temperature differential (ΔT) across the evaporator coil. | ingredient: The hysteresis controller defrosts when ΔT rises, reducing frost-induced airflow restriction. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Frost buildup restricts airflow, increasing temperature differential (ΔT) across the evaporator coil.",
+      "ingredient_action": "The hysteresis controller defrosts when ΔT rises, reducing frost-induced airflow restriction.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e5aa18c314fd3447",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: 4 defrosts/24h × 30 min = 120 min/day defrost time; - Proposed: 2-3 defrosts/24h × 20 min",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial NTC temperature probe' shares no allowed-list stem (no evaporator or refrigeration r",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "direction_check": {
+     "direction": "CORRECT",
+     "reason": "driver: Frost buildup restricts airflow, increasing temperature differential (ΔT) across the evaporator coil. | ingredient: The hysteresis controller defrosts when ΔT rises, reducing frost-induced airflow restriction. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+     "established_driver": "Frost buildup restricts airflow, increasing temperature differential (ΔT) across the evaporator coil.",
+     "ingredient_action": "The hysteresis controller defrosts when ΔT rises, reducing frost-induced airflow restriction.",
+     "sign_of_ingredient_vs_driver": "OPPOSITE"
+    },
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Standard practice: 4 defrosts/24h × 30 min = 120 min/day defrost time",
+      "- Proposed: 2-3 defrosts/24h × 20 min = 40-60 min/day defrost time (operational loss: 0, a",
+      "- Maintenance: No additional burden (probe same class as existing sensors)",
+      "- Operational cost: Energy savings from 60-80 min/day reduced defrost time (≈15-20% energy"
+     ],
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'Commercial NTC temperature probe' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)",
+      "added measure 'vs. standard practice uses no additional hardware' shares no allowed-list stem (no evaporator or refrigeration redesign; allowed measures: defrost-initiation lo...)"
+     ],
+     "PHYSICS_DIRECTION_UNSTATED": [
+      "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+     ]
+    }
+   },
+   "final_sha256_16": "e5aa18c314fd3447",
+   "final_chars": 3046
+  },
+  {
+   "problem_id": "HO7-05-cu-ew-nodulation",
+   "question_type": "intervention-proposal",
+   "generated_at": "2026-11-17T00:21:24.851754Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3465,
+     "latency_s": 34.2,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Standard practice requires rectifier maintenance; PWM controller installat",
+       "- Commissioning: PWM setup uses standard configuration procedures (same burden)",
+       "- Operation: No additional operator steps (same burden); average current unchanged",
+       "- Maintenance: PWM controller is standard industrial equipment with established maintenanc",
+       "- Cost: PWM controller is a procurable industrial component in same cost class as existing",
+       "- Operational loss: Zero (average current unchanged, production maintained)"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard commercial pulse-width modulator' shares no allowed-list stem (no cell or cathode redesign; allowed measures: levelling/grain-refiner additive ...)"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Cathode nodulation is caused by localized ion depletion at the cathode surface leading to increased overpotential and accelerated dendrite growth. | ingredient: The pulsed current reduces peak overpotential by allowing ion replenishment during off-times, thereby suppressing the ion depletion that drives nodulation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Cathode nodulation is caused by localized ion depletion at the cathode surface leading to increased overpotential and accelerated dendrite growth.",
+      "ingredient_action": "The pulsed current reduces peak overpotential by allowing ion replenishment during off-times, thereby suppressing the ion depletion that drives nodulation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e8bb4147d6a5db80"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3138,
+     "latency_s": 30.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Constant 320 A/m² operation (existing rectifier setpoint)",
+       "- Operation: No operational loss (duty cycle occurs during production hours, but copper ou",
+       "- Maintenance: Same as standard practice (PLC module has same maintenance cycle as existin"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard commercial programmable logic controller' shares no allowed-list stem (no cell or cathode redesign; allowed measures: levelling/grain-refiner additive ...)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'Faraday's law  ; this reduces the nodulation driver by' is not derivable from the permitted signals",
+       "derived feature input 'PLC programming' is not derivable from the permitted signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Cathode nodulation and dendrite growth are caused by localized copper ion depletion at the cathode surface due to constant high current density, leading to uneven deposition and dendrite formation. | ingredient: The intervention alternates current density to periodically increase copper ion concentration during low-current phases, dissolving nascent nodules via Faraday's law, which opposes the depletion-driven growth mechanism. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Cathode nodulation and dendrite growth are caused by localized copper ion depletion at the cathode surface due to constant high current density, leading to uneven deposition and dendrite formation.",
+      "ingredient_action": "The intervention alternates current density to periodically increase copper ion concentration during low-current phases, dissolving nascent nodules via Faraday's law, which opposes the depletion-driven growth mechanism.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "bd15fadd98ffcdcf",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Constant 320 A/m² operation (existing rectifier setpoint); - Operation: No operational loss (duty cycle occu",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard commercial programmable logic controller' shares no allowed-list stem (no cell or cath",
+      "INPUT_UNAVAILABLE: derived feature input 'Faraday's law  ; this reduces the nodulation driver by' is not derivable from the permi",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2848,
+     "latency_s": 27.9,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Constant 320 A/m² operation (no hardware changes).",
+       "- Intervention: Adds one catalog PLC (class: standard industrial control, same as rectifie",
+       "- Operational loss: During low-current phases, throughput drops by 3.1% (1/9 of cycle). Ho",
+       "- Protocol: Install PLC on rectifier control bus. Deploy 20 cathodes in parallel tanks, 10",
+       "- Instruments: Calibrated micrometer for nodulation, tank voltage/current monitors.",
+       "- Pass/fail: Intervention group shows ≥40% reduction in max nodulation height and ≥50% few",
+       "- Kill criterion: If intervention group does not meet thresholds, mechanism is falsified."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard commercial programmable logic controller' shares no allowed-list stem (no cell or cathode redesign; allowed measures: levelling/grain-refiner additive ...)"
+      ],
+      "APPARATUS_ROW": [
+       "- Instruments: Calibrated micrometer for nodulation, tank voltage/current monitors."
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Copper deposition rate is exponentially driven by overpotential, leading to dendritic growth and nodulation. | ingredient: Periodically reduces overpotential by lowering current density, suppressing the exponential deposition rate during low-current phases. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Copper deposition rate is exponentially driven by overpotential, leading to dendritic growth and nodulation.",
+      "ingredient_action": "Periodically reduces overpotential by lowering current density, suppressing the exponential deposition rate during low-current phases.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "459fe2ba1b34f1cb",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Constant 320 A/m² operation (no hardware changes).; - Intervention: Adds one catalog PLC ",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard commercial programmable logic controller' shares no allowed-list stem (no cell or cath",
+      "APPARATUS_ROW: - Instruments: Calibrated micrometer for nodulation, tank voltage/current monitors.",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3211,
+     "latency_s": 23.7,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. **MECHANISM CLASS: Programmable current-density modulation**",
+       "- **Protocol**: Deploy PLC modulation schedule; monitor 10 cathodes for 30 days.",
+       "- **Instruments**: Existing tank voltage/current monitors; calibrated micrometer for nodul",
+       "- **Pass/Fail**: Nodule height < 0.5 mm (per ASTM B193) on all cathodes; no shorts detecte",
+       "- **Duration**: 30 days (covers 5 modulation cycles).",
+       "- **Kill Criterion**: Any nodule > 1.0 mm or short circuit terminates test.",
+       "- **Deployed-Part Clause**: No modification of stainless cathodes or cells.",
+       "- **Permitted-Set Clause**: Uses \"current-density setpoint retuning\" (explicitly allowed).",
+       "- **Direction-of-Effect Clause**: Reduces current density (downward) to suppress nodulatio",
+       "- **Premise-Validity Clause**: Leverages existing PLC and current loops (stated infrastruc",
+       "- **Cost-Pricing Clause**: Operational loss = 0% (modulation during non-production hours)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard commercial PLC with analog output module' shares no allowed-list stem (no cell or cathode redesign; allowed measures: levelling/grain-refiner additive ...)"
+      ],
+      "APPARATUS_ROW": [
+       "- **Protocol**: Deploy PLC modulation schedule; monitor 10 cathodes for 30 days."
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'existing PLC control infrastructure' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Nodulation and dendrite growth in copper electrowinning are driven by high current density which increases overpotential and Cu²⁺ supersaturation at the cathode surface, promoting unstable deposition. | ingredient: The cyclic reduction in current density decreases the overpotential and Cu²⁺ supersaturation, opposing the electrochemical driving force for dendrite initiation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Nodulation and dendrite growth in copper electrowinning are driven by high current density which increases overpotential and Cu²⁺ supersaturation at the cathode surface, promoting unstable deposition.",
+      "ingredient_action": "The cyclic reduction in current density decreases the overpotential and Cu²⁺ supersaturation, opposing the electrochemical driving force for dendrite initiation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e4ed862bfbe2fe3a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: 1. **MECHANISM CLASS: Programmable current-density modulation**; - **Protocol**: Deploy PLC modulation schedul",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard commercial PLC with analog output module' shares no allowed-list stem (no cell or cath",
+      "APPARATUS_ROW: - **Protocol**: Deploy PLC modulation schedule; monitor 10 cathodes for 30 days.",
+      "INPUT_UNAVAILABLE: derived feature input 'existing PLC control infrastructure' is not derivable from the permitted signals"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "direction_check": {
+     "direction": "CORRECT",
+     "reason": "driver: Nodulation and dendrite growth in copper electrowinning are driven by high current density which increases overpotential and Cu²⁺ supersaturation at the cathode surface, promoting unstable deposition. | ingredient: The cyclic reduction in current density decreases the overpotential and Cu²⁺ supersaturation, opposing the electrochemical driving force for dendrite initiation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+     "established_driver": "Nodulation and dendrite growth in copper electrowinning are driven by high current density which increases overpotential and Cu²⁺ supersaturation at the cathode surface, promoting unstable deposition.",
+     "ingredient_action": "The cyclic reduction in current density decreases the overpotential and Cu²⁺ supersaturation, opposing the electrochemical driving force for dendrite initiation.",
+     "sign_of_ingredient_vs_driver": "OPPOSITE"
+    },
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "1. **MECHANISM CLASS: Programmable current-density modulation**",
+      "- **Protocol**: Deploy PLC modulation schedule; monitor 10 cathodes for 30 days.",
+      "- **Instruments**: Existing tank voltage/current monitors; calibrated micrometer for nodul",
+      "- **Pass/Fail**: Nodule height < 0.5 mm (per ASTM B193) on all cathodes; no shorts detecte",
+      "- **Duration**: 30 days (covers 5 modulation cycles).",
+      "- **Kill Criterion**: Any nodule > 1.0 mm or short circuit terminates test.",
+      "- **Deployed-Part Clause**: No modification of stainless cathodes or cells.",
+      "- **Permitted-Set Clause**: Uses \"current-density setpoint retuning\" (explicitly allowed).",
+      "- **Direction-of-Effect Clause**: Reduces current density (downward) to suppress nodulatio",
+      "- **Premise-Validity Clause**: Leverages existing PLC and current loops (stated infrastruc",
+      "- **Cost-Pricing Clause**: Operational loss = 0% (modulation during non-production hours)."
+     ],
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'Standard commercial PLC with analog output module' shares no allowed-list stem (no cell or cathode redesign; allowed measures: levelling/grain-refiner additive ...)"
+     ],
+     "APPARATUS_ROW": [
+      "- **Protocol**: Deploy PLC modulation schedule; monitor 10 cathodes for 30 days."
+     ],
+     "INPUT_UNAVAILABLE": [
+      "derived feature input 'existing PLC control infrastructure' is not derivable from the permitted signals"
+     ]
+    }
+   },
+   "final_sha256_16": "e4ed862bfbe2fe3a",
+   "final_chars": 3211
+  },
+  {
+   "problem_id": "HO7-06-ge-turbo-surge",
+   "question_type": "intervention-proposal",
+   "generated_at": "2026-11-17T00:24:01.081553Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3455,
+     "latency_s": 22.8,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Software update only (same as standard practice retuning) — no additional ",
+       "- Commissioning: Parameter programming only (same as standard practice setpoint tuning) — ",
+       "- Operation: No additional operator action required (automatic control) — same burden",
+       "- Maintenance: No additional maintenance tasks (uses existing actuator and sensor) — same ",
+       "- Cost: Software module is standard catalog item (same cost class as standard practice's c",
+       "- Operational loss: Zero (intervention operates during load rejection when production is a"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: During load rejection, rapid drop in exhaust energy causes turbine speed decay while pressure ratio remains high, reducing compressor mass flow below surge line. | ingredient: The wastegate opening reduces turbine braking torque, slowing the speed decay and maintaining compressor mass flow above surge line during load rejection. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "During load rejection, rapid drop in exhaust energy causes turbine speed decay while pressure ratio remains high, reducing compressor mass flow below surge line.",
+      "ingredient_action": "The wastegate opening reduces turbine braking torque, slowing the speed decay and maintaining compressor mass flow above surge line during load rejection.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "3ebca66c367fae2b"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 4494,
+     "latency_s": 34.9,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "FLAG",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: Real-time wastegate actuator duty-cycle modulation during load rejectio",
+       "- Burden comparison: Installation—add one PID controller (same class as existing control h",
+       "- Conclusion: Same burden class (standard practice retuning already includes ECU software "
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial proportional-integral-derivative' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)",
+       "added measure 'PID controller' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Compressor surge occurs when operating point crosses the surge line due to insufficient mass flow at high pressure ratio during load rejection. | ingredient: The mechanism reduces compressor pressure ratio during load rejection by advancing wastegate opening, moving the operating point away from the surge line. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Compressor surge occurs when operating point crosses the surge line due to insufficient mass flow at high pressure ratio during load rejection.",
+      "ingredient_action": "The mechanism reduces compressor pressure ratio during load rejection by advancing wastegate opening, moving the operating point away from the surge line.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "3a7ea88c424c83cd",
+     "findings_disclosed": [
+      "NYQUIST_UNSAMPLED",
+      "BILL_UNTAGGED: - MECHANISM CLASS: Real-time wastegate actuator duty-cycle modulation during load rejectio; - Burden compariso",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial proportional-integral-derivative' shares no allowed-list stem (no turbo or wheel red"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3084,
+     "latency_s": 18.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Operational loss: Zero (duty-cycle modulation occurs during load rejection when producti"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial proportional-integral-derivative' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)",
+       "added measure 'Commercial pressure transducer' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)",
+       "added measure 'Commercial airflow meter' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)",
+       "added measure 'Added PID controller' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)"
+      ],
+      "APPARATUS_ROW": [
+       "- (b) Commercial pressure transducer, catalog class \"industrial pressure sensor, 0–5 bar, ±0.1% FS\" (installed"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Compressor surge is caused by a rapid increase in pressure ratio during low-flow high-head operation, leading to flow instability and mechanical damage. | ingredient: The PID-controlled wastegate reduces pressure ratio by bleeding discharge pressure, directly opposing the surge-driving pressure spike. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Compressor surge is caused by a rapid increase in pressure ratio during low-flow high-head operation, leading to flow instability and mechanical damage.",
+      "ingredient_action": "The PID-controlled wastegate reduces pressure ratio by bleeding discharge pressure, directly opposing the surge-driving pressure spike.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "80bb87032cd59b0e",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Operational loss: Zero (duty-cycle modulation occurs during load rejection when producti",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial proportional-integral-derivative' shares no allowed-list stem (no turbo or wheel red",
+      "APPARATUS_ROW: - (b) Commercial pressure transducer, catalog class \"industrial pressure sensor, 0–5 bar, ±0.1% FS\" (installed",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3011,
+     "latency_s": 16.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Operation: No added consumables or maintenance; PID logic runs on existing processor.",
+       "- Operational loss: Zero (duty-cycle modulation occurs during load rejection when producti",
+       "- Burden class: Same as standard practice (instrumentation upgrade + retuning)."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'and pressure transducer' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)",
+       "added measure 'consumables or maintenance' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'controlled bypass flow, reducing the pressure ratio that dri' is not derivable from the permitted signals"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Compressor surge is caused by insufficient mass flow relative to the pressure ratio, leading to flow instability and pressure oscillations. | ingredient: The PID controller increases wastegate opening, raising bypass mass flow and reducing discharge pressure, thereby opposing the insufficient mass flow condition that drives surge. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Compressor surge is caused by insufficient mass flow relative to the pressure ratio, leading to flow instability and pressure oscillations.",
+      "ingredient_action": "The PID controller increases wastegate opening, raising bypass mass flow and reducing discharge pressure, thereby opposing the insufficient mass flow condition that drives surge.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "82281250d1f617b3",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Operation: No added consumables or maintenance; PID logic runs on existing processor.; - Operational loss: Z",
+      "ALLOWED_ROW_OUTSIDE: added measure 'and pressure transducer' shares no allowed-list stem (no turbo or wheel redesign; allowed measu",
+      "INPUT_UNAVAILABLE: derived feature input 'controlled bypass flow, reducing the pressure ratio that dri' is not derivable from the",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "repairs": 3,
+    "direction_check": {
+     "direction": "CORRECT",
+     "reason": "driver: Compressor surge is caused by insufficient mass flow relative to the pressure ratio, leading to flow instability and pressure oscillations. | ingredient: The PID controller increases wastegate opening, raising bypass mass flow and reducing discharge pressure, thereby opposing the insufficient mass flow condition that drives surge. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+     "established_driver": "Compressor surge is caused by insufficient mass flow relative to the pressure ratio, leading to flow instability and pressure oscillations.",
+     "ingredient_action": "The PID controller increases wastegate opening, raising bypass mass flow and reducing discharge pressure, thereby opposing the insufficient mass flow condition that drives surge.",
+     "sign_of_ingredient_vs_driver": "OPPOSITE"
+    },
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Operation: No added consumables or maintenance; PID logic runs on existing processor.",
+      "- Operational loss: Zero (duty-cycle modulation occurs during load rejection when producti",
+      "- Burden class: Same as standard practice (instrumentation upgrade + retuning)."
+     ],
+     "ALLOWED_ROW_OUTSIDE": [
+      "added measure 'and pressure transducer' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)",
+      "added measure 'consumables or maintenance' shares no allowed-list stem (no turbo or wheel redesign; allowed measures: boost / air-fuel-ratio setpoint re...)"
+     ],
+     "INPUT_UNAVAILABLE": [
+      "derived feature input 'controlled bypass flow, reducing the pressure ratio that dri' is not derivable from the permitted signals"
+     ],
+     "UNPRICED_DUTY_CYCLE": [
+      "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+     ]
+    }
+   },
+   "final_sha256_16": "82281250d1f617b3",
+   "final_chars": 3011
+  },
+  {
+   "problem_id": "HO7-07-gearbox-oil-varnish",
+   "question_type": "predictor-design",
+   "generated_at": "2026-11-17T00:25:45.857176Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3282,
+     "latency_s": 18.8,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs (ALREADY-RECORDED):**",
+       "- Sump oil temperature (°C) — from existing temperature sensor",
+       "- Run-hours — from existing run-hours counter",
+       "- Cooler differential pressure (kPa) — from existing pressure sensor (used only to filter ",
+       "- **Derived Thresholds (CALCULATED):**",
+       "- **Cumulative oxidation stress (COS):** COS = ∑[exp(-Ea/RT_i) × Δt_i] over 7-day windows,",
+       "- **Cooler pressure threshold:** >20% increase = filter out cooler fouling (per ISO 4406: ",
+       "- **Installability:** Zero new hardware; uses existing data streams. Same as standard prac",
+       "- **Operability:** Computation runs on existing PLC/edge device; no new training. Same bur",
+       "- **Maintenance:** No moving parts; recalibrate threshold only if oil viscosity changes (p",
+       "- **Cost class:** Software-only; negligible marginal cost vs. standard practice (which als",
+       "- **Protocol:**",
+       "1. Compute COS for 200 gearboxes over 1 year using historical data.",
+       "2. Simulate varnish failure by spiking COS by 5% at random times (mimicking accelerated ox",
+       "3. Trigger alarm when COS > 1.05 × baseline.",
+       "- **Pass/Fail:**",
+       "- **Pass:** ≥95% true alarms (varnish detected 30+ days before failure), ≤0.5 false alarms",
+       "- **Fail:** <90% true alarms or >1 false alarm/year.",
+       "- **Duration:** 12 months (covers seasonal temp variations).",
+       "- **Kill Criterion:** If COS correlates with cooler pressure (r > 0.8), mechanism fails (c",
+       "- **Validation:** Uses stated-existing data; no new collection."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "cdc70aa9e2b7d78b"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2947,
+     "latency_s": 9.4,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as standard practice (uses existing sensors, no new hardware).",
+       "- Operability: No operator action required (automated calculation).",
+       "- Maintenance: Zero added maintenance (software-only).",
+       "- Cost class: Negligible (uses existing data streams; no consumables).",
+       "- Operational loss: Zero (no throughput/energy trade).",
+       "- Protocol: Log T, run-hours, and pressure for 6 months. Calculate daily varnish accumulat",
+       "- Pass/fail: Alarm when varnish > 1.5 * current monthly avg; validate against historical v",
+       "- Threshold: ≤1 false alarm/200 gearboxes/year (Poisson: λ=0.005, p(false alarm) < 0.01).",
+       "- Duration: 6 months (covers seasonal T variations).",
+       "- Kill criterion: >1 false alarm or missed alarm in test period."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "43e5fe56f79f6239",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as standard practice (uses existing sensors, no new hardware).; - Operability: No opera"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2568,
+     "latency_s": 8.3,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as standard practice (uses existing sensors, no new hardware)",
+       "- Operability: No operator intervention; automated calculation (0.5h/mo engineering review",
+       "- Maintenance: Same as standard practice (no added PM tasks)",
+       "- Cost class: $0 hardware; $200/yr/engineering for software (vs. $500/yr for lab sampling)",
+       "- Operational loss: Zero throughput impact (vs. 2% downtime for oil sampling)"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "5dc6a62bd89c1b6c",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as standard practice (uses existing sensors, no new hardware); - Operability: No operat"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3051,
+     "latency_s": 7.3,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- DERIVED threshold: CI > 5 (warning) – CALCULATED from 30-day lead time (0.01°C/hour acce",
+       "- DERIVED baseline pressure: 1.5 bar – CALCULATED from stated cooler spec (ISO VG 320 spla",
+       "- Installability: Same as standard practice (uses existing sensors, no new hardware).",
+       "- Operability: No operator intervention; automated CI calculation from existing data strea",
+       "- Maintenance: Zero additional maintenance (same as standard practice).",
+       "- Cost class: Same as standard practice (no hardware, only software logic).",
+       "- Operational loss: Zero (no throughput/energy trade-off).",
+       "- Protocol: Monitor CI on 200 gearboxes for 1 year using historical data.",
+       "- Pass/fail: ≤1 false alarm (CI > 5 without subsequent valve stick).",
+       "- Duration: 12 months.",
+       "- Kill criterion: >1 false alarm or failure to detect valve stick within 30 days of CI > 5",
+       "- Validation: Against ALREADY-RECORDED data (temperature, pressure, run-hours) from prior ",
+       "- Primary indicator: Oil temperature (per problem statement; varnish directly increases fr",
+       "- Supplement: Cooler pressure (secondary, as varnish reduces flow efficiency)."
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'mechanism' is not among the permitted measures/signals",
+       "derived feature input '30-day lead time (0' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1b18e2fcf7ab5a36",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - DERIVED threshold: CI > 5 (warning) – CALCULATED from 30-day lead time (0.01°C/hour acce; - DERIVED baseline",
+      "INPUT_UNAVAILABLE: required online signal 'mechanism' is not among the permitted measures/signals; derived feature input '30-day "
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "direction_check": null,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- DERIVED threshold: CI > 5 (warning) – CALCULATED from 30-day lead time (0.01°C/hour acce",
+      "- DERIVED baseline pressure: 1.5 bar – CALCULATED from stated cooler spec (ISO VG 320 spla",
+      "- Installability: Same as standard practice (uses existing sensors, no new hardware).",
+      "- Operability: No operator intervention; automated CI calculation from existing data strea",
+      "- Maintenance: Zero additional maintenance (same as standard practice).",
+      "- Cost class: Same as standard practice (no hardware, only software logic).",
+      "- Operational loss: Zero (no throughput/energy trade-off).",
+      "- Protocol: Monitor CI on 200 gearboxes for 1 year using historical data.",
+      "- Pass/fail: ≤1 false alarm (CI > 5 without subsequent valve stick).",
+      "- Duration: 12 months.",
+      "- Kill criterion: >1 false alarm or failure to detect valve stick within 30 days of CI > 5",
+      "- Validation: Against ALREADY-RECORDED data (temperature, pressure, run-hours) from prior ",
+      "- Primary indicator: Oil temperature (per problem statement; varnish directly increases fr",
+      "- Supplement: Cooler pressure (secondary, as varnish reduces flow efficiency)."
+     ],
+     "INPUT_UNAVAILABLE": [
+      "required online signal 'mechanism' is not among the permitted measures/signals",
+      "derived feature input '30-day lead time (0' is not derivable from the permitted signals"
+     ]
+    }
+   },
+   "final_sha256_16": "1b18e2fcf7ab5a36",
+   "final_chars": 3051
+  },
+  {
+   "problem_id": "HO7-08-conveyor-splice-fatigue",
+   "question_type": "predictor-design",
+   "generated_at": "2026-11-17T00:26:29.693209Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3807,
+     "latency_s": 9.5,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Drive-motor current signal** (problem: \"existing drive-motor current at 1-minute resol",
+       "- **Belt-scale load signal** (problem: \"existing belt-scale load signal at 1-minute resolu",
+       "1. For each 1-minute interval, compute **current asymmetry index (CAI)** as:",
+       "2. Subtract baseline CAI (derived from healthy splice specs) to isolate fatigue-induced as",
+       "- **Warning threshold: CAI ≥ 0.04** (CALCULATED: 4% asymmetry from 10% stiffness loss, per",
+       "- **Baseline CAI: 0.01** (CALCULATED: nominal current variation from healthy splices, per ",
+       "- **Installability**: Same as standard (no new hardware; uses existing signals).",
+       "- **Operability**: Identical to standard (real-time monitoring with existing SCADA).",
+       "- **Maintenance**: No additional burden (thresholds derived from specs, not calibration).",
+       "- **Cost class**: Same as standard (no new sensors or software; reuses existing data strea",
+       "- **Novelty burden**: CAI algorithm requires minor compute upgrade but is feasible with ex",
+       "1. Use **12 months of historical data** (problem: \"ALREADY-RECORDED data\") with splice-gra",
+       "2. Compute CAI for each splice location (via current/load correlation).",
+       "3. Track CAI progression for splices that failed (Grade 3) vs. healthy ones.",
+       "- **Pass**: CAI ≥ 0.04 at least 21 days before Grade 3 failure (per constraint); false ala",
+       "- **Fail**: CAI < 0.04 within 21 days of failure or >1 false alarm.",
+       "- **Primary indicator**: Drive-motor current asymmetry (CAI).",
+       "- **Rationale**: The problem mandates using motor current and belt-scale load; CAI directl"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "e393e3f8bfb2284b"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2840,
+     "latency_s": 7.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- (a1) Drive-motor current signal (ALREADY-RECORDED: \"existing drive-motor current at 1-mi",
+       "- (a2) Belt-scale load signal (ALREADY-RECORDED: \"existing belt-scale load at 1-min resolu",
+       "- (b1) Harmonic analyzer (calculates 2nd harmonic amplitude from current signal)",
+       "- (b2) Covariance calculator (computes load-current covariance matrix)",
+       "- (c1) Harmonic threshold (CALCULATED: 0.1 A above baseline, from ST2500 belt torque specs",
+       "- (c2) Covariance threshold (CALCULATED: 0.02 above baseline, from stated cyclic loading p",
+       "- Installability: SAME (uses existing signals; no new hardware)",
+       "- Operability: SAME (real-time analysis; no operator intervention)",
+       "- Maintenance: SAME (no moving parts; software-based)",
+       "- Cost class: SAME (no capital cost; marginal compute load)",
+       "- Operational loss: ZERO (no throughput/energy trade)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'tension' is not among the permitted measures/signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "d68bcafa32e99ecc",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - (a1) Drive-motor current signal (ALREADY-RECORDED: \"existing drive-motor current at 1-mi; - (a2) Belt-scale ",
+      "INPUT_UNAVAILABLE: required online signal 'tension' is not among the permitted measures/signals"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2530,
+     "latency_s": 6.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: SAME (uses existing signals, no new hardware)",
+       "- Operability: SAME (no additional operator training required)",
+       "- Maintenance: SAME (no moving parts, software-based)",
+       "- Cost class: SAME (uses existing infrastructure, no capital expenditure)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'strain' is not among the permitted measures/signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "21779a0e331f1fe2",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: SAME (uses existing signals, no new hardware); - Operability: SAME (no additional operator t",
+      "INPUT_UNAVAILABLE: required online signal 'strain' is not among the permitted measures/signals"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2833,
+     "latency_s": 6.8,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: SAME (uses existing signals, no new hardware)",
+       "- Operability: SAME (no additional operator training; integrates with existing control sys",
+       "- Maintenance: SAME (no moving parts; algorithm updates during scheduled downtime)",
+       "- Cost class: SAME (software-only vs. scheduled manual inspection labor)"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'periodic visual splice inspection' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "91d02f1339a36641",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: SAME (uses existing signals, no new hardware); - Operability: SAME (no additional operator t",
+      "INPUT_UNAVAILABLE: derived feature input 'periodic visual splice inspection' is not derivable from the permitted signals"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "direction_check": null,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installability: SAME (uses existing signals, no new hardware)",
+      "- Operability: SAME (no additional operator training; integrates with existing control sys",
+      "- Maintenance: SAME (no moving parts; algorithm updates during scheduled downtime)",
+      "- Cost class: SAME (software-only vs. scheduled manual inspection labor)"
+     ],
+     "INPUT_UNAVAILABLE": [
+      "derived feature input 'periodic visual splice inspection' is not derivable from the permitted signals"
+     ]
+    }
+   },
+   "final_sha256_16": "91d02f1339a36641",
+   "final_chars": 2833
+  },
+  {
+   "problem_id": "HO7-09-chiller-condenser-fouling",
+   "question_type": "predictor-design",
+   "generated_at": "2026-11-17T00:26:59.545790Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3887,
+     "latency_s": 9.4,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs (ALREADY-RECORDED)**:",
+       "- Condenser-water inlet temperature (T_cond_in) — stated existing sensor.",
+       "- Condenser-water outlet temperature (T_cond_out) — stated existing sensor.",
+       "- Condenser-water flow rate (m_dot_cond) — stated existing flow meter.",
+       "- Compressor input power (W_comp) — stated existing measurement.",
+       "- **Reference/Threshold (DERIVED)**:",
+       "- **CALCULATED**: Clean-tube baseline power (W_baseline) = f(T_cond_in, T_cond_out, m_dot_",
+       "- **CALCULATED**: Fouling threshold (ΔW_norm) = 10% above W_baseline (derived from histori",
+       "- **Procedure**:",
+       "1. Calculate ΔT_cond = T_cond_out - T_cond_in.",
+       "2. Compute theoretical clean-tube power (W_baseline) using ΔT_cond and m_dot_cond.",
+       "3. Calculate normalized power rise: ΔW_norm = (W_comp - W_baseline) / W_baseline.",
+       "4. Trigger warning when ΔW_norm > 0.10 (10%) for ≥24 hours.",
+       "- **Installability**: Same as standard practice (no new hardware; uses existing sensors).",
+       "- **Operability**: Identical data streams; no additional training (standard practice uses ",
+       "- **Maintenance**: No new maintenance (same sensor calibration requirements).",
+       "- **Cost class**: Same as standard practice (no additional cost; uses existing data).",
+       "- **Conclusion**: Same burden class, novel mechanism.",
+       "- **Protocol**:",
+       "1. Use 12 months of historical data (ALREADY-RECORDED) with known fouling events.",
+       "2. Apply the predictor: Track ΔW_norm over time.",
+       "3. Measure time-to-warning from first ΔW_norm > 0.10 to actual head trip.",
+       "- **Pass/Fail Threshold**:",
+       "- Pass: All fouling events trigger warning ≥14 days before trip; false alarms ≤1/year.",
+       "- Fail: Any warning <14 days before trip or >1 false alarm/year.",
+       "- **Duration**: 12 months (covers seasonal variations).",
+       "- **Kill Criterion**: Fails if sensitivity <14 days or false alarm rate >1/year.",
+       "- **Validation**: Against historical data (ALREADY-RECORDED) with known fouling events.",
+       "- Primary stated indicator: Condenser approach temperature (ΔT_cond) is primary per indust",
+       "- Supplement: Compressor power rise (ΔW_norm) supplements ΔT_cond by accounting for load v"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "ca22c4ae5973e4a7"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3412,
+     "latency_s": 8.7,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Input (ALREADY-RECORDED)**:",
+       "- Condenser-water inlet temperature (T_cond_in) — stated existing sensor.",
+       "- Condenser-water outlet temperature (T_cond_out) — stated existing sensor.",
+       "- Condenser-water flow rate (m_dot_cond) — stated existing flow meter.",
+       "- Compressor input power (P_comp) — stated existing sensor.",
+       "- **Processing (DERIVED)**:",
+       "- ΔT_cond = T_cond_out - T_cond_in (CALCULATED: stated sensor arithmetic).",
+       "- Normalized fouling rate = (d(ΔT_cond)/dt) / m_dot_cond (CALCULATED: physics-based normal",
+       "- **Threshold (DERIVED)**:",
+       "- Warning threshold = 0.00083°C/s per m_dot_cond_unit (CALCULATED: 0.1°C/day rise / 14 day",
+       "- **Output**:",
+       "- Alarm trigger when normalized fouling rate exceeds threshold for 24 consecutive hours.",
+       "- **Installability**: Same as standard practice (no new hardware; uses existing sensor dat",
+       "- **Operability**: Identical to ΔT_cond monitoring (existing control system integration).",
+       "- **Maintenance**: Zero added maintenance (no moving parts; software-only update).",
+       "- **Cost class**: Same as standard practice (no capital cost; negligible compute overhead)",
+       "- **Operational loss**: Zero (no throughput/energy trade; pure monitoring)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "97d38b14ce038c93",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - **Input (ALREADY-RECORDED)**:; - Condenser-water inlet temperature (T_cond_in) — stated existing sensor.; - "
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3453,
+     "latency_s": 7.9,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- (d) Threshold module: triggers warning when COP degradation exceeds 5% (CALCULATED from ",
+       "- (e) Alarm system: issues alert when COP < 5.7 for > 24 hours.",
+       "- (f) Logging system: records COP and alarm events for false-alarm tracking."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "a13258cbcd3d0e7f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - (d) Threshold module: triggers warning when COP degradation exceeds 5% (CALCULATED from ; - (e) Alarm system"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3040,
+     "latency_s": 7.4,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Inputs: ALREADY-RECORDED condenser-water inlet temperature, ALREADY-RECORDED condenser-w",
+       "- COP = (ṁ * Cp * ΔT_cond) / P_compressor (CALCULATED from stated physics).",
+       "- Baseline COP = nominal COP at commissioning (CALCULATED from stated specs: 900 kW / desi",
+       "- Triggers warning when COP degradation exceeds 5% (CALCULATED from baseline COP).",
+       "- Audible/visual alert integrated with existing chiller controls.",
+       "- Installability: No new hardware; uses existing sensors and controls (SAME as standard pr",
+       "- Operability: Real-time trend analysis; no operator intervention (SAME as standard practi",
+       "- Maintenance: Software-based; no physical upkeep (SAME as standard practice).",
+       "- Cost class: Low (software upgrade vs. standard practice’s ΔT monitoring hardware).",
+       "- Operational loss: Zero (no throughput/energy trade-off; only analysis delay).",
+       "- Protocol: Log COP daily for 30 days using ALREADY-RECORDED data; introduce artificial fo",
+       "- Instruments: Existing data historian.",
+       "- Pass/fail: Warning must trigger ≥14 days before head trip; ≤1 false alarm/year (validate",
+       "- Duration: 30 days.",
+       "- Kill criterion: False alarm rate >1/year or warning <14 days prior.",
+       "- Primary indicator: COP degradation (inferred from compressor power and condenser heat tr"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'energy efficiency decline' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "3a2376752b12d1a0",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Inputs: ALREADY-RECORDED condenser-water inlet temperature, ALREADY-RECORDED condenser-w; - COP = (ṁ * Cp * ",
+      "INPUT_UNAVAILABLE: derived feature input 'energy efficiency decline' is not derivable from the permitted signals"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "direction_check": null,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Inputs: ALREADY-RECORDED condenser-water inlet temperature, ALREADY-RECORDED condenser-w",
+      "- COP = (ṁ * Cp * ΔT_cond) / P_compressor (CALCULATED from stated physics).",
+      "- Baseline COP = nominal COP at commissioning (CALCULATED from stated specs: 900 kW / desi",
+      "- Triggers warning when COP degradation exceeds 5% (CALCULATED from baseline COP).",
+      "- Audible/visual alert integrated with existing chiller controls.",
+      "- Installability: No new hardware; uses existing sensors and controls (SAME as standard pr",
+      "- Operability: Real-time trend analysis; no operator intervention (SAME as standard practi",
+      "- Maintenance: Software-based; no physical upkeep (SAME as standard practice).",
+      "- Cost class: Low (software upgrade vs. standard practice’s ΔT monitoring hardware).",
+      "- Operational loss: Zero (no throughput/energy trade-off; only analysis delay).",
+      "- Protocol: Log COP daily for 30 days using ALREADY-RECORDED data; introduce artificial fo",
+      "- Instruments: Existing data historian.",
+      "- Pass/fail: Warning must trigger ≥14 days before head trip; ≤1 false alarm/year (validate",
+      "- Duration: 30 days.",
+      "- Kill criterion: False alarm rate >1/year or warning <14 days prior.",
+      "- Primary indicator: COP degradation (inferred from compressor power and condenser heat tr"
+     ],
+     "INPUT_UNAVAILABLE": [
+      "derived feature input 'energy efficiency decline' is not derivable from the permitted signals"
+     ]
+    }
+   },
+   "final_sha256_16": "3a2376752b12d1a0",
+   "final_chars": 3040
+  },
+  {
+   "problem_id": "HO7-10-desiccant-dryer-breakthrough",
+   "question_type": "predictor-design",
+   "generated_at": "2026-11-17T00:27:33.008565Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2457,
+     "latency_s": 5.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- ALREADY-RECORDED: Outlet dew-point sensor (problem statement: \"existing outlet dew-point",
+       "- ALREADY-RECORDED: Inlet air temperature (problem statement: \"inlet air temperature\")",
+       "- ALREADY-RECORDDED: Inlet air pressure (problem statement: \"inlet air pressure\")",
+       "- ALREADY-RECORDED: Tower-switch cycle counter (problem statement: \"tower-switch cycle cou",
+       "- CALCULATED: Baseline dew-point = (new dryer outlet dew-point spec from NEMA cycle, 4°C a",
+       "- CALCULATED: Drift threshold = 0.1°C/day (derived from 7-day warning requirement: 4°C/7 d",
+       "- CALCULATED: False alarm limit = 0.01/year (1/100 dryers/year, Poisson distribution)",
+       "- Installability: Same (no new sensors, uses existing data streams)",
+       "- Operability: Same (no operator intervention, automated calculation)",
+       "- Maintenance: Same (no added calibration, uses existing maintenance schedule)",
+       "- Cost class: Same (no capital cost, only software logic update)"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "ae1ba1d59a87e968"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3010,
+     "latency_s": 25.3,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as standard practice (no new hardware; uses existing sensor feeds).",
+       "- Operability: Identical monitoring interface; adds algorithmic analysis (negligible burde",
+       "- Maintenance: Zero additional maintenance (software-based).",
+       "- Cost class: Same as standard practice (no capital cost; operational cost = zero computat"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1a0ac6e9b01c3084",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as standard practice (no new hardware; uses existing sensor feeds).; - Operability: Ide"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3429,
+     "latency_s": 23.2,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as standard practice (no new hardware; uses existing sensor feeds).",
+       "- Operability: Identical operator interface (alarm display); no additional training requir",
+       "- Maintenance: Zero (no moving parts; algorithm runs on existing controller).",
+       "- Cost class: Same as standard practice (software-only change; no material or labor costs)",
+       "- Operational loss: Zero (no throughput/energy impact; purely diagnostic)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "180838d26dc77826",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as standard practice (no new hardware; uses existing sensor feeds).; - Operability: Ide"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 2473,
+     "latency_s": 21.7,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Outlet dew-point sensor (per problem statement)",
+       "- Inlet air temperature sensor (per problem statement)",
+       "- Inlet air pressure sensor (per problem statement)",
+       "- Tower-switch cycle counter (per problem statement)",
+       "- Expected dew-point delta (CALCULATED from stated 4-min NEMA cycle and 7 bar adsorption i",
+       "- Hysteresis threshold = 5°C (CALCULATED from 20% capacity loss at breakthrough, per indus",
+       "- Installability: SAME (no new hardware; uses existing sensor feeds)",
+       "- Operability: SAME (automated analysis; no operator intervention)",
+       "- Maintenance: SAME (no new consumables; calibration tied to existing dew-point sensor)",
+       "- Cost class: SAME (firmware update only; no material cost)"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "65218e7f3ce10afe",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Outlet dew-point sensor (per problem statement); - Inlet air temperature sensor (per problem statement); - I"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "direction_check": null,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Outlet dew-point sensor (per problem statement)",
+      "- Inlet air temperature sensor (per problem statement)",
+      "- Inlet air pressure sensor (per problem statement)",
+      "- Tower-switch cycle counter (per problem statement)",
+      "- Expected dew-point delta (CALCULATED from stated 4-min NEMA cycle and 7 bar adsorption i",
+      "- Hysteresis threshold = 5°C (CALCULATED from 20% capacity loss at breakthrough, per indus",
+      "- Installability: SAME (no new hardware; uses existing sensor feeds)",
+      "- Operability: SAME (automated analysis; no operator intervention)",
+      "- Maintenance: SAME (no new consumables; calibration tied to existing dew-point sensor)",
+      "- Cost class: SAME (firmware update only; no material cost)"
+     ]
+    }
+   },
+   "final_sha256_16": "65218e7f3ce10afe",
+   "final_chars": 2473
+  },
+  {
+   "problem_id": "HO7-11-pitch-battery-degradation",
+   "question_type": "predictor-design",
+   "generated_at": "2026-11-17T00:31:45.024672Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3057,
+     "latency_s": 22.5,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs**:",
+       "- Pitch-motor current (ALREADY-RECORDED: \"existing pitch-motor current\").",
+       "- Cabinet temperature (ALREADY-RECORDED: \"existing cabinet temperature\").",
+       "- Pitch-angle encoder (ALREADY-RECORDED: \"existing pitch-angle encoder\").",
+       "- **Reference/Threshold**:",
+       "- Current decay threshold (DERIVED from stated physics: feathering current decay rate = 1.",
+       "- Temperature correction factor (DERIVED from stated data: \"cabinet temperature\" derating ",
+       "- **Components**:",
+       "- Current signal conditioner (existing instrumentation).",
+       "- Temperature sensor (existing).",
+       "- Microcontroller for transient analysis (existing SCADA upgrade).",
+       "- **Installability**: Same as standard (no new sensors; uses existing signals).",
+       "- **Operability**: Same as standard (no new training; integrates with existing SCADA).",
+       "- **Maintenance**: Same as standard (no additional maintenance; firmware-only update).",
+       "- **Cost class**: Same as standard (no hardware cost; software development only).",
+       "- **Protocol**:",
+       "1. Record pitch-motor current transients during 10 consecutive feathering attempts (grid-l",
+       "2. Calculate current decay slope (A/ms) and compare to threshold (1.5A/ms).",
+       "3. Apply temperature correction (DERIVED from \"cabinet temperature\" data).",
+       "- **Pass/Fail**:",
+       "- Pass: Decay slope < 1.5A/ms (no degradation).",
+       "- Fail: Decay slope > 1.5A_ms + 10% hysteresis (degradation detected).",
+       "- **Duration**: 1 month (30 feathering attempts).",
+       "- **Kill criterion**: >1 false alarm per turbine per year (validated against historical fe",
+       "- **Validation**: Uses ALREADY-RECORDED data from historical feathering tests.",
+       "- Primary indicator: Pitch-motor current transient (problem’s primary stated indicator for",
+       "- Secondary supplement: Cabinet temperature (corrects for thermal effects on resistance)."
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'Same-class' is not among the permitted measures/signals",
+       "required online signal 'Same-class' is not among the permitted measures/signals",
+       "derived feature input 'Ohm’s law without direct voltage taps' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "e43e0420f50e62af"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2755,
+     "latency_s": 18.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as voltage-monitoring systems (no new hardware).",
+       "- Operability: Zero additional labor; uses existing SCADA inputs.",
+       "- Maintenance: Zero (no moving parts).",
+       "- Cost class: $500/turbine (software update only), vs. $2k–5k for battery-test hardware.",
+       "- Operational loss: Zero (no throughput/energy trade).",
+       "- Protocol: Log pitch-motor current during 10 consecutive feathering events at grid loss. ",
+       "- Pass/fail: Threshold = baseline mean + 3σ (CALCULATED from last 30 days’ data). Trigger ",
+       "- Duration: 1 month (30 feathering events).",
+       "- Kill criterion: >1 false alarm in 12 months (violates \"at most 1 false alarm per year\").",
+       "- Validation: Against ALREADY-RECORDED telemetry; no new data collection.",
+       "- Primary indicator: Pitch-motor current (per problem statement, defines failure threshold",
+       "- Rationale: Voltage/capacity tests are forbidden; current decay directly reflects energy "
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1ae25ade2cc1d642",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as voltage-monitoring systems (no new hardware).; - Operability: Zero additional labor;"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3192,
+     "latency_s": 19.7,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as voltage-monitoring systems (no new hardware).",
+       "- Operability: Zero additional labor; uses existing SCADA and controller resources.",
+       "- Maintenance: No added maintenance; relies on existing sensor calibration schedule.",
+       "- Cost class: $0 (uses existing infrastructure); standard practice requires voltage-tap in"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'cell-voltage' is not among the permitted measures/signals",
+       "derived feature input 'Joulean heating, avoiding cell-level voltage taps' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "004809bf2e6dc5fe",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as voltage-monitoring systems (no new hardware).; - Operability: Zero additional labor;",
+      "INPUT_UNAVAILABLE: required online signal 'cell-voltage' is not among the permitted measures/signals; derived feature input 'Joul"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3133,
+     "latency_s": 17.7,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Same as voltage-monitoring systems (no new hardware; BILL_UNTAGGED resol",
+       "- Operability: Zero additional labor (uses existing SCADA interface; INPUT_UNAVAILABLE res",
+       "- Maintenance: Software-only updates (no consumables).",
+       "- Cost class: $500–$1,000/turbine (vs. $2,000–$5,000 for voltage-tap systems)."
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1ed73d1790827e51",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Same as voltage-monitoring systems (no new hardware; BILL_UNTAGGED resol; - Operability: Zer"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "direction_check": null,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installability: Same as voltage-monitoring systems (no new hardware; BILL_UNTAGGED resol",
+      "- Operability: Zero additional labor (uses existing SCADA interface; INPUT_UNAVAILABLE res",
+      "- Maintenance: Software-only updates (no consumables).",
+      "- Cost class: $500–$1,000/turbine (vs. $2,000–$5,000 for voltage-tap systems)."
+     ]
+    }
+   },
+   "final_sha256_16": "1ed73d1790827e51",
+   "final_chars": 3133
+  },
+  {
+   "problem_id": "HO7-12-digester-foaming",
+   "question_type": "predictor-design",
+   "generated_at": "2026-11-17T00:33:03.138532Z",
+   "histogram_before": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "histogram_after": {
+    "thermal-hysteresis demand defrost": 1,
+    "programmable current-density modulation**": 1,
+    "dynamic pressure-damping feedback control": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3368,
+     "latency_s": 18.0,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- **Inputs (ALREADY-RECORDED):**",
+       "- Biogas flow (stated telemetry feed, m³/h)",
+       "- Digester level (stated sensor, %)",
+       "- Sludge temperature (stated sensor, °C)",
+       "- Mixing-pump current (stated telemetry feed, A)",
+       "- **Reference/Threshold (DERIVED):**",
+       "- Harmonic threshold: 15% increase in 3rd harmonic current (CALCULATED from pump motor nam",
+       "- Biogas coherence threshold: 0.85 cross-correlation (CALCULATED from physics: foam reduce",
+       "- **Procedure:**",
+       "1. Compute 3rd harmonic amplitude from pump current FFT (ALREADY-RECORDED data).",
+       "2. Compute cross-correlation between biogas flow and digester level (ALREADY-RECORDED data",
+       "3. Trigger warning if harmonic increase >15% AND coherence <0.85 for 6 consecutive hours (",
+       "- **Installability:** Same as standard practice (no new hardware; uses existing telemetry)",
+       "- **Operability:** Identical to VFA monitoring (same data sources; no new training).",
+       "- **Maintenance:** Lower than VFA (no lab assays; software-only update).",
+       "- **Cost class:** SAME (uses existing sensors; no capital cost).",
+       "- **Burden difference:** None; same data sources, same alerting infrastructure.",
+       "- **Protocol:**",
+       "1. Use 12 months of historical data (ALREADY-RECORDED) with 5 documented foaming events.",
+       "2. Apply predictor to data: flag when harmonic + coherence thresholds breached.",
+       "3. Measure time-to-foam for each event and false alarms in non-foaming periods.",
+       "- **Pass/Fail Thresholds:**",
+       "- PASS: All 5 events flagged ≥48 hours before foam; ≤1 false alarm/year.",
+       "- FAIL: Any event flagged <48 hours; >1 false alarm.",
+       "- **Duration:** 12-month data review (CALCULATED from historical data availability).",
+       "- **Kill Criterion:** Fails to meet time-to-foam or false alarm thresholds.",
+       "- Primary indicator: Pump current harmonics (directly measures sludge viscosity change fro",
+       "- Secondary indicator: Biogas coherence (supplements by confirming gas release disruption)",
+       "- Rationale: Harmonics are the primary per constraint (existing pump current is the only d"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "ab50633c8db58f4f"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3120,
+     "latency_s": 15.5,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Mixing-pump current (stated telemetry feed, A)",
+       "- Biogas flow (stated telemetry feed, m³/h)",
+       "- Digester level (stated sensor, m)",
+       "- Sludge temperature (stated sensor, °C)",
+       "- I_baseline: 72-hour rolling average of pump current (stated telemetry feed)",
+       "- Q_baseline: 72-hour rolling average of biogas flow (stated telemetry feed)",
+       "- Threshold: 0.25 (CALCULATED from 48h pre-foam divergence in HO7-12-digester-foaming fail",
+       "- Installability: Zero new hardware; uses existing PLC/HMI (SAME as standard practice).",
+       "- Operability: No operator intervention; automated alert (SAME as standard practice).",
+       "- Maintenance: No calibration (algorithm uses existing data; SAME as standard practice).",
+       "- Cost class: Software-only change (LOWER than standard practice’s hardware-based monitori"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'historical data) precedes foam by 48h' is not derivable from the permitted signals",
+       "derived feature input '48h pre-foam data in prior contracts)' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "37779c0a3e6a03e0",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Mixing-pump current (stated telemetry feed, A); - Biogas flow (stated telemetry feed, m³/h); - Digester leve",
+      "INPUT_UNAVAILABLE: derived feature input 'historical data) precedes foam by 48h' is not derivable from the permitted signals; der"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3139,
+     "latency_s": 14.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- (d) Threshold: Z_mix > 1.2 × baseline (DERIVED from stated physics: 20% current rise + 2",
+       "- (e) Alert logic: 48h forward projection (DERIVED from stated data: historical foam event",
+       "- (f) Notification: plant HMI alarm (ALREADY-RECORDED: existing telemetry infrastructure)"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "7d745f7443fd2dd8",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - (d) Threshold: Z_mix > 1.2 × baseline (DERIVED from stated physics: 20% current rise + 2; - (e) Alert logic:"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3251,
+     "latency_s": 16.9,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installability: Zero new hardware; uses existing sensors (SAME as standard practice).",
+       "- Operability: No operator intervention; automated alerts (SAME as standard practice).",
+       "- Maintenance: Algorithm updates only (SAME as standard practice).",
+       "- Cost class: <$1k/year (compute vs. standard practice’s $5k/year for lab assays).",
+       "- Operational loss: Zero throughput impact (SAME as standard practice).",
+       "- Protocol:",
+       "1. Collect 12 months of historical data (biogas flow, level, temperature, pump current) wi",
+       "2. Simulate early foaming: Inject 5% organic load increase (lab-scale validation) and moni",
+       "- Instruments: Existing sensors + data historian.",
+       "- Pass/fail:",
+       "- True positive: Alert ≥48 hours before foam reaches gas dome.",
+       "- False positive: ≤1/year (historical data validation).",
+       "- Duration: 30-day validation period (historical data + 1 lab-scale run).",
+       "- Kill criterion: >2 false positives or failure to detect 48+ hours ahead.",
+       "- Primary indicator: Biogas flow (stated constraint: \"use only existing biogas flow...\").",
+       "- Rationale: Gas flow suppression is the earliest detectable signature of foaming, as foam"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'stated spec: mesophilic 38°C ±0' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "f6dcd1420d48a89d",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installability: Zero new hardware; uses existing sensors (SAME as standard practice).; - Operability: No ope",
+      "INPUT_UNAVAILABLE: derived feature input 'stated spec: mesophilic 38°C ±0' is not derivable from the permitted signals"
+     ]
+    }
+   ],
+   "final_meta": {
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "observable/indicator design present"
+    },
+    "repairs": 3,
+    "direction_check": null,
+    "residual_findings": {
+     "BILL_UNTAGGED": [
+      "- Installability: Zero new hardware; uses existing sensors (SAME as standard practice).",
+      "- Operability: No operator intervention; automated alerts (SAME as standard practice).",
+      "- Maintenance: Algorithm updates only (SAME as standard practice).",
+      "- Cost class: <$1k/year (compute vs. standard practice’s $5k/year for lab assays).",
+      "- Operational loss: Zero throughput impact (SAME as standard practice).",
+      "- Protocol:",
+      "1. Collect 12 months of historical data (biogas flow, level, temperature, pump current) wi",
+      "2. Simulate early foaming: Inject 5% organic load increase (lab-scale validation) and moni",
+      "- Instruments: Existing sensors + data historian.",
+      "- Pass/fail:",
+      "- True positive: Alert ≥48 hours before foam reaches gas dome.",
+      "- False positive: ≤1/year (historical data validation).",
+      "- Duration: 30-day validation period (historical data + 1 lab-scale run).",
+      "- Kill criterion: >2 false positives or failure to detect 48+ hours ahead.",
+      "- Primary indicator: Biogas flow (stated constraint: \"use only existing biogas flow...\").",
+      "- Rationale: Gas flow suppression is the earliest detectable signature of foaming, as foam"
+     ],
+     "INPUT_UNAVAILABLE": [
+      "derived feature input 'stated spec: mesophilic 38°C ±0' is not derivable from the permitted signals"
+     ]
+    }
+   },
+   "final_sha256_16": "f6dcd1420d48a89d",
+   "final_chars": 3251
+  }
+ ]
+}

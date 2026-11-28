@@ -1,0 +1,2734 @@
+{
+ "record": "V82_TYPED_PLAN_POPULATION/1.0.0",
+ "session": "builder-r47s2",
+ "route": "F61 D2 (AM44 direction 2): typed-operator plan layer on DEV; LLM expansion + matched-budget ablation vs V7.7 are the next step",
+ "legality": "operator typed input_contract satisfied (state dict convention, probe 14/14) against the problem-statement anchor",
+ "stats": {
+  "problems": 36,
+  "plans_total": 108,
+  "plans_per_problem": 3.0,
+  "schedule_share": 0.046296296296296294,
+  "schedule_bar_max": 0.17,
+  "schedule_bar_met": true,
+  "allowed_row_outside": 0,
+  "measure_classes_used": [
+   "boundary",
+   "configuration",
+   "control",
+   "duty_cycle",
+   "geometry"
+  ],
+  "operator_coverage": {
+   "DIRECT_TRANSFER": 36,
+   "FAILURE_PATH_INVERSION": 31,
+   "DOMAIN_KNOWLEDGE_FIRST": 11,
+   "BOUNDARY_CONDITION_CHANGE": 22,
+   "GEOMETRIC_TRANSFORMATION": 8
+  },
+  "distinct_operators": 5,
+  "llm_calls": 0
+ },
+ "problems": [
+  {
+   "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+   "dev_source": "v2-burned",
+   "device": "planar solid-oxide fuel cell stack with ferritic-steel interconnect and LSCF cathode",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "cathode",
+       "cell",
+       "ferritic",
+       "fuel",
+       "interconnect",
+       "lscf",
+       "oxide",
+       "planar",
+       "solid",
+       "stack",
+       "steel"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "chromium",
+       "interconnect",
+       "poisoning"
+      ],
+      "shared_with_problem_failure": [
+       "chromium",
+       "interconnect",
+       "poisoning"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "boundary",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-02-perovskite-module-degradation",
+   "dev_source": "v2-burned",
+   "device": "glass-glass perovskite solar module (formamidinium-lead-iodide) in rooftop deployment",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "deployment",
+       "formamidinium",
+       "glass",
+       "iodide",
+       "lead",
+       "module",
+       "perovskite",
+       "rooftop",
+       "solar"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "degradation",
+       "moisture",
+       "perovskite"
+      ],
+      "shared_with_problem_failure": [
+       "degradation",
+       "moisture",
+       "perovskite"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "boundary",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-03-lead-service-line-release",
+   "dev_source": "v2-burned",
+   "device": "lead service lines connecting a municipal main to homes, low-alkalinity corrosive water",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "ph"
+      ],
+      "problem_constraint": "no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustment only; tap lead <5 ppb at 90th percentile within 12 months; keep disinfection byproduct compliance",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "alkalinity",
+       "connecting",
+       "corrosive",
+       "home",
+       "lead",
+       "line",
+       "low",
+       "main",
+       "municipal",
+       "service",
+       "water"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "corrosion",
+       "lead",
+       "line",
+       "release",
+       "service"
+      ],
+      "shared_with_problem_failure": [
+       "corrosion",
+       "lead",
+       "line",
+       "release",
+       "service"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-04-gt-compressor-fouling",
+   "dev_source": "v2-burned",
+   "device": "industrial gas-turbine axial compressor in coastal/industrial intake air",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "air",
+       "axial",
+       "coastal",
+       "compressor",
+       "gas",
+       "industrial",
+       "intake",
+       "turbine"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "aerosol",
+       "compressor",
+       "fouling"
+      ],
+      "shared_with_problem_failure": [
+       "aerosol",
+       "compressor",
+       "fouling"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "duty_cycle",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "temperature",
+      "current"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-05-ev-busbar-fretting",
+   "dev_source": "v2-burned",
+   "device": "EV battery pack busbar-to-cell-tab bolted joints under road vibration",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "battery",
+       "bolted",
+       "busbar",
+       "cell",
+       "joint",
+       "pack",
+       "road",
+       "tab",
+       "under",
+       "vibration"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "busbar",
+       "corrosion",
+       "fretting"
+      ],
+      "shared_with_problem_failure": [
+       "busbar",
+       "corrosion",
+       "fretting"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "boundary",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-06-sewer-crown-corrosion",
+   "dev_source": "v2-burned",
+   "device": "concrete sewer trunk with H2S headspace and intermittent flow",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "concrete",
+       "flow",
+       "h2s",
+       "headspace",
+       "intermittent",
+       "sewer",
+       "trunk"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "biogenic",
+       "corrosion",
+       "crown",
+       "sewer",
+       "sulfuric"
+      ],
+      "shared_with_problem_failure": [
+       "biogenic",
+       "corrosion",
+       "crown",
+       "sewer",
+       "sulfuric"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "boundary",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-09-oltc-contact-erosion",
+   "dev_source": "v2-burned",
+   "device": "on-load tap-changer diverter switch in a power transformer, oil-immersed",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "current"
+      ],
+      "problem_constraint": "use only existing OLTC motor-current and vibro-acoustic signatures per operation; warn >=30 days before a failed change; <=1 false alarm per 20 transformers/yr; no new sensors",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "changer",
+       "diverter",
+       "immersed",
+       "load",
+       "oil",
+       "power",
+       "switch",
+       "tap",
+       "transformer"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "contact",
+       "diverter",
+       "erosion",
+       "oltc"
+      ],
+      "shared_with_problem_failure": [
+       "contact",
+       "diverter",
+       "erosion",
+       "oltc"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-10-pump-cavitation-erosion",
+   "dev_source": "v2-burned",
+   "device": "centrifugal charge pump in boiler feed service, variable speed",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "current",
+       "pressure"
+      ],
+      "problem_constraint": "use only existing discharge pressure, vibration and motor current; warn >=14 days before head drops 5%; <=2 false alarms per pump/yr; no new sensors",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "boiler",
+       "centrifugal",
+       "charge",
+       "feed",
+       "pump",
+       "service",
+       "speed",
+       "variable"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "cavitation",
+       "erosion",
+       "pump"
+      ],
+      "shared_with_problem_failure": [
+       "cavitation",
+       "erosion",
+       "pump"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-11-blade-leading-edge-erosion",
+   "dev_source": "v2-burned",
+   "device": "onshore wind-turbine rotor blade composite leading edge in rain/sand",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "coating",
+       "surface"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "blade",
+       "composite",
+       "edge",
+       "leading",
+       "onshore",
+       "rain",
+       "rotor",
+       "sand",
+       "turbine",
+       "wind"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "blade",
+       "edge",
+       "erosion",
+       "leading"
+      ],
+      "shared_with_problem_failure": [
+       "blade",
+       "edge",
+       "erosion",
+       "leading"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-12-crude-preheat-fouling",
+   "dev_source": "v2-burned",
+   "device": "shell-and-tube crude preheat exchanger train in a refinery",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "flow"
+      ],
+      "problem_constraint": "use only existing T/P/flow on both sides; warn >=7 days before duty loss 5%; <=1 false alarm per exchanger/yr; no new sensors",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "crude",
+       "exchanger",
+       "preheat",
+       "refinery",
+       "shell",
+       "train",
+       "tube"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "crude",
+       "fouling",
+       "preheat"
+      ],
+      "shared_with_problem_failure": [
+       "crude",
+       "fouling",
+       "preheat"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-13-rail-wheel-rcf",
+   "dev_source": "v2-burned",
+   "device": "railway vehicle wheel tread under repeated contact stress",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "load"
+      ],
+      "problem_constraint": "use only existing wayside wheel-impact/load detectors and vehicle vibration; warn >=30 days before tread defect grade 3; <=1 false alarm per 100 wheels/yr; no new sensors",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "contact",
+       "railway",
+       "repeated",
+       "stress",
+       "tread",
+       "under",
+       "vehicle",
+       "wheel"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "contact",
+       "fatigue",
+       "rail",
+       "rolling",
+       "wheel"
+      ],
+      "shared_with_problem_failure": [
+       "contact",
+       "fatigue",
+       "rail",
+       "rolling",
+       "wheel"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO2-15-robot-gearbox-wear",
+   "dev_source": "v2-burned",
+   "device": "industrial robot RV/cycloidal speed reducer at a joint",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "current"
+      ],
+      "problem_constraint": "use only existing motor current/torque and encoder; warn >=30 days before path error exceeds spec; <=1 false alarm per 100 robots/yr; no new sensors",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "cycloidal",
+       "industrial",
+       "joint",
+       "reducer",
+       "robot",
+       "speed"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "reducer",
+       "robot",
+       "wear"
+      ],
+      "shared_with_problem_failure": [
+       "reducer",
+       "robot",
+       "wear"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-01-cooling-tower-legionella",
+   "dev_source": "v3-burned",
+   "device": "induced-draft cooling tower serving a hospital chilled-water plant, with film-fill packing and a basin",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "basin",
+       "chilled",
+       "cooling",
+       "draft",
+       "fill",
+       "film",
+       "hospital",
+       "induced",
+       "packing",
+       "plant",
+       "serving",
+       "tower",
+       "water"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "basin",
+       "biofilm",
+       "colonization",
+       "legionella"
+      ],
+      "shared_with_problem_failure": [
+       "basin",
+       "biofilm",
+       "colonization",
+       "legionella"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "boundary",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-02-offshore-riser-internal-corrosion",
+   "dev_source": "v3-burned",
+   "device": "10-inch carbon-steel subsea gas-production riser with water condensation at the dewpoint band, 1200 m water depth",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "section",
+       "wall"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "concentration",
+       "frequency"
+      ],
+      "problem_constraint": "allowed measures: batch corrosion-inhibitor injection at the riser inlet or in-line inspection pigging frequency increase only; no internal coating or lined spool re-placement is permitted because the",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "1200",
+       "band",
+       "carbon",
+       "condensation",
+       "depth",
+       "dewpoint",
+       "gas",
+       "inch",
+       "production",
+       "riser",
+       "steel",
+       "subsea",
+       "water"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-03-vaccine-coldchain-overtemp",
+   "dev_source": "v3-burned",
+   "device": "pharmacy-grade vaccine refrigerator bank (six 400 L cabinets) in a regional distribution hub, with 300 vials of mRNA product",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "300",
+       "400",
+       "bank",
+       "cabinet",
+       "distribution",
+       "grade",
+       "hub",
+       "mrna",
+       "pharmacy",
+       "product",
+       "refrigerator",
+       "regional",
+       "six",
+       "vaccine",
+       "vial"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "defrost",
+       "overtemperature",
+       "recovery"
+      ],
+      "shared_with_problem_failure": [
+       "defrost",
+       "overtemperature",
+       "recovery"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "duty_cycle",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "temperature",
+      "current"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-04-paper-dryer-lint-fire",
+   "dev_source": "v3-burned",
+   "device": "paper-machine dryer section, 40 cylinders, with hood exhaust ducts and a lint accumulation history at the rope-return area",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "layers"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "temperature"
+      ],
+      "problem_constraint": "allowed measures: hood ventilation rebalancing and duct access-door cleaning procedure with IR surface-temperature monitoring only; replacement of dryer cans, ropes, or duct geometry is excluded; clea",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "accumulation",
+       "area",
+       "cylinder",
+       "dryer",
+       "duct",
+       "exhaust",
+       "history",
+       "hood",
+       "lint",
+       "machine",
+       "paper",
+       "return",
+       "rope",
+       "section"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-05-immersion-fluid-degradation",
+   "dev_source": "v3-burned",
+   "device": "single-phase immersion-cooling tank (synthetic ester dielectric) hosting 38 GPU servers, 55 C bulk fluid, 1.2 m deep",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "bulk",
+       "cooling",
+       "deep",
+       "dielectric",
+       "ester",
+       "fluid",
+       "gpu",
+       "hosting",
+       "immersion",
+       "phase",
+       "server",
+       "single",
+       "synthetic",
+       "tank"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "copper",
+       "dissolution",
+       "ester",
+       "fluid",
+       "oxidation"
+      ],
+      "shared_with_problem_failure": [
+       "copper",
+       "dissolution",
+       "ester",
+       "fluid",
+       "oxidation"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "duty_cycle",
+     "principle_id": [
+      35,
+      19,
+      36
+     ],
+     "signals_used": [
+      "temperature",
+      "current"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-06-greenhouse-emitter-clogging",
+   "dev_source": "v3-burned",
+   "device": "drip-irrigation fertigation system over 2.4 hectares of greenhouse tomatoes, with 16 mm laterals and pressure-compensating emitters",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "ph"
+      ],
+      "problem_constraint": "allowed measures: acid-dosing interval retuning (nitric acid, pH floor 5.6) and screen-filter flush automation only; emitter or lateral redesign is excluded; root-growth intrusion must be addressed by",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "compensating",
+       "drip",
+       "emitter",
+       "fertigation",
+       "greenhouse",
+       "hectare",
+       "irrigation",
+       "lateral",
+       "over",
+       "pressure",
+       "system",
+       "tomatoe"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "clogging",
+       "emitter",
+       "precipitate",
+       "root"
+      ],
+      "shared_with_problem_failure": [
+       "clogging",
+       "emitter",
+       "precipitate",
+       "root"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-07-elevator-door-opener-trips",
+   "dev_source": "v3-burned",
+   "device": "traction elevator with a DC door operator and belt-driven door hanger rollers serving 60 openings/day per door",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "current"
+      ],
+      "problem_constraint": "the controller already logs door-motor current per operation and door close-duration; the failure-DEFINING event is the door-timeout trip, so the predictor must trigger on the operator's measured curr",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "belt",
+       "day",
+       "door",
+       "driven",
+       "elevator",
+       "hanger",
+       "opening",
+       "operator",
+       "per",
+       "roller",
+       "serving",
+       "traction"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "belt",
+       "flattening",
+       "hanger",
+       "roller",
+       "slip"
+      ],
+      "shared_with_problem_failure": [
+       "belt",
+       "flattening",
+       "hanger",
+       "roller",
+       "slip"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-08-irrigation-pump-waterhammer",
+   "dev_source": "v3-burned",
+   "device": "centrifugal irrigation pump with a 2.4 km PVC main, check valve at the pump, and air valves at two high points",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "pressure",
+       "strain"
+      ],
+      "problem_constraint": "pressure transducers already log at 10 Hz at the pump header and at high point 2; the failure-DEFINING quantity is the peak pressure transient amplitude at the pump header (the primary indicator); soi",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "air",
+       "centrifugal",
+       "check",
+       "high",
+       "irrigation",
+       "main",
+       "point",
+       "pump",
+       "pvc",
+       "two",
+       "valve"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "fatigue",
+       "joint",
+       "return",
+       "surge"
+      ],
+      "shared_with_problem_failure": [
+       "fatigue",
+       "joint",
+       "return",
+       "surge"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-09-bakery-oven-gasket-degradation",
+   "dev_source": "v3-burned",
+   "device": "rotating-rack bakery oven with a rope door gasket and steam injection, 14 bakes/day",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "temperature"
+      ],
+      "problem_constraint": "the oven controller already records steam-valve duty and cavity-temperature recovery time per bake; the failure-DEFINING symptom is the cavity temperature-recovery time after rack loading (the primary",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "bake",
+       "bakery",
+       "day",
+       "door",
+       "gasket",
+       "injection",
+       "oven",
+       "rack",
+       "rope",
+       "rotating",
+       "steam"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "door",
+       "gasket",
+       "hardening",
+       "leak",
+       "steam"
+      ],
+      "shared_with_problem_failure": [
+       "door",
+       "gasket",
+       "hardening",
+       "leak",
+       "steam"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-10-forklift-watering-events",
+   "dev_source": "v3-burned",
+   "device": "warehouse fleet of 18 lead-acid forklift batteries on opportunity charging with a shared watering cart",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "voltage"
+      ],
+      "problem_constraint": "chargers already log charge amp-hours and end-of-charge voltage per battery, and the watering cart logs fills per battery; the failure-DEFINING quantity is the electrolyte level deficit the fills comp",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "acid",
+       "battery",
+       "cart",
+       "charging",
+       "fleet",
+       "forklift",
+       "lead",
+       "opportunity",
+       "shared",
+       "warehouse",
+       "watering"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "electrolyte",
+       "loss",
+       "plate",
+       "sulfation",
+       "top"
+      ],
+      "shared_with_problem_failure": [
+       "electrolyte",
+       "loss",
+       "plate",
+       "sulfation",
+       "top"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-11-mri-chiller-surge",
+   "dev_source": "v3-burned",
+   "device": "air-cooled screw chiller rejecting heat for an MRI suite, with a variable-speed condenser fan bank and a fixed evaporator flow",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "pressure",
+       "temperature"
+      ],
+      "problem_constraint": "the chiller controller already logs suction pressure, discharge pressure, and condenser fan staging every 10 seconds; the failure-DEFINING precursor is the condenser approach temperature (the primary ",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "air",
+       "bank",
+       "chiller",
+       "condenser",
+       "cooled",
+       "evaporator",
+       "fan",
+       "fixed",
+       "flow",
+       "heat",
+       "mri",
+       "rejecting",
+       "screw",
+       "speed",
+       "suite",
+       "variable"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "ambient",
+       "compressor",
+       "high",
+       "surge"
+      ],
+      "shared_with_problem_failure": [
+       "ambient",
+       "compressor",
+       "high",
+       "surge"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "HO3-12-paver-screed-wear",
+   "dev_source": "v3-burned",
+   "device": "asphalt paver with a vibratory screed plate set paving 1.5 km of arterial road per week",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "frequency"
+      ],
+      "problem_constraint": "the paver logs screed vibration frequency, amplitude, and extension-plate position per shift, and grade control logs mat thickness sensor readings per meter; the failure-DEFINING quantity is the mat t",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "arterial",
+       "asphalt",
+       "paver",
+       "paving",
+       "per",
+       "plate",
+       "road",
+       "screed",
+       "set",
+       "vibratory",
+       "week"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "edge",
+       "plate",
+       "screed",
+       "thinning"
+      ],
+      "shared_with_problem_failure": [
+       "edge",
+       "plate",
+       "screed",
+       "thinning"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "dev_source": "dev12",
+   "device": "valve-regulated lead-acid battery positive plate",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "cross",
+       "section"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "acid",
+       "battery",
+       "lead",
+       "plate",
+       "positive",
+       "regulated",
+       "valve"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "corrosion"
+      ],
+      "shared_with_problem_failure": [
+       "corrosion"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "dev_source": "dev12",
+   "device": "multilayer polymer food packaging film",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "layer"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "humidity"
+      ],
+      "problem_constraint": "hold water vapor transmission rate below 0.5 g/m2/day over 18 months of shelf life at 25 C and 65 percent relative humidity",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "film",
+       "food",
+       "multilayer",
+       "packaging",
+       "polymer"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "dev_source": "dev12",
+   "device": "electric double-layer supercapacitor module in an automotive under-hood 12 V stop-start system",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "voltage"
+      ],
+      "problem_constraint": "keep capacitance loss below 10 percent over a 10-year life at up to 2.7 V rated cell voltage and 65 C maximum ambient, without adding more than 1 mm of module height",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "automotive",
+       "double",
+       "electric",
+       "hood",
+       "layer",
+       "module",
+       "start",
+       "stop",
+       "supercapacitor",
+       "system",
+       "under"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "dryout",
+       "electrolyte"
+      ],
+      "shared_with_problem_failure": [
+       "dryout",
+       "electrolyte"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "dev_source": "dev12",
+   "device": "slip-ring brush assembly of a 1.5 MW generator excitation system running at 1800 rpm",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "1800",
+       "assembly",
+       "brush",
+       "excitation",
+       "generator",
+       "ring",
+       "rpm",
+       "running",
+       "slip",
+       "system"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "contact",
+       "wear"
+      ],
+      "shared_with_problem_failure": [
+       "contact",
+       "wear"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "duty_cycle",
+     "principle_id": [
+      18,
+      1,
+      31
+     ],
+     "signals_used": [
+      "temperature",
+      "current"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "dev_source": "dev12",
+   "device": "water-cooled centrifugal chiller condenser tube bank in a district cooling plant using an open cooling tower loop",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "layer",
+       "tube"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "load",
+       "temperature"
+      ],
+      "problem_constraint": "the predictor must use only BMS points already logged (chilled water supply/return temperature, condenser water supply/return temperature, compressor power, pump speed, outdoor wet-bulb), must resolve",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "bank",
+       "centrifugal",
+       "chiller",
+       "condenser",
+       "cooled",
+       "cooling",
+       "district",
+       "loop",
+       "open",
+       "plant",
+       "tower",
+       "tube",
+       "using",
+       "water"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "dev_source": "dev12",
+   "device": "13-cell series NMC-811 lithium-ion battery module for a 3 kWh stationary-storage cabinet",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "current",
+       "voltage"
+      ],
+      "problem_constraint": "hold maximum cell-to-cell voltage spread below 35 mV at rest across a 10-year calendar life in a module that sees a 15 C top-to-bottom thermal gradient, without increasing the module footprint, and us",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "811",
+       "battery",
+       "cabinet",
+       "cell",
+       "ion",
+       "kwh",
+       "lithium",
+       "module",
+       "nmc",
+       "sery",
+       "stationary",
+       "storage"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "imbalance",
+       "sery"
+      ],
+      "shared_with_problem_failure": [
+       "imbalance",
+       "sery"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "dev_source": "dev12",
+   "device": "oil-filled power transformer (132/33 kV, 40 MVA)",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "current",
+       "load",
+       "pressure",
+       "temperature"
+      ],
+      "problem_constraint": "predictor must infer fault onset from the online sensors already installed (top-oil temperature, load current, ambient temperature, tank pressure) at 15-minute resolution, and must flag a developing f",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "132",
+       "filled",
+       "mva",
+       "oil",
+       "power",
+       "transformer"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "degradation",
+       "insulation"
+      ],
+      "shared_with_problem_failure": [
+       "degradation",
+       "insulation"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "dev_source": "dev12",
+   "device": "anode-supported solid oxide fuel cell stack with a yttria-stabilized zirconia electrolyte and a lanthanum strontium manganite cathode",
+   "plans": [
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "flow",
+       "voltage"
+      ],
+      "problem_constraint": "survive 500 thermal cycles from 25 C to 800 C at 5 C/min heating rate while holding open-circuit voltage above 1.0 V and keeping seal leakage below 1 percent of fuel flow, without increasing stack mas",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "anode",
+       "cathode",
+       "cell",
+       "electrolyte",
+       "fuel",
+       "lanthanum",
+       "manganite",
+       "oxide",
+       "solid",
+       "stabilized",
+       "stack",
+       "strontium",
+       "supported",
+       "yttria",
+       "zirconia"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "cycling",
+       "fatigue",
+       "thermal"
+      ],
+      "shared_with_problem_failure": [
+       "cycling",
+       "fatigue",
+       "thermal"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "dev_source": "dev12",
+   "device": "rolling-element bearing in a 350 kW industrial fan drive",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "350",
+       "bearing",
+       "drive",
+       "element",
+       "fan",
+       "industrial",
+       "rolling"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "bearing",
+       "spalling"
+      ],
+      "shared_with_problem_failure": [
+       "bearing",
+       "spalling"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "configuration",
+     "principle_id": [
+      18,
+      1,
+      31
+     ],
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "dev_source": "dev12",
+   "device": "4.16 kV induction motor driving a boiler feed pump",
+   "plans": [
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "boiler",
+       "driving",
+       "feed",
+       "induction",
+       "motor",
+       "pump"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "insulation",
+       "motor"
+      ],
+      "shared_with_problem_failure": [
+       "insulation",
+       "motor"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    },
+    {
+     "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+     "measure_class": "duty_cycle",
+     "principle_id": [
+      13,
+      29,
+      10
+     ],
+     "signals_used": [
+      "temperature",
+      "current"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "basis": "problem-statement anchor"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "dev_source": "dev12",
+   "device": "shell-and-tube condenser on a steam turbine exhaust, 300 MW unit",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "tube"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "BOUNDARY_CONDITION_CHANGE",
+     "measure_class": "boundary",
+     "principle_id": "P35",
+     "signals_used": [
+      "pressure",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "boundary_terms": [
+       "flow",
+       "pressure",
+       "temperature"
+      ],
+      "problem_constraint": "predictor must use existing temperature and flow measurements only, fire at least 3 weeks before back-pressure hits the derating limit, no requirement for new instrumentation",
+      "basis": "the mechanism was observed under explicit boundary conditions that can be changed to the problem's regime"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "300",
+       "condenser",
+       "exhaust",
+       "shell",
+       "steam",
+       "tube",
+       "turbine",
+       "unit"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    }
+   ]
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "dev_source": "dev12",
+   "device": "laminated elastomeric bridge bearing pad on a 75-year-design-life highway bridge",
+   "plans": [
+    {
+     "operator_id": "GEOMETRIC_TRANSFORMATION",
+     "measure_class": "geometry",
+     "principle_id": "P1",
+     "signals_used": [
+      "visual_inspection",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "geometry_terms": [
+       "layers",
+       "surface"
+      ],
+      "basis": "the mechanism is embodied in a physical structure whose geometry is transformable (>= 1 geometry term)"
+     }
+    },
+    {
+     "operator_id": "DIRECT_TRANSFER",
+     "measure_class": "configuration",
+     "principle_id": "P5",
+     "signals_used": [
+      "flow_rate",
+      "pressure"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "shared_system_terms": [
+       "bearing",
+       "bridge",
+       "design",
+       "elastomeric",
+       "highway",
+       "laminated",
+       "life",
+       "pad",
+       "year"
+      ],
+      "basis": "evidence system-domain overlaps the problem device domain (>= 2 terms)"
+     }
+    },
+    {
+     "operator_id": "FAILURE_PATH_INVERSION",
+     "measure_class": "control",
+     "principle_id": "P22",
+     "signals_used": [
+      "vibration",
+      "temperature"
+     ],
+     "contract_satisfied": true,
+     "contract_state": {
+      "satisfied": true,
+      "failure_mode_terms": [
+       "aging",
+       "bearing",
+       "bridge"
+      ],
+      "shared_with_problem_failure": [
+       "aging",
+       "bearing",
+       "bridge"
+      ],
+      "basis": "the evidence documents a failure pathway that can be inverted into an operating mechanism"
+     }
+    }
+   ]
+  }
+ ]
+}

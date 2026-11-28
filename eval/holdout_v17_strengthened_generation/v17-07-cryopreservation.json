@@ -1,0 +1,142 @@
+{
+ "problem_id": "v17-07-cryopreservation",
+ "domain": "nucleation_phase_change",
+ "question_type": "invention",
+ "executor_id": "builder-r145s1-strengthened-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit",
+ "run": "holdout-v17-strengthened-generation (the SEALED strengthened one-shot: the R146 levers — the EPO conditioning, the hypothesis ranking, the quant generation-time contract)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:f7c1b7c5610f": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:17fbf99a9218": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:ce5025aa23cb": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "nucleation_phase_change",
+   "confidence": 1.0,
+   "evidence_span": "nucleation",
+   "allowed_mech_classes": [
+    "controlled_nucleation_sites",
+    "acoustic_ultrasonic_nucleation",
+    "dissolved_gas_management",
+    "superheat_pressure_path_control",
+    "nucleation_inhibitor_dosing"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "controlled_nucleation_sites",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r146_levers": {
+   "epo_conditioning": true,
+   "hypothesis_ranking": {
+    "n_classes_ranked": 5,
+    "top_class": "controlled_nucleation_sites",
+    "top_transfer_distance": 1,
+    "conventional_first_response": "add insulation or heat to keep the material away from the phase boundary"
+   },
+   "quant_contract": "generation-time (the demand loop)"
+  }
+ },
+ "generated_at": "2026-11-24T08:16:21Z",
+ "attempts_n": 1,
+ "row_wall_s": 9.1,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice for cryopreservation ice nucleation delivers a DESIGN CHANGE via slow, uncontrolled cooling (the \"add insulation or heat to keep the material away from the phase boundary\" response) or via the introduction of cryoprotectants, which modifies the thermodynamic driving force but risks cellular toxicity. My mechanism departs by utilizing **controlled_nucleation_sites** through engineered surface texturing (micro-pinholes or reentrant cavities) on the cooling vessel walls to pin the ice nucleation event at a specific, predicted temperature, replacing the stochastic supercooling burst with a deterministic, spatially localized phase transition. The failure-physics connection is that uncontrolled ice nucleation within the cell suspension volume generates latent heat release that creates thermal shock and mechanical shear from ice crystal growth; pinning the site removes the stochasticity and allows the latent heat to dissipate rapidly into the bulk fluid, keeping the local temperature gradient below the damage threshold.\n\nPHYSICS CHECK\nThe governing relation is the supercooling ΔT required to initiate nucleation. For a bulk liquid, ΔT_bulk = 4σ / (3 L_v r_c), where σ is interfacial energy, L_v is latent heat of fusion, and r_c is critical radius. The standard practice relies on homogeneous nucleation or random heterogeneous sites, leading to large, unpredictable ΔT_bulk (often 5–10 K for water-based solutions). By introducing controlled nucleation sites with a known contact angle θ and radius of curvature r_s, the required supercooling is reduced to ΔT_site = (2σ / (L_v r_s)) (1 - cos θ). \nMagnitude verification: For water at -5°C, homogeneous nucleation may not occur until ~-40°C due to kinetic barriers, but in practice, random dust/heterogeneous sites cause bursts at -10°C to -15°C. Engineering a site with r_s = 10 µm and θ ≈ 60° yields a predicted nucleation onset temperature T_onset ≈ -12°C to -15°C deterministically. The reduction in supercooling depth ΔΔT = T_site - T_stochastic is approximately 3–5 K, which reduces the peak latent heat flux q_peak = ρ L_v (dT/dt) by the same relative factor, mitigating thermal shock.\n\nIMPLEMENTATION BILL\n- **Component:** Micro-structured cooling reservoir walls or vial exterior surfaces.\n- **Material:** Same glass/plastic as standard cryovials, but modified during manufacturing with a laser-etched micro-pinholed array (10-50 µm scale) on the heat-transfer surface.\n- **Procedure:**\n    1. Replace standard smooth-walled vials/reservoirs with micro-pinholed variants.\n    2. Cool the sample at the standard rate (e.g., 1°C/min).\n    3. Monitor temperature. The system will show a sudden temperature rise (latent heat spike) at a specific T_nuc when the pinned sites activate.\n- **Input Streams:**\n    - **ALREADY-RECORDED:** The cooling rate profile (°C/min) and the resulting temperature-time trace are standard outputs of existing cryopreservation protocols and programmable freezers. No new sensors are required; the existing thermometer/thermocouple data already records the latent heat spike.\n    - **DERIVED REFERENCE:** The threshold for \"successful pinning\" is derived from the observed temperature spike in the ALREADY-RECORDED data. If the spike occurs at a single, narrow temperature band (<2 K width) across multiple runs, the mechanism is active. The \"fail\" threshold is a broad, uncontrolled nucleation event (spike >5 K wide or absent spike until deep supercooling), derived from standard statistical variability of homogeneous nucleation.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability:** Same as standard vials; drop-in replacement. No new hardware in the freezer.\n- **Operability:** Identical to standard procedure. The operator does not need to change the cooling schedule; the surface texture does the work.\n- **Maintenance:** Zero additional maintenance. The vials are single-use or standard wash; the micro-structures are permanent.\n- **Cost Class:** Slight increase in vial manufacturing cost (laser etching), but comparable to specialized medical-grade vials. No change in infrastructure cost (freezers, probes).\n- **Conclusion:** SAME burden class (single-use consumable, no infrastructure change), DIFFERENT mechanism (surface pinning vs. passive waiting for random nucleation). The trade-off is a minor increase in vial unit cost for a significant reduction in cellular damage risk from stochastic thermal shock.\n\nEXECUTABLE TEST\n- **Protocol:** Run 10 vials with micro-pinholed walls and 10 vials with smooth walls (control) in a standard programmable freezer at 1°C/min cooling. Record temperature vs. time using existing built-in thermocouples.\n- **Instruments:** Standard cryofreezer with temperature logging (already present).\n- **Pass/Fail Thresholds:**\n    - **Pass:** The micro-pinholed vials exhibit a sharp, reproducible temperature rise (latent heat spike) at T_spike within ±1 K of a predicted value (calculated from site geometry) across 9/10 runs. The control vials show stochastic spike timing/temperature (spread >3 K).\n    - **Fail:** The micro-pinholed vials show no distinct spike, or the spike temperature distribution matches the stochastic control (spread >3 K).\n- **Duration:** One cooling cycle (~4-6 hours from 20°C to -80°C).\n- **Kill Criterion:** The mechanism is falsified if the standard deviation of the nucleation temperature for the treated group is not at least 50% lower than the standard deviation of the control group within a single batch of 10 vials.\n\nCONSTRAINT BIND\nThe monitored indicator is the **nucleation temperature spike** (the temperature rise due to latent heat release) in the temperature-time record. This is the PRIMARY stated indicator of ice formation in cryopreservation. The standard practice's failure is the *stochasticity* of this event; the mechanism's success is defined by the *determinism* (low variance) of this same event. No secondary indicator replaces this; it is the direct physical signature of the phase change. The problem states \"ice nucleation damages cells\"; the spike is the moment of damage. The intervention targets the moment of nucleation.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Component:** Micro-structured cooling reservoir walls or vial exterior surfaces.",
+    "- **Material:** Same glass/plastic as standard cryovials, but modified during manufacturin",
+    "- **Procedure:**",
+    "1. Replace standard smooth-walled vials/reservoirs with micro-pinholed variants.",
+    "2. Cool the sample at the standard rate (e.g., 1°C/min).",
+    "3. Monitor temperature. The system will show a sudden temperature rise (latent heat spike)",
+    "- **Input Streams:**",
+    "- **ALREADY-RECORDED:** The cooling rate profile (°C/min) and the resulting temperature-ti",
+    "- **DERIVED REFERENCE:** The threshold for \"successful pinning\" is derived from the observ",
+    "- **Installability:** Same as standard vials; drop-in replacement. No new hardware in the ",
+    "- **Operability:** Identical to standard procedure. The operator does not need to change t",
+    "- **Maintenance:** Zero additional maintenance. The vials are single-use or standard wash;",
+    "- **Cost Class:** Slight increase in vial manufacturing cost (laser etching), but comparab",
+    "- **Conclusion:** SAME burden class (single-use consumable, no infrastructure change), DIF"
+   ],
+   "APPARATUS_ROW": [
+    "3. Monitor temperature. The system will show a sudden temperature rise (latent heat spike) at a specific T_nuc"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'cooling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [
+    "generic surface pattern present but a mapped mechanism dominates: ['passive insulation as a cure-all']"
+   ],
+   "quant_markers": 2,
+   "mapped_mechanism": "controlled_nucleation_sites",
+   "cross_domain": "pharmaceutical processing"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 50% gain)",
+    "predicted_value": "the measured quantity must reach 1.50x the baseline",
+    "calc_trace": "1 + 0.50 = 1.50",
+    "falsifier": "the measured gain must reach 1.50x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "class-generic:nucleation_phase_change"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "5a60f6343f32d17f"
+}

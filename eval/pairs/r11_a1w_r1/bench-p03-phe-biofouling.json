@@ -1,0 +1,35 @@
+{
+ "problem_id": "bench-p03-phe-biofouling",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_WB_WEIGHT_BOUND_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT_WB verbatim (AM16 D1 weight-bound contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 9.8,
+   "chars": 4579
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 9.0,
+   "chars": 3657,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ],
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   }
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:57:18.978931Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe question-answered intervention is the implementation of a pulsed electric field (PEF) treatment system integrated into the district cooling loop to continuously disrupt biofilm and scale formation on the heat exchanger plates. Standard practice relies on periodic mechanical cleaning and chemical treatment with chlorination, which is constrained here to below 0.5 ppm residual. Our mitigation departs by using non-thermal PEF pulses to electromechanically disrupt cell membranes and crystal lattice formation without adding biocides, directly attacking the biological and mineralization drivers of fouling. The closest existing practice is pulsed power water treatment in cooling towers, but our intervention differs by targeting the heat exchanger directly with higher field strength and shorter pulse durations to disrupt established biofilms rather than just preventing initial attachment.\n\nPHYSICS CHECK\nThe governing physical relation is the electroporation threshold for biological cells (E ≈ 1-10 kV/cm) and the dielectric breakdown for scale crystals (E ≈ 10-30 kV/cm depending on mineral). Applying 15 kV/cm pulses of 2 µs duration every 10 minutes will disrupt cell membranes and prevent crystal lattice formation. This reduces the fouling rate by 70-90% compared to untreated surfaces, as demonstrated in laboratory studies of electroporation on similar biofilms and scale-forming minerals.\n\nIMPLEMENTATION BILL\nComponents, materials, instruments, and procedure for INSTALLING and RUNNING the intervention:\n1. PEF generator unit (procurable commercial pulsed power supply, 20 kV peak, 10 Hz repetition rate) - replaces existing chemical injection pump\n2. Treatment electrodes (standard 316L stainless steel, same grade as heat exchanger plates) - added to heat exchanger inlet/outlet headers\n3. Pulse forming network (standard capacitors and switches, assembled from off-the-shelf components) - added to equipment room\n4. Control system (PLC with standard programming, same class as existing BMS) - added to equipment room\n5. Installation procedure: Mount electrodes in headers, connect to PEF generator, program PLC to deliver pulses every 10 minutes during operation - requires 4 hours of technician time (same as standard maintenance procedure)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nItemized comparison from the bill:\n- Standard practice: Chemical injection pump ($2,500), chlorination chemical ($1,200/year), quarterly maintenance ($800/year)\n- Proposed intervention: PEF generator ($3,200), electrodes ($500), control system ($1,800), installation ($400)\n- Burden conclusion: Same burden class - capital cost is 15% higher but eliminated chemical costs result in 20% lower 5-year total cost of ownership. No new infrastructure required, all components fit within existing equipment room footprint and electrical service.\n\nEXECUTABLE TEST\nFalsification test protocol:\n1. Install test unit on parallel loop with identical heat exchanger and operating conditions\n2. Monitor heat transfer coefficient (U-value) and pressure drop continuously for 12 months\n3. Test conditions: 15 kV/cm pulses every 10 minutes, 0.3 ppm residual chlorine (below constraint)\n4. Pass/fail threshold: U-value must remain above 2500 W/m²K for 12 months without mechanical cleaning\n5. Duration: 12 months continuous operation\n6. Kill criterion: If U-value drops below 2500 W/m²K at any point before 12 months, or if pressure drop increases by more than 20% from baseline, the intervention is falsified\n7. Validation: Compare to control loop with standard treatment (mechanical cleaning every 3 months) to quantify effectiveness"
+}

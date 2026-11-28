@@ -1,0 +1,18 @@
+**Mitigation Proposal: Closed-Loop Power-Limited Crush Adjustment**
+
+**Mechanism:**
+The coarsened product and high power per tonne indicate that the crusher is operating in a "choking" state or with a closed side setting (CSS) that is too wide, causing excessive recirculating load (coarse fraction returning) and inefficient energy transfer. The mitigation uses the **existing motor power meter** as a direct proxy for crusher load and efficiency. By correlating the power draw per tonne of feed (a calculated metric using the existing feed and discharge scales) against a target baseline established at the last liner change, an automated control loop can dynamically adjust the hydraulic pressure or CSS limit to minimize specific energy consumption, thereby narrowing the CSS and reducing the coarse fraction returning to the crusher.
+
+**Implementation:**
+1.  **Calculate Specific Energy (SE):** The control system continuously calculates SE in kWh/tonne using real-time data from the **motor power meter** (integrating power over time) and the **discharge-belt scale** (measuring throughput). The feed-rate scale provides context for total mass balance but discharge is the primary output metric for SE.
+2.  **Establish Baseline:** Retrieve the historical SE value from the last liner change, when the crusher was known to be efficient and product size was optimal. Set this value as the target threshold ($SE_{target}$).
+3.  **Control Logic:**
+    *   If current $SE > SE_{target}$ (indicating inefficient operation/coarse product), the controller increases the hydraulic pressure setpoint for the cone crusher’s hydraulic system. This action narrows the effective CSS, forcing a tighter crush and reducing the coarse fraction that bypasses the crushing chamber.
+    *   If $SE < SE_{target}$ (indicating the crusher is "starved" or operating too tight), the controller decreases the hydraulic pressure to widen the CSS, preventing excessive power draw and mechanical stress.
+    *   The adjustment rate is limited to prevent oscillation.
+
+**Measures Relied Upon:**
+*   **Motor Power Meter:** Provides real-time instantaneous power and integrates it for energy calculation. The rise in power per tonne is the key indicator of coarse recirculation and inefficiency.
+*   **Discharge-Belt Scale:** Provides the mass flow rate of the crushed product, essential for calculating "per tonne" metrics.
+*   **Feed-Rate Scale:** Used for cross-checking mass balance and ensuring the discharge scale reading is consistent with total input, helping to distinguish between throughput changes and actual efficiency changes.
+*   **Existing Hydraulic Controls:** The implementation assumes the crusher’s hydraulic system (which controls CSS) is accessible and modifiable via the existing control system (PLC/DCS) without new hardware, only reprogramming the setpoint logic based on the calculated SE.

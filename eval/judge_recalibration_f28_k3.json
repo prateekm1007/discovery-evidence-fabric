@@ -1,0 +1,725 @@
+{
+ "record": "JUDGE_RECALIBRATION_F28_K3_R11/1.0.0",
+ "at": "2026-11-15T06:24:55.007582+00:00",
+ "judge": [
+  "crowllm",
+  "qwen-3.8-max:free"
+ ],
+ "method": "k=3 independent draws per pair (the free rung is non-deterministic across sessions \u2014 same v2 prompt scored kappa 0.556 then 0.412 on two runs 30 min apart; single-draw kappa at n=10 measures draw noise, not the prompt), majority vote on prefer, per-axis median; every draw recorded",
+ "axis_suffix": "\n\n\n=== PER-AXIS SCORING CONTRACT (required) ===\nScore EACH answer on four axes, 1 (poor) to 5 (excellent), as integer\nkeys in the SAME single JSON object:\n  \"N_A\",\"F_A\",\"T_A\",\"C_A\" (answer A) and \"N_B\",\"F_B\",\"T_B\",\"C_B\"\n  (answer B).\nAxis definitions (calibrated, apply them exactly):\n  novelty (N): how far the CORE MECHANISM departs from the\n    field-standard, textbook practice for this problem class. A\n    restatement of the standard practice (the conventional device,\n    procedure, or monitoring approach used across the industry) scores\n    1-2 REGARDLESS of how specific or well-written it is; a standard\n    approach with one non-obvious twist scores 3; a different\n    mechanism from the standard one scores 4-5. Judge the MECHANISM,\n    not the writing quality.\n  feasibility (F): whether the proposed change could actually be\n    built/procured/implemented and serve as specified using existing\n    engineering means and components. Novelty itself does NOT lower\n    feasibility: score what the answer STATES (means, components,\n    magnitudes, procedure), not how similar it is to standard\n    practice. A novel but fully specified implementable design scores\n    4-5; an answer with vague or physically implausible means scores\n    1-2.\n  testability (T): is the falsification test concrete and capable of\n    killing the proposal (specific protocol, measurable thresholds)\n    \u2014 5 = pass/fail protocol with numbers; 1 = vague or none.\n  constraint_compliance (C): does the answer respect every stated\n    user constraint verbatim (5 = all explicitly respected; 1 =\n    violated or ignored).\nYour response is ONE JSON object with the rubric keys, the eight axis\nkeys, and \"prefer\". No other text.\n",
+ "acceptance": "kappa >= 0.6; novelty sign >= 0.8; bench-p02 novelty direction correct",
+ "rows": [
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 3,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 1,
+   "judge_nd": 2
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 5,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 3
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 5,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 3
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 5,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 3
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 5,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 2,
+    "T_B": 4,
+    "C_B": 3
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 2,
+   "judge_nd": 3
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 3,
+      "T_B": 5,
+      "C_B": 2
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 3,
+      "T_B": 5,
+      "C_B": 2
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 3,
+      "T_B": 5,
+      "C_B": 2
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 3,
+    "T_B": 5,
+    "C_B": 2
+   },
+   "auditor_pref": "tie",
+   "auditor_nd": 1,
+   "judge_nd": 2
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 4,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 2,
+   "judge_nd": 4
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 4
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 4
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 4
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 3,
+    "F_A": 3,
+    "T_A": 4,
+    "C_A": 5,
+    "N_B": 3,
+    "F_B": 2,
+    "T_B": 4,
+    "C_B": 4
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 0,
+   "judge_nd": 0
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 2,
+      "T_A": 2,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 2,
+      "T_A": 2,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 2,
+      "T_A": 2,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 5
+     },
+     "prefer": "B"
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 3,
+    "F_A": 2,
+    "T_A": 2,
+    "C_A": 5,
+    "N_B": 3,
+    "F_B": 2,
+    "T_B": 3,
+    "C_B": 5
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 1,
+   "judge_nd": 0
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 3,
+      "C_A": 4,
+      "N_B": 4,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 3,
+      "C_A": 4,
+      "N_B": 4,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 3,
+      "C_A": 4,
+      "N_B": 4,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 3,
+    "T_A": 3,
+    "C_A": 4,
+    "N_B": 4,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "auditor_pref": "baseline",
+   "auditor_nd": -1,
+   "judge_nd": -2
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 2,
+      "C_A": 3,
+      "N_B": 3,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 2,
+      "C_A": 3,
+      "N_B": 3,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 2,
+      "C_A": 3,
+      "N_B": 3,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 3,
+    "T_A": 2,
+    "C_A": 3,
+    "N_B": 3,
+    "F_B": 4,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "auditor_pref": "baseline",
+   "auditor_nd": 0,
+   "judge_nd": -1
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 5,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 5,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 5,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 5,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 3,
+    "F_B": 3,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 1,
+   "judge_nd": 1
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 2,
+    "T_B": 4,
+    "C_B": 2
+   },
+   "auditor_pref": "a1",
+   "auditor_nd": 1,
+   "judge_nd": 2
+  }
+ ],
+ "stats": {
+  "n_valid": 10,
+  "preference_agreement": 0.8,
+  "kappa": 0.556,
+  "novelty_sign_agreement": 0.9,
+  "bench_p02_direction": "CORRECT",
+  "bench_p02_judge_nd": 2,
+  "bench_p02_median_F_A": 2
+ },
+ "accepted": false,
+ "residual_analysis": {
+  "binding_disagreements": [
+   {
+    "pair": "eval-new01-supercap-dryout",
+    "judge": "baseline (3/3 unanimous)",
+    "auditor": "a1",
+    "shape": "systematic value difference: the judge weights the baseline's operational familiarity over A1's novelty; the auditor weights novelty. Not draw noise (3/3 unanimous twice).",
+    "disposition": "typed for AUDITOR adjudication (Art. XXVI) \u2014 this is a preference-weighting difference, not a prompt defect"
+   },
+   {
+    "pair": "dev-fu-001-bearing-spalling",
+    "judge": "a1 (3/3 unanimous)",
+    "auditor": "tie",
+    "shape": "the judge forces A/B where the auditor sees parity",
+    "disposition": "typed for AUDITOR adjudication"
+   }
+  ],
+  "verdict": "k=3 majority stabilizes the judge (all 10 pairs unanimous 3/3; novelty sign agreement 0.9 >= 0.8; bench-p02 direction CORRECT \u2014 the F28 headline defect fixed). kappa 0.556 < 0.6 remains, carried ENTIRELY by the two systematic value differences above \u2014 further prompt iteration does not move them (v3 TIE guidance measured, no help; v4 testability anchor measured, no help; run-to-run single-draw noise was the earlier confound, now stabilized). Honest state: prompt recalibration delivered what it can; the residual is a rater-value difference the auditor owns (Art. XXVI).",
+  "runs_measured": [
+   {
+    "run": "single-draw v2 (run A)",
+    "kappa": 0.556,
+    "sign": 0.8,
+    "bench_p02": "CORRECT",
+    "n_valid": 10
+   },
+   {
+    "run": "single-draw v2 (run B, 30 min later)",
+    "kappa": 0.412,
+    "sign": 0.8,
+    "bench_p02": "FLAT (TIE)",
+    "n_valid": 10
+   },
+   {
+    "run": "single-draw v3 (TIE guidance)",
+    "kappa": 0.538,
+    "sign": 0.778,
+    "bench_p02": "CORRECT",
+    "n_valid": 9
+   },
+   {
+    "run": "single-draw v2+v4 anchor (run B)",
+    "kappa": 0.25,
+    "sign": 0.778,
+    "bench_p02": "CORRECT (nd 0)",
+    "n_valid": 9
+   },
+   {
+    "run": "k=3 majority v2",
+    "kappa": 0.556,
+    "sign": 0.9,
+    "bench_p02": "CORRECT (nd 2)",
+    "n_valid": 10,
+    "unanimous": "10/10 pairs 3/3"
+   }
+  ],
+  "prompt_iterations_measured": [
+   "v2 (anchors)",
+   "v3 (+TIE guidance)",
+   "v4 (+testability anchor)"
+  ]
+ }
+}

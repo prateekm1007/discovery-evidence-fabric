@@ -1,0 +1,56 @@
+{
+ "record": "R108S1_D7D8_D4SOURCE_RECON/1.0.0",
+ "session": "builder-r108s1",
+ "claim": "c-0132 (read-only recon riding the verifier claim; the c-0127 pre-claim recon precedent — public metadata only, zero dataset-byte downloads beyond a 16-byte zip-magic probe, zero quota, zero LLM)",
+ "ran_at": "2026-11-20T05:50:00Z (sandbox clock, TRUE UTC)",
+ "why": "the auditor directions D7/D8/D4 remain unexecuted (the executor claims c-0129/c-0130 hold live leases until 2026-11-22/23 and the claiming session builder-r105s2 is dead — takeover is CI-gated on lease death); this recon sizes every path so the takeover windows execute without re-derivation",
+ "token_custody": "all HF reads via the R108-delivered token (.env.keys 0600, digest-only b5aaf542b2fd; public-read scope re-confirmed)",
+ "disk_budget": {
+  "free_rootfs": "5.9G of 9.9G (df at recon time)",
+  "sequencing_constraint": "D7 extraction (~1.5G typed target) + D8 stack (torch CPU ~1.5-2G + Sundial 513.3MB + C-MAPSS 12.4MB) DO NOT both fit with headroom — the takeover window must sequence: D7 extract -> measure -> clean cache, then D8 install -> measure; or D8 first (typed in the takeover plan)"
+ },
+ "D7_datasets": {
+  "mirror_search": "HfApi().list_datasets(search=...) per the auditor direction, queries xjtu/femto/ims/pronostia/bearing, limit 12-14 each; the auditable raw lists are in the takeover plan",
+  "xjtu_sy_primary": {
+   "mirror": "DavidNguyen/XJTU-SY_Bearing_Datasets (dl=4967)",
+   "root_zip": "XJTU-SY_Bearing_Datasets.zip 5,447,931,446 bytes, ETag \"cc883d5d0d940a64afc5eb04e768c556282303d730271c308bfc1740bf9b39df\", Accept-Ranges: bytes, HTTP 206 verified on a 16-byte magic probe (PK\\x03\\x04)",
+   "data_folder": "the 6 RAR5 parts (744.5MB x5 + 722.2MB x1) whose sha256s MATCH the committed manifest eval/p3_realdata/xjtu_sy_parts_manifest.txt — this mirror IS the prior session's source; the RAR5 path stays blocked (unrar-free 0.3.1 only; no 7zz/7z/unar in the sandbox)",
+   "selective_extraction_design": "the ZIP path REPLACES the RAR5 need: range-fetch the EOCD + central directory from the zip tail, parse member offsets/sizes, range-fetch ONLY the typed bearing-subset member spans, inflate locally — no 4.4GB RAR set, no 5.4GB full download; the typed subset target is ~1.5G of CSVs (bearings with n>=192 files for the CTX=96 protocol floor, across the 3 operating conditions)",
+   "citation": "B. Wang, Y. Lei, N. Li, N. Li, IEEE Trans. Reliability 69(1):401-412, 2020, DOI 10.1109/TR.2018.2882682 (the committed stage-1 provenance)"
+  },
+  "femto_secondary": {
+   "mirror": "odysseywt/FEMTO: FEMTO.csv 1,305.0MB, MIT (the PRONOSTIA conversion); Amgharr/FEMTO-ST_DATASET = PRE-EXTRACTED features (465.8+956.8+839.3MB parquet, someone's model features, NOT raw vibrations — typed unusable for the raw conformal leg)",
+   "note": "the auditor's 'FEMTO-ST/PRONOSTIA or NASA IMS' fallback: FEMTO fits via the MIT mirror; odysseywt/XJTU XJTU.csv (11,741.3MB single CSV) is disk-infeasible; NO IMS bearing mirror found on HF (the 'ims' search returns IMSLP/imsdb noise) — the auditor's 'search for mirrors first' instruction executed with typed negatives"
+  },
+  "extractor_fallback": "7-Zip via GitHub releases ip7z/7zip (reachable, 200) if the zip-range path fails at execution; www.7-zip.org resolves (404 on the guessed filename — host alive)"
+ },
+ "D8_sundial_arm": {
+  "model": "thuml/sundial-base-128m (downloads 41697)",
+  "license": "apache-2.0 (tag + cardData, byte-read)",
+  "files": "model.safetensors 513.3MB + custom code (configuration_sundial.py, modeling_sundial.py, ts_generation_mixin.py, flow_loss.py, config.json, generation_config.json) — requires trust_remote_code=True; library_name transformers; pipeline_tag time-series-forecasting; trained on thuml/UTSD + Salesforce/lotsa_data + autogluon/chronos_datasets (cardData)",
+  "protocol_anchor": "the committed stage-3 protocol (eval/r105s2_p3_stage3_record.json): ONE-step TRUE-history walk, CTX=96, split conformal alpha=0.10, sliding K=100 causal residuals fit-half-primed, N_CONSEC=3 alarm rule, n>=192 floor, FD001 ALL-100 ch14 / FD002 40-units-seed-17 ch1; the matched-budget baseline = the COMMITTED Chronos-Bolt/TimeMoE bytes (no re-run of Bolt — Art. 29(c) recompute-not-rerun applies to committed baselines); Sundial runs the same protocol and the table declares winner/typed-tie",
+  "stack_gap": "torch/transformers are NOT installed in this reprovision (the prior env was lost); CPU torch install ~1.5-2G — fits only sequenced (see disk_budget); C-MAPSS source re-verified reachable: phm-datasets S3 zip HTTP 200, Content-Length 12,429,152 (sha16 anchor c9c5dec12a945a82 from the committed stage-1 provenance)",
+  "timer_xl": "the auditor's long-context OPTION — typed secondary; Sundial is the primary arm"
+ },
+ "D4_source_matrix": {
+  "dead_ends_typed": [
+   "baber/uspto_raw: created 2024-03-12, lastModified 2024-03-13 (a 2024-03 snapshot); max B* grant date seen in dense windows: 2023-10-31; the datasets-server /filter endpoint 500s (no where-index) — the mirror CANNOT supply post-cutoff items (the claims leg stays the capability leg it was typed as)",
+   "all HF USPTO mirrors searched: freshest = 2023-11 (ufukhaman/uspto_balanced_200k); none carry 2025+ grants",
+   "bulkdata.uspto.gov: http 000 (egress-blocked, tested twice incl. browser UA); search.patentsview.org: http 000; worldwide.espacenet.com: 403"
+  ],
+  "reachable_typed": [
+   "data.epo.org/linked-data: 200 (bibliographic + abstract only — no claims; insufficient alone for the claims leg)",
+   "api.crossref.org: 200 with from-pub-date filters",
+   "export.arxiv.org/api/query: 200",
+   "api.semanticscholar.org: 429 rate-limited but reachable",
+   "www.wipo.int: 302 (reachable)"
+  ],
+  "post_cutoff_bound": "per VF-6 (the c-0132 verifier record): corpus items must be dated STRICTLY AFTER 2025-09-29 (the first demonstrated post-knowledge failure), NOT after the committed rule's 2025-05-07; the 2026 window (all-honest-unknown battery rows) is the strongest bound",
+  "options_for_takeover": {
+   "OPTION-A_patent_leg": "a reachable 2026 patent-claims source (retest the blocked hosts at execution time; claims = ground truth, NO distillation needed; the engine patent_claim_extract.py already exists)",
+   "OPTION-B_paper_leg": "arXiv papers published strictly after 2025-09-29 + the MOOSE-Chem2-style distillation via agnes-3.0-flash (CREDENTIAL-GATED: AGNES absent, vault locked; the one master reminder covers it)",
+   "both_gated": "the D4 rebuild + rerun are DOUBLY gated (source + credentials) from this sandbox; the takeover window re-tests sources first, then executes whichever option is unblocked"
+  }
+ },
+ "no_acceptance_claims": true
+}

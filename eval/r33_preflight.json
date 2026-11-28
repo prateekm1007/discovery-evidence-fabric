@@ -1,0 +1,57 @@
+{
+ "record": "R33_PREFLIGHT/1.0.0",
+ "session": "builder-r20s1",
+ "at": "2026-11-16T11:12:48Z",
+ "responds_to": "AM31 verdict (audit tip 622450281) directions D1-D4",
+ "f47_read_order_fix": {
+  "constitution_source": "builder branch queue/dev12_r7 (working tree), NOT the audit-branch copy",
+  "audited_base_tip": "8e8e1b635",
+  "working_tip": "HEAD (see git log; custody commit on top of 7cff10559)",
+  "version": "v3.1.0 (owner-directed enforcement refactor; supersedes v2.12.0)",
+  "bytes_measured": 17514,
+  "constitution_sha256_16": "d6e535f4f842bcaa",
+  "articles_read_this_round": [
+   "1 Evidence & provenance",
+   "3 Fail closed",
+   "8 Unknown & commercial honesty",
+   "12 Stage calibration & falsification",
+   "17 Secrets & credential custody",
+   "27 Capability budget",
+   "28 Owner-dependency timeout",
+   "29 Parallel builders (claim/execute/verify)"
+  ],
+  "byte_note": "measured 17514 bytes at 8e8e1b635, ad0432bbd, 7cff10559, and HEAD (identical) — the AM31 record states 17418; the 96-byte delta is a typed observation on the verdict record, the builder bytes are unchanged since the audited tip || CORRECTED (R34, D5, Art. 4): the constitution is ONE identical blob (e79f9176b806c091bfff7b4fa95dc5d11d5e4ead) at 8e8e1b635/ad0432bbd/7cff10559/e401bb2ad/HEAD. Measured at the audited SHA e401bb2ad: 17,418 CHARACTERS (wc -m) and 17,514 BYTES (wc -c). AM31/AM32's 17,418 figure is the character count; the builder's earlier '17,514 bytes' was the byte count of the same blob. There is no byte delta — the 96-unit discrepancy was a units mismatch (multibyte UTF-8), typed as a units observation, not a content change.",
+  "am30_citation": "confirmed correct per AM31 — the audit-branch 127701-byte v2.x copy was NOT used"
+ },
+ "f45_position": {
+  "leak_commits_verified": [
+   "f90fc7d9f (2026-08-18, PatSnap key sk-lcQO3l...bwZ7 in message body)",
+   "76c23fef7 (2026-08-18, OpenRouter key sk-or-v1-897ac0...6679 in message body)"
+  ],
+  "scan": "full commit-message history of queue+main: exactly 2 key-like strings (the two leak commits); no further hits",
+  "remedy": "owner-side rotation (F45); NO history rewrite performed (AM31 direction 5); neither key used from history",
+  "owner_action": "rotate both keys (one line, per AM31 owner-action framing)"
+ },
+ "custody_state": {
+  "vault_rows": [
+   "nvidia (verified, masked surface)",
+   "github PAT (verified, masked surface; authenticated as prateekm1007)"
+  ],
+  "env_keys_gitignored": [
+   ".env (my-project)",
+   ".env.keys (fabric worktree)"
+  ],
+  "secret_grep_staged_diff": "0 findings (no credential bytes in any commit this round)"
+ },
+ "d1_state": {
+  "claim": "c-0034 pushed before any problem read (72cdf4ca8); lease to 2026-11-17T02:00:00Z",
+  "packet": "extracted from audit tip 622450281 AFTER claim push; custody commit with sha256 11b46c6fc4e73082...",
+  "run": "r33_holdout_v5_oneshot.py launched 11:09Z; rows commit as produced; primary z.ai gateway 401/500 this container -> amended NVIDIA chain per c-0031 amendments #2/#3 (typed per-attempt disclosures)"
+ },
+ "d2_state": {
+  "judge_route": "registry pin CONFIRMED at crowllm.com/v1/chat/completions + CROWLLM_API_KEY + deepseek-v4-flash:free (llm_registry.py ProviderSpec)",
+  "credential": "CROWLLM_API_KEY lost in the R32 vault wipe (record holds fingerprint 2ed1295edb9abc3e prefix-only); NOT recoverable from committed bytes (history message scan: exactly 2 keys, both F45 leaks; blob scan clean)",
+  "operator_request": "ONE credential window requested: re-supply CROWLLM_API_KEY (Art. 17 lookup, never re-ask honored — this is the typed reminder the operator asked for); recalibration runs in the window it arrives"
+ },
+ "byte_count_correction_r34": "CORRECTED (R34, D5, Art. 4): the constitution is ONE identical blob (e79f9176b806c091bfff7b4fa95dc5d11d5e4ead) at 8e8e1b635/ad0432bbd/7cff10559/e401bb2ad/HEAD. Measured at the audited SHA e401bb2ad: 17,418 CHARACTERS (wc -m) and 17,514 BYTES (wc -c). AM31/AM32's 17,418 figure is the character count; the builder's earlier '17,514 bytes' was the byte count of the same blob. There is no byte delta — the 96-unit discrepancy was a units mismatch (multibyte UTF-8), typed as a units observation, not a content change."
+}

@@ -1,0 +1,43 @@
+{
+ "record": "R136_VERIFIER_RECORD/1.0.0",
+ "role": "VERIFIER (Art. 29(b)/(c))",
+ "session": "builder-r134s2",
+ "work_id": "r136-verifier-c0216",
+ "at": "2026-11-23 (sandbox clock)",
+ "claim_verified": "c-0216 (builder-r121s1-3e8a41d7, r136-panel-v2-instrument-fixes, base 1613e109a, tip 2d1170f06)",
+ "coordination": "the twin's artifact_paths pre-declare eval/r136_verifier_record.json — this record lands in that pre-declared slot; no new claim registered, no registry writes, c-0214 (this session's OPEN resume claim) UNTOUCHED and typed subsumed below",
+ "verification_scope": "the audit's three code claims independently re-verified by inspection from committed bytes at queue tip 2d1170f06 + the twin's prereg consistency + the duplicate-patch disposition",
+ "audit_claim_a_constraint_blind": {
+  "verdict": "CONFIRMED by inspection",
+  "evidence": "discovery_fabric/engine/blind_panel.py build_pair_prompt (line 492): the problem-facts block appends DEVICE, FAILURE, USER'S QUESTION and — only when present — USER'S CLARIFICATION; the problem's constraint field is NEVER read by the function (no problem.get('constraint') anywhere in the prompt path)",
+  "the_blindness": "discovery_fabric/engine/prompts.py: the C-axis rubric line reads 'constraint_compliance: does the answer respect every stated user constraint verbatim (5 = all constraints explicitly respected; 1 = constraint violated or ignored)' and the JSON contract carries C_A/C_B — the judge scores a criterion whose deciding information is withheld",
+  "consequence": "the twin's v2 arm (ONE constraint line in the problem-facts block) gives the judge the same information the labeler had; v1 stays the byte-untouched baseline arm"
+ },
+ "audit_claim_b_art27_double_count": {
+  "verdict": "CONFIRMED by inspection; numeric recompute filed separately (work id r136s2-share-reconcile)",
+  "evidence": "tests/test_article27_capability_budget.py: CODE_PATHS = [engine/, scripts/, tests/, requirements.txt] (line ~173); _diff_numstat(base, CODE_PATHS) returns ca,cb ALREADY including engine; the old formula tot = ea+eb+ca+cb (line ~223) therefore counts engine twice and share = (ea+eb)/tot understates the true engine share",
+  "corrected_formula": "share = (ea+eb)/(ca+cb) — engine once; the twin's corrected shares (R133 57.6%, R134 23.3%, R135 17.5%) are independently reproduced from the diffs in eval/r136s2_share_reconciliation.json"
+ },
+ "audit_claim_c_rcal_denominator": {
+  "verdict": "CONFIRMED by inspection",
+  "evidence": "discovery_fabric/engine/panel_agreement.py rcal_qualification (line 355): n = len(legs) — the legs PRESENT in the judge_rows dict; answered = len(valid)/n (line 377); a judge record that is missing legs is scored on the legs that showed up, so missing legs can never fail the 0.9 answered bar",
+  "consequence": "the twin's denominator fix (EXPECTED legs) + the >=2-qualified guard + the partial-run fixture are the correct instrument repair; the v2 run must score answered_rate against the frozen expected-leg count"
+ },
+ "prereg_consistency": {
+  "corpus": "the frozen 10 r5 pairs with the auditor's forced-choice labels at 009ce91a85bd (eval/auditor_judgments_r11_r5.json) — byte-verified present on the audit branch; labels UNTOUCHED by this lane",
+  "gates": "per-judge acc>=0.8 AND answered>=0.9 (fixed denominator), panel >=3 qualified from >=2 non-agnes families, agreement>=0.7, kappa>=0.6, AUC>=0.8 — UNCHANGED from the standing bar; no bar lowering, no label tuning (dev-fu-001 GROUNDED stands)",
+  "arms": "v1 byte-untouched baseline; v2 = the one constraint line — matches the audit's own framing ('judges are not shown the information that decides those items')"
+ },
+ "duplicate_patch_disposition": {
+  "typed_finding": "this session produced four duplicate patches in the prior window (the constraint-line fix, the denominator guard, the Art. 27 formula fix, the streaming/JSON-record work) and pushed NOTHING (no GitHub credential was wired; under Art. 29(b) the lane was a VERIFIER's)",
+  "custody_status": "NOT RECOVERABLE: the sandbox recycle reverted the workspace to an R64s4-era local HEAD (bfaab8511) with a CLEAN tree — git status shows no modifications, git stash is empty, the reflog carries only the R64s4 lineage plus this session's reset to tip 2d1170f06; the four patch surfaces exist nowhere in the workspace (searched for r136/panel/art27/denominator filenames and *.patch/*.diff artifacts)",
+  "verdict": "zero duplicate implementation commits exist on the queue (the twin's implementation is itself still pending — tip 2d1170f06 is the prereg) and this lane authors NONE: the four fix intents map 1:1 onto c-0216's prereg (the one constraint line; the expected-legs denominator + >=2-qualified guard + partial-run fixture; the Art. 27 corrected formula + diff recompute; SSE streaming on the 504-class legs + the JSON-only record); this session stays VERIFIER for the instrument and runs only its own work ids (credential restore, this record, the label freeze, the share reconciliation, the F31e replication)",
+  "delete_disposition": "the duplicate patch series is already deleted de facto (nothing survives to delete); the deletion is typed here rather than performed"
+ },
+ "c0214_disposition": {
+  "claim": "c-0214 (r134s2-panel-resume, this session's prior window, OPEN, lease 2026-11-29)",
+  "typed_status": "SUBSUMED, registry untouched: the twin's c-0216 prereg covers the same missing legs ('the 504/missing legs from R134 retried under streaming FIRST' + byte-resume); this session executes no duplicate legs; the OPEN claim is left for the twin's run to consume rather than edited during the twin's open window — the coordination note lives in this record"
+ },
+ "check_run_discipline": "this record's push quotes its own check-run id + conclusion in eval/r136s2_status.json; one push per work_id",
+ "no_score_claims": true
+}

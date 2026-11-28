@@ -1,0 +1,136 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new04-chiller-fouling-predictor",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '37f97d8c956ec53f46a25472e9db756ecc18f15710ae86202daf719988ecb90d', 'baseline_answer_sha256': '91beb0db7e7c98ec9ac5d599b9ed36d7eb9bf22cc2becda5e1e6bd3a5b34852f', 'evidence_sha256': '2bef717a65f253e494ec07979a7fe1746926e2abc4b25a802b0072403e0b3cda', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 30,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "repair_mode": {
+  "mode": "LEAD_PRESERVING_REPAIR",
+  "article": "Amendment 2 owner directive 2026-11-14 P0-1; Art. LXXXIV (re-ideate only on starvation), Art. LI (ledger consumption rides the record)",
+  "candidate_source": "R2 incumbent (frozen; repaired in place per Amendment 2 P0-1)",
+  "candidate_frozen": {
+   "lever": "operations",
+   "name": "Predictive Cleaning via Machine Learning Fouling Index",
+   "mechanism": "ML model predicts fouling state from BMS data (chilled water \u0394T, condenser \u0394P, outdoor WB) and triggers cleaning.",
+   "failure_link": "Replaces fixed schedule with data-driven triggers, reducing energy waste from over-cleaning or under-cleaning."
+  },
+  "critic_findings": {
+   "verdict": "PASS",
+   "kills": [],
+   "flags": [],
+   "basis": []
+  },
+  "repair_directives": [
+   "fix exactly the listed findings IN PLACE; every aspect not named stays byte-stable"
+  ],
+  "prior_findings": [
+   "condenser \u0394P is NOT in the BMS point list the constraint enumerates (chilled/condenser water temps, compressor power, pump speed, outdoor wet-bulb) (auditor R2)",
+   "'user-approved' was fabricated \u2014 no such user statement exists (auditor R2)"
+  ],
+  "byte_stability_rule": "everything not named by a finding stays as-is; every edit carries a diff + finding reference",
+  "class_defect_checks": {
+   "verdict": "CLEAN",
+   "kills": [],
+   "flags": []
+  }
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "operations",
+    "name": "Predictive Cleaning via Machine Learning Fouling Index"
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "learning_feed": {
+  "article": "Art. LI \u2014 negative knowledge changes future search",
+  "prior_killed_classes": [],
+  "consumed": false
+ },
+ "chosen": {
+  "lever": "operations",
+  "name": "Predictive Cleaning via Machine Learning Fouling Index",
+  "mechanism": "ML model predicts fouling state from BMS data (chilled water \u0394T, condenser \u0394P, outdoor WB) and triggers cleaning.",
+  "failure_link": "Replaces fixed schedule with data-driven triggers, reducing energy waste from over-cleaning or under-cleaning."
+ },
+ "compose": {
+  "wall_s": 5.7,
+  "transport_ok": true,
+  "answer_sha256": "78ae1d933bfdfd81"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "downgrade": 0
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: An online fouling index calculated from BMS-logged condenser water supply temperature, chilled water return temperature, and outdoor wet-bulb temperature. The trigger initiates chemical cleaning when the index exceeds a threshold calibrated against the fixed monthly cadence baseline. This data-driven approach replaces the fixed schedule, reducing compressor energy waste from over-cleaning or under-cleaning.\n\nMECHANISM: Fouling layers increase thermal resistance, causing the condenser water supply temperature to rise for a given load. The predictor isolates this temperature drift from ambient effects using outdoor wet-bulb data. By triggering cleaning only when the temperature rise exceeds the energy penalty of a clean tube bank, the system eliminates the silent energy waste that occurs when operators clean on a calendar regardless of actual tube condition.\n\nDEPARTURE FROM STANDARD: Standard practice uses a fixed monthly cleaning cadence. The departure is an online leading indicator that triggers maintenance on measured thermal degradation rather than a calendar schedule.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: Sampling interval = 15 minutes (design choice to balance BMS load and resolution; no citation)\nASSUMPTION PARAMETER: Calibration load = 100% (design choice to ensure sensitivity to fouling state changes within the 3-day resolution constraint; no citation)\n\nINDICATOR: Fouling Temperature Deviation (K), calculated as the difference between the logged condenser water supply temperature and the baseline supply temperature predicted from outdoor wet-bulb and chilled water return temperature.\n\nTHRESHOLD: 0.5 K (ASSUMPTION based on the requirement to resolve state changes within 3 days at full load)\n\nVALIDATION PROTOCOL: Temperature: 15 degrees Celsius, Duration: 30 days, sample size n = 4 independent DEVICES. The data window is a rolling 4-week period. The detection criterion is a sustained Fouling Temperature Deviation (K) of at least 0.5 K for 72 hours.",
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 7,
+    "assumption": 0,
+    "unbound_numbers": 0,
+    "all_numbers": 7,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "n_llm_calls": 1,
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "class_defects": "CLEAN",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT"
+ },
+ "typed_note": "lead-preserving repair delivery",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_compose",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  }
+ ],
+ "e2e_wall_s": 5.8,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

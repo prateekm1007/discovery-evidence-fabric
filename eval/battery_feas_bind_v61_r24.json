@@ -1,0 +1,3284 @@
+{
+ "record": "BATTERY_INT_V61_CONSTRAINT_BIND_R24/1.0.0 \u2014 V6 ROUND 2 (Art. 20 clock 2/2) + the F36 constraint-fit fix",
+ "at": "2026-11-15T19:30:00.449889Z",
+ "claim": {
+  "work_id": "r24-v61-constraint-bind",
+  "claim_id": "c-0014",
+  "executor": "builder-r20s1",
+  "verifier": "peer session INVITED \u2014 recomputes from committed bytes (Art. 13), never re-runs"
+ },
+ "pre_registration": {
+  "commit": "driver + contract + claim pushed BEFORE any LLM call (git history order)",
+  "byte_map": {
+   "ride_r11_predictor": [
+    "dev-fu-001-bearing-spalling",
+    "dev-fu-003-motor-insulation",
+    "dev-fu-004-fouling",
+    "eval-new02-slipring-predictor",
+    "eval-new04-chiller-fouling-predictor",
+    "eval-new06-bearing-vibration-predictor",
+    "eval-new07-transformer-dga-predictor",
+    "eval-new08-pipeline-leak-predictor",
+    "eval-new09-hvac-filter-predictor",
+    "eval-new10-solar-inverter-predictor",
+    "eval-new11-conveyor-belt-predictor",
+    "eval-new12-axle-bearing-predictor"
+   ],
+   "fresh_v61": [
+    "bench-p01-pemfc-dehydration",
+    "bench-p02-leadacid-grid-corrosion",
+    "bench-p03-phe-biofouling",
+    "bench-p04-pump-cavitation",
+    "bench-p05-bridge-bearing-aging",
+    "bench-p06-water-biofilm",
+    "bench-p07-cgm-biofouling",
+    "bench-p08-mems-stiction",
+    "bench-p09-packaging-barrier",
+    "bench-p10-pv-pid",
+    "bench-p11-spindle-thermal-drift",
+    "bench-p12-mbr-fouling",
+    "dev-fu-005-bridge-bearing",
+    "eval-new01-supercap-dryout",
+    "eval-new03-insulin-pump-occlusion",
+    "eval-new05-liion-balance-drift",
+    "eval-sofc-redox",
+    "eval-sofc-thermal-cycling"
+   ]
+  },
+  "lever": "UNCHANGED in kind (contract-level bind at mechanism choice \u2014 the V6 arm, round 2/2); strengthened with constraint-awareness: allowed-measures enumerations + hard exclusions read from the problem's own constraint text (the F36 fix, AM24 D2)",
+  "acceptance_verbatim": "feasibility |gap| <= 0.25 AND novelty delta >= 0.5 on >= 30 pairs, and the ablation beats the incumbent (CI excludes it)",
+  "arithmetic_disclosure": "rides floor 14/30 ~= 0.467 (pre-registered, unchanged)"
+ },
+ "judge": {
+  "route": [
+   "crowllm",
+   "qwen-3.8-max:free"
+  ],
+  "k": 3,
+  "pace_s": 13.0,
+  "transport_ladder": true
+ },
+ "generation_record": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Standard anode flow field (metal bipolar plates) [a]",
+     "- Hydrophilic coating (commercially available silica-based) [b] (replaces standard hydroph",
+     "- Coating application procedure (spray-coating, 10\u00b5m thickness) [c] (parameter change to e",
+     "- In-situ hydration validation protocol [c] (new procedure using existing stack instrument",
+     "- Standard practice: Cathode humidifier system (energy cost: 10% parasitic load)",
+     "- Proposed intervention: No additional humidification hardware (same [a] items)",
+     "- Added: Commercial hydrophilic coating ([b], same cost class as standard coatings)",
+     "- Added: Modified coating procedure ([c], within existing coating process capabilities)",
+     "- Net burden: Same (no new hardware, same coating cost class, no energy penalty)"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cathode' in: novelty statement (intervention) \u2014 to prevent membrane dehydration under high current density operation while ",
+     "excluded stem 'cathode' in: our mitigation departs by introducing hydrophilic properties to the anode side to enhance water back-diffusion",
+     "excluded stem 'cathode' in: standard practice):\n- standard anode flow field (metal bipolar plates) [a]\n- hydrophilic coating (commercially",
+     "excluded stem 'humidification' in: novelty statement (intervention) \u2014 to prevent membrane dehydration under high current density operation while "
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "repairs": 0,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Standard bill: Working electrode (Pt/Au) [a], Reference electrode (Ag/AgCl) [a], Electro",
+     "- Modified bill:",
+     "- Working electrode (Pt/Au) [a] (no change)",
+     "- Reference electrode (Ag/AgCl) [a] (no change)",
+     "- Electrolyte gel with zwitterionic polymer additive [b] (replaces standard gel; procurabl",
+     "- Gel mixing protocol [c] (modified curing time to 24h at 37\u00b0C to ensure polymer network f",
+     "- Process: 24h curing vs standard 12h (within existing autoclave capacity; no new equipmen",
+     "- Total burden: Same class (material handling and curing time increase <10% vs standard pr"
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: comb finger gap design, power supply, microcontroller, optical lever ",
+     "- Proposed intervention:",
+     "- Total burden: same class as standard practice (minimal new hardware, software changes)",
+     "- Protocol: Subject 10 devices to 10000g shock (per MIL-STD-883 Method 2002.4) with and wi",
+     "- Instruments: Shock test fixture, precision shaker, calibrated reference accelerometer, d",
+     "- Pass/fail: Zero-g offset \u226450mg post-shock with intervention; >50mg without intervention ",
+     "- Duration: 100ms shock pulse per test",
+     "- Kill criterion: Any device showing permanent offset >50mg fails the test",
+     "- Survives 10000g shock: Verified via shock test protocol",
+     "- No permanent zero-g offset >50mg: Directly measured in test",
+     "- Uses only allowed measures: Electrostatic repulsion (not prohibited), no mechanical rede",
+     "- No new development: Pulse generator is procurable, software update is standard practice"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'offset' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f",
+     "excluded stem 'permanent' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f",
+     "excluded stem 'zero' in: measure zero-g offset before/after shock using calibrated reference accelerometer.\n- instruments: shock test f"
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Standard practice bill: Soda-lime cover glass (c \u2248 13% Na\u2082O)",
+     "- Proposed intervention bill:",
+     "- Standard practice: Soda-lime glass procurement and lamination",
+     "- Proposed intervention: Borosilicate glass procurement (same cost class) + same laminatio",
+     "- Burden conclusion: Same burden class \u2014 no additional equipment, no procedural changes, a",
+     "- Protocol: Subject modules to 1000 V bias at 85\u00b0C/85% RH for 1000 hours (IEC 62892 PID te",
+     "- Instruments: Solar simulator (IEC 60904-9), temperature/humidity chamber, data logger.",
+     "- Pass/fail: Power loss \u2264 0.5% after 1000 hours (extrapolates to <0.5% annual over 25 year",
+     "- Duration: 1000 hours (accelerated test).",
+     "- Kill criterion: Power loss > 0.5% after 1000 hours."
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "repairs": 2,
+   "residual_findings": {
+    "DEV_NEED": [
+     "custom formulation"
+    ],
+    "BILL_UNTAGGED": [
+     "1. Install reformulated grease (5% PCM) in spindle bearings.",
+     "2. Measure tool center point displacement (laser interferometer) and bearing temperature (",
+     "3. Compare to baseline (conventional grease) under identical conditions.",
+     "- **Allowed measures**: Retrofit-only (no new hardware), PCM additive is procurable.",
+     "- **Exclusions**: No warmup idle cycles added; PCM additive is a reformulation, not a new ",
+     "- **Performance**: Directly tests displacement \u226410 \u00b5m bound.",
+     "- **No constraint violation**: \"Adding\" refers to idle cycles, not material additives."
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'adding' in: - **no constraint violation**: \"adding\" refers to idle cycles, not material additives.",
+     "excluded stem 'cycle' in: **novelty statement (intervention)**  \nto prevent thermal elongation of the spindle shaft during warmup cycles",
+     "excluded stem 'cycle' in: this departs from adjacent thermal management techniques (e.g., external cooling jackets) by embedding thermal",
+     "excluded stem 'cycle' in: **implementation bill**  \n*(standard practice: conventional grease, no additives.)*  \n| **item**              "
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Standard practice bill: Continuous backwash pump, air scour system, chemical cleaning ta",
+     "- Intervention bill:",
+     "- Operational burden: Equal to standard practice. No additional operator training required",
+     "- Maintenance burden: Equal to standard practice. Solenoid valve and timer module have sam",
+     "- Protocol: Run two identical membrane bioreactors side-by-side at 8 g/L MLSS, one with st",
+     "- Instruments: Pressure transducers, flow meters, data logging system",
+     "- Pass/fail: Intervention system must show TMP rise rate <50% of control system and mainta",
+     "- Duration: 180 days",
+     "- Kill criterion: If intervention system requires chemical cleaning before 180 days or flu"
+    ]
+   }
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Intervention additions:"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'bearing' in: standard practice relies on visual inspection and periodic replacement; this intervention alternates the prima",
+     "excluded stem 'bearing' in: install bearing with alternating top/bottom layer orientation (a) \u2014 reconfiguration of existing bearing layers",
+     "excluded stem 'bearing' in: rotate bearing 180\u00b0 every 15 years during scheduled maintenance (c) \u2014 procedural change to existing maintenanc",
+     "excluded stem 'bearing' in: install burden: 0 (uses existing bearing)"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "repairs": 2,
+   "residual_findings": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'module' in: novelty statement (intervention) \u2014 to prevent electrolyte dry-out in the automotive supercapacitor module, sta",
+     "excluded stem 'module' in: a 10 \u03bcm microporous ptfe membrane with 0.1 \u03bcm pores reduces \u03b4p by >90% at 65\u00b0c, cutting solvent loss by an ord"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "repairs": 2,
+   "residual_findings": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'increasing' in: by increasing balancing current proportionally to cell temperature, we reduce the capacity spread (\u03b4c) at a ra",
+     "excluded stem 'module' in: this maintains the voltage spread below 35 mv by compensating for the thermal-driven divergence in state-of-ch",
+     "excluded stem 'module' in: no additional cost, weight, or complexity is introduced.\n\nexecutable test \u2014 \nprotocol: cycle the module with 1"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: Uses Ni-YSZ anode directly bonded to YSZ electrolyte (no additional c",
+     "- My intervention adds only one standard catalog item (SDC powder for screen-printing) and"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cell' in: novelty statement (intervention) \u2014 to prevent or mitigate redox cycling degradation in the ni-ysz anode of a p",
+     "excluded stem 'cell' in: the intervention does not increase cell package thickness beyond the 2 mm constraint, as the sdc layer is ultr",
+     "excluded stem 'cell' in: eis must show no significant delamination in sdc cells (arc area <5% increase) vs",
+     "excluded stem 'cell' in: controls (arc area >20% increase).\nduration: 6 months (for cycling testing).\nkill criterion: if any cell with "
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "repairs": 2,
+   "residual_findings": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: mass increase is 0% (same seal material)",
+     "excluded stem 'mass' in: mass increase is 0% (same seal material)",
+     "excluded stem 'stack' in: novelty statement (intervention) \u2014 to prevent thermal cycling fatigue in the anode-supported sofc stack, we wi"
+    ]
+   }
+  }
+ ],
+ "bind_summary": {
+  "repairs_total": 28,
+  "pairs_with_residual_findings": 11,
+  "pairs_with_constraint_residual": 8
+ },
+ "ladder_stats": {
+  "first_try_valid": 52,
+  "recovered": 2,
+  "still_dead": 5,
+  "total_attempts": 56
+ },
+ "results": [
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 3,
+    "T_A": 4,
+    "C_A": 5,
+    "N_B": 4,
+    "F_B": 4,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": -2,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": -1,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": -2,
+    "f_abs_gap_r10": 1,
+    "f_signed_gap_r10": -1,
+    "prefer_r10": "B"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/dev-fu-001-bearing-spalling.json",
+    "a1_answer_sha256_16": "4ae337fddffad3f0",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 3,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 5
+     },
+     "prefer": "TIE"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 3,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 5
+     },
+     "prefer": "TIE"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 3,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 5
+     },
+     "prefer": "TIE"
+    }
+   ],
+   "majority_prefer": "TIE",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 2,
+    "T_A": 3,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 2,
+    "T_B": 3,
+    "C_B": 5
+   },
+   "novelty_delta": 0,
+   "feasibility_abs_gap": 0,
+   "feasibility_signed_gap": 0,
+   "testability_delta": 0,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 0,
+    "f_abs_gap_r10": 0,
+    "f_signed_gap_r10": 0,
+    "prefer_r10": "TIE"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/dev-fu-003-motor-insulation.json",
+    "a1_answer_sha256_16": "5969b213f7cd394d",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 4,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 4,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 4,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 3,
+    "F_A": 4,
+    "T_A": 4,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 2,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": 0,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 2,
+    "f_abs_gap_r10": 1,
+    "f_signed_gap_r10": -1,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/dev-fu-004-fouling.json",
+    "a1_answer_sha256_16": "8e940f7cdafcf34e",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 4,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_TRANSPORT_FAILED",
+     "axes": null,
+     "prefer": null
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 4,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B"
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 3,
+    "T_A": 4,
+    "C_A": 4,
+    "N_B": 4,
+    "F_B": 4,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": -2,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": -1,
+   "constraint_delta": -1,
+   "r10_battery_reference": {
+    "n_delta_r10": -2,
+    "f_abs_gap_r10": 1,
+    "f_signed_gap_r10": -1,
+    "prefer_r10": "B"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new02-slipring-predictor.json",
+    "a1_answer_sha256_16": "ff8f60e0aca62ebf",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 3,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 3,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 3,
+    "F_B": 4,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 0,
+   "feasibility_abs_gap": 0,
+   "feasibility_signed_gap": 0,
+   "testability_delta": 1,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 0,
+    "f_abs_gap_r10": 0,
+    "f_signed_gap_r10": 0,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new04-chiller-fouling-predictor.json",
+    "a1_answer_sha256_16": "1b79556ff8ac7eb1",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new06-bearing-vibration-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_TRANSPORT_FAILED",
+     "axes": null,
+     "prefer": null
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 3,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 2,
+   "feasibility_signed_gap": -2,
+   "testability_delta": 1,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 3,
+    "f_abs_gap_r10": 2,
+    "f_signed_gap_r10": -2,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new06-bearing-vibration-predictor.json",
+    "a1_answer_sha256_16": "ca2a53f9195ac290",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 2,
+    "T_B": 4,
+    "C_B": 2
+   },
+   "novelty_delta": 2,
+   "feasibility_abs_gap": 2,
+   "feasibility_signed_gap": 2,
+   "testability_delta": 1,
+   "constraint_delta": 3,
+   "r10_battery_reference": {
+    "n_delta_r10": 2,
+    "f_abs_gap_r10": 2,
+    "f_signed_gap_r10": 2,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new07-transformer-dga-predictor.json",
+    "a1_answer_sha256_16": "d04ca598b5c7a3d4",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new08-pipeline-leak-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_TRANSPORT_FAILED",
+     "axes": null,
+     "prefer": null
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": 1,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 3,
+    "f_abs_gap_r10": 1,
+    "f_signed_gap_r10": -1,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new08-pipeline-leak-predictor.json",
+    "a1_answer_sha256_16": "bb53afcd6603d0dc",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new09-hvac-filter-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_TRANSPORT_FAILED",
+     "axes": null,
+     "prefer": null
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_TRANSPORT_FAILED",
+     "axes": null,
+     "prefer": null
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 3,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 0,
+   "feasibility_signed_gap": 0,
+   "testability_delta": 1,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 3,
+    "f_abs_gap_r10": 0,
+    "f_signed_gap_r10": 0,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new09-hvac-filter-predictor.json",
+    "a1_answer_sha256_16": "8450b448ad558164",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new10-solar-inverter-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 3,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 3,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 4,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 2,
+   "feasibility_abs_gap": 2,
+   "feasibility_signed_gap": -2,
+   "testability_delta": 0,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 2,
+    "f_abs_gap_r10": 2,
+    "f_signed_gap_r10": -2,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new10-solar-inverter-predictor.json",
+    "a1_answer_sha256_16": "12bddf51c539f17d",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new11-conveyor-belt-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": 1,
+   "testability_delta": 1,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 3,
+    "f_abs_gap_r10": 1,
+    "f_signed_gap_r10": 1,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new11-conveyor-belt-predictor.json",
+    "a1_answer_sha256_16": "374429172b029c6b",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "eval-new12-axle-bearing-predictor",
+   "a1_arm": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+   "question_type": "predictor-design",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "critic_verdict": "CLEAN",
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A"
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A"
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 4,
+   "feasibility_abs_gap": 3,
+   "feasibility_signed_gap": -3,
+   "testability_delta": 0,
+   "constraint_delta": 0,
+   "r10_battery_reference": {
+    "n_delta_r10": 4,
+    "f_abs_gap_r10": 3,
+    "f_signed_gap_r10": -3,
+    "prefer_r10": "A"
+   },
+   "ride": {
+    "row_source": "battery_a1w_r11.json",
+    "byte_source": "eval/pairs/r11_a1w_r1/eval-new12-axle-bearing-predictor.json",
+    "a1_answer_sha256_16": "0d67e0518a3280b0",
+    "rule": "byte-identical pair rides its committed judged row (AM19 sec.2 determinism)"
+   }
+  },
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p01-pemfc-dehydration.json",
+    "a1_answer_sha256_16": "c5a7b81eb8a21bff",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.1
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.8
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 2
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 4.8
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 3,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 4,
+    "T_B": 4,
+    "C_B": 2
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": 1,
+   "constraint_delta": 3
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p02-leadacid-grid-corrosion.json",
+    "a1_answer_sha256_16": "c97b0051470d9818",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 1,
+      "F_A": 1,
+      "T_A": 1,
+      "C_A": 1,
+      "N_B": 1,
+      "F_B": 1,
+      "T_B": 1,
+      "C_B": 1
+     },
+     "prefer": "TIE",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.2
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 1,
+      "F_A": 1,
+      "T_A": 1,
+      "C_A": 1,
+      "N_B": 1,
+      "F_B": 1,
+      "T_B": 1,
+      "C_B": 1
+     },
+     "prefer": "TIE",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.9
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 1,
+      "F_A": 1,
+      "T_A": 1,
+      "C_A": 1,
+      "N_B": 1,
+      "F_B": 1,
+      "T_B": 1,
+      "C_B": 1
+     },
+     "prefer": "TIE",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.6
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "TIE",
+   "median_axes": {
+    "N_A": 1,
+    "F_A": 1,
+    "T_A": 1,
+    "C_A": 1,
+    "N_B": 1,
+    "F_B": 1,
+    "T_B": 1,
+    "C_B": 1
+   },
+   "novelty_delta": 0,
+   "feasibility_abs_gap": 0,
+   "feasibility_signed_gap": 0,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p03-phe-biofouling.json",
+    "a1_answer_sha256_16": "ad48bdc2683a23d7",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.2
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 4.4
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.8
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 4,
+   "feasibility_abs_gap": 3,
+   "feasibility_signed_gap": -3,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p04-pump-cavitation.json",
+    "a1_answer_sha256_16": "decfbce110bc6446",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.7
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 5.5
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 4,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_TRANSPORT_FAILED",
+       "latency_s": 0.5
+      },
+      {
+       "n": 2,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.7
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 4,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 2,
+   "feasibility_signed_gap": -2,
+   "testability_delta": 1,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p05-bridge-bearing-aging.json",
+    "a1_answer_sha256_16": "6ccb61ff6490656d",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 1,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 9.9
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 1,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 7.4
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 1,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.6
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 1,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 4,
+   "feasibility_abs_gap": 4,
+   "feasibility_signed_gap": -4,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p06-water-biofilm.json",
+    "a1_answer_sha256_16": "f79e54b53ea7a9ed",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.3
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.6
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.0
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 4,
+   "feasibility_abs_gap": 3,
+   "feasibility_signed_gap": -3,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p07-cgm-biofouling.json",
+    "a1_answer_sha256_16": "cabfb7be68361a0e",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 3,
+      "C_B": 3
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.5
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 3,
+      "C_B": 3
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.2
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 3,
+      "C_B": 3
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 6.4
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 3,
+    "C_B": 3
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": 1,
+   "testability_delta": 2,
+   "constraint_delta": 2
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p08-mems-stiction.json",
+    "a1_answer_sha256_16": "68b8c5dbd1e6ae49",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.7
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.5
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 5.5
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 4,
+   "feasibility_abs_gap": 3,
+   "feasibility_signed_gap": -3,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p09-packaging-barrier.json",
+    "a1_answer_sha256_16": "941820dc31d4ec62",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 3
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 14.8
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 3
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.7
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 3,
+      "C_B": 3
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.3
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 2,
+    "T_B": 3,
+    "C_B": 3
+   },
+   "novelty_delta": 2,
+   "feasibility_abs_gap": 2,
+   "feasibility_signed_gap": 2,
+   "testability_delta": 2,
+   "constraint_delta": 2
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p10-pv-pid.json",
+    "a1_answer_sha256_16": "d774d665c368f199",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 1,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 5.0
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 1,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.1
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 1,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.5
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 1,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 4,
+   "feasibility_signed_gap": -4,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p11-spindle-thermal-drift.json",
+    "a1_answer_sha256_16": "836edd88f0d414fd",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 3.8
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 4.0
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 5,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 5.0
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 5,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 4,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/bench-p12-mbr-fouling.json",
+    "a1_answer_sha256_16": "f328770511bd0027",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 1
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 9.6
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 1
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 4.0
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 5,
+      "T_B": 5,
+      "C_B": 1
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.6
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 5,
+    "T_B": 5,
+    "C_B": 1
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 3,
+   "feasibility_signed_gap": -3,
+   "testability_delta": 0,
+   "constraint_delta": 4
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/dev-fu-005-bridge-bearing.json",
+    "a1_answer_sha256_16": "194ceaafa32fcb5a",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 3,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.4
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 3,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 6.4
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 3,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.3
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 2,
+    "T_A": 3,
+    "C_A": 5,
+    "N_B": 4,
+    "F_B": 4,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": -2,
+   "feasibility_abs_gap": 2,
+   "feasibility_signed_gap": -2,
+   "testability_delta": -2,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/eval-new01-supercap-dryout.json",
+    "a1_answer_sha256_16": "37b219cb4e162644",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "TIE",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 17.9
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "TIE",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 6.2
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 2,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 2,
+      "F_B": 2,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "TIE",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.8
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "TIE",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 2,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 2,
+    "F_B": 2,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 0,
+   "feasibility_abs_gap": 0,
+   "feasibility_signed_gap": 0,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/eval-new03-insulin-pump-occlusion.json",
+    "a1_answer_sha256_16": "18970ce9513fcbd7",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 2.1
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 8.1
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 4,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_TRANSPORT_FAILED",
+       "latency_s": 0.9
+      },
+      {
+       "n": 2,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.9
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 4,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": 1,
+   "testability_delta": 1,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_COMMITTED_dev12",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/eval-new05-liion-balance-drift.json",
+    "a1_answer_sha256_16": "a25e954a587a379c",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 11.3
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 6.0
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 2,
+      "F_A": 3,
+      "T_A": 4,
+      "C_A": 5,
+      "N_B": 4,
+      "F_B": 4,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "B",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.8
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "B",
+   "median_axes": {
+    "N_A": 2,
+    "F_A": 3,
+    "T_A": 4,
+    "C_A": 5,
+    "N_B": 4,
+    "F_B": 4,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": -2,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": -1,
+   "testability_delta": -1,
+   "constraint_delta": 0
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/eval-sofc-redox.json",
+    "a1_answer_sha256_16": "e1211164b741b84d",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 3,
+      "C_B": 4
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 9.1
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 3,
+      "C_B": 4
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 4.4
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 4,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 3,
+      "C_B": 4
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 8.0
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 4,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 3,
+    "C_B": 4
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 1,
+   "feasibility_signed_gap": 1,
+   "testability_delta": 2,
+   "constraint_delta": 1
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "a1_arm": "SYS_A1_INT_V61_CONSTRAINT_BIND",
+   "question_type": "intervention-proposal",
+   "question_type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "baseline_source": "CURATED_STANDARD_REFERENCE_builder",
+   "byte_provenance": {
+    "byte_source": "eval/pairs/r24_feas_bind_v61/eval-sofc-thermal-cycling.json",
+    "a1_answer_sha256_16": "90872bb7063bfc71",
+    "generation": "single draft under SYS_A1_INT_V61 (V6 bind + constraint awareness, F36) + neutral typed repairs; no selection"
+   },
+   "judge": [
+    "crowllm",
+    "qwen-3.8-max:free"
+   ],
+   "draws": [
+    {
+     "k": 0,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 3.7
+      }
+     ]
+    },
+    {
+     "k": 1,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 4.4
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "outcome": "JUDGE_VALID",
+     "axes": {
+      "N_A": 4,
+      "F_A": 3,
+      "T_A": 5,
+      "C_A": 5,
+      "N_B": 1,
+      "F_B": 3,
+      "T_B": 5,
+      "C_B": 5
+     },
+     "prefer": "A",
+     "transport_attempts": [
+      {
+       "n": 1,
+       "outcome": "JUDGE_VALID",
+       "latency_s": 1.6
+      }
+     ]
+    }
+   ],
+   "majority_prefer": "A",
+   "median_axes": {
+    "N_A": 4,
+    "F_A": 3,
+    "T_A": 5,
+    "C_A": 5,
+    "N_B": 1,
+    "F_B": 3,
+    "T_B": 5,
+    "C_B": 5
+   },
+   "novelty_delta": 3,
+   "feasibility_abs_gap": 0,
+   "feasibility_signed_gap": 0,
+   "testability_delta": 0,
+   "constraint_delta": 0
+  }
+ ],
+ "summary_type_credited": {
+  "label": "type-MATCH pairs only (primary form)",
+  "n_valid": 30,
+  "novelty_delta_mean": 2.0,
+  "novelty_ci95": [
+   1.284,
+   2.716
+  ],
+  "feasibility_abs_gap_mean": 1.533,
+  "feasibility_ci95": [
+   1.105,
+   1.961
+  ],
+  "per_axis_means_A_minus_B": {
+   "N": 2.0,
+   "F_signed": -1.0,
+   "T": 0.333,
+   "C": 0.467
+  },
+  "prefer_tally": {
+   "a1_arms": 23,
+   "baseline": 4,
+   "tie": 3
+  },
+  "question_type_mismatches_in_scope": 0,
+  "AM14_D5_point_estimate": {
+   "novelty_clause_pass": true,
+   "feasibility_clause_pass": false,
+   "both_simultaneous_pass": false,
+   "form": "mean over judged pairs (the Art. 14 gate form)",
+   "threshold_provenance": "owner directive 2026-11-15 (AM14 D5); class BUYER_DEFINED"
+  },
+  "r7_comparable_CI": {
+   "novelty_clause_pass": true,
+   "feasibility_clause_pass": false,
+   "both_simultaneous_pass": false
+  }
+ },
+ "summary_intervention_rows": {
+  "label": "INTERVENTION rows (the changed arm)",
+  "n_valid": 18,
+  "novelty_delta_mean": 2.333,
+  "novelty_ci95": [
+   1.423,
+   3.244
+  ],
+  "feasibility_abs_gap_mean": 1.778,
+  "feasibility_ci95": [
+   1.173,
+   2.382
+  ],
+  "per_axis_means_A_minus_B": {
+   "N": 2.333,
+   "F_signed": -1.222,
+   "T": 0.333,
+   "C": 0.667
+  },
+  "prefer_tally": {
+   "a1_arms": 14,
+   "baseline": 2,
+   "tie": 2
+  },
+  "question_type_mismatches_in_scope": 0,
+  "AM14_D5_point_estimate": {
+   "novelty_clause_pass": true,
+   "feasibility_clause_pass": false,
+   "both_simultaneous_pass": false,
+   "form": "mean over judged pairs (the Art. 14 gate form)",
+   "threshold_provenance": "owner directive 2026-11-15 (AM14 D5); class BUYER_DEFINED"
+  },
+  "r7_comparable_CI": {
+   "novelty_clause_pass": true,
+   "feasibility_clause_pass": false,
+   "both_simultaneous_pass": false
+  }
+ },
+ "art20_ablation": {
+  "arm_under_test": "SYS_A1_INT_V61 (V6 bind + constraint awareness) \u2014 V6 arm ROUND 2/2",
+  "incumbent": "SYS_A1_INT_V4 single-draw (the r20 bytes)",
+  "metric": "intervention-subset type-credited feasibility |gap|",
+  "incumbent_intervention_fgap_r20": 1.5,
+  "v6_round1_intervention_fgap_r23": 2.333,
+  "v61_round2_intervention_fgap_this": 1.778,
+  "incumbent_ndelta_r20": 2.333,
+  "v61_ndelta_this": 2.333,
+  "round_2_rule": "if not beating the incumbent on the primary metric, the contract-bind lever RETIRES at 2 (Art. 20) \u2014 no round 3 under this lever kind",
+  "typed_note": "constraint-fit (F36) is measured as a typed deterministic proxy here (zero-violation rate); the AUTHORITATIVE read is the auditor's, on holdout v3"
+ }
+}

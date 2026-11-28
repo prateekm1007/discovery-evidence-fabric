@@ -1,0 +1,25 @@
+{
+ "record": "R33_CROWLLM_PROBE/1.0.0",
+ "session": "builder-r20s1",
+ "at": "2026-11-16T11:13:44Z",
+ "responds_to": "AM31 D2 + F46 (judge route is crowllm.com, NOT OpenRouter — no swap authorized)",
+ "route_pin": "llm_registry.py ProviderSpec: crowllm / CROWLLM_API_KEY / https://crowllm.com/v1/chat/completions / deepseek-v4-flash:free",
+ "credential_state": "CROWLLM_API_KEY lost in the R32 vault wipe; NOT recoverable from committed bytes (message-history scan: exactly 2 keys, both F45 leaks); operator credential window REQUESTED (typed reminder per operator instruction)",
+ "probes": [
+  {
+   "endpoint": "/v1/models (no auth)",
+   "result": "TIMEOUT after 20s, 0 bytes (HTTP 000)",
+   "typed": "catalog endpoint slow/unresponsive during overload"
+  },
+  {
+   "endpoint": "/v1/chat/completions (no auth, model deepseek-v4-flash:free)",
+   "result": "HTTP 503 in 9.8s, body: system cpu overloaded (current: 99.9%, threshold: 90%) code=system_cpu_overloaded",
+   "typed": "SERVICE REACHABLE — typed infra overload, not DNS/connection failure; serving capacity degraded right now"
+  }
+ ],
+ "d2_accept_state": {
+  "probe_passes": "PARTIAL — host reachable and typed-responsive; a PASSING probe needs CROWLLM_API_KEY (operator) and a non-overloaded serving window (provider transient)",
+  "recalibration": "the PRE-REGISTERED instrument scripts/r29_judge_calibration.py (claim c-0026, probe/run/assemble modes; auditor anchor audit branch @ d7540c6fe:eval/auditor_r28_adjudication.json — anchor commit verified reachable) fires in the credential window; NO new instrument authored, the frozen pins stay"
+ },
+ "no_swap": "Art. 26 honored — judge route NOT swapped, no fallback judge wired"
+}

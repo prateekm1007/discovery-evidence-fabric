@@ -1,0 +1,207 @@
+{
+  "schema": "COMPLETION_CONTRACT/1.0.0",
+  "run_id": "r138-r138-fresh-05-pipeline-gel-plugging",
+  "final_status": "INVENTION_REQUIRES_EXPERIMENT",
+  "verified_at": "2026-11-23T14:27:45.852538+00:00",
+  "authority": "this record is the final product-state authority for the run (backend, machine-checkable); the session/UI surface READS it and never re-derives FINISHED_DISCOVERY",
+  "valid_query": {
+    "valid": true,
+    "class": "VALID_QUERY",
+    "typed_blocker": null,
+    "reason": "coherent problem + available evidence/infrastructure path"
+  },
+  "preconditions": {
+    "VALID_QUERY": true,
+    "EVIDENCE_BOUND": false,
+    "AT_LEAST_ONE_ADMISSIBLE_SURVIVOR": false,
+    "COMPLETE_DISCOVERY_RECORD": false,
+    "COMPLETE_CANDIDATE_BOUND_TECHNOLOGY_PACKAGE": false
+  },
+  "components": {
+    "evidence": {
+      "component": "evidence",
+      "complete": false,
+      "source_files": [
+        "INVENTION_SPECIFICATION[_<key>].json"
+      ],
+      "missing_candidate_artifacts": [],
+      "per_survivor": [],
+      "requirement": "custodied evidence records (source identity + content hash) + the mechanism's supporting span, for every displayed survivor"
+    },
+    "mechanisms": {
+      "component": "mechanisms",
+      "complete": false,
+      "source_files": [
+        "SURVIVOR_SELECTION.json",
+        "INVENTION_SPECIFICATION[_<key>].json",
+        "PACKAGE_SKIPPED_CHEAP_SCREEN_[<key>].json",
+        "ENVELOPE_[<key>].json"
+      ],
+      "n_competing_investigated": 0,
+      "n_killed": 0,
+      "n_excluded_by_gates": 0,
+      "n_surviving": 0,
+      "competing_vs_surviving": {
+        "competing_candidates_investigated": [],
+        "killed_by_challenge": [],
+        "excluded_by_gates": [],
+        "surviving_candidates": [],
+        "note": "competing != surviving; a single survivor after multiple competing candidates were investigated is a genuine competing-mechanism investigation (kills and recorded gate exclusions are distinct outcomes, both exposed)"
+      },
+      "per_survivor": [],
+      "competing_candidates": [],
+      "requirement": ">=1 mechanism with a stated falsification / kill condition per displayed survivor, AND every exposed competing candidate carries candidate_id + mechanism + kill condition + a RESOLVED disposition (SURVIVED/KILLED/EXCLUDED; UNRESOLVED fails closed); the competing set is recorded, kills included"
+    },
+    "adversarial": {
+      "component": "adversarial",
+      "complete": false,
+      "source_files": [
+        "SURVIVOR_SELECTION.json"
+      ],
+      "unresolved_rows": [],
+      "excluded_rows": [],
+      "per_survivor": [],
+      "requirement": "every displayed survivor: recorded SURVIVED disposition + attack overall + quality verdict; every investigated candidate: a RESOLVED disposition — SURVIVED, KILLED (the challenge killed it), or EXCLUDED (a recorded gate exclusion: quality/span/physics). Only a MISSING/UNRESOLVED disposition blocks a finished discovery — an unresolved challenge is never papered over (Art. XXV/XXIX)"
+    },
+    "engineering_model": {
+      "component": "engineering_model",
+      "complete": false,
+      "missing_candidate_artifacts": [],
+      "source_files": [
+        "ENGINEERING_SPECIFICATION[_<key>].json",
+        "GEOMETRY_OUT.json",
+        "RANKED_PACKAGE_RECORDS.json"
+      ],
+      "per_survivor": [],
+      "requirement": "engineering definition present + critical parameters recorded (values may be honestly UNKNOWN) + an explicit model class for every displayed survivor (never a 'see package' placeholder) + for canonically geometry-warranted problems, a candidate-owned 3D model artifact inside the candidate's OWN package"
+    },
+    "decisive_experiment": {
+      "component": "decisive_experiment",
+      "complete": false,
+      "missing_candidate_artifacts": [],
+      "source_files": [
+        "DECISIVE_EXPERIMENT[_<key>].json"
+      ],
+      "authority": "state_integrity.falsification_contract_status (Art. LII): complete only when an experimental outcome that kills the mechanism is stated",
+      "per_survivor": [],
+      "requirement": "experiment + discriminator + prediction + decision rule / falsification condition + execution status, for every displayed survivor"
+    },
+    "technology_package": {
+      "component": "technology_package",
+      "complete": false,
+      "source_files": [
+        "RANKED_PACKAGE_RECORDS.json",
+        "DOWNLOAD/<candidate-bound zip>",
+        "RANKED_DISCOVERY_RESULTS.json"
+      ],
+      "n_admissible_survivors": 0,
+      "n_complete_candidate_bound_packages": 0,
+      "hash_verification": [],
+      "violations": [],
+      "content_verification": [],
+      "content_complete": true,
+      "quality_verification": [],
+      "quality_verified": true,
+      "release_note": "COMPLETE_CANDIDATE_PACKAGE != BUYER_RELEASED_PACKAGE: this component proves the candidate's deliverable (compiled + quality-verified + bound + hash-verified + contents-verified). Buyer release is the bridge release authority's separate decision; the UI never presents a candidate package as released unless that path passed.",
+      "requirement": "every displayed admissible survivor has its OWN complete candidate-bound package whose recorded SHA-256 equals the on-disk bytes, whose ZIP passes the independent quality gate, and whose opened bytes carry the six-part discovery record for that candidate"
+    }
+  },
+  "missing_components": [
+    "evidence",
+    "mechanisms",
+    "adversarial",
+    "engineering_model",
+    "decisive_experiment",
+    "technology_package"
+  ],
+  "recovery": [
+    {
+      "component": "evidence",
+      "missing_because": "NO / INSUFFICIENT EVIDENCE",
+      "recoverable": true,
+      "recovery_path": "evidence retrieval + custody freeze (RETRIEVE stage, the evidence fabric's own repair/retry path)",
+      "recovery_class": "EVIDENCE",
+      "attempted": true,
+      "attempt_evidence": [
+        "stage_RETRIEVE.json"
+      ],
+      "exhausted": true,
+      "note": "recovery (when attempted) always returns through the same evidence and admission gates — the path may change the engineering route, provider, candidate, or iteration, never the epistemology"
+    },
+    {
+      "component": "mechanisms",
+      "missing_because": "NO / INSUFFICIENT MECHANISMS",
+      "recoverable": true,
+      "recovery_path": "mechanism-generation / evolution / retry path (INVENTION_LINEAGE.json + the IMPROVE kill-point children path)",
+      "recovery_class": "MECHANISM",
+      "attempted": true,
+      "attempt_evidence": [
+        "INVENTION_LINEAGE.json"
+      ],
+      "exhausted": true,
+      "note": "recovery (when attempted) always returns through the same evidence and admission gates — the path may change the engineering route, provider, candidate, or iteration, never the epistemology"
+    },
+    {
+      "component": "adversarial",
+      "missing_because": "ADVERSARIAL KILL / UNRESOLVED CHALLENGE",
+      "recoverable": true,
+      "recovery_path": "IMPROVE kill-point -> fresh candidate -> re-run gates (engineering_attack + independent attack)",
+      "recovery_class": "ADVERSARIAL",
+      "attempted": false,
+      "attempt_evidence": [],
+      "exhausted": false,
+      "note": "recovery (when attempted) always returns through the same evidence and admission gates — the path may change the engineering route, provider, candidate, or iteration, never the epistemology"
+    },
+    {
+      "component": "engineering_model",
+      "missing_because": "3D BUILD FAILURE / MODEL CLASS NOT ESTABLISHED",
+      "recoverable": true,
+      "recovery_path": "domain-aware conceptual/model fallback (_candidate_geometry -> explicit model class)",
+      "recovery_class": "MODEL",
+      "attempted": true,
+      "attempt_evidence": [
+        "RANKED_PACKAGE_RECORDS.json"
+      ],
+      "exhausted": true,
+      "note": "recovery (when attempted) always returns through the same evidence and admission gates — the path may change the engineering route, provider, candidate, or iteration, never the epistemology"
+    },
+    {
+      "component": "decisive_experiment",
+      "missing_because": "DECISIVE EXPERIMENT NOT ESTABLISHED",
+      "recoverable": true,
+      "recovery_path": "experiment selector + falsification-contract projection (DECISIVE_EXPERIMENT.json); a kill outcome stated from the run's own records or the honest INVENTION_REQUIRES_EXPERIMENT terminal",
+      "recovery_class": "EXPERIMENT",
+      "attempted": true,
+      "attempt_evidence": [
+        "stage_KILLER_EXPERIMENT.json"
+      ],
+      "exhausted": true,
+      "note": "recovery (when attempted) always returns through the same evidence and admission gates — the path may change the engineering route, provider, candidate, or iteration, never the epistemology"
+    },
+    {
+      "component": "technology_package",
+      "missing_because": "PACKAGE FAILURE",
+      "recoverable": true,
+      "recovery_path": "package compiler retry / repair (EngineRun._compile_ranked_packages -> the canonical package_compiler with the candidate's own inputs)",
+      "recovery_class": "PACKAGE",
+      "attempted": true,
+      "attempt_evidence": [
+        "RANKED_PACKAGE_RECORDS.json"
+      ],
+      "exhausted": true,
+      "note": "recovery (when attempted) always returns through the same evidence and admission gates — the path may change the engineering route, provider, candidate, or iteration, never the epistemology"
+    }
+  ],
+  "competing_vs_surviving": {
+    "competing_candidates_investigated": [],
+    "killed_by_challenge": [],
+    "excluded_by_gates": [],
+    "surviving_candidates": [],
+    "note": "competing != surviving; a single survivor after multiple competing candidates were investigated is a genuine competing-mechanism investigation (kills and recorded gate exclusions are distinct outcomes, both exposed)"
+  },
+  "finished_discovery": false,
+  "typed_terminal_state": "INVENTION_REQUIRES_EXPERIMENT",
+  "diagnostic_only": true,
+  "invariant": "FINISHED_DISCOVERY = VALID_QUERY + EVIDENCE_BOUND + AT_LEAST_ONE_ADMISSIBLE_SURVIVOR + COMPLETE_DISCOVERY_RECORD (6-part shape) + COMPLETE_CANDIDATE_BOUND_TECHNOLOGY_PACKAGE; typed constitutional blockers are never converted into discoveries; one survivor after competing candidates were investigated IS a finished discovery",
+  "recovery_attempts": []
+}

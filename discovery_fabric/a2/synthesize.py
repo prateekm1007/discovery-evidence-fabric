@@ -37,7 +37,7 @@ RETRIEVED PAPER:
 
 Respond in EXACTLY this format (each field on ONE line):
 MECHANISM: <mechanism from the paper>
-INTERVENTION: <specific intervention transferring mechanism to device>
+INTERVENTION: <specific intervention transferring the mechanism to a device, material, surface, or process change (all four classes admissible)>
 EXPECTED_EFFECT: <expected effect>
 FALSIFICATION_TEST: <concrete test>
 {span_instruction}
@@ -330,9 +330,13 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
     # fallback (2 papers bound), never a 3-call rotation — the third
     # attempt starved the evaluator under the cap (Art. XXVII).
     _ROTATION_PAPERS = 2          # operational bound, disclosed here
-    _ROTATION_BACKOFF_S = (0, 8, 20)  # MODEL_DERIVED operational bound:
-    #  the measured flap window is ~1-4 min; 0/8/20 s spreads three real
-    #  attempts across it without stretching a run's wall time
+    # owner round 2026-11-13 item 2: the fixed inter-attempt backoff
+    # (0/8/20 s) is REMOVED — rotation attempts run IMMEDIATELY (the
+    # measured wall spent 8-20 s per rotation asleep while the ring
+    # recovered; the rotate IS the recovery, and the gateway AIMD plus
+    # the chunk pacing own the cooldown, Art. LXI: infrastructure
+    # absence is typed, never slept through)
+    _ROTATION_BACKOFF_S = (0, 0, 0)
 
     # R483 (the measured production blocker — THREE consecutive runs
     # ended honestly typed INCOMPLETE_INFERENCE_FAILURE but were
@@ -548,8 +552,46 @@ def synthesize(problem: dict, evidence: list[dict]) -> dict | None:
                         "mechanism_source_span"]
                     resp = resp + "\n" + resp2
         if not parsed.get("intervention"):
-            print("  [synthesize] no intervention in response")
-            continue
+            # R143S1 DIR-4 BROADEN (the measured F9 wind-starve class):
+            # a response that summarizes the paper instead of proposing
+            # an intervention starved WHOLE PROBLEMS (the r142 wind run:
+            # both papers' responses parsed intervention-less -> 0
+            # candidates -> the enrichment path never fired). ONE
+            # recorded same-provider retry with the response contract
+            # restated (the E15/R483 corrective-retry precedent — the
+            # defect named, the contract restated; the provider/model
+            # unchanged, the retry rides the candidate provenance).
+            print("  [synthesize] no intervention in response — one "
+                  "recorded same-provider retry (the R143 broaden)")
+            _retry2 = _timed_chat(
+                prompt + "\n\nCONTRACT CORRECTION: your previous "
+                "response summarized the paper but did not propose an "
+                "engineering intervention. Answer again in the SAME "
+                "format: it MUST contain an INTERVENTION line (a "
+                "concrete device, material, surface, or process change that "
+                "mitigates the "
+                "stated failure), a MECHANISM line, an EXPECTED_EFFECT "
+                "line, a FALSIFICATION_TEST line, and a "
+                "MECHANISM_SOURCE_SPAN line quoting THIS abstract "
+                "verbatim (>= 8 consecutive words).",
+                system="You are a medical device engineer.",
+                max_tokens=1024)
+            if _retry2:
+                parsed2 = _parse_fields(_retry2)
+                if parsed2.get("intervention"):
+                    parsed = parsed2
+                    resp = _retry2
+                    retry_note = ("R143 broaden: the first response "
+                                  "carried no intervention (a summary); "
+                                  "one recorded same-provider retry with "
+                                  "the response contract restated "
+                                  "rescued this candidate")
+                else:
+                    print("  [synthesize] retry still intervention-"
+                          "less — the paper is skipped (typed)")
+                    continue
+            else:
+                continue
 
         def _candidate_from(text, parsed):
             return {

@@ -1,0 +1,32 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implementation of a **Pulsed Forward-Flow Reversal (FFR)** hydraulic control strategy combined with **biofilm-thinning shear stress modulation**. This approach utilizes the existing transmembrane pressure (TMP) differential to periodically reverse the flow direction across the membrane, generating a high-magnitude transient shear stress that mechanically detaches loosely bound soluble microbial products (SMPs) and extracellular polymeric substances (EPS) before they consolidate into a dense, resistive cake layer. Unlike constant suction or simple cross-flow, the pulsing frequency is tuned to the relaxation time of the EPS matrix, preventing the re-formation of the rigid biofilm structure while maintaining net forward permeation.
+
+**Implementation:**
+1.  **Valve Actuation Array:** Install rapid-response solenoid or pneumatic valves on the permeate and feed lines of the submerged module to enable automated flow reversal cycles.
+2.  **Control Logic:** Deploy a PLC or embedded controller programmed with a dual-time-scale algorithm:
+    *   *Slow Timescale (Minutes-Hours):* Adjusts the average net permeation rate to maintain the required >18 LMH target, compensating for any slight loss in specific flux.
+    *   *Fast Timescale (Seconds):* Executes the FFR cycle. The system operates in a "suction mode" for $T_{suction}$, then reverses to "forward flow" for $T_{forward}$, where the pressure difference is sufficient to generate a shear stress ($\tau$) exceeding the critical detachment threshold for EPS ($\tau_{critical} \approx 10-20$ Pa, typical for loosely bound biofilms) but below the fiber damage limit.
+3.  **Sensor Integration:** Integrate a high-frequency TMP sensor with feedback control. If TMP begins to rise beyond a setpoint (indicating fouling accumulation), the controller automatically increases the frequency of the FFR cycles or increases $T_{forward}$ to enhance shear, rather than waiting for a chemical clean.
+
+**Measures it Relies On:**
+*   **Shear-Dependent Detachment:** Relies on the physical principle that SMPs and loosely bound EPS have low adhesion strength to the membrane surface and to each other. High transient shear stresses break the hydrodynamic boundary layer, allowing convective backflushing to sweep away these materials.
+*   **Net Flux Preservation:** Relies on the fact that FFR is a zero-net-permeation event (forward flow equals reverse flow in volume over the cycle), so it does not reduce the *net* water production, only redistributing it. The system must be sized to handle the peak flow rates during forward reversal without exceeding pump head limits.
+*   **MLSS Stability:** Relies on maintaining 8 g/L MLSS; the suspended solids act as scrubbers for the detached EPS, preventing their re-deposition on the membrane by sweeping them out of the fiber bundle through the cross-flow generated during the forward phase.
+
+**Concrete Falsification Test:**
+**Test Name:** Controlled FFR Efficacy and Flux Recovery Ratio (FRR) Experiment.
+
+**Protocol:**
+1.  **Setup:** Operate the submerged MBR at 8 g/L MLSS with a controlled feed of synthetic SMP/EPS solution (to simulate the fouling precursor) at a constant net flux of 18 LMH.
+2.  **Arm A (Control):** Run with constant suction TMP (no FFR).
+3.  **Arm B (Test):** Run with the proposed FFR algorithm (e.g., 10-sec suction, 2-sec forward reversal, generating 15 Pa peak shear).
+4.  **Duration:** Run for 12 months, or until chemical cleaning is mandated by standard practice.
+5.  **Falsification Criteria:**
+    *   **Criterion 1 (Cleaning Interval):** If Arm B requires chemical cleaning more frequently than every 6 months (e.g., at month 4 due to persistent TMP rise despite FFR), the approach fails the interval constraint.
+    *   **Criterion 2 (Flux Sustainability):** If the average net flux in Arm B drops below 18 LMH for more than 5% of the operational time during the 6-month window (due to inability of the controller to compensate for residual fouling), the approach fails the flux constraint.
+    *   **Criterion 3 (Mechanical Validation):** If post-mortem analysis of the membrane surface after 6 months of Arm B operation shows a consolidated, thick EPS cake layer (>500 μm) indistinguishable from Arm A, the hypothesis that FFR prevents consolidation is falsified.
+
+**Expected Outcome:**
+Arm B should show a stable TMP profile (<10% rise over 6 months) and a Flux Recovery Ratio (FRR) >95% after physical rinsing (without chemical clean), proving that FFR prevents the *consolidation* phase of fouling. If Arm B’s TMP rises at the same rate as Arm A, or if chemical clean is required before 6 months, the mitigation is falsified.

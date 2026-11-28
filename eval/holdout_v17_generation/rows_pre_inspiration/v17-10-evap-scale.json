@@ -1,0 +1,108 @@
+{
+ "problem_id": "v17-10-evap-scale",
+ "domain": "pulp-mill-evaporation",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:0b5f15155d5d": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:7910658a6a8f": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "deposition_fouling",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "deposition_fouling",
+     "admitted": true,
+     "rank": 0,
+     "basis": "chemistry is admitted class #1 for the deposition_fouling failure physics"
+    }
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:09:51Z",
+ "attempts_n": 1,
+ "row_wall_s": 10.5,
+ "a1_answer": "**NOVELTY STATEMENT**\n**Standard Practice:** Chemical mitigation via continuous acid injection to shift the $\\text{pH}$ of the circulating black liquor below the $\\text{Al(OH)}_3$ precipitation threshold, delivered by a metering pump and control loop.\n**Mechanism Departure:** Closed-loop **chemical dosing control using real-time conductivity-to-pH inference** via a pre-existing conductivity sensor and a static physics-based look-up table, eliminating the need for a dedicated pH sensor or new instrumentation.\n**Failure-Physics Connection:** Alkaline aluminum hydroxide scaling is kinetically gated by $\\text{pH} > 5.0$. Conductivity in this specific ionic matrix is a monotonic, reversible proxy for $\\text{pH}$ (and thus ionic strength/activity). By correling the *already-recorded* conductivity signal to the *stated* $\\text{pH}$ threshold, we can infer the scaling risk state without new hardware.\n\n**PHYSICS CHECK**\n**Governing Relation:** In Kraft black liquor, conductivity ($\\kappa$, in mS/cm) is dominated by $\\text{Na}_2\\text{SO}_4$ and $\\text{NaOH}$ dissociation. $\\text{pH}$ is determined by the hydroxide ion concentration, which is stoichiometrically linked to the total dissolved solids (TDS) and alkalinity. While not a perfect 1:1 mapping across all concentrations, in the operating window ($0.2–0.4 \\text{ mS/cm}$ for $\\text{NaOH}$), there is a strong monotonic correlation.\n**Magnitude Verification:**\n*   **Threshold:** $\\text{pH} < 5.0$ prevents $\\text{Al(OH)}_3$ precipitation.\n*   **Conductivity Proxy:** Typical Kraft black liquor at $15\\%$ TS and $\\text{pH} 11$ has $\\kappa \\approx 20\\text{--}25 \\text{ mS/cm}$. Diluting/acidifying to $\\text{pH} 5.0$ significantly increases ionic strength (due to added $\\text{H}^+$ and $\\text{SO}_4^{2-}$ if sulfuric acid is used, or shifts equilibrium). *Correction/Refinement:* Actually, adding $\\text{H}_2\\text{SO}_4$ increases conductivity significantly. The \"standard practice\" relies on knowing the $\\text{pH}$. The novelty is that **conductivity is already recorded** and can be used to *infer* the *change* in $\\text{pH}$ state relative to a baseline.\n*   **Simpler Physics:** The key is not absolute $\\text{pH}$ from $\\kappa$, but **rate of change** or **absolute deviation** from a \"clean\" baseline $\\kappa_{clean}$. As scaling occurs, surface area changes, but more importantly, if scaling is *prevented*, the $\\text{pH}$ must be held. If we use conductivity to *detect* the *need* for dosing, we are using a secondary indicator to monitor the primary indicator ($\\text{pH}$).\n*   **Wait, Constraint Check:** The problem states \"signals_used\": `[\"ph\", \"conductivity\"]`. The data source rule says inputs must be *already recorded*. The problem statement implies a sensor exists. If a $\\text{pH}$ sensor exists, standard practice is just \"inject acid when $\\text{pH} > 5.0$\". The novelty must be in the *mechanism*.\n*   **Revised Mechanism:** **Transient Conductivity Damping as a Scaling Kinetic Indicator.** The standard practice monitors *steady-state* $\\text{pH}$. The departure: Monitor the **response time constant ($\\tau$)** of the conductivity signal to a dosing pulse. Scaling reduces effective heat transfer area and alters local fluid dynamics/ionic boundary layers, changing the *dynamic* conductivity response.\n*   **Simpler, Viable Novelty:** **Feed-forward Acid Dosing based on Alkali Content (Conductivity).** Standard practice is feedback (measure $\\text{pH}$, act). Departure: Use **Conductivity** (already recorded, robust, no calibration drift) to calculate **Total Alkali** and **Sulfide** (via a physical model of the liquor), then compute the **exact stoichiometric acid dose** required to reach $\\text{pH} 5.0$. This removes the $\\text{pH}$ sensor from the *control loop* (making it a verification only), relying on the *mass balance* of the ionic species derived from conductivity. This is a \"Design Change\" in the *procedure/logic*: **Stoichiometric Pre-computation Dosing.**\n\n**IMPLEMENTATION BILL**\n1.  **Input Stream 1 (ALREADY-RECORDED):** Conductivity transmitter output ($\\kappa$, mS/cm). *Rationale:* Stated in problem context (Kraft liquor monitoring).\n2.  **Input Stream 2 (ALREADY-RECORDED):** Solids content (TS, %) from existing density/conductivity or lab data. *Rationale:* Standard pulp mill data.\n3.  **Calculation Module (DERIVED):** A DCS calculation function implementing the **Kraft Liquor Ionic Balance**.\n    *   **Derivation:** $\\text{pOH} = f(\\kappa, \\text{TS}, T, \\text{Sulfidity})$. Sulfidity is typically controlled and known (stated spec/operating parameter).\n    *   **Threshold (DERIVED):** The model outputs a predicted $\\text{pH}_{predicted}$. The threshold is $\\text{pH}_{target} = 5.0$ (Stated physics limit for Al-precipitation).\n    *   **Dose Calculation:** $\\Delta \\text{Acid} = k \\cdot (\\text{Alkali}_{current} - \\text{Alkali}_{target})$.\n4.  **Actuator (STANDARD PRACTICE PARITY):** Existing acid metering pump (e.g., $\\text{H}_2\\text{SO}_4$). No new hardware.\n5.  **Control Loop (DESIGN CHANGE):** Replace the $\\text{pH}$-feedback loop with a **Feed-Forward** loop driven by $\\kappa$ and TS. The $\\text{pH}$ sensor (if it exists) is demoted to a *trip limit* or *validation* check, not the primary driver.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:** SAME. No new sensors. Uses existing $\\kappa$ and TS signals.\n*   **Operability:** SAME. Operator sets Sulfidity and TS; DCS calculates dose.\n*   **Maintenance:** BETTER. Conductivity sensors are far more robust than $\\text{pH}$ electrodes (which require frequent calibration and cleaning). Removing $\\text{pH}$ from the *control loop* reduces dependency on the most troublesome sensor in the plant.\n*   **Cost Class:** SAME. No capital expenditure for new instrumentation.\n\n**EXECUTABLE TEST**\n*   **Protocol:** Run the evaporator in \"Manual-Verification\" mode for 48 hours.\n*   **Instruments:** Existing Conductivity sensor, existing $\\text{pH}$ sensor (for reference only), acid metering flow meter.\n*   **Pass/Fail Threshold:**\n    1.  **Correlation:** $\\text{pH}_{predicted}$ (from $\\kappa$/TS model) must correlate with $\\text{pH}_{measured}$ with an $\\text{R}^2 > 0.95$ and max error $< 0.2 \\text{ units}$.\n    2.  **Scale Mitigation:** Maintain $\\text{pH}_{predicted} < 5.0$ for 48 hours. Visual inspection of tubes or monitoring of **Evaporation Rate (kg steam/kg liquor)** must show **no decline** relative to the baseline \"Clean Tube\" performance metric (stated as \"cutting the evaporation rate\" is the failure, so the indicator is restoration/maintenance of rate).\n*   **Kill Criterion:** If $\\text{pH}_{predicted}$ deviates from $\\text{pH}_{measured}$ by $> 0.5 \\text{ units}$ for $> 10$ minutes, the control logic is unstable or the ionic model is invalid for the current liquor chemistry. Abort and revert to standard $\\text{pH}$ feedback.\n*   **Validation:** Validated against *already-recorded* historical data of $\\kappa$ vs. $\\text{pH}$ from the last 6 months to refine the $f(\\kappa, \\text{TS}, T)$ function *before* deployment. No new commissioning campaign required; the model is derived from existing logs.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Input Stream 1 (ALREADY-RECORDED):** Conductivity transmitter output ($\\kappa$, mS/c",
+    "2.  **Input Stream 2 (ALREADY-RECORDED):** Solids content (TS, %) from existing density/co",
+    "3.  **Calculation Module (DERIVED):** A DCS calculation function implementing the **Kraft ",
+    "*   **Derivation:** $\\text{pOH} = f(\\kappa, \\text{TS}, T, \\text{Sulfidity})$. Sulfidity is",
+    "*   **Threshold (DERIVED):** The model outputs a predicted $\\text{pH}_{predicted}$. The th",
+    "*   **Dose Calculation:** $\\Delta \\text{Acid} = k \\cdot (\\text{Alkali}_{current} - \\text{A",
+    "4.  **Actuator (STANDARD PRACTICE PARITY):** Existing acid metering pump (e.g., $\\text{H}_",
+    "5.  **Control Loop (DESIGN CHANGE):** Replace the $\\text{pH}$-feedback loop with a **Feed-",
+    "*   **Installability:** SAME. No new sensors. Uses existing $\\kappa$ and TS signals.",
+    "*   **Operability:** SAME. Operator sets Sulfidity and TS; DCS calculates dose.",
+    "*   **Maintenance:** BETTER. Conductivity sensors are far more robust than $\\text{pH}$ ele",
+    "*   **Cost Class:** SAME. No capital expenditure for new instrumentation.",
+    "*   **Protocol:** Run the evaporator in \"Manual-Verification\" mode for 48 hours.",
+    "*   **Instruments:** Existing Conductivity sensor, existing $\\text{pH}$ sensor (for refere",
+    "*   **Pass/Fail Threshold:**",
+    "1.  **Correlation:** $\\text{pH}_{predicted}$ (from $\\kappa$/TS model) must correlate with ",
+    "2.  **Scale Mitigation:** Maintain $\\text{pH}_{predicted} < 5.0$ for 48 hours. Visual insp",
+    "*   **Kill Criterion:** If $\\text{pH}_{predicted}$ deviates from $\\text{pH}_{measured}$ by",
+    "*   **Validation:** Validated against *already-recorded* historical data of $\\kappa$ vs. $"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, Constraint Check:** The problem states \"signals_used\": `[\"ph\", \"conductivity\"]`. The data source rule says inputs must"
+   ],
+   "APPARATUS_ROW": [
+    "2.  **Scale Mitigation:** Maintain $\\text{pH}_{predicted} < 5.0$ for 48 hours. Visual inspection of tubes or m"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "b5dafd2ed632667b"
+}

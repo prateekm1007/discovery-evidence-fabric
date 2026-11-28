@@ -181,16 +181,42 @@ def test_baseline_arm_same_rule():
 
 
 def _calib_fake(n_good: int, n_empty: int):
-    """Deterministic calibration stub: n_good valid picks of the good
-    answer, n_empty empty responses, rest valid but WRONG."""
+    """Deterministic calibration stub: n_good pairs answered with the
+    good pick, n_empty pairs never answering (empty on BOTH the first
+    attempt and the AM3 D5 cap escalation), the rest valid but WRONG.
+
+    PAIR-SCOPED, not transport-call-scoped (the r28-disclosed
+    IndexError, fixed under c-0023/AM27 D4): the driver's
+    _judge_judgment_call makes a SECOND transport call for an empty
+    first response (the AM3 D5 cap escalation re-asks through the
+    SAME prompt) and for a failed parse (the retry EXTENDS the
+    prompt), so counting transport calls overruns the 30-entry
+    corpus (31 calls for 30 pairs). Pair identity is recovered from
+    the prompt bytes: an escalation repeats the previous prompt
+    exactly and a parse retry starts with it, so a repeated/
+    extended prompt is the SAME pair. The DRIVER is byte-unchanged —
+    the defect was the outdated stub model of the call pattern.
+    """
     pairs = R.json.loads(open(
         Path(__file__).resolve().parents[1] /
         "eval" / "judge_calibration.json", encoding="utf-8").read())
-    state = {"i": 0}
+    state = {"pair": -1, "base_prompt": None}
+
+    def _same_pair(prompt: str) -> bool:
+        b = state["base_prompt"]
+        return b is not None and (prompt == b or prompt.startswith(b))
 
     def fake(provider, model, prompt, system, max_tokens):
-        idx = state["i"]
-        state["i"] += 1
+        if not _same_pair(prompt):
+            state["pair"] += 1
+            state["base_prompt"] = prompt
+        idx = state["pair"]
+        if idx < 0 or idx >= len(pairs):
+            # never a silent wrong-shape answer: a call outside the
+            # corpus is a stub defect, typed loudly
+            return {"status": "FAIL", "content": None,
+                    "error": f"calibration stub out of corpus "
+                             f"(pair {idx}, corpus {len(pairs)})"}
         if idx < n_empty:
             return {"status": "OK", "content": ""}
         # valid pick: the good answer is A when the deterministic order is

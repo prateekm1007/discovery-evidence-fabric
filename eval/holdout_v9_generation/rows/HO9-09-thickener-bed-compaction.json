@@ -1,0 +1,95 @@
+{
+ "problem_id": "HO9-09-thickener-bed-compaction",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:7b96f5722fb9": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:5d5608ff2810": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:19:09.770662Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\n**Proposed Intervention:** Implement a \"Dense-Head\" operating protocol that combines a specific anionic polyacrylamide flocculant with a controlled reduction of rake speed and a lowered bed-level setpoint, creating a high-compressive-load environment at the underflow discharge point to maximize particle consolidation.\n**Standard Practice vs. Mitigation:** Standard practice operates thickeners at a fixed bed level and constant rake speed to maximize volume handling, accepting a loosely packed bed that limits underflow density. My mitigation is a departure that deliberately trades some settling height for increased compressive stress, using flocculant selection to maintain sludge stability while the mechanical retuning forces the bed into a denser equilibrium state.\n**Adjacent-Technique Clearance:** The closest existing practice is \"high-density thickener design\" (e.g., Dorr-Oliver dense-head zones). The difference here is that this is not a capital hardware redesign (which is excluded), but a **configuration and procedure change** (TRIZ P5: Defect-to-Virtue / Transformation) that leverages existing rake and control systems to mimic the physics of a dense-head zone through operational parameters.\n**Mechanism:** The mechanism attacks the failure's driving physics (low compressive stress leading to low density) by increasing the effective unit weight of the sludge bed via flocculation (reducing interstitial water) and increasing the vertical compressive stress at the rake tips by lowering the bed level (reducing bed height $h$) and slowing the rake (increasing torque/holding time).\n\nPHYSICS CHECK\n**Governing Relation:** Underflow density $\\rho_u$ in a compressing bed is governed by the compressive stress $\\sigma_c$ at the bottom:\n$$ \\sigma_c \\approx \\rho_s g h_{bed} $$\nWhere $\\rho_s$ is sludge unit weight, $g$ is gravity, and $h_{bed}$ is bed depth. However, in a high-rate thickener, the *actual* consolidation is limited by the **yield stress** $\\tau_y$ of the flocculated sludge and the **rake speed** $v_r$. If $v_r$ is too high, the bed is continuously disrupted, preventing stress relaxation and densification.\n**Direction-of-Effect:**\n*   **Driving Variable:** Effective Compressive Stress at the rake tip / Bed Consolidation Time.\n*   **Mechanism Moves:** **Up** the Consolidation Time (by lowering $v_r$) and **Up** the Sludge Unit Weight $\\rho_s$ (via anionic flocculant).\n*   **Result:** This **Increases** the effective compressive load on the solid particles and **Reduces** the interstitial water pressure, thereby **Raising** the underflow density $\\rho_u$.\n*   **Sign Check:** The failure is *low* density. The remedy must *raise* density. Raising consolidation time and sludge weight raises density. The direction is correct.\n\n**Magnitude Verification:**\nAssume standard bed height $h = 5$ m. Lowering setpoint to $h' = 3$ m reduces hydrostatic head, but if we simultaneously increase sludge density $\\rho_s$ from 1050 kg/m³ to 1100 kg/m³ (via flocculant) and halve rake speed (increasing residence/compression time), the effective consolidation factor increases. The critical transition is that slowing the rake allows the thixotropic structure to recover. Empirically, reducing rake speed by 50% in a high-rate thickener can increase underflow density by 10–15% if the bed is not overloaded, by allowing more time for particle rearrangement under static load before disruption.\n\n**Input-Availability:**\n*   **Signals Required:** Bed Level (existing radar/sonar), Rake Torque (existing drive motor amps), Underflow Density (existing inline densitometer or periodic lab samples).\n*   **Permitted Sources:** All these signals are standard process variables in a thickener control system. No new instrumentation is required. The constraint allows \"bed-level/underflow setpoint retuning\" and \"rake-speed/recirculation procedure.\"\n\n**Cost-Pricing (Operational Loss):**\n*   **Loss:** Lowering bed height $h$ reduces the total inventory volume in the tank, potentially reducing buffer time during feed upsets.\n*   **Bound:** A 2m reduction in bed height in a 20m diameter tank reduces volume by $\\pi (10^2) (2) \\approx 628 m^3$.\n*   **Trade-off:** This is a **zero operational loss** regarding throughput *if* the feed rate remains constant, as the thickener is not a storage vessel but a processing unit. The \"loss\" is only a safety margin reduction. Given the plant's primary goal is density, this trade is net positive. No energy is lost; rake speed reduction may actually *save* slight energy if the torque drops due to better sludge conditioning, though typically torque monitoring is used to ensure it doesn't stall.\n\nIMPLEMENTATION BILL\n*Note: Every row is tagged per the PROCUREMENT RULE. No new hardware is added. The mechanism is purely procedural and parameter-based.*\n\n1.  **Flocculant Selection & Dosing Adjustment:** Select a high-molecular-weight anionic polyacrylamide (PAM) specifically formulated for tailings compaction. Adjust the dosing pump setpoint (existing equipment) to optimize zeta potential for flocculation.\n    *   **Tag:** (a) Existing dosing system; (b) Procured standard chemical catalog item (PAM granules/liquid); (c) Parameter change (dosing rate).\n2.  **Bed Level Setpoint Retuning:** Lower the automated bed-level control setpoint from the current value (e.g., 5.0 m) to 3.0 m. This reduces the hydrostatic pressure on the bottom but, critically, moves the discharge point to a region of the bed profile where the sludge is structurally more consolidated and less disrupted by the rake's continuous passage.\n    *   **Tag:** (c) Parameter change to existing control loop.\n3.  **Rake Speed Duty Cycle Change:** Implement a procedure to reduce the rake speed from continuous high speed to a variable speed profile (or simply a lower fixed speed) that matches the torque limit of the drive, preventing bed disruption while maintaining rotation. If the drive has a VFD, program a 20% speed reduction. If not, engage the existing gear reduction or mechanical brake/limit to slow the drive to its next standard setting.\n    *   **Tag:** (c) Procedure/parameter change on existing rake drive.\n4.  **Underflow Discharge Verification:** Maintain existing underflow density monitoring. Use the densitometer (existing) to verify the new operating point achieves the target density.\n    *   **Tag:** (a) Existing instrumentation used as-is.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Hardware:** **Zero** new hardware. All components (dosing pumps, controls, drives) are existing plant assets.\n*   **Procurement:** One new chemical item (flocculant). Standard practice *already* procures flocculants; this is a **swap** within the same class (changing the specific PAM type or dosage), not a new infrastructure burden. Cost is marginal (chemical consumption).\n*   **Installation/Commissioning:** **Zero** installation. Changes are software setpoints (PLC/DCS) and procedural updates (SOPs). Commissioning burden is negligible (hours, not days).\n*   **Operational Loss:** As calculated above, the loss of buffer volume is an acceptable engineering trade-off for the product quality improvement (density). There is no reduction in production throughput (tons/day of tailings processed), only a change in the state of the discharge.\n*   **Conclusion:** Same-or-lower burden. This intervention removes the need for future capital projects (like bed deepening) by optimizing the existing equipment's physics.\n\nEXECUTABLE TEST\n**Protocol:**\n1.  **Baseline:** Record current underflow density ($\\rho_{u,baseline}$) and bed level for 3 days.\n2.  **Intervention:**\n    *   Switch flocculant to the selected anionic PAM.\n    *   Lower bed level setpoint by 20% (or 1.0–2.0 m).\n    *   Reduce rake speed by 20% (if variable drive available) or implement a \"slow-down\" procedure.\n3.  **Stabilization:** Allow 48 hours for the bed to re-equilibrate. Monitor torque to ensure it does not exceed 110% of rated limit.\n4.  **Measurement:** Measure underflow density ($\\rho_{u,new}$) using the inline densitometer and cross-check with grab samples.\n5.  **Duration:** 7 days continuous operation.\n\n**Pass/Fail Thresholds:**\n*   **Pass:** $\\rho_{u,new} > \\rho_{u,baseline} + 0.05 g/cm^3$ (5% relative increase) **AND** Rake Torque $< 90\\%$ of limit (ensuring stability).\n*   **Fail/Kill Criterion:** If bed level drops below the minimum underflow discharge height (blocking the pipe), or if torque exceeds 110% (indicating bed plugging/stalling), immediately revert to baseline parameters. If density does not improve within 48 hours of stabilization, the flocculant selection is incorrect; adjust dosage or select a different PAM class.\n\n**Falsification:** The test validates effectiveness by showing the **drop** in interstitial water (density increase) and the **reduction** in disruption (lower torque/stability). If the density does not rise despite the lowered bed and slower rake, the hypothesis that compaction is limited by rake disruption/flocculation quality is falsified.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Flocculant Selection & Dosing Adjustment:** Select a high-molecular-weight anionic p",
+    "2.  **Bed Level Setpoint Retuning:** Lower the automated bed-level control setpoint from t",
+    "3.  **Rake Speed Duty Cycle Change:** Implement a procedure to reduce the rake speed from ",
+    "4.  **Underflow Discharge Verification:** Maintain existing underflow density monitoring. ",
+    "*   **Hardware:** **Zero** new hardware. All components (dosing pumps, controls, drives) a",
+    "*   **Procurement:** One new chemical item (flocculant). Standard practice *already* procu",
+    "*   **Installation/Commissioning:** **Zero** installation. Changes are software setpoints ",
+    "*   **Operational Loss:** As calculated above, the loss of buffer volume is an acceptable ",
+    "*   **Conclusion:** Same-or-lower burden. This intervention removes the need for future ca"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: The failure is caused by excessive compressive stress at the underflow discharge point (high bed weight), which drives the sludge into a state of over-c"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "97bf895c536d232b",
+ "smoke": false
+}

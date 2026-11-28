@@ -83,11 +83,42 @@ if sys.platform == "win32":
         _fake_fcntl.flock = lambda *a, **k: None
         sys.modules["fcntl"] = _fake_fcntl
 
-PROVIDER_ENV_VARS = [
-    "OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",
-    "GEMINI_API_KEY", "OPENAI_API_KEY", "QWEN_API_KEY", "DEEPSEEK_API_KEY",
-    "MISTRAL_API_KEY",
-]
+def _provider_env_vars():
+    """Derive the provider-credential surface from the ONE authoritative
+    table (llm_registry.PROVIDER_SPECS) — the hand-maintained list went
+    stale (R8 measured: XKIRO_API_KEY/AGNES_API_KEY/INCEPTION_API_KEY/
+    HF_TOKEN/UNOROUTER_API_KEY were missing, and a startup_validation
+    test legitimately loaded the real vault into the process env, so
+    the leak reached the 'no probe with empty credentials' contract).
+    LOCAL_QWEN_BASE_URL is a transport endpoint, not a secret — excluded.
+    The static fallback keeps the suite alive if the registry import
+    ever breaks (typed warning, never silent drift)."""
+    fallback = [
+        "OPENROUTER_API_KEY", "NVIDIA_API_KEY", "ANTHROPIC_API_KEY",
+        "GEMINI_API_KEY", "OPENAI_API_KEY", "QWEN_API_KEY",
+        "DEEPSEEK_API_KEY", "MISTRAL_API_KEY",
+    ]
+    try:
+        from discovery_fabric.engine.llm_registry import PROVIDER_SPECS
+        names = set()
+        for spec in PROVIDER_SPECS:
+            if spec.env_var and spec.env_var != "LOCAL_QWEN_BASE_URL":
+                names.add(spec.env_var)
+            for extra in (spec.key_env_vars or []):
+                if extra != "LOCAL_QWEN_BASE_URL":
+                    names.add(extra)
+        if names:
+            return sorted(names)
+        print("[conftest] registry returned no provider env vars; "
+              "using the static fallback list (typed)")
+        return fallback
+    except Exception as exc:  # noqa: BLE001 — typed, never silent
+        print(f"[conftest] provider-env derivation failed typed "
+              f"({type(exc).__name__}: {exc}); static fallback in use")
+        return fallback
+
+
+PROVIDER_ENV_VARS = _provider_env_vars()
 
 # Source-layer credentials (read from .env.keys, not env vars). Same
 # hermetic rule as the LLM keys above: provisioning a source key (e.g. the
@@ -290,3 +321,123 @@ def _hermetic_model_routing_state(monkeypatch, tmp_path):
     _mr.clear_probe_cache()
     yield
     _mr.clear_probe_cache()
+
+
+# ---------------------------------------------------------------------------
+# F86 (claim c-154, builder-r111s1): the bounded pytest tmp discipline.
+#
+# MEASURED TWICE (R110s2): the battery's tmp_path fixtures accumulated
+# ~4.7GB per full run under /tmp/pytest-of-z/<n> — on the ~4.7GB-free
+# reprovisioned rootfs that filled the disk to 100% TWICE during one
+# window (the first manifest hash pass truncated 79 downloads; the
+# Bolt model download died mid-run). pytest's own retention keeps the
+# last 3 numbered runs, which is exactly the accumulation that never
+# gets reclaimed between the CI-replica battery runs in one sandbox.
+#
+# This fixture (a) removes every STALE numbered run at session start,
+# (b) removes the CURRENT run's numbered dir at session finish (the
+# fixtures are per-run temp state; nothing downstream reads them), so
+# a full battery leaves /tmp with ~0 pytest residue (<< the 1GB bound
+# the acceptance names), and (c) a light watchdog thread reaps the
+# STALE dirs (not the live one) if the session runs long. ENGINE_LIVE
+# is not consulted: this is disk hygiene, not hermeticity. F86_KEEP_TMP
+# opts out for debugging a specific suite's fixtures.
+# ---------------------------------------------------------------------------
+def _tmp_pytest_root() -> Path:
+    import getpass
+    import tempfile
+    return (Path(os.environ.get("PYTEST_DEBUG_TEMPROOT",
+                                tempfile.gettempdir()))
+            / f"pytest-of-{getpass.getuser()}")
+
+
+def _du_bytes(root: Path) -> int:
+    total = 0
+    if root.exists():
+        for p in root.rglob("*"):
+            try:
+                if p.is_file():
+                    total += p.stat().st_size
+            except OSError:
+                pass
+    return total
+
+
+def _reap_stale(root: Path, keep: str | None = None,
+                min_age_s: float = 600.0) -> int:
+    """Remove pytest-N tmp dirs. Three guards measured in after the
+    F88 cascade (the reaper deleted a LIVE dir twice):
+      1. the glob is pytest-[0-9]* — "pytest-current" is pytest 9's
+         own LOCK SYMLINK (make_numbered_dir's _force_symlink) and
+         must NEVER be touched;
+      2. a dir newer than min_age_s belongs to a LIVE session (this
+         one or a concurrent one) and is skipped; OUR live dir is
+         additionally protected by name (keep), and the session-finish
+         pass removes OUR dir explicitly via the cached name;
+      3. fail-closed: keep=None in the watchdog means it never runs
+         (the session-finish pass passes an explicit mode instead).
+    Returns the count of removed dirs."""
+    import shutil
+    import time as _t
+    n = 0
+    if root.exists():
+        for d in sorted(root.glob("pytest-[0-9]*")):
+            if keep is not None and d.name == keep:
+                continue
+            try:
+                age = _t.time() - d.stat().st_mtime
+            except OSError:
+                continue
+            if age < min_age_s:
+                continue  # a live session (ours or concurrent)
+            shutil.rmtree(d, ignore_errors=True)
+            n += 1
+    return n
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _bounded_pytest_tmp(request):
+    """The F86 disk-hygiene fixture, FINAL form (the R112 window):
+    a session-START stale reap (age-guarded, so a concurrent live
+    session's fresh dir is never touched) + a session-FINISH cleanup
+    (OUR numbered dir removed by NAME + the still-stale others). The
+    intermediate designs (a 30s watchdog thread) are RETIRED: they
+    measured as the cause of two 78-ERROR battery cascades — the
+    per-tick getbasetemp() contended on pytest's own tmp lock, the
+    `pytest-*` glob ate pytest 9's `pytest-current` lock symlink, and
+    the unguarded reaper deleted the LIVE dir. The acceptance bound
+    (/tmp pytest residue <=1GB after a full battery) needs no
+    watchdog: nothing accumulates (the start reap) and nothing leaks
+    (the finish reap)."""
+    if os.environ.get("F86_KEEP_TMP"):
+        yield
+        return
+    root = _tmp_pytest_root()
+    # (a) stale runs from crashed sessions never accumulate (the age
+    # guard protects any concurrent live session's fresh dir)
+    _reap_stale(root)
+
+    # our own numbered dir, resolved once (the fail-closed lesson: a
+    # raising getbasetemp() must not disable the finish cleanup's
+    # name-targeted part, only make it best-effort)
+    factory = getattr(request.config, "_tmp_path_factory", None)
+    keep = None
+    try:
+        if factory is not None:
+            keep = factory.getbasetemp().name
+    except Exception:
+        keep = None
+    yield
+    # (b) the current run's residue goes too (the acceptance bound):
+    # OUR dir removed by NAME; other dirs only if STALE (>10 min —
+    # a concurrent session's fresh dir is protected by the age guard)
+    before = _du_bytes(root)
+    if keep is not None:
+        import shutil
+        shutil.rmtree(root / keep, ignore_errors=True)
+    n_stale = _reap_stale(root, keep=keep)
+    after = _du_bytes(root)
+    print(f"\n[F86] bounded-tmp: pytest residue {before // 2**20}MB -> "
+          f"{after // 2**20}MB (removed our run's tree "
+          f"{keep or 'unknown'} + {n_stale} stale; bound: /tmp pytest "
+          f"residue <=1GB)")

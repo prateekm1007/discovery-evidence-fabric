@@ -1,0 +1,63 @@
+{
+ "problem_id": "HO2-04-gt-compressor-fouling",
+ "arm": "challenger",
+ "dev_source": "v2-burned",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "challenger = identical machine + the typed_plan payload field (the P2 addition under test)",
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the machine's typed plan layer - the intervention MUST implement this plan)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "winner_rule": "non_schedule_first",
+ "plan_measure_class": "configuration",
+ "generated_at": "2026-11-17T19:35:31.149385Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a periodic injection of a low-concentration surfactant solution into the wash water during offline water washes to reduce aerosol adhesion forces. Standard practice uses pure water washes; this mitigation departs by introducing surfactant chemistry to lower interfacial tension and disrupt deposit bonding. The closest existing practice is industrial parts-washing with surfactant additives, but this differs by targeting gas-turbine fouling physics and using transient, low-dose injection during scheduled washes. The mechanism attacks the failure by reducing the adhesion energy of salt/hydrocarbon aerosols to metal surfaces, making deposits easier to remove mechanically by water shear.\n\nPHYSICS CHECK — The driving variable is aerosol adhesion energy (J/m²). The mechanism lowers adhesion energy by 30–50% via surfactant adsorption at the deposit-metal interface, reducing interfacial tension from ~72 mN/m (pure water) to ~30 mN/m (surfactant-modified). This reduces the work of adhesion (Wa = γ(1 + cos θ)), making deposits easier to shear off at lower water-jet velocities. Lower adhesion energy directly reduces fouling accumulation rate between washes, improving heat rate recovery.\n\nIMPLEMENTATION BILL — \n1. (b) Standard peristaltic pump, installed on wash water supply line upstream of injection port, set to 0.1% v/v surfactant concentration during wash cycle\n2. (b) Standard inline static mixer, installed downstream of pump on wash water line to ensure surfactant dispersion\n3. (b) Standard conductivity probe, installed on wash water discharge line to monitor surfactant concentration (0.05–0.15% range)\n4. (c) Procedure change: Modify wash controller logic to activate pump for 5 minutes at start of each offline wash cycle, then deactivate\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Standard practice: Offline wash cycle with pure water (no surfactant pump or injection system)\n- This intervention adds: (1) peristaltic pump (catalog class, same as standard practice’s chemical dosing systems), (2) static mixer (catalog class, same as standard practice’s water treatment skids), (3) conductivity probe (catalog class, same as standard practice’s water quality monitoring), (4) controller logic update (standard procedure change). Burden class: same (minor hardware addition + software change, within standard maintenance envelope). Operational loss: zero (uses existing offline wash windows).\n\nEXECUTABLE TEST — \n- Protocol: Conduct two 30-day fouling cycles on identical compressor sections; one with standard pure water wash, one with surfactant-enhanced wash (0.1% v/v alkyl polyglucoside). Measure pressure drop across stage 1–3 at identical mass flow rates pre- and post-wash.\n- Instruments: Standard pressure transducers (existing plant equipment), calibrated flow meter, surfactant concentration monitor.\n- Pass/fail: Heat rate recovery ≥3% in surfactant wash vs. pure water wash (Δη/η ≥ 0.03), with no increase in blade roughness ( profilometer measurement).\n- Duration: 60 days (two 30-day cycles).\n- Kill criterion: If surfactant wash shows <2% heat rate recovery or any blade erosion (visual inspection + profilometry), mechanism fails.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice: Offline wash cycle with pure water (no surfactant pump or injection s",
+    "- This intervention adds: (1) peristaltic pump (catalog class, same as standard practice’s",
+    "- Protocol: Conduct two 30-day fouling cycles on identical compressor sections; one with s",
+    "- Instruments: Standard pressure transducers (existing plant equipment), calibrated flow m",
+    "- Pass/fail: Heat rate recovery ≥3% in surfactant wash vs. pure water wash (Δη/η ≥ 0.03), ",
+    "- Duration: 60 days (two 30-day cycles).",
+    "- Kill criterion: If surfactant wash shows <2% heat rate recovery or any blade erosion (vi"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'erosion' in: pure water wash (δη/η ≥ 0.03), with no increase in blade roughness ( profilometer measurement).\n- duration: 60"
+   ],
+   "APPARATUS_ROW": [
+    "3. (b) Standard conductivity probe, installed on wash water discharge line to monitor surfactant concentration"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_CHECK_UNAVAILABLE": [
+    "typed fail-open: HTTPError: HTTP Error 500: Internal Server Error (the authoritative read stays the auditor's)"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "2746dbe5a8559288",
+ "smoke": false
+}

@@ -1,0 +1,56 @@
+{
+ "problem_id": "HO4-01-esp-back-corona",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V72",
+ "machine_module": "scripts/r29_tune_battery_v74.py::machine_generate_v74 (imported, commit 7a1b7e050)",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is a rapping-interval retuning strategy that applies a variable-frequency rapping schedule based on ash-layer resistivity, reducing charge accumulation and back-corona onset. Standard practice uses fixed-interval rapping regardless of ash properties; this intervention dynamically adjusts rapping frequency by periodically measuring ash resistivity and retuning the rapping schedule to maintain a target charge density below the back-corona threshold. Adjacent-technique clearance: closest existing practice is fixed-interval rapping with manual adjustments; this differs by automating resistivity-based retuning. The mechanism attacks the driving physics by directly controlling the charge density buildup that causes back-corona in high-resistivity ash layers.\n\nPHYSICS CHECK — The governing relation is the critical charge density for back-corona onset: J_c = σ * E, where σ is ash resistivity and E is electric field. For σ > 1e11 ohm-cm, J_c exceeds typical ESP operating currents, causing charge buildup. By retuning rapping frequency to maintain charge density below J_c (e.g., by increasing rapping rate as resistivity rises), the intervention keeps J < J_c. Magnitude verification: if resistivity increases by 10x, rapping frequency increases by 2x (empirically observed), reducing charge density by 50%, sufficient to stay below J_c.\n\nIMPLEMENTATION BILL — (a) Existing ESP rapping controller (PWM controller, no sensor tap), (b) Standard resistivity probe (catalog: industrial ash resistivity probe, +/-10% accuracy), (b) Standard programmable logic controller (catalog: PLC with analog input module), (c) Rapping schedule algorithm (parameter change: set PLC to measure resistivity hourly and adjust rapping interval using f_rap = k / σ, where k is a tuning constant). Standard practice bill: (a) Existing ESP rapping controller (fixed interval). Intervention adds: (b) Resistivity probe, (b) PLC, (c) Algorithm.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installation: Standard practice (1 rapping controller) vs. Intervention (1 rapping controller + 1 probe + 1 PLC) — same burden (catalog parts, no new infrastructure). Commissioning: Standard practice (fixed setup) vs. Intervention (PLC programming, 1-day setup) — same burden (standard programming task). Operation: Standard practice (fixed rapping) vs. Intervention (hourly resistivity measurement + algorithm) — same burden (existing control system). Maintenance: Standard practice (controller maintenance) vs. Intervention (controller + probe + PLC maintenance) — same burden (catalog parts). Operational loss: Zero (rapping occurs during normal operation, no production downtime).\n\nEXECUTABLE TEST — Protocol: Install resistivity probe and PLC on ESP; run at full load for 30 days with variable ash resistivity (1e11 to 1e12 ohm-cm). Instruments: Resistivity probe, stack opacity monitor, ESP current meter. Pass/fail: Stack opacity increase <5% from baseline, ESP current variation <10% from setpoint. Duration: 30 days. Kill criterion: Opacity increase >10% or current drop >20%. Falsification: If opacity or current exceeds thresholds, the mechanism fails to mitigate back-corona.",
+ "a1_answer_sha256_16": "a906bbd896206181",
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3041,
+   "latency_s": 11.2,
+   "transport_tries": 1,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Standard practice: PWM controller (existing), no sensor tap, fixed waveform, no paramete"
+    ]
+   },
+   "sha256_16": "0dbbd076244e5ef4"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 3208,
+   "latency_s": 11.0,
+   "transport_tries": 2,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {},
+   "sha256_16": "a906bbd896206181",
+   "findings_disclosed": []
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 1,
+  "residual_findings": {}
+ },
+ "problems_sha256_16": "5e2eca51b6a3b8ee",
+ "audit_tip_at_read": "af3ef4d01",
+ "generated_at": "2026-11-16T07:01:14Z",
+ "one_shot": true,
+ "judged": false,
+ "note": "PENDING-AUDITOR (Art. 10: the builder never scores; the auditor scores with the PRIVATE rubric; acceptance bar mean >=3.0/4 and 0 allowed-measures violations per the sealed pre-registration)"
+}

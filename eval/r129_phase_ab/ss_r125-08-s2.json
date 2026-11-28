@@ -1,0 +1,69 @@
+{
+ "problem_id": "r125-08-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 1,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 9.21,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 1095,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 21.14,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1466,
+    "completion_tokens": 1712,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Adaptive Cycle-Length Extension via Oxygen-Transmitter Feedback Loop**\n\n**Mechanism:**\nThe root cause of the slipping purity and shortening cycles is likely the current control logic maintaining a static or conservatively short cycle time, preventing the molecular sieve beds from reaching equilibrium (complete desorption of oxygen) before switching. As the beds age or operating conditions drift, the fixed cycle time becomes insufficient, causing \"premature break-through\" where oxygen starts appearing in the product nitrogen earlier in the cycle, forcing the system to cut off the product portion to maintain purity (if interlocked) or simply resulting in lower average purity. Simultaneously, the short cycles cause frequent switching, leading to higher total air consumption per unit of usable nitrogen because the regeneration phase is inefficient and the \"dead time\" at switch-over is repeated more often.\n\nThe proposed mitigation implements a **closed-loop feedback adjustment of the cycle time (specifically the adsorption phase duration)** using the existing **Product Oxygen Analyzer** as the primary process variable and the **Cycle-Time Counter** to execute the change. The logic monitors the oxygen concentration at the *end* of the adsorption phase. If the oxygen level is detected to be higher than the ideal \"knee\" of the breakthrough curve (indicating the bed is saturating earlier than optimal or the cycle is too short for the current bed performance), the system **increases** the total cycle time. This allows for a longer adsorption period where the first half of the air flow is used to purify the nitrogen, and a longer regeneration period for the other bed to fully desorb oxygen. Conversely, if the oxygen at the end of the adsorption phase is well below the specification limit with a large margin, the cycle time can be safely **decreased** to reduce air consumption.\n\n**Direction-of-Effect (DIRECTION-OF-EFFECT):**\n*   **Driving Variable:** Product Oxygen Concentration (PV) measured by the Product Oxygen Analyzer.\n*   **Direction:** An **increase** in the driving variable (O2 concentration) above the Set Point causes an **increase** in the Manipulated Variable (Total Cycle Time). Conversely, a **decrease** in the driving variable below the Set Point (minus hysteresis) causes a **decrease** in the Manipulated Variable (Total Cycle Time). The feedforward variable (Feed-Air Pressure) has an **inverse** relationship to the base cycle time: an **increase** in pressure causes a **decrease** in the calculated base cycle time to maintain constant residence time.\n\n**Implementation:**\n1.  **Signal Mapping:** Connect the **Product Oxygen Analyzer** output signal to the PLC/controller's analog input (if not already active for control) and the **Cycle-Time Counter** output/input for timekeeping. The **Feed-Air Pressure Transmitter** is used as a feedforward compensation variable to normalize the air flow rate.\n2.  **Control Logic (PID or On-Off):** Implement a control loop where:\n    *   **Process Variable (PV):** Product Oxygen Concentration (measured at the end of the adsorption phase, just before the valve switch). **Source:** Existing Product Oxygen Analyzer.\n    *   **Set Point (SP):** Target Oxygen Concentration at the end of the adsorption phase. This SP should be set *below* the final purity specification limit to provide a buffer. For example, if the spec is <0.5% O2, set the SP for end-of-adsorption O2 to <0.2% O2. **Source:** Fixed configuration parameter derived from purity specification.\n    *   **Manipulated Variable (MV):** Total Cycle Time (in seconds). **Source:** Controlled output of the PLC to the **Cycle-Time Counter**.\n    *   **Feedforward:** The **Feed-Air Pressure Transmitter** value is used to adjust the base cycle time. Higher pressure (higher flow) requires a slightly shorter cycle time to maintain the same residence time in the bed; lower pressure requires a longer cycle time. This calculation: $T_{base} = T_{nominal} \\times \\frac{P_{nominal}}{P_{current}}$. **Source:** Existing Feed-Air Pressure Transmitter. $P_{nominal}$ is a configured constant. $P_{current}$ is the real-time reading from the Feed-Air Pressure Transmitter.\n3.  **Adjustment Algorithm:**\n    *   At the end of each adsorption phase, compare the PV (O2 Analyzer reading) against the SP.\n    *   If PV > SP (Too much O2, purity slipping): **Increase** the cycle time by a small increment (e.g., +1 second or +0.5% of current cycle). This allows more time for adsorption and regeneration.\n    *   If PV < SP - Hysteresis (O2 very low, large margin): **Decrease** the cycle time by a small increment to reduce air consumption.\n    *   Use the **Cycle-Time Counter** to implement rate limiting (e.g., maximum 1 second change per cycle) to prevent oscillation. **Source:** Existing Cycle-Time Counter.\n\n**Implementation Bill:**\n*   **Item 1: PLC Logic Update.** Modification of the existing controller program to implement the adaptive cycle-time algorithm described above.\n    *   **Cost/Resource:** Internal engineering hours for logic development, testing, and commissioning. No new hardware purchased.\n*   **Item 2: Operational Cost & Throughput Impact Assessment.**\n    *   **Throughput:** Extending the cycle time during break-through events (high O2) will slightly reduce the instantaneous output of usable nitrogen per unit of time, as a larger portion of each cycle is devoted to adsorption/regeneration rather than product yield. However, this ensures the product remains within specification, preventing waste of off-spec nitrogen. Net throughput of *usable* nitrogen is maintained or improved compared to the failure state where cycles are shortening and purity is slipping.\n    *   **Energy:** The feedforward compensation ($T_{base} = T_{nominal} \\times \\frac{P_{nominal}}{P_{current}}$) aims to maintain optimal residence time, preventing energy waste from overly long cycles when pressure/flow is high, or insufficient adsorption when pressure/flow is low. The total air consumption is optimized to the actual flow conditions, aiming to reduce the observed increase in feed-air consumption per unit of demand.\n    *   **Availability:** The control loop includes rate limiting to prevent oscillation. The system defaults to safe, longer cycle times if the O2 analyzer fails high, ensuring product purity. No new single points of failure are introduced as the system relies on existing, installed instrumentation.\n\n**Measures it Relies On:**\n*   **Product Oxygen Analyzer:** Provides the real-time purity feedback indicating whether the current cycle time is sufficient for the bed's current adsorption capacity. It detects the \"break-through\" point. **Permitted Sensor.**\n*   **Feed-Air Pressure Transmitter:** Provides a proxy for air flow rate, enabling feedforward compensation so that the cycle time adjustment accounts for variations in compressor output or demand, ensuring consistent gas residence time in the beds. **Permitted Sensor.**\n*   **Cycle-Time Counter:** Records and controls the duration of each phase. It allows the system to track the change in cycle length and ensures the mechanical switching valves operate in sync with the new, dynamically adjusted timing. **Permitted Sensor/Counter.**\n\n**Result:**\nBy dynamically extending the cycle time when oxygen break-through is detected early (due to bed saturation or aging), the system ensures that the adsorption phase runs long enough to produce high-purity nitrogen for the majority of the cycle, and the regeneration phase is long enough to properly restore the bed's capacity. This directly addresses the \"slipping purity\" and \"shortening cycles\" failure. The feedforward compensation ensures that \"feed-air consumption\" is optimized for the actual flow conditions, reducing waste from overly long cycles when not needed or insufficiently long cycles when required.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Item 1: PLC Logic Update.** Modification of the existing controller program to imple",
+   "*   **Cost/Resource:** Internal engineering hours for logic development, testing, and comm",
+   "*   **Item 2: Operational Cost & Throughput Impact Assessment.**",
+   "*   **Throughput:** Extending the cycle time during break-through events (high O2) will sl",
+   "*   **Energy:** The feedforward compensation ($T_{base} = T_{nominal} \\times \\frac{P_{nomi",
+   "*   **Availability:** The control loop includes rate limiting to prevent oscillation. The ",
+   "*   **Product Oxygen Analyzer:** Provides the real-time purity feedback indicating whether",
+   "*   **Feed-Air Pressure Transmitter:** Provides a proxy for air flow rate, enabling feedfo",
+   "*   **Cycle-Time Counter:** Records and controls the duration of each phase. It allows the"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 31.36,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

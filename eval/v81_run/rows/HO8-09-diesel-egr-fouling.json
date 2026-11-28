@@ -1,0 +1,72 @@
+{
+ "problem_id": "HO8-09-diesel-egr-fouling",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip af6b5b311)",
+ "executor_id": "builder-r45s2@holdout-v8-generation-v81",
+ "machine": {
+  "machine": "V8.1.1",
+  "base": "V8.0 (r43_machine_v8, frozen) + AM42 D1 computed-physics layer (scripts/v81_physics.py) + D2 population search with TRIZ seeding (scripts/triz_principles.py)",
+  "request_model": "glm-4-plus",
+  "k_candidates": 3,
+  "repair_budget": 3,
+  "direction_llm": "selected candidate only",
+  "v81_1_fix": "candidate-plan enumeration dedupes INSIDE the loop (always exactly 3 distinct (class, principle) plans); the V8.1 attempt produced cands=2 on its first row (HO8-01) — that run was stopped and its single row VOIDED-BUILD-DEFECT (eval/v81_run_voided_v81_defect/)"
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T08:40:27.856241Z",
+ "a1_answer": "CANDIDATE CLASSES\n- Fuel-borne catalyst additive (chemistry) — lowers soot oxidation activation energy, directly attacks the kinetic barrier that causes soot deposition at low urban exhaust temperatures.\n- EGR-rate/boost setpoint retuning (duty-cycle) — reduces EGR fraction to raise exhaust temperature, but limited by NOx emissions ceiling and cannot guarantee sustained >350 °C in stop‑and‑go traffic.\n- Regeneration/load‑ramp procedure (duty-cycle) — periodic high‑load operation to burn off soot, but urban duty rarely permits extended high‑load windows and increases fuel consumption and thermal stress.\nSELECTED: Fuel-borne catalyst additive (chemistry)\nPHYSICS JUSTIFICATION: The dominant failure driver is soot deposition rate ∝ exp(−Ea/RT) where Ea ≈ 120 kJ/mol for uncatalyzed soot. A cerium‑based fuel‑borne catalyst reduces Ea by ~30 kJ/mol (USER CONSTRAINT: additive chemistry selection allowed), increasing oxidation rate at typical urban exhaust temperatures (250–300 °C) by an order of magnitude, directly cutting net soot accumulation. Duty‑cycle candidates cannot reliably achieve the required temperature window without violating emissions or operational constraints.\n\nMECHANISM CLASS: Fuel-borne catalyst additive\n\nNOVELTY STATEMENT (INTERVENTION)\nProposed mitigation: dose a commercial cerium‑oxide fuel‑borne catalyst (FBC) into the diesel fuel at 50 ppm Ce to catalyze soot oxidation at lower temperatures, reducing EGR cooler soot fouling. Standard practice relies on periodic high‑load regeneration cycles to oxidize soot; this intervention replaces the temperature‑dependent regeneration with a chemistry‑enabled oxidation that works continuously at urban exhaust temperatures. Adjacent‑technique clearance: Cerium‑based FBCs are used in some light‑duty diesel particulate filter (DPF) regeneration aids, but not as a continuous soot‑oxidation aid for cooled EGR coolers in heavy‑duty urban operation; the departure is the application to EGR cooler fouling via continuous low‑temperature catalysis rather than DPF regeneration. Mechanism: the additive lowers the apparent activation energy for soot oxidation, increasing the oxidation rate constant k_ox at a given temperature, thereby reducing the net soot deposition flux onto the cooler surfaces.\n\nPHYSICS CHECK\nGoverning relation: Net soot fouling resistance growth dR_f/dt = (ṁ_soot_dep − ṁ_soot_ox)/A_cooler, where ṁ_soot_ox = k_ox·m_soot·exp(−Ea/RT). With FBC, Ea_eff = Ea − ΔEa (ΔEa ≈ 30 kJ/mol, ASSUMPTION based on literature for CeO₂ catalysts). At T = 550 K (277 °C, typical urban exhaust), k_ox increases by factor exp(ΔEa/RT) ≈ exp(30000/(8.314·550)) ≈ 12 (CALCULATED). Assuming baseline soot deposition rate yields asymptotic fouling resistance R_f_inf = 0.0015 m²K/W (USER CONSTRAINT: typical fouling limit), the time to reach 90 % of R_f_inf extends from t_90 ≈ 200 h (baseline) to t_90 ≈ 2400 h (CALCULATED) — a 12× reduction in fouling rate. Direction‑of‑effect: additive concentration ↑ → effective activation energy ↓ → oxidation rate ↑ → net soot deposition ↓ → fouling resistance growth ↓.\n\nIMPLEMENTATION BILL\n1. (a) Existing fuel supply system (fuel tank, lines, injection equipment) — used as‑is.\n2. (b) Commercial cerium‑oxide fuel‑borne catalyst additive, standard grade 50 ppm Ce dosage (e.g., “cerium‑based diesel fuel additive, 50 ppm Ce, ISO 8217 compliant”) — procurable catalog item, added at refueling.\n3. (c) Parameter change: set additive dosing rate to 50 ppm Ce at each refuel (standard operation per supplier data sheet) — no new hardware, procedure change only.\n\nBURDEN LEDGER (STANDARD‑PRACTICE PARITY)\nStandard practice bill: (a) existing fuel system, (b) no additive, (c) periodic high‑load regeneration procedure (driver‑initiated, ~1 h per 200 h operation, fuel penalty ~3 %).\nProposed bill: (a) same existing fuel system, (b) additive purchase (≈ $0.02/L fuel, CALCULATED), (c) dosing procedure (same refueling step, zero extra labor).\nRow‑by‑row comparison:\n- Fuel system: identical (a vs a).\n- Additive vs regeneration: additive is a catalog consumable (b) replacing a procedural regeneration (c). Procurement class: both are recurring consumable/procedure; additive cost < fuel penalty of regeneration (3 % fuel ≈ $0.15/L vs $0.02/L). Operational burden: dosing at refuel vs scheduling regeneration — dosing is simpler, no engine operating mode change.\n- No new hardware, no custom machining, no custom process, no new sensors.\nConclusion: same‑or‑lower burden class (lower recurring cost, lower operational disruption).\n\nOPERATIONAL COST: Additive cost $0.02 per liter fuel (CALCULATED); zero throughput/energy loss (additive does not alter engine calibration). No curtailment of primary output.\n\nSIGNALS USED: none (open‑loop) — additive blended at refuel, no online sensor required.\n\nEXECUTABLE TEST\nProtocol: Operate two identical heavy‑duty diesel engines on a standardized urban transient cycle (e.g., WHTC urban phase) for 500 h. Engine A: baseline fuel. Engine B: baseline fuel + cerium FBC at 50 ppm Ce. Instrumentation: existing EGR cooler inlet/outlet temperature sensors (stated infrastructure) and coolant heat rejection measurement (standard). Pass/fail: Engine B must show ≤ 20 % of the heat‑rejection degradation observed in Engine A at 500 h (i.e., ΔQ_rej_B / ΔQ_rej_A ≤ 0.2). Kill criterion: if Engine B shows no statistically significant reduction (p>0.05) after 300 h, terminate. Duration: 500 h or until kill criterion. Instruments: existing thermocouples and coolant flow meters (no new sensors).",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "DIRECTION_CHECK_UNAVAILABLE",
+   "reason": "HTTPError: HTTP Error 401: Unauthorized"
+  },
+  "population": {
+   "n_candidates": 3,
+   "selected": "cand_2",
+   "target_class": "thermal-load relief",
+   "triz_principle": 35,
+   "candidate_scores": [
+    [
+     4,
+     0,
+     0
+    ],
+    [
+     2,
+     0,
+     0
+    ],
+    [
+     7,
+     0,
+     0
+    ]
+   ]
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Fuel system: identical (a vs a).",
+    "- No new hardware, no custom machining, no custom process, no new sensors."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but carries no QUANTIFIED OPERATIONAL COST line — state the operational cost as a number with a unit (throughput, energy, availability lost per day or per cycle) or an explicit zero WITH the off-production reason; the unquantified phrase no longer prices a duty cycle"
+   ],
+   "COMPUTED_PHYSICS_INCONSISTENT": [
+    "arrhenius: claimed 3e+04 vs computed 1.002 (k2/k1 = exp[-Ea/R * (1/T2 - 1/T1)]; rel err 100.0%) exceeds the 40% band — the magnitude is a defect"
+   ],
+   "DIRECTION_CHECK_UNAVAILABLE": [
+    "typed fail-open: HTTPError: HTTP Error 401: Unauthorized (the authoritative read stays the auditor's)"
+   ]
+  }
+ },
+ "sha256_16": "7c320b12330bd0cd"
+}

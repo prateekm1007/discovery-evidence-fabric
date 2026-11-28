@@ -1,0 +1,89 @@
+{
+ "record": "R151S1_TRANSPORT_CENSUS_ESCALATION/1.0.0",
+ "at": "2026-11-24 16:58 UTC (probe time)",
+ "directive": "DIR 2 (TOP): fund a valid >=3-judge path (the score-8 panel is transport-gated)",
+ "fresh_probe": {
+  "xkiro_vault_key": {
+   "google/gemini-2.5-flash": {
+    "alive": false,
+    "http": 403,
+    "err": "{\"error\":{\"message\":\"google/gemini-2.5-flash is available with a subscription plan only — it is not sold pay-as-you-go. "
+   },
+   "anthropic/claude-sonnet-4": {
+    "alive": false,
+    "http": 403,
+    "err": "{\"error\":{\"message\":\"This premium model requires an active paid plan or real deposited balance. Subscribe to a plan or t"
+   },
+   "openai/gpt-6.1-sol": {
+    "alive": false,
+    "http": 403,
+    "err": "{\"error\":{\"message\":\"This premium model requires an active paid plan or real deposited balance. Subscribe to a plan or t"
+   },
+   "x-ai/grok-4.7": {
+    "alive": false,
+    "http": 403,
+    "err": "{\"error\":{\"message\":\"This premium model requires an active paid plan or real deposited balance. Subscribe to a plan or t"
+   }
+  },
+  "xkiro_directions_key": {
+   "google/gemini-2.5-flash": {
+    "alive": false,
+    "http": 401,
+    "err": "{\"error\":{\"message\":\"Invalid or disabled API key.\",\"type\":\"authentication_error\",\"code\":\"authentication_error\"}}"
+   }
+  },
+  "cent_ai": {
+   "deepseek-v4-flash": {
+    "alive": false,
+    "http": 402,
+    "err": "{\"error\":{\"code\":\"insufficient_balance\",\"message\":\"Your balance is empty. Top up or buy a package in the dashboard.\",\"pa"
+   },
+   "qwen3.8-flash": {
+    "alive": false,
+    "http": 402,
+    "err": "{\"error\":{\"code\":\"insufficient_balance\",\"message\":\"Your balance is empty. Top up or buy a package in the dashboard.\",\"pa"
+   },
+   "hy4-flash:free": {
+    "alive": true,
+    "http": 200,
+    "latency_s": 2.3,
+    "reply": ""
+   },
+   "glm-5.3-flash:free": {
+    "alive": false,
+    "http": 429,
+    "err": "{\"error\":{\"code\":\"rate_limited\",\"message\":\"Today's free pool for 'glm-5.3-flash:free' is used up. It resets at 00:00 UTC"
+   },
+   "glm-5.3-flash": {
+    "alive": false,
+    "http": 402,
+    "err": "{\"error\":{\"code\":\"insufficient_balance\",\"message\":\"Your balance is empty. Top up or buy a package in the dashboard.\",\"pa"
+   }
+  },
+  "glm_free": {}
+ },
+ "census": {
+  "alive_judge_lanes": [
+   "cent-ai hy4-flash:free (200, 2.3s) — 1 lane"
+  ],
+  "dead_or_gated": {
+   "xkiro (directions' key (digest f473944703d5 per the directions text))": "401 invalid/disabled (reproduced this window)",
+   "xkiro (VAULT key, digest f6c09bee9bde — DIFFERS from the directions' key)": "auth-VALID (models list 200, 73 models) but EVERY premium model 403 'requires an active paid plan or real deposited balance' — a real key with ZERO funding; typed NOT_A_FUNDED_PATH (per the delete list, neither an invalid NOR an unfunded key counts)",
+   "cent-ai paid (dsv4f/qw38f/glm53f)": "402 insufficient_balance",
+   "glm-5.3-flash:free": "429 free-pool used up, resets 00:00 UTC (probe ran 16:58 UTC — 7h out; even after reset it is ONE more lane: 2 alive total, still below the 3-judge gate)",
+   "agnes (the default generator)": "alive, but agnes judging v18 = F2 self-certification (NON-COUNTING); the compliant agnes-as-judge lane needs the non-agnes generation (c-0261, live lease) + the agnes R-CAL (c-0262, live lease) — NOT re-run under a rival lease"
+  },
+  "free_tier_enumeration": "cent-ai exposes exactly 2 free-tier models (glm-5.3-flash:free, hy4-flash:free) — no hidden third free lane"
+ },
+ "owner_ask_escalated_TOP": {
+  "act_1 (cheapest, unblocks immediately)": "cent-ai top-up — unblocks the r148-R-CAL-qualified dsv4f + qw38f (alpha 0.835) -> 3 judges from 3 families (deepseek/qwen/hy4) on the v18 set in one window",
+  "act_2 (broader)": "an xkiro plan or deposited balance on the VAULT key (it is auth-valid; any pay-as-you-go-capable model unblocks claude/gpt/grok/moonshot lanes)",
+  "act_3 (standing)": "rotate the history-exposed credentials (F45)",
+  "escalation_basis": "the funding ask is now open R150 -> R151 (2 verdicts; V117 typed it); Art. 12 of the auditor constitution escalates at 3 rounds — this record pre-escalates it as the TOP item so it does not idle a third round"
+ },
+ "offline_work_this_window_per_art28": [
+  "the physics-truth lever verification (eval/r151s1_physics_recompute.json — the DIR-6/7 acceptance recomputed from bytes)",
+  "the worldwide lever census (this record's sibling, eval/r151s1_worldwide_lever_census.json)",
+  "the DIR-3 stand-down typing (live leases respected)"
+ ]
+}

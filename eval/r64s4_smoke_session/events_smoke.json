@@ -1,0 +1,502 @@
+{
+ "record": "HOLDOUT_V9_GENERATION_EVENTS/1.0.0",
+ "run": "holdout-v9-generation",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "registered_model": "agnes-3.0-flash",
+ "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+ "window_started_at": "2026-11-18T07:10:48.893814Z",
+ "events": [
+  {
+   "problem_id": "HO7-01-zinc-ew-acid-mist",
+   "generated_at": "2026-11-18T07:10:48.909441Z",
+   "histogram_before": {},
+   "histogram_after": {
+    "** surface tension suppression via bulk foaming agent dosing": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 7980,
+     "latency_s": 14.1,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "1. Chemical supply of acid mist suppressant (catalog item).",
+       "2. Timer-based dosing pump (existing equipment).",
+       "3. Ventilation fans running at constant speed (existing equipment).",
+       "4. Temperature control loop for electrolyte (existing equipment).",
+       "*   **Hardware:** The intervention adds **zero** new hardware. It uses the existing dosing",
+       "*   **Operational Loss:** Lowering the temperature setpoint to 40°C may slightly reduce th",
+       "*   **Conclusion:** The burden is **lower** than standard practice because it reduces chem",
+       "*   **Protocol:**",
+       "1.  Establish baseline: Operate tankhouse at 45°C, continuous dosing of standard surfactan",
+       "2.  Intervention Setup:",
+       "*   Retune electrolyte temperature setpoint to 40°C.",
+       "*   Switch dosing chemistry to selected foam-blanket concentrate.",
+       "*   Reprogram dosing pump to activate only when $T_{electrolyte} > 42°C$ for 5 minutes, th",
+       "*   Enforce cell-cover closure procedure during dosing windows.",
+       "3.  Run for 14 days.",
+       "4.  Measure airborne acid mist concentration daily using the same sampler and location.",
+       "*   **Instruments:** Standard high-volume air sampler, temperature logger (existing PLC), ",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Pass:** Airborne acid mist concentration is reduced by $\\geq 50\\%$ relative to the b",
+       "*   **Kill Criterion:** If mist concentration increases, or if the foam blanket causes exc",
+       "*   **Falsification:** The test falsifies the approach if the \"gated\" dosing does not redu"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'procedural checklist item' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)",
+       "added measure 'no maintenance overhead' shares no allowed-list stem (no cell or anode redesign; allowed measures: electrolyte additive / foam-blanket...)"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: The established physical driver of acid aerosol generation in zinc electrowinning is the mechanical entrapment of electrolyte droplets by bursting oxyge"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: The established physical driver of acid aerosol generation in zinc electrowinning is the mechanical entrapment of electrolyte droplets by bursting oxygen bubbles at the gas-liquid interface, a process that is exacerbated by lower electrolyte temperatures due to increased viscosit | ingredient: Lowering the electrolyte temperature setpoint increases the liquid's viscosity and surface tension, which enhances droplet entrainment and stabilizes smaller, heavier aerosols, thereby adding to the damage integral rather than reducing it. | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "The established physical driver of acid aerosol generation in zinc electrowinning is the mechanical entrapment of electrolyte droplets by bursting oxygen bubbles at the gas-liquid interface, a process that is exacerbated by lower electrolyte temperatures due to increased viscosit",
+      "ingredient_action": "Lowering the electrolyte temperature setpoint increases the liquid's viscosity and surface tension, which enhances droplet entrainment and stabilizes smaller, heavier aerosols, thereby adding to the damage integral rather than reducing it.",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "339ac22b0520da0c"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 5827,
+     "latency_s": 58.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom compound"
+      ],
+      "BILL_UNTAGGED": [
+       "- Row 1 & 2 (Antifoam & Pump): Procurement of standard catalog item. Burden class: Same. T",
+       "- Row 3 (Setpoint change): No hardware cost. Operational loss: Zinc deposition efficiency ",
+       "- Row 4 (Ventilation duty): Operational loss: None. Air quality standards are met because "
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'antifoam stabilization, preventing bubble film rupture) and ' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: The mechanical rupture of rising oxygen bubbles at the electrolyte surface entrains liquid droplets (acid mist) due to the film's surface tension and instability. | ingredient: The silicone antifoam lowers surface tension and increases bubble film stability to prevent rupture, and lower temperature reduces vapor pressure and mist concentration, both reducing the generation of acid aerosol. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "The mechanical rupture of rising oxygen bubbles at the electrolyte surface entrains liquid droplets (acid mist) due to the film's surface tension and instability.",
+      "ingredient_action": "The silicone antifoam lowers surface tension and increases bubble film stability to prevent rupture, and lower temperature reduces vapor pressure and mist concentration, both reducing the generation of acid aerosol.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "bd266ffbaf3f114d",
+     "findings_disclosed": [
+      "DEV_NEED: custom compound",
+      "BILL_UNTAGGED: - Row 1 & 2 (Antifoam & Pump): Procurement of standard catalog item. Burden class: Same. T; - Row 3 (Setpoint ",
+      "INPUT_UNAVAILABLE: derived feature input 'antifoam stabilization, preventing bubble film rupture) and ' is not derivable from the"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 11696,
+     "latency_s": 19.3,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Standard Practice Bill:** Often runs vents at 100% or low duty, uses no antifoam or ",
+       "*   **Intervention Bill Comparison:**",
+       "*   **Hardware:** Zero new hardware. Uses existing dosing pumps (or manual funnel if none,",
+       "*   **Cost:** Antifoam is a consumable. Cost per liter is low. Total daily cost is negligi",
+       "*   **Operational Loss:**",
+       "*   **Ventilation:** Increasing fan duty cycle or changing direction may increase electric",
+       "*   **Temperature:** Raising temperature from 40°C to 45°C may slightly increase electroly",
+       "*   **Conclusion:** Same-or-lower burden. No new capital. Procedural changes. Net energy b"
+      ],
+      "PHYSICS_DIRECTION_INVERTED": [
+       "the sign/integral check reads the mechanism INVERTED: driver: Acid mist generation is physically driven by the rupture of gas bubbles at the electrolyte surface, where higher electrolyte temperatures and lower surf"
+      ]
+     },
+     "direction_check": {
+      "direction": "INVERTED",
+      "reason": "driver: Acid mist generation is physically driven by the rupture of gas bubbles at the electrolyte surface, where higher electrolyte temperatures and lower surface tension generally facilitate bubble formation, growth, and subsequent film rupture that entrains liquid droplets. | ingredient: The proposed intervention raises the electrolyte temperature and adds antifoam (which lowers surface tension), thereby increasing the volatility of the acid and the probability of bubble rupture/droplet entrainment, which adds to the acid mist generation integral rather than redu | ingredient sign vs driver: SAME -> INVERTED",
+      "established_driver": "Acid mist generation is physically driven by the rupture of gas bubbles at the electrolyte surface, where higher electrolyte temperatures and lower surface tension generally facilitate bubble formation, growth, and subsequent film rupture that entrains liquid droplets.",
+      "ingredient_action": "The proposed intervention raises the electrolyte temperature and adds antifoam (which lowers surface tension), thereby increasing the volatility of the acid and the probability of bubble rupture/droplet entrainment, which adds to the acid mist generation integral rather than redu",
+      "sign_of_ingredient_vs_driver": "SAME"
+     },
+     "sha256_16": "3945e4449726d5cb",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Standard Practice Bill:** Often runs vents at 100% or low duty, uses no antifoam or ; *   **Intervention",
+      "PHYSICS_DIRECTION_INVERTED: the sign/integral check reads the mechanism INVERTED: driver: Acid mist generation is physically driven by the"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 7523,
+     "latency_s": 16.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom formulation"
+      ],
+      "BILL_UNTAGGED": [
+       "*   **Intervention Bill:**",
+       "*   **Hardware Burden:** The intervention adds three standard catalog items (antifoam chem",
+       "*   **Installation Burden:** Simple splicing into the existing circulation loop. No cell o",
+       "*   **Operational Loss:** The antifoam introduces a small amount of silicone into the elec",
+       "*   **Parity Conclusion:** The burden is lower than installing new ventilation ducts or ce",
+       "1.  **Baseline Measurement:** Measure the acid mist concentration in the tankhouse air at ",
+       "2.  **Intervention:** Start the antifoam dosing at 0.5 mL/min. Allow 4 hours for steady-st",
+       "3.  **Post-Intervention Measurement:** Repeat the mist concentration measurement under ide",
+       "4.  **Pass/Fail Threshold:** The intervention is successful if the acid mist concentration",
+       "5.  **Duration:** 24-hour continuous dosing to verify no rapid degradation of the foam lay",
+       "6.  **Kill Criterion:** If the mist reduction is <20% or if the foam layer collapses compl",
+       "*   **Required Signal:** Visual confirmation of foam layer height (manual observation or e",
+       "*   **Permitted Source:** The problem states \"tankhouse ventilation and cell-cover procedu",
+       "*   **Setpoint Modulation:** None.",
+       "*   **Duty Cycle:** Continuous dosing.",
+       "*   **Operational Cost:** Chemical cost of antifoam (~$500/year for 20L pail at 100 ppm). "
+      ],
+      "APPARATUS_ROW": [
+       "1.  **Baseline Measurement:** Measure the acid mist concentration in the tankhouse air at the operator breathi",
+       "*   **Permitted Source:** The problem states \"tankhouse ventilation and cell-cover procedure only\" and \"electr"
+      ],
+      "NAMED_VARIANT": [
+       "variant-marker: custom formulation | 1.  **(b) Procurement:** One commercial-grade silicone-based antifoaming agent, "
+      ],
+      "DIRECTION_UNPROVEN": [
+       "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+      ]
+     },
+     "direction_check": {
+      "direction": "UNCLEAR",
+      "reason": "driver: The failure is caused by the bursting of gas bubbles at the air-liquid interface, which ejects acid-laden droplets into the atmosphere when the retraction velocity of the liquid film exceeds the capillary velocity threshold. | ingredient: The dosed silicone emulsion acts as a defoamer/surfactant that stabilizes the foam matrix and prevents individual bubble bursts by keeping the bubbles trapped within the bulk foam structure rather than allowing them to rise and rupture at the free surface. | ingredient sign vs driver: UNSTATED -> UNCLEAR",
+      "established_driver": "The failure is caused by the bursting of gas bubbles at the air-liquid interface, which ejects acid-laden droplets into the atmosphere when the retraction velocity of the liquid film exceeds the capillary velocity threshold.",
+      "ingredient_action": "The dosed silicone emulsion acts as a defoamer/surfactant that stabilizes the foam matrix and prevents individual bubble bursts by keeping the bubbles trapped within the bulk foam structure rather than allowing them to rise and rupture at the free surface.",
+      "sign_of_ingredient_vs_driver": "UNSTATED",
+      "divergence": "the model labeled INVERTED but the sign comparison derives UNCLEAR — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "521007c5e39af63a",
+     "findings_disclosed": [
+      "DEV_NEED: custom formulation",
+      "BILL_UNTAGGED: *   **Intervention Bill:**; *   **Hardware Burden:** The intervention adds three standard catalog items (antif",
+      "APPARATUS_ROW: 1.  **Baseline Measurement:** Measure the acid mist concentration in the tankhouse air at the operator breathi",
+      "NAMED_VARIANT: variant-marker: custom formulation | 1.  **(b) Procurement:** One commercial-grade silicone-based antifoaming ",
+      "DIRECTION_UNPROVEN: the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign t"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "smoke_synthetic",
+   "final_sha256_16": "521007c5e39af63a",
+   "final_chars": 7523
+  },
+  {
+   "problem_id": "HO7-09-chiller-condenser-fouling",
+   "generated_at": "2026-11-18T07:12:46.149859Z",
+   "histogram_before": {
+    "** surface tension suppression via bulk foaming agent dosing": 1
+   },
+   "histogram_after": {
+    "** surface tension suppression via bulk foaming agent dosing": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 8851,
+     "latency_s": 14.6,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Components:** Data logger/PLC programming (existing infrastructure). No new hardware",
+       "*   **Input Streams (ALREADY-RECORDED):**",
+       "1.  Condenser water inlet temperature ($T_{in}$) – *Stated sensor*.",
+       "2.  Condenser water outlet temperature ($T_{out}$) – *Stated sensor*.",
+       "3.  Condenser water flow meter ($\\dot{m}$) – *Stated sensor*.",
+       "4.  Compressor input power ($W_{in}$) – *Stated sensor*.",
+       "*   **Derived Indicators (CALCULATED):**",
+       "1.  **Rejection Heat Rate ($Q_{rej}$):** $Q_{rej} = \\dot{m} \\cdot c_p \\cdot (T_{out} - T_{",
+       "2.  **Specific Power Ratio ($R_p$):** $R_p = W_{in} / Q_{rej}$. This ratio is proportional",
+       "3.  **Load-Normalized Baseline ($R_{p,ref}$):** Derived from **STATEMENT** of nameplate or",
+       "4.  **Cumulative Fouling Drift Index ($D_f$):** $D_f = \\int_{t_0}^{t} (R_p(t) - R_{p,ref})",
+       "*   **Threshold:**",
+       "*   **Trip Limit:** The problem states the failure ends in a \"high-head trip.\" The head tr",
+       "*   **Warning Threshold:** Set $D_f$ such that the rate of change $\\frac{dD_f}{dt}$ (which",
+       "*   **Calculation:** Let $P_{excess} = W_{in} - (R_{p,ref} \\cdot Q_{rej})$. If $P_{excess}",
+       "*   *Derivation of $E_{crit}$:* $E_{crit}$ corresponds to the energy equivalent of the 14-",
+       "*   *Simplified Threshold Rule:* Alarm when $\\frac{dW_{in}}{dt} |_{load-const} > \\delta$ f",
+       "*   **Installability:** **SAME**. Uses existing BMS/PLC tags. No new sensors, no refrigera",
+       "*   **Operability:** **HEAVIER**. Requires logic to normalize power by rejection heat ($Q_",
+       "*   **Maintenance:** **SAME**. No new physical interfaces to maintain.",
+       "*   **Cost:** **SAME**. Only computing resource.",
+       "*   **Justification:** The burden is strictly computational, using data streams that are *",
+       "*   **Protocol:**",
+       "1.  Retrieve 2 years of **ALREADY-RECORDED** data: $T_{in}, T_{out}, \\dot{m}, W_{in}$.",
+       "2.  Identify periods of \"clean\" operation (low ambient temp, stable flow) to establish $R_",
+       "3.  Simulate the algorithm on historical data.",
+       "4.  Identify the time $t_{trip}$ when the chiller historically tripped on high head or was",
+       "5.  Measure $t_{warn}$: the time when the Cumulative Drift Index crossed the threshold.",
+       "6.  **Pass Criteria:**",
+       "*   $t_{trip} - t_{warn} \\ge 14$ days (**USER CONSTRAINT**: \"warn at least 14 days\").",
+       "*   False Positives: Count the number of times the alarm triggered during non-fouling peri",
+       "*   **Kill Criterion:** If the historical data shows that the power drift does not lead th",
+       "*   **Falsification Check:** If the fouling mechanism is *biological* (slime) that causes ",
+       "*   **Primary Stated Indicator:** **Compressor Input Power ($W_{in}$)**.",
+       "*   **Why Primary:** The problem explicitly states the failure mode is \"compressor power u",
+       "*   **Secondary Indicator:** **Condenser Water Temperatures/Flow ($T_{in}, T_{out}, \\dot{m",
+       "*   **Constraint Compliance:**",
+       "*   \"Use only existing...\": Yes, all four signals are listed in the user variables.",
+       "*   \"No new sensors/refrigerant taps\": Yes, only water side and power meter used.",
+       "*   \"14 days lead\": Verified by the time-to-trip analysis in the executable test.",
+       "*   \"1 false alarm/year\": The normalization by $Q_{rej}$ and the use of a cumulative drift"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "2c2d3a121eb2d935"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 8900,
+     "latency_s": 13.7,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **Installability:** **LOWER** burden. Standard practice often requires adding DP senso",
+       "*   **Operability:** **SAME** burden. Standard practice uses BMS alarms. This uses BMS ala",
+       "*   **Maintenance:** **LOWER** burden. No new sensors to fail or calibrate.",
+       "*   **Cost:** **LOWER** burden. No hardware installation.",
+       "*   **Operational Loss:** **ZERO**. The monitor is passive. It does not alter duty cycle.",
+       "1.  **Data Retrospective Test:** Pull 6 months of historical BMS data for this chiller.",
+       "2.  **Baseline Identification:** Identify the last full clean (flush) date. Define $P_{cle",
+       "3.  **Simulate Fouling:** Using the virtual monitor's algorithm, run it on the data stream",
+       "4.  **Validation:**",
+       "*   **Pass Criterion:** The monitor must issue a \"Warning\" signal at least 14 days *before",
+       "*   **False Alarm Check:** Run the algorithm on 1 year of data. Count alarms where head pr",
+       "5.  **Kill Criterion:** If the power drift is dominated by non-fouling factors (e.g., evap",
+       "*   **Primary Stated Indicator:** The problem states the failure is \"condenser tube foulin",
+       "*   **Why this is primary/allowed:** The constraint permits \"compressor input power.\" The ",
+       "*   **14-Day Lead:** The threshold is set at 5% power increase. Based on fouling rates, th",
+       "1.  Obtain BMS logs for the last full year including one chiller clean.",
+       "2.  Define $T_{in}$, $Flow$, $P_{comp}$, and $Head$ (if available in logs, otherwise use $",
+       "3.  Compute $P_{predicted}$ for every interval using the \"Clean\" curve.",
+       "4.  Compute $\\Delta P = P_{actual} - P_{predicted}$.",
+       "5.  Trigger alarm when $\\Delta P > 5\\%$ and $T_{in} > 25^\\circ C$ (to avoid low-load noise",
+       "6.  **Measure:** Time between Alarm Trigger and Head Trip.",
+       "7.  **Pass/Fail:**",
+       "*   If (Time to Trip - Time to Alarm) >= 14 days for every event, PASS.",
+       "*   If False Alarms > 1/year, FAIL.",
+       "*   If the mechanism cannot distinguish between Evaporator fouling and Condenser fouling u",
+       "*   **Driving Quantity:** Condenser Fouling Resistance ($R_f$).",
+       "*   **Sign Imposed:** As $R_f$ increases, Compressor Power ($P_{comp}$) **INCREASES**.",
+       "*   **Why it lowers the failure integral:** The mechanism does not lower the integral; it "
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'heat-transfer' is not among the permitted measures/signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "090e0a029ea4f45f",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **Installability:** **LOWER** burden. Standard practice often requires adding DP senso; *   **Operability:",
+      "INPUT_UNAVAILABLE: required online signal 'heat-transfer' is not among the permitted measures/signals"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 10890,
+     "latency_s": 15.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Thermal-Electrical Inversion Monitor (No New Hardware).",
+       "*   All inputs are **ALREADY-RECORDED** via the BMS/SCADA system:",
+       "1.  $T_{in}$ (Condenser Water Inlet Temp) - **STATED EXISTING SENSOR**",
+       "2.  $T_{out}$ (Condenser Water Outlet Temp) - **STATED EXISTING SENSOR**",
+       "3.  $\\dot{m}_w$ (Condenser Water Flow) - **STATED EXISTING SENSOR**",
+       "4.  $P_{in}$ (Compressor Input Power) - **STATED EXISTING SENSOR**",
+       "*   **No New Sensors, No DP Taps, No Refrigerant Taps.**",
+       "*   **Installability:** **LOWER** burden. Standard practice requires installing DP transdu",
+       "*   **Operability:** **SAME** burden. Both systems require a BMS/SCADA connection. My syst",
+       "*   **Maintenance:** **LOWER** burden. No sensors to fail, no diaphragms to burst, no tube",
+       "*   **Rough Cost Class:** **LOWER**. Standard practice: $2k-$5k (hardware + labor). My app",
+       "*   **Operational Loss:** **ZERO**. No throughput penalty. The \"cost\" is the risk of false",
+       "*   **Protocol:**",
+       "1.  Extract 6 months of historical BMS data for the 900 kW chiller: $T_{in}, T_{out}, \\dot",
+       "2.  Calculate $I_{foul}(t) = P_{in}(t) / Q_{w}(t)$ where $Q_w = \\dot{m}_w c_p (T_{out}-T_{",
+       "3.  Identify the \"Clean State\" epoch (minimum $I_{foul}$ cluster, typically post-chemical ",
+       "4.  Identify the \"Trip State\" epoch (maximum $P_{in}$ before high-head lockout, if availab",
+       "5.  Simulate the \"14-day warning\" by applying a 14-day linear regression to $I_{foul}$ in ",
+       "6.  **Pass Criterion:** The regression line intersects the \"85% of $I_{trip}$\" threshold *",
+       "7.  **Kill Criterion:** If the regression intersects the threshold **less than 14 days** b",
+       "*   **Primary Stated Indicator:** **Compressor Input Power ($P_{in}$)**. This is the direc",
+       "*   **Supplementary Indicator:** **Condenser Water Flow ($\\dot{m}_w$)** and **$\\Delta T_w$",
+       "*   **Why:** The constraint explicitly forbids new sensors and refrigerant taps. The \"head",
+       "2.  **INPUT_UNAVAILABLE:** Resolved. The previous draft incorrectly required \"heat-transfe",
+       "3.  **DEPLOYED-PART CLAUSE:** The mechanism does not modify any part of the chiller. It us",
+       "4.  **PERMITTED-SET CLAUSE:** The permitted set is \"existing condenser-water inlet/outlet ",
+       "5.  **DIRECTION-OF-EFFECT:** Explicitly stated in Physics Check. The indicator detects the",
+       "6.  **EXEMPLAR-REALITY / PREMISE-VALIDITY / CERTIFIED-SYSTEM-AS-SOLD:** No commercial hard",
+       "7.  **INPUT-AVAILABILITY CLAUSE:**",
+       "*   $P_{in}$: **PERMITTED** (Constraint: \"compressor input power\")",
+       "*   $T_{in}$: **PERMITTED** (Constraint: \"condenser-water inlet... temperature\")",
+       "*   $T_{out}$: **PERMITTED** (Constraint: \"condenser-water... outlet temperature\")",
+       "*   $\\dot{m}_w$: **PERMITTED** (Constraint: \"condenser-water flow meter\")",
+       "*   All are derivable from stated existing signals.",
+       "8.  **COST-PRICING CLAUSE:** No setpoint modulation is proposed that incurs operational co",
+       "9.  **MECHANISM-DIVERSITY CLAUSE:** \"MECHANISM CLASS: Thermal-Electrical Inversion Monitor",
+       "*   **Threshold:** $I_{foul, alert} = 0.85 \\times I_{foul, trip}$, where $I_{foul, trip}$ ",
+       "*   **Test:** Backtest on 1 year of BMS data. Pass if 100% of cleaning events were precede"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "required online signal 'Direct' is not among the permitted measures/signals",
+       "derived feature input 'energy balance inversion without new sensors' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "6e6c60df2ffd6e2a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Thermal-Electrical Inversion Monitor (No New Hardware).; *   All inputs are **ALREADY",
+      "INPUT_UNAVAILABLE: required online signal 'Direct' is not among the permitted measures/signals; derived feature input 'energy bal"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 8152,
+     "latency_s": 64.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "observable/indicator design present"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "*   **MECHANISM CLASS:** Post-Hoc Efficiency Deviation Monitor (Software-Only).",
+       "1.  **Data Ingestion Module:**",
+       "*   *Item:* PLC/SCADA Historian Tag Mapping.",
+       "*   *Input Streams:*",
+       "*   $T_{cw,in}$, $T_{cw,out}$: **ALREADY-RECORDED** (Problem constraint: \"existing condens",
+       "*   $\\dot{m}_{cw}$: **ALREADY-RECORDED** (Problem constraint: \"existing condenser-water fl",
+       "*   $P_{in}$: **ALREADY-RECORDED** (Problem constraint: \"compressor input power\").",
+       "*   *Reference:* No new sensors. No refrigerant pressure taps.",
+       "2.  **Calculation Engine:**",
+       "*   *Item:* Daily Rolling Window Calculation Script.",
+       "*   *Logic:*",
+       "1.  Calculate Water-Side Heat Load: $Q_{water} = \\dot{m}_{cw} \\cdot c_p \\cdot (T_{cw,out} ",
+       "2.  Calculate Specific Power: $SP = P_{in} / Q_{water}$ (kW/kW).",
+       "3.  Normalize for Ambient: $SP_{norm} = SP \\cdot f(T_{cw,in})$. *Note: Condenser performan",
+       "4.  Compute Baseline: $SP_{baseline}$ is the median $SP_{norm}$ over the previous 90 days ",
+       "5.  Compute Deviation: $\\Delta SP = SP_{norm} - SP_{baseline}$.",
+       "3.  **Alert Logic:**",
+       "*   *Item:* Threshold Comparator.",
+       "*   *Threshold:* $\\Delta SP > 0.05$ kW/kW (5% efficiency drop) sustained for 48 hours.",
+       "*   *Rationale:* A 5% drop in EER is a significant operational cost driver and indicative ",
+       "*   **Installability:** Standard practice (ΔP transducer) requires installing a D/P sensor",
+       "*   **Operability:** Standard practice is continuous. My approach is continuous calculatio",
+       "*   **Maintenance:** No sensor calibration or drift to maintain (no new sensors). **Zero**",
+       "*   **Rough Cost Class:** Standard practice: ~$2k-$5k (sensors + wiring + calibration). My",
+       "*   **Operational Loss:** **Zero.** The monitoring does not change the duty cycle or throu",
+       "*   **Protocol:**",
+       "1.  Access the BMS historian for the target chiller.",
+       "2.  Extract 1 year of data including periods of known clean condenser (after chemical clea",
+       "3.  Run the calculation engine ($SP_{norm}$ vs Time).",
+       "4.  Overlay the calculated $\\Delta SP$ trend with the actual timeline.",
+       "5.  Identify the \"True Positive\" moment: The day the condenser was cleaned.",
+       "6.  Measure the lead time: How many days before the \"High Head Trip\" event did $\\Delta SP$",
+       "7.  Measure False Alarms: Count instances where $\\Delta SP > 0.05$ for 48 hours but no sub",
+       "*   **Pass/Fail Thresholds:**",
+       "*   **Lead Time:** $\\geq 14$ days before high-head trip.",
+       "*   **False Alarm Rate:** $\\leq 1$ per year.",
+       "*   **Kill Criterion:** If the $\\Delta SP$ signal is dominated by ambient temperature fluc",
+       "*   **Validation Source:** Uses ONLY already-recorded data (as per constraint). No new sen",
+       "*   **Primary Stated Indicator:** **Compressor Input Power** is the primary failure driver",
+       "*   **Supplementary Indicator:** **Condenser Water ΔT** is used to calculate the Heat Load",
+       "*   **Compliance Check:**",
+       "*   *Existing Sensors Only:* Yes (T_in, T_out, Flow, P_in).",
+       "*   *No New Sensors:* Yes.",
+       "*   *No Refrigerant Taps:* Yes.",
+       "*   *14-Day Warning:* Achieved by the slow accumulation rate of fouling vs. the exponentia",
+       "*   *< 1 False Alarm/Year:* Achieved by using a robust median baseline and a hysteresis ti"
+      ],
+      "INPUT_UNAVAILABLE": [
+       "derived feature input 'Thermal-Electrical Efficiency Inversion' is not derivable from the permitted signals"
+      ]
+     },
+     "direction_check": null,
+     "sha256_16": "1d38bbbc2e7e798b",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: *   **MECHANISM CLASS:** Post-Hoc Efficiency Deviation Monitor (Software-Only).; 1.  **Data Ingestion Module:*",
+      "INPUT_UNAVAILABLE: derived feature input 'Thermal-Electrical Efficiency Inversion' is not derivable from the permitted signals"
+     ]
+    }
+   ],
+   "engine_plans_n": 3,
+   "winner_rule": "smoke_synthetic",
+   "final_sha256_16": "1d38bbbc2e7e798b",
+   "final_chars": 8152
+  }
+ ]
+}

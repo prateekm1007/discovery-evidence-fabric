@@ -1,0 +1,31 @@
+{
+ "problem_id": "HO2-04-gt-compressor-fouling",
+ "question_type": "intervention-proposal",
+ "a1_source": "SYS_A1_INT_V4",
+ "contract_for_qt": true,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe intervention is a modified intake air humidity control system that actively modulates humidity to prevent salt and hydrocarbon aerosol deposition on compressor blades. Standard practice relies solely on inlet filtration/coalescer and periodic online water washing to remove deposits after they form. Our intervention is a genuine departure because it prevents deposition by altering the aerosol physics at the point of intake, rather than removing deposits after they accumulate. The closest existing mitigation practice is inlet air filtration in power plants, which physically removes particles but does not alter aerosol deposition physics through humidity modulation. Our intervention attacks the failure's driving mechanism by maintaining optimal humidity levels that prevent salt crystallization and hydrocarbon condensation on blade surfaces.\n\nPHYSICS CHECK\nThe governing physical relation is the Kelvin equation, which describes the relationship between relative humidity (RH) and the equilibrium vapor pressure over a curved surface. For salt aerosols, deposition occurs when RH exceeds the deliquescence relative humidity (DRH), typically ~75% for NaCl. For hydrocarbons, deposition occurs when temperature drops below the dew point. By maintaining intake air RH between 40-60% and temperature above the hydrocarbon dew point, we prevent both salt dissolution and hydrocarbon condensation. A 3% heat rate recovery is achievable by reducing deposition by an estimated 60%, based on empirical data showing each 1% reduction in flow area corresponds to approximately 0.5% heat rate increase.\n\nIMPLEMENTATION BILL\nStandard Practice Bill:\n- Inlet filtration/coalescer system (existing)\n- Online water washing system (existing)\n- Scheduled water wash procedure (existing)\n\nIntervention Bill:\n- Intake air humidity sensor (b) - replaces existing temperature/pressure sensors\n- Intake air temperature sensor (a) - already present in standard practice\n- Humidity control module (b) - procurable HVAC humidity controller\n- Modulating steam injection valve (b) - standard HVAC control valve\n- Condensate drain system (a) - already present in standard practice\n- Control system software update (c) - parameter change to existing control system\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Sensors: Adding humidity sensor increases component count but replaces no existing items. Burden: same (standard instrumentation practice).\n- Control module: Adding humidity controller requires new hardware but is a standard catalog item. Burden: same (HVAC control equipment class).\n- Steam injection valve: Adding modulating valve is standard industrial equipment. Burden: same (control valve class).\n- Software update: Parameter change to existing system, no new hardware. Burden: lower (no additional equipment).\n- Installation: Utilizes existing condensate drain and control cabinet space. Burden: same (standard installation practice).\n- Maintenance: Requires periodic sensor calibration but reduces water wash frequency. Burden: same (standard calibration practice).\nOverall Burden Class: Same as standard practice. The additional components are all standard catalog items from existing industrial practice, and the installation utilizes existing infrastructure.\n\nEXECUTABLE TEST\nProtocol: Install humidity control system on test compressor and operate for 6,000 equivalent operating hours (EOH) with and without the intervention. Monitor compressor performance parameters continuously.\nInstruments: Inlet humidity sensor (±2% RH accuracy), temperature sensors (±1°C accuracy), pressure sensors (±0.1% accuracy), flow meters (±1% accuracy), and exhaust thermocouples (±1°C accuracy).\nPass/Fail Threshold: Heat rate reduction of ≥3% with intervention vs. baseline without intervention. Fouling rate reduction of ≥60% based on pressure drop measurements.\nDuration: 6,000 EOH (representative of time between overhauls).\nKill Criterion: If heat rate reduction is <2% or if any erosion/corrosion is detected on blades during inspection, the intervention fails.",
+ "a1_answer_sha256_16": "44ce25b508dc63cb",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 9.6,
+   "chars": 4085,
+   "transport_tries": 1
+  }
+ ],
+ "machine_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "problems_sha256_16": "79db7868a0e7483d",
+ "audit_tip_at_read": "6235108c3",
+ "generated_at": "2026-11-15T17:33:22Z",
+ "one_shot": true,
+ "judged": false,
+ "judge": "NONE — auditor scores with the PRIVATE rubric"
+}

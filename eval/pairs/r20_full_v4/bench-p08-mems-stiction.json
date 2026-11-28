@@ -1,0 +1,23 @@
+{
+ "problem_id": "bench-p08-mems-stiction",
+ "a1_source": "SYS_A1_INT_V4/r20_full_battery",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is to implement a dynamic electrostatic repulsion system that prevents comb finger contact during shock events. Standard practice uses passive anti-stiction coatings and design spacing, which rely on physical separation and surface properties. Our mitigation introduces a novel active repulsion mechanism that generates sufficient electrostatic force to push fingers apart during high-g events. The closest existing practice is electrostatic self-testing in MEMS, but our approach differs by using this mechanism continuously during shock events rather than just for testing. The intervention attacks the failure's driving physics (contact between fingers) by applying a voltage differential that creates an electrostatic repulsive force proportional to the square of the voltage and inversely proportional to the square of the gap distance.\n\nPHYSICS CHECK — The electrostatic repulsive force between two conductive plates is given by F = ε₀AV²/(2d²), where ε₀ is the permittivity of free space, A is the overlapping area, V is the applied voltage, and d is the gap distance. For a MEMS accelerometer with 10 μm gap and 100 μm² overlapping area, applying 5V generates approximately 2.2 μN of force. During a 10,000 g shock on a 1 mg proof mass, the inertial force is 0.1 N. However, the repulsive force acts directly on the comb fingers where contact would occur, while the inertial force acts on the entire proof mass. By designing the comb geometry to maximize the force-to-inertia ratio, the electrostatic repulsion can be made sufficient to prevent contact. The force scales with V², so modest voltage increases provide substantial force increases.\n\nIMPLEMENTATION BILL — Standard practice includes:\n- (a) MEMS comb structure with fixed finger spacing\n- (a) Anti-stiction coating (e.g., FDTS)\n- (b) Standard accelerometer ASIC with bias voltage generation\n\nProposed intervention:\n- (a) MEMS comb structure (existing)\n- (b) Commercially available high-voltage switch (e.g., MAX16046, rated for 36V)\n- (b) Standard ceramic capacitor (100nF, 50V rating)\n- (c) Modified ASIC firmware to detect shock events and apply repulsion voltage\n- (c) Modified ASIC voltage generation circuit to provide 5-10V during shock events\n- (c) Procedure to calibrate repulsion voltage during manufacturing to ensure sufficient force without causing instability\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- MEMS comb structure: No change (same)\n- Anti-stiction coating: No change (same)\n- ASIC: Minor modification to firmware and voltage generation (same class, negligible cost increase)\n- Added components: One HV switch and one capacitor (standard catalog items, minimal cost)\n- Burden class: Same as standard practice (minor firmware modification, low-cost standard components)\n\nEXECUTABLE TEST — \nProtocol: Subject 100 devices to 10,000 g shock in all three axes (x, y, z) using a shock test machine with controlled acceleration profile. Before and after each shock, measure zero-g offset using a precision centrifuge. During shock events, apply the electrostatic repulsion voltage according to the intervention scheme.\nInstruments: Shock test machine, precision centrifuge, oscilloscope to monitor repulsion voltage.\nPass/fail criterion: Device passes if zero-g offset remains within 50 mg of pre-shock value after all shock tests.\nDuration: 10,000 g shocks applied sequentially with 1-minute intervals between shocks.\nKill criterion: Any single device showing zero-g offset exceeding 50 mg after any shock test constitutes failure of the intervention.",
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.7,
+   "chars": 3600
+  }
+ ],
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "violations": {},
+  "repairs": 0
+ },
+ "generated_at": "2026-11-15T14:28:15.710814Z"
+}

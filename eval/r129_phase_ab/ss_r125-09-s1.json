@@ -1,0 +1,76 @@
+{
+ "problem_id": "r125-09-s1",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 1,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 3.46,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 560,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.74,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 966,
+    "completion_tokens": 950,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (the",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) \u2014 the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Targeted Corner Heating via Exhaust Damper Modulation and Conditional Cycle Extension**\n\n**Mechanism:**\nThe root cause of the lagging corners is a static thermal distribution. This proposal modulates the exhaust damper to reduce convective heat loss, allowing corner temperatures to rise. The cycle timer is used only for gating and conditional extension, not as a primary heating mechanism.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Exhaust Damper Position (actuated)\n*   **Direction of Effect:** Closing the damper decreases airflow velocity, reduces convective cooling, and increases local heat retention in the corner zones, causing corner temperature ($T_{corner}$) to rise relative to center temperature ($T_{center}$).\n*   **Secondary Driver:** Cycle Timer (gating logic)\n*   **Direction of Effect:** The timer does not alter thermal physics. It defines the time window for the damper modulation and conditions the extension of the hold phase based on the success of the thermal recovery.\n\n**Implementation:**\n1.  **Permitted Inputs and Derivations:**\n    *   $T_{corner}$: Derived from the average of the corner-zone thermocouples (existing sensor).\n    *   $T_{center}$: Derived from the central zone thermocouple (existing sensor).\n    *   $\\\\Delta T = T_{corner} - T_{center}$: Derived calculation from existing thermocouple signals.\n    *   $P_{damper}$: Exhaust damper position feedback (existing sensor).\n    *   $t_{elapsed}$: Elapsed time from cycle timer (existing measurement).\n    *   $T_{target}$: Pre-set constant cure temperature spec (logical threshold, not a new sensor).\n\n2.  **Closed-Loop Damper Modulation:**\n    *   During the soak phase (gated by $t_{elapsed}$ within the soak window), monitor $\\\\Delta T$.\n    *   If $\\\\Delta T < -Threshold_{lag}$ (corners are cooler than center), command the damper to move toward a closed position.\n    *   The command is limited by the $P_{damper}$ feedback to prevent over-travel.\n    *   This action reduces convective heat loss, allowing corners to catch up.\n\n3.  **Conditional Cycle Extension (Logic Gate):**\n    *   At the end of the standard soak time ($t_{standard}$), evaluate the status of the corners.\n    *   If $T_{corner} \\\\geq T_{target}$: Proceed to end of cycle at scheduled time. No extension.\n    *   If $T_{corner} < T_{target}$: Activate a short, defined \"recovery window\" ($\\\\Delta t_{recovery}$) where the damper remains in its modulated (closed) position.\n    *   End the cycle only after the recovery window elapses or $T_{corner} \\\\geq T_{target}$ is met, whichever comes first. This prevents indefinite extension.\n\n**Implementation Bill:**\n1.  **Throughput Impact:**\n    *   Well-balanced loads (no lag detected): 0% throughput loss. Cycle completes at standard time.\n    *   Lagging loads: Throughput reduced by $\\\\Delta t_{recovery}$ (e.g., 5-10 minutes). This is an operational cost incurred only when necessary to meet quality spec.\n2.  **Energy Impact:**\n    *   Damper closure slightly increases static pressure, potentially increasing fan power by ~2-5% during the modulation phase.\n    *   Net energy impact is positive because it avoids the need for a blanket, longer cycle for all loads, which would incur higher energy and opportunity cost.\n3.  **Availability Risk:**\n    *   Low. Relies on existing hardware (damper, timers, TCs). No new points of failure.\n    *   Safety: Damper position limits prevent mechanical over-travel.\n\n**Measures it Relies On:**\n*   **Existing Sensors:** Zone thermocouples (for $T_{corner}$, $T_{center}$).\n*   **Existing Measurements:** Exhaust damper position feedback (for $P_{damper}$).\n*   **Existing Measurements:** Cycle timer (for $t_{elapsed}$).",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Throughput Impact:**",
+   "*   Well-balanced loads (no lag detected): 0% throughput loss. Cycle completes at standard",
+   "*   Lagging loads: Throughput reduced by $\\\\Delta t_{recovery}$ (e.g., 5-10 minutes). This",
+   "2.  **Energy Impact:**",
+   "*   Damper closure slightly increases static pressure, potentially increasing fan power by",
+   "*   Net energy impact is positive because it avoids the need for a blanket, longer cycle f",
+   "3.  **Availability Risk:**",
+   "*   Low. Relies on existing hardware (damper, timers, TCs). No new points of failure.",
+   "*   Safety: Damper position limits prevent mechanical over-travel.",
+   "*   **Existing Sensors:** Zone thermocouples (for $T_{corner}$, $T_{center}$).",
+   "*   **Existing Measurements:** Exhaust damper position feedback (for $P_{damper}$).",
+   "*   **Existing Measurements:** Cycle timer (for $t_{elapsed}$)."
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ]
+ },
+ "wall_clock_s": 9.21,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

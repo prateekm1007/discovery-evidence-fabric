@@ -1,0 +1,85 @@
+{
+ "problem_id": "r125-11-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 123.16,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 547,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 5.5,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 652,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 129.32,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 1688,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 2.95,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 974,
+    "completion_tokens": 855,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "Mitigation Proposal\n\nMechanism:\nImplement a closed-loop, real-time die pressure stabilization control using the existing melt pressure transducers and line-speed encoder. The core mechanism is a differential pressure feedback loop that modulates the extruder screw speed to dampen pressure oscillations, thereby stabilizing the melt flow rate and reducing gauge variation. Since trim scrap is high, the process window is likely being violated by these pressure waves. Stabilizing the pressure source will directly reduce the downstream flow instability that causes gauge variation across the web.\n\nDirection of Effect:\nIncreasing the extruder screw speed drives an increase in melt pressure and volumetric flow rate at the die. Consequently, the control loop must apply negative feedback: if the mean melt pressure exceeds the setpoint, the screw speed is decreased to reduce pressure; if the mean melt pressure falls below the setpoint, the screw speed is increased to raise pressure. This inverse relationship between the required control adjustment and the measured pressure deviation ensures oscillations are damped rather than amplified.\n\nImplementation:\n1. Signal Processing: Create a real-time signal by averaging the readings from the existing melt pressure transducers at the die outlet. This creates a \"Mean Melt Pressure\" ($P_{avg}$) signal.\n2. Oscillation Detection & Feedback: Configure the existing PLC/DCS controller to monitor the variance or high-frequency deviation of $P_{avg}$ over a rolling window (e.g., 5\u201310 seconds). Use the existing line-speed encoder to ensure the control loop is synchronized with the material residence time; if line speed is constant, the control loop gain can be tuned for that specific throughput.\n3. Control Action: Integrate a proportional-integral (PI) controller into the extruder screw speed setpoint. The error term is the deviation of $P_{avg}$ from a stable setpoint (which can be derived from the historical mean during stable periods or manually set to the nominal operating point). The controller outputs a small, rapid adjustment to the screw speed to counteract the pressure oscillations. This assumes the extruder drive has sufficient authority. If die gap is the primary source of oscillation, the existing temperature transducers can be used to verify uniformity, but the screw speed remains the primary variable to adjust melt delivery rate without new hardware.\n4. Trim Reduction Strategy: Simultaneously, use the existing temperature transducers to verify that no hot spots are contributing to flow instability. If temperatures are uniform, the pressure oscillation is likely mechanical (e.g., pump cavitation or screw slippage). By stabilizing pressure via screw speed modulation, the melt flow becomes more laminar and consistent, reducing the need for excessive trimming to meet gauge specs.\n\nMeasures it relies on:\n*   Mean Melt Pressure ($P_{avg}$): Derived by arithmetic averaging of the individual signal outputs from the existing melt pressure transducers installed at the die outlet.\n*   Line Speed ($v$): Derived directly from the signal output of the existing line-speed encoder.\n*   Die Zone Temperatures ($T_i$): Derived directly from the signal outputs of the existing temperature transducers installed at the extruder zones and die.\n*   No New Instrumentation: All inputs are strictly from the permitted existing sensors; no new instrumentation is added.\n\nIMPLEMENTATION BILL:\n*   Controller Logic Update: Configuration of the existing PLC/DCS to implement the PI control algorithm and rolling window variance calculation. Cost: Engineering labor only; no new hardware.\n*   Extruder Drive Interface: Verification and minor tuning of the existing extruder drive controller to accept the new setpoint modulation signal. Cost: Engineering labor only; no new hardware.\n*   Sensor Maintenance: Verification of baseline calibration for existing melt pressure and temperature transducers to ensure signal integrity. Cost: Routine maintenance labor; no new hardware.\n*   Commissioning: On-line testing and gain tuning of the feedback loop during low-risk production windows. Cost: Operational labor; no new hardware.\n*   Total New Hardware Cost: $0.00. All actions utilize existing infrastructure.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   Controller Logic Update: Configuration of the existing PLC/DCS to implement the PI con",
+   "*   Extruder Drive Interface: Verification and minor tuning of the existing extruder drive",
+   "*   Sensor Maintenance: Verification of baseline calibration for existing melt pressure an",
+   "*   Commissioning: On-line testing and gain tuning of the feedback loop during low-risk pr",
+   "*   Total New Hardware Cost: $0.00. All actions utilize existing infrastructure."
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 149.82,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

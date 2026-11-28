@@ -1,0 +1,128 @@
+{
+ "problem_id": "v17-29-motor-winding",
+ "domain": "electrical_insulation",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:f500014a4d37": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:399098ebf18c": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:941f56e1f39d": "reject-duplicate"
+  },
+  "strength_kit": {
+   "failure_class": "electrical_insulation",
+   "confidence": 1.0,
+   "evidence_span": "partial discharge, winding insulation",
+   "allowed_mech_classes": [
+    "stress_grading",
+    "environmental_enclosure",
+    "creepage_path_extension"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": true
+  }
+ },
+ "generated_at": "2026-11-24T15:47:04Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.5,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers: a design change that increases bulk dielectric thickness or material class at the winding site to raise the absolute breakdown voltage.\nMechanism departure: Transfer of stress_grading physics from stator end windings to the spike-event context; inserting a high-permittivity (ε_r ≈ 10–15) stress-relief sleeve at the slot exit and terminations to homogenize the local electric field, preventing the field enhancement at the defect/void interface that initiates partial discharge.\nFailure-physics connection: Partial discharge (PD) inception occurs when the local peak electric field at a void/defect exceeds the breakdown strength of the gas within the void (E_pd). In a standard motor, the air/void permittivity (ε_r ≈ 1) is much lower than the solid insulation (ε_r ≈ 4–5), causing a discontinuity in electric displacement (D). According to Gauss's law at the interface, the local E-field in the void is enhanced by the ratio of surrounding insulation permittivity to void permittivity (E_void ≈ E_ins * ε_ins/ε_void). By enclosing the critical void region with a high-ε_r solid stress-grade material, the discontinuity is reduced (ε_grade > ε_void), physically lowering the local E-field below the PD inception threshold during voltage spikes, without adding bulk volume or monitoring.\n\nPHYSICS CHECK\nGoverning relation: Electric field at a dielectric interface is governed by the continuity of normal electric displacement (D_n): D_ins = D_grade. Therefore, E_grade = E_ins * (ε_ins / ε_grade).\nMagnitude verification: Assume a typical motor winding insulation permittivity ε_ins = 4.5 (relative) and a standard stress-grade material ε_grade = 12 (relative). The field reduction factor at the interface is 4.5/12 = 0.375. If the local spike-induced field in the standard insulation is 25 kV/mm, the field within the high-permittivity graded region drops to 25 kV/mm * 0.375 = 9.4 kV/mm. This 9.4 kV/mm is below the typical PD inception field for voids in polymeric insulation (typically 10–15 kV/mm), preventing discharge. All constants are ASSUMED standard material values for polyimide/mica composites.\n\nIMPLEMENTATION BILL\nComponents:\n- High-permittivity (ε_r = 10–15) solid resin or ceramic-matrix stress-grade sleeve (ALREADY-RECORDED material class: stator end winding stress-grade, transferred to spike-event site).\n- Application location: Encasing the outermost turn at the slot exit and the termination region where the spike-induced field concentration peaks.\nInstruments:\n- No new sensors. The intervention is a static physical geometry/material change.\nProcedure:\n- During winding manufacture or retrofit, wrap the identified high-field-stress regions with the high-ε_r material.\nInput streams:\n- ALREADY-RECORDED: Manufacturer nameplate voltage rating (stated), standard winding insulation datasheet (stated).\nReferences/Thresholds:\n- DERIVED: PD inception threshold for the specific void gas (typically air) is derived from Paschen's law / standard insulation testing data (stated physics: ~10-15 kV/mm).\n- DERIVED: Required ε_grade is derived from E_spike_peak * (ε_ins / ε_grade) < E_pd_inception.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Higher than adding insulation thickness; requires precise placement at high-field-stress nodes rather than blanket layering.\nOperability: Zero. It is a passive, solid-state material intervention. No power, no electronics.\nMaintenance: None. The material does not degrade on its own; it fails only if the underlying winding fails.\nRough cost class: SAME as adding insulation material. It replaces a volume of low-ε_r filler or extra tape with a higher-cost material in a much smaller, targeted area. The net material cost is comparable; labor is slightly higher due to precision.\nConclusion: SAME burden class (passive, non-electronic, installed at commissioning), DIFFERENT mechanism (targeted field grading via ε-contrast vs. bulk volume insulation).\n\nEXECUTABLE TEST\nProtocol:\n1. Fabricate two identical winding specimens: Specimen A (control, standard ε_r=4.5 insulation) and Specimen B (test, with ε_r=12 stress-grade sleeve at slot exit).\n2. Introduce a standardized artificial void (0.5 mm diameter) at the stress site in both specimens.\n3. Subject both to a 1.5x nameplate voltage spike (stated test condition: IEC 60034-5 lightning impulse or BIL equivalent) repeated 1,000 times.\nInstruments: PD measuring system (Rogowski coil + band-pass filter + pulse counter), high-speed oscilloscope.\nPass/Fail Thresholds:\n- Specimen B must show zero detected PD events during the 1,000 spikes.\n- Specimen A must show > 100 PD events (to confirm the baseline failure mode is present).\nDuration: 24 hours total test time.\nKill Criterion: The mechanism is FALSIFIED if Specimen B exhibits PD inception voltage > 10% higher than Specimen A, OR if the PD count in Specimen B does not drop by at least 90% relative to Specimen A within the 1,000-spike window.\nTest Vehicle: High-voltage bench rig with PD measurement capability.\n\nCONSTRAINT BIND\nPrimary stated indicator: Partial discharge occurrence (the physical manifestation of the failure). The mechanism directly suppresses this indicator by lowering the local E-field below the inception threshold. No secondary indicator replaces it; PD is the primary and sole metric for success.\n\nM. DELIVERABLE-CLASS BIND\nNOVELTY STATEMENT\nStandard practice delivers: a design change that increases bulk dielectric thickness or material class at the winding site to raise the absolute breakdown voltage.\nMechanism departure: Transfer of stress_grading physics from stator end windings to the spike-event context; inserting a high-permittivity (ε_r ≈ 10–15) solid stress-relief sleeve at the slot exit and terminations to homogenize the local electric field, preventing the field enhancement at the defect/void interface that initiates partial discharge.\nFailure-physics connection: Partial discharge (PD) inception occurs when the local peak electric field at a void/defect exceeds the breakdown strength of the gas within the void (E_pd). In a standard motor, the air/void permittivity (ε_r ≈ 1) is much lower than the solid insulation (ε_r ≈ 4–5), causing a discontinuity in electric displacement (D). According to Gauss's law at the interface, the local E-field in the void is enhanced by the ratio of surrounding insulation permittivity to void permittivity (E_void ≈ E_ins * ε_ins/ε_void). By enclosing the critical void region with a high-ε_r solid stress-grade material, the discontinuity is reduced (ε_grade > ε_void), physically lowering the local E-field below the PD inception threshold during voltage spikes, without adding bulk volume or monitoring.\n\nPHYSICS CHECK\nGoverning relation: Electric field at a dielectric interface is governed by the continuity of normal electric displacement (D_n): D_ins = D_grade. Therefore, E_grade = E_ins * (ε_ins / ε_grade).\nMagnitude verification: Assume a typical motor winding insulation permittivity ε_ins = 4.5 (relative) and a standard stress-grade material ε_grade = 12 (relative). The field reduction factor at the interface is 4.5/12 = 0.375. If the local spike-induced field in the standard insulation is 25 kV/mm, the field within the high-permittivity graded region drops to 25 kV/mm * 0.375 = 9.4 kV/mm. This 9.4 kV/mm is below the typical PD inception field for voids in polymeric insulation (typically 10–15 kV/mm), preventing discharge. All constants are ASSUMED standard material values for polyimide/mica composites.\n\nIMPLEMENTATION BILL\nComponents:\n- High-permittivity (ε_r = 10–15) solid resin or ceramic-matrix stress-grade sleeve (ALREADY-RECORDED material class: stator end winding stress-grade, transferred to spike-event site).\n- Application location: Encasing the outermost turn at the slot exit and the termination region where the spike-induced field concentration peaks.\nInstruments:\n- No new sensors. The intervention is a static physical geometry/material change.\nProcedure:\n- During winding manufacture or retrofit, wrap the identified high-field-stress regions with the high-ε_r material.\nInput streams:\n- ALREADY-RECORDED: Manufacturer nameplate voltage rating (stated), standard winding insulation datasheet (stated).\nReferences/Thresholds:\n- DERIVED: PD inception threshold for the specific void gas (typically air) is derived from Paschen's law / standard insulation testing data (stated physics: ~10-15 kV/mm).\n- DERIVED: Required ε_grade is derived from E_spike_peak * (ε_ins / ε_grade) < E_pd_inception.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Higher than adding insulation thickness; requires precise placement at high-field-stress nodes rather than blanket layering.\nOperability: Zero. It is a passive, solid-state material intervention. No power, no electronics.\nMaintenance: None. The material does not degrade on its own; it fails only if the underlying winding fails.\nRough cost class: SAME as adding insulation material. It replaces a volume of low-ε_r filler or extra tape with a higher-cost material in a much smaller, targeted area. The net material cost is comparable; labor is slightly higher due to precision.\nConclusion: SAME burden class (passive, non-electronic, installed at commissioning), DIFFERENT mechanism (targeted field grading via ε-contrast vs. bulk volume insulation).\n\nEXECUTABLE TEST\nProtocol:\n1. Fabricate two identical winding specimens: Specimen A (control, standard ε_r=4.5 insulation) and Specimen B (test, with ε_r=12 stress-grade sleeve at slot exit).\n2. Introduce a standardized artificial void (0.5 mm diameter) at the stress site in both specimens.\n3. Subject both to a 1.5x nameplate voltage spike (stated test condition: IEC 60034-5 lightning impulse or BIL equivalent) repeated 1,000 times.\nInstruments: PD measuring system (Rogowski coil + band-pass filter + pulse counter), high-speed oscilloscope.\nPass/Fail Thresholds:\n- Specimen B must show zero detected PD events during the 1,000 spikes.\n- Specimen A must show > 100 PD events (to confirm the baseline failure mode is present).\nDuration: 24 hours total test time.\nKill Criterion: The mechanism is FALSIFIED if Specimen B exhibits PD inception voltage > 10% higher than Specimen A, OR if the PD count in Specimen B does not drop by at least 90% relative to Specimen A within the 1,000-spike window.\nTest Vehicle: High-voltage bench rig with PD measurement capability.\n\nCONSTRAINT BIND\nPrimary stated indicator: Partial discharge occurrence (the physical manifestation of the failure). The mechanism directly suppresses this indicator by lowering the local E-field below the inception threshold. No secondary indicator replaces it; PD is the primary and sole metric for success.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- High-permittivity (ε_r = 10–15) solid resin or ceramic-matrix stress-grade sleeve (ALREA",
+    "- Application location: Encasing the outermost turn at the slot exit and the termination r",
+    "- No new sensors. The intervention is a static physical geometry/material change.",
+    "- During winding manufacture or retrofit, wrap the identified high-field-stress regions wi",
+    "- ALREADY-RECORDED: Manufacturer nameplate voltage rating (stated), standard winding insul",
+    "- DERIVED: PD inception threshold for the specific void gas (typically air) is derived fro",
+    "- DERIVED: Required ε_grade is derived from E_spike_peak * (ε_ins / ε_grade) < E_pd_incept"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [
+    "generic surface pattern present but a mapped mechanism dominates: ['passive insulation as a cure-all']"
+   ],
+   "quant_markers": 2,
+   "mapped_mechanism": "stress_grading",
+   "cross_domain": ""
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "field stress vs the air breakdown anchor",
+    "predicted_value": "E = 50.0 kV/mm (air anchor ~3 kV/mm)",
+    "calc_trace": "25.0 kV / 0.5 mm = 50.0 kV/mm",
+    "falsifier": "the partial-discharge onset must stay above 1.5x the working E in the PD bench test; the opposite result falsifies the invention",
+    "route": "class-generic:electrical_insulation"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "29233e3207d45f36"
+}

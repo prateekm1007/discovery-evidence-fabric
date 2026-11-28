@@ -1,0 +1,73 @@
+{
+ "record": "R50_ALL_REFS_SECRET_SCAN/1.1.0",
+ "mode": "messages",
+ "v1_1_0_note": "the messages leg (commit messages, exact-SHA attribution) joins tips+history per the epistemic v3.2.0 Art. 17 addition (F45/CORR-2)",
+ "detector": {
+  "token_rules": [
+   "github-pat",
+   "github-token-classic",
+   "gitlab-pat",
+   "aws-access-key",
+   "google-api-key",
+   "slack-token",
+   "openrouter-key",
+   "private-key-block",
+   "jwt"
+  ],
+  "generic_rule": "secret-vocabulary key + quoted value with Shannon entropy >= 3.5",
+  "excluded_shapes": {
+   "hex64-digest": "the house sha256 seal corpus (21043 seals triaged non-secret, R45 detect-secrets sweep, commit 1995f7e75) \u2014 a documented repo integrity mechanism, not a secret class",
+   "hex40-blobsha": "git object sha shape",
+   "uuid-value": "versioned uuid shape, no secret content class"
+  },
+  "discovery_regex": "github_pat_[0-9A-Za-z_]+|gh[pousr]_[0-9A-Za-z]+|glpat-[0-9A-Za-z_-]+|AKIA[0-9A-Z]+|AIza[0-9A-Za-z_-]+|xox[baprs]-[0-9A-Za-z-]+|sk-or-v1-[0-9a-fA-F]+|BEGIN [A-Za-z ]*PRIVATE KEY|eyJ[A-Za-z0-9_-]+[.]|api[_-]?key|apikey|auth[_-]?token|access[_-]?token|secret[_-]?key|client[_-]?secret|secret|credential|passwo?r?d|passwd|bearer",
+  "fingerprint": "sha256(rule|secret) \u2014 secret values are never printed or written"
+ },
+ "refs_scanned": [
+  "origin/archive/rounds-R309-R383",
+  "origin/arena/01a0ab36-discovery-evidence-fabric",
+  "origin/audit/r11-auditor-verdict-20261114",
+  "origin/main",
+  "origin/queue/dev12_r7",
+  "origin/r401/empirical-canonicalization",
+  "origin/r412/gradient-v2",
+  "origin/r412/gradient-v3",
+  "origin/r412/tvm-v2-instrument",
+  "origin/r415/discovery-availability-v1",
+  "origin/r416/honest-causes-evolution-v1",
+  "origin/r448/visual-lab",
+  "origin/r449-c2/visual-benchmark",
+  "origin/r450-c2/visual-feedback-layer",
+  "origin/r452-coder1-discovery-engineering-organ",
+  "origin/r453-c2/claude-class-ui",
+  "origin/r454-c2/conversational-ui",
+  "origin/r454-c2/visual-deadweight",
+  "origin/r456-lean-2",
+  "origin/r513-closure",
+  "origin/runtime-state",
+  "origin/runtime-state-hf",
+  "origin/runtime-state-hf-c2"
+ ],
+ "n_refs": 23,
+ "messages_stats": {
+  "method": "git log --all --format=<RS><H><US><B>",
+  "commits_scanned": 5527,
+  "message_lines_scanned": 36424,
+  "truncated": false,
+  "cap_bytes": 2147483648
+ },
+ "verdict": "FAIL_UNBASELINED_FINDINGS",
+ "findings_total_raw": 1,
+ "findings_baselined": 0,
+ "unbaselined": [
+  {
+   "rule": "openrouter-key",
+   "surface": "commit_message",
+   "ref": "history-messages",
+   "path": "<commit-message>",
+   "commit": "76c23fef787e4d6e7f04eb62e1b6e2f400af8a45",
+   "fingerprint": "f05916a7592dbccf47447ddf6b43b99be7ef0573b442fa30731fc5ed31aba4e7"
+  }
+ ],
+ "n_unbaselined": 1
+}

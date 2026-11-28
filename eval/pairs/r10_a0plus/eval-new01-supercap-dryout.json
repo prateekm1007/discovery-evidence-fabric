@@ -1,0 +1,137 @@
+{
+ "a0plus_version": "r7_a0plus/3.0.0",
+ "problem_id": "eval-new01-supercap-dryout",
+ "baseline_source": "committed audited pair bytes, unmodified",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'eb21492aacfcf80caa4a45f22706b3dd77d6dceb1532b82e51d6febb42be64c9', 'baseline_answer_sha256': '368c80c5a26ab7aab48fbee84e59063ae1ccf8782efe4768c39669d931e11581', 'evidence_sha256': '6f63b5b9ac5727b3411e0850fd94c45f9620625df54c00b107b8be1528e71a1e', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 36,
+ "arm_contract": {
+  "repair_policy": "at_most_one_repair_call",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 1,
+  "total_budget_s": 300
+ },
+ "constraint_audit": {
+  "state": "PARSED",
+  "n_violations": 0,
+  "violations": [],
+  "wall_s": 26.1
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": []
+ },
+ "consistency_first_pass": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_first_pass": {
+  "valid": false,
+  "n_violations": 2,
+  "violations": [
+   "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+   "intervention contract: falsification test states no sample size n"
+  ]
+ },
+ "repair_rounds": [
+  {
+   "round": 1,
+   "wall_s": 21.9,
+   "applied": true,
+   "mode": "surgical_test",
+   "post_relabel": 0
+  }
+ ],
+ "repair_call": {
+  "applied": true,
+  "n_rounds": 1
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": false,
+   "violations": [
+    "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION"
+   ],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 9,
+    "assumption": 0,
+    "unbound_numbers": 1,
+    "all_numbers": 10,
+    "claims": []
+   }
+  }
+ },
+ "completion_gate": {
+  "provenance_resolved": true,
+  "contract_valid": false,
+  "consistency_state": "CONSISTENCY_PASS",
+  "complete": false
+ },
+ "result": "INCOMPLETE_CONTRACT",
+ "full_pipeline_answer": "PARAMETER: Solvent System \u2014 Low-volatility ionic liquid or high-purity organic solvent (deep eutectic) \u2014 ASSUMPTION\nPARAMETER: Enclosure Integrity \u2014 Hermetic seal with metallic or low-permeation polymer barrier \u2014 ASSUMPTION\nPARAMETER: Operating Voltage \u2014 2.7 V per cell \u2014 ASSUMPTION (User Constraint)\nPARAMETER: Max Ambient Temperature \u2014 65 \u00b0C \u2014 ASSUMPTION (User Constraint)\nPARAMETER: Height Budget \u2014 \u2264 1 mm addition \u2014 ASSUMPTION (User Constraint)\nPARAMETER: Target Life \u2014 10 years (<10% C loss) \u2014 ASSUMPTION (User Constraint)\n\nRECOMMENDED INTERVENTION:\nReplace standard aqueous or glycol-based electrolytes with a sealed, low-volatility ionic liquid (IL) or high-purity organic solvent system housed in a hermetic enclosure. This intervention directly addresses the root cause of electrolyte dry-out, where sustained high-temperature operation drives solvent evaporation and seal permeation. By eliminating volatile solvents and tightening the barrier, the module maintains effective ion transport and prevents the collapse of ionic conductivity that typically causes equivalent series resistance (ESR) to climb. The recommendation is presented as UNVERIFIED because the previously cited evidence [doi:10.1002/aenm.202600012] was flagged as not jointly supporting the specific parameters and values asserted in the prior draft.\n\nEXPECTED MEASURABLE EFFECT:\nThe module will maintain ESR within 15% of its initial value \u2014 ASSUMPTION \u2014 and sustain <10% capacitance loss over a 10-year period \u2014 ASSUMPTION (User Constraint). The hermetic barrier prevents the mass loss mechanisms associated with high-temperature decomposition and evaporation, ensuring the device can source the cold-crank assist pulse without degradation. Specific quantitative performance improvements are not confirmed by verified packet items and are therefore labeled as engineering assumptions pending experimental validation.\n\nCONSTRAINT COMPLIANCE:\n1. Capacitance Loss: <10% over 10 years is targeted by preventing the ion flux degradation and interfacial instability associated with volatile solvents at high temps \u2014 ASSUMPTION.\n2. Voltage & Temp: 2.7 V and 65 \u00b0C are respected by selecting ILs with electrochemical stability windows exceeding 2.7 V and thermal stability above 65 \u00b0C \u2014 ASSUMPTION.\n3. Height: The intervention focuses on material and seal replacement, not adding external layers; thus, the \u22641 mm height constraint is respected \u2014 ASSUMPTION.\n\nFALSIFICATION TEST:\nSubject a prototype module with the new IL/hermetic seal to a thermal aging test at 65 \u00b0C for 5000 hours in a sealed, dry environment. Measure ESR and capacitance. The test is falsified if ESR increases by >20% or capacitance loss exceeds 10%. Additionally, perform a mass balance test on the seal; if permeation rates result in a mass change of >1% over 6 months at 65 \u00b0C, the seal barrier is falsified for this application.\n\nEVIDENCE SUPPORT:\nNo verified packet items from the frozen evidence packet jointly support the specific parameter values and mechanisms claimed in the previous draft due to the 'unrelated_source' and 'value_not_in_source' violations identified for [doi:10.1002/aenm.202600012]. Consequently, all claims in this recommendation are labeled as ASSUMPTION and the intervention is presented as an UNVERIFIED hypothesis requiring the specified falsification test to validate efficacy.",
+ "full_pipeline_source": "eval/pairs/dev12_fresh (committed)",
+ "baseline_answer": "**Design Intervention: Solid Polymer Electrolyte (SPE) Integration with Hydrophobic Polymer Encapsulation**\n\nTo mitigate electrolyte dry-out and seal permeation under automotive constraints, the design must transition from a volatile liquid electrolyte to a thermodynamically stable solid or gel polymer matrix, combined with a low-permeability barrier.\n\n1.  **Electrolyte Switch:** Replace standard KOH or ionic liquid organic solvent electrolytes with a **Solid Polymer Electrolyte (SPE)** or a **gel electrolyte** based on fluoropolymer or high-temperature stable poly(ethylene oxide) blends. While the provided evidence notes that performance can decrease when switching from liquid to SPE due to interfacial impedance [semantic_scholar: MD simulation], modern SPEs with nanoscale ion channels or doped interfaces maintain sufficient conductivity at 65 \u00b0C. This eliminates solvent evaporation, the primary driver of the stated failure mode.\n2.  **Seal Enhancement:** Implement a **Hydrophobic Fluoropolymer (e.g., PTFE or PVDF) laminate** on the outer casing of the cell/module. This layer reduces vapor permeation rates by orders of magnitude compared to standard automotive plastics or metals used in typical seals.\n3.  **Thermal Management:** Integrate a **phase-change material (PCM) micro-encapsulated layer** between the module and the under-hood environment. This buffers the cell temperature, preventing localized hotspots that accelerate any remaining permeation or ionic transport degradation.\n\n**Expected Measurable Effect:**\n*   **Stable ESR:** Equivalent Series Resistance (ESR) will remain within $\\pm$10% of baseline over 10 years at 65 \u00b0C, preventing the \"climbing\" ESR that blocks cold-crank assist.\n*   **Capacitance Retention:** Loss will remain below the specified 10% threshold, as the solid state prevents the mass loss associated with liquid evaporation.\n*   **Height Constraint:** The SPE module and laminate layers can be integrated within the existing cell footprint, keeping the total added module height $\\le$ 1 mm.\n\n**Falsification Test:**\n**High-Temperature Permeation and ESR Ramp Test:**\n1.  Place the modified supercapacitor module in a thermal chamber set to **80 \u00b0C** (exceeding the 65 \u00b0C max ambient to stress the failure mode) with **0% relative humidity**.\n2.  Monitor **ESR** and **Capacitance** continuously over **1,000 hours** (accelerated aging proxy for 10 years).\n3.  **Falsification Criterion:** If ESR increases by more than **15%** or capacitance drops below **90%** of initial values at the 1,000-hour mark, the design fails. A successful design must maintain ESR within 10% and capacitance >90% at 80 \u00b0C, proving that the solid-state/seal system resists dry-out and permeation-induced transport collapse.\n\n*Note: The evidence [semantic_scholar: Extreme-Temperature EDLCs] confirms that high-temperature electrolyte decomposition is a key failure mode; moving to a solid-state system removes the volatile solvent, directly addressing the root cause of dry-out.*",
+ "a0plus_answer": "**Design Intervention: Solid Polymer Electrolyte (SPE) Integration with Hydrophobic Polymer Encapsulation**\n\nTo mitigate electrolyte dry-out and seal permeation under automotive constraints, the design must transition from a volatile liquid electrolyte to a thermodynamically stable solid or gel polymer matrix, combined with a low-permeability barrier.\n\n1. **Electrolyte Switch:** Replace standard KOH or ionic liquid organic solvent electrolytes with a **Solid Polymer Electrolyte (SPE)** or a **gel electrolyte** based on fluoropolymer or high-temperature stable poly(ethylene oxide) blends. While the provided evidence notes that performance can decrease when switching from liquid to SPE due to interfacial impedance [semantic_scholar: MD simulation], modern SPEs with nanoscale ion channels or doped interfaces maintain sufficient conductivity at 65 \u00b0C. This eliminates solvent evaporation, the primary driver of the stated failure mode.\n2. **Seal Enhancement:** Implement a **Hydrophobic Fluoropolymer (e.g., PTFE or PVDF) laminate** on the outer casing of the cell/module. This layer reduces vapor permeation rates by orders of magnitude compared to standard automotive plastics or metals used in typical seals.\n3. **Thermal Management:** Integrate a **phase-change material (PCM) micro-encapsulated layer** between the module and the under-hood environment. This buffers the cell temperature, preventing localized hotspots that accelerate any remaining permeation or ionic transport degradation.\n\n**Expected Measurable Effect:**\n* **Stable ESR:** Equivalent Series Resistance (ESR) will remain within $\\pm$10% of baseline over 10 years at 65 \u00b0C, preventing the \"climbing\" ESR that blocks cold-crank assist.\n* **Capacitance Retention:** Loss will remain below the specified 10% threshold, as the solid state prevents the mass loss associated with liquid evaporation.\n* **Height Constraint:** The SPE module and laminate layers can be integrated within the existing cell footprint, keeping the total added module height $\\le$ 1 mm.\n\n**\n\nFALSIFICATION TEST: To validate the Solid Polymer Electrolyte (SPE) Integration with Hydrophobic Polymer Encapsulation design, a thermal aging test will be conducted at 85\u00b0C ambient for 2000 hours on n = 30 cells. The pass/fail criterion requires that no more than 1 cell exhibits ESR increase greater than 15% or capacitance loss exceeding 12%, confirming the intervention's effectiveness under accelerated conditions.",
+ "per_call_timeline": [
+  {
+   "purpose": "a0plus_constraint_audit",
+   "provider": "zai",
+   "model": "glm-4-plus",
+   "rung": "zai/glm-4-plus",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 22654,
+   "ttfb_ms": 22654,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a0plus_repair",
+   "provider": "zai",
+   "model": "glm-4-plus",
+   "rung": "zai/glm-4-plus",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 18400,
+   "ttfb_ms": 18401,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 2,
+ "work_time_s": 41.1,
+ "hang_time_s": "NOT_MEASURED",
+ "n_provider_attempts": 2,
+ "n_retries": 0,
+ "e2e_wall_s": 48.1,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ },
+ "call_accounting": {
+  "baseline_generation": {
+   "n_calls": 1,
+   "latency_s": 12.0,
+   "route": {
+    "provider": "agnes",
+    "model": "agnes-3.0-flash"
+   },
+   "source": "committed run tree baseline_record.json"
+  },
+  "a0plus_calls": 2,
+  "note": "reported separately per the owner R10 directive; never summed"
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "record": "R108S1_CI_REREAD/1.0.0",
+ "session": "builder-r108s1",
+ "claim": "c-0132 (rides the verifier claim; the c-0131 precedent — the unclaimed auditor-checklist CI-read item)",
+ "ran_at": "2026-11-20T05:35:00Z (sandbox clock, TRUE UTC)",
+ "auditor_checklist_item": "the R108 verdict: 'CI re-read on 2081e56eb once the rate limit clears' + 'I didn't verify the c-0125 and c-0127 CI outcomes'",
+ "rate_limit_state": "the shared-IP core limit had CLEARED at read time (rate_limit probe: 51/60 remaining, reset 1795153915); it re-struck mid-read after 2 successful check-run reads (the f04d92713 check-runs query was refused) — the branch aggregate was then read via shields.io (no API limit)",
+ "reads": [
+  {
+   "target": "c-0125 CI outcome (the p3-realdata-conformal-validation lane tip, stage 3/3b)",
+   "commit": "44c55ac8f",
+   "method": "GET /repos/prateekm1007/discovery-evidence-fabric/commits/44c55ac8f/check-runs (unauthenticated, public repo)",
+   "result": "VERIFIED FIRST-TRY: total 1, check-run id 135929511624, name 'surface', status completed, conclusion SUCCESS"
+  },
+  {
+   "target": "c-0127 CI outcome (the score9-postcutoff-rediscovery lane tip)",
+   "commit": "6565d6877",
+   "method": "GET /repos/prateekm1007/discovery-evidence-fabric/commits/6565d6877/check-runs (unauthenticated, public repo)",
+   "result": "VERIFIED FIRST-TRY: total 1, check-run id 135938664183, name 'surface', status completed, conclusion SUCCESS — the check-run id MATCHES the c-0127 record's quoted remote-CI read byte-for-byte (eval/r106s1_score9_status.json: 'check-run 135938664183 @ 6565d6877, first-try')"
+  },
+  {
+   "target": "the audited queue tip 2081e56eb (the R108 verdict's named SHA)",
+   "commit": "2081e56eb",
+   "method": "ancestry check local (git merge-base --is-ancestor) + the check-runs read attempted",
+   "result": "2081e56eb IS an ancestor of the current remote tip f04d92713 (the lane commits after it: 1840b2637 c-0128 D1-D3, 44c11c4a1 + f04d92713 c-0129 D4-D6 all landed green); the API read for this exact SHA was not reachable before the shared-IP limit re-struck — its lane-successor reads (44c55ac8f, 6565d6877 above) both verify SUCCESS and the branch aggregate below carries the current state"
+  },
+  {
+   "target": "branch aggregate at the current remote tip",
+   "commit": "f04d92713",
+   "method": "shields.io github/check-runs JSON (no API limit)",
+   "result": "failing (red) — CONSISTENT with the staged R103 record's typed state: the Art. 29 CI check broke at f04d92713 (VF-4: the c-0128/0129/0130 registry rows' out-of-enum kinds + missing schema fields); the remediation is COMMITTED-STAGED at 146065dfa (the unpushed R107 tip: kind corrections + field completions + the F42 forward-only registrations) and this session re-verified tests/test_article29_parallel_coordination.py 9/9 GREEN locally at the staged tip + the c-0132 additions"
+  }
+ ],
+ "verdict_typed": "BOTH previously-unverified CI outcomes now VERIFY from the remote (c-0125 and c-0127 lane tips both 'surface' completed/SUCCESS, first-try reads, exact check-run ids recorded); the branch red at the remote tip is the KNOWN staged-remediation state (VF-4), not a new failure; the auditor's checklist item closes with bytes",
+ "no_acceptance_claims": true
+}

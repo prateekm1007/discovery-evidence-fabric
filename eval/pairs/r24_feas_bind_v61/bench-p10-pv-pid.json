@@ -1,0 +1,95 @@
+{
+ "problem_id": "bench-p10-pv-pid",
+ "a1_source": "SYS_A1_INT_V61/r24_feas_bind_v61",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The intervention is to replace the standard soda-lime cover glass with a low-sodium borosilicate glass to prevent sodium ion migration into cell shunting paths. Standard practice uses soda-lime glass (c ≈ 13% Na₂O), which is a primary source of mobile sodium ions; this intervention departs by using a glass with inherently low sodium content (<0.5% Na₂O) that is already standard in the solar industry for other applications, directly reducing the driving mechanism of PID. The closest existing mitigation practice is using protective coatings or barriers to block ion migration, which differs fundamentally by adding a layer rather than eliminating the ion source itself.\n\nPHYSICS CHECK — The governing relation is the flux of sodium ions J = -D∇c, where D is diffusivity and ∇c is the concentration gradient. Reducing the sodium concentration in the glass from ~13% to <0.5% decreases ∇c by >96%, directly suppressing J and ion migration into shunting paths. This reduction is sufficient to limit annual power loss below 0.5% over 25 years at 1000 V bias, as the dominant source of mobile sodium is eliminated.\n\nIMPLEMENTATION BILL —  \n- Standard practice bill: Soda-lime cover glass (c ≈ 13% Na₂O)  \n- Proposed intervention bill:  \n  1. Low-sodium borosilicate cover glass (c < 0.5% Na₂O) (b) — procurable standard catalog item, same class as standard glass  \n  2. No additional equipment or procedures required (a) — uses existing lamination and framing infrastructure  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) —  \n- Standard practice: Soda-lime glass procurement and lamination  \n- Proposed intervention: Borosilicate glass procurement (same cost class) + same lamination (no change)  \n- Burden conclusion: Same burden class — no additional equipment, no procedural changes, and borosilicate glass is a standard procurable item in the solar industry with comparable cost to soda-lime glass.\n\nEXECUTABLE TEST —  \n- Protocol: Subject modules to 1000 V bias at 85°C/85% RH for 1000 hours (IEC 62892 PID test), measure power output before and after.  \n- Instruments: Solar simulator (IEC 60904-9), temperature/humidity chamber, data logger.  \n- Pass/fail: Power loss ≤ 0.5% after 1000 hours (extrapolates to <0.5% annual over 25 years).  \n- Duration: 1000 hours (accelerated test).  \n- Kill criterion: Power loss > 0.5% after 1000 hours.",
+ "meta": {
+  "repairs": 2,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Standard practice bill: Soda-lime cover glass (c ≈ 13% Na₂O)",
+    "- Proposed intervention bill:",
+    "- Standard practice: Soda-lime glass procurement and lamination",
+    "- Proposed intervention: Borosilicate glass procurement (same cost class) + same laminatio",
+    "- Burden conclusion: Same burden class — no additional equipment, no procedural changes, a",
+    "- Protocol: Subject modules to 1000 V bias at 85°C/85% RH for 1000 hours (IEC 62892 PID te",
+    "- Instruments: Solar simulator (IEC 60904-9), temperature/humidity chamber, data logger.",
+    "- Pass/fail: Power loss ≤ 0.5% after 1000 hours (extrapolates to <0.5% annual over 25 year",
+    "- Duration: 1000 hours (accelerated test).",
+    "- Kill criterion: Power loss > 0.5% after 1000 hours."
+   ]
+  },
+  "final_sha256_16": "d774d665c368f199",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3112,
+    "latency_s": 9.8,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {
+     "BILL_UNTAGGED": [
+      "- Test 20 modules (10 with interlayer, 10 control) at 1000 V bias, 85°C/85% RH per IEC 628",
+      "- Measure power output and IV curves weekly for 6,000 hours (equivalent to 25 years at 0.5"
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'encapsulant' in: **standard practice:** modules use soda-lime glass with no dedicated sodium barrier, relying on encapsulants t",
+      "excluded stem 'encapsulant' in: this reduces pid-induced shunting by >95%, keeping power loss below 0.5%/year.\n\n### implementation bill\n**stan",
+      "excluded stem 'encapsulant' in: *(no new equipment required; ald tools are standard in pv manufacturing.)*\n\n### burden ledger (standard-practi",
+      "excluded stem 'encapsulants' in: **standard practice:** modules use soda-lime glass with no dedicated sodium barrier, relying on encapsulants t"
+     ]
+    },
+    "sha256_16": "e07b1077eaafddfe"
+   },
+   {
+    "stage": "repair_1",
+    "chars": 2585,
+    "latency_s": 8.0,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {
+     "BILL_UNTAGGED": [
+      "- Glass substitution: Same cost class (borosilicate is standard in solar industry)",
+      "- No additional equipment needed (uses existing lamination line)",
+      "- No additional testing required (IEC 628 test unchanged)",
+      "- No maintenance burden (same cleaning/inspection procedures)",
+      "- Installation burden: IDENTICAL (no change to module form factor)",
+      "- Protocol: Test 20 modules (10 with borosilicate, 10 soda-lime control) at 1000 V bias, 8",
+      "- Instruments: IV curve tracer, electroluminescence camera, sodium ion mobility analyzer.",
+      "- Pass/Fail: Power loss <0.5% for borosilicate group vs >3% for control group at completio",
+      "- Duration: 1000 hours (~6 weeks) with weekly IV measurements.",
+      "- Kill Criterion: If any borosilicate module shows >0.5% power loss, test fails and mechan"
+     ],
+     "CONSTRAINT_EXCLUSION": [
+      "excluded stem 'encapsulant' in: at 1000 v bias and 85°c/85% rh, the standard soda-lime glass (c ≈ 13% na₂o) would generate ~10¹² ions/cm²/year"
+     ]
+    },
+    "sha256_16": "b5e5ae255c720950"
+   },
+   {
+    "stage": "repair_2",
+    "chars": 2376,
+    "latency_s": 7.5,
+    "critic_verdict": "CLEAN",
+    "findings_disclosed": {
+     "BILL_UNTAGGED": [
+      "- Standard practice bill: Soda-lime cover glass (c ≈ 13% Na₂O)",
+      "- Proposed intervention bill:",
+      "- Standard practice: Soda-lime glass procurement and lamination",
+      "- Proposed intervention: Borosilicate glass procurement (same cost class) + same laminatio",
+      "- Burden conclusion: Same burden class — no additional equipment, no procedural changes, a",
+      "- Protocol: Subject modules to 1000 V bias at 85°C/85% RH for 1000 hours (IEC 62892 PID te",
+      "- Instruments: Solar simulator (IEC 60904-9), temperature/humidity chamber, data logger.",
+      "- Pass/fail: Power loss ≤ 0.5% after 1000 hours (extrapolates to <0.5% annual over 25 year",
+      "- Duration: 1000 hours (accelerated test).",
+      "- Kill criterion: Power loss > 0.5% after 1000 hours."
+     ]
+    },
+    "sha256_16": "d774d665c368f199"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T19:19:03.845030Z"
+}

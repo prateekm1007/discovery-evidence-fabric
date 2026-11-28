@@ -1,0 +1,99 @@
+{
+ "problem_id": "v17-06-solar-backlash",
+ "domain": "solar-tracking",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P31",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "chemistry",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:6c8887ac34df": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:8cf2fbb16921": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "thermal_attack_surface",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_attack_surface",
+     "admitted": true,
+     "rank": 2,
+     "basis": "configuration is admitted class #3 for the thermal_attack_surface failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T03:58:00Z",
+ "attempts_n": 1,
+ "row_wall_s": 9.6,
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a MATERIAL modification (grease re-formulation or replacement) to prevent drying at high tilt temperature.  \nMy same-class departure is a CONFIGURATION modification: a dual-chamber grease reservoir with thermal barrier that isolates fresh grease from the drive mechanism during high-temperature operation, preventing drying while maintaining lubrication.  \nThis works because the failure physics (thermal_attack_surface) degrades grease at the boundary interface; isolating the fresh grease from the heat source via configuration prevents the thermal attack from reaching the lubricant.  \n\nPHYSICS CHECK  \nGoverning relation: Heat transfer through a thermal barrier (Q = k·A·ΔT/d) must limit grease chamber temperature to <100°C (grease degradation threshold).  \nCALCULATED: For a 5mm ceramic barrier (k=1 W/m·K), ΔT=50°C (drive chamber - ambient), Q = 1·0.1·50/0.005 = 1000 W/m² — sufficient to maintain grease below degradation if drive chamber is <150°C.  \n\nIMPLEMENTATION BILL  \n- Components:  \n  - Dual-chamber grease reservoir (stated: \"existing grease reservoir modified\")  \n  - Thermal barrier (ceramic composite, stated: \"material from existing insulation specs\")  \n  - Pressure-equalization valve (stated: \"existing valve repurposed\")  \n- Inputs (ALREADY-RECORDED):  \n  - Tilt angle telemetry (stated: \"tilt angle sensor output\")  \n  - Drive temperature (stated: \"motor temperature sensor\")  \n- References (DERIVED):  \n  - Grease degradation threshold (CALCULATED: from stated grease spec sheet: max 100°C)  \n  - Thermal barrier thickness (CALCULATED: from stated insulation specs: 5mm ceramic)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: Same (modifies existing reservoir)  \n- Operability: Same (no new controls; passive thermal barrier)  \n- Maintenance: Same (grease refill via existing port)  \n- Cost: Same (uses stated materials; no new sensors)  \n- Burden class: IDENTICAL to standard practice (material modification), but via configuration instead.  \n\nEXECUTABLE TEST  \nProtocol: Monitor backlash torque (stated: \"primary indicator\") at 45° tilt while cycling drive temperature between 80°C and 120°C.  \nInstruments: Torque sensor (stated: \"existing load cell\"), temperature logger (stated: \"existing data logger\").  \nPass/fail: Backlash increase <5% of baseline (CALCULATED: from stated torque spec) over 48 hours.  \nKill criterion: Backlash >10% increase (CALCULATED: 2× acceptable wear threshold per stated maintenance manual).  \nDuration: 48 hours (accelerated thermal cycle).  \n\nCONSTRAINT BIND  \nPrimary indicator: Backlash torque (stated: \"defines failure\" in problem). Secondary indicator: Temperature (supplements to confirm thermal event).  \nRISK: Thermal barrier cracking if thermal expansion exceeds material limits (addressed via stated ceramic composite specs).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Components:",
+    "- Dual-chamber grease reservoir (stated: \"existing grease reservoir modified\")",
+    "- Thermal barrier (ceramic composite, stated: \"material from existing insulation specs\")",
+    "- Pressure-equalization valve (stated: \"existing valve repurposed\")",
+    "- Inputs (ALREADY-RECORDED):",
+    "- Tilt angle telemetry (stated: \"tilt angle sensor output\")",
+    "- Drive temperature (stated: \"motor temperature sensor\")",
+    "- References (DERIVED):",
+    "- Grease degradation threshold (CALCULATED: from stated grease spec sheet: max 100°C)",
+    "- Thermal barrier thickness (CALCULATED: from stated insulation specs: 5mm ceramic)",
+    "- Installability: Same (modifies existing reservoir)",
+    "- Operability: Same (no new controls; passive thermal barrier)",
+    "- Maintenance: Same (grease refill via existing port)",
+    "- Cost: Same (uses stated materials; no new sensors)",
+    "- Burden class: IDENTICAL to standard practice (material modification), but via configurat"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "f5467e02a2e61545"
+}

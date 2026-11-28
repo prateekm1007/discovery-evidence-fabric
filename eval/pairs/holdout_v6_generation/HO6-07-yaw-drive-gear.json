@@ -1,0 +1,164 @@
+{
+ "problem_id": "HO6-07-yaw-drive-gear",
+ "question_type": "predictor-design",
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme using motor current and position encoder to detect positioning errors.  \n- Novel same-class mechanism: Fatigue-induced backlash growth manifests as asymmetric current signatures during reversal; detect by analyzing current hysteresis width and slope changes relative to position error history.  \n- Failure physics connection: Gear tooth fatigue increases backlash, causing sudden torque spikes during direction reversal; current hysteresis width correlates with backlash magnitude.  \n\n**PHYSICS CHECK**  \n- Governing relation: Backlash-induced torque spike ΔT = k * θ_backlash, where k is torsional stiffness (stated spec).  \n- Magnitude verification: For a 0.1° positioning error (spec limit), ΔT ≈ 50 Nm (CALCULATED from gearbox nameplate torsional stiffness 500 Nm/rad). Current spike ΔI = ΔT / K_motor (K_motor = 10 Nm/A per motor spec), giving ΔI = 5A.  \nDIRECTION-OF-EFFECT: driving variable = backlash; the mechanism detects it by measuring ΔI during reversal (up); this raises the early warning signal, reducing failure risk.  \n\n**IMPLEMENTATION BILL**  \n(a) Firmware update to existing yaw controller (ALREADY-RECORDED: yaw motor current telemetry).  \n(b) Algorithm to compute current hysteresis width (ΔI_max - ΔI_min) during slew reversals (ALREADY-RECORDED: nacelle yaw-position encoder).  \n(c) Threshold calculator: ΔI_threshold = 1.5 * baseline_ΔI (DERIVED from baseline_ΔI = 3A, measured from 30 days of healthy operation data per problem statement).  \n(d) Position error rate calculator: d(position_error)/dt (DERIVED from position encoder data, spec limit = 0.1°/30 days).  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: SAME (firmware-only update to existing controller).  \n- Operability: SAME (no new operator actions; embedded in yaw control logic).  \n- Maintenance: SAME (no new hardware; calibration-free per physics-derived threshold).  \n- Cost class: SAME (no new sensors; software-only modification).  \n- Operational loss: ZERO (no downtime; early warning prevents positioning faults).  \n\n**EXECUTABLE TEST**  \n- Protocol: Record yaw motor current and position encoder during 100 slew reversals (healthy and artificially fatigued gear).  \n- Instruments: Existing controller telemetry logs (ALREADY-RECORDED).  \n- Pass/fail: ΔI > 1.5 * baseline_ΔI AND d(position_error)/dt > 0.0033°/day for 3 consecutive reversals.  \n- Duration: 1 week (100 reversals at 10/day).  \n- Kill criterion: >1 false alarm in healthy data or failure to detect ΔI > 5A in fatigued data.  \n- Validation: Against 30 days of historical data (stated to exist) and physics-derived ΔI = 5A for 0.1° error.  \n\n**CONSTRAINT BIND**  \n- Primary indicator: Position error (per problem statement, defines failure threshold).  \n- Supplemental indicator: Motor current hysteresis (used to predict position error growth).  \n- Compliance: Uses only existing yaw motor current and nacelle yaw-position encoder; warns 30 days before 0.1° error; <1 false alarm/year; no new sensors.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installability: SAME (firmware-only update to existing controller).",
+    "- Operability: SAME (no new operator actions; embedded in yaw control logic).",
+    "- Maintenance: SAME (no new hardware; calibration-free per physics-derived threshold).",
+    "- Cost class: SAME (no new sensors; software-only modification).",
+    "- Operational loss: ZERO (no downtime; early warning prevents positioning faults).",
+    "- Protocol: Record yaw motor current and position encoder during 100 slew reversals (healt",
+    "- Instruments: Existing controller telemetry logs (ALREADY-RECORDED).",
+    "- Pass/fail: ΔI > 1.5 * baseline_ΔI AND d(position_error)/dt > 0.0033°/day for 3 consecuti",
+    "- Duration: 1 week (100 reversals at 10/day).",
+    "- Kill criterion: >1 false alarm in healthy data or failure to detect ΔI > 5A in fatigued ",
+    "- Validation: Against 30 days of historical data (stated to exist) and physics-derived ΔI ",
+    "- Primary indicator: Position error (per problem statement, defines failure threshold).",
+    "- Supplemental indicator: Motor current hysteresis (used to predict position error growth)",
+    "- Compliance: Uses only existing yaw motor current and nacelle yaw-position encoder; warns"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 3056,
+   "latency_s": 8.9,
+   "transport_tries": 1,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- **Input Streams** (ALREADY-RECORDED):",
+     "1. Yaw motor current (3-phase, 10 kHz sampling, stated sensor: \"yaw motor current\").",
+     "2. Nacelle yaw-position encoder (1° resolution, 1 Hz update, stated sensor: \"nacelle yaw-p",
+     "- **Reference/Threshold** (DERIVED):",
+     "- Baseline torque ripple spectrum: Calculated from healthy current data (stated data: \"exi",
+     "- Sideband growth threshold: Calculated as 3× standard deviation of baseline sideband ampl",
+     "- Position error proxy: Calculated from encoder drift rate (stated spec: \"yaw positioning ",
+     "- **Installability**: Same as standard (no new hardware; uses existing current/encoder fee",
+     "- **Operability**: Same (embedded in control system; no operator training).",
+     "- **Maintenance**: Same (no calibration; thresholds derived from existing data).",
+     "- **Cost class**: Same (no new sensors; algorithm runs on existing controller)."
+    ]
+   },
+   "sha256_16": "e76131a4da0513de"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 2796,
+   "latency_s": 8.8,
+   "transport_tries": 2,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "FLAG",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (no new hardware, firmware-only update to existing controller).",
+     "- Operability: SAME (uses existing sensors, no operator interface change).",
+     "- Maintenance: SAME (no additional consumables or calibration).",
+     "- Cost class: SAME (processor module < $100, standard PLC upgrade).",
+     "- Operational loss: ZERO (no downtime for installation).",
+     "- Protocol: Record current and encoder during 20 consecutive slew cycles at rated torque.",
+     "- Instruments: Existing data logger (10 kHz sync).",
+     "- Pass/fail: Phase shift > 0.5 ms for ≥ 80% of cycles = FAIL (predictor validated).",
+     "- Duration: 1 hour per turbine.",
+     "- Kill criterion: Phase shift < 0.2 ms in all tests = PREDICTOR KILLED (no signal).",
+     "- Validation: Against ALREADY-RECORDED data from prior gear failures (phase shift observed",
+     "- Primary indicator: Positioning error (USER CONSTRAINT: \"warn before positioning error ex",
+     "- Supplement: Phase shift (secondary, enables 30-day warning).",
+     "- Rationale: Positioning error defines failure; phase shift is a precursor measurable only"
+    ]
+   },
+   "sha256_16": "2e18b695c3aa3f29",
+   "findings_disclosed": [
+    "USER_LABEL_FABRICATED_CONSTRAINT",
+    "BILL_UNTAGGED: - Installability: SAME (no new hardware, firmware-only update to existing controller).; - Operability: SAME (u"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2695,
+   "latency_s": 7.8,
+   "transport_tries": 3,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (firmware-only update to existing controller).",
+     "- Operability: SAME (no new operator interfaces; alarms integrate with existing SCADA).",
+     "- Maintenance: SAME (no additional maintenance; algorithm runs in controller memory).",
+     "- Cost class: SAME (no hardware costs; firmware update labor < 4 hours/turbine).",
+     "- Operational loss: ZERO (no downtime; warning is pre-emptive)."
+    ]
+   },
+   "sha256_16": "fa8d6da37e86635c",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: SAME (firmware-only update to existing controller).; - Operability: SAME (no new operator in"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 3065,
+   "latency_s": 10.6,
+   "transport_tries": 4,
+   "route": "zai_gateway",
+   "route_model": null,
+   "fallback_reason": null,
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME (firmware-only update to existing controller).",
+     "- Operability: SAME (no new operator actions; embedded in yaw control logic).",
+     "- Maintenance: SAME (no new hardware; calibration-free per physics-derived threshold).",
+     "- Cost class: SAME (no new sensors; software-only modification).",
+     "- Operational loss: ZERO (no downtime; early warning prevents positioning faults).",
+     "- Protocol: Record yaw motor current and position encoder during 100 slew reversals (healt",
+     "- Instruments: Existing controller telemetry logs (ALREADY-RECORDED).",
+     "- Pass/fail: ΔI > 1.5 * baseline_ΔI AND d(position_error)/dt > 0.0033°/day for 3 consecuti",
+     "- Duration: 1 week (100 reversals at 10/day).",
+     "- Kill criterion: >1 false alarm in healthy data or failure to detect ΔI > 5A in fatigued ",
+     "- Validation: Against 30 days of historical data (stated to exist) and physics-derived ΔI ",
+     "- Primary indicator: Position error (per problem statement, defines failure threshold).",
+     "- Supplemental indicator: Motor current hysteresis (used to predict position error growth)",
+     "- Compliance: Uses only existing yaw motor current and nacelle yaw-position encoder; warns"
+    ]
+   },
+   "sha256_16": "a0d6214fdc0c605e",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installability: SAME (firmware-only update to existing controller).; - Operability: SAME (no new operator ac"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T16:11:14Z"
+}

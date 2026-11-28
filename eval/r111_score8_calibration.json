@@ -1,0 +1,49 @@
+{
+ "record": "R111_SCORE8_CALIBRATION/1.0.0",
+ "executor": "builder-r111s1",
+ "claim": "c-153 (r111-score8-calibration, task)",
+ "recompute_only": "every rating byte from the committed r106 panel record (CORR-9: never re-scored, never re-run); zero LLM calls",
+ "domain_split_committed": "the sealed rows' own question_type field (15 intervention-proposal / 15 predictor-design) — the within-domain normalization uses a committed field, not an invented clustering",
+ "normalization": {
+  "formula": "z = (x - median_domain_pooled) / (1.4826 * MAD_domain_pooled); MAD=0 domains degenerate to median-centering (typed)",
+  "degenerate_mad_domains": [
+   "predictor-design",
+   "intervention-proposal"
+  ],
+  "domain_stats": {
+   "predictor-design": {
+    "median": 4,
+    "mad_scaled": 0.0,
+    "n_pooled": 41
+   },
+   "intervention-proposal": {
+    "median": 4.0,
+    "mad_scaled": 0.0,
+    "n_pooled": 44
+   }
+  }
+ },
+ "agreement": {
+  "metric": "pairwise proportion agreement on the binarized votes (complete seat pairs)",
+  "tightened_within_domain": 0.6875,
+  "raw_baseline_same_pairs": 0.6875,
+  "r106_panel_committed": 0.5875,
+  "target": 0.7,
+  "target_met": false,
+  "per_seat_pair": {
+   "A1~A2": 0.68,
+   "A1~A3": 0.7,
+   "A2~A3": 0.68
+  }
+ },
+ "gate_calibration": {
+  "rule": "a row FAILS iff its seat-mean robust-z sits more than 1 scaled-MAD below its domain median; the burned demo ACCEPTS iff no row fails AND the pooled mean z >= 0",
+  "rows_below_domain_floor": [],
+  "pooled_mean_z": 0.8,
+  "demo_accepted": true,
+  "calibration_pass": true,
+  "audit_anchor": "the burned demo was ACCEPTED by the auditor R105 verdict at mean 3.90 (CORR-9); calibration_pass=true means the tightened gate reproduces that acceptance from committed bytes"
+ },
+ "honest_note": "the agreement is measured on BINARIZED votes of an ordinal rubric — the within-domain normalization removes the cross-domain scale heterogeneity, not rater variance; a target-miss is typed, never tuned away",
+ "no_acceptance_claims": true
+}

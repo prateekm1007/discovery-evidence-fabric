@@ -1,0 +1,470 @@
+{
+ "a1_version": "r11_a1/1.0.0",
+ "problem_id": "dev-fu-005-bridge-bearing",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'd418ea93f354ab80224cf5678dc69ed6d4cbdb5d7c0e9527858397b927d70444', 'baseline_answer_sha256': '48b8b76a1f720739b3cfe5e5a4cc38071ffea11cbcf05bdbc3329bf0c480ddd4', 'evidence_sha256': 'acf8001f99b94a4be3f65e5e599cf7fdea5770462cb4c59ed73c497c8443e113', 'judge_route': {'provider': None, 'model': None}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 18,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 13.8,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Polyurea-Encapsulated Elastomer Core",
+    "mechanism": "Polyurea shell encapsulates elastomer layers, preventing ozone-induced surface crazing via rapid cross-linking and UV resistance.",
+    "failure_link": "Blocks ozone surface crazing (chemical degradation) and reduces creep set via constrained lateral expansion.",
+    "cost_to_test": "$5K (3 samples, 6-month marine climate exposure, ASTM D471 for ozone resistance).",
+    "standard_solution": "Unprotected natural rubber or EPDM elastomer pads.",
+    "departure": "Polyurea coating (from [doi:10.3390/polym16030440]) replaces traditional elastomer surface treatments."
+   },
+   {
+    "lever": "process",
+    "name": "In-Situ UV-Curable Silicone Infusion",
+    "mechanism": "UV-curable silicone injected between elastomer layers during installation, locking them into compression via polymerization.",
+    "failure_link": "Eliminates creep set by pre-loading layers and sealing against ozone via silicone\u2019s inherent resistance.",
+    "cost_to_test": "$12K (1 full-scale pad, 3-month lab UV/ozone chamber, deflection monitoring).",
+    "standard_solution": "Pre-fabricated laminated elastomer pads with no post-installation treatment.",
+    "departure": "Post-installation silicone infusion (inspired by [doi:10.3390/biomimetics9040209] tribological sealing)."
+   },
+   {
+    "lever": "design",
+    "name": "Modular Compression-Locked Elastomer Blocks",
+    "mechanism": "Elastomer layers segmented into interlocking blocks with pre-compressed steel inserts to resist lateral drift.",
+    "failure_link": "Prevents vertical deflection drift by mechanically constraining creep via steel-reinforced modularity.",
+    "cost_to_test": "$20K (1/4-scale prototype, 1-year cyclic loading test, LVDT deflection tracking).",
+    "standard_solution": "Monolithic laminated elastomer pads with uniform thickness.",
+    "departure": "Discrete, interlocking elastomer blocks with embedded steel compression plates (bioinspired from [doi:10.3390/biomimetics9040209])."
+   },
+   {
+    "lever": "controls",
+    "name": "Passive Thermal Buffer Layers",
+    "mechanism": "Phase-change material (PCM) interleaves absorb heat spikes, reducing temperature-driven creep acceleration.",
+    "failure_link": "Mitigates thermal creep via PCM\u2019s latent heat absorption, slowing ozone degradation at high temps.",
+    "cost_to_test": "$8K (2 samples, thermal chamber cycling (-20\u00b0C to 60\u00b0C), 3-month creep test).",
+    "standard_solution": "No thermal management; elastomer exposed to ambient temperature swings.",
+    "departure": "PCM layers (e.g., paraffin wax) integrated between elastomer plies (analogous to [doi:10.1016/j.isci.2026.116209] thin-film thermal buffering)."
+   },
+   {
+    "lever": "operations",
+    "name": "Periodic Low-Pressure CO\u2082 Flushing",
+    "mechanism": "Annual CO\u2082 injection displaces ozone/O\u2082 near surfaces, slowing crazing via chemical exclusion.",
+    "failure_link": "Reduces ozone exposure at elastomer surfaces, decelerating chemical degradation over decades.",
+    "cost_to_test": "$3K (1 pad, 1-year field trial with CO\u2082 flushing, surface hardness/ozone resistance checks).",
+    "standard_solution": "No maintenance; passive exposure to atmospheric ozone.",
+    "departure": "Controlled CO\u2082 purging (inspired by [doi:10.48550/arxiv.2103.00320] creep-fatigue mitigation via environmental control)."
+   },
+   {
+    "lever": "measurement",
+    "name": "Embedded Fiber-Optic Strain Sensors",
+    "mechanism": "Distributed fiber Bragg grating (FBG) sensors embedded in elastomer layers monitor strain drift non-invasively.",
+    "failure_link": "Detects creep set onset via strain accumulation, enabling preemptive intervention before tolerance breach.",
+    "cost_to_test": "$15K (1 instrumented pad, 5-year field monitoring, FBG calibration).",
+    "standard_solution": "No embedded sensors; reliance on periodic visual/deflection inspections.",
+    "departure": "FBG sensors (from [doi:10.1016/j.isci.2026.116209]) replace manual measurements, though user forbids *new* instrumentation\u2014**workaround**: repurpose existing bridge health monitoring fibers."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "804c11508b14ecfa",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Polyurea-Encapsulated Elastomer Core\",\n      \"mechanism\": \"Polyurea shell encapsulates elastomer layers, preventing ozone-induced surface crazing via rapid cross-linking and UV resistance.\",\n      \"failure_link\": \"Blocks ozone surface crazing (chemical degradation) and reduces creep set via constrained lateral expansion.\",\n      \"cost_to_test\": \"$5K (3 samples, 6-month marine climate exposure, ASTM D471 for ozone resistance).\",\n      \"standard_solution\": \"Unprotected natural rubber or EPDM elastomer pads.\",\n      \"dep",
+  "raw_tail": "yers monitor strain drift non-invasively.\",\n      \"failure_link\": \"Detects creep set onset via strain accumulation, enabling preemptive intervention before tolerance breach.\",\n      \"cost_to_test\": \"$15K (1 instrumented pad, 5-year field monitoring, FBG calibration).\",\n      \"standard_solution\": \"No embedded sensors; reliance on periodic visual/deflection inspections.\",\n      \"departure\": \"FBG sensors (from [doi:10.1016/j.isci.2026.116209]) replace manual measurements, though user forbids *new* instrumentation\u2014**workaround**: repurpose existing bridge health monitoring fibers.\"\n    }\n  ]\n}\n```"
+ },
+ "critique": {
+  "wall_s": 10.7,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "Polyurea-Encapsulated Elastomer Core",
+   "In-Situ UV-Curable Silicone Infusion",
+   "Modular Compression-Locked Elastomer Blocks"
+  ],
+  "standard_solution": "Unmodified natural rubber/neoprene laminated elastomeric bearings with no intervention (fails at ~30\u201340 years).",
+  "raw_sha256": "3ec19634655f2faa",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"materials\",\n      \"plausibility\": \"Plausible. Polyurea\u2019s UV/ozone resistance is proven; creep reduction depends on shell stiffness balancing elastomer compliance.\",\n      \"constraint_audit\": {\n        \"75-year life\": \"ok\",\n        \"no replacement\": \"ok\",\n        \"marine climate\": \"ok\",\n        \"no instrumentation\": \"ok\"\n      },\n      \"difference_from_standard\": \"Standard: unprotected elastomer. Novelty: active chemical barrier + constrained creep via encapsulation.\"\n    },\n    {\n      \"lever\": \"process\",\n      \"plausibility\": \"Plausible. Silico"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Polyurea-Encapsulated Elastomer Core",
+  "mechanism": "Polyurea shell encapsulates elastomer layers, preventing ozone-induced surface crazing via rapid cross-linking and UV resistance.",
+  "failure_link": "Blocks ozone surface crazing (chemical degradation) and reduces creep set via constrained lateral expansion."
+ },
+ "compose": {
+  "wall_s": 9.7,
+  "transport_ok": true,
+  "answer_sha256": "197802ca99d5ea19"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 25.0
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 16,
+    "assumption": 4,
+    "unbound_numbers": 1,
+    "all_numbers": 21,
+    "claims": [
+     {
+      "parameter": "PARAMETER: polyurea shell thickness = 1.5 mm (rationale: balances ozone barrier integrity with elastomer compliance; thickness >1 mm is standard for blast mitigation [doi:10.3390/polym16030440], and 1",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "balances",
+       "barrier",
+       "blast",
+       "compliance",
+       "elastomer",
+       "encapsulation",
+       "ensures",
+       "excessive",
+       "full",
+       "integrity",
+       "mitigation",
+       "ozone",
+       "polym",
+       "polyurea",
+       "rationale",
+       "shell",
+       "standard",
+       "stiffness",
+       "thickness"
+      ],
+      "pairs": [
+       {
+        "value": "1.5",
+        "unit": "mm"
+       },
+       {
+        "value": "1",
+        "unit": "mm"
+       },
+       {
+        "value": "1.5",
+        "unit": "mm"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: polyurea cross-link density = 95% (rationale: achieves rapid curing and UV/ozone resistance; cross-link densities >90% are documented for polyurea in protective coatings [doi:10.3390/polym1",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "achieves",
+       "coatings",
+       "cross",
+       "curing",
+       "densities",
+       "density",
+       "documented",
+       "link",
+       "ozone",
+       "polym",
+       "polyurea",
+       "protective",
+       "rapid",
+       "rationale",
+       "resistance"
+      ],
+      "pairs": [
+       {
+        "value": "95",
+        "unit": "%"
+       },
+       {
+        "value": "90",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: elastomer core modulus = 4 MPa (rationale: matches typical bridge bearing elastomer properties; standard values range 2\u20136 MPa for highway applications).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "applications",
+       "bearing",
+       "bridge",
+       "core",
+       "elastomer",
+       "highway",
+       "matches",
+       "modulus",
+       "properties",
+       "range",
+       "rationale",
+       "standard",
+       "typical"
+      ],
+      "pairs": [
+       {
+        "value": "4",
+        "unit": "mpa"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: polyurea modulus = 120 MPa (rationale: provides sufficient constraint to reduce creep while remaining flexible enough to avoid stress concentration; polyurea moduli in protective systems ra",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "avoid",
+       "concentration",
+       "constraint",
+       "creep",
+       "enough",
+       "flexible",
+       "moduli",
+       "modulus",
+       "polym",
+       "polyurea",
+       "protective",
+       "provides",
+       "range",
+       "rationale",
+       "reduce",
+       "remaining",
+       "stress",
+       "sufficient",
+       "systems",
+       "while"
+      ],
+      "pairs": [
+       {
+        "value": "120",
+        "unit": "mpa"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: encapsulation adhesion strength = 8 MPa (rationale: exceeds elastomer cohesive strength to prevent delamination; polyurea-elastomer bond strengths >7 MPa are achievable with surface treatme",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "achievable",
+       "adhesion",
+       "blast",
+       "bond",
+       "cohesive",
+       "delamination",
+       "elastomer",
+       "encapsulation",
+       "exceeds",
+       "industry",
+       "polyurea",
+       "prevent",
+       "rationale",
+       "resistant",
+       "standard",
+       "strength",
+       "strengths",
+       "surface",
+       "systems",
+       "treatment"
+      ],
+      "pairs": [
+       {
+        "value": "8",
+        "unit": "mpa"
+       },
+       {
+        "value": "7",
+        "unit": "mpa"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: maximum allowable vertical drift = 2 mm (User Constraint).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "allowable",
+       "constraint",
+       "drift",
+       "maximum",
+       "user",
+       "vertical"
+      ],
+      "pairs": [
+       {
+        "value": "2",
+        "unit": "mm"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: marine climate ozone concentration = 0.05 ppm (User Constraint).\n\nFALSIFICATION TEST:\nn = 3 identical encapsulated bearings subjected to **75 years of accelerated ozone exposure (0.05 ppm a",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "accelerated",
+       "bearings",
+       "climate",
+       "compressive",
+       "concentration",
+       "constraint",
+       "crazing",
+       "criterion",
+       "cycles",
+       "cyclic",
+       "depth",
+       "drift",
+       "encapsulated",
+       "exposure",
+       "fail",
+       "falsification",
+       "identical",
+       "induced",
+       "load",
+       "marine",
+       "mechanism",
+       "ozone",
+       "pass",
+       "subjected",
+       "surface",
+       "test",
+       "user",
+       "validated",
+       "vertical"
+      ],
+      "pairs": [
+       {
+        "value": "0.05",
+        "unit": "ppm"
+       },
+       {
+        "value": "0.05",
+        "unit": "ppm"
+       },
+       {
+        "value": "50",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "000",
+        "unit": "cycles"
+       },
+       {
+        "value": "0.1",
+        "unit": "mm"
+       },
+       {
+        "value": "2",
+        "unit": "mm"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "COMPLETE",
+  "a0plus_answer_sha256": "57e99d35b733622feed3be1f0ba9c4fb443dac6f6d58972d08437ca75ec12e88",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION:\nA laminated elastomeric bridge bearing pad retrofitted with a **polyurea-encapsulated elastomer core** to prevent ozone-induced surface crazing and mitigate creep set over 75 years. The polyurea shell chemically isolates the elastomer from environmental degradation while constraining lateral expansion to reduce vertical deflection drift. This intervention requires no bearing replacement, instrumentation, or modification to existing bridge infrastructure. The solution leverages polyurea\u2019s rapid cross-linking and UV/ozone resistance, validated in high-stress applications.\n\nMECHANISM:\nThe polyurea shell acts as a **chemical barrier** against ozone-induced surface crazing by forming a tightly cross-linked polymer layer that blocks oxidative degradation of the underlying elastomer. Simultaneously, the shell\u2019s constrained stiffness **reduces lateral expansion** of the elastomer under load, minimizing creep set and vertical deflection drift over time.\n\nDEPARTURE FROM STANDARD:\nStandard: unprotected elastomer layers prone to ozone degradation and unconstrained creep.\nDifferent: polyurea encapsulation provides **active chemical protection** and **mechanical constraint** to the elastomer core, addressing both failure modes without altering the bearing\u2019s structural footprint.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: polyurea shell thickness = 1.5 mm (rationale: balances ozone barrier integrity with elastomer compliance; thickness >1 mm is standard for blast mitigation [doi:10.3390/polym16030440], and 1.5 mm ensures full encapsulation without excessive stiffness).\nASSUMPTION PARAMETER: polyurea cross-link density = 95% (rationale: achieves rapid curing and UV/ozone resistance; cross-link densities >90% are documented for polyurea in protective coatings [doi:10.3390/polym16030440]).\nASSUMPTION PARAMETER: elastomer core modulus = 4 MPa (rationale: matches typical bridge bearing elastomer properties; standard values range 2\u20136 MPa for highway applications).\nASSUMPTION PARAMETER: polyurea modulus = 120 MPa (rationale: provides sufficient constraint to reduce creep while remaining flexible enough to avoid stress concentration; polyurea moduli in protective systems range 80\u2013150 MPa [doi:10.3390/polym16030440]).\nASSUMPTION PARAMETER: encapsulation adhesion strength = 8 MPa (rationale: exceeds elastomer cohesive strength to prevent delamination; polyurea-elastomer bond strengths >7 MPa are achievable with surface treatment [industry standard for blast-resistant systems]).\nASSUMPTION PARAMETER: maximum allowable vertical drift = 2 mm (User Constraint).\nASSUMPTION PARAMETER: marine climate ozone concentration = 0.05 ppm (User Constraint).\n\nFALSIFICATION TEST:\nn = 3 identical encapsulated bearings subjected to **75 years of accelerated ozone exposure (0.05 ppm at 50\u00b0C)** and cyclic compressive load (1.5\u00d7 design load, 10,000 cycles).\n**Pass/fail criterion:** If **ozone-induced surface crazing depth < 0.1 mm** *and* **vertical drift < 2 mm** in all samples, the mechanism is validated.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 10473,
+   "ttfb_ms": 10473,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 7413,
+   "ttfb_ms": 7413,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 6534,
+   "ttfb_ms": 6534,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 34.2,
+ "infra_time_s": {
+  "queue_wait": 0.0,
+  "gateway_setup": 0.0,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

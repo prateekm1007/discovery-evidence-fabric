@@ -1,0 +1,136 @@
+{
+ "problem_id": "HO11-19-pump-seal-flush",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r91s1@holdout-v11-generation",
+ "machine": "r91_v11_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; the identity binding asserts the request id 'agnes-3.0-flash'; the frozen module file constant 'agnes-3.0-flash' is untouched — the freeze guard pins it); ALL FIVE binds active (F75 + chemistry elicitation + formula-direction + element-conservation + equilibrium-direction — the machine runs the committed critic surface, it adds nothing)",
+ "run": "holdout-v11-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    13,
+    29,
+    10
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:269c8a6ea229": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:8c843369c74a": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:5028338c10d5": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 2,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 15.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1517,
+      1521
+     ],
+     "unit": "degC",
+     "quantity": "15.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 150.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1757,
+      1762
+     ],
+     "unit": "degC",
+     "quantity": "150.0 degC",
+     "dimension": "[temperature]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T22:25:15.294843Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT\nStandard Practice: Delivers a monitoring/indication scheme by analyzing flush flow rate or pressure differentials across the seal flush system to detect clogging or depletion.\nMy Departure: Delivers the same indication class by exploiting the thermodynamic coupling between seal face heat rejection and local bulk fluid cooling; specifically, predicting flush failure via the divergence of seal temperature rise relative to discharge pressure drop (a proxy for reduced mass flow cooling capacity) while strictly using only existing temperature and pressure signals.\nFailure-Physics Connection: Seal failure is driven by thermal load ($Q$). Flush failure removes the cooling medium, causing $T_{seal}$ to rise. Since flush flow cannot be measured, the predictor uses the physics of heat transfer: $Q = \\dot{m} C_p \\Delta T$. If flush flow ($\\dot{m}$) fails or restricts, $\\Delta T$ (inferred from $T_{seal}$ vs. ambient/bulk) rises non-linearly while discharge pressure (pump head) remains stable. The predictor detects the *loss of heat sink* before the *mechanical leak* occurs.\n\nPHYSICS CHECK\nGoverning Relation: The thermal balance at the seal face during healthy operation is $Q_{gen} = h_{flush} A (T_{seal} - T_{bulk}) + Q_{conv}$. During flush failure, $h_{flush}$ drops precipitately. The leading indicator is the ratio of Thermal Dissipation Resistance ($R_{th} \\approx \\Delta T / Q_{gen}$) to Pump Head ($H$).\nMagnitude Verification: Normal flush flow maintains $\\Delta T_{seal}$ within 5-15°C of bulk fluid. As flush flow approaches zero, $\\Delta T_{seal}$ rises linearly with power density until thermal runaway. The time-to-failure (leak) is dominated by the time for the interface temperature to exceed the elastomer limit (~150°C for standard fluoroelastomers in this context).\nDIRECTION-OF-EFFECT: driving variable = Seal Face Temperature Rise ($\\Delta T_{seal}$); the mechanism moves it DOWN by ensuring flush availability (which is the physical state the predictor monitors); this REDUCES the thermal integral that drives seal degradation and eventual leak.\nMechanism Diversity: MECHANISM CLASS: Thermodynamic Divergence Monitoring.\n\nIMPLEMENTATION BILL\nConstraint Bind: The problem states \"no new sensors and NO flush flow meter\" and \"use only the existing seal temperature, motor current and discharge pressure.\" The bill must therefore be a pure software/algorithmic predictor using these three inputs. No physical hardware is added to the device.\n\n(a) Algorithm Module (Software)\n   - Input: $T_{seal}$ (Already-Recorded: \"existing seal temperature\")\n   - Input: $P_{discharge}$ (Already-Recorded: \"discharge pressure\")\n   - Input: $I_{motor}$ (Already-Recorded: \"motor current\")\n   - Reference: $T_{bulk}$ (Derived: Stated ambient/suction temp or calculated from $P_{discharge}$ via saturation curve if saturated steam, otherwise assumed constant plant baseline).\n   - Derivation: Compute $Q_{est} \\propto I_{motor} \\cdot \\omega \\cdot \\eta$ (Power input proxy).\n   - Calculation: Calculate specific heat rejection coefficient $k = \\frac{\\Delta T_{seal}}{Q_{est}}$.\n   - Threshold: Alert when $k$ exceeds $k_{crit}$ (Derived from healthy baseline data already recorded in DCS).\n   - Tag: (b) Procurement - Software License for existing DCS/SCADA platform (Standard practice already carries DCS licenses).\n\n(b) Data Validation Logic (Software)\n   - Input: Historical logs of $T_{seal}$, $P_{discharge}$, $I_{motor}$ (Already-Recorded).\n   - Reference: Healthy operating envelope (Derived: 95th percentile of $k$ from past healthy cycles).\n   - Action: Filter out transient start-up/stop events to isolate steady-state thermal behavior.\n   - Tag: (c) Service - Commissioning of algorithm parameters (Standard practice requires sensor calibration/validation services).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Zero. No hardware installation. Uses existing DCS nodes.\nOperability: Zero additional operator burden. Automated alarm only.\nMaintenance: Zero. No new physical parts to fail.\nOperational Loss: 0 (ASSUMPTION: No throughput/energy loss as no setpoints are changed, only monitored).\nCost Class: Same as standard practice (software only), lower than adding a flush flow meter (which would require pipe cutting, flow meter purchase, calibration, and loop wiring).\n\nEXECUTABLE TEST\nProtocol:\n1. Retrieve 6 months of historical DCS data for a pump that later experienced seal leak.\n2. Calculate $k = (T_{seal} - T_{suction}) / (I_{motor} \\cdot P_{discharge})$ for all steady-state points.\n3. Identify the timestamp $t_{failure}$ (date of seal leak repair).\n4. Calculate the timestamp $t_{divergence}$ where $k$ first exceeded the 95th percentile healthy baseline by more than 2 standard deviations.\n5. Pass Criterion: $(t_{failure} - t_{divergence}) \\geq 21$ days.\n6. Falsification: If $(t_{failure} - t_{divergence}) < 21$ days, the thermal divergence signal is not early enough, and the mechanism is killed.\n7. False Alarm Rate: Count instances in healthy periods where $k$ exceeded threshold. Must be $\\leq 1$ per pump per year.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: $T_{seal}$ (Seal Temperature). This is the direct thermal proxy for seal health.\nSecondary Indicators: $P_{discharge}$ and $I_{motor}$ are used solely to normalize $T_{seal}$ against load (differential pressure and power), ensuring that temperature rises due to high load are not misidentified as flush failure. The constraint \"no new sensors\" is met by using only these three existing streams.\n\nRISK FIELD\nTension: The constraint \"no flush flow meter\" forces reliance on $T_{seal}$ as the primary proxy. If the seal faces are worn but still flushing, $T_{seal}$ may remain low despite impending mechanical failure. However, the problem specifically asks for a predictor for *seal flush failure* (not general wear), making thermal divergence the correct physics-based lead indicator.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Input: $T_{seal}$ (Already-Recorded: \"existing seal temperature\")",
+    "- Input: $P_{discharge}$ (Already-Recorded: \"discharge pressure\")",
+    "- Input: $I_{motor}$ (Already-Recorded: \"motor current\")",
+    "- Reference: $T_{bulk}$ (Derived: Stated ambient/suction temp or calculated from $P_{disch",
+    "- Derivation: Compute $Q_{est} \\propto I_{motor} \\cdot \\omega \\cdot \\eta$ (Power input pro",
+    "- Calculation: Calculate specific heat rejection coefficient $k = \\frac{\\Delta T_{seal}}{Q",
+    "- Threshold: Alert when $k$ exceeds $k_{crit}$ (Derived from healthy baseline data already",
+    "- Input: Historical logs of $T_{seal}$, $P_{discharge}$, $I_{motor}$ (Already-Recorded).",
+    "- Reference: Healthy operating envelope (Derived: 95th percentile of $k$ from past healthy",
+    "- Action: Filter out transient start-up/stop events to isolate steady-state thermal behavi"
+   ]
+  }
+ },
+ "declared_template_prose": "thermodynamic divergence monitoring.",
+ "allowed_row_outside": 0,
+ "sha256_16": "4ef3c1904894739c",
+ "smoke": false
+}

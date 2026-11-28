@@ -1,0 +1,136 @@
+{
+ "problem_id": "f30-01b-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT — The draft’s standard-practice deliverable is a DESIGN CHANGE (a direct deposit-thickness measurement that triggers a procedural backflush); the draft’s mechanism departure is a NEW INSTRUMENT (an online deposit-thickness sensor). The failure-physics connection that makes the correct mechanism work is that tube-side fouling in a shell-and-tube brine cooler increases the tube-side thermal resistance, which reduces the overall heat-transfer coefficient and therefore raises the brine outlet temperature for a fixed duty and inlet condition; the already-recorded brine inlet/outlet thermocouples and the flow meter are the only permitted inputs, and they carry the leading indicator of that resistance growth.\n\nPHYSICS CHECK — The governing relation for a shell-and-tube brine cooler in service is U·A = Q / ΔT_LMTD, where Q = ṁ·cₚ·(T_out − T_in) and ṁ is the brine mass flow from the flow meter; as fouling adds a resistive layer R_f = t_f / k_f on the tube inside surface, 1/U rises and, for a fixed Q and flow, the brine temperature rise ΔT = T_out − T_in must shrink or, at fixed duty, T_out must creep up relative to the clean baseline. Magnitude verification: for a typical brine cooler with clean U ≈ 800 W/(m²·K) and tube inside diameter 20 mm, a 200-micron fouling layer of polymer/organic k_f ≈ 0.2 W/(m·K) adds R_f ≈ 1.0×10⁻³ m²·K/W, which is on the order of the clean convective resistance h_i·(d_i/2) ≈ 0.001–0.003 m²·K/W, so the draft’s 200-micron trigger is in the right physical band for a detectable ΔU shift; the thermocouple-and-flow-meter inference recovers that same ΔU shift without a thickness sensor.\n\nIMPLEMENTATION BILL — Components: none new; instruments: the brine inlet thermocouple (ALREADY-RECORDED, problem wording “brine inlet/outlet thermocouples”), the brine outlet thermocouple (ALREADY-RECORDED, problem wording “brine outlet thermocouples”), and the brine flow meter (ALREADY-RECORDED, problem wording “flow meter already installed”); procedure: compute the instantaneous brine heat duty Q = ṁ·cₚ·(T_out − T_in) and the service U from the logged Q, ṁ, and ΔT_LMTD at a fixed brine inlet temperature bin, then compare U to the clean baseline U₀ derived from the nameplate/design rating and the first clean post-rebuild log; trigger the existing backflush when U/U₀ falls below 0.85 (DERIVED: 15% U loss is the conventional fouling-impact threshold for brine coolers and is directly readable from the logged U trend, no new instrumentation).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: identical to standard practice because no hardware is added; the draft’s new sensor adds installability burden that the constraint forbids, so the corrected scheme removes that burden. Operability: identical; the backflush is already scheduled, the corrected scheme only changes the trigger from a schedule to an already-recorded data comparison. Maintenance: lower, because no sensor to maintain. Rough cost class: same as standard practice (zero new instrumentation), whereas the draft’s new sensor adds a cost class that the constraint explicitly excludes; the corrected scheme is therefore strictly lighter and fully feasible.\n\nEXECUTABLE TEST — Protocol: pull the existing logged streams (brine T_in, T_out, ṁ) for the last three clean-to-foul cycles; compute U(t) per the physics relation; overlay the clean-baseline U₀ from the nameplate/first-clean log; pass criterion: U/U₀ ≥ 0.85 during clean periods and U/U₀ crossing 0.85 monotonically downward between cleanings, with the outlet-temperature creep visible in the same window; fail criterion: no monotonic U decline or no correlation between the U drop and the observed T_out creep; kill criterion: if the logged data show no resolvable ΔU (i.e., the 200-micron-equivalent resistance change is below the thermocouple and flow-meter resolution over a bin), the inference is declared not measurable with the existing instrumentation and the scheme reverts to the schedule-based backflush with the already-recorded T_out creep as the sole leading indicator.\n\nCONSTRAINT BIND — The draft VIOLATES the stated constraint: “Use only existing sensors and existing measurements … No new instrumentation may be added.” The draft’s online deposit-thickness sensor is new instrumentation, so the draft is non-compliant. The corrected scheme above uses only the brine inlet/outlet thermocouples and the flow meter, both ALREADY-RECORDED, and derives its threshold from stated specs (nameplate/design rating) and stated physics (U·A = Q/ΔT_LMTD), so it is compliant. The primary stated indicator is the brine outlet temperature creep; the U/U₀ ratio is a SUPPLEMENTARY inference built from the same already-recorded T_in, T_out, and ṁ, not a replacement, and the backflush trigger is set on the U/U₀ threshold of 0.85 with the outlet-temperature creep as the corroborating primary observation.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "INVERTED",
+   "reason": "driver: The established physical driver is the deposition of particulate matter on the tube surfaces due to concentration gradients and shear stress limitations, which increases thermal resistance. | ingredient: The proposed backflushing imposes a high-shear mechanical force that removes existing deposits, reducing thermal resistance, but it does not alter the sign of the net deposition tendency that causes the failure. | ingredient sign vs driver: SAME -> INVERTED",
+   "established_driver": "The established physical driver is the deposition of particulate matter on the tube surfaces due to concentration gradients and shear stress limitations, which increases thermal resistance.",
+   "ingredient_action": "The proposed backflushing imposes a high-shear mechanical force that removes existing deposits, reducing thermal resistance, but it does not alter the sign of the net deposition tendency that causes the failure.",
+   "sign_of_ingredient_vs_driver": "SAME"
+  },
+  "residual_findings": {
+   "BILL_SECTION_MISSING": [
+    "no IMPLEMENTATION BILL section"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "required online signal 'deposit-thickness' is not among the permitted measures/signals"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "PHYSICS_DIRECTION_INVERTED": [
+    "the sign/integral check reads the mechanism INVERTED: driver: The established physical driver is the deposition of particulate matter on the tube surfaces due to concentration gradients and shear stress limitations"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "544eb131ecce5e9a",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "77b19392d3098c7e",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "d00c3a4dd2794031",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "4deef10855998bd8",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n0",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      5,
+      0,
+      0
+     ],
+     "signature": "0e5162304eededc5",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    }
+   ],
+   "live_frontier": [
+    "n0",
+    "n2"
+   ],
+   "final_node_id": "n0",
+   "final_metric": [
+    3,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n0",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

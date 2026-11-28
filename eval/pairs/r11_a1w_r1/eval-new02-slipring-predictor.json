@@ -1,0 +1,23 @@
+{
+ "problem_id": "eval-new02-slipring-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.7,
+   "chars": 2933
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using vibration and temperature measurements as leading indicators. Our departure is a MONITORING/INDICATION scheme using electrical contact resistance transients as the leading indicator, which directly relates to the physics of brush-slip ring interface degradation before mechanical wear manifests as detectable vibration or temperature changes.\n\nPHYSICS CHECK — The governing physical relation is the contact resistance equation: R = ρL/A, where ρ is resistivity, L is effective contact length, and A is contact area. As wear progresses, the contact area A decreases, causing resistance R to increase. This increase occurs before significant mechanical vibration or temperature rise. At 1800 rpm, we expect resistance spikes of 5-10% above baseline when contact area has degraded by approximately 3-5%, which is sufficient to trigger an alert weeks before failure.\n\nIMPLEMENTATION BILL — \n1. Plant historian data (already present in the problem's stated device)\n2. Signal processing algorithm (off-the-shelf signal processing library, same class as standard vibration analysis tools)\n3. Statistical analysis module (off-the-shelf statistical package, same class as standard trending tools)\n4. Threshold comparison module (standard control system logic, same class as existing alarm systems)\n\nAll components are either already present in the plant's monitoring infrastructure or are standard signal processing tools used in conventional vibration analysis.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installability: SAME (uses existing historian data, no additional hardware required)\n- Operability: SAME (integrates with existing control room interfaces)\n- Maintenance: SAME (no additional maintenance requirements beyond standard system updates)\n- Cost class: SAME (uses existing data streams and standard processing tools, no additional hardware costs)\n\nThe approach maintains the same burden class as standard monitoring while providing earlier detection through a different physical mechanism.\n\nEXECUTABLE TEST — \nProtocol: Collect 1-minute sampled voltage and current data from the excitation system for 6 months. Calculate contact resistance as R = V/I for each sample. Implement the statistical analysis to identify resistance transients exceeding 5% above baseline for more than 3 consecutive samples.\n\nInstruments: Plant historian data, standard signal processing workstation, existing control system alarm interface.\n\nPass/fail threshold: Must detect at least 90% of actual failures occurring in the test period with no more than 1 false alarm per year per machine.\n\nDuration: 6 months of continuous operation with at least 3 documented brush/slip ring failures occurring during the test period.\n\nKill criterion: If the false alarm rate exceeds 1 per year per machine or if the detection rate is less than 90%, the predictor is rejected."
+}

@@ -1,0 +1,145 @@
+{
+ "problem_id": "HO10-23-hx-tube-vibration",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r85s1@holdout-v10-generation",
+ "machine": "r85_v10_one_shot/1.1.0 (AM75 re-freeze) — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; the AM75 identity binding asserts the request id 'agnes-3.0-flash'; the frozen module file constant 'agnes-3.0-flash' is untouched — the freeze guard pins it)",
+ "run": "holdout-v10-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P1",
+   "P5",
+   [
+    18,
+    1,
+    31
+   ]
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "GEOMETRIC_TRANSFORMATION",
+   "principle_id": "P1",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:afd77eeb8f05": "novel",
+   "cand:MS:DIRECT_TRANSFER:fff2eca38ab2": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:efe88e3cd9b8": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 2,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 10.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4856,
+      4859
+     ],
+     "unit": "percent",
+     "quantity": "10.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      6139,
+      6145
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "GEOMETRIC_TRANSFORMATION",
+  "triz_principle": "P1",
+  "measure_class": "geometry",
+  "signals_used": [
+   "visual_inspection",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T19:29:17.699586Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a **MONITORING/INDICATION** scheme (predictive maintenance alert) by measuring tube vibration directly (accelerometers) or inferring it from new flow-metering; My mechanism departs by deriving the **vibration excitation force spectrum** directly from the **existing shell-side pressure-drop signal**, using the fluid-dynamic relation between pressure fluctuations and hydrodynamic lift on tubes, treating pressure drop not just as a scalar but as the source of the stochastic forcing term in the tube-rod equation; Failure physics: Tube vibration amplitude scales with the RMS of the hydrodynamic lift, which is driven by the turbulent pressure fluctuations in the shell-side cross-flow, making shell-side $\\Delta P$ the primary indicator of the excitation force magnitude.\n\nPHYSICS CHECK — The governing relation is the hydrodynamic lift force on a cylindrical tube in cross-flow, $F_L \\approx \\frac{1}{2} \\rho C_L D L u_{rms}^2$, where $u_{rms}$ is the local velocity fluctuation. The shell-side pressure drop $\\Delta P_{shell}$ is proportional to the dynamic head $\\rho u_{mean}^2$ and the turbulence intensity. For a fixed geometry and fluid density, the mean shell-side velocity $u_{mean} \\propto \\sqrt{\\Delta P_{shell}}$. The vibration amplitude $X$ in a forced oscillator is proportional to the excitation force. Thus, $X \\propto \\Delta P_{shell}$. \nDIRECTION-OF-EFFECT: driving variable = **Shell-Side Pressure Drop ($\\Delta P_{shell}$)**; the mechanism moves it **DOWN** (by detecting an upward drift in the baseline and alerting to reduce flow/velocity) by **alerting on a positive trend**; this **reduces** the hydrodynamic excitation force, thereby lowering the vibration amplitude and fatigue damage. The damage integral $\\int F^2 dt$ decreases as $\\Delta P$ is stabilized or reduced.\n\nIMPLEMENTATION BILL — \nMECHANISM CLASS: Signal Processing of Existing DCS Tags\n\n1.  **Component:** DCS/PLC Historian Query Module (Software/Logic).\n    *   **Input Streams:** ALREADY-RECORDED: Shell-side Pressure Transmitter PV (Process Value) and Flow Controller Output. (Problem states \"existing shell-side... flow\" and \"pressure drop\").\n    *   **Action:** Calculate the ratio $R = \\frac{\\Delta P_{shell}}{\\dot{V}^2}$ (where $\\dot{V}$ is mass/volumetric flow). This ratio represents the \"effective\" friction factor or turbulence intensity index, isolating the flow-induced component from pure thermal effects.\n    *   **Tag:** (a) Firmware/Logic update. No new hardware.\n\n2.  **Component:** Anomaly Detection Algorithm (Baseline Derivation).\n    *   **Input Streams:** ALREADY-RECORDED: Historical $R$ values over the last 12 months from the DCS.\n    *   **Action:** Compute the median $R_{base}$ and standard deviation $\\sigma_R$. Define the alert threshold $T_{alert} = R_{base} + k \\cdot \\sigma_R$ (where $k$ is a statistical constant, e.g., 3 or 4). A sustained value of $R > T_{alert}$ indicates an increase in turbulence/pressure drop not explained by flow rate alone, signaling increased vibration risk.\n    *   **Tag:** (b) Algorithm deployment on existing SCADA/DCS.\n\n3.  **Component:** Operational Setpoint Adjustment Protocol (Procedural).\n    *   **Input Streams:** The alert from Row 2.\n    *   **Action:** Upon alert, the control system automatically (or operator-initiated) reduces the pump speed/flow to a \"Safe Velocity\" $u_{safe}$ calculated from the critical flow velocity for tube vibration $V_c$ (calculated from known tube diameter, support span, and material stiffness). \n    *   **Tag:** (c) Procedural/Control Logic change.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n*   **Installability:** Zero new hardware. Standard practice (tube accelerometers) requires physical mounting, wiring, and calibration. This scheme requires only software deployment. **Burden is LOWER** for installation.\n*   **Operability:** Automated. No manual inspection required. **Burden is SAME** as automated monitoring.\n*   **Maintenance:** No mechanical wear parts in the monitor. **Burden is LOWER.**\n*   **Cost:** Software logic cost is negligible compared to the cost of accelerometer sensors, signal conditioners, and labor for installation. **Burden is LOWER.**\n*   **Operational Loss:** Reducing flow to $u_{safe}$ reduces heat exchanger effectiveness (thermal duty) by approximately $(1 - \\frac{u_{safe}}{u_{nom}})^2$. This is an explicit trade-off for preventing failure.\n\nEXECUTABLE TEST — \n1.  **Protocol:** Extract 6 months of historical $\\Delta P_{shell}$ and Flow data from the DCS.\n2.  **Calculation:** Compute $R = \\Delta P / \\dot{V}^2$ for every hour.\n3.  **Baseline:** Determine the 95th percentile of $R$ as the \"normal\" operating upper bound.\n4.  **Falsification:** Identify a period where a known tube vibration event (or leak precursor) occurred (if available in logs) OR simulate a 10% increase in $\\Delta P$ at constant Flow. If the algorithm flags the threshold breach 30+ days before the predicted fatigue limit is reached (based on S-N curve for the tube material), the test passes.\n5.  **Kill Criterion:** If the correlation between $R$ and known vibration amplitudes (from any existing vibration surveys) is $R^2 < 0.7$, the mechanism is invalid because pressure drop does not faithfully represent the local turbulence intensity causing the vibration.\n\nCONSTRAINT BIND — The monitored indicator is **Shell-Side Pressure Drop** (primary stated indicator). The flow and temperature are used to normalize the pressure drop into the turbulence index $R$, supplementing the primary indicator but not replacing it. No new sensors are used. No tube accelerometers are used.\n\nRISK — **NYQUIST_UNSAMPLED:** The DCS sampling rate for pressure and flow must be sufficient to capture the frequency of interest. If the DCS records only 1-minute averages, high-frequency turbulence components are lost. However, for *wear* prediction, the *time-averaged* excitation amplitude (RMS) is the driver, not the instantaneous high-frequency peaks. The 1-minute average of the square of the signal (or the signal squared averaged) is sufficient for fatigue damage integration over 30 days. The \"unsampled\" defect is resolved by using the time-averaged RMS value derived from the DCS historical data, which is the correct physics for long-term wear, not the instantaneous dynamic response.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Component:** DCS/PLC Historian Query Module (Software/Logic).",
+    "*   **Input Streams:** ALREADY-RECORDED: Shell-side Pressure Transmitter PV (Process Value",
+    "*   **Action:** Calculate the ratio $R = \\frac{\\Delta P_{shell}}{\\dot{V}^2}$ (where $\\dot{",
+    "2.  **Component:** Anomaly Detection Algorithm (Baseline Derivation).",
+    "*   **Input Streams:** ALREADY-RECORDED: Historical $R$ values over the last 12 months fro",
+    "*   **Action:** Compute the median $R_{base}$ and standard deviation $\\sigma_R$. Define th",
+    "3.  **Component:** Operational Setpoint Adjustment Protocol (Procedural).",
+    "*   **Input Streams:** The alert from Row 2.",
+    "*   **Action:** Upon alert, the control system automatically (or operator-initiated) reduc",
+    "*   **Installability:** Zero new hardware. Standard practice (tube accelerometers) require",
+    "*   **Operability:** Automated. No manual inspection required. **Burden is SAME** as autom",
+    "*   **Maintenance:** No mechanical wear parts in the monitor. **Burden is LOWER.**",
+    "*   **Cost:** Software logic cost is negligible compared to the cost of accelerometer sens",
+    "*   **Operational Loss:** Reducing flow to $u_{safe}$ reduces heat exchanger effectiveness",
+    "1.  **Protocol:** Extract 6 months of historical $\\Delta P_{shell}$ and Flow data from the",
+    "2.  **Calculation:** Compute $R = \\Delta P / \\dot{V}^2$ for every hour.",
+    "3.  **Baseline:** Determine the 95th percentile of $R$ as the \"normal\" operating upper bou",
+    "4.  **Falsification:** Identify a period where a known tube vibration event (or leak precu",
+    "5.  **Kill Criterion:** If the correlation between $R$ and known vibration amplitudes (fro"
+   ]
+  }
+ },
+ "declared_template_prose": "signal processing of existing dcs tags",
+ "allowed_row_outside": 0,
+ "sha256_16": "f6383aad7fdae00d",
+ "smoke": false
+}

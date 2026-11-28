@@ -1,0 +1,206 @@
+{
+ "a1_version": "r11_a1/1.0.0",
+ "problem_id": "eval-new04-chiller-fouling-predictor",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '37f97d8c956ec53f46a25472e9db756ecc18f15710ae86202daf719988ecb90d', 'baseline_answer_sha256': '91beb0db7e7c98ec9ac5d599b9ed36d7eb9bf22cc2becda5e1e6bd3a5b34852f', 'evidence_sha256': '2bef717a65f253e494ec07979a7fe1746926e2abc4b25a802b0072403e0b3cda', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 30,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 19.4,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Self-Cleaning Nanocoated Tubes",
+    "mechanism": "Tubes coated with photocatalytic TiO\u2082 or superhydrophobic films degrade organic fouling under UV/light exposure.",
+    "failure_link": "Mitigates fouling buildup by breaking down organic deposits *before* they raise approach temperature.",
+    "cost_to_test": "$5K (rig time: 1 week; samples: 10 coated/10 control tubes; duration: 3 months).",
+    "standard_solution": "Stainless steel or copper-nickel tubes with manual cleaning.",
+    "departure": "Active fouling degradation via light-triggered chemistry, eliminating need for scheduled mechanical cleaning."
+   },
+   {
+    "lever": "process",
+    "name": "Dynamic Condenser Flushing with Ozone",
+    "mechanism": "Ozone-injected condenser water oxidizes biofilm and loosens inorganic deposits during low-load periods.",
+    "failure_link": "Disrupts fouling layer formation by oxidizing organic precursors *before* they harden into a thermal barrier.",
+    "cost_to_test": "$3K (rig time: 2 days; ozone generator rental; duration: 1 month).",
+    "standard_solution": "Fixed-frequency chemical cleaning or manual brushing.",
+    "departure": "Targeted, demand-driven oxidation during off-peak hours to prevent fouling accumulation."
+   },
+   {
+    "lever": "design",
+    "name": "Modular Tube Bank with Rotating Segments",
+    "mechanism": "Tubes arranged in removable cartridges allow isolated cleaning of fouled sections without full shutdown.",
+    "failure_link": "Isolates fouling impact to specific tube segments, enabling *partial* cleaning triggers based on localized performance degradation.",
+    "cost_to_test": "$20K (rig time: 2 weeks; mock-up of 1/4 tube bank; duration: 1 month).",
+    "standard_solution": "Fixed, non-removable tube bank requiring full-system cleaning.",
+    "departure": "Decouples fouling progression across tube bank, enabling granular cleaning triggers."
+   },
+   {
+    "lever": "controls",
+    "name": "Adaptive Approach Temperature Setpoint",
+    "mechanism": "BMS adjusts condenser approach temperature setpoint dynamically based on fouling proxy (e.g., \u0394T between supply/return condenser water).",
+    "failure_link": "Compensates for fouling-induced thermal resistance *in real-time*, delaying cleaning until energy penalty exceeds threshold.",
+    "cost_to_test": "$0 (uses existing BMS; validate with 3-day full-load tests).",
+    "standard_solution": "Fixed approach temperature setpoint with time-based cleaning.",
+    "departure": "Closed-loop control of thermal performance to *optimize* cleaning cadence vs. energy tradeoff."
+   },
+   {
+    "lever": "operations",
+    "name": "Predictive Cleaning via Fouling Index",
+    "mechanism": "BMS calculates a fouling index from compressor power + condenser \u0394T/\u0394P, triggering cleaning when index exceeds 3% energy penalty threshold.",
+    "failure_link": "Links fouling to *direct compressor energy impact*, ensuring cleaning aligns with stated 3% energy reduction goal.",
+    "cost_to_test": "$0 (retrofit BMS logic; validate with 1-month trial).",
+    "standard_solution": "Fixed monthly cleaning schedule regardless of fouling state.",
+    "departure": "Data-driven cleaning trigger tied to *measurable energy degradation*, not time."
+   },
+   {
+    "lever": "measurement",
+    "name": "Acoustic Fouling Sensor Array",
+    "mechanism": "Ultrasonic transducers detect changes in tube wall vibration patterns caused by fouling layer stiffness.",
+    "failure_link": "Provides *direct fouling thickness* data, enabling cleaning triggers before thermal performance degrades.",
+    "cost_to_test": "$15K (rig time: 1 week; 4 sensors per tube bank; duration: 2 weeks).",
+    "standard_solution": "Thermal performance metrics (\u0394T/\u0394P) as fouling proxies.",
+    "departure": "Non-invasive, *real-time* fouling thickness measurement for precise cleaning triggers."
+   }
+  ],
+  "raw_sha256": "4bc27a313536ada3",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Self-Cleaning Nanocoated Tubes\",\n      \"mechanism\": \"Tubes coated with photocatalytic TiO\u2082 or superhydrophobic films degrade organic fouling under UV/light exposure.\",\n      \"failure_link\": \"Mitigates fouling buildup by breaking down organic deposits *before* they raise approach temperature.\",\n      \"cost_to_test\": \"$5K (rig time: 1 week; samples: 10 coated/10 control tubes; duration: 3 months).\",\n      \"standard_solution\": \"Stainless steel or copper-nickel tubes with manual cleaning.\",\n      \"departure\": \"Active foul"
+ },
+ "critique": {
+  "wall_s": 24.5,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "[5] Predictive Cleaning via Fouling Index",
+   "[2] Dynamic Condenser Flushing with Ozone",
+   "[4] Adaptive Approach Temperature Setpoint"
+  ],
+  "standard_solution": "Fixed monthly manual cleaning (no fouling prediction, no energy optimization, labor waste).",
+  "raw_sha256": "a3f10728b5d1d965",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"[1] Self-Cleaning Nanocoated Tubes\",\n      \"plausibility\": \"Plausible for organic fouling; UV penetration in open loop may be limited. Physics kill: TiO\u2082 needs UV, superhydrophobic films may fail with biofilm adhesion.\",\n      \"constraint_audit\": {\n        \"BMS points\": \"violates (requires new sensors/actuators)\",\n        \"3-day resolution\": \"violates (passive, no real-time feedback)\",\n        \"3% energy reduction\": \"ok (if fouling is organic-dominated)\"\n      },\n      \"difference_from_standard\": \"Standard: manual cleaning. Difference: passive f",
+  "top1_match": "FELL_BACK_TO_CANDIDATE_1"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Self-Cleaning Nanocoated Tubes",
+  "mechanism": "Tubes coated with photocatalytic TiO\u2082 or superhydrophobic films degrade organic fouling under UV/light exposure.",
+  "failure_link": "Mitigates fouling buildup by breaking down organic deposits *before* they raise approach temperature."
+ },
+ "compose": {
+  "wall_s": 11.6,
+  "transport_ok": true,
+  "answer_sha256": "fd2b4d66f9bac0f5"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 34.5
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 7,
+    "assumption": 1,
+    "unbound_numbers": 0,
+    "all_numbers": 8,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT",
+  "a0plus_answer_sha256": "f3b173c1d607a9a82ca9354547b6a9064ebadc53fd7aa6aef6d7d15989432849",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: Monitor the **condenser approach temperature (CAT) drift rate** (\u0394CAT/\u0394time) under full-load conditions. A cleaning trigger is issued when CAT exceeds its baseline by **0.5\u00b0C over 3 days** (resolved within the constraint) or when compressor power exceeds **97% of the fouling-free baseline** (calibrated to 3% energy reduction). This leverages existing BMS points without new sensors.\n\nMECHANISM: Fouling raises CAT by increasing thermal resistance; the rate of CAT rise correlates with fouling accumulation. Compressor power rises as the condenser struggles to reject heat, creating a secondary proxy for fouling severity. The 3-day window ensures resolution aligns with the constraint.\n\nDEPARTURE FROM STANDARD: Standard practice uses fixed monthly cleaning; this solution dynamically triggers cleaning based on **real-time CAT drift and compressor power**, eliminating wasted labor and ensuring fouling is addressed only when it impacts performance.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: baseline CAT = 5\u00b0C (User Constraint: condenser water supply/return temperature is logged, and 5\u00b0C is a typical design approach for open-loop systems)\n ASSUMPTION PARAMETER: fouling-free compressor power baseline = 95% of max rated power (rationale: 5% headroom accounts for normal operational variance before fouling effects dominate)\n ASSUMPTION PARAMETER: \u0394CAT threshold = 0.5\u00b0C over 3 days (rationale: empirical studies show 0.5\u00b0C CAT rise correlates with ~3% compressor energy increase [doi:10.16962/elkapj/si.arimpie-2015.16])\n ASSUMPTION PARAMETER: compressor power trigger = 97% of baseline (rationale: 3% energy reduction target requires detecting fouling before power loss exceeds 3% of nominal)\n\nINDICATOR: condenser approach temperature drift rate (\u0394\u00b0C/day) and compressor power (% of baseline)\n\nTHRESHOLD: 0.5\u00b0C CAT rise over 3 days (ASSUMPTION) **OR** compressor power \u2265 97% of baseline (calibrated to 3% energy reduction)\n\nVALIDATION PROTOCOL: n = 3 independent chiller units; data window = 30 days of continuous full-load operation. The protocol validates **condenser approach temperature drift rate (\u0394\u00b0C/day) and compressor power (% of baseline)** by comparing triggered cleaning intervals to manual monthly cleaning energy use, ensuring \u22653% compressor energy reduction.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 16124,
+   "ttfb_ms": 16123,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 21343,
+   "ttfb_ms": 21343,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 8295,
+   "ttfb_ms": 8295,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 55.7,
+ "infra_time_s": {
+  "queue_wait": 0.0,
+  "gateway_setup": 0.0,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

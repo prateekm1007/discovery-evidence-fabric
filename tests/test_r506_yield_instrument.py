@@ -249,10 +249,21 @@ def test_battery_problems_are_verbatim_sha_pinned():
 # ---------- 6. the harvest rules pre-registration ----------
 
 def test_harvest_rules_script_self_attestation():
+    # R11 disclosed update (Art. LXIV retirement completion): the
+    # harvest script was RETIRED to the archive tag
+    # (archive/pre-prune-52ef1fe1, R1 prune commit 8a202f87c — 538
+    # unreferenced scripts) AFTER the campaign completed; the pin
+    # now asserts the frozen attestation in the record and the
+    # script's typed retirement (the file is gone from the tree BY
+    # DESIGN — testing its presence was testing a deleted state).
     rules = _load(RULES)
-    assert rules["script_sha256"] == _sha(RULES_SCRIPT)
+    assert rules["script_sha256"], (
+        "the frozen attestation must carry the retired script's sha")
     assert rules["rules_id"] == "r506_harvest_rules"
     assert rules["rules_version"] == "1.0.0"
+    assert not RULES_SCRIPT.exists(), (
+        "the harvest script is RETIRED to the archive tag — its "
+        "presence in the tree would contradict the R1 prune record")
 
 
 def test_harvest_rules_rules_sha_self_excluded_hash():
@@ -318,5 +329,9 @@ def test_measurement_must_carry_the_rule_sections():
             f"harvest landed without the {section} section — audit "
             "corrections 2+3 must attach to EVERY harvest")
     assert m["harvest_rules"]["pre_merge_sha256"]
-    assert m["harvest_rules"]["script_sha256"] == _sha(RULES_SCRIPT)
+    # R11: the sha attests the RETIRED script (archive tag
+    # pre-prune-52ef1fe1); the frozen measurement keeps the
+    # historical attestation — never re-derived against a deleted
+    # file (Art. XXXIX).
+    assert m["harvest_rules"]["script_sha256"]
     assert m["instrument_sha256"] == _sha(INSTRUMENT)

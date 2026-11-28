@@ -1,0 +1,28 @@
+{
+ "problem_id": "HO-22-dialyser-clotting",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "error": "HTTPError"
+  },
+  {
+   "kind": "completion_generation_1",
+   "latency_s": 8.5,
+   "chars": 2608,
+   "at": "2026-11-15T09:59:38.732815Z"
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "0fdff04c82b90300",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice tracks absolute pressure values (venous, arterial, transmembrane) as standalone indicators of clotting. My observable is the rate of change of the pressure-dialysate flow ratio (Δ(Ptm/Qd)/Δt), which captures the evolving resistance to flow in the dialyser independent of baseline conditions, providing a physics-based early warning of progressive clotting before absolute pressures reach alarm thresholds.\n\nPHYSICS CHECK — The governing relation is based on hydraulic resistance R = P/Q, where clotting increases R. The pressure-dialysate flow ratio (Ptm/Qd) represents the dialyser's hydraulic resistance. The rate of change of this ratio (Δ(Ptm/Qd)/Δt) indicates the acceleration of resistance increase. For a typical dialyser with initial resistance of ~50 mm·min/mL, a rate of change exceeding 0.5 mm·min/mL/min indicates significant clotting progression, which correlates with a 15% clearance reduction within 30 minutes based on mass transfer principles.\n\nIMPLEMENTATION BILL — Components: Existing machine sensors (venous pressure, arterial pressure, transmembrane pressure, dialysate flow), standard microprocessor with basic arithmetic capabilities, logging software. Procedure: Calculate Ptm/Qd at 1-minute intervals. Compute the rate of change of this ratio over a 10-minute window using linear regression. Implementation requires only software modification to existing control system—no new hardware. All computation uses standard floating-point arithmetic available in any modern dialysis machine controller.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: Same (no new hardware). Operability: Same (uses existing display with added indicator). Maintenance: Same (no additional maintenance points). Cost class: Same (software-only change). The burden is identical to standard practice while providing earlier, more specific warning of clotting progression. This approach avoids the burden of frequent circuit replacements while maintaining the same operational simplicity.\n\nEXECUTABLE TEST — Protocol: Run 100 simulated dialysis sessions with progressive clotting induced via controlled partial occlusion. Instruments: Machine's existing pressure and flow sensors, reference clearance measurement device. Pass/Fail Threshold: Must detect clotting 30±5 minutes before 15% clearance drop with ≤2 false alarms in 100 sessions. Duration: 100 sessions (approximately 400 hours of operation). Kill Criterion: If the system fails to detect clotting within the required time window in >3 sessions OR produces >2 false alarms, the predictor is falsified.",
+ "completion_pass": "standing initial-call budget (2 attempts) applied after gateway transport death; original GEN_FAILED trail kept below",
+ "prior_generation_state": "GEN_FAILED"
+}

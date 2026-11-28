@@ -1,0 +1,39 @@
+{
+ "problem_id": "HO8-05-caster-mold-breakout",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip 7c9c8ffb6)",
+ "executor_id": "builder-r44s1@holdout-v8-generation",
+ "machine": {
+  "machine": "V8.0",
+  "base": "V7.7 (r40_machine_v77) with the R42-verdict generation binds (claims c-0060)",
+  "request_model": "glm-4-plus",
+  "repair_budget": 3,
+  "k_gen": 1
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T03:41:30.410372Z",
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**  \nTo prevent sticker breakout from inadequate mold flux lubrication, deploy a pulsed mold flux injection schedule synchronized with mold oscillation. Standard practice uses continuous mold flux addition; this intervention periodically increases flux supply during critical oscillation phases, directly replenishing lubricant when mold friction peaks. The closest existing technique is continuous flux level control, but this differs by timing flux addition to oscillation cycles rather than maintaining a constant level. The mechanism leverages the known correlation between oscillation cycles and friction peaks to preemptively boost lubrication.\n\n**PHYSICS CHECK**  \nDIRECTION-OF-EFFECT: driving variable = mold flux film thickness; the mechanism moves it UP by 30–50% during oscillation \"on\" phases via timed injection pulses; this REDUCES frictional heat and steel/mold adhesion. The governing relation is τ ∝ 1/h (frictional shear stress τ is inversely proportional to flux film thickness h). By increasing h during high-stress oscillation phases, τ is reduced below the critical adhesion threshold, preventing sticker breakout.\n\n**IMPLEMENTATION BILL**  \n*(Standard practice: Continuous mold flux addition via existing hopper)*  \n- **(c)** Procedure: Set mold flux injection timer to pulse at 0.5 Hz (5 s on/15 s off), synchronized with existing mold oscillation signal.  \n- **(c)** Procedure: Adjust injection pump duty cycle to deliver 1.5× standard flux volume during \"on\" pulses.  \n- **(c)** Procedure: Calibrate flux level sensor hysteresis to 10 mm (existing sensor, new setpoint).  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n| Standard Practice          | This Intervention          | Burden Change |  \n|----------------------------|----------------------------|---------------|  \n| Continuous flux addition   | Pulsed addition (5s on/15s off) | Same (timer reprogramming) |  \n| Fixed pump duty cycle      | Duty cycle modulation (1.5× during pulses) | Same (existing pump) |  \n| No hysteresis adjustment   | Hysteresis setpoint (10 mm) | Same (existing sensor) |  \n**Conclusion**: Same burden (no new hardware; all changes are parameter adjustments to existing equipment).  \n\n**EXECUTABLE TEST**  \n**Protocol**: Run 10 casting cycles (5 hours) with pulsed injection vs. continuous addition. Measure mold friction force via existing oscillation load cell and flux film thickness via IR pyrometry (temperature gradient).  \n**Pass/Fail**: Friction force reduction ≥20% and film thickness increase ≥30% during pulses for ≥80% of cycles.  \n**Duration**: 5 hours per test (2 tests total).  \n**Kill Criterion**: Friction force exceeds historical breakout threshold at any point.  \n\n**CANDIDATE CLASSES**  \n- Mold flux viscosity chemistry adjustment — alters lubricant rheology to improve film stability  \n- Casting speed setpoint reduction — lowers shear stress on flux film  \n- Pulsed oscillation-synchronized flux injection — targets lubricant replenishment to friction peaks  \n**SELECTED**: Pulsed oscillation-synchronized flux injection — directly addresses the time-varying nature of lubrication demand, whereas viscosity changes or speed reduction degrade output without dynamic precision.  \n\n**MECHANISM CLASS**: Duty-cycle modulation  \n\n**SIGNALS USED**: Existing mold oscillation position sensor (binary on/off state)  \n\n**OPERATIONAL COST**: Zero (pulses occur during existing oscillation phases; no production curtailment)",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Mold breakout is caused by insufficient flux film thickness leading to high frictional shear stress and steel/mold adhesion | ingredient: Increases flux film thickness during high-stress oscillation phases, reducing frictional shear stress | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Mold breakout is caused by insufficient flux film thickness leading to high frictional shear stress and steel/mold adhesion",
+   "ingredient_action": "Increases flux film thickness during high-stress oscillation phases, reducing frictional shear stress",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Mold flux viscosity chemistry adjustment — alters lubricant rheology to improve film sta",
+    "- Casting speed setpoint reduction — lowers shear stress on flux film",
+    "- Pulsed oscillation-synchronized flux injection — targets lubricant replenishment to fric"
+   ]
+  }
+ },
+ "sha256_16": "4e7114f4a089ef3d"
+}

@@ -1,0 +1,33 @@
+{
+ "judge": "dsr1",
+ "family": "deepseek",
+ "model": "deepseek-ai/DeepSeek-R1",
+ "pid": "r143-11-wind-gearbox",
+ "pass": "det",
+ "a_is": "a1",
+ "blind_order_parity": true,
+ "outcome": "VALID",
+ "parsed": {
+  "axes": {
+   "N_A": 2,
+   "N_B": 5,
+   "F_A": 4,
+   "F_B": 1,
+   "T_A": 5,
+   "T_B": 1,
+   "C_A": 5,
+   "C_B": 5
+  },
+  "prefer": "A"
+ },
+ "raw_tail": "t RUL thresholds to trigger inspections (pass/fail at defined limits).  \n- *B (Score 1)*: No testable thresholds; \"healing\" is vague (how to verify subsurface crack closure without destructive testing?).  \n\n**Constraint-Compliance**:  \n- *Both (Score 5)*: Neither violates explicit constraints (device: renewable, failure: microcracks→spalling).  \n\n**Expert Weighting & Preference**:  \n- *A* is viable (feasible + testable) but standard (low novelty). *B* is novel but infeasible and untestable—**novelty alone cannot win**. *A*’s viability dominates; *B* fails as an engineering solution due to fabrication risks (induction remelting unsupported by reality). **Forced choice: A**.  \n\n```json\n{\n  \"N_A\": 2, \"F_A\": 4, \"T_A\": 5, \"C_A\": 5,\n  \"N_B\": 5, \"F_B\": 1, \"T_B\": 1, \"C_B\": 5,\n  \"prefer\": \"A\"\n}\n```",
+ "attempts": [
+  {
+   "attempt": 1,
+   "budget": 8000,
+   "latency_s": 34.5,
+   "error": null
+  }
+ ],
+ "wall_s": 34.5
+}

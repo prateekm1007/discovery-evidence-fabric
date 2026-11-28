@@ -1,0 +1,33 @@
+{
+ "record": "R159S2_HF_ROTATION_RESTORE/1.0.0",
+ "session": "builder-r159s2",
+ "at": "2026-11-26 ~09:2x UTC",
+ "event": "HF MASTER TOKEN ROTATION (owner re-delivery #2) — PROBED VALID, VAULT RESTORE PATH RE-OPENED",
+ "custody": {
+  "delivered_digest": "0af8db243dee",
+  "expired_prior_digest": "33bc7af22c62",
+  "genuine_rotation": true,
+  "probe": "whoami-v2 -> 200 (user prateekm1, type user, role fineGrained)",
+  "vault_writes": "BOTH vault files carry the rotated bytes (digest 0af8db243dee); zero key bytes in this record or commit (Art. 17)"
+ },
+ "r77_restore_path": {
+  "script": "scripts/r77_vault_restore.py",
+  "result": "exit 0 — RESTORED 8 vault-managed keys + 2 session-only kept (HF_TOKEN session-only by design: the vault does not manage its own bootstrap)",
+  "per_key": {
+   "AGNES_API_KEY": "d0c666a3842f [COMMITTED_RECORD_MATCH]",
+   "AGNES_API_KEY_2": "5c4dffd28fe4 [NEW_IN_RECORDS]",
+   "AGNES_BASE_URL": "e592ff32df1f [NEW_IN_RECORDS]",
+   "CENT_AI_API_KEY": "a5beece70d05 [NEW_IN_RECORDS]",
+   "CENT_AI_BASE_URL": "9eb06a0caddd [NEW_IN_RECORDS]",
+   "GH_PAT": "f1ebca5f9b62 [COMMITTED_RECORD_MATCH]",
+   "GITHUB_TOKEN": "f1ebca5f9b62 [COMMITTED_RECORD_MATCH]",
+   "XKIRO_API_KEY": "f6c09bee9bde [COMMITTED_RECORD_MATCH]",
+   "HF_TOKEN": "session-only kept (0af8db243dee intact post-merge)",
+   "TOKENROUTER_API_KEY": "session-only kept (c148574f6215 intact post-merge)"
+  },
+  "cross_check": "XKIRO_API_KEY vault digest f6c09bee9bde == the R153S3 auth-valid proof AND the r160s1 persistent-disk finding (c-0265) — the xkiro key is now recoverable in ANY sandbox, not just r160s1's",
+  "script_constant_update": "MASTER_TOKEN_DIGEST 33bc7af22c62 -> 0af8db243dee (forward-only, the rotation the script's own ROTATION_TO_DISCLOSE path anticipated; dead-on-arrival prior attempt typed in eval/r159s2_hf_rekey_event.json)"
+ },
+ "typed_conclusion": "DIR 8's standing recycle-recovery path is RESTORED: with the rotated master token, any future sandbox can re-open the owner vault (prateekm1/operator-keys-vault) and recover the vault-managed credentials fail-closed. The owner act list for HF is CLOSED. No other lane impacted; the r160s1 panel lane and the P5 v2 lane continue unchanged.",
+ "impacted_dirs": ["DIR 8 (F45: HF line CLOSED — recovery path restored; rotate the history-exposed credentials when convenient, never committed)"]
+}

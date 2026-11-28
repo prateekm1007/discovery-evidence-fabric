@@ -1,0 +1,13 @@
+**Verdict:** The draft is **VALID**. It does not violate any constraints, rely on unavailable resources, invert physical directions, or misprice the duty cycle.
+
+**Reasoning:**
+
+1.  **Constraint Compliance:** The constraint explicitly states that "The ONLY permitted control variable is the dosing-pump stroke rate." The draft proposes cutting this variable to a fixed percentage (70%), which is fully compliant. It also explicitly states "no pH feedback in the loop," adhering to the prohibition against using the inlet pH monitor as a control input due to probe drift.
+
+2.  **Physical Direction:** The failure mode is an overshoot of caustic dosing, causing pH to exceed 10.5. Caustic (base) raises pH. Therefore, reducing the dose is the correct physical direction to lower or maintain the pH within the limit. The draft proposes reducing the stroke rate, which physically reduces the mass flow of caustic, directly mitigating the overshoot.
+
+3.  **Duty Cycle / Scheduling:** The draft proposes a "fixed daily schedule." In water treatment, coagulant and caustic dosing often correlate with water demand or flow rates that have diurnal patterns. A fixed schedule is a standard, low-complexity heuristic that is "available" and logically sound for a baseline mitigation. It does not misprice the duty cycle; rather, it stabilizes it to prevent the stochastic overshoots inherent in feedback loops with drifting sensors.
+
+4.  **Reliance on Available Resources:** The proposal relies on the dosing pump (available), the ability to set its stroke rate (available), and weekly lab titrations (available and mentioned in the problem context as the basis for review). It does not rely on the unstable pH probe for control.
+
+The draft is a conservative, constraint-compliant heuristic mitigation. While it may require periodic manual tuning (via the "weekly lab titration" review), it is a valid first-line response to the specific constraint that prevents real-time pH feedback control.

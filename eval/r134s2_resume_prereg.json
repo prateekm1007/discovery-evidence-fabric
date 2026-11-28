@@ -1,0 +1,24 @@
+{
+ "record": "R134S2_RESUME_PREREG/1.0.0",
+ "claim": "c-0214",
+ "work_id": "r134s2-panel-resume",
+ "session": "builder-r134s2",
+ "base_sha": "3e3a0a00b",
+ "typed_at": "2026-11-23 (sandbox clock, pre-push; skew typed, no false Z)",
+ "authority": "the R134 directions DIR 2 (TOP) + the twin's typed resume in eval/r134s1_status.json ('RESUME TYPED: llama4mav remaining; byte-resume driver') + the frozen round-3 contract eval/r134_panel_prereg.json (pushed be4eb8794, check-run 137514715294 success) — THIS prereg extends the execution scope only; the contract, labels, thresholds, vote rule and the COT_COMPARATIVE_SUFFIX bytes are UNCHANGED (no bar lowering, no label tuning)",
+ "scope_typed_before_any_call": [
+  "(1) BYTE-RESUME of scripts/r134_panel_driver.py: the missing llama4mav legs. DISK TRUTH at this prereg: eval/r134_panel holds 4 llama4mav records (4/20), i.e. SIXTEEN legs remaining — honestly CORRECTING the close's '6/20 remaining' count (2 in-flight legs were not persisted; the correction is typed here before the run, not silently absorbed).",
+  "(2) A ONE-ATTEMPT TRANSPORT-RETRY pass for the 3 dsr1 legs typed TRANSPORT_FAILED (both attempts 504 gateway timeouts: dev-fu-005-bridge-bearing/mir, eval-new04-chiller-fouling-predictor/det+mir) and for ANY llama4mav leg that lands RATE_LIMITED or TRANSPORT_FAILED during the resume. Retry records are written as SEPARATE __retry1.json files; the canonical records are NEVER mutated or moved. SUPERSEDE RULE (typed): a __retry1 record replaces the canonical record in the tally ONLY IF its outcome is VALID; a failed retry leaves the typed fail standing. Retry records carry the same prompt contract (blind_order parity + build_pair_prompt(cot=True)) — no re-prompting beyond the driver's own built-in attempt-2 contract reminder.",
+  "(3) The recompute instrument gains ONE typed extension: scripts/r134_panel_recompute.py load_raw() applies the SUPERSEDE RULE (a 4-line merge); every other tally line (qualification, agreement, kappa, AUC, delta table, gate dict) is UNTOUCHED — the engine cross-check still must equal it."
+ ],
+ "honest_determination_typed_before_the_run": "the >=3-qualified-judges gate is MATHEMATICALLY UNREACHABLE this round on the frozen committed data: qw32b 0.6, qwen235b 0.7, dsv32 0.6 are COMPLETE (20/20) with acc < 0.8 — only dsr1 (17/20, retryable) and llama4mav (4/20, resumable) remain candidates, so n_qualified <= 2 even if every remaining leg is perfect. The preregistered verdict is therefore EXPECTED NOT_MET (the no_bar_lowering clause's own honest path). THIS run's purpose: complete the instrument (llama4mav n=4 partial is UNPROVEN — its delta feeds the auditor's enlarged corpus round), clear dsr1's transport noise (typed hygiene, not gate-shopping — the result counts whatever it parses), and produce the completed delta table + agreement/AUC data for the auditor's ~20-30 corpus enlargement (the prereg's own power_note).",
+ "expected_max_qualified": 2,
+ "cost": "~16 llama4mav legs (pace 90 s, timeout 300 s) + 3 dsr1 retries (R1, 8000 tokens, timeout 420 s) + up to a few transport-retry legs — bounded, byte-resume, background",
+ "independence": "all gate numbers from scripts/r134_panel_recompute.py (raw records + audit-branch label bytes only) + the engine module as the second code path (diff must be 0) — unchanged from the frozen prereg",
+ "artifacts": [
+  "eval/r134_panel/<tag>__<pid>__<pass>.json (byte-resumed) + <...>__retry1.json (typed retries)",
+  "eval/r134_panel_calibration.json (the COMPLETED independent recompute + engine cross-check + delta table)",
+  "eval/r134s2_status.json (dict schemas)"
+ ],
+ "coordination": "the twin's window (c-0213) closed the interim at 3e3a0a00b (close-push check-run 137549621477 SUCCESS — read + quoted in eval/r134s2_status.json per D2, completing the twin's typed 'next window's first act'); this lane resumes THEIR typed instrument under THEIR frozen prereg — no duplicate design, no scope change (Art. 29(c)); the counter authority is reconciled in the SAME lock push (claim_counter 203 -> 214 at root + refs/claims/counter — the R131-F5 divergence, typed)"
+}

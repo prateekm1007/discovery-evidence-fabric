@@ -1,0 +1,48 @@
+{
+ "leg_version": "score9-patentclaim/v1.0.0",
+ "upstream_payload": "PatentChem (MIT) github learningmatter-mit/PatentChem \u2014 the extraction APPROACH adopted as engine rules (claims-section extraction, numbered-claim segmentation, keyword query mining, molecule SMILES mining)",
+ "engine_module": "discovery_fabric/engine/patent_claim_extract.py",
+ "typed_correction_BIGPATENT_MISS": "the first real-corpus pick was big_patent subset b (HF NortheasternUniversity/big_patent, CC-BY-4.0, parquet sha16 13c23fdb01ac49e5) \u2014 the field census FAILED: the HF parquet carries ONLY description+abstract, NO claims field; the extraction over it yielded the honest empty state (0 segmented OK) and the leg PIVOTED (Art. 4 disclosure, not a silent swap)",
+ "real_corpus": {
+  "dataset": "baber/uspto_raw \u2014 the Google-Patents-form USPTO grant dump mirror (publication_number, grant_date, claims_html, kind_code, IPC/CPC)",
+  "access": "HF datasets-server /rows (parquet-backed), offset scan with client-side filters: kind_code B*, grant_date present, claims >= 500 chars, chemistry markers present",
+  "licensing_note": "the mirror carries NO license tag (typed); the underlying texts are USPTO grant publications (US-government publication); the Google Patents Public Data form is attributed; the NOTICE row carries the attribution",
+  "grant_years": [
+   "2012",
+   "2014",
+   "2017",
+   "2018",
+   "2020",
+   "2023"
+  ],
+  "post_cutoff_property": "NOT claimed for this leg (typed) \u2014 the post-cutoff property belongs to the MOOSE-Chem2 rediscovery corpus; the claims leg is a capability leg on real USPTO claim bytes"
+ },
+ "sampling": "offset scan (19965000..19995000 window) -> 12 granted chemistry-marked patents",
+ "n_patents": 12,
+ "n_segmented_ok": 10,
+ "n_keyword_ok": 10,
+ "subject_terms": [
+  "electrolyte",
+  "catalyst",
+  "polymer",
+  "compound of formula",
+  "pharmaceutical composition",
+  "alkyl",
+  "aqueous solution",
+  "organic solvent",
+  "acid",
+  "salt",
+  "lubricant",
+  "stabilizer",
+  "refrigerant",
+  "halogenated olefin"
+ ],
+ "rdkit_mode": "present (rdkit Chem.MolFromSmiles validator)",
+ "molecules_rdkit_validated_total": 2,
+ "typed_findings": [
+  "2/12 patents yield REFUSED_DEGENERATE_INPUT (claims_html stripped to whitespace \u2014 image-form claims; the fail-closed path fires on real bytes)",
+  "SMILES literals are RARE in granted-claim text: only 2 rdkit-validated tokens across 12 patents \u2014 the conservative miner (charset + bond/ring + rdkit validation) refuses by design (Art. 3); real claims name molecules via Markush/naming conventions, not SMILES",
+  "USPTO bulk egress: bulkdata.uspto.gov DEAD (http 000 x3); data.uspto.gov SPA-shell only; patents.google.com 503; patents.justia.com 403; archive.org 429 \u2014 TYPED INFRA STATE (Art. 15); the Zenodo 75GB mirror exceeds the 6.0GB rootfs"
+ ],
+ "honest_state": "the extraction rules are engine rules (F63) with fixture CI (mechanics-only, Art. 22) AND a real-bytes acceptance sample (12 granted USPTO patents, 10/12 segmented OK, keyword mining live, molecule mining typed-conservative)"
+}

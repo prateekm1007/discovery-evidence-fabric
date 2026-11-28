@@ -1,0 +1,166 @@
+{
+ "problem_id": "r125-09-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 48.27,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.84,
+     "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 713,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 1.29,
+     "usage": {
+      "prompt_tokens": 1085,
+      "completion_tokens": 261,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"## Mitigation Proposal: Exhaust Damper-Driven Corner-Compensation Cycle L",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Exhaust Damper-Driven Corner-Compensation Cycle Logic**\n\n**Mechanism:**\nExploit the existing exhaust damper as a thermal bypass valve to create a controlled \"corner boost\" zone. By modulating the damper position later in the cycle, you can redirect convective heat from the center (which already meets spec) toward the lagging corners, effectively increasing the local heat flux at the periphery without altering the oven's setpoint temperature or adding hardware. This shifts the thermal gradient from \"center-heavy\" to \"balanced,\" allowing the corners to catch up so the total cycle time can be reduced back to the original spec, rather than extending it.\n\n**Implementation:**\n1. **Baseline Mapping (Using Existing Sensors):** Use the current zone thermocouples (TCs) to establish a correlation map between TC readings and known corner/center lag. Typically, in a forced-convvection or recirculating oven, the center TCs lead the corner TCs. If corner TCs are not explicitly listed as separate \"zones\" but are part of a zone, identify the TC closest to the affected corners (e.g., TC-3 for front-left, TC-4 for front-right) versus the central TC (TC-1/2).\n2. **Logic Definition (Cycle Timer + Damper Feedback):** Program the controller to trigger a damper actuation event at a specific percentage of the cycle (e.g., T75%), determined by the point where the central TCs reach 90% of their target equilibrium.\n3. **Damper Action:** At T75%, command the exhaust damper to move from its current \"vent\" position (e.g., 30% open) to a more \"closed\" or \"bypass\" position (e.g., 10% open) for a duration of 5–10 minutes. This reduction in exhaust volume increases internal static pressure and forces the recirculation fan (if present) or natural convection to drive more air across the outer perimeter where the parts are, while reducing heat loss to the exhaust stack.\n4. **Validation & Adjustment:** Monitor the corner-adjacent TCs during this phase. If the corner TCs begin to rise faster relative to the center TCs, the damper position is effective. Use the damper position feedback to fine-tune the exact opening percentage that maximizes the temperature differential between corner and center without causing overshoot in the center.\n5. **Cycle Reversion:** Once the corner TCs converge with the center TCs within the tolerance band, revert the damper to its standard end-of-cycle position for final conditioning, and reduce the total cycle timer back to the original specification.\n\n**Measures It Relies On:**\n*   **Oven Zone Thermocouples:** To detect the onset of thermal equilibrium in the center and confirm convergence of the corner zones. The control logic triggers on the delta between the \"center\" TC group and the \"perimeter\" TC group.\n*   **Exhaust Damper Position Feedback:** To provide closed-loop confirmation that the damper has achieved the required bypass/retention position, ensuring consistent airflow modification from batch to batch.\n*   **Cycle Timer:** To trigger the compensation event at the precise phase of the cure where the core temperature is high enough to support heat redistribution but before the chemical reaction is fully completed, allowing the corners to catch up during the remaining soak.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (the"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "delivered_bill": "## Mitigation Proposal: Exhaust Damper-Driven Corner-Compensation Cycle Logic\n\n**Mechanism:**\nExploit the existing exhaust damper as a thermal bypass valve to create a controlled \"corner boost\" zone. By modulating the damper position later in the cycle, you can redirect convective heat from the center (which already meets spec) toward the lagging corners, effectively increasing the local heat flux at the periphery without altering the oven's setpoint temperature or adding hardware. This shifts the thermal gradient from \"center-heavy\" to \"balanced,\" allowing the corners to catch up so the total cycle time can be reduced back to the original spec, rather than extending it.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the **Exhaust Damper Position** (reduction in opening). The mechanical effect is a decrease in exhaust airflow resistance, which increases internal static pressure and modifies the recirculation vector. The thermal effect is an increase in local convective heat transfer coefficient (h) at the oven perimeter/corners. The direction of effect on the failure metric is a reduction in the temperature delta (\\Delta T) between center and corners, thereby eliminating the uneven cure quality.",
+   "post_review_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 3.59,
+     "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 659,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 6.51,
+     "usage": {
+      "prompt_tokens": 1065,
+      "completion_tokens": 1364,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Load-Dependent Exhaust Damper Modulation**\\n\\n**Me",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Load-Dependent Exhaust Damper Modulation**\n\n**Mechanism:**\nThe uneven cure (corner lag) indicates that heat distribution is non-uniform, likely due to natural convection patterns or recirculation issues that cause the center to heat faster than the corners. The exhaust damper controls the balance of atmospheric pressure and gas residence time within the oven. By modulating the exhaust damper opening, we can influence the internal airflow velocity and turbulence. Specifically, a partially closed exhaust damper increases internal static pressure and reduces the velocity of escaping gases, which helps retain hot gases near the corners and increases turbulence, thereby improving heat transfer to the colder corner regions. Conversely, a fully open damper allows hot gases to escape quickly from the center, exacerbating the lag at the corners.\n\n**Implementation:**\n1.  **Profile Development:** During the next calibration run, record the standard cycle temperature profiles at each oven zone thermocouple (center and corners) while manually testing three distinct exhaust damper positions (e.g., 10% open, 25% open, 40% open). Identify the damper position that minimizes the temperature differential between the corner thermocouples and the center thermocouple while still maintaining the target cure temperature.\n2.  **Control Logic Update:** Modify the existing cycle timer and control logic to schedule the exhaust damper position as a function of time within the cure cycle. Instead of holding the damper at a fixed position, implement a staged profile:\n    *   *Preheat/Initial Cure Phase:* Set the damper to the position identified to maximize corner heating (likely more closed) to raise the corner temperature faster.\n    *   *Main Cure Phase:* Adjust the damper to the position that maintains uniform temperature across all zones for the majority of the cycle.\n    *   *Cooling/Finish Phase:* Open the damper fully to accelerate heat removal and solidification.\n3.  **Feedback Loop (Optional but recommended within constraints):** Use the corner zone thermocouple readings to trigger a slight adjustment in the damper position if the corner temperature deviates from the center temperature by more than a set threshold (e.g., 5°C) during the main cure phase. This utilizes the existing sensors and damper feedback loop.\n\n**Measures Relied Upon:**\n*   **Oven Zone Thermocouples:** Used to monitor real-time temperature distribution. The key measure is the temperature difference ($\\Delta T$) between the corner zones and the center zone. This metric confirms whether the damper modulation is successfully reducing the lag.\n*   **Exhaust Damper Position Feedback:** Provides the actual position of the damper for closed-loop control and verification that the commanded position is achieved.\n*   **Cycle Timer:** Used to define the time-based stages of the damper modulation profile and to coordinate the switching between damper positions with the cure process phases.\n*   **Existing Process Knowledge:** Relies on the understanding that exhaust damper position directly impacts internal airflow and gas residence time, which in turn affects heat distribution uniformity. No new sensors are added; only the existing setpoints and control logic are adjusted.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+    "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (the",
+    "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Load-Dependent Exhaust Damper Modulation**\n\n**Mechanism:**\nUneven cure (corner lag) indicates non-uniform heat distribution due to natural convection patterns causing the center to heat faster than the corners. The exhaust damper controls the balance of atmospheric pressure and gas residence time within the oven. By modulating the exhaust damper opening, we can influence internal airflow velocity and turbulence. Specifically, a partially closed exhaust damper increases internal static pressure and reduces the velocity of escaping gases, which helps retain hot gases near the corners and increases turbulence, thereby improving heat transfer to the colder corner regions. Conversely, a fully open damper allows hot gases to escape quickly from the center, exacerbating the lag at the corners.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Exhaust Damper Position (Commanded Opening %).\n*   **Direction:** Decreasing the Damper Opening (closing it) increases internal gas residence time and static pressure, leading to an **increase** in Corner Zone Temperature and a **decrease** in the Temperature Differential (ΔT) between Center and Corner zones.\n*   **Secondary Effect:** Increasing the Damper Opening decreases Corner Zone Temperature and increases the Center-Corner ΔT.\n\n**Implementation Bill:**\n1.  **Profile Development (Calibration Phase):** During the next calibration run, record temperature profiles at each oven zone thermocouple (center and corners) while manually testing three distinct exhaust damper positions (e.g., 10% open, 25% open, 40% open) using the **Exhaust Damper Position Feedback** sensor to verify actual position.\n2.  **Control Logic Update (Scheduling Phase):** Modify the existing **Cycle Timer** logic to schedule the exhaust damper position as a function of time within the cure cycle. Instead of holding the damper at a fixed position, implement a staged profile defined by absolute time marks from the **Cycle Timer**:\n    *   *Preheat/Initial Cure Phase (0-20% of Cycle Time):* Set the damper to the position identified in calibration to maximize corner heating (likely more closed) to raise the corner temperature faster.\n    *   *Main Cure Phase (20-80% of Cycle Time):* Adjust the damper to the position that maintains uniform temperature across all zones for the majority of the cycle.\n    *   *Cooling/Finish Phase (80-100% of Cycle Time):* Open the damper fully to accelerate heat removal and solidification.\n3.  **Feedback Verification (Monitor Phase):** Use the **Oven Zone Thermocouples** to monitor real-time temperature. Calculate the Temperature Differential (ΔT) as: `ΔT = T_Corner_Avg - T_Center`.\n    *   *Input Derivation:* `T_Corner_Avg` is derived from the average of the corner zone thermocouple readings. `T_Center` is the reading from the center zone thermocouple.\n    *   If ΔT deviates from the target by more than a set threshold (e.g., 5°C) during the Main Cure Phase, log the event for offline tuning. *Note: Active closed-loop adjustment is not implemented to avoid introducing new control dynamics that conflict with the fixed batch schedule; the schedule is static based on the **Cycle Timer** and validated by the **Oven Zone Thermocouples**.*\n\n**Operational Cost & Impact (Pricing of Duty Cycle):**\n*   **Energy Impact:** The staged profile includes a \"Closing\" phase (increased pressure/residence time). This increases thermal mass retention, potentially requiring ~5% less heating energy during the preheat phase but increasing fan load by ~2% (estimated from damper friction vs. open flow). Net energy change is considered neutral to slightly positive efficiency.\n*   **Throughput Impact:** The cycle time is unchanged. The damper modulation does not extend the cure duration. The \"Cooling\" phase (fully open damper) accelerates the post-cure solidification step, potentially allowing a 5-minute reduction in total batch turnaround time if the cooling rack is not the bottleneck. If cooling is not a bottleneck, throughput remains unchanged.\n*   **Availability:** No new hardware is added. The **Exhaust Damper Position Feedback** sensor is existing. The control logic change is software-only. Availability impact is nil during operation; minor downtime (~1 hour) required for the **Cycle Timer** and setpoint update.\n\n**Measures Relied Upon & Input Derivation:**\n*   **Oven Zone Thermocouples:** \n    *   *Input:* Real-time temperature values `T_z` for each zone `z`.\n    *   *Derived Signal:* `T_Corner_Avg = (T_Corner_NW + T_Corner_NE + T_Corner_SW + T_Corner_SE) / 4`.\n    *   *Derived Signal:* `ΔT = T_Corner_Avg - T_Center`.\n    *   *Usage:* Verification of uniformity and diagnostic of lag.\n*   **Exhaust Damper Position Feedback:** \n    *   *Input:* Percentage open `P_damper`.\n    *   *Usage:* Verification that the commanded damper position (from the schedule) is actually achieved. If `|P_commanded - P_damper| > 5%`, flag a mechanical fault.\n*   **Cycle Timer:** \n    *   *Input:* Elapsed time `t` and Total Cycle Time `T_total`.\n    *   *Derived Signal:* Percent Cycle `PC = (t / T_total) * 100`.\n    *   *Usage:* Triggers the switching between Preheat, Main Cure, and Cooling phases in the damper schedule.\n*   **Existing Process Knowledge:** Relies on the understanding that exhaust damper position directly impacts internal airflow and gas residence time. No new sensors are added; only the existing setpoints and control logic are adjusted.\n\n**Removed/Invalid Inputs:**\n*   No active feedback loop adjusting damper position in real-time based on ΔT during the main cure phase (removed to maintain the 'staged profile' approach and avoid unpriced control complexity; ΔT is used for monitoring/verification only).",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "1.  **Profile Development (Calibration Phase):** During the next calibration run, record t",
+     "2.  **Control Logic Update (Scheduling Phase):** Modify the existing **Cycle Timer** logic",
+     "*   *Preheat/Initial Cure Phase (0-20% of Cycle Time):* Set the damper to the position ide",
+     "*   *Main Cure Phase (20-80% of Cycle Time):* Adjust the damper to the position that maint",
+     "*   *Cooling/Finish Phase (80-100% of Cycle Time):* Open the damper fully to accelerate he",
+     "3.  **Feedback Verification (Monitor Phase):** Use the **Oven Zone Thermocouples** to moni",
+     "*   *Input Derivation:* `T_Corner_Avg` is derived from the average of the corner zone ther",
+     "*   If ΔT deviates from the target by more than a set threshold (e.g., 5°C) during the Mai",
+     "*   **Energy Impact:** The staged profile includes a \"Closing\" phase (increased pressure/r",
+     "*   **Throughput Impact:** The cycle time is unchanged. The damper modulation does not ext",
+     "*   **Availability:** No new hardware is added. The **Exhaust Damper Position Feedback** s",
+     "*   **Oven Zone Thermocouples:**",
+     "*   *Input:* Real-time temperature values `T_z` for each zone `z`.",
+     "*   *Derived Signal:* `T_Corner_Avg = (T_Corner_NW + T_Corner_NE + T_Corner_SW + T_Corner_",
+     "*   *Derived Signal:* `ΔT = T_Corner_Avg - T_Center`.",
+     "*   *Usage:* Verification of uniformity and diagnostic of lag.",
+     "*   **Exhaust Damper Position Feedback:**",
+     "*   *Input:* Percentage open `P_damper`.",
+     "*   *Usage:* Verification that the commanded damper position (from the schedule) is actual",
+     "*   **Cycle Timer:**",
+     "*   *Input:* Elapsed time `t` and Total Cycle Time `T_total`.",
+     "*   *Derived Signal:* Percent Cycle `PC = (t / T_total) * 100`.",
+     "*   *Usage:* Triggers the switching between Preheat, Main Cure, and Cooling phases in the ",
+     "*   **Existing Process Knowledge:** Relies on the understanding that exhaust damper positi",
+     "*   No active feedback loop adjusting damper position in real-time based on ΔT during the "
+    ],
+    "APPARATUS_ROW": [
+     "3.  **Feedback Verification (Monitor Phase):** Use the **Oven Zone Thermocouples** to monitor real-time temper",
+     "*   No active feedback loop adjusting damper position in real-time based on ΔT during the main cure phase (rem"
+    ],
+    "CONVERSION": [
+     "ADDED_PROCESS_STEP: Cure on a row that does not ride existing/unchanged infrastructure: *   *Preheat/Initial Cure Phase (0-20% of Cycle Time):* Set the damper to the position identified in calibration to maximize corner heating (likely more closed)",
+     "ADDED_PROCESS_STEP: Cure on a row that does not ride existing/unchanged infrastructure: *   *Main Cure Phase (20-80% of Cycle Time):* Adjust the damper to the position that maintains uniform temperature across all zones for the majority of the cycl",
+     "ADDED_PROCESS_STEP: Cure on a row that does not ride existing/unchanged infrastructure: *   If ΔT deviates from the target by more than a set threshold (e.g., 5°C) during the Main Cure Phase, log the event for offline tuning. *Note: Active closed-l",
+     "ADDED_PROCESS_STEP: Cure on a row that does not ride existing/unchanged infrastructure: *   *Usage:* Triggers the switching between Preheat, Main Cure, and Cooling phases in the damper schedule.",
+     "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: *   No active feedback loop adjusting damper position in real-time based on ΔT during the main cure phase (removed to maintain the 'staged profile' approach and"
+    ],
+    "DRIVER_CLASS_AS_REMEDY": [
+     "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "## Mitigation Proposal: Exhaust Damper-Driven Corner-Compensation Cycle Logic\n\n**Mechanism:**\nExploit the existing exhaust damper as a thermal bypass valve to create a controlled \"corner boost\" zone. By modulating the damper position later in the cycle, you can redirect convective heat from the center (which already meets spec) toward the lagging corners, effectively increasing the local heat flux at the periphery without altering the oven's setpoint temperature or adding hardware. This shifts the thermal gradient from \"center-heavy\" to \"balanced,\" allowing the corners to catch up so the total cycle time can be reduced back to the original spec, rather than extending it.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the **Exhaust Damper Position** (reduction in opening). The mechanical effect is a decrease in exhaust airflow resistance, which increases internal static pressure and modifies the recirculation vector. The thermal effect is an increase in local convective heat transfer coefficient (h) at the oven perimeter/corners. The direction of effect on the failure metric is a reduction in the temperature delta (\\Delta T) between center and corners, thereby eliminating the uneven cure quality.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED"
+}

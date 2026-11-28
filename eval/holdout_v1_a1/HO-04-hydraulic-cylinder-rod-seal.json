@@ -1,0 +1,21 @@
+{
+ "problem_id": "HO-04-hydraulic-cylinder-rod-seal",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 5.7,
+   "chars": 2583
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "a20015a5c9b58418",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice tracks static rod seal leakage rate and pressure-holding capability. My observable is the dynamic temperature-dependent friction coefficient profile during start-up, specifically the stick-slip amplitude decay rate, which directly indicates the transition from boundary to mixed lubrication regime as the seal warms up. This connects to failure physics through the temperature-dependent viscoelastic properties of the seal material and the resulting asperity contact mechanics during cold start.\n\nPHYSICS CHECK — The governing physical relation is μ(T) = μ₀ + α·(T₀ - T) + β·(dP/dt), where μ is the friction coefficient, T is temperature, P is pressure, and α, β are material constants. For a typical NBR seal at -25°C, μ can increase by 300-400% compared to 25°C. This is verified by published elastomer tribology data showing exponential friction increase below the glass transition temperature.\n\nIMPLEMENTATION BILL — Components: 1) Existing pressure transducer (sampling rate ≥100 Hz), 2) Existing temperature sensor near rod seal, 3) Existing position/velocity encoder on cylinder, 4) Standard data acquisition system already used for machine health monitoring. Procedure: Calculate friction coefficient from measured pressure drop and velocity during start-up cycles. Compute stick-slip amplitude decay rate from velocity oscillations. All computation uses standard engineering math (differentiation, filtering, curve fitting) on existing data streams. No new hardware required.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: SAME (uses existing sensors). Operability: SAME (no additional operator actions). Maintenance: SAME (no new maintenance procedures). Cost class: SAME (no additional hardware). The approach differs only in the data analysis software, which is a minimal development effort compared to seal hardware changes. This achieves the required observability without increasing deployment burden.\n\nEXECUTABLE TEST — Protocol: Cycle the cylinder at 25°C and record baseline friction coefficient. Cool system to -25°C and perform 10 start-up cycles while recording pressure, temperature, and position. Measure stick-slip amplitude decay rate (SAADR) from velocity oscillations. Pass threshold: SAADR ≥ 0.8 (normalized) within 5 cycles at -25°C. Kill criterion: SAADR < 0.5 after 10 cycles or visible leakage (>1 drop/25 strokes) during test. Duration: 1 hour including temperature stabilization. Test falsified if the proposed seal material/design doesn't show improved SAADR compared to current baseline at -25°C."
+}

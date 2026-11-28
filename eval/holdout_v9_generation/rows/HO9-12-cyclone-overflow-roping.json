@@ -1,0 +1,89 @@
+{
+ "problem_id": "HO9-12-cyclone-overflow-roping",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    35,
+    20,
+    15
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:cf1aa2911ec7": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:9124336478c3": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:23:18.873504Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\n*   **Question answered:** Propose a mitigation for underflow roping cutting classification efficiency.\n*   **Standard Practice:** Standard practice typically maintains a constant inlet pressure or a nominal feed density setpoint without dynamic adjustment, leading to periodic high-concentration surges at the vortex finder that cause roping (solid bridge formation).\n*   **My Mitigation:** Implement a **Feed-Density Setpoint Retuning** protocol that dynamically lowers the steady-state feed density setpoint during periods of elevated underflow specific weight, using existing flow and pressure signals to modulate the dilution water addition, thereby keeping the underflow below the critical roping threshold.\n*   **Adjacent-Technique Clearance:** The closest existing practice is \"constant pressure control\" or \"open-loop dilution.\" My mechanism differs by **closed-loop density-setpoint retuning**: it does not just add water to maintain pressure; it specifically targets the *density* (via dilution ratio) as the control variable to prevent the physical phase transition to solids, using the *underflow flow rate* and *inlet pressure* (as a proxy for solids load) to drive the setpoint change.\n*   **Departure:** The departure is the **operating point selection** of the feed density setpoint, driven by the inverse correlation between underflow flow stability and density, rather than a fixed pressure value.\n\nPHYSICS CHECK\n*   **Governing Relation:** Roping occurs when the underflow concentration $C_{of}$ exceeds a critical jamming concentration $C_{crit}$, which is inversely proportional to the particle size and fluid viscosity. Roping probability $P_{rope} \\propto (C_{of} - C_{crit})^+$.\n*   **Magnitude Verification:** By retuning the feed density setpoint to be lower (i.e., increasing dilution water), $C_{of}$ is reduced. If standard practice holds $C_{of}$ at $0.8 C_{crit}$ on average, but peaks at $1.2 C_{crit}$ due to flow pulsation, retuning the setpoint to maintain a floor of $0.6 C_{crit}$ eliminates the integral of $(C_{of} - C_{crit})^+$ over the duty cycle, reducing roping events from periodic to rare.\n*   **DIRECTION-OF-EFFECT:** Driving variable = **Underflow Specific Gravity (Density)**; the mechanism moves it **down** by **increasing dilution water flow via feed-density setpoint retuning**; this **reduces** the **Roping Probability** (which is driven *up* by high density).\n*   **Direction-Correctness:** The active ingredient (lowering density setpoint) imposes a negative sign on the driving quantity (density), which lowers the failure integral (roping events), confirming the mechanism is not inverted.\n\nIMPLEMENTATION BILL\n*   **MECHANISM CLASS:** Configuration/Operating-Point Parameter Retuning\n\n| Row | Component/Operation | Tag | Details |\n| :--- | :--- | :--- | :--- |\n| 1 | **Feed-Density Setpoint Logic** | (c) | Modify the control logic (PLC/DCS) to introduce a negative gain on the feed-density setpoint based on the deviation of underflow flow rate from its nominal value. This is a parameter change to the existing control system. |\n| 2 | **Inlet-Pressure Setpoint Adjustment** | (c) | Simultaneously lower the inlet-pressure setpoint by 5-10 kPa to reduce the solids load rate entering the cyclone, ensuring the total volumetric flow remains within the dilution pump's capacity. This is a standard parameter change. |\n| 3 | **Dilution Water Flow Modulation** | (c) | Use the existing dilution water valve to increase flow in response to the density setpoint change. No new hardware; uses existing valve and control loop. |\n| 4 | **Commissioning & Testing Protocol** | (c) | A procedure to validate the new setpoints against historical roping data. No new instrumentation is added; uses existing flow meters and pressure transducers. |\n\n*Note: No new hardware is installed. All rows are parameter or procedure changes to existing equipment.*\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Comparison:** Standard practice uses fixed setpoints. This intervention adds a minor computational load to the existing PLC (negligible cost).\n*   **Hardware Cost:** $0 (no new parts).\n*   **Installation Burden:** $0 (software/logic change only).\n*   **Operational Loss Pricing:**\n    *   **Throughput:** Zero loss. The cyclone capacity is maintained by adjusting pressure and dilution in tandem.\n    *   **Quality:** The underflow density is slightly lower, which may increase the tailings moisture slightly, but this is within standard operational tolerances for desliming cyclones and is a tradeoff for eliminating downtime due to roping.\n    *   **Net Trade:** Positive. The cost of slightly higher dilution water (energy for pumping) is vastly outweighed by the reduction in maintenance labor and downtime from unjamming the spigot.\n*   **Conclusion:** Same-or-lower burden class. The mechanism is \"light\" (software/parameter) and delivers a \"heavy\" benefit (reliability).\n\nEXECUTABLE TEST\n*   **Protocol:**\n    1.  Baseline: Run for 48 hours with current standard setpoints. Record number of roping events (manual log of spigot clearing frequency) and average underflow flow variance.\n    2.  Intervention: Implement the feed-density setpoint retuning logic (negative gain on density, linked to underflow flow). Run for 48 hours under identical feed material conditions.\n    3.  Pass/Fail:\n        *   **Pass:** Roping events reduce by >50% AND underflow flow variance decreases by >20%.\n        *   **Fail:** Roping events persist OR underflow flow variance increases (indicating unstable control).\n    4.  Kill Criterion: If inlet pressure drops below 100 kPa (minimum operational limit) or dilution water exceeds pump capacity, abort and revert.\n*   **Instruments:** Existing flow meters (underflow, dilution water) and pressure transducers (inlet). No new sensors required.\n\nCONSTRAINT COMPLIANCE CHECK\n*   **Allowed Measures:** \"feed-density setpoint retuning, inlet-pressure setpoint retuning, or spigot/apex-change procedure only.\"\n*   **Compliance:** The mechanism uses **feed-density setpoint retuning** (Row 1) and **inlet-pressure setpoint retuning** (Row 2). It does NOT modify the spigot or apex (no machining, no physical change). It does not add new hardware.\n*   **Permitted-Set Clause:** The measures are drawn exclusively from the permitted set. No physical measure (like a new valve or sensor) is installed.\n*   **Deployed-Part Clause:** The cyclone and apex are used as-is. No modification.\n*   **Input-Availability:** The required signals are `flow_rate` (underflow) and `pressure` (inlet), both stated in the `user_variables` and standard plant infrastructure.\n*   **Direction-of-Effect:** Confirmed correct (lowering density reduces roping).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **MECHANISM CLASS:** Configuration/Operating-Point Parameter Retuning",
+    "*   **Comparison:** Standard practice uses fixed setpoints. This intervention adds a minor",
+    "*   **Hardware Cost:** $0 (no new parts).",
+    "*   **Installation Burden:** $0 (software/logic change only).",
+    "*   **Operational Loss Pricing:**",
+    "*   **Throughput:** Zero loss. The cyclone capacity is maintained by adjusting pressure an",
+    "*   **Quality:** The underflow density is slightly lower, which may increase the tailings ",
+    "*   **Net Trade:** Positive. The cost of slightly higher dilution water (energy for pumpin",
+    "*   **Conclusion:** Same-or-lower burden class. The mechanism is \"light\" (software/paramet"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ },
+ "declared_template_prose": "** configuration/operating-point parameter retuning",
+ "allowed_row_outside": 0,
+ "sha256_16": "cd129e854812a34a",
+ "smoke": false
+}

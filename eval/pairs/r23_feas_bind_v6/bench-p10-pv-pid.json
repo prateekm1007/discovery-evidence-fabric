@@ -1,0 +1,26 @@
+{
+ "problem_id": "bench-p10-pv-pid",
+ "a1_source": "SYS_A1_INT_V6/r23_feas_bind_v6",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION) — The proposed intervention is to apply a thin, electrically conductive barrier coating between the cover glass and the encapsulant to block sodium ion migration while maintaining electrical insulation. Standard practice uses soda-lime glass without any ion-blocking barrier, allowing sodium ions to migrate freely under bias. This intervention departs by introducing a selective ion-blocking layer that maintains module optical and electrical performance while physically blocking sodium diffusion. The closest existing practice is the use of borosilicate glass in some premium modules to reduce sodium content, but our approach differs by actively blocking ion migration rather than reducing the source concentration. The mechanism works by creating a high-energy barrier for sodium ion diffusion through the glass-encapsulant interface, leveraging the Donnan exclusion principle where the charged interface repels ions of the same charge.\n\nPHYSICS CHECK — The governing physical relation is Fick's first law of diffusion: J = -D(dC/dx), where J is the ion flux, D is the diffusion coefficient, and dC/dx is the concentration gradient. By introducing a barrier coating with a very low sodium diffusion coefficient (D_barrier << D_glass), we reduce the effective D in the migration path by a factor of 100-1000. For a typical sodium concentration gradient of 10^18 ions/cm³ across a 100μm glass thickness, the barrier coating (1μm thick with D_barrier = 10^-15 cm²/s) would reduce the ion flux from ~10^10 ions/cm²/s to ~10^7 ions/cm²/s, a reduction sufficient to keep annual power loss below 0.5% over 25 years.\n\nIMPLEMENTATION BILL — \n1. Thin-film deposition equipment (already present in module manufacturing line) (a)\n2. Sputtering target material: Silicon nitride (Si3N4) with sodium-blocking properties (procurable standard catalog item) (b)\n3. Process parameter change: Add 30-second sputtering step at 150°C between glass cutting and lamination (parameter change to existing equipment) (c)\n4. Quality control protocol: Verify coating thickness (50±5 nm) and uniformity (±5%) using existing spectrophotometer (a)\n5. No change to encapsulant material (already present) (a)\n6. No change to cell manufacturing process (already present) (a)\n7. No change to frame or junction box (already present) (a)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \nStandard practice uses: Glass cutting → Cleaning → Lamination\nOur intervention adds: One 30-second sputtering step (equipment already present)\nNo additional materials beyond standard Si3N4 target (same class as existing AR coating targets)\nNo additional equipment beyond existing deposition tool\nNo additional labor beyond 5 seconds/module added to existing process\nNo additional testing beyond existing QC checks\nConclusion: Same burden class (manufacturing throughput remains >100 modules/hour, no new equipment required, no new materials beyond standard procurements, same QC infrastructure)\n\nEXECUTABLE TEST — \nProtocol: Subject 20 modules with barrier coating and 20 control modules to 1000V bias at 85°C/85% RH for 1000 hours. Measure power output at 0, 250, 500, 750, and 1000 hours. After testing, perform SIMS (Secondary Ion Mass Spectrometry) analysis on 5 modules from each group to measure sodium concentration at the glass-encapsulant interface.\nInstruments: Solar simulator (IEC 60904-9), environmental chamber, SIMS instrument\nPass/Fail Threshold: Coated modules must show <0.1% power loss after 1000 hours vs. >0.5% loss in controls. SIMS must show >90% reduction in sodium concentration at interface in coated modules.\nDuration: 1000 hours accelerated testing\nKill Criterion: If any coated module shows >0.2% power loss or SIMS shows <70% sodium reduction, the intervention fails.",
+ "meta": {
+  "repairs": 0,
+  "residual_findings": {},
+  "final_sha256_16": "5c5f7d8c7814c914",
+  "attempts": [
+   {
+    "stage": "draft",
+    "chars": 3780,
+    "latency_s": 8.3,
+    "critic_verdict": "CLEAN",
+    "type_gate": {
+     "verdict": "MATCH",
+     "reason": "proposes a mitigation (section=True, verbs=True)"
+    },
+    "scan": {},
+    "sha256_16": "5c5f7d8c7814c914"
+   }
+  ]
+ },
+ "generated_at": "2026-11-15T18:06:49.127183Z"
+}

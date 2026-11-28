@@ -1,0 +1,103 @@
+{
+ "problem_id": "v17-29-tubesheet-crack",
+ "domain": "fire-tube-boilers",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P1",
+   "P5",
+   "P18"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "GEOMETRIC_TRANSFORMATION",
+   "principle_id": "P1",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:afd77eeb8f05": "novel",
+   "cand:MS:DIRECT_TRANSFER:7e71ebec8f9d": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:c16f6a4cfc10": "reject-duplicate"
+  },
+  "failure_physics": {
+   "family": "thermal_fatigue_crack",
+   "winner_measure_class": "geometry",
+   "winner_principle_id": "P1",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_fatigue_crack",
+     "admitted": true,
+     "rank": 0,
+     "basis": "geometry is admitted class #1 for the thermal_fatigue_crack failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:26:05Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.1,
+ "a1_answer": "NOVELTY STATEMENT\nThe standard practice for fire-tube boiler tubesheet thermal fatigue delivers a MATERIAL UPGRADE or THICKENING DESIGN CHANGE to increase fatigue life. This proposal delivers a GEOMETRIC DESIGN CHANGE: a non-schedule ligament reinforcement pattern. The mechanism’s departure is shifting stress from uniform ligament reduction to a localized fillet geometry that lowers the stress concentration factor ($K_t$) at the tube-to-tubesheet junction, directly addressing the initiation site of thermal fatigue cracks without altering material or overall vessel thickness.\n\nPHYSICS CHECK\nThe governing relation is the stress concentration factor $K_t$ under cyclic thermal loading. Thermal cycling induces cyclic hoop stress $\\Delta\\sigma_h = E \\alpha \\Delta T$ at the tube-sheet interface. The fatigue life $N$ scales with $1/K_t^n$ (where $n \\approx 2-4$ for steels).\nMagnitude verification: Standard straight-sided tubesheets have $K_t \\approx 1.5-1.8$ at the ligament. A \"tapered fillet\" or \"counterbored\" ligament geometry, as per ASME Section VIII guidelines, reduces $K_t$ to $\\approx 1.2-1.4$ by distributing the reaction force over a larger radius. A 20% reduction in $K_t$ results in a factor of $\\approx 1.2^3 \\approx 1.7$ improvement in fatigue life under constant $\\Delta\\sigma_h$. This is a calculable geometric effect independent of material changes.\n\nIMPLEMENTATION BILL\n*   **Component:** Fire-tube boiler tubesheet (tube-side and/or gas-side).\n*   **Geometry Modification:** Replace standard straight-through or simple counterbored tube holes with **large-radius internal fillets** or **tapered transition zones** at the ligament regions between tube openings. This is a machining or forming modification to the tubesheet blank *prior* to assembly, not a post-fabrication patch.\n*   **Material:** Same base material as existing tubesheet (e.g., A220, A102). No new alloy specification.\n*   **Procedure:** Update tubesheet fabrication drawings to include fillet radii $R \\geq 1.5 \\times \\text{tube outer diameter}$ at the ligament corners. Verify via visual inspection and UT (Ultrasonic Testing) that the fillet profile is continuous and free of notches.\n*   **Input Streams:**\n    *   **Visual Inspection:** ALREADY-RECORDED. Standard commissioning and periodic inspections of tubesheet surfaces for crack initiation at ligaments are already part of maintenance logs.\n    *   **Pressure:** ALREADY-RECORDED. Boiler operating pressure telemetry is standard.\n*   **Reference/Threshold:** DERIVED FROM STATED PHYSICS. The threshold for \"mitigation\" is the reduction in calculated stress range at the ligament root. The design target is $K_t \\leq 1.4$ (CALCULATED from standard stress analysis charts for filleted ligaments vs. sharp corners). The failure threshold is the onset of visible cracking, which the geometry prevents by lowering the driving force for crack initiation.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** The geometric change is applied during fabrication. No field retrofit of installed equipment is required (unlike material upgrades which may require re-certification or welding of overlays). It is a \"design change\" that fits within the same fabrication class as standard tubesheets.\n*   **Operability:** No change in operating parameters (pressure, temperature, flow).\n*   **Maintenance:** Same visual inspection regime. The fillets may actually improve visual accessibility to the ligament root compared to sharp corners which trap soot/scale.\n*   **Cost Class:** SAME CLASS. Increased machining time or forming complexity is marginal compared to the cost of material upgrades (expensive alloy tubesheets) or full vessel replacement. It avoids the premium cost of high-nickel or titanium alloys.\n*   **Why it is worth it:** It addresses the root cause (stress concentration) rather than the symptom (material fatigue limit), providing a longer-term solution with lower lifecycle cost than material upgrades.\n\nEXECUTABLE TEST\n*   **Protocol:** Select a set of existing fire-tube boilers with documented thermal fatigue cracking at ligaments (from ALREADY-RECORDED inspection logs). Fabricate a control group of tubesheets with standard sharp-corner geometry and a test group with the proposed large-radius fillet geometry from the same material batch.\n*   **Instruments:** Thermal cycle rig capable of simulating the boiler's specific $\\Delta T$ and cycle rate (derived from operating logs). Optical coherence tomography (OCT) or high-magnification stereo-microscopy for crack detection.\n*   **Pass/Fail Threshold:** The test group must demonstrate crack initiation cycle count $N_{init}$ $\\geq 1.5 \\times$ the control group's $N_{init}$ under identical thermal cycling conditions. This 1.5x factor accounts for the calculated $K_t$ reduction (from 1.7x theoretical to 1.5x conservative engineering margin).\n*   **Duration:** Test to the point of crack initiation in the control group. The test is killed if the test group exhibits any crack initiation *before* the control group or if the $K_t$ analysis fails to predict the observed life improvement by at least 50%.\n*   **Validation:** The test validates the mechanism against ALREADY-RECORDED failure data (existing cracks) by showing that the geometric intervention prevents the recurrence of the specific failure mode identified in the records. No new baseline dataset collection is required; the comparison is direct between two geometric configurations under identical physical loads.\n\nCONSTRAINT BIND\n*   **Primary Stated Indicator:** The problem states \"cracks at ligaments from thermal cycling.\" The primary indicator is **crack initiation at the ligament**. The proposed mechanism directly targets this location by modifying the local geometry.\n*   **Secondary Indicator:** Visual inspection of ligaments is a secondary monitoring tool. The geometry change does not replace the need for inspection but reduces the *probability* of the indicator appearing.\n*   **Why this mechanism:** The typed plan specifies \"GEOMETRIC_TRANSFORMATION\" and \"P1\" (Segmentation/Isolation). By isolating the high-stress ligament region with a fillet, the design prevents the thermal stress from concentrating at a sharp corner, thereby mitigating the thermal fatigue failure physics directly.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component:** Fire-tube boiler tubesheet (tube-side and/or gas-side).",
+    "*   **Geometry Modification:** Replace standard straight-through or simple counterbored tu",
+    "*   **Material:** Same base material as existing tubesheet (e.g., A220, A102). No new allo",
+    "*   **Procedure:** Update tubesheet fabrication drawings to include fillet radii $R \\geq 1",
+    "*   **Input Streams:**",
+    "*   **Visual Inspection:** ALREADY-RECORDED. Standard commissioning and periodic inspectio",
+    "*   **Pressure:** ALREADY-RECORDED. Boiler operating pressure telemetry is standard.",
+    "*   **Reference/Threshold:** DERIVED FROM STATED PHYSICS. The threshold for \"mitigation\" i",
+    "*   **Installability:** The geometric change is applied during fabrication. No field retro",
+    "*   **Operability:** No change in operating parameters (pressure, temperature, flow).",
+    "*   **Maintenance:** Same visual inspection regime. The fillets may actually improve visua",
+    "*   **Cost Class:** SAME CLASS. Increased machining time or forming complexity is marginal",
+    "*   **Why it is worth it:** It addresses the root cause (stress concentration) rather than"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'fatigue' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "daee1fbb5d612a2c"
+}

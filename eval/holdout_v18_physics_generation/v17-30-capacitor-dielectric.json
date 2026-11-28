@@ -1,0 +1,162 @@
+{
+ "problem_id": "v17-30-capacitor-dielectric",
+ "domain": "electrical_insulation",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:3a812efd20e4": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:0090043b97ad": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:470c5668eaf4": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "electrical_insulation",
+   "confidence": 1.0,
+   "evidence_span": "dielectric",
+   "allowed_mech_classes": [
+    "stress_grading",
+    "environmental_enclosure",
+    "creepage_path_extension"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 0,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:47:16Z",
+ "attempts_n": 2,
+ "row_wall_s": 31.3,
+ "a1_answer": "### NOVELTY STATEMENT\n**Standard Practice:** The field-standard response to dielectric breakdown from defect/field concentration is to increase insulation thickness or use a higher-grade dielectric material globally (\"more insulation\"). This raises the nominal breakdown voltage but does not address local field enhancements at inhomogeneities.\n**Mechanism Departure:** This proposal introduces **local permittivity grading via high-k filler injection at the defect site**, rather than adding low-permittivity voids or series barriers.\n**Failure-Physics Connection:** In a capacitive dielectric, the electric displacement $D$ is continuous across material interfaces. At a defect (air void, $ \\epsilon_{void} \\approx 1 $), the local permittivity is lower than the bulk dielectric ($ \\epsilon_{bulk} $), causing the local electric field $ E_{defect} = D / \\epsilon_{void} $ to spike, exceeding the bulk breakdown field $ E_{bulk} $. By injecting a high-permittivity filler ($ \\epsilon_{filler} > \\epsilon_{bulk} $) into the defect, the local field $ E_{local} = D / \\epsilon_{filler} $ is *reduced* below the breakdown threshold, while the adjacent bulk dielectric experiences a slightly *increased* field (still below breakdown) due to $ D $-continuity. This inverts the standard \"void amplification\" failure mode.\n\n### PHYSICS CHECK\n**Governing Relation:**  \nFor two dielectric media in series under DC/steady AC, charge conservation and no free surface charge imply:\n$$ \\epsilon_1 E_1 = \\epsilon_2 E_2 = D $$\nThus, the field at the defect is:\n$$ E_{defect} = \\frac{V_{total}}{d_{total}} \\cdot \\frac{\\epsilon_{bulk}}{\\epsilon_{defect}} $$\n**Magnitude Verification:**  \nAssume a defect of thickness $ d_{def} = 0.1 $ mm embedded in a bulk dielectric of thickness $ d_{bulk} = 9.9 $ mm. Total gap $ d = 10 $ mm. Applied voltage $ V = 10 $ kV (USER CONSTRAINT: typical operating voltage for medium-voltage capacitor class).\n$ \\epsilon_{bulk} = 4.0 $ (ASSUMPTION: typical polyethylene/propylene film dielectric constant, *because* it is a standard capacitor material with $ \\epsilon_r \\approx 2.25 $ to $ 4.0 $, *falsified if* the actual dielectric is $ \\epsilon_r < 2 $, in which case the grading effect is halved).\n$ \\epsilon_{filler} = 10.0 $ (ASSUMPTION: high-k ceramic filler such as barium titanate-loaded epoxy, *because* $ \\epsilon_r $ up to 10–30 is achievable in commercial potting compounds, *falsified if* filler $ \\epsilon_r < 5 $, in which case field reduction is $ <50\\%$ and breakdown risk remains high).\n\nCalculation:\n1. Bulk field without filler: $ E_{bulk} = \\frac{10,000 \\text{ V}}{10 \\text{ mm}} = 1000 \\text{ V/mm} $.\n2. With $ \\epsilon_{defect} = 1.0 $ (air void): $ E_{defect} = 1000 \\text{ V/mm} \\times \\frac{4.0}{1.0} = 4000 \\text{ V/mm} $. This exceeds typical dielectric strength (~10–20 kV/mm for solid polymers, but air breakdown is ~3 kV/mm), so the void breaks down first.\n3. With $ \\epsilon_{defect} = 10.0 $ (high-k filler): $ E_{defect} = 1000 \\text{ V/mm} \\times \\frac{4.0}{10.0} = 400 \\text{ V/mm} $.\n4. Bulk field with filler: $ E_{bulk} = 400 \\text{ V/mm} \\times \\frac{10.0}{4.0} = 1000 \\text{ V/mm} $ (unchanged, since $ D $ is set by total $ V $ and total $ d $, and the filler's higher $ \\epsilon $ reduces its voltage share, but the bulk's lower $ \\epsilon $ increases its field slightly; actually, $ E_{bulk} = \\frac{D}{\\epsilon_{bulk}} = \\frac{\\epsilon_{filler} E_{defect}}{\\epsilon_{bulk}} = \\frac{10 \\times 400}{4} = 1000 $ V/mm. Wait, $ D = \\epsilon_{filler} E_{defect} = 10 \\times 400 = 4000 $ V·F/mm? No, units: $ D $ in V·F/mm is wrong. Let’s use standard SI or consistent units.\n\nCorrect calculation:\n$ D = \\frac{\\epsilon_0 \\epsilon_{avg} V}{d} $. Better to use the ratio:\n$ E_{defect} / E_{bulk} = \\epsilon_{bulk} / \\epsilon_{defect} $.\nIf $ \\epsilon_{defect} = 10 $, $ \\epsilon_{bulk} = 4 $, then $ E_{defect} = 0.4 \\times E_{bulk\\_effective} $.\nThe voltage drop across the defect $ V_{def} = E_{defect} \\cdot d_{def} $.\n$ E_{defect} = \\frac{V}{d_{bulk}/\\epsilon_{bulk} + d_{def}/\\epsilon_{defect}} \\cdot \\frac{1}{\\epsilon_{defect}} \\cdot \\epsilon_0 $? No, simpler:\n$ V = E_{bulk} d_{bulk}/\\epsilon_{bulk} \\cdot \\epsilon_{avg}? $ No.\nStandard formula for two dielectrics in series:\n$ E_1 = \\frac{V}{\\frac{d_1}{\\epsilon_1} + \\frac{d_2}{\\epsilon_2}} \\cdot \\frac{1}{\\epsilon_1} $\nHere, $ d_1 = 0.1 $ mm (defect), $ \\epsilon_1 = 10 $ (filler), $ d_2 = 9.9 $ mm (bulk), $ \\epsilon_2 = 4 $ (bulk).\n$ E_{defect} = \\frac{10,000 \\text{ V}}{\\frac{0.1}{10} + \\frac{9.9}{4}} \\cdot \\frac{1}{10} = \\frac{10,000}{0.01 + 2.475} \\cdot 0.1 = \\frac{10,000}{2.485} \\cdot 0.1 \\approx 4025 \\cdot 0.1 = 402.5 \\text{ V/mm} $.\n$ E_{bulk} = \\frac{10,000}{2.485} \\cdot \\frac{1}{4} \\approx 4025 \\cdot 0.25 = 1006 \\text{ V/mm} $.\nWithout filler (air void, $ \\epsilon_1 = 1 $):\n$ E_{defect} = \\frac{10,000}{\\frac{0.1}{1} + \\frac{9.9}{4}} \\cdot \\frac{1}{1} = \\frac{10,000}{0.1 + 2.475} = \\frac{10,000}{2.575} \\approx 3883 \\text{ V/mm} $.\n$ E_{bulk} = \\frac{10,000}{2.575} \\cdot \\frac{1}{4} \\approx 971 \\text{ V/mm} $.\nResult: Injecting high-k filler reduces $ E_{defect} $ from ~3883 V/mm to ~402 V/mm (a 90% reduction), while $ E_{bulk} $ increases from ~971 to ~1006 V/mm (a 3.6% increase), well within the bulk dielectric’s breakdown strength (~15,000 V/mm).\n\n### IMPLEMENTATION BILL\n- **Component:** High-permittivity filler material (barium titanate/epoxy composite).\n- **Material:** Commercially available high-k potting compound ($ \\epsilon_r \\geq 10 $, ASSUMPTION: *because* such compounds exist for in-circuit isolation, *falsified if* no commercial compound achieves $ \\epsilon_r \\geq 10 $ with dielectric strength > 10 kV/mm).\n- **Instrument:** X-ray or ultrasonic imaging to locate defects (ALREADY-RECORDED: standard non-destructive testing (NDT) data from capacitor manufacturing QA).\n- **Procedure:** Inject filler into identified voids during a rework or manufacturing QC step.\n- **Reference/Threshold:** Bulk dielectric strength $ E_{bd} > 15 $ kV/mm (DERIVED: *from stated specs* of standard polypropylene/polyethylene film used in capacitors, *falsified if* the dielectric is a lower-grade material with $ E_{bd} < 10 $ kV/mm, in which case the 3.6% field increase may approach breakdown).\n\n### BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability:** Same as standard defect rework; uses existing NDT and injection tools. No new enclosure or external hardware.\n- **Operability:** No change in operating procedure.\n- **Maintenance:** No added maintenance; filler is permanent.\n- **Rough Cost Class:** Slightly higher material cost than air voids, but lower than replacing the entire capacitor or adding thick insulation layers. Comparable to standard defect remediation.\n\n### EXECUTABLE TEST\n**Protocol:**  \n1. Take a capacitor sample with a known, imaged void ($ d_{def} = 0.1 $ mm).  \n2. Measure capacitance and leakage current before and after filler injection.  \n3. Ramp voltage at 1 kV/s until breakdown. Record breakdown voltage $ V_{bd} $.  \n4. Repeat on 5 untreated voids and 5 treated voids.\n\n**Pass/Fail Thresholds:**  \n- **Pass:** Treated voids show $ V_{bd} $ increase of at least 20% (CALCULATED: *because* $ E_{defect} $ drops from ~3.9 kV/mm to ~0.4 kV/mm, the limiting field shifts from the defect to the bulk, and bulk $ E_{bd} = 15 $ kV/mm, so $ V_{bd} $ should approach $ 15 \\text{ kV/mm} \\times 10 \\text{ mm} = 150 \\text{ kV} $, a 15x increase, but practically limited by bulk imperfections; a 20% increase is a conservative, falsifiable benchmark).  \n- **Kill Criterion:** **The mechanism is FALSIFIED if the breakdown voltage does not increase by at least 20% within the first voltage ramp (duration: 150 seconds for 150 kV)** as measured on the treated sample versus untreated control, using a standard HV source and a digital multimeter for breakdown detection. The physical test vehicle is a **bench-top high-voltage source with automatic trip and a current probe** to detect breakdown current spikes.\n\n### CONSTRAINT BIND\n- **Primary Stated Indicator:** Dielectric breakdown voltage (or field strength at breakdown). The threshold is the breakdown field strength $ E_{bd} $.\n- **Secondary Indicator:** Leakage current (supplemental, used to confirm filler integrity and no new tracking paths).\n- **Why:** Breakdown voltage is the direct measure of whether the defect/field concentration has been mitigated. Leakage current is secondary because it indicates material degradation but does not directly quantify field grading.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **Component:** High-permittivity filler material (barium titanate/epoxy composite).",
+    "- **Material:** Commercially available high-k potting compound ($ \\epsilon_r \\geq 10 $, AS",
+    "- **Instrument:** X-ray or ultrasonic imaging to locate defects (ALREADY-RECORDED: standar",
+    "- **Procedure:** Inject filler into identified voids during a rework or manufacturing QC s",
+    "- **Reference/Threshold:** Bulk dielectric strength $ E_{bd} > 15 $ kV/mm (DERIVED: *from ",
+    "- **Installability:** Same as standard defect rework; uses existing NDT and injection tool",
+    "- **Operability:** No change in operating procedure.",
+    "- **Maintenance:** No added maintenance; filler is permanent.",
+    "- **Rough Cost Class:** Slightly higher material cost than air voids, but lower than repla",
+    "1. Take a capacitor sample with a known, imaged void ($ d_{def} = 0.1 $ mm).",
+    "2. Measure capacitance and leakage current before and after filler injection.",
+    "3. Ramp voltage at 1 kV/s until breakdown. Record breakdown voltage $ V_{bd} $.",
+    "4. Repeat on 5 untreated voids and 5 treated voids.",
+    "- **Pass:** Treated voids show $ V_{bd} $ increase of at least 20% (CALCULATED: *because* ",
+    "- **Kill Criterion:** **The mechanism is FALSIFIED if the breakdown voltage does not incre",
+    "- **Primary Stated Indicator:** Dielectric breakdown voltage (or field strength at breakdo",
+    "- **Secondary Indicator:** Leakage current (supplemental, used to confirm filler integrity",
+    "- **Why:** Breakdown voltage is the direct measure of whether the defect/field concentrati"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, $ D = \\epsilon_{filler} E_{defect} = 10 \\times 400 = 4000 $ V·F/mm? No, units: $ D $ in V·F/mm is wrong. Let’s use stan"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "marginal",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 2,
+   "mapped_mechanism": "stress_grading",
+   "cross_domain": ""
+  },
+  "physics_gate": {
+   "verdict": "FAIL",
+   "failing": [
+    "SIGN_FIELD_GRADING"
+   ],
+   "checks": [
+    {
+     "id": "SIGN_FIELD_GRADING",
+     "verdict": "FAIL",
+     "detail": "the answer inserts a LOW-permittivity layer at a series/barrier interface and claims it REDUCES the local field — the relation is reversed: D-continuity gives E_low-eps = D/eps_low, so the low-eps layer sees a HIGHER field and the adjacent high-eps site INCREASES (the verified v17-29 class). Stress grading works by RAISING local permittivity (high-k fillers) or graded conductivity, never by inserting voids in series."
+    }
+   ],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 90% gain)",
+    "predicted_value": "the measured quantity must reach 1.90x the baseline",
+    "calc_trace": "1 + 0.90 = 1.90",
+    "falsifier": "the measured gain must reach 1.90x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {},
+   "demand": {
+    "fired": true,
+    "gate_first": "FAIL",
+    "failing_first": [
+     "SIGN_FIELD_GRADING",
+     "ASSUMPTION_BOUNDS"
+    ],
+    "quant_first_computed": true,
+    "gate_retry": "FAIL",
+    "failing_retry": [
+     "SIGN_FIELD_GRADING"
+    ],
+    "retry_accepted": true,
+    "acceptance_rule": "strict improvement (fewer failing physics checks); the physics gate is the binding contract"
+   }
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "e7f2c885a698888e"
+}

@@ -1,0 +1,75 @@
+{
+ "record": "R54S2_BUILDER_STATUS/1.0.0",
+ "session": "builder-r54s2",
+ "work_ids": [
+  "r54-p1-unit-checked-measurement (VERIFIER, c-0074)",
+  "r54-fv5-physics-hardening (EXECUTOR, c-0073)"
+ ],
+ "base_sha": "576a1195c",
+ "round": "R54 (second builder session: the c-0072 verifier lane + the F-V5 physics hardening the relay never carried)",
+ "protocol": [
+  "FULL constitution reads re-verified at BOTH R54 pins before any action: EPISTEMIC v3.1.0 @ 01c0a9491 (md5 525536896f8000a17fab124fac845ca0 \u2014 byte-identical to the peer's re-verification) + AUDITOR v1.2.0 @ 14e309bfb (md5 abe1c4127bfc9e53b0f29c16e14892d5); eval/r54_auditor_verification.json + AM49 read in full",
+  "claim-before-work per Art. 29(b): session registered + claims c-0073/c-0074 committed and PUSHED (e7128eadd) BEFORE any remediation work; the push is the lock",
+  "vault: 1 protocol key \u2014 the typed mid-R52 NVIDIA absence carries over a fourth round; this session's work is zero-LLM"
+ ],
+ "art29e_stand_down": {
+  "what": "the r53s1 local lineage (5 commits ee331af20..cedb07cc0 carrying claims c-0071/c-0072/c-0073-local: the F64 remedy, the F65 remedy, the TRIZ corpus + F-V5 hardening) was NEVER pushed \u2014 push custody was unavailable in R53",
+  "state": "the relayed remote lineage already carries the F64/F65/TRIZ content (remote c-0071, builder-r53s1 attribution; AM49-verified) \u2014 same-work_id NON-FAST-FORWARD",
+  "action": "per Art. 29(e) the duplicates are STOOD DOWN (never rebased, never pushed); the local lineage is archived at the local branch r53s1-unpushed-archive (the r50s1 precedent); only the DISJOINT residual the relay did not carry \u2014 the F-V5 physics hardening \u2014 re-lands as the new claim c-0073",
+  "verified_disjoint": "code inspection + live probes at 576a1195c: the remote physics_checks.py had NO out_of_domain guards and 3 crash classes reproduced LIVE before the claim was filed"
+ },
+ "c0074_verifier_lane": {
+  "verified": "c-0072 (builder-r54s1, work commit d1ab96178): the P1 >=80% numeric-claims-unit-checked measurement",
+  "record": "eval/r54_verifier_c0072.json \u2014 VERIFICATION_PASS, 7 legs green",
+  "headline": "the measurement recomputed BYTE-IDENTICAL from committed bytes: 36/36 = 1.0 >= 0.80, P1_UNIT_CHECKED_PASS (artifact sha256 fd410bdcdc6ea307b9565d8593372616460e08715c832d6616b70a8bb8871386 before == after); row-set identity (12 burned v7 labelled DEV rows), no-fabrication (on-row PENDING_INPUTS all zero), independent tally (zero diff), router determinism (incl. case-inversion probe), scenarios RUN 12/12, CI bar-gate verified",
+  "methodology": "pre-registered definition in-script (AM44 criteria-before-data as practiced; enforcement = byte-reproducibility + CI gate, typed honestly); anti-gaming audit typed; residual typed: on-row numeric verification awaits rows with numeric context (the P2 ablation's measurement); the P1 gate evaluation remains the auditor's call",
+  "flip": "c-0072 OPEN -> DONE citing this record (the c-0068/c-0069/c-0071 verifier-attribution precedent); the AM49 open item 'P1_80pct_unit_checked' is CLOSED at the measurement level"
+ },
+ "c0073_remedy_lane": {
+  "finding": "F-V5 class LIVE at the remote tip (3 crash classes through run_check: arrhenius T2=0 K, npsh rho=0 guard-after-division, dewpoint Magnus floor \u2014 uncaught ZeroDivisionError, Art. 3 typed-refusal violations); the identical defect was verifier-filed and fixed on the r53s1 lineage in R53 but the relay did not carry it",
+  "remedy": "faithful port onto the 12-relation registry: arrhenius 0 K guard + exponent saturation bounds (1995f7e75 pattern, clamp disclosed in-band), npsh guard moved before the division, dewpoint floor + degenerate guards, ZeroDivisionError joins the typed except classes; 4 regression pins (suite 14/14)",
+  "content_preservation": "BYTE-EVIDENCED: eval/r54_p1_unit_checked.json sha256-identical pre/post; the labelled regression PASS 0/0/0 byte-identical; all 12 reference scenarios value-identical (arrhenius 1.0016369747921925 / npsh 6.6883 / dewpoint -6.698)",
+  "work_commit": "807b54cac"
+ },
+ "art27_capability_budget": {
+  "engine_diff": "physics_checks.py +73/-11 (the F-V5 guards) + tests/test_physics_checks.py +67/-0 (the pins) \u2014 of the session's +180/-14 total; engine share 40.6% raw-insertions (73/180), 43.3% changed-lines (84/194) \u2014 both >= 30%. TYPED CORRECTION (CORR-2 also_typed): the c-0073 commit message quotes +201/-14 total = 36.3%/38.7% \u2014 an understatement from a line-count estimate made pre-commit (the record file is 35 lines, not 56); the engine figures were correct; the true share is HIGHER and still satisfies the rule; original quoted values preserved in CORR-2",
+  "primary_metric_delta": "NOT CLAIMED \u2014 the F-V5 remedy is content-preserving robustness (byte-evidenced); the verifier lane changed zero engine bytes; no capability change this session",
+  "deletions": "none"
+ },
+ "corr_2": {
+  "what": "the R54 credential bundle's OpenRouter attribution corrected per Art. 4: the full sk-or-v1 key shape is in the commit MESSAGE of 76c23fef7 (v26, 2026-08-18) \u2014 NOT 35642149a5 (v28, whose message carries zero sk-or hits); root cause = the scan artifact stores the commit field as the subject prefix 'feat: episte...' (ambiguous across the firewall series) and the bundle builder resolved it to the wrong commit; the three other commit-message sk-or- hits are pattern mentions in scan-report texts (benign)",
+  "owner_action_unchanged": "rotate the OpenRouter key (exactly one live key shape, one commit message); values never printed (shape-count greps only)",
+  "forward_fix": "the scan artifact's commit-field convention (subject prefix instead of SHA) should be fixed in any next scan revision"
+ },
+ "remote_ci": {
+  "pushed_shas": "e7128eadd (claims) + 6e984f6ab (verifier record + c-0072/c-0074 flips) + 807b54cac (F-V5 remedy + c-0073 flip)",
+  "head": "807b54cac",
+  "remote_ci_conclusion": "success",
+  "read_at": "2026-11-17T15:27:32Z (the check-run's completed_at; this record written ~2026-11-17T21:00 sandbox clock \u2014 the skew is typed, ordering proven by ancestry per CORR-1)",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success",
+    "head": "a96a3bf51"
+   }
+  ],
+  "note": "the D2 read with the REAL quoted conclusion: the surface run at the F-V5-hardened head includes the P1.4 regression gate, the P1 unit-checked gate, the constitution suites on the flipped registry, and the tips secret-scan gate \u2014 all green",
+  "pushed_sha": "a96a3bf51",
+  "completion_note": "pushed_sha completed + check_runs quoted from a fresh check-runs API read (2026-11-17, surface=success at a96a3bf51) as part of the R57 gate-widening: the D2 validator's name regex previously skipped session-suffixed records, so this record's block was never validated; no conclusion value changed"
+ },
+ "directions_status": {
+  "dir1_p1_measurement": "DONE (the peer's c-0072, now VERIFIED + FLIPPED; the AM49 P1-gate leg closed at the measurement level)",
+  "dir2_triz_pretty_print": "DONE (the peer's d1ab96178: engine/data/triz_classical_matrix.json pretty-printed, engine share 92.6% their round; this session's remedy commit keeps 40.6% >= 30%)",
+  "dir3_c0071_flip": "DONE (the peer flipped it with AM49 attribution; verified in the registry at 576a1195c)",
+  "dir4_git_mode_scan": "DONE (the peer's bundle) + CORRECTED in one attribution by this session (CORR-2: the OpenRouter key is in 76c23fef7's message, not 35642149a5's)",
+  "dir5_p2_ablation": "BLOCKED as typed \u2014 needs the confidential instrument (F60 custody) + the LLM credential; the criteria evaluator is pre-registered (scripts/r53_p2_ablation_criteria.py); zero-LLM adoption criteria already committed",
+  "dir6_p0_custody": "OWNER ACT pending (status only, per the round cadence) \u2014 the credential bundle + CORR-2 together form the precise inventory: rotate the OpenRouter key (76c23fef7 message), both GitHub credentials (GH_PAT + GITHUB_TOKEN vault-value history hits), the R451-era shape-class exposure decision; the NVIDIA vault-key absence carries over a fourth round; then v9 sealed acceptance"
+ },
+ "llm_calls": 0,
+ "honesty_notes": [
+  "the dewpoint degenerate guard (a == alpha) is defensive armor \u2014 no natural input reached it in the probes; typed in the remediation record",
+  "the verifier's defect-hunt probes ran as read-only diagnostics immediately before the claims were filed \u2014 typed in the claim notes (the Art. 29(b) disclosure pattern)",
+  "the push during the claims step was rejected once (the peer pushed c96e44078 mid-round); rebased disjoint (their commit touched eval/r54_status.json only) and re-pushed \u2014 the Art. 29(e) diff-against-remote-before-push discipline",
+  "the secret-scan gate's raw count grew 58 -> 75 across the peer's R54 commits (the pretty-printed TRIZ data + new test fixtures match existing baseline fingerprints); 0 unbaselined at every read \u2014 the baseline did not grow, the matched raw hits did"
+ ]
+}

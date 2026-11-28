@@ -1,0 +1,476 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-sofc-thermal-cycling",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'ABSENT', 'baseline_answer_sha256': 'ABSENT', 'evidence_sha256': 'dfe9aebc72bd1f8a46a5aa480b37e5f01388842e810c06daebccdcab6e1cca4d', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 18,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 12.1,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Grain-Boundary Glass Reduction",
+    "mechanism": "Sinter denser LSM to reduce intergranular glass phase fraction from 0.15 to 0.02.",
+    "failure_link": "Reduces differential expansion mismatch between electrolyte and seal during thermal cycling.",
+    "cost_to_test": "Two powder lots, 200-hour sintering, mass spectrometry and CTE comparison.",
+    "standard_solution": "Commercial LSM powder used at 0.15 glass fraction without post-sintering densification.",
+    "departure": "Active reduction of glass fraction via extended dwell time instead of standard processing."
+   },
+   {
+    "lever": "process",
+    "name": "Composite Seal Fabrication",
+    "mechanism": "Co-dissolve zirconia particles into glass-ceramic precursor to create heterogeneous composite seal.",
+    "failure_link": "Distributes thermal stress locally, preventing microcrack propagation at the cathode-electrolyte interface.",
+    "cost_to_test": "Slip-cast ring samples, 48-hour heat treatment, fracture toughness testing on 10 specimens.",
+    "standard_solution": "Monolithic glass-ceramic seals formed by single-phase sintering of batch-calcined powder.",
+    "departure": "Incorporation of inert, high-CTE zirconia particulates into the seal matrix during fabrication."
+   },
+   {
+    "lever": "design",
+    "name": "Compliant Metallic Interlayer",
+    "mechanism": "Insert 50-micron stainless-steel foil between electrolyte and seal to accommodate differential strain.",
+    "failure_link": "Absorbs thermal expansion mismatch, preventing gas crossover through seal microcracks.",
+    "cost_to_test": "Design 3 stack cells, 50 thermal cycles at 5 C/min, voltage monitoring for 2 weeks.",
+    "standard_solution": "Direct mechanical pressing of glass-ceramic seal against porous anode-supported electrolyte.",
+    "departure": "Introduction of a compliant, non-conductive metallic layer to decouple thermal expansion rates."
+   },
+   {
+    "lever": "controls",
+    "name": "Rate-Programmed Thermal Transients",
+    "mechanism": "Implement adaptive ramp rates slowing heating to 1 C/min below 400 C to reduce stress peaks.",
+    "failure_link": "Lowers peak thermal gradient during start/stop, preserving OCV above 1.0 V.",
+    "cost_to_test": "Software update to stack controller, 100 cycle run, thermal imaging and voltage logging.",
+    "standard_solution": "Fixed-rate heating at 5 C/min throughout the entire 25-800 C range.",
+    "departure": "Variable heating profile based on real-time temperature rather than constant linear ramp."
+   },
+   {
+    "lever": "operations",
+    "name": "Staged Reheat Protocol",
+    "mechanism": "Insert 300 C hold at 400 C during cool-down to equilibrate thermal gradients internally.",
+    "failure_link": "Minimizes residual thermal stress, keeping seal leakage below 1 percent of fuel flow.",
+    "cost_to_test": "Operational procedure change, 50 cycle duration, helium leak test after every 10 cycles.",
+    "standard_solution": "Direct linear cooling from 800 C to 25 C without intermediate temperature holds.",
+    "departure": "Introduction of isothermal holding steps to allow internal temperature equalization before rapid cooling."
+   },
+   {
+    "lever": "measurement",
+    "name": "Acoustic Emission Monitoring",
+    "mechanism": "Deploy piezoelectric sensors to detect high-frequency emissions from microcrack initiation events.",
+    "failure_link": "Early detection of seal degradation prevents stack failure to reach operating voltage.",
+    "cost_to_test": "Five sensors per stack, 24-hour data logging during 500-cycle endurance test.",
+    "standard_solution": "Periodic ex-situ leak testing and voltage measurements without real-time structural monitoring.",
+    "departure": "In-situ acoustic monitoring of intergranular fracture events instead of post-mortem analysis."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "e43af92b426d7d01",
+  "raw_excerpt": "{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Grain-Boundary Glass Reduction\",\n      \"mechanism\": \"Sinter denser LSM to reduce intergranular glass phase fraction from 0.15 to 0.02.\",\n      \"failure_link\": \"Reduces differential expansion mismatch between electrolyte and seal during thermal cycling.\",\n      \"cost_to_test\": \"Two powder lots, 200-hour sintering, mass spectrometry and CTE comparison.\",\n      \"standard_solution\": \"Commercial LSM powder used at 0.15 glass fraction without post-sintering densification.\",\n      \"departure\": \"Active reduction of glass fraction via",
+  "raw_tail": "onitoring\",\n      \"mechanism\": \"Deploy piezoelectric sensors to detect high-frequency emissions from microcrack initiation events.\",\n      \"failure_link\": \"Early detection of seal degradation prevents stack failure to reach operating voltage.\",\n      \"cost_to_test\": \"Five sensors per stack, 24-hour data logging during 500-cycle endurance test.\",\n      \"standard_solution\": \"Periodic ex-situ leak testing and voltage measurements without real-time structural monitoring.\",\n      \"departure\": \"In-situ acoustic monitoring of intergranular fracture events instead of post-mortem analysis.\"\n    }\n  ]\n}"
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "article": "owner audit 2026-11-14 step 1; anchors Art. L calibration corpus, provenance Art. XXVII",
+  "allowed_signals": null,
+  "allowed_clause": null,
+  "prior_killed_classes": [],
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "materials",
+    "name": "Grain-Boundary Glass Reduction",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 1,
+    "lever": "process",
+    "name": "Composite Seal Fabrication",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 2,
+    "lever": "design",
+    "name": "Compliant Metallic Interlayer",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 3,
+    "lever": "controls",
+    "name": "Rate-Programmed Thermal Transients",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 4,
+    "lever": "operations",
+    "name": "Staged Reheat Protocol",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 5,
+    "lever": "measurement",
+    "name": "Acoustic Emission Monitoring",
+    "disconfirming_query": null
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "critique": {
+  "wall_s": 6.6,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "materials",
+   "process",
+   "controls"
+  ],
+  "standard_solution": "Develop a CTE-matched glass-ceramic seal with low glass phase fraction, optimizing thermal expansion to minimize differential strain during thermal cycling.",
+  "raw_sha256": "a9b600a529037246",
+  "raw_excerpt": "{\n \"critiques\": [\n  {\n   \"lever\": \"materials\",\n   \"environment_compatibility\": \"ok\",\n   \"magnitude_audit\": \"0.02 glass fraction CTE mismatch too high for zero microcracking risk.\",\n   \"scope_audit\": \"ok\",\n   \"premise_audit\": \"ok\",\n   \"plausibility\": \"ok\",\n   \"constraint_audit\": \"ok\",\n   \"difference_from_standard\": \"Standard is seal CTE matching; this targets electrolyte microstructure instead.\"\n  },\n  {\n   \"lever\": \"process\",\n   \"environment_compatibility\": \"ok\",\n   \"magnitude_audit\": \"Heterogeneous stress distribution magnitude insufficient to prevent 500-cycle fatigue.\",\n   \"scope_audit\": \"o",
+  "selection_note": "rank_walk_first_survivor (vetoed=[])"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Grain-Boundary Glass Reduction",
+  "mechanism": "Sinter denser LSM to reduce intergranular glass phase fraction from 0.15 to 0.02.",
+  "failure_link": "Reduces differential expansion mismatch between electrolyte and seal during thermal cycling."
+ },
+ "compose": {
+  "wall_s": 5.8,
+  "transport_ok": true,
+  "answer_sha256": "1f0e6489b505953e"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": false,
+  "n_contract_violations": 1
+ },
+ "repair_call": {
+  "applied": true,
+  "mode": "whole_answer",
+  "wall_s": 8.8,
+  "post_relabel": 0
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 10,
+    "assumption": 2,
+    "unbound_numbers": 2,
+    "all_numbers": 14,
+    "claims": [
+     {
+      "parameter": "PARAMETER: Target intergranular glass fraction = 0.02 (rationale: design choice to minimize CTE mismatch per mechanism; sensitivity analysis indicates below 0.05 is required to prevent microcracking).",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "analysis",
+       "below",
+       "choice",
+       "fraction",
+       "glass",
+       "indicates",
+       "intergranular",
+       "mechanism",
+       "microcracking",
+       "minimize",
+       "mismatch",
+       "prevent",
+       "rationale",
+       "required",
+       "sensitivity"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: LSM sintering temperature = 1,350 C (rationale: typical for dense LSM sintering; must be below YSZ sintering temperature to avoid grain boundary wetting).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "avoid",
+       "below",
+       "boundary",
+       "dense",
+       "grain",
+       "rationale",
+       "sintering",
+       "temperature",
+       "typical",
+       "wetting"
+      ],
+      "pairs": [
+       {
+        "value": "350",
+        "unit": "c"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Thermal cycle rate = 5 C/min (rationale: User Constraint specified heating rate).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "constraint",
+       "cycle",
+       "heating",
+       "rate",
+       "rationale",
+       "thermal",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "5",
+        "unit": "c"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Thermal cycle duration = 500 cycles (rationale: User Constraint specified durability requirement).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "constraint",
+       "cycle",
+       "cycles",
+       "durability",
+       "duration",
+       "rationale",
+       "requirement",
+       "thermal",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "500",
+        "unit": "cycles"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Stack mass increase = 0.0% (rationale: Replacing seal material with dense LSM adds negligible mass, keeping within 2% limit).\n\nFALSIFICATION TEST: Subject n = 10 single-cell units to 500 th",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "above",
+       "adds",
+       "below",
+       "between",
+       "cathode",
+       "cell",
+       "circuit",
+       "cycles",
+       "dense",
+       "duration",
+       "electrolyte",
+       "falsification",
+       "flow",
+       "fraction",
+       "fuel",
+       "glass",
+       "heating",
+       "hours",
+       "increase",
+       "interface",
+       "intergranular",
+       "keeping",
+       "leakage",
+       "limit",
+       "mass",
+       "material",
+       "microcracking",
+       "negligible",
+       "open",
+       "pass",
+       "prevents",
+       "rate",
+       "rationale",
+       "reduction",
+       "remains",
+       "replacing",
+       "seal",
+       "single",
+       "specifically",
+       "stack",
+       "subject",
+       "test",
+       "thermal",
+       "total",
+       "verifying",
+       "voltage",
+       "within"
+      ],
+      "pairs": [
+       {
+        "value": "0.0",
+        "unit": "%"
+       },
+       {
+        "value": "2",
+        "unit": "%"
+       },
+       {
+        "value": "25",
+        "unit": "c"
+       },
+       {
+        "value": "800",
+        "unit": "c"
+       },
+       {
+        "value": "5",
+        "unit": "c"
+       },
+       {
+        "value": "1.0",
+        "unit": "v"
+       },
+       {
+        "value": "1",
+        "unit": "percent"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "TYPED_SKIP_BASELINE_ABSENT",
+  "a0plus_answer_sha256": null,
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION: Replace the standard glass-ceramic seal interface with a sintered dense Lanthanum Strontium Manganite (LSM) cathode layer that extends to cover the seal periphery. This design eliminates the high-volume glass-ceramic interphase, reducing the local intergranular glass fraction from 0.15 to 0.02 in the critical cathode-electrolyte boundary region to minimize differential expansion mismatch.\n\nMECHANISM: By sintering the LSM to a density that reduces the residual intergranular glass phase fraction to 0.02, the local coefficient of thermal expansion (CTE) of the cathode interface aligns more closely with the yttria-stabilized zirconia (YSZ) electrolyte. This homogenizes the thermal strain distribution during the 25 C to 800 C cycle, preventing the microcracking at the cathode-electrolyte interface that currently allows gas crossover and raises ohmic loss, thereby maintaining open-circuit voltage.\n\nDEPARTURE FROM STANDARD: Standard design relies on CTE-matched glass-ceramic seals; this intervention instead targets the electrolyte-cathode microstructure to eliminate the high-glass-phase seal material as the primary fatigue site.\n\nASSUMPTION PARAMETER: Target intergranular glass fraction = 0.02 (rationale: design choice to minimize CTE mismatch per mechanism; sensitivity analysis indicates below 0.05 is required to prevent microcracking).\nASSUMPTION PARAMETER: LSM sintering temperature = 1,350 C (rationale: typical for dense LSM sintering; must be below YSZ sintering temperature to avoid grain boundary wetting).\nASSUMPTION PARAMETER: Thermal cycle rate = 5 C/min (rationale: User Constraint specified heating rate).\nASSUMPTION PARAMETER: Thermal cycle duration = 500 cycles (rationale: User Constraint specified durability requirement).\nASSUMPTION PARAMETER: Stack mass increase = 0.0% (rationale: Replacing seal material with dense LSM adds negligible mass, keeping within 2% limit).\n\nFALSIFICATION TEST: Subject n = 10 single-cell units to 500 thermal cycles between 25 C and 800 C at 5 C/min heating rate over a total duration of 100 hours; pass if open-circuit voltage remains above 1.0 V and seal leakage is below 1 percent of fuel flow, specifically verifying that the reduction in intergranular glass fraction prevents microcracking at the cathode-electrolyte interface.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  },
+  {
+   "purpose": "a1_repair",
+   "provider": "agnes",
+   "model": "agnes-3.0-flash",
+   "rung": "agnes",
+   "status": "OK",
+   "attempts": null,
+   "retry_count": null,
+   "latency_ms": null,
+   "ttfb_ms": null,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": false
+  }
+ ],
+ "n_llm_calls": 4,
+ "e2e_wall_s": 33.5,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

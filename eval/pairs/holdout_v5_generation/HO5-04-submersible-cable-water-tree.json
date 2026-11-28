@@ -1,0 +1,88 @@
+{
+ "problem_id": "HO5-04-submersible-cable-water-tree",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nProposed intervention: a coordinated three-axis parameter/procedure change — (1) VFD dv/dt limiting enabled and switching frequency reduced to the motor-nameplate minimum, (2) termination/gland sealing upgraded to a double-seal anaerobic-thread-sealant procedure with calibrated torque sequence, (3) pump duty-cycle scheduled to run only when well level is below 50 % of the cable’s submerged length — all implemented on existing equipment without new hardware.  \nStandard practice: sets VFD switching frequency to a default (e.g., 4 kHz) without dv/dt limiting, uses a single-seal gland procedure, and runs the pump on a level-based on/off cycle that energizes the cable at all submerged lengths.  \nDeparture: the novelty is the **simultaneous, quantified retuning of all three permitted axes** to attack the water-tree driving variables (electric-field stress and moisture-exposure time) as a single mechanism; standard practice treats them independently and does not minimize dv/dt via software.  \nAdjacent-technique clearance: the closest existing mitigation in any industry is installing external dv/dt filters or sine-wave filters (hardware). This intervention achieves comparable dv/dt reduction and stress-cycle reduction purely through VFD parameter retuning, sealing procedure upgrade, and scheduling — a genuine departure because it uses no added components.\n\nPHYSICS CHECK  \nGoverning relation: water-tree growth rate ∝ Eⁿ·t (n≈2–3), where E is the peak electric field in the insulation and t is the energized time under moisture. VFD dv/dt determines the voltage overshoot at the cable end (ΔV ∝ dv/dt·√(L·C)), which directly raises E. Switching frequency f_sw determines the number of stress cycles per second (t_eff ∝ f_sw·t_on). Submerged cable length L_sub determines the defect population exposed to moisture while energized.  \nMagnitude verification: enabling VFD dv/dt limit (typical minimum 200 V/µs vs. default 1000–2000 V/µs) reduces ΔV by ~60–80 %, cutting E by a similar factor; reducing f_sw from 4 kHz to 1.5 kHz cuts stress cycles by 62 %; scheduling to run only when L_sub < 50 % cuts exposed defect length by ≥50 %. Combined effect reduces the growth-rate driver by >90 % (0.2·0.38·0.5 ≈ 0.038).  \nDIRECTION-OF-EFFECT: driving variable = peak electric-field stress (E) and energized moisture-exposure time (t); the mechanism moves E **down** by limiting dv/dt and moves t **down** by lowering f_sw and restricting energized submerged length; this **reduces** the water-tree growth rate.\n\nIMPLEMENTATION BILL  \n| # | Component / Action | Generic Class / Stated Item | Attachment Point in Stated Infrastructure | Operating Parameter / Procedure Detail | Tag |\n|---|-------------------|----------------------------|------------------------------------------|----------------------------------------|-----|\n| 1 | VFD dv/dt limit enable | Existing VFD (stated) | VFD parameter menu (existing control) | Set “dv/dt limit” or “soft PWM” to minimum available value (e.g., 200 V/µs) | (c) |\n| 2 | VFD switching frequency reduction | Existing VFD (stated) | VFD parameter menu (existing control) | Set switching frequency to motor-nameplate minimum (e.g., 1.5 kHz) | (c) |\n| 3 | Termination/gland sealing procedure | Existing cable glands (stated) | Motor-terminal box and well-head gland (existing) | Apply anaerobic thread sealant (standard catalog, e.g., Loctite 545 equivalent) to gland threads; torque gland nuts to manufacturer spec in two stages (50 % then 100 %) with 5 min dwell; inspect seal visually | (c) |\n| 4 | Duty-cycle scheduling logic | Existing pump controller & well-level sensor (stated) | Pump control system (existing PLC/relay logic) | Modify start/stop logic: pump runs only when well-level sensor reads < 50 % of cable submerged length; hysteresis band ±5 % to prevent chatter | (c) |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n| Burden Category | Standard Practice | This Intervention | Comparison |\n|-----------------|-------------------|-------------------|------------|\n| Hardware procurement | None (uses existing VFD, glands, controller) | None (all rows (c)) | Same |\n| Installation labor | Standard gland sealing (single seal, no torque sequence) | Enhanced gland sealing (double seal, torque sequence) | +15 min per gland (2 glands) — negligible, same skill level |\n| Commissioning | VFD default parameters; level-based on/off | VFD parameter changes (2 settings); scheduling logic update | +30 min engineering time — same tooling (laptop/keypad) |\n| Operational loss | Continuous pumping per level | Pumping restricted to L_sub < 50 % | **Zero net loss**: scheduling shifts pumping to lower-level windows; total daily volume unchanged (pump runs longer when level is low). Explicitly priced at 0 kWh/day. |\n| Maintenance | Periodic gland inspection | Same inspection frequency; sealant is standard catalog item | Same |\n| Cost class | No added cost | No added cost (sealant is standard catalog, <$10) | Same or lower |\n\nConclusion: same-or-lower burden class in every row; no hidden development, machining, or custom parts.\n\nEXECUTABLE TEST  \nProtocol:  \n1. Baseline: install a portable partial-discharge (PD) monitor (high-frequency CT on cable ground conductor, 100 MHz bandwidth) for 7 days of normal operation. Record PD pulse count, magnitude (mV), and phase-resolved pattern.  \n2. Intervention: apply all four bill rows (VFD parameters, sealing procedure, scheduling).  \n3. Post-intervention: repeat PD monitoring for 7 days under similar well-level cycles.  \nInstruments: portable PD monitor (standard catalog, e.g., HV Diagnostics PD-Surveyor class), laptop.  \nPass/fail thresholds:  \n- PD pulse count reduced by ≥50 % (same voltage phase windows).  \n- Maximum PD magnitude reduced by ≥40 %.  \n- No new PD activity at termination phase angles (validates sealing).  \nDuration: 14 days total (7 baseline + 7 post).  \nKill criterion: if PD count or magnitude increases, or if motor torque becomes insufficient at 1.5 kHz (trip on overload), revert VFD parameters and declare intervention falsified.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {}
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 6672,
+   "latency_s": 60.7,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "sustained_primary_outage (HTTP 500 x2, typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "NAMED_VARIANT": [
+     "model/brand-marker: IP68 | | 2 | Double-gland termination kit: two standard cable glands (IP68, nickel-plat"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "4505ab83293a51ef"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 4149,
+   "latency_s": 120.6,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "sustained_primary_outage (HTTP 500 x2, typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installation burden: same (VFD already installed).",
+     "- Commissioning burden: additional 30 minutes for parameter entry and verification.",
+     "- Operational burden: VFD runs at lower switching frequency (reduces switching losses) and",
+     "- Maintenance burden: unchanged.",
+     "- Cost class: same (no new parts)."
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "4eeb0c5b7b1821d6",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Installation burden: same (VFD already installed).; - Commissioning burden: additional 30 minutes for parame",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 6095,
+   "latency_s": 95.8,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "sustained_primary_outage (HTTP 500 x2, typed)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {},
+   "sha256_16": "4ceafba66664a5e6",
+   "findings_disclosed": []
+  }
+ ],
+ "generated_at": "2026-11-16T11:32:40Z"
+}

@@ -1,0 +1,38 @@
+{
+ "record": "R128_TRANSPORT_PROBE/1.0.0",
+ "claim": "c-0203 (work id r128-cluster-rescore-and-transports)",
+ "session": "builder-r121s1-3e8a41d7",
+ "authority": "the owner's dir-4: wire Amazon Bedrock as a transport (bearer AWS_BEARER_TOKEN_BEDROCK on POST /model/<id>/converse, no SDK, no host) and keep the HF router as a second path. Test: a dry run returns a typed refusal, and the first funded call is recorded with usage bytes",
+ "bedrock": {
+  "transport": "discovery_fabric/engine/route_adapter.py bedrock_converse (route_adapter/2.1.0, additive; the agnes path byte-unchanged)",
+  "dry_run": {
+   "call": "bedrock_converse([{'role':'user','content':'x'}], '<model>', api_key=None)",
+   "typed_refusal": "[missing_key] bedrock: no AWS_BEARER_TOKEN_BEDROCK in the vault (env-only, digests-only \u2014 F45 custody)",
+   "test": "PASS"
+  },
+  "funded_call": "PENDING-OWNER \u2014 no AWS_BEARER_TOKEN_BEDROCK in the vault this window (the owner's checklist row 'From you: a Bedrock API key'); the first funded call will be appended here with its usage bytes by the same probe",
+  "probe_ready": "scripts/r128_transport_probe.py re-runs both transports and appends the usage bytes to this record"
+ },
+ "hf_router": {
+  "transport": "discovery_fabric/engine/route_adapter.py hf_router_chat (route_adapter/2.1.0, additive)",
+  "custody": "HF_TOKEN in the gitignored vault (.env.keys), env-only, digest 33bc7af22c62 recorded, never printed or committed",
+  "dry_run_no_key": "typed [missing_key] refusal verified (API key=None path)",
+  "state_correction": "the owner's audit basis says the HF router 'returned HTTP 402 for lack of credits' \u2014 under the CURRENT vault token (digest 33bc7af22c62) the route is FUNDED: a live probe call SUCCEEDED. The 402 typed-refusal class is implemented and stays on the books (payment_required), but the measured current state is 200",
+  "first_funded_call": {
+   "model": "meta-llama/llama-3.1-8b-instruct",
+   "content": "OK",
+   "usage_bytes": {
+    "prompt_tokens": 42,
+    "completion_tokens": 2,
+    "cached_tokens": 0
+   }
+  },
+  "implication_typed": "a SECOND model family (meta-llama via the HF router) is now callable from the sandbox \u2014 the score-8 panel's transport precondition moves one step closer; the panel itself stays owner/auditor-gated"
+ },
+ "probe_runs": 4,
+ "last_probe_updates": [
+  "bedrock dry run typed refusal: [missing_key] bedrock: no AWS_BEARER_TOKEN_BEDROCK in the vault (env-only, digests-only \u2014 F45 custody)",
+  "bedrock funded call still refused (typed): [missing_key] bedrock: no AWS_BEARER_TOKEN_BEDROCK in the vault (env-only, digests-only \u2014 F45 custody)",
+  "hf funded call recorded: {'prompt_tokens': 42, 'completion_tokens': 2, 'cached_tokens': 0}"
+ ]
+}

@@ -1,0 +1,134 @@
+{
+ "problem_id": "dev-fu-003-motor-insulation",
+ "commit": "2fc229ec1ea7",
+ "run_id": "r1-pipeline+baseline+judge-2026-11-13173704000",
+ "dirty_tree": true,
+ "question": "Propose the most cost-effective measurable leading indicator for the stated failure, its operating threshold, and the concrete test that would validate or kill the predictor.",
+ "clarification_answer": null,
+ "baseline_answer": "### **Proposed Solution: Offline Partial Discharge (PD) Testing with Dielectric Dissipation Factor (DDF) as Leading Indicator**\n**Failure Mechanism:** Stator winding insulation degradation via partial discharge (PD) \u2192 ground fault cascade \u2192 motor failure.\n\n**Constraints Respected:**\n- Offline PD testing only (no continuous monitoring).\n- No hardware modifications (no sensors).\n- \u22656 months warning before ground fault.\n- No false emergency shutdowns.\n\n---\n\n### **Design/Intervention: Semi-Annual PD + DDF Testing with Threshold-Based Escalation**\n1. **Test Method:**\n   - **Partial Discharge (PD) Measurement:** Use a high-voltage PD detector (e.g., IEC 60034-27 compliant) to measure apparent charge (pC) and pulse count at **1.3\u00d7rated voltage (4.16 kV \u00d7 1.3 = 5.4 kV)** for 1 hour.\n     - *Why?* PD activity at elevated voltage stresses insulation defects (voids, delamination) before they propagate to ground faults. Offline testing avoids false alarms during normal operation.\n   - **Dielectric Dissipation Factor (DDF, tan \u03b4):** Measure DDF at **1 kV/mm (or 50% of breakdown strength)** using a dielectric spectrometer (e.g., IEEE 286-2000).\n     - *Why?* DDF increases with moisture ingress, thermal aging, or polymer chain scission\u2014key degradation pathways for XLPE/epoxy insulation (supported by [EuropePMC: Properties of Polymer Composites](https://europepmc.org/article/MED/33000000)).\n\n2. **Thresholds (Derived from Evidence):**\n   - **PD Threshold:**\n     - **Warning:** >50 pC (apparent charge) **or** >100 pulses/min at 5.4 kV.\n       - *Rationale:* [ArXiv: Non-Invasive Fault Detection](https://arxiv.org/abs/2103.04567) shows PD >50 pC correlates with incipient turn-to-turn faults in induction motors. Offline testing at 1.3\u00d7voltage amplifies PD signals from critical defects.\n     - **Action:** Escalate to corrective maintenance (e.g., insulation drying, re-coating) if PD persists after 3 months.\n   - **DDF Threshold:**\n     - **Warning:** tan \u03b4 > **0.02** (baseline: 0.005\u20130.01 for healthy XLPE/epoxy).\n       - *Rationale:* [Semantic Scholar: Treeing in XLPE](https://www.semanticscholar.org/paper/TREEING-IN-CROSS-LINKED-POLYETHYLENE-INSULATION%3A-...-Khan/58a3b2e4e0d9d8a4a1e0e1e0e1e0e1e0) links DDF >0.02 to micro-void formation and water treeing, precursors to PD and ground faults.\n\n3. **Validation Test (Falsification Protocol):**\n   - **Hypothesis:** \"If PD \u226450 pC **and** DDF \u22640.02 at 6-month intervals, the motor will not experience a ground fault within 12 months.\"\n   - **Falsification Test:**\n     - **Case 1:** PD >50 pC **or** DDF >0.02 \u2192 **Predicts** ground fault within 12 months.\n       - *Action:* Accelerated aging test (e.g., thermal cycling + voltage stress) to confirm defect propagation.\n     - **Case 2:** PD \u226450 pC **and** DDF \u22640.02 for 3 consecutive tests \u2192 **Kills** the predictor if a ground fault still occurs.\n       - *Implication:* Alternative failure modes (e.g., mechanical stress, manufacturing defects) dominate; adjust thresholds or add vibration analysis (per [EuropePMC: Magnetic Sensor Study](https://europepmc.org/article/MED/32500000",
+ "pipeline_answer": "Deploy a high-sensitivity Hall-effect sensor (e.g., model LEM HS100, sensitivity 10 mV/mT, bandwidth 100 kHz) positioned 50 mm from the motor casing during scheduled outages to capture the magnetic flux density spectrum of the 4.16 kV induction motor. Operate the motor at 50% load (ASSUMPTION: 250 kW based on typical boiler feed pump duty cycles) for 30 minutes to stabilize thermal and mechanical conditions, then record the magnetic flux density spectrum from 10 Hz to 10 kHz with a 1 Hz resolution. Compare the rotor frequency harmonics (e.g., 2\u00d7rotor frequency, sidebands at \u00b11\u00d7rotor frequency) and torque-related peaks (e.g., 6\u00d7line frequency) against a baseline profile established during a previous outage. The intervention is UNVERIFIED and requires validation via a falsification test comparing spectral shifts in degraded insulation samples (e.g., from [doi:10.15407/techned2026.06.003]) against healthy baselines.\n\n**INDICATOR:** Magnetic flux density spectrum amplitude at 2\u00d7rotor frequency (\u00b110 Hz bandwidth) and torque-related peaks (6\u00d7line frequency \u00b15 Hz).\n**THRESHOLD:** 15% increase from baseline [ASSUMPTION: derived from [doi:10.3390/s25144471]\u2019s spectral anomaly detection threshold for rotor-related faults].\n**PROTOCOL:** Collect spectra during 3 consecutive outages (n=3), each with 3 trials of 30-minute recordings. Alert if any trial exceeds the 15% threshold in \u22652 harmonics. Falsification test: Inject known insulation defects (e.g., partial discharge sources per [doi:10.15407/techned2026.06.003]) into a test motor and verify \u226515% spectral shift at 2\u00d7rotor frequency within 6 months of defect introduction.\n\n**How it respects constraints:**\n- **Offline PD testing only:** Uses scheduled outages for sensor deployment and data collection, avoiding continuous monitoring.\n- **No continuous monitoring hardware:** Sensor is deployed temporarily during outages, requiring no permanent installation.\n- **At least 6 months before ground fault:** 15% spectral shift threshold is calibrated to detect early-stage insulation degradation (EVIDENCE-BACKED [doi:10.15407/techned2026.06.003]).\n- **No false emergency shutdowns:** Alerts are based on spectral analysis, not real-time thresholds, and require manual confirmation.\n\n**Supporting evidence:**\n- Magnetic flux density spectrum analysis for rotor anomalies (EVIDENCE-BACKED [doi:10.3390/s25144471]).\n- Insulation degradation mechanisms (EVIDENCE-BACKED [doi:10.15407/techned2026.06.003]).\n\nNote: this proposal is delivered as an unverified engineering hypothesis \u2014 the retrieved record does not directly support it, so treat the stated falsification test as a precondition, not a validated recommendation.",
+ "evidence_ids": [
+  "doi:10.3390/s25144471",
+  "doi:10.3390/polym8050173",
+  "doi:10.1038/s41598-025-92821-z",
+  "doi:10.1038/s41598-025-97104-1",
+  "doi:10.15407/techned2026.06.003",
+  "doi:10.1177/09673911261470971",
+  "doi:10.48550/arxiv.2110.07437",
+  "doi:10.48550/arxiv.2110.02427",
+  "doi:10.48550/arxiv.2202.12139",
+  "doi:10.5545/sv-jme.2015.2632"
+ ],
+ "bound_inputs": {
+  "pipeline_answer_sha256": "7dbd97f4d3261280ff083f1a031ad0427de3693c1fbfea3dc38af37783ae7f7f",
+  "baseline_answer_sha256": "2f813bb171ab99a17baa76fa7f09ebc86eef469d3c1654f2c9ad7548da113470",
+  "evidence_sha256": "363042db4261750306e3ca20e6b99d261f59b88d577648a02e929278a4f53658",
+  "judge_route": {
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b"
+  },
+  "rubric_version": "0-4-rubric/1"
+ },
+ "judge_record": {
+  "usable_pair": false,
+  "outcome": "JUDGE_PARSE_FAILED",
+  "passes": 1,
+  "pass_outcomes": [
+   "JUDGE_PARSE_FAILED",
+   "JUDGE_VALID"
+  ],
+  "scores": {
+   "a_answered": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "b_user_vars": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "c_prediction": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "d_evidence": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "e_clarification": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   },
+   "f_novelty": {
+    "pipeline_mean": null,
+    "baseline_mean": null,
+    "diff": null
+   }
+  },
+  "winner": null,
+  "pref_passes": [],
+  "number_absent": {
+   "pipeline": [],
+   "baseline": [
+    "0.005",
+    "0.01",
+    "0.02",
+    "1.3",
+    "100",
+    "2000",
+    "2103.04567",
+    "286",
+    "32500000",
+    "33000000",
+    "4.16",
+    "5.4",
+    "50",
+    "60034"
+   ]
+  },
+  "number_absent_detail": {
+   "pipeline": {
+    "all": 17,
+    "unverified": 0,
+    "assumption_labeled": 15,
+    "packet_bound": 17,
+    "user_variable_bound": 1,
+    "unbound": 0,
+    "fabricated_rate": 0.0
+   },
+   "baseline": {
+    "all": 25,
+    "unverified": 14,
+    "assumption_labeled": 0,
+    "packet_bound": 11,
+    "user_variable_bound": 1,
+    "unbound": 14,
+    "fabricated_rate": 0.56
+   }
+  },
+  "judge_content_len": [
+   502,
+   71
+  ],
+  "judge_latency_s": [
+   2.6,
+   1.1
+  ],
+  "bound_inputs": {
+   "pipeline_answer_sha256": "7dbd97f4d3261280ff083f1a031ad0427de3693c1fbfea3dc38af37783ae7f7f",
+   "baseline_answer_sha256": "2f813bb171ab99a17baa76fa7f09ebc86eef469d3c1654f2c9ad7548da113470",
+   "evidence_sha256": "363042db4261750306e3ca20e6b99d261f59b88d577648a02e929278a4f53658",
+   "judge_route": {
+    "provider": "xkiro",
+    "model": "mistralai/ministral-14b"
+   },
+   "rubric_version": "0-4-rubric/1"
+  }
+ },
+ "baseline_same_evidence_hash": "363042db4261750306e3ca20e6b99d261f59b88d577648a02e929278a4f53658",
+ "pipeline_same_evidence_hash": "363042db4261750306e3ca20e6b99d261f59b88d577648a02e929278a4f53658"
+}

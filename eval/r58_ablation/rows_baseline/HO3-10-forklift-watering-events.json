@@ -1,0 +1,38 @@
+{
+ "problem_id": "HO3-10-forklift-watering-events",
+ "arm": "baseline",
+ "dev_source": "v3-burned",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T18:56:02.933151Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme (electrolyte level deficit tracking via fill logs).  \n- Same-class mechanism departure: Mass-balance deficit calculator using integrated charge amp-hour and fill volume data to predict electrolyte loss before visible deficit.  \n- Failure-physics connection: Opportunity charging causes electrolyte loss via gassing; unmitigated loss leads to low electrolyte, exposing plates to air and causing top sulfation, which irreversibly raises impedance and reduces capacity.  \n\n**PHYSICS CHECK**  \nGoverning relation: Electrolyte mass loss ∝ charge amp-hours (Faraday's law: 26.8 Ah per gram of H₂O lost during gassing).  \nCALCULATED: 1 Ah charged → 0.034 mL H₂O lost (26.8 g/mol H₂O / 96485 C/mol * 3600 s/h * 1 Ah * 1 mL/g).  \nDIRECTION-OF-EFFECT: driving variable = electrolyte mass; mechanism moves it DOWN by calculating deficit from fills vs. expected gassing losses; this REDUCES plate exposure time.  \n\n**IMPLEMENTATION BILL**  \n(a) Data processing unit (e.g., PLC or edge computer with historical data access)  \n(b) Charger log parser (ALREADY-RECORDED: \"chargers already log charge amp-hours per battery\")  \n(c) Watering-cart log parser (ALREADY-RECORDED: \"watering cart logs fills per battery\")  \n(d) Mass-balance algorithm (CALCULATED: baseline = 0 mL deficit; threshold = 200 mL deficit, derived from 20% capacity loss requiring ~6000 mL total loss, 1/3 expected pre-failure deficit)  \n(e) Alert system (e.g., dashboard flag or SMS)  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: Zero new hardware (uses existing logs); software-only deploy.  \n- Operability: Same as standard practice (daily log review + automated alerts).  \n- Maintenance: No physical maintenance; software updates only.  \n- Cost class: Same as standard practice (log parsing vs. manual deficit tracking); operational cost = zero (no throughput/energy trade).  \n\n**EXECUTABLE TEST**  \nProtocol:  \n1. Extract 6 months of charger amp-hour and watering-cart fill logs for 18 batteries.  \n2. Compute daily mass-balance deficit (expected loss from Ah vs. actual fills).  \n3. Flag batteries with deficit ≥200 mL for 7+ consecutive days.  \nPass/fail: ≤1 false alarm/month across fleet; all 2/year capacity losses must trigger warning ≥7 days prior.  \nDuration: 6 months of log replay.  \nKill criterion: >1 false alarm/month or failure to warn ≥7 days prior.  \n\n**CONSTRAINT BIND**  \nPrimary indicator: Electrolyte level deficit (the failure-defining quantity per constraint); secondary indicator: End-of-charge voltage (supplement only, as it correlates with state of charge but not directly with deficit).",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installability: Zero new hardware (uses existing logs); software-only deploy.",
+    "- Operability: Same as standard practice (daily log review + automated alerts).",
+    "- Maintenance: No physical maintenance; software updates only.",
+    "- Cost class: Same as standard practice (log parsing vs. manual deficit tracking); operati",
+    "1. Extract 6 months of charger amp-hour and watering-cart fill logs for 18 batteries.",
+    "2. Compute daily mass-balance deficit (expected loss from Ah vs. actual fills).",
+    "3. Flag batteries with deficit ≥200 mL for 7+ consecutive days."
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "9de7eb2bee8df4aa",
+ "smoke": false
+}

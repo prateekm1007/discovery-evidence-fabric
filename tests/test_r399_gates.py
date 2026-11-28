@@ -301,14 +301,24 @@ def test_rejected_run_generates_no_package_artifacts(tmp_path):
         package_registry_path=str(tmp_path / "sandbox_registry.json"))
     manifest = run2.run()
 
-    # the honest skip record exists with the measured basis
-    skipped = json.loads(
-        (tmp_path / "PACKAGE_SKIPPED_SCIENTIFICALLY_REJECTED.json")
-        .read_text())
-    assert skipped["entry_status"] == "SKIPPED"
-    assert skipped["prerequisite"] == \
-        "CANDIDATE_NOT_SCIENTIFICALLY_REJECTED"
-    assert skipped["prerequisite_evidence"]["final_status"] == "REJECTED"
+    # the honest skip record exists with the measured basis when a grid
+    # candidate reached the packaging gate (the legacy architecture path).
+    # R183: the grid is disabled by route on EVERY problem class, so in
+    # the shipped configuration no grid candidate reaches that gate at
+    # all — the W2.1 safety property (no package spend) still holds and
+    # is asserted below. Both branches are typed, never silent.
+    skip_path = tmp_path / "PACKAGE_SKIPPED_SCIENTIFICALLY_REJECTED.json"
+    if skip_path.exists():
+        skipped = json.loads(skip_path.read_text())
+        assert skipped["entry_status"] == "SKIPPED"
+        assert skipped["prerequisite"] == \
+            "CANDIDATE_NOT_SCIENTIFICALLY_REJECTED"
+        assert skipped["prerequisite_evidence"]["final_status"] == "REJECTED"
+    else:
+        assert not list(tmp_path.glob("INVENTION_SPECIFICATION_grid-*.json"))
+        grid_record = json.loads(
+            (tmp_path / "EXPLORATION_GRID.json").read_text())
+        assert grid_record["route"]["route"] == "CHEAP_ARM"
     # and NONE of the expensive artifacts ran:
     assert not (tmp_path / "CAD_PIPELINE_LEDGER.json").exists()
     assert not (tmp_path / "PACKAGE_REPORT.json").exists()

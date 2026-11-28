@@ -1,0 +1,51 @@
+{
+ "record": "R146_P4_PANEL_PARTIAL_RECOMPUTE/1.0.0",
+ "claim": "c-0252",
+ "work_id": "r146-p4-panel-v17-strengthened",
+ "session": "builder-r146s1-b",
+ "at": "2026-11-24 (sandbox clock)",
+ "method": "independent recompute from the 120 raw leg bytes (auditor Art. 13; the driver's own tally step crashed on an r145 field residue \u2014 KeyError r144_within_answer_novel \u2014 the raw legs are intact)",
+ "per_judge": {
+  "dsr1": {
+   "n_legs": 30,
+   "n_valid": 10,
+   "all_transports_failed": false,
+   "error_class": "payment_required from leg 11 (the first 10 VALID, then 402)",
+   "rulings_viable_nonobvious": 10
+  },
+  "qw32b": {
+   "n_legs": 30,
+   "n_valid": 0,
+   "all_transports_failed": true,
+   "error_class": "payment_required (HTTP 402, HF Inference Providers pre-paid credits exhausted)",
+   "rulings_viable_nonobvious": 0
+  },
+  "qwen235b": {
+   "n_legs": 30,
+   "n_valid": 0,
+   "all_transports_failed": true,
+   "error_class": "payment_required (HTTP 402, HF Inference Providers pre-paid credits exhausted)",
+   "rulings_viable_nonobvious": 0
+  },
+  "dsv32": {
+   "n_legs": 30,
+   "n_valid": 0,
+   "all_transports_failed": true,
+   "error_class": "payment_required (HTTP 402, HF Inference Providers pre-paid credits exhausted)",
+   "rulings_viable_nonobvious": 0
+  }
+ },
+ "n_legs": 120,
+ "n_candidates": 30,
+ "both_majority_count": 10,
+ "both_majority_pct": 33.3,
+ "no_vote_candidates": 20,
+ "state_typed": "INFRA_BLOCKED_PAYMENT_REQUIRED \u2014 the >=50% DIR-4 acceptance is UNRESOLVED on infrastructure (Art. 15: infra failure is never a scientific result; typed skip, never scored as a mechanism failure). The dsr1 pre-exhaustion signal: 10/10 VALID rulings are viable+non_obvious. 20/30 candidates have zero votes; qw32b/qwen235b/dsv32 are 0/30 (all 402).",
+ "acceptance": "UNRESOLVED (infrastructure) \u2014 NOT adjudicated on quality; byte-resume on credit restore continues the SAME generation (the failed legs carry no generation; Art. 7 no-re-roll intact)",
+ "escalation": "OWNER ACCOUNT-LEVEL: HF Inference Providers pre-paid credits exhausted (HTTP 402). No funded judge transport remains: xkiro/cent keys absent from the vault, zai-gateway retired (owner order 2026-11-18), deepai/nvidia typed dead; agnes is the GENERATOR and cannot judge (Art. 10 self-certification ban).",
+ "reconciliation_vs_builder_screen": {
+  "builder_screen_strong": 16,
+  "panel_both": 10,
+  "note": "of the 10 candidates with a dsr1 ruling, 9 are builder-screen strong (1 marginal also ruled viable+non_obvious) \u2014 directionally consistent; the remaining 6 strong + 13 marginal candidates have NO votes yet"
+ }
+}

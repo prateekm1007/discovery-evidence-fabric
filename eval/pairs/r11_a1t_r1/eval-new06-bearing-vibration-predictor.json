@@ -1,0 +1,35 @@
+{
+ "problem_id": "eval-new06-bearing-vibration-predictor",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V3_SAME_CLASS_NOVELTY",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V3 verbatim (session-2 audited predictor contract)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "observable/indicator design present"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.0,
+   "chars": 3431
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 7.9,
+   "chars": 3472,
+   "findings_disclosed": [
+    "TEST_DURATION_REALTIME"
+   ],
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   }
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a MONITORING/INDICATION scheme using vibration amplitude (RMS or peak) as the leading indicator. My same-class mechanism departure is the time-domain envelope of the bearing defect frequency's modulation depth, which captures the spalling progression through increasing modulation of the defect frequency rather than just its amplitude. This works because spalling progression increases the surface irregularity depth, which modulates the defect frequency's amplitude in time domain before significantly increasing its overall energy.\n\nPHYSICS CHECK — The governing physical relation is the modulation depth of the bearing defect frequency, calculated as (max - min)/(max + min) over a moving window. For a bearing with inner race defect frequency (BPFI) of 73 Hz (CALCULATED from bearing geometry and shaft speed), a modulation depth exceeding 0.15 (ASSUMPTION: based on empirical studies showing this threshold correlates with early spalling) indicates spalling initiation. Verification: At 1 kHz sampling, we can resolve 73 Hz modulation with ~14 samples/cycle (1000/73), sufficient to capture modulation depth changes of 5% (ASSUMPTION: exceeds typical noise floor).\n\nIMPLEMENTATION BILL — \n1. Existing 1 kHz vibration sensor (same class as standard practice's monitoring)\n2. Existing 1 Hz SCADA logging system (same class as standard practice's monitoring)\n3. Off-the-shelf digital signal processing module (same class as standard practice's signal conditioning)\n   - Input: 1 kHz vibration signal\n   - Processing: Bandpass filter around BPFI (73 Hz ± 5 Hz), compute envelope, calculate modulation depth over 10-second windows (ASSUMPTION: sufficient to capture modulation without excessive computation)\n   - Output: Modulation depth value logged at 1 Hz to SCADA\n4. Existing alarm system (same class as standard practice's indication)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \n- Installability: SAME - uses existing sensor and logging infrastructure, no additional hardware installation required\n- Operability: SAME - no additional operator training needed, integrates with existing SCADA interface\n- Maintenance: SAME - no additional maintenance requirements beyond standard vibration monitoring\n- Cost class: SAME - only requires software modification to existing processing module (ASSUMPTION: existing processing capability can be reprogrammed)\n- Burden difference: Minimal computational overhead for modulation depth calculation vs. standard RMS calculation\n\nEXECUTABLE TEST — \nPROTOCOL: \n1. Install the modulation depth algorithm on the processing module\n2. Monitor 20 bearings in similar service conditions\n3. Record modulation depth values continuously at 1 Hz\n4. Set alarm threshold at modulation depth > 0.15\n5. Record all alarms and bearing replacement dates\n\nINSTRUMENTS: \n- Existing 1 kHz vibration sensors\n- Existing SCADA logging system\n- Manual vibration analyzer for periodic verification (ASSUMPTION: available in maintenance practice)\n\nPASS/FAIL CRITERIA: \n- PASS: Alarm triggers ≥14 days before bearing replacement in ≥90% of cases, with ≤2 false alarms/year across all monitored bearings\n- FAIL: Alarm triggers <14 days before replacement in >10% of cases, or >2 false alarms/year\n\nDURATION: 12 months of continuous monitoring\n\nKILL CRITERION: If during the test period, any bearing reaches the point of catastrophic failure (spalling beyond repair) without prior alarm, the predictor is killed."
+}

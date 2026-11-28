@@ -1,0 +1,31 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Shift the positive grid alloy composition from Antimony-Tin ($Sb-Sn$) to **Calcium-Silicon ($Ca-Si$)** with a trace addition of **Lead-Calcium (Pb-Ca)** and **Copper (Cu)** or **Bismuth (Bi)** to optimize the electrochemical stability of the corrosion layer. The core mechanism is the formation of a denser, more protective lead calcium phosphate ($PbCa(PO_4)_2$) layer on the grid surface, which significantly reduces the rate of positive grid corrosion compared to antimony-dominated alloys, even at higher float voltages. This addresses the root cause: the consumption of grid cross-section due to rapid oxidation/dissolution cycles at 2.27 V/cell.
+
+**Implementation:**
+1.  **Alloy Formulation:** Reformulate the positive grid casting alloy to **Pb-Ca-Si-Cu**. Typical composition: 96-98% Pb, 1.5-2.0% Ca, 0.3-0.5% Si, 0.1-0.3% Cu.
+    *   *Note:* Calcium content is kept high enough to form protective phosphates but low enough to avoid excessive brittleness. Silicon acts as a deoxidizer and improves sintering properties. Copper enhances the resistance of the corrosion layer.
+    *   *Constraint Check:* Antimony is **0%** (well below the 2% limit). This allows for stricter control of the float voltage.
+2.  **Electrolyte Management:** Use a high-purity electrolyte with specific inhibitors or ensure extremely high purity to prevent impurity-induced accelerated corrosion (e.g., tin or bismuth impurities from manufacturing processes).
+3.  **Voltage Strategy:** Because the Pb-Ca alloy is less susceptible to rapid grid corrosion than Pb-Sb alloys at standard float voltages, the battery can be floated at **2.25 V/cell** instead of 2.27 V/cell, or if 2.27 V/cell is mandated by the system, the Pb-Ca alloy provides sufficient margin to survive 15 years without excessive grid thinning. The 2.27 V/cell requirement is met, but the alloy choice makes this voltage sustainable.
+4.  **Manufacturing Process:** Employ **pulverized lead paste** and **high-dielectric strength separators** to maintain plate-to-plate contact without mechanical stress on the fragile Ca-alloy grid. Ensure grid casting quality to minimize internal voids which act as corrosion initiators.
+
+**Measures it Relies On:**
+*   **Corrosion Layer Stability:** The Pb-Ca alloy forms a more compact, less porous corrosion layer that self-heals and resists further oxidation better than Pb-Sn or Pb-Sb layers at elevated temperatures/float voltages.
+*   **Lower Gassing Rate:** Pb-Ca alloys generally have a lower water consumption rate (gassing) than Sb alloys, reducing electrolyte stratification and acid concentration at the positive grid top, which is a primary driver of grid corrosion.
+*   **Impurity Control:** The design relies on strict metallurgical control to keep antimony and other heavy metal impurities below 0.1%, ensuring the protective layer chemistry is not disrupted.
+
+**Falsification Test:**
+**Accelerated Float Life Test (AFLT) at 2.27 V/cell:**
+1.  Prepare three sets of identical valve-regulated lead-acid (VRLA) batteries:
+    *   Set A: Standard Pb-Sb-Sn alloy (Reference, ~2% Sb).
+    *   Set B: Proposed Pb-Ca-Si-Cu alloy (0% Sb).
+    *   Set C: Pb-Ca alloy without Cu/Si optimization (Control).
+2.  Apply continuous float charge at **2.27 V/cell** and **35°C** (accelerating aging).
+3.  Monitor **internal resistance** and **capacity** every month for 24 months.
+4.  Terminate each set when capacity falls below **80% of rated capacity** (service threshold).
+5.  **Post-Mortem Analysis:** Disassemble the end-of-life batteries from Set B. Perform **metallographic cross-section analysis** of the positive grids to measure remaining cross-sectional area.
+6.  **Falsification Criteria:**
+    *   If Set B (Pb-Ca-Si-Cu) fails before **180 months** (15 years) under extrapolated conditions, or if metallographic analysis shows grid cross-section reduction >20% at the 12-month mark (indicating accelerated corrosion), the mitigation is falsified.
+    *   Specifically, if the grid thinning rate in Set B is *greater* than in Set A (Pb-Sb) at the same voltage and temperature, the proposed alloy change does not mitigate the failure mode and is falsified. The success metric is that Set B must exhibit a *lower* corrosion rate (thinner loss) and longer time-to-threshold than the Pb-Sb reference when subjected to the same stress conditions.

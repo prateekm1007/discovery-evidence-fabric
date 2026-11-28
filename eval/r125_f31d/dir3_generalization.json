@@ -1,0 +1,21 @@
+{
+ "record": "R125_DIR3_GENERALIZATION/1.0.0",
+ "claim": "c-0189 (r125-f31d-clean-confirmation), the dir-3 leg",
+ "authority": "the R125 verdict direction 3: 'run the F97 fix on a held-out narration corpus to confirm 0 false positives generalize. Accept: precision holds on unseen narration; genuine-fire sensitivity holds.'",
+ "precision_on_heldout": {
+  "held_out_corpora": "the committed bill corpora NEVER in the F97 calibration corpus: eval/r116_f30_run (30 bill-legs) + eval/r122_lever_run (96 bill-legs) = 126 truly-held-out legs",
+  "firings": 0,
+  "reading": "the fixed detector fires on NOTHING in the held-out committed corpora — zero false positives outside the calibration set (the calibration set itself: 0/69, the R124 acceptance)",
+  "confirmatory_only": "the twin's eval/r123_v2_run (192 bill-legs) also scored 0 — same ITEMS as the calibration sets (21/25 pids in the firing corpus, 24/25 in the calibration item sets), so it is confirmatory, not held-out; the honest held-out count excludes it"
+ },
+ "sensitivity_on_unseen_domains": {
+  "the_probes": "5 hand-authored fragments in domains disjoint from every calibration device (UV disinfection, rotary kiln, CNC mill) — frozen in tests/test_r124_f97_detector_precision.py",
+  "the_gaps_found": "the FIRST run found 3 sensitivity failures on unseen text, all one class: PASSIVE-FRAME quantities ('X measured continuously in-line') where the np walk landed on the trailing adverbial ('in-line during operation'), plus the compound branch shadowing the passive parse ('signal measured'), participle heads ('taken'), and short specifiers (NOx, under the stemmer's 4-char floor)",
+  "the_fixes": "6 structural patches (no corpus-word tuning): (1) the backward passive-frame walk; (2) adverbial heads ('in-line','in-service','real-time') never head a quantity np; (3) the compound branch requires physical content before it can claim the parse; (4) a closed participle set ('taken','captured','based',...) never heads a quantity np and cuts a leg-2 capture; (5) short specifier tokens carry content, checked verbatim against the permitted span; (6) leg-2 skips leading ongoing-marker modifiers",
+  "after": "5/5 (UV-fluorescence, kiln-NOx, acoustic-emission fire with the right quantities named; the permitted-bridge and the unseen narration stay silent)",
+  "regression": "the R124 acceptance STILL GREEN after the patches: the 69-firing corpus 0/69 survivors + the original 6 probes 6/6 (tests/test_r124_f97_detector_precision.py 12/12)"
+ },
+ "the_conscious_refreeze": "re-freeze #4: scripts/r40_machine_v77.py b95afc9006223bcd -> 92485038719557e4 (scan_input_availability only; the changed-file map + the dir-3 authority in eval/r64_v9_preflight.json re_freeze_note; the R89 guard re-pinned)",
+ "battery": "the full 63-suite exact-CI battery green (the earlier reds were sandbox-missing modules — mapie, pint, cantera — NOT repo defects; the chemistry suite reds at the committed tip too, env-only, and passes with cantera installed)",
+ "zero_llm": "no model called anywhere in this leg"
+}

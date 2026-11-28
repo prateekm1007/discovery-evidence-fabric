@@ -1,0 +1,16 @@
+{
+ "record": "R127_PHASEA_PREREG_AMENDMENT/1.0.0 (committed AFTER the failed first gate run, BEFORE the re-run bytes)",
+ "claim": "c-0200 (work id r127-phaseA-speed, still OPEN)",
+ "amends": "eval/r127_phaseA_prereg.json",
+ "the_measured_failure": "the first gate run (bytes eval/r127_phaseA/gate/, scoring gate_scoring.json) typed TYPED_NEGATIVE: 19/24 items TYPED_CALL_FAIL — the ROOT CAUSE is infrastructure, typed from the records: HTTP 429 'You've reached the API rate limit for free users' on the agnes route (the free-tier window, shared with the twin lane's concurrent re-test traffic); my gate runner DROPPED the established AGNES transport-backoff pattern (the committed F31e runner carries 4 attempts / 120 s sleeps), so a single 429 failed the leg instantly (wall 0.07-0.1 s). The 5 items whose calls got through delivered CLEAN: schema parsed first try on every reviewer leg that ran, 0 parse retries, delivered defects 0/5.",
+ "what_changed_in_the_instrument": "workers 4 -> 2; an 8 s inter-call spacing inside each problem chain; the ESTABLISHED transport backoff restored (4 attempts, 120 s sleep) catching ONLY RouteRefused classes rate_limited/transport — auth/missing_key fail immediately; PARSE failures stay fail-closed with NO retry (the g2 gate wording is sharpened: PARSE retries 0, transport backoff attempts counted separately and reported — never a parse repair loop)",
+ "corrections": [
+  "the prereg said 'the 12 r125_f31e_set problems' — the set carries 24 ITEMS (12 domains x 2 variants); the gate run covers all 24 (typed correction, no set change)",
+  "g1 speed gates unchanged (median <= 120 s, worst <= 300 s per problem, per-problem wall clock)",
+  "g3 unchanged (the honest hit-rate report; the first run measured 0/6830)",
+  "g4 unchanged in kind, baseline re-scoped to the same 24 items: not worse than the F31e d1 baseline by more than 1 item"
+ ],
+ "byte_resume": "the 5 clean deliveries from the failed run are KEPT (byte-skip resume, the established pattern); the 19 failed items re-run",
+ "ordering_guarantee": "the failed run bytes + the scoring + this amendment + the runner patch in ONE push BEFORE the re-run starts",
+ "invalidates": "NOTHING — the failed run stays on the board as measured; the amendment changes transport mechanics only, not the output contract under test"
+}

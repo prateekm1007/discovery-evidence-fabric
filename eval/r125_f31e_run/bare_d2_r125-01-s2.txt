@@ -1,0 +1,21 @@
+**Mitigation Proposal: Closed-Loop Barrel Zone Temperature Drift Compensation via Cycle-Time and Check-Weigher Feedback**
+
+**Mechanism:**
+The observed increase in part weight and prolonged screw recovery time at constant barrel setpoints indicates a thermal drift in the barrel zones, likely caused by insulation degradation, ambient temperature changes, or heater element aging. This drift reduces material viscosity consistency, leading to longer melt homogenization (increased recovery time) and over-injection (increased weight). The mitigation mechanism is a **post-cycle, data-driven offset correction loop** that adjusts the *effective* thermal input by modifying the barrel zone setpoints in small, incremental steps. This is achieved not by changing the heater hardware, but by re-mapping the software setpoints based on the deviation of two existing metrics: (1) the trend in screw recovery time and (2) the mean part weight from the check-weigher.
+
+**Implementation:**
+1.  **Data Aggregation:** The existing cycle-time logger already records screw recovery time (time from end of injection to start of next shot). The check-weigher provides per-part weight data. Both streams are timestamped and synchronized with the current barrel zone setpoints.
+2.  **Drift Detection Algorithm:** Implement a rolling 24-hour average calculation for both screw recovery time and part weight. Define baseline targets: Target Weight ($W_t$) and Target Recovery Time ($T_{r,t}$).
+3.  **Offset Calculation Logic:**
+    *   If Mean Recovery Time $> T_{r,t}$ **and** Mean Weight $> W_t$: This confirms thermal drift causing the material to require more time/heat to achieve consistent flow, leading to over-injection. The system applies a **negative temperature offset** to the mid-barrel zones (zones 2–3, where screw recovery occurs) to increase melt viscosity consistency and reduce injection volume per shot, thereby correcting weight down and reducing recovery time.
+    *   The offset magnitude ($\Delta T$) is calculated as: $\Delta T = k \cdot (W_{mean} - W_t) + k' \cdot (T_{r,mean} - T_{r,t})$, where $k$ and $k'$ are tuned gain factors (starting small, e.g., 0.5°C per 1% weight deviation).
+    *   If Mean Weight $< W_t$ or Recovery Time $< T_{r,t}$, the offset direction is reversed.
+4.  **Setpoint Adjustment:** The calculated $\Delta T$ is added to the current user-defined barrel zone setpoints in the machine controller. This adjustment is applied gradually (e.g., 0.5°C steps every 10 cycles) to avoid thermal shock.
+5.  **Verification:** After each adjustment cycle, the system monitors the next 50 parts. If weight and recovery time converge to targets, the offset is locked. If they overshoot, the offset magnitude is reduced. The check-weigher continues to gate parts; scrap is minimized by preventing out-of-tolerance parts from being produced, not just detected.
+
+**Measures it Relies On:**
+*   **Existing Sensors/Measurements:**
+    *   **Barrel Zone Thermocouples:** Provide actual temperature for verification of setpoint application (used to ensure no overheating occurs during offset).
+    *   **Cycle-Time Logger:** Provides screw recovery time trend ($T_{r,mean}$) as an indicator of material melt consistency and process stability.
+    *   **Check-Weigher:** Provides actual part weight ($W_{mean}$) as the primary quality metric and feedback signal for injection volume correction.
+*   **No New Instrumentation:** The mitigation uses only the existing control system’s ability to write new setpoints to the barrel heaters and the existing data logs from the cycle-time logger and check-weigher. No new sensors, hardware, or interfaces are added.

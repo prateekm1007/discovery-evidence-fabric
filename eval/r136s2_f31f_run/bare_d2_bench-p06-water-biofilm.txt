@@ -1,0 +1,18 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implement a **hydrodynamic flushing regimen via automated dead-end blow-off valves** on the identified dead-end mains, synchronized to off-peak hours. This mechanically removes the stagnant biofilm substrate, preventing the accumulation of biomass that would otherwise consume the chloramine residual and act as a reservoir for heterotrophic growth leading to nitrification. By physically removing the biofilm, the disinfectant residual (maintained at >1.0 mg/L) remains available throughout the network to suppress regrowth, rather than being consumed in the dead-end zones.
+
+**Implementation:**
+1.  **Install automatic blow-off valves** (e.g., pressure-actuated or timed solenoid valves) at the terminal ends of the dead-end mains, sized to achieve a minimum flow velocity of >0.5 m/s during the flush to shear off biofilm.
+2.  **Integrate with SCADA:** Program the valves to open for 10–15 minutes at 2:00 AM (lowest demand) to drain the static water and flush the main.
+3.  **Monitor Residual:** Ensure the main system’s chloramine feed rate is adjusted to maintain the 1.0 mg/L constraint at the farthest customer *during normal flow*, while accounting for the temporary dilution or flush effect (negligible if the dead-end volume is small relative to the main trunk).
+4.  **Biofilm Removal:** The flush physically strips the biofilm, resetting the "age" of the biofilm to zero, thereby reducing the demand for disinfectant within the pipe and minimizing the organic nitrogen substrate required for nitrification.
+
+**Measures Relied Upon:**
+- **Hydrodynamic Shear Stress:** Flow velocity during the blow-off must exceed the critical threshold for biofilm detachment (~0.3–0.5 m/s).
+- **Disinfectant Persistence:** Chloramine residual must persist >1.0 mg/L at the farthest customer post-flush; this is ensured by the constraint’s requirement to *not boost dose*, so the baseline dose is sufficient if biofilm load is reduced.
+- **Nitrification Inhibition:** By removing the biofilm (which houses nitrosomonads), the opportunity for nitrification is removed, keeping nitrite below regulatory limits.
+
+**Concrete Falsification Test:**
+Install real-time nitrite sensors and turbidity/flow monitors at the dead-end main’s outlet and at the farthest customer. Execute the proposed blow-off schedule for 4 weeks. If the failure persists—specifically if nitrite concentrations still spike above the regulatory limit during 25°C summer conditions, or if total chlorine residual at the farthest customer drops below 1.0 mg/L despite the baseline dose being maintained—then the approach is falsified. The test must show a statistically significant reduction in nitrite peaks (>50% reduction in maximum nitrite concentration) and consistent residual >1.0 mg/L to be valid.

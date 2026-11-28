@@ -1,0 +1,101 @@
+{
+ "problem_id": "r125-10-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 5.33,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 885,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 3.96,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 751,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.29,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 686,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 5.51,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1083,
+    "completion_tokens": 1068,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Feed Rate Adjustment via Drive Power Hysteresis**\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Main drive power ($P_{actual}$). An increase in $P_{actual}$ indicates increased mechanical load and proximity to stall due to tougher feed material.\n*   **Direction of Mechanical Effect:** An increase in $P_{actual}$ above $P_{limit}$ causes a decrease in the commanded feed conveyor speed. Conversely, a decrease in $P_{actual}$ below $P_{hysteresis}$ causes an increase in the commanded feed conveyor speed.\n*   **System Outcome:** Reducing feed rate lowers instantaneous torque demand, preventing drive stall and allowing the shredder to clear the material at a consistent, non-stalling speed. This restores consistent crushing action, thereby reducing screen undersize anomalies and stabilizing discharge throughput on the lighter-than-rated side.\n\n**Mechanism:**\nImplement a rule-based control algorithm that uses the **main drive power meter** as the primary real-time indicator of shredder load and mechanical stress. By monitoring $P_{actual}$, the system dynamically reduces the **feed conveyor rate** via the existing feed conveyor drive interface. Whenever $P_{actual}$ exceeds a safe threshold ($P_{limit}$), the feed rate is reduced to lower the instantaneous load, preventing stalls on tougher feed. This allows the shredder to maintain continuous rotation. The goal is to maximize *effective* throughput by avoiding stoppages, even if it requires temporarily lowering the nominal feed rate. The \"lighter\" discharge is addressed by optimizing screen separation efficiency indirectly; maintaining consistent, non-stalling operation restores the intended crushing action, reducing particle size distribution anomalies (undersize growth).\n\n**Implementation Bill:**\n1.  **Parameter Configuration (One-Time Commissioning):**\n    *   Determine **Power Limit ($P_{limit}$)**: Set slightly below the historical stall point (derived from main drive power meter records).\n    *   Determine **Hysteresis Threshold ($P_{hysteresis}$)**: Set 10% lower than $P_{limit}$ (derived from $P_{limit}$).\n    *   Determine **Step Reduction ($\\Delta S$)**: Set to 5% speed reduction per command cycle (fixed control parameter).\n    *   Verify **Feed Conveyor Control Interface**: Confirm existing VFD or speed selector accepts discrete speed step commands from the control system.\n\n2.  **Control Logic Execution (Continuous Runtime):**\n    *   **Input Signal:** Read $P_{actual}$ from the existing main drive power meter.\n    *   **Condition 1 (Load High):** If $P_{actual} > P_{limit}$, send a command to the feed conveyor drive to reduce speed by $\\Delta S$ (5%). If $P_{actual}$ remains high for a sustained period despite reduction, command a full halt of the feed conveyor and trigger an alarm.\n    *   **Condition 2 (Load Recovering):** If $P_{actual} < P_{hysteresis}$, send a command to the feed conveyor drive to increase speed toward the rated rate, respecting maximum ramp-up limits.\n\n3.  **Verification and Monitoring (Post-Implementation):**\n    *   **Feed Verification:** Use the existing **Feed Conveyor Scale** to confirm that the actual mass flow rate ($W_{feed}$) decreases when Condition 1 is triggered and increases when Condition 2 is triggered. This validates that the speed commands are translating to expected mass changes.\n    *   **Discharge Verification:** Use the existing **Discharge Conveyor Scale** to monitor weight-per-hour ($W_{discharge}$). An increase in stable $W_{discharge}$ relative to the previous stalled state confirms the mitigation is effective.\n    *   **Screen Observation:** Manually verify that screen undersize fraction decreases as the shredder operates at consistent torque.\n\n**Measures it Relies On:**\n*   **Main Drive Power Meter:** Provides the real-time load signal ($P_{actual}$) used for control logic. This is a permitted existing sensor.\n*   **Feed Conveyor Drive Interface:** The control output is a speed adjustment command. This is not a new sensor but an actuation interface of an existing component. The feedback for verification comes from the Feed Conveyor Scale.\n*   **Feed Conveyor Scale:** Provides the measurement of feed mass flow ($W_{feed}$). This is a permitted existing sensor used for verification, ensuring the feed rate reduction is physically occurring as commanded.\n*   **Discharge Conveyor Scale:** Provides the measurement of discharge mass flow ($W_{discharge}$). This is a permitted existing sensor used for verification of throughput recovery.\n*   **Removed Inputs:** No new instrumentation is added. The proposal explicitly removes any reliance on unlisted sensors (e.g., torque sensors, vibration sensors) which are not permitted. The \"screen undersize\" observation is a manual check of an existing product stream, not a new automated signal input to the control loop.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Parameter Configuration (One-Time Commissioning):**",
+   "*   Determine **Power Limit ($P_{limit}$)**: Set slightly below the historical stall point",
+   "*   Determine **Hysteresis Threshold ($P_{hysteresis}$)**: Set 10% lower than $P_{limit}$ ",
+   "*   Determine **Step Reduction ($\\Delta S$)**: Set to 5% speed reduction per command cycle",
+   "*   Verify **Feed Conveyor Control Interface**: Confirm existing VFD or speed selector acc",
+   "2.  **Control Logic Execution (Continuous Runtime):**",
+   "*   **Input Signal:** Read $P_{actual}$ from the existing main drive power meter.",
+   "*   **Condition 1 (Load High):** If $P_{actual} > P_{limit}$, send a command to the feed c",
+   "*   **Condition 2 (Load Recovering):** If $P_{actual} < P_{hysteresis}$, send a command to",
+   "3.  **Verification and Monitoring (Post-Implementation):**",
+   "*   **Feed Verification:** Use the existing **Feed Conveyor Scale** to confirm that the ac",
+   "*   **Discharge Verification:** Use the existing **Discharge Conveyor Scale** to monitor w",
+   "*   **Screen Observation:** Manually verify that screen undersize fraction decreases as th",
+   "*   **Main Drive Power Meter:** Provides the real-time load signal ($P_{actual}$) used for",
+   "*   **Feed Conveyor Drive Interface:** The control output is a speed adjustment command. T",
+   "*   **Feed Conveyor Scale:** Provides the measurement of feed mass flow ($W_{feed}$). This",
+   "*   **Discharge Conveyor Scale:** Provides the measurement of discharge mass flow ($W_{dis",
+   "*   **Removed Inputs:** No new instrumentation is added. The proposal explicitly removes a"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 'for verification' shares no allowed-list stem (Use only existing sensors and existing measurements: the main drive power meter ...)"
+  ],
+  "APPARATUS_ROW": [
+   "3.  **Verification and Monitoring (Post-Implementation):**"
+  ]
+ },
+ "wall_clock_s": 21.7,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

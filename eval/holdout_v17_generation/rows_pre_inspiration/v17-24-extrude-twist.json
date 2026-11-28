@@ -1,0 +1,103 @@
+{
+ "problem_id": "v17-24-extrude-twist",
+ "domain": "aluminum-extrusion",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P40",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P40",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:ba9a4090cd0c": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:f535716c2488": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "abrasion_erosion",
+   "winner_measure_class": "geometry",
+   "winner_principle_id": "P40",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "abrasion_erosion",
+     "admitted": true,
+     "rank": 1,
+     "basis": "geometry is admitted class #2 for the abrasion_erosion failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:13:25Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.9,
+ "a1_answer": "NOVELTY STATEMENT\n- Standard practice: A monitoring/indication scheme where the bearing replacement is triggered by a measured pressure spike or visual inspection of the bearing face after a scheduled interval; the mechanism is reactive substitution of worn parts.\n- Departure: A geometry-based design change that introduces a \"floating bearing\" ring with a radially compliant, self-centering annular interface between the die and the fixed holder, maintaining the bearing gap via a static pre-load that is independent of the extrusion pressure; the mechanism is proactive elimination of the wear-driving eccentricity.\n- Failure physics connection: Abrasion-erosion wear in extrusion dies is driven by relative sliding velocity and normal contact pressure. Twisting out of tolerance occurs when localized bearing wear creates eccentricity, causing the bar to twist due to asymmetric friction. By using a geometry that self-centers under load, the relative sliding velocity at the bearing interface is reduced to near-zero in the radial direction, and the normal pressure is distributed uniformly, eliminating the primary drivers of the abrasive-erosion family.\n\nPHYSICS CHECK\n- Governing relation: The eccentricity-induced twist angle $\\theta$ is proportional to the radial displacement $\\delta$ of the die center, $\\theta \\propto \\delta / L_{eff}$, where $L_{eff}$ is the effective bearing length. Wear depth $w$ follows an Archard-type equation $w \\propto K P v t$, where $P$ is contact pressure, $v$ is sliding velocity, and $t$ is time.\n- Magnitude verification: In a standard fixed bearing, thermal and mechanical misalignments cause $\\delta$ to vary by 0.05–0.20 mm, leading to significant asymmetry in $P$ and $v$ on one side, causing rapid localized wear. In the floating bearing geometry, the compliant annular interface allows the die to shift radially by $\\delta$ to find the position of minimum total contact force. At equilibrium, the net radial force is zero, meaning the pressure distribution becomes symmetric. The sliding velocity $v$ relative to the fixed holder becomes nearly zero in the radial direction (only axial movement exists), reducing the $K P v$ term by orders of magnitude compared to the sliding contact of a fixed bearing. Thus, wear rate drops drastically, and $\\delta$ remains small and constant, keeping twist within tolerance.\n\nIMPLEMENTATION BILL\n- Components: \n  1. **Floating Die Ring (FDR)**: A new geometry component machined from tungsten carbide (or the same material class as standard bearings) with an annular recess. Tag: DERIVED from stated spec of \"die bearings\" material class.\n  2. **Compliant Insert**: A thin, low-friction ring (e.g., PTFE-coated or solid polymer of same thermal class) placed in the annular recess. Tag: ALREADY-RECORDED material class available in extrusion shops for lubrication guides.\n  3. **Pre-load Springs**: Radial leaf springs or disc springs housed in a peripheral cavity. Tag: DERIVED from standard physics of Hooke's law; spring force $F = k\\delta$ provides the centering force.\n- Instruments: \n  1. **Visual Inspection Gauge**: A simple bore gauge to check the FDR diameter before and after runs. Tag: ALREADY-RECORDED tool used for die inspection.\n  2. **Pressure Transducer**: Existing die block pressure sensor. Tag: ALREADY-RECORDED sensor stated in problem context (signals_used includes \"pressure\").\n- Procedure:\n  1. Assemble FDR with compliant insert and springs into the die holder.\n  2. Set spring pre-load $F_0$ such that the contact pressure $P_0 = F_0 / A_{contact}$ is slightly less than the minimum extrusion pressure, ensuring the die floats but remains centered. Tag: CALCULATED from force balance $F_{extrusion} = F_{spring} + F_{friction}$.\n  3. Run extrusion. The pressure signal will show a stable baseline; any spike indicates misalignment of the FDR itself, not wear.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Same as standard bearing installation; requires machining the annular recess in the die holder (standard machine shop work).\n- Operability: No new controls; the floating action is passive and mechanical.\n- Maintenance: The compliant insert is a sacrificial part, similar to a standard bearing, but the wear rate is orders of magnitude lower due to the physics check. The spring mechanism requires no power.\n- Cost Class: Same as standard bearing replacement plus low-cost springs and PTFE insert. The FDR is machined from the same tungsten carbide stock.\n- Conclusion: Same burden class, different mechanism. The standard practice replaces the worn bearing; this design prevents the wear from occurring at the same rate, extending life without changing the operational workflow.\n\nEXECUTABLE TEST\n- Protocol: \n  1. Install the FDR assembly in a test die with a known pressure profile.\n  2. Run 1000 meters of aluminum through the die.\n  3. Measure the twist angle at the bar exit using a standard twist gauge.\n  4. Disassemble and measure the wear depth on the FDR interface using a bore gauge.\n- Pass/Fail Thresholds:\n  - Twist angle must remain within the stated tolerance (e.g., 0.5 degrees) throughout the run.\n  - Wear depth on the FDR must be less than 50% of the standard bearing's wear depth at the same run length.\n- Duration: 1000 meters is a standard production run length.\n- Kill Criterion: If the twist angle exceeds tolerance or the wear depth exceeds 50% of the standard, the mechanism is invalid.\n- Validation: Compare the pressure signal from the ALREADY-RECORDED transducer; a stable pressure with no spikes confirms the FDR is functioning. The wear depth measurement is a direct physical observable that can be verified against the Archard equation prediction.\n\nCONSTRAINT BIND (predictor)\n- Primary Stated Indicator: The \"pressure\" signal is the primary indicator of the die's health. In standard practice, a pressure spike indicates bearing wear. In this design, the pressure remains stable because the FDR prevents the eccentricity that causes the spike.\n- Supplementary Indicator: Visual inspection of the FDR surface is supplementary. It is used to verify the wear depth after the run but is not the trigger for replacement during operation.\n- Explicit Statement: The primary indicator \"pressure\" is used to confirm the mechanism is working (stable signal), while \"visual inspection\" is used for post-run validation. The twist out of tolerance is the failure mode being mitigated, and it is directly linked to the pressure stability and the FDR geometry.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Components:",
+    "1. **Floating Die Ring (FDR)**: A new geometry component machined from tungsten carbide (o",
+    "2. **Compliant Insert**: A thin, low-friction ring (e.g., PTFE-coated or solid polymer of ",
+    "3. **Pre-load Springs**: Radial leaf springs or disc springs housed in a peripheral cavity",
+    "- Instruments:",
+    "1. **Visual Inspection Gauge**: A simple bore gauge to check the FDR diameter before and a",
+    "2. **Pressure Transducer**: Existing die block pressure sensor. Tag: ALREADY-RECORDED sens",
+    "- Procedure:",
+    "1. Assemble FDR with compliant insert and springs into the die holder.",
+    "2. Set spring pre-load $F_0$ such that the contact pressure $P_0 = F_0 / A_{contact}$ is s",
+    "3. Run extrusion. The pressure signal will show a stable baseline; any spike indicates mis",
+    "- Installability: Same as standard bearing installation; requires machining the annular re",
+    "- Operability: No new controls; the floating action is passive and mechanical.",
+    "- Maintenance: The compliant insert is a sacrificial part, similar to a standard bearing, ",
+    "- Cost Class: Same as standard bearing replacement plus low-cost springs and PTFE insert. ",
+    "- Conclusion: Same burden class, different mechanism. The standard practice replaces the w"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "981890b5a24cac48"
+}

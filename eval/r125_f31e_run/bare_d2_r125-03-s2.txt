@@ -1,0 +1,17 @@
+**Mitigation Proposal: Shift-Based Baseline Correction using Mixer Current Profiling**
+
+**Mechanism:**
+The irregular mixer motor current profile is a direct indicator of changing concrete rheology (viscosity/thixotropy), which in this context correlates with unintended changes in water content relative to aggregate moisture. The core failure is a drift in the "dry aggregate moisture assumption" used by the batch controller, causing the plant to add more water than necessary to reach target consistency. This mitigation uses the existing mixer current meter not just as a diagnostic, but as a closed-loop reference for shift-to-shift drift, correcting the batch scale's water setpoint based on the observed current deviation from a healthy baseline.
+
+**Implementation:**
+1.  **Establish a "Golden" Current Profile:** During a known-good shift (when concrete consistency is verified as correct via standard slump tests and mixer current is smooth/normal), record the mixer motor current time-series profile for a standard batch. Save this as the baseline profile for the specific mix design.
+2.  **Drift Detection via Current Deviation:** On each subsequent shift, for the first 2-3 batches, compare the real-time mixer current profile to the "Golden" profile. Calculate the root-mean-square (RMS) deviation or the peak-current difference at specific mixing phases (e.g., blending phase). A rising RMS deviation or higher peak current indicates a stiffer, drier mix, implying too little water or too much dry aggregate. Conversely, a lower current indicates a more fluid mix.
+3.  **Dynamic Water Setpoint Adjustment:** If the current profile deviates from the baseline in a direction indicating the mix is too stiff (higher current), **increase** the water setpoint on the batch scale for the next batch by a fixed increment (e.g., 1-2% of total batch weight). If the mix is too fluid (lower current), **decrease** the water setpoint by the same increment. This creates a manual but data-driven feedback loop where the operator or a simple PLC logic adjusts the batch scale's water target based on the mixer's electrical signature.
+4.  **Cross-Check with Air Temperature:** Use the existing plant air thermometer to flag shifts where ambient temperature differs significantly from the "Golden" shift. Higher temperatures may cause aggregate moisture loss or increased evaporation, requiring proactive water adjustments even before the mixer current shows significant drift. This acts as a predictive input to the correction algorithm.
+
+**Measures Relied On:**
+*   **Mixer Motor Current Meter:** Provides a real-time, quantitative proxy for concrete consistency and mixing difficulty, allowing detection of drift from the baseline without needing new consistency sensors.
+*   **Batch Scale Records:** Provides the actual water and aggregate masses added, enabling precise, stepwise adjustments to the water setpoint.
+*   **Plant Air Thermometer:** Provides environmental context to correlate temperature shifts with potential moisture loss or changes in concrete workability, aiding in the predictive adjustment of water content.
+
+This approach uses only existing instrumentation to create a closed-loop system where the mixer's electrical behavior guides the batch scale's water dosing, directly addressing the shift-to-shift consistency drift and the uncontrolled increase in water added for the same aggregate deliveries.

@@ -1,0 +1,102 @@
+{
+ "problem_id": "v17-01-rail-shelling",
+ "domain": "rail",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P18",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:512abc3d28f9": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:1a2be81203c2": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:a31cededd940": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "abrasion_erosion",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "abrasion_erosion",
+     "admitted": true,
+     "rank": 3,
+     "basis": "configuration is admitted class #4 for the abrasion_erosion failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:19:42Z",
+ "attempts_n": 1,
+ "row_wall_s": 11.8,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE via material hardening or geometry profile modification to increase contact hardness or reduce peak Hertzian stress at the gauge corner. My same-class departure is a CONFIGURATION mechanism: implementing a **Dynamic Contact Geometry Shifting** system that actively alters the effective wheel-rail contact patch position away from the gauge corner during curve negotiation. The failure-physics connection is that shifting the contact point laterally out of the high-stress zone of the gauge corner reduces the peak subsurface shear stress that drives Rolling Contact Fatigue (RCF) shelling.\n\nPHYSICS CHECK\nThe governing relation is Hertzian contact stress distribution. For a wheel flange or tread contacting a rail, the peak subsurface shear stress $\\tau_{max}$ occurs at a depth $z \\approx 0.78a$ and laterally at distance $b \\approx 0.5\\text{-}0.7a$ from the contact center, where $a$ is the semi-major axis of the contact ellipse.\nMagnitude verification: Standard RCF initiation occurs when cyclic $\\tau_{max}$ exceeds the fatigue limit of the rail steel (~900-1000 MPa shear). By shifting the contact centroid laterally by $\\Delta x = 1.5a$ from the gauge corner (where $a$ is typically 10-15 mm for heavy rail), the local Hertzian stress at the gauge corner location drops by more than 50% because the peak stress moves with the centroid. This reduces the fatigue damage accumulation rate per pass, extending the time to shelling initiation.\n\nIMPLEMENTATION BILL\n*   **Primary Stated Indicator (Constraint Bind):** Wheel load and lateral force data from existing axle box sensors (ALREADY-RECORDED in most modern locomotive fleets) are the primary indicators. The system monitors the magnitude of the lateral force $F_y$ which directly correlates to the slip and contact stress distribution.\n*   **Configuration Hardware:** A lateral wheelset steering actuator (linear actuator, class similar to those used in active suspension) installed on the bogie axle. This is a MATERIAL/GEOMETRY configuration change.\n*   **Input Streams:**\n    *   Lateral wheel force $F_y$ (ALREADY-RECORDED in standard condition monitoring logs).\n    *   Wheel tread profile (from standard periodic wheel laser scanning, ALREADY-RECORDED).\n    *   Curve radius (ALREADY-RECORDED in track geometry database).\n*   **Reference/Threshold:** The control threshold for actuation is derived from the ratio $F_y / F_z$ (Lateral-to-Vertical load ratio). A DERIVED threshold of $F_y / F_z > 0.3$ indicates high-slip, high-stress conditions at the gauge corner where steering should be active to shift the contact point. This value is derived from standard wheel-rail interaction physics for heavy freight locomotives.\n*   **Procedure:** The actuator shifts the wheelset laterally by 2-4 mm relative to the axle housing. This changes the effective contact point on the rail head from the gauge corner to the tread/foot interface, where the rail steel is thicker and has a higher fatigue limit.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Same as active suspension or existing bogie maintenance. No new sensor types required; uses existing wheel force sensors and wheel scan data.\n*   **Operability:** Passive when $F_y/F_z < 0.3$. Active steering requires minor hydraulic/pneumatic power, class-comparable to existing brake systems.\n*   **Maintenance:** The actuator is a standard linear motion component, similar class to door actuators or suspension dampers. No exotic material replacement.\n*   **Cost Class:** Higher than passive profile grinding (standard practice), but comparable to active bogie systems already in some locomotive classes. The burden is in the mechanical actuator, not in new instrumentation.\n\nEXECUTABLE TEST\nProtocol:\n1.  Select a test curve with known radius and gauge corner RCF history.\n2.  Run the locomotive with the lateral steering actuator enabled.\n3.  Record $F_y/F_z$ ratios and wheelset lateral displacement from existing sensors.\n4.  Measure rail head temperature and use non-contact laser profilometry (if available on the rail, or via post-test inspection) to verify contact point shift.\nPass/Fail Thresholds:\n*   PASS: The contact point shifts laterally off the gauge corner by >1.5 mm when $F_y/F_z > 0.3$.\n*   PASS: Post-test inspection shows reduced surface roughness or delayed shelling initiation compared to a control run without steering.\n*   FAIL: No lateral shift observed, or increased wear on the new contact point exceeds the reduction in gauge corner shelling rate (net damage increase).\nDuration: One full curve transit sequence.\nKill Criterion: If the shifted contact point creates a new stress concentration that causes spalling or excessive wear within 1000 passes.\n\nCONSTRAINT BIND (PREDICTOR)\nThe monitored indicator is the **Lateral Wheel Force ($F_y$)**. This is the PRIMARY stated indicator because $F_y$ directly determines the contact stress distribution and slip at the gauge corner. The wheelset lateral displacement is a secondary indicator that validates the mechanism's actuation but does not define the failure threshold. The system only operates when the primary indicator $F_y/F_z$ exceeds the derived physics threshold, ensuring the intervention is targeted to high-stress conditions.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "DEV_NEED": [
+    "new sensor type"
+   ],
+   "BILL_UNTAGGED": [
+    "*   **Primary Stated Indicator (Constraint Bind):** Wheel load and lateral force data from",
+    "*   **Configuration Hardware:** A lateral wheelset steering actuator (linear actuator, cla",
+    "*   **Input Streams:**",
+    "*   Lateral wheel force $F_y$ (ALREADY-RECORDED in standard condition monitoring logs).",
+    "*   Wheel tread profile (from standard periodic wheel laser scanning, ALREADY-RECORDED).",
+    "*   Curve radius (ALREADY-RECORDED in track geometry database).",
+    "*   **Reference/Threshold:** The control threshold for actuation is derived from the ratio",
+    "*   **Procedure:** The actuator shifts the wheelset laterally by 2-4 mm relative to the ax",
+    "*   **Installability:** Same as active suspension or existing bogie maintenance. No new se",
+    "*   **Operability:** Passive when $F_y/F_z < 0.3$. Active steering requires minor hydrauli",
+    "*   **Maintenance:** The actuator is a standard linear motion component, similar class to ",
+    "*   **Cost Class:** Higher than passive profile grinding (standard practice), but comparab"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'Fatigue' and the stated failure driver 'fatigue' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "228e1ffcaeca06bd"
+}

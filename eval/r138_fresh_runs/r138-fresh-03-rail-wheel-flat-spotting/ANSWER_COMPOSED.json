@@ -1,0 +1,472 @@
+{
+ "composer_version": "answer_composer/1.5.0",
+ "n_llm_calls": 3,
+ "question_type": "intervention-proposal",
+ "started_at": "2026-11-23T14:19:21+00:00Z",
+ "prompt_sha256": "7f5d3bed581f012ab80970892e6849f445949ee60718db3c399305fef32f14b9",
+ "provider_route": [
+  {
+   "provider": "agnes",
+   "provider_attempted": "agnes",
+   "model": "agnes-3.0-flash",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 5355,
+   "ttfb_s": 5.354,
+   "gateway_hang": false,
+   "failure_type": null,
+   "fallback_provider": null
+  }
+ ],
+ "model": "agnes-3.0-flash",
+ "cost_provenance": {
+  "model_id": "agnes-3.0-flash",
+  "model_revision": "agnes router; agnes-3.0-flash / agnes-2.5-flash / agnes-2.0-flash measured live 2026-09-26 (tiny completions + 3/3 FIELD-line compliance); no per-model revision pin exposed by the router — recorded honest (Art. VI)",
+  "transport": "https://apihub.agnes-ai.com/v1/chat/completions",
+  "local_or_remote": "REMOTE",
+  "license": "provider serving terms (operator-supplied key; flash served at $0 balance, pro gated)",
+  "cost_basis": "FREE_TIER_API",
+  "account_domain": "OWNER_AGNES_ACCOUNT",
+  "policy": "ZERO_PAID_COST",
+  "policy_version": "model_cost_policy/1.1.0"
+ },
+ "output_sha256": "00ca03d1a63e82aad257a4e4e3b3b73baff392a41812ea5cf1659178e19dd37a",
+ "truncation": {
+  "first_call_finish_reason": "stop",
+  "first_call_truncated": false,
+  "n_truncation_retries": 0,
+  "repair_finish_reason": "stop",
+  "repair_truncated": false
+ },
+ "constraint_audit_arm": "on",
+ "constraint_check_first_pass": {
+  "state": "PARSED",
+  "n_violations": 0,
+  "verdicts": [
+   {
+    "constraint_index": 1,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 2,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 3,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 4,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   }
+  ],
+  "restates_device": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "restates_constraint": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  }
+ },
+ "consistency_check_first_pass": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_first_pass": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1371/journal.pone.0357272] does not jointly support its parameter (value_not_in_source)",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1371/journal.pone.0357272] does not jointly support its parameter (value_not_in_source)"
+  ]
+ },
+ "constraint_audit_first_pass": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_after_repair_1": {
+  "valid": false,
+  "violations": [
+   "intervention contract: concrete parameter not labeled EVIDENCE-BACKED or ASSUMPTION",
+   "intervention contract: no concrete numeric parameter",
+   "intervention contract: no concrete test/measure named"
+  ]
+ },
+ "constraint_audit_after_repair_1": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0
+ },
+ "consistency_after_repair_1": {
+  "state": "CHECK_ABSENT",
+  "n_violations": 0
+ },
+ "contract_after_repair_2": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n"
+  ]
+ },
+ "constraint_audit_after_repair_2": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0
+ },
+ "consistency_after_repair_2": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0
+ },
+ "repaired": true,
+ "repair_rounds_used": 2,
+ "downgrade_arm": "on",
+ "downgrade": {
+  "applied": true,
+  "n_relabels": 0,
+  "n_citations_dropped": 0,
+  "n_jargon_stripped": 0,
+  "relabels": [],
+  "citations_dropped": [],
+  "valid_after_downgrade": false
+ },
+ "answer": "Implement a hierarchical optimal coordination control layer on the locomotive's Electronic Control Pneumatic (ECP) or brake control unit. This layer replaces the current fixed-step deceleration logic with a Particle Swarm Optimization (PSO) Linear Quadratic Regulator (LQR) combined with a feedforward-robust integral sliding mode tracker. The objective is to compute a smooth, optimal expected deceleration profile that maintains traction-adhesion margins during emergency braking on contaminated rails, thereby preventing wheel-lock sliding and flat spotting.\n\nPARAMETER: PSO swarm size (N_particles) — 30 particles — ASSUMPTION\nPARAMETER: LQR weight matrix ratio (Q/R) — 100/1 (acceleration penalty vs. control effort) — ASSUMPTION\nPARAMETER: Maximum allowable longitudinal jerk (j_max) — 0.5 m/s³ — ASSUMPTION\nPARAMETER: Time-To-Collision pre-estimation horizon (T_TTC) — 3.0 s — ASSUMPTION\nPARAMETER: Wheel-slip threshold for intervention (s_threshold) — 0.10 (dimensionless) — ASSUMPTION\nPARAMETER: Adhesion coefficient estimate for contaminated rail (μ_contam) — 0.25 — ASSUMPTION\n\nThe system monitors wheel speed and axle speed to calculate slip. When slip exceeds s_threshold, the PSO-LQR layer activates, calculating a deceleration profile that maximizes braking force while keeping slip below the threshold. The sliding mode tracker ensures smooth execution, avoiding the sudden changes in deceleration that cause longitudinal jerk and wheel locking. This approach respects the existing EN braking distance standard by ensuring the total stopping distance remains within limits, while reducing the incidence of wheel flats. No track infrastructure changes are required; the intervention is purely software/firmware on the locomotive's existing brake control hardware.\n\nExpected measurable effect: A 40% reduction in wheel flat incidence per 10,000 emergency braking events on contaminated rails, with braking distance variance reduced by 15% compared to current systems.\n\nFalsification test:\n- Test temperature: 20 °C ambient (standard test track conditions)\n- Duration: 2 weeks of operational monitoring on a 50-km contaminated rail segment\n- Sample size n: 1,000 emergency braking events\n- Numeric pass/fail criteria: Pass if the mean wheel-slip peak is < 0.15 AND the frequency of flat spotting events is reduced by > 30% relative to baseline; fail if braking distance exceeds the EN standard limit by > 5% OR if flat spotting frequency shows no significant reduction (p > 0.05).\n\nEvidence support: The control strategy is based on autonomous emergency braking optimal coordination control strategies, which propose improved Time-To-Collision pre-estimation models and state threshold time determination to solve sudden changes in expected braking deceleration. Note: This specific parameterization for freight locomotives is UNVERIFIED and requires the stated test to confirm efficacy.",
+ "contract": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n"
+  ],
+  "bindings": {
+   "evidence_bound": 13,
+   "assumption": 1,
+   "unbound_numbers": 3,
+   "all_numbers": 17,
+   "claims": [
+    {
+     "parameter": "PARAMETER: PSO swarm size (N_particles) — 30 particles — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "particles",
+      "size",
+      "swarm"
+     ],
+     "pairs": [],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: LQR weight matrix ratio (Q/R) — 100/1 (acceleration penalty vs. control effort) — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "acceleration",
+      "control",
+      "effort",
+      "matrix",
+      "penalty",
+      "ratio",
+      "weight"
+     ],
+     "pairs": [],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Maximum allowable longitudinal jerk (j_max) — 0.5 m/s³ — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "allowable",
+      "jerk",
+      "longitudinal",
+      "maximum"
+     ],
+     "pairs": [
+      {
+       "value": "0.5",
+       "unit": "m"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Time-To-Collision pre-estimation horizon (T_TTC) — 3.0 s — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "collision",
+      "estimation",
+      "horizon",
+      "time"
+     ],
+     "pairs": [
+      {
+       "value": "3.0",
+       "unit": "s"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Wheel-slip threshold for intervention (s_threshold) — 0.10 (dimensionless) — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "dimensionless",
+      "intervention",
+      "slip",
+      "threshold",
+      "wheel"
+     ],
+     "pairs": [],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Adhesion coefficient estimate for contaminated rail (μ_contam) — 0.25 — ASSUMPTION\n\nThe system monitors wheel speed and axle speed to calculate slip. When slip exceeds s_threshold, the PSO-",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "activates",
+      "adhesion",
+      "ambient",
+      "approach",
+      "autonomous",
+      "avoiding",
+      "axle",
+      "based",
+      "baseline",
+      "below",
+      "brake",
+      "braking",
+      "calculate",
+      "calculating",
+      "cause",
+      "changes",
+      "coefficient",
+      "collision",
+      "compared",
+      "conditions",
+      "confirm",
+      "contam",
+      "contaminated",
+      "control",
+      "coordination",
+      "criteria",
+      "current",
+      "deceleration",
+      "determination",
+      "distance",
+      "duration",
+      "effect",
+      "efficacy",
+      "emergency",
+      "ensures",
+      "ensuring",
+      "estimate",
+      "estimation",
+      "events",
+      "exceeds",
+      "execution",
+      "existing",
+      "expected",
+      "fail",
+      "falsification",
+      "firmware",
+      "flat",
+      "flats",
+      "force",
+      "freight",
+      "frequency",
+      "hardware",
+      "improved",
+      "incidence",
+      "infrastructure",
+      "intervention",
+      "jerk",
+      "keeping",
+      "layer",
+      "limit",
+      "limits",
+      "locking",
+      "locomotive",
+      "locomotives",
+      "longitudinal",
+      "maximizes",
+      "mean",
+      "measurable",
+      "mode",
+      "models",
+      "monitoring",
+      "monitors",
+      "note",
+      "numeric",
+      "operational",
+      "optimal",
+      "parameterization",
+      "pass",
+      "peak",
+      "profile",
+      "propose",
+      "purely",
+      "rail",
+      "rails",
+      "reduced",
+      "reducing",
+      "reduction",
+      "relative",
+      "remains",
+      "required",
+      "requires",
+      "respects",
+      "sample",
+      "segment",
+      "shows",
+      "significant",
+      "size",
+      "sliding",
+      "slip",
+      "smooth",
+      "software",
+      "solve",
+      "specific",
+      "speed",
+      "spotting",
+      "standard",
+      "stopping",
+      "strategies",
+      "strategy",
+      "sudden",
+      "support",
+      "system",
+      "systems",
+      "temperature",
+      "test",
+      "threshold",
+      "time",
+      "total",
+      "track",
+      "tracker",
+      "unverified",
+      "variance",
+      "wheel",
+      "when",
+      "which",
+      "while",
+      "within"
+     ],
+     "pairs": [
+      {
+       "value": "40",
+       "unit": "%"
+      },
+      {
+       "value": "15",
+       "unit": "%"
+      },
+      {
+       "value": "20",
+       "unit": "°c"
+      },
+      {
+       "value": "30",
+       "unit": "%"
+      },
+      {
+       "value": "5",
+       "unit": "%"
+      }
+     ],
+     "conversion_recorded": false
+    }
+   ]
+  },
+  "question_type": "intervention-proposal"
+ },
+ "constraint_audit": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "constraint_check": {
+  "check_version": "constraint_check/1.0.0",
+  "state": "PARSED",
+  "n_constraints": 4,
+  "verdicts": [
+   {
+    "constraint_index": 1,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 2,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 3,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 4,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   }
+  ],
+  "restates_device": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "restates_constraint": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "n_violations": 0,
+  "verified_quotes": 0,
+  "n_unverified_quotes": 0
+ },
+ "consistency_check": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "state": "COMPOSED_CONTRACT_DOWNGRADED",
+ "tech_sanity": {
+  "enabled": false,
+  "flag": "ENGINE_TECH_SANITY",
+  "findings": [],
+  "n_findings": 0
+ },
+ "caveats": [
+  "Note: some supporting details in this answer could not be verified against the retrieved records and are labeled as engineering assumptions; the falsification test is the precondition for relying on them."
+ ],
+ "finished_at": "2026-11-23T14:19:30+00:00Z",
+ "admitted_candidates": [
+  {
+   "candidate_id": "cand:A2:r138-fresh-03-rail-wheel-flat-spotting:08f0eee81d7c7fe8",
+   "attack_verdict": "PASS",
+   "hypothesis": false
+  }
+ ]
+}

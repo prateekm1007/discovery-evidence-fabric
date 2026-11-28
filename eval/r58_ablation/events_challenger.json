@@ -1,0 +1,805 @@
+{
+ "record": "R58_ABLATION_EVENTS_CHALLENGER/1.0.0",
+ "run": "r58-p2-dev-ablation-machine-leg",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "registered_model": "glm-4-plus",
+ "window_started_at": "2026-11-17T19:34:01.077715Z",
+ "events": [
+  {
+   "problem_id": "HO2-01-sofc-interconnect-cr-poisoning",
+   "generated_at": "2026-11-17T19:25:37.012595Z",
+   "histogram_before": {},
+   "histogram_after": {
+    "flow-through ceramic getter shield": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 2939,
+     "latency_s": 6.3,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Bare LSCF cathode surface (existing equipment)."
+      ],
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'cell' in: the getter layer reduces cr_partial_pressure at the cathode surface by chemisorption, lowering deposition by >",
+       "excluded stem 'interconnect' in: standard practice uses bare lscf cathodes or protective coatings applied directly to the interconnect; this mi",
+       "excluded stem 'interconnect' in: adjacent-technique clearance: the closest existing practice is chromate-forming coatings on interconnects to b",
+       "excluded stem 'interconnects' in: adjacent-technique clearance: the closest existing practice is chromate-forming coatings on interconnects to b"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Chromium volatilization from ferritic-steel interconnect leads to deposition at the cathode triple-phase boundary, increasing polarization resistance. | ingredient: The MnCo2O4 getter layer chemisorbs chromium species, reducing chromium partial pressure at the cathode surface and preventing deposition. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Chromium volatilization from ferritic-steel interconnect leads to deposition at the cathode triple-phase boundary, increasing polarization resistance.",
+      "ingredient_action": "The MnCo2O4 getter layer chemisorbs chromium species, reducing chromium partial pressure at the cathode surface and preventing deposition.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "a42706f4889258f1"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3370,
+     "latency_s": 10.3,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: chemisorptive getter layer",
+       "- Standard practice: Bare LSCF cathode (existing equipment), no maintenance items beyond s",
+       "- Burden class: Same (no new equipment, uses existing maintenance infrastructure, catalog ",
+       "- Operational loss: Zero (getter layer does not obstruct cathode gas flow or reduce active"
+      ],
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'cell' in: magnitude verification: a getter with 10× higher chromium affinity than the cathode surface can reduce p_cr by",
+       "excluded stem 'interconnect' in: the closest existing practice is the use of perovskite-based coatings on interconnects, but this intervention ",
+       "excluded stem 'interconnects' in: the closest existing practice is the use of perovskite-based coatings on interconnects, but this intervention "
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Chromium vapor deposition at the cathode triple-phase boundary increases polarization resistance | ingredient: The getter layer reduces chromium partial pressure by chemisorption, thereby reducing the driving force for chromium deposition | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Chromium vapor deposition at the cathode triple-phase boundary increases polarization resistance",
+      "ingredient_action": "The getter layer reduces chromium partial pressure by chemisorption, thereby reducing the driving force for chromium deposition",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "0c9221599a44008a",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - MECHANISM CLASS: chemisorptive getter layer; - Standard practice: Bare LSCF cathode (existing equipment), no",
+      "CONSTRAINT_EXCLUSION: excluded stem 'cell' in: magnitude verification: a getter with 10× higher chromium affinity than the cathode s"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 4049,
+     "latency_s": 12.4,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom formulation"
+      ],
+      "BILL_UNTAGGED": [
+       "- **MECHANISM CLASS:** chemisorptive getter coating",
+       "- **Protocol:** Install coated plates in a test stack; measure polarization resistance eve",
+       "- **Instruments:** Existing stack instrumentation (voltage, current, flow rate).",
+       "- **Pass/Fail:** ΔR_p < 5% over 10,000 h; coating adhesion tested via peel-off post-test.",
+       "- **Kill Criterion:** R_p increase >5% at any interval.",
+       "- **Duration:** 10,000 h.",
+       "- **Constraint fit:** No interconnect/cathode modification; power decay <5%; coating condu",
+       "- Allowed measures: Coating (per constraint).",
+       "- Exclusions: No interconnect/cathode change (getter is on anode flow field).",
+       "- Performance: Coating maintains conductivity/adhesion (zirconia-yttria meets this).",
+       "- Generic class: \"Commercial zirconia-yttria getter coating\" (stock grade, no custom formu",
+       "- Novelty: Application to anode flow field (not interconnect/cathode).",
+       "- No new sensors; uses existing instrumentation.",
+       "- No surface treatment development (coating is applied as-sold).",
+       "- No added process steps (spray/cure is standard).",
+       "- No operational loss (coating does not reduce fuel utilization).",
+       "- Driving variable: [Cr] at cathode.",
+       "- Mechanism action: Reduces [Cr] by >90% via chemisorption.",
+       "- Result: Lowers polarization resistance.",
+       "- Required signals: Flow rate, pressure (existing per problem statement).",
+       "- Operational cost: $0.50/plate (no throughput/energy loss).",
+       "- MECHANISM CLASS: chemisorptive getter coating."
+      ],
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'interconnect' in: your mitigation: a chemisorptive getter layer with 10× higher chromium affinity than the cathode, applied exte",
+       "excluded stem 'interconnect' in: - **constraint fit:** no interconnect/cathode modification; power decay <5%; coating conductive/adherent (zirc",
+       "excluded stem 'interconnect' in: - exclusions: no interconnect/cathode change (getter is on anode flow field)",
+       "excluded stem 'interconnect' in: - novelty: application to anode flow field (not interconnect/cathode)"
+      ],
+      "NAMED_VARIANT": [
+       "variant-marker: custom formulation | - Generic class: \"Commercial zirconia-yttria getter coating\" (stock grade, no cu"
+      ],
+      "CONVERSION": [
+       "ADDED_PROCESS_STEP: coating on a row that does not ride existing/unchanged infrastructure: - **MECHANISM CLASS:** chemisorptive getter coating",
+       "ADDED_PROCESS_STEP: coating on a row that does not ride existing/unchanged infrastructure: - (b) Commercial zirconia-yttria getter coating (stock grade, 5 µm thickness, applied per supplier data sheet), installed on anode-side flow field plates (exist",
+       "ADDED_PROCESS_STEP: coating on a row that does not ride existing/unchanged infrastructure: - (c) Procedure: Apply coating via spray coating (standard operation per supplier), cure at 400°C for 1 h (standard procedure).",
+       "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: - (c) Procedure: Apply coating via spray coating (standard operation per supplier), cure at 400°C for 1 h (standard procedure)."
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Chromium volatilization from ferritic-steel interconnect and subsequent deposition at the cathode triple-phase boundary increases polarization resistance. | ingredient: The chemisorptive getter coating irreversibly binds chromium vapor in the anode compartment, reducing chromium concentration at the cathode. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Chromium volatilization from ferritic-steel interconnect and subsequent deposition at the cathode triple-phase boundary increases polarization resistance.",
+      "ingredient_action": "The chemisorptive getter coating irreversibly binds chromium vapor in the anode compartment, reducing chromium concentration at the cathode.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "de8bfa54a0e66153",
+     "findings_disclosed": [
+      "DEV_NEED: custom formulation",
+      "BILL_UNTAGGED: - **MECHANISM CLASS:** chemisorptive getter coating; - **Protocol:** Install coated plates in a test stack; me",
+      "CONSTRAINT_EXCLUSION: excluded stem 'interconnect' in: your mitigation: a chemisorptive getter layer with 10× higher chromium affini",
+      "NAMED_VARIANT: variant-marker: custom formulation | - Generic class: \"Commercial zirconia-yttria getter coating\" (stock grade",
+      "CONVERSION: ADDED_PROCESS_STEP: coating on a row that does not ride existing/unchanged infrastructure: - **MECHANISM CLASS"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 5164,
+     "latency_s": 10.5,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "DEV_NEED": [
+       "custom formulation",
+       "custom material"
+      ],
+      "BILL_UNTAGGED": [
+       "- MECHANISM CLASS: flow-through ceramic getter shield",
+       "- Standard practice: No additional components or procedures beyond stack assembly",
+       "- This intervention:",
+       "- Burden class: Same (additional materials are standard ceramic components, procedure is s"
+      ],
+      "CONVERSION": [
+       "ADDED_PROCESS_STEP: bonded on a row that does not ride existing/unchanged infrastructure: - (b) Commercial alumina support frame (stock rectangular, 2 mm thick) — bonded to flow channel walls using high-temperature cement"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Chromium volatilization from ferritic-steel interconnect leads to chromium vapor deposition at cathode triple-phase boundary, increasing polarization resistance. | ingredient: Zirconia-yttria getter material adsorbs chromium vapor from gas flow, reducing chromium partial pressure at cathode surface and decreasing deposition rate. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Chromium volatilization from ferritic-steel interconnect leads to chromium vapor deposition at cathode triple-phase boundary, increasing polarization resistance.",
+      "ingredient_action": "Zirconia-yttria getter material adsorbs chromium vapor from gas flow, reducing chromium partial pressure at cathode surface and decreasing deposition rate.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "311023a2bb51c78d",
+     "findings_disclosed": [
+      "DEV_NEED: custom formulation; custom material",
+      "BILL_UNTAGGED: - MECHANISM CLASS: flow-through ceramic getter shield; - Standard practice: No additional components or proced",
+      "CONVERSION: ADDED_PROCESS_STEP: bonded on a row that does not ride existing/unchanged infrastructure: - (b) Commercial alu"
+     ]
+    }
+   ],
+   "final_sha256_16": "311023a2bb51c78d",
+   "final_chars": 5164
+  },
+  {
+   "problem_id": "HO2-02-perovskite-module-degradation",
+   "generated_at": "2026-11-17T19:34:01.078278Z",
+   "histogram_before": {
+    "flow-through ceramic getter shield": 1
+   },
+   "histogram_after": {
+    "flow-through ceramic getter shield": 1,
+    "edge-seal barrier enhancement**": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4685,
+     "latency_s": 10.8,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "CONVERSION": [
+       "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: | Edge seal application | Single-pass extrusion (a) | Co-extrusion with interlock cure (c) | Co-extrude both layers simultaneously; cure at 150°C for 20 min wit",
+       "ADDED_PROCESS_STEP: lamination on a row that does not ride existing/unchanged infrastructure: | Module assembly     | Standard lamination (a) | Standard lamination + edge pre-cure (c) | Apply edge seal before main lamination; pre-cure edges at 150°C/5-to",
+       "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: | Module assembly     | Standard lamination (a) | Standard lamination + edge pre-cure (c) | Apply edge seal before main lamination; pre-cure edges at 150°C/5-to"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Moisture ingress and UV exposure cause perovskite decomposition and encapsulant delamination | ingredient: The bilayer sealant reduces moisture diffusion coefficient and absorbs UV photons, opposing both degradation pathways | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Moisture ingress and UV exposure cause perovskite decomposition and encapsulant delamination",
+      "ingredient_action": "The bilayer sealant reduces moisture diffusion coefficient and absorbs UV photons, opposing both degradation pathways",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "d63a68645f4af47f"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3005,
+     "latency_s": 10.7,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Same as standard practice (uses existing dispensing system, no new hardwar",
+       "- Commissioning: Same as standard practice (uses existing cure parameters)",
+       "- Operation: Same as standard practice (no additional monitoring or maintenance)",
+       "- Cost: Same as standard practice (butyl sealant is a standard catalog item; UV absorber i",
+       "- Burden class: Same as standard practice (no new equipment, no additional labor, no opera"
+      ],
+      "APPARATUS_ROW": [
+       "- Operation: Same as standard practice (no additional monitoring or maintenance)"
+      ],
+      "CONVERSION": [
+       "ADDED_PROCESS_STEP: coatings on a row that does not ride existing/unchanged infrastructure: 1. (b) Commercial UV-absorbing edge sealant, butyl-based, 5 mm width, 0.5 mm thickness, with 2 wt% benzotriazole UV absorber (stock grade, per supplier data she"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: UV photon flux at the seal-perovskite interface causes photochemical degradation of the perovskite. | ingredient: The UV-absorbing edge seal reduces UV photon flux at the interface by converting harmful UV radiation into heat. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "UV photon flux at the seal-perovskite interface causes photochemical degradation of the perovskite.",
+      "ingredient_action": "The UV-absorbing edge seal reduces UV photon flux at the interface by converting harmful UV radiation into heat.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "0d2fa6c86ebe69a3",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Same as standard practice (uses existing dispensing system, no new hardwar; - Commissioning: S",
+      "APPARATUS_ROW: - Operation: Same as standard practice (no additional monitoring or maintenance)",
+      "CONVERSION: ADDED_PROCESS_STEP: coatings on a row that does not ride existing/unchanged infrastructure: 1. (b) Commercial ",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 3086,
+     "latency_s": 10.6,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: Same as standard (uses existing dispensing system, no new hardware)",
+       "- Commissioning: Same as standard (no additional calibration)",
+       "- Operation: Same as standard (no additional monitoring or maintenance)",
+       "- Maintenance: Same as standard (no new consumables or procedures)",
+       "- Cost: Same class (tape cost offset by reduced material waste from higher pressure)",
+       "- Operational loss: Zero (no impact on module efficiency or output)"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial fluoropolymer hydrophobic tape' shares no allowed-list stem (retain module efficiency within 2% of nameplate; edge-seal and encapsulant chang...)"
+      ],
+      "APPARATUS_ROW": [
+       "- Operation: Same as standard (no additional monitoring or maintenance)"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: ™ | - New: (b) Commercial fluoropolymer hydrophobic tape, 50 μm thick, PTFE-coated, ",
+       "model/brand-marker: UV 60 | EXECUTABLE TEST — Protocol: Subject 10 modules (5 control, 5 intervention) to IE"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Moisture ingress through the edge seal drives perovskite decomposition and delamination. | ingredient: The hydrophobic fluoropolymer barrier reduces moisture diffusivity (D), lowering moisture flux (J) and thus the integrated moisture dose that causes degradation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Moisture ingress through the edge seal drives perovskite decomposition and delamination.",
+      "ingredient_action": "The hydrophobic fluoropolymer barrier reduces moisture diffusivity (D), lowering moisture flux (J) and thus the integrated moisture dose that causes degradation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "c0c75faa5aab0fde",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Installation: Same as standard (uses existing dispensing system, no new hardware); - Commissioning: Same as ",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial fluoropolymer hydrophobic tape' shares no allowed-list stem (retain module efficienc",
+      "APPARATUS_ROW: - Operation: Same as standard (no additional monitoring or maintenance)",
+      "NAMED_VARIANT: model/brand-marker: ™ | - New: (b) Commercial fluoropolymer hydrophobic tape, 50 μm thick, PTFE-coated, ; mode",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3013,
+     "latency_s": 9.1,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial fluoropolymer hydrophobic tape' shares no allowed-list stem (retain module efficiency within 2% of nameplate; edge-seal and encapsulant chang...)"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: ™ | - (b) Commercial fluoropolymer hydrophobic tape, 50 μm thick, PTFE-coated, 10 mm"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Moisture ingress and UV exposure decompose the perovskite and delaminate the encapsulant | ingredient: The hydrophobic fluoropolymer tape reduces the effective diffusion coefficient for liquid water, decreasing moisture ingress rate | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Moisture ingress and UV exposure decompose the perovskite and delaminate the encapsulant",
+      "ingredient_action": "The hydrophobic fluoropolymer tape reduces the effective diffusion coefficient for liquid water, decreasing moisture ingress rate",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "e9692801d240fdc6",
+     "findings_disclosed": [
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial fluoropolymer hydrophobic tape' shares no allowed-list stem (retain module efficienc",
+      "NAMED_VARIANT: model/brand-marker: ™ | - (b) Commercial fluoropolymer hydrophobic tape, 50 μm thick, PTFE-coated, 10 mm"
+     ]
+    }
+   ],
+   "final_sha256_16": "e9692801d240fdc6",
+   "final_chars": 3013
+  },
+  {
+   "problem_id": "HO2-03-lead-service-line-release",
+   "generated_at": "2026-11-17T19:34:47.691866Z",
+   "histogram_before": {
+    "flow-through ceramic getter shield": 1,
+    "edge-seal barrier enhancement**": 1
+   },
+   "histogram_after": {
+    "flow-through ceramic getter shield": 1,
+    "edge-seal barrier enhancement**": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 3589,
+     "latency_s": 10.0,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Installation: 1 solenoid valve (same class as standard practice’s control valves) + 1 ti",
+       "- Commissioning: Timer programming (standard procedure) — no development.",
+       "- Operation: Daily 5-minute pulses (negligible water loss: <0.1% of daily flow) — no throu",
+       "- Maintenance: Valve/timer maintenance same as standard practice’s dosing equipment.",
+       "- Cost class: Same as standard practice’s control hardware — no increase."
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Mechanical timer' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)"
+      ],
+      "APPARATUS_ROW": [
+       "Standard practice bill: (a) orthophosphate dosing system, (b) pH/adjutant injection system, (c) water quality "
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Corrosion of lead service lines is driven by electrochemical dissolution of lead in low-alkalinity water, forming scale that releases lead particles. | ingredient: Increased flow velocity imposes shear stress on the pipe wall, mechanically disrupting the corrosion scale and reducing lead release. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Corrosion of lead service lines is driven by electrochemical dissolution of lead in low-alkalinity water, forming scale that releases lead particles.",
+      "ingredient_action": "Increased flow velocity imposes shear stress on the pipe wall, mechanically disrupting the corrosion scale and reducing lead release.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "634f724e32552543"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 3210,
+     "latency_s": 9.2,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Burden class: Same as standard practice (no new hardware classes, only parameter changes"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Standard mechanical timer' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)"
+      ],
+      "APPARATUS_ROW": [
+       "- Standard practice: (a) orthophosphate dosing system (continuous operation), (b) pH/adjutant injection system"
+      ],
+      "NAMED_VARIANT": [
+       "model/brand-marker: AM-10 | - (c) Operating parameter change: Set the SCADA timer to pulse the solenoid valv"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Lead release from service lines is governed by diffusion-limited transport, where the concentration gradient at the pipe wall drives lead flux outward according to Fick's first law. | ingredient: Pulsed orthophosphate dosing increases the orthophosphate concentration gradient at the pipe wall during pulses, which reduces the net lead flux over the duty cycle due to non-linear solubility effects. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Lead release from service lines is governed by diffusion-limited transport, where the concentration gradient at the pipe wall drives lead flux outward according to Fick's first law.",
+      "ingredient_action": "Pulsed orthophosphate dosing increases the orthophosphate concentration gradient at the pipe wall during pulses, which reduces the net lead flux over the duty cycle due to non-linear solubility effects.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "0a2d9a94f273f7b3",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Burden class: Same as standard practice (no new hardware classes, only parameter changes",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophos",
+      "APPARATUS_ROW: - Standard practice: (a) orthophosphate dosing system (continuous operation), (b) pH/adjutant injection system",
+      "NAMED_VARIANT: model/brand-marker: AM-10 | - (c) Operating parameter change: Set the SCADA timer to pulse the solenoid valv",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2921,
+     "latency_s": 8.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Continuous pump operation (24/7), 0.5 L/min flow, 100% operational bu",
+       "- Intervention:",
+       "- Burden class: Same as standard practice (no new hardware classes; operational burden red"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Standard mechanical timer module' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Standard mechanical timer' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Lead corrosion and release is driven by the dissolution of lead into water, which is thermodynamically favored by low orthophosphate concentration and high lead solubility. | ingredient: Pulsed orthophosphate injection reduces the time-integrated orthophosphate concentration at the pipe wall, which would increase lead dissolution kinetics by decreasing phosphate scale formation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Lead corrosion and release is driven by the dissolution of lead into water, which is thermodynamically favored by low orthophosphate concentration and high lead solubility.",
+      "ingredient_action": "Pulsed orthophosphate injection reduces the time-integrated orthophosphate concentration at the pipe wall, which would increase lead dissolution kinetics by decreasing phosphate scale formation.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE",
+      "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+     },
+     "sha256_16": "44f8e00112543b82",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Continuous pump operation (24/7), 0.5 L/min flow, 100% operational bu; - Intervention:; -",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophos",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3068,
+     "latency_s": 9.1,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)",
+       "added measure 'Solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophosphate dosing and pH/alkalinity adjustme...)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Lead release from service lines is driven by the dissolution of lead into water due to corrosion processes, which increases with higher lead solubility in the absence of protective scale formation. | ingredient: Pulsed orthophosphate dosing increases orthophosphate concentration at the pipe surface, promoting the formation of stable lead-phosphate mineral scale that reduces lead solubility and release. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Lead release from service lines is driven by the dissolution of lead into water due to corrosion processes, which increases with higher lead solubility in the absence of protective scale formation.",
+      "ingredient_action": "Pulsed orthophosphate dosing increases orthophosphate concentration at the pipe surface, promoting the formation of stable lead-phosphate mineral scale that reduces lead solubility and release.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "81aa972deef630df",
+     "findings_disclosed": [
+      "ALLOWED_ROW_OUTSIDE: added measure 'Standard solenoid valve' shares no allowed-list stem (no line replacement this cycle; orthophos",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    }
+   ],
+   "final_sha256_16": "81aa972deef630df",
+   "final_chars": 3068
+  },
+  {
+   "problem_id": "HO2-04-gt-compressor-fouling",
+   "generated_at": "2026-11-17T19:35:31.149385Z",
+   "histogram_before": {
+    "flow-through ceramic getter shield": 1,
+    "edge-seal barrier enhancement**": 1
+   },
+   "histogram_after": {
+    "flow-through ceramic getter shield": 1,
+    "edge-seal barrier enhancement**": 1
+   },
+   "attempts": [
+    {
+     "stage": "draft",
+     "chars": 4092,
+     "latency_s": 11.0,
+     "transport_tries": 1,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Commercial humidifier solenoid valve, DN25 PN16, normally closed, 24 VDC (replaces stand",
+       "- Commercial stainless steel atomizing nozzle, 0.5 mm orifice, 2 bar operating pressure (s",
+       "- Commercial timer module, programmable, 0.1 s resolution (replaces standard wash timer)",
+       "- Set control logic to trigger humidity pulse when inlet PM2.5 > 50 µg/m³ (contamination e",
+       "- Set pulse duration: 10 s every 30 min during high-contamination events",
+       "- Set humidifier duty: 2 L/min water injection during pulses (same flow rate as standard w",
+       "- **Installation:** Standard practice installs wash nozzles/valves; this replaces one wash",
+       "- **Commissioning:** Standard practice sets wash timer; this sets timer parameters (same c",
+       "- **Operation:** Standard practice runs wash cycles; this runs humidity pulses (same water",
+       "- **Maintenance:** Standard practice replaces wash nozzles; this replaces humidifier nozzl",
+       "- **Cost:** Uses existing infrastructure and catalog parts (same as standard practice). **"
+      ],
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'cause' in: statistical significance via t-test (p<0.05).\n**duration:** 100 hours per test (covers 1–2 fouling cycles per ",
+       "excluded stem 'causes' in: statistical significance via t-test (p<0.05).\n**duration:** 100 hours per test (covers 1–2 fouling cycles per ",
+       "excluded stem 'corrosion' in: statistical significance via t-test (p<0.05).\n**duration:** 100 hours per test (covers 1–2 fouling cycles per ",
+       "excluded stem 'erosion' in: statistical significance via t-test (p<0.05).\n**duration:** 100 hours per test (covers 1–2 fouling cycles per "
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'a humidifier valve' shares no allowed-list stem (no blade redesign or coating change; inlet filtration/coalescer and online water...)"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Aerosol deposition on compressor blades is caused by small particles (1-5 µm) that evade filtration and adhere to blade surfaces. | ingredient: Humidity injection agglomerates small aerosol particles into larger particles (20-50 µm) that are captured by existing filtration, reducing the number of particles that reach the blades. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Aerosol deposition on compressor blades is caused by small particles (1-5 µm) that evade filtration and adhere to blade surfaces.",
+      "ingredient_action": "Humidity injection agglomerates small aerosol particles into larger particles (20-50 µm) that are captured by existing filtration, reducing the number of particles that reach the blades.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "fcec99d2137f108d"
+    },
+    {
+     "stage": "repair_1",
+     "chars": 2943,
+     "latency_s": 9.0,
+     "transport_tries": 2,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Maintenance: No additional maintenance (pump is standard class, same maintenance interva",
+       "- Operational loss: Zero (wash occurs during normal operation at non-peak load points — no"
+      ],
+      "ALLOWED_ROW_OUTSIDE": [
+       "added measure 'Commercial surfactant injection pump' shares no allowed-list stem (no blade redesign or coating change; inlet filtration/coalescer and online water...)",
+       "added measure 'Commercial non-ionic surfactant solution' shares no allowed-list stem (no blade redesign or coating change; inlet filtration/coalescer and online water...)",
+       "added measure 'vs. standard' shares no allowed-list stem (no blade redesign or coating change; inlet filtration/coalescer and online water...)",
+       "added measure 'vs. standard' shares no allowed-list stem (no blade redesign or coating change; inlet filtration/coalescer and online water...)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Salt and hydrocarbon aerosol deposit adhesion energy on compressor blades | ingredient: Reduces deposit adhesion energy via alternating wash fluids that dissolve salt and dislodge hydrocarbons | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Salt and hydrocarbon aerosol deposit adhesion energy on compressor blades",
+      "ingredient_action": "Reduces deposit adhesion energy via alternating wash fluids that dissolve salt and dislodge hydrocarbons",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "30bc0b8c43f75ad3",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Maintenance: No additional maintenance (pump is standard class, same maintenance interva; - Operational loss",
+      "ALLOWED_ROW_OUTSIDE: added measure 'Commercial surfactant injection pump' shares no allowed-list stem (no blade redesign or coating",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_2",
+     "chars": 2985,
+     "latency_s": 8.8,
+     "transport_tries": 3,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Offline wash cycle with pure water (no surfactant pump or injection s",
+       "- This intervention adds: (1) a standard commercial surfactant injection pump (same mainte",
+       "- Burden class: Same as standard practice (pump is catalog item, schedule is parameter cha"
+      ],
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'cause' in: standard practice uses pure water washes; this mitigation is a departure because it introduces a chemical adhe",
+       "excluded stem 'corrosion' in: kill criterion: if heat rate recovery <3% or erosion/corrosion detected, mechanism fails.",
+       "excluded stem 'erosion' in: kill criterion: if heat rate recovery <3% or erosion/corrosion detected, mechanism fails."
+      ],
+      "APPARATUS_ROW": [
+       "3. (b) Standard conductivity probe, installed on the wash water discharge line to monitor surfactant concentra"
+      ],
+      "UNPRICED_DUTY_CYCLE": [
+       "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ]
+     },
+     "direction_check": {
+      "direction": "CORRECT",
+      "reason": "driver: Aerosol fouling in gas turbine compressors is caused by the adhesion of salt and hydrocarbon particles to blade surfaces, which is governed by interfacial tension between the aerosol droplets and the surface. | ingredient: The hydrophilic surfactant reduces interfacial tension, thereby decreasing the adhesion force of deposits to the blade surface. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+      "established_driver": "Aerosol fouling in gas turbine compressors is caused by the adhesion of salt and hydrocarbon particles to blade surfaces, which is governed by interfacial tension between the aerosol droplets and the surface.",
+      "ingredient_action": "The hydrophilic surfactant reduces interfacial tension, thereby decreasing the adhesion force of deposits to the blade surface.",
+      "sign_of_ingredient_vs_driver": "OPPOSITE"
+     },
+     "sha256_16": "61e31581b414ec66",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Offline wash cycle with pure water (no surfactant pump or injection s; - This interventio",
+      "CONSTRAINT_EXCLUSION: excluded stem 'cause' in: standard practice uses pure water washes; this mitigation is a departure because it ",
+      "APPARATUS_ROW: 3. (b) Standard conductivity probe, installed on the wash water discharge line to monitor surfactant concentra",
+      "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+     ]
+    },
+    {
+     "stage": "repair_3",
+     "chars": 3226,
+     "latency_s": 8.9,
+     "transport_tries": 4,
+     "route": "zai_gateway",
+     "route_model": null,
+     "fallback_reason": null,
+     "critic_verdict": "CLEAN",
+     "type_gate": {
+      "verdict": "MATCH",
+      "reason": "proposes a mitigation (section=True, verbs=True)"
+     },
+     "scan": {
+      "BILL_UNTAGGED": [
+       "- Standard practice: Offline wash cycle with pure water (no surfactant pump or injection s",
+       "- This intervention adds: (1) peristaltic pump (catalog class, same as standard practice’s",
+       "- Protocol: Conduct two 30-day fouling cycles on identical compressor sections; one with s",
+       "- Instruments: Standard pressure transducers (existing plant equipment), calibrated flow m",
+       "- Pass/fail: Heat rate recovery ≥3% in surfactant wash vs. pure water wash (Δη/η ≥ 0.03), ",
+       "- Duration: 60 days (two 30-day cycles).",
+       "- Kill criterion: If surfactant wash shows <2% heat rate recovery or any blade erosion (vi"
+      ],
+      "CONSTRAINT_EXCLUSION": [
+       "excluded stem 'erosion' in: pure water wash (δη/η ≥ 0.03), with no increase in blade roughness ( profilometer measurement).\n- duration: 60"
+      ],
+      "APPARATUS_ROW": [
+       "3. (b) Standard conductivity probe, installed on wash water discharge line to monitor surfactant concentration"
+      ],
+      "PHYSICS_DIRECTION_UNSTATED": [
+       "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+      ],
+      "MECHANISM_CLASS_UNSTATED": [
+       "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+      ],
+      "DIRECTION_CHECK_UNAVAILABLE": [
+       "typed fail-open: HTTPError: HTTP Error 500: Internal Server Error (the authoritative read stays the auditor's)"
+      ]
+     },
+     "direction_check": {
+      "direction": "DIRECTION_CHECK_UNAVAILABLE",
+      "reason": "HTTPError: HTTP Error 500: Internal Server Error"
+     },
+     "sha256_16": "2746dbe5a8559288",
+     "findings_disclosed": [
+      "BILL_UNTAGGED: - Standard practice: Offline wash cycle with pure water (no surfactant pump or injection s; - This interventio",
+      "CONSTRAINT_EXCLUSION: excluded stem 'erosion' in: pure water wash (δη/η ≥ 0.03), with no increase in blade roughness ( profilometer ",
+      "APPARATUS_ROW: 3. (b) Standard conductivity probe, installed on wash water discharge line to monitor surfactant concentration",
+      "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+      "MECHANISM_CLASS_UNSTATED: the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration",
+      "DIRECTION_CHECK_UNAVAILABLE: typed fail-open: HTTPError: HTTP Error 500: Internal Server Error (the authoritative read stays the auditor's)"
+     ]
+    }
+   ],
+   "final_sha256_16": "2746dbe5a8559288",
+   "final_chars": 3226
+  }
+ ]
+}

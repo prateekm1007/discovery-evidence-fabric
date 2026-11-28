@@ -1,0 +1,73 @@
+{
+ "lane": "claiming",
+ "problem_id": "r123-07-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor-v2 (bare author [committed bytes] + F97-fixed check + improved-directive reviewer)",
+ "improved_directive_len": 567,
+ "authored_bill": "**Mitigation Proposal: Pulse-Cleaning Duty Cycle Optimization via DP-Opacity Correlation**\n\n**Mechanism:**\nThe rising differential pressure (DP) and increased compressed-air consumption indicate that the current pulse-cleaning frequency is either too frequent (causing blinding of filter media and increased blower/air load) or the air volume per pulse is insufficient to fully dislodge dust, leading to dust re-settling and gradual cake build-up. By correlating the existing **clean-air plume opacity meter** readings with the **baghouse DP**, we can determine the optimal \"cleaning trigger\" point. The goal is to adjust the pulse frequency to only initiate cleaning when the opacity (indicative of breakthrough dust) or DP (indicative of total resistance) exceeds a specific, data-driven threshold derived from historical best-performance periods, rather than using a fixed-time or fixed-cycle schedule. This prevents over-pulsing (which blinds bags and increases air consumption due to re-entry of fine dust into the fabric weave) and ensures thorough cleaning when needed.\n\n**Implementation:**\n1.  **Data Correlation:** Use the existing data logging system (or manual recording if no DCS historian is available, but assuming basic data capture for the specified sensors) to plot **Baghouse DP** against **Clean-Air Plume Opacity** over time. Identify the specific DP value at which opacity begins to consistently exceed the regulatory or quality limit (the \"breakthrough\" point) *before* DP reaches the current high-limit alarm. This DP value becomes the new **Optimal Cleaning Threshold (DP_Opt)**.\n2.  **Regulator Adjustment:** Since the compressed-air consumption has grown, verify the **compressed-air pressure regulator gauge**. If the regulator is set higher than necessary (often done to compensate for perceived poor cleaning), reduce the regulator setpoint to the minimum pressure required to generate the required air volume per pulse for the bag fabric material, as validated by the manufacturer's spec. Lowering the pressure reduces air consumption and reduces the kinetic energy that can cause \"blinding\" (dust compacting into the fabric pores).\n3.  **Trigger Logic Change:** Modify the controller's (or operator's manual procedure's) pulse-triggering criterion. Instead of pulsing at a fixed time interval, configure the system to pulse only when the **Baghouse DP > DP_Opt**. \n    *   *If the system only supports time-based cycling:* Manually calculate the new time interval using the DP_Opt and the observed DP accumulation rate (from the DP taps). Set the timer to this calculated value. This effectively uses the DP trend to set the time, relying on the existing DP taps.\n4.  **Verification:** Monitor the **Compressed-Air Pressure Regulator Gauge** for stability at the new, potentially lower, setpoint. Track the **DP** to ensure it stabilizes at DP_Opt (or slightly above) rather than climbing. Confirm the **Opacity Meter** reads within acceptable limits. The air consumption should decrease because: (a) fewer pulses are delivered (only when needed), and (b) each pulse is delivered at an optimized, likely lower, pressure.\n\n**Measures It Relies On:**\n*   **Baghouse DP Taps:** Provides the primary feedback signal for determining when cleaning is actually necessary (based on total resistance) and for calculating the new time-based trigger interval.\n*   **Clean-Air Plume Opacity Meter:** Provides the secondary, critical feedback signal that validates whether the cleaning is effective (low opacity) and helps establish the DP_Opt threshold by correlating \"good\" performance (low opacity) with specific DP levels.\n*   **Compressed-Air Pressure Regulator Gauge:** Allows manual adjustment of the pulse air pressure to optimize air consumption and prevent media blinding, relying on visual/reading confirmation of the setpoint and stability.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (the",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Pulse-Cleaning Duty Cycle Optimization via DP-Opacity Correlation**\n\n**Mechanism:**\nThe rising differential pressure (DP) and increased compressed-air consumption indicate that the current pulse-cleaning frequency is either too frequent (causing blinding of filter media and increased blower/air load) or the air volume per pulse is insufficient to fully dislodge dust, leading to dust re-settling and gradual cake build-up. By correlating the existing **clean-air plume opacity meter** readings with the **baghouse DP**, we can determine the optimal \"cleaning trigger\" point. The goal is to adjust the pulse frequency to only initiate cleaning when the opacity (indicative of breakthrough dust) or DP (indicative of total resistance) exceeds a specific, data-driven threshold derived from historical best-performance periods, rather than using a fixed-time or fixed-cycle schedule. This prevents over-pulsing (which blinds bags and increases air consumption due to re-entry of fine dust into the fabric weave) and ensures thorough cleaning when needed.\n\n**DIRECTION-OF-EFFECT STATEMENT:**\nThe driving variable is the **Differential Pressure (DP)** across the baghouse, which rises due to dust accumulation. The proposed mechanism acts in the **opposite direction** of this accumulation: by triggering cleaning at a lower, data-driven threshold (DP_Opt) and reducing pulse pressure, the system reduces the net DP increase rate and prevents the secondary effect of media blinding. The direction of effect is **decreasing** the differential pressure trend and **decreasing** compressed-air consumption, directly counteracting the failure modes of rising DP and increased air usage.\n\n**Implementation Bill:**\n1.  **Item 1: Data Correlation & Threshold Derivation**\n    *   **Action:** Plot **Baghouse DP** (from DP taps) against **Clean-Air Plume Opacity** (from opacity meter) over time to identify the \"breakthrough\" point where opacity exceeds limits.\n    *   **Cost/Resource:** Operator time for historical data review (approx. 2 hours). No new hardware cost.\n    *   **Output:** Define `DP_Opt` (Optimal Cleaning Threshold).\n\n2.  **Item 2: Regulator Setpoint Adjustment**\n    *   **Action:** Verify **Compressed-Air Pressure Regulator Gauge**. Reduce setpoint to the minimum required for effective cleaning (validated against fabric spec), typically lowering pressure to prevent blinding.\n    *   **Cost/Resource:** Minimal labor for adjustment. Operational savings from reduced air compression energy demand.\n    *   **Constraint:** Must maintain sufficient kinetic energy to dislodge dust; verified by subsequent opacity readings.\n\n3.  **Item 3: Trigger Logic Modification**\n    *   **Action:** Configure controller to trigger pulses only when **Baghouse DP > DP_Opt**.\n    *   **Alternative (Time-Based):** If hardware lacks DP-trigger capability, calculate new time interval `T_new` using `T_new = (DP_Opt - DP_clean) / (dDP/dt)`, where `dDP/dt` is the observed DP accumulation rate from DP taps.\n    *   **Cost/Resource:** Controller programming time or procedural update for operators.\n    *   **Risk Mitigation:** Include a manual override check using the Opacity Meter if DP triggers but opacity remains high.\n\n4.  **Item 4: Verification & Monitoring**\n    *   **Action:** Monitor **Compressed-Air Pressure Regulator Gauge** for stability. Track **Baghouse DP** for stabilization at `DP_Opt`. Confirm **Clean-Air Plume Opacity** is within limits.\n    *   **Cost/Resource:** Ongoing operator observation.\n    *   **Success Metrics:** Stable DP below previous alarm limit; reduced air consumption; opacity within regulatory/quality limits.\n\n**Measures It Relies On (Permitted Sensors & Derivations):**\n*   **Baghouse DP Taps:** \n    *   *Used as:* Primary feedback signal for cleaning trigger (`DP > DP_Opt`) and for calculating DP accumulation rate (`dDP/dt`) if time-based cycling is used.\n    *   *Derivation:* Direct measurement. `DP` = (Pressure at high DP tap) - (Pressure at low DP tap).\n*   **Clean-Air Plume Opacity Meter:** \n    *   *Used as:* Validation signal for cleaning effectiveness and for determining `DP_Opt` via correlation analysis.\n    *   *Derivation:* Direct measurement of plume opacity; used to identify the DP level at which opacity exceeds acceptable limits.\n*   **Compressed-Air Pressure Regulator Gauge:** \n    *   *Used as:* Monitoring and adjusting pulse air pressure.\n    *   *Derivation:* Direct measurement of regulator output pressure. Used to verify setpoint reduction and stability.\n\n**Pricing of Operational Impact:**\n*   **Energy Cost:** Reduction in compressed-air consumption due to fewer pulses (lower duty cycle) and lower pressure per pulse. Estimated 10-20% reduction in compressor energy load.\n*   **Throughput/Availability:** No expected reduction in baghouse throughput. Availability may increase as catastrophic pressure drop failures are prevented.\n*   **Maintenance Cost:** Reduced frequency of bag replacements due to minimized media blinding.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Item 1: Data Correlation & Threshold Derivation**",
+   "*   **Action:** Plot **Baghouse DP** (from DP taps) against **Clean-Air Plume Opacity** (f",
+   "*   **Cost/Resource:** Operator time for historical data review (approx. 2 hours). No new ",
+   "*   **Output:** Define `DP_Opt` (Optimal Cleaning Threshold).",
+   "2.  **Item 2: Regulator Setpoint Adjustment**",
+   "*   **Action:** Verify **Compressed-Air Pressure Regulator Gauge**. Reduce setpoint to the",
+   "*   **Cost/Resource:** Minimal labor for adjustment. Operational savings from reduced air ",
+   "*   **Constraint:** Must maintain sufficient kinetic energy to dislodge dust; verified by ",
+   "3.  **Item 3: Trigger Logic Modification**",
+   "*   **Action:** Configure controller to trigger pulses only when **Baghouse DP > DP_Opt**.",
+   "*   **Alternative (Time-Based):** If hardware lacks DP-trigger capability, calculate new t",
+   "*   **Cost/Resource:** Controller programming time or procedural update for operators.",
+   "*   **Risk Mitigation:** Include a manual override check using the Opacity Meter if DP tri",
+   "4.  **Item 4: Verification & Monitoring**",
+   "*   **Action:** Monitor **Compressed-Air Pressure Regulator Gauge** for stability. Track *",
+   "*   **Cost/Resource:** Ongoing operator observation.",
+   "*   **Success Metrics:** Stable DP below previous alarm limit; reduced air consumption; op",
+   "*   **Baghouse DP Taps:**",
+   "*   *Used as:* Primary feedback signal for cleaning trigger (`DP > DP_Opt`) and for calcul",
+   "*   *Derivation:* Direct measurement. `DP` = (Pressure at high DP tap) - (Pressure at low ",
+   "*   **Clean-Air Plume Opacity Meter:**",
+   "*   *Used as:* Validation signal for cleaning effectiveness and for determining `DP_Opt` v",
+   "*   *Derivation:* Direct measurement of plume opacity; used to identify the DP level at wh",
+   "*   **Compressed-Air Pressure Regulator Gauge:**",
+   "*   *Used as:* Monitoring and adjusting pulse air pressure.",
+   "*   *Derivation:* Direct measurement of regulator output pressure. Used to verify setpoint",
+   "*   **Energy Cost:** Reduction in compressed-air consumption due to fewer pulses (lower du",
+   "*   **Throughput/Availability:** No expected reduction in baghouse throughput. Availabilit",
+   "*   **Maintenance Cost:** Reduced frequency of bag replacements due to minimized media bli"
+  ],
+  "APPARATUS_ROW": [
+   "4.  **Item 4: Verification & Monitoring**",
+   "*   **Action:** Monitor **Compressed-Air Pressure Regulator Gauge** for stability. Track **Baghouse DP** for s",
+   "*   *Used as:* Monitoring and adjusting pulse air pressure."
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ]
+ }
+}

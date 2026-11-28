@@ -48,7 +48,7 @@ def _live_sha():
 # chain below is now HISTORICAL; the live chain is pinned after it.
 
 def test_constitution_version_2_10_1():
-    assert "**Version:** 2.10.1" in _body()
+    assert "**Version:** 2.11.0" in _body()
     assert "2.10.0 → v2.10.1" in _body() or "2.10.0 → 2.10.1" in _body()
 
 
@@ -63,8 +63,11 @@ def test_lxxxv_chain_binds_and_links():
     rec = json.loads((R510C / "AMENDMENT_RECORD_LXXXV.json")
                      .read_text(encoding="utf-8"))
     assert rec["old"]["version"] == "2.10.0"
+    # R11: the LXXXV record is HISTORICAL (its new = the 2.10.1 body
+    # sha); the live chain link is now R11's LXXXVI record.
     assert rec["new"]["version"] == "2.10.1"
-    assert rec["new"]["sha256"] == _live_sha()
+    assert rec["new"]["sha256"] == \
+        "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56"
     assert rec["reviewer_provenance"] == "AI_REVIEW"
 
 
@@ -89,7 +92,16 @@ def test_r510_record_chain_binds_and_links():
                        .read_text(encoding="utf-8"))
     assert rec85["old"]["version"] == "2.10.0"
     assert rec85["new"]["version"] == "2.10.1"
-    assert rec85["new"]["sha256"] == _live_sha()
+    # R11: the LIVE link is now the LXXXVI amendment (the invention
+    # gate) — the LXXXV record's "new" is the historical 2.10.1 body
+    # sha, and the LXXXVI record's "old" chains to it (Art. XI).
+    assert rec85["new"]["sha256"] == \
+        "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56"
+    rec86 = json.loads((REPO / "R11" / "constitution"
+                        / "AMENDMENT_RECORD_LXXXVI.json")
+                       .read_text(encoding="utf-8"))
+    assert rec86["from_version"] == "2.10.1"
+    assert rec86["to_version"] == "2.11.0"
     assert rec["checks"]["operator_directive_verbatim_in_body"] is True
     assert rec["checks"]["no_existing_article_weakened"] is True
     assert rec["checks"]["compliance_check"] is True
@@ -98,7 +110,7 @@ def test_r510_record_chain_binds_and_links():
 
 def test_acknowledgment_rebound_to_2_10_1():
     ack = json.loads(ACK.read_text(encoding="utf-8"))
-    assert ack["constitution_version"] == "2.10.1"
+    assert ack["constitution_version"] == "2.11.0"
     assert ack["constitution_hash"] == _live_sha()
     assert ack["session"] == "R510"
 

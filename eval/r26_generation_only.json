@@ -1,0 +1,648 @@
+{
+ "record": "BATTERY_V7_CATALOG_R26_GENERATION_ONLY/1.0.0",
+ "at": "2026-11-15T21:51:50.183254Z",
+ "work_id": "r26-v7-catalog-battery",
+ "claim": "c-0020",
+ "mode": "GENERATION_ONLY (judge transport absent — typed in eval/r26_judge_blocked.json; the judged battery resumes from these bytes)",
+ "byte_map": {
+  "fresh_v7_intervention": [
+   "bench-p01-pemfc-dehydration",
+   "bench-p02-leadacid-grid-corrosion",
+   "bench-p03-phe-biofouling",
+   "bench-p04-pump-cavitation",
+   "bench-p05-bridge-bearing-aging",
+   "bench-p06-water-biofilm",
+   "bench-p07-cgm-biofouling",
+   "bench-p08-mems-stiction",
+   "bench-p09-packaging-barrier",
+   "bench-p10-pv-pid",
+   "bench-p11-spindle-thermal-drift",
+   "bench-p12-mbr-fouling",
+   "dev-fu-005-bridge-bearing",
+   "eval-new01-supercap-dryout",
+   "eval-new03-insulin-pump-occlusion",
+   "eval-new05-liion-balance-drift",
+   "eval-sofc-redox",
+   "eval-sofc-thermal-cycling"
+  ],
+  "fresh_v5_predictor": [
+   "dev-fu-001-bearing-spalling",
+   "dev-fu-003-motor-insulation",
+   "dev-fu-004-fouling",
+   "eval-new02-slipring-predictor",
+   "eval-new04-chiller-fouling-predictor",
+   "eval-new06-bearing-vibration-predictor",
+   "eval-new07-transformer-dga-predictor",
+   "eval-new08-pipeline-leak-predictor",
+   "eval-new09-hvac-filter-predictor",
+   "eval-new10-solar-inverter-predictor",
+   "eval-new11-conveyor-belt-predictor",
+   "eval-new12-axle-bearing-predictor"
+  ],
+  "pilot_8": [
+   "bench-p03-phe-biofouling",
+   "bench-p04-pump-cavitation",
+   "bench-p05-bridge-bearing-aging",
+   "bench-p06-water-biofilm",
+   "bench-p08-mems-stiction",
+   "bench-p09-packaging-barrier",
+   "bench-p10-pv-pid",
+   "bench-p12-mbr-fouling"
+  ]
+ },
+ "machine": "contract_for_v7 (V7 catalog-composition on interventions / SYS_A1F_V5 on predictors) + critic + type gate + typed scans (base + constraint-fit + catalog v2 on interventions + predictor violations) + NEUTRAL repairs budget 2; K_GEN=1; judge-blind (no outcome feedback)",
+ "generator": {
+  "model": "zai-org/GLM-5.3",
+  "temperature": 0.0
+ },
+ "generation_record": [
+  {
+   "problem_id": "bench-p01-pemfc-dehydration",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Standard practice requires cathode humidifier installation (1 hour). This ",
+     "- Commissioning: Standard practice requires humidifier calibration (0.5 hours). This inter",
+     "- Operation: Standard practice requires continuous cathode humidifier operation (10% paras",
+     "- Maintenance: Standard practice requires humidifier filter replacement (monthly, 0.5 hour"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cathode' in: standard practice uses only cathode humidification with a 10% parasitic load to manage hydration, with no anod",
+     "excluded stem 'cathode' in: this maintains membrane hydration at 1.5 a/cm² without increasing cathode humidification",
+     "excluded stem 'cathode' in: maintenance: inspect capillary wick monthly for clogging (c); replace if flow rate drops >10% (c).\n\nburden led",
+     "excluded stem 'cathode' in: this intervention adds timer calibration (0.1 hours) and wick flow rate calibration (0.2 hours) – total 0.3 ho"
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p02-leadacid-grid-corrosion",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p03-phe-biofouling",
+   "repairs": 0,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p04-pump-cavitation",
+   "repairs": 2,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p05-bridge-bearing-aging",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Same (uses existing jig and cement applicator; no new tools).",
+     "- Materials: Same cost class (NR and EPDM are commodity elastomers, price comparable to ne",
+     "- Labor: Same (bonding procedure is identical to standard, just an additional interface).",
+     "- Maintenance: Same (no additional maintenance; no new monitoring required).",
+     "- Total burden: Same class (no new hardware, same labor hours, same material cost class)."
+    ],
+    "APPARATUS_ROW": [
+     "- Maintenance: Same (no additional maintenance; no new monitoring required)."
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p06-water-biofilm",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Standard practice requires 2h weekly flush (2 valves × 2h = 4 valve-hours/",
+     "- Commissioning: Standard practice requires weekly valve operation (2h). This intervention",
+     "- Operation: Standard practice requires 2h/week manual operation. This intervention requir",
+     "- Maintenance: Standard practice requires quarterly valve maintenance (1h/week). This inte",
+     "- Cost Class: All components (valve, timer, analyzer) are existing infrastructure or stand"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: DN50 | 1. (a) Existing DN50 gate valve at dead-end | Modified to act as a flow reversal"
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p07-cgm-biofouling",
+   "repairs": 2,
+   "residual_findings": {
+    "NAMED_VARIANT": [
+     "model/brand-marker: TPS61200 | | (b) Commercially available voltage-boost converter (if needed for 0.5 V) | (b)"
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p08-mems-stiction",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Novelty lives in the **arrangement**: silica coating (not fluoropolymer) for shock absor",
+     "- No new sensors or monitoring; relies on existing shock/offset measurement.",
+     "- Constraint satisfied: Survives 10,000 g without permanent offset >50 mg."
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p09-packaging-barrier",
+   "repairs": 0,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p10-pv-pid",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "bench-p11-spindle-thermal-drift",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: TEC module replaces existing housing cover (same as standard practice's bu",
+     "- Commissioning: PID controller configuration (same as standard practice's thermal managem",
+     "- Operation: No additional operator steps (automatic control via existing spindle power su",
+     "- Maintenance: Standard thermal paste replacement interval (same as standard practice)",
+     "- Cost class: Procurable standard components (same as standard practice's thermal manageme"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cycle' in: magnitude verification: assuming a bearing heat generation of 500w and a tec cooling capacity of 300w (procura",
+     "excluded stem 'cycles' in: magnitude verification: assuming a bearing heat generation of 500w and a tec cooling capacity of 300w (procura",
+     "excluded stem 'warmup' in: magnitude verification: assuming a bearing heat generation of 500w and a tec cooling capacity of 300w (procura"
+    ]
+   }
+  },
+  {
+   "problem_id": "bench-p12-mbr-fouling",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Installation**: Standard PLC programming reused; solenoid valve/flow diverter installe",
+     "- **Commissioning**: Flux monitor calibration unchanged; reverse-flow schedule programmed ",
+     "- **Operation**: No added energy (solenoid valve uses <5 W); no new sensors.",
+     "- **Maintenance**: Valve inspected quarterly (same as chemical dosing); no added burden.",
+     "- **Protocol**: Run two identical MBRs at 8 g/L MLSS, 18 LMH net flux. One uses reverse-fl",
+     "- **Instruments**: Flux monitor, pressure transducer, turbidimeter.",
+     "- **Pass/Fail**: Intervention system maintains flux >18 LMH with chemical cleaning >6 mont",
+     "- **Duration**: 180 days.",
+     "- **Kill Criterion**: Flux drops below 18 LMH in either system for 24 consecutive hours."
+    ],
+    "APPARATUS_ROW": [
+     "| Flux monitor calibration | Flux monitor calibration | (a) |",
+     "- **Commissioning**: Flux monitor calibration unchanged; reverse-flow schedule programmed in 30 minutes (less ",
+     "- **Operation**: No added energy (solenoid valve uses <5 W); no new sensors.",
+     "- **Instruments**: Flux monitor, pressure transducer, turbidimeter."
+    ]
+   }
+  },
+  {
+   "problem_id": "dev-fu-005-bridge-bearing",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation time: Standard = 1 hour static; Intervention = 4.5 hours (within same opera",
+     "- Cost class: Same (uses existing infrastructure and procurable items)"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'bearing' in: novelty statement (intervention) — the intervention is to apply a multi-stage stress-relief cycling procedure ",
+     "excluded stem 'bearing' in: standard practice installs the bearing in a single static step; our mitigation introduces a novel dynamic cycl",
+     "excluded stem 'bearing' in: adjacent-technique clearance: the closest existing practice is \"bearing pre-compression\" during installation, ",
+     "excluded stem 'bearing' in: this magnitude is sufficient to keep vertical deflection drift within design tolerance over 75 years in a mari"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new01-supercap-dryout",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Adds 1 cavity machining step (≤30 sec/unit) vs standard's end plate prep; ",
+     "- Commissioning: Identical to standard (no added steps or equipment)",
+     "- Operation: Identical to standard (no added controls/monitoring)",
+     "- Maintenance: Identical to standard (no added procedures)",
+     "- Cost class: Same as standard (all components are catalog items, no exotic materials)"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'height' in: this mitigation departs by introducing a pressure-balancing bladder that dynamically replenishes electrolyte v",
+     "excluded stem 'module' in: this mitigation departs by introducing a pressure-balancing bladder that dynamically replenishes electrolyte v",
+     "excluded stem 'module' in: the magnitude verification shows a 30% reduction in evaporation rate at 65°c when maintaining constant pressur",
+     "excluded stem 'module' in: esr measured at 65°c after every 100 cycles.\ninstruments: capacitance meter (±0.5%), esr meter (±1%), thermal "
+    ],
+    "APPARATUS_ROW": [
+     "- Operation: Identical to standard (no added controls/monitoring)"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new03-insulin-pump-occlusion",
+   "repairs": 2,
+   "residual_findings": {
+    "DEV_NEED": [
+     "prototype"
+    ],
+    "BILL_UNTAGGED": [
+     "- Installation burden: Same (1 connection step, no additional tools required)",
+     "- Materials burden: Same (dual pressure sensors of same class as existing, no new material",
+     "- Instrumentation burden: Same (uses existing pump processing capability)",
+     "- Operational burden: Same (no additional user steps beyond standard pump checks)",
+     "- Maintenance burden: Same (sensors replaced during standard pump servicing)",
+     "- Cost class: Same (MEMS pressure transducers are commodity components)"
+    ],
+    "NAMED_VARIANT": [
+     "variant-marker: prototype | EXECUTABLE TEST — Protocol: Test 20 pumps with prototype modification against 20"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new05-liion-balance-drift",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Standard requires BMS logic config (0.5 hr). Proposed adds sensor installa",
+     "- Commissioning: Standard practice (0.2 hr) vs proposed (0.2 hr) – same",
+     "- Operation: No change – uses existing 1 A balancing current",
+     "- Maintenance: Same as standard – no additional components",
+     "- Cost class: Sensors are commodity items; software modification is within existing BMS ca"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'module' in: proposed adds sensor installation (0.3 hr) and algorithm programming (0.2 hr) – total 1.0 hr (higher but justi"
+    ],
+    "APPARATUS_ROW": [
+     "- (b) Commercial temperature sensor array: Install 13 NTC thermocouples (one per cell), commercially available",
+     "- Installation: Standard requires BMS logic config (0.5 hr). Proposed adds sensor installation (0.3 hr) and al"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-sofc-redox",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Standard practice requires flow controller logic modification (0.5 labor h",
+     "- Commissioning: Standard practice requires gas sequence validation (1.0 hr). Proposed add",
+     "- Operation: Standard practice uses existing gas flows. Proposed adds humidity monitoring ",
+     "- Maintenance: Standard practice requires periodic flow calibration. Proposed adds humidit",
+     "- Cost: Humidifier/sensor are standard catalog items ($500 total), within the existing ins",
+     "- Protocol: Subject cells to 200 start-stop cycles at 750°C with the proposed gas sequence",
+     "- Instruments: Laser deflection system (stress resolution ±5 MPa), electrochemical analyze",
+     "- Pass/Fail: Pass if interfacial stress < 100 MPa at all cycles and power density > 0.35 W",
+     "- Duration: 200 cycles (≈1 month accelerated testing at 750°C).",
+     "- Kill Criterion: Immediate failure if interfacial stress exceeds 150 MPa (indicating immi"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'cell' in: executable test —  \n- protocol: subject cells to 200 start-stop cycles at 750°c with the proposed gas sequence",
+     "excluded stem 'cells' in: executable test —  \n- protocol: subject cells to 200 start-stop cycles at 750°c with the proposed gas sequence",
+     "excluded stem 'existing' in: this prevents microstructural rearrangement and agglomeration.\n\nimplementation bill —\n- (a) modify existing fl",
+     "excluded stem 'existing' in: - (a) modify existing flow controller logic (anode n₂ inlet) — implement a 2-stage shutdown sequence: stage 1 "
+    ],
+    "APPARATUS_ROW": [
+     "- (b) Procure a standard commercial temperature/humidity sensor (e.g., Sensirion SHT85) to monitor inlet strea",
+     "- Installation: Standard practice requires flow controller logic modification (0.5 labor hr). Proposed adds hu",
+     "- Maintenance: Standard practice requires periodic flow calibration. Proposed adds humidity sensor recalibrati",
+     "- Protocol: Subject cells to 200 start-stop cycles at 750°C with the proposed gas sequence. Measure interfacia"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: SHT85 | - (b) Procure a standard commercial temperature/humidity sensor (e.g., Sensirion"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-sofc-thermal-cycling",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- Installation: Same as standard (no new hardware, same assembly steps) — no burden increa",
+     "- Commissioning: Same cure duration (1 hour) and temperature (600°C), same energy use — sa",
+     "- Operation: Identical to standard — no burden increase.",
+     "- Maintenance: Same as standard — no burden increase.",
+     "- Cost: Graded seal is a procurable standard catalog item (same cost class as uniform seal",
+     "- Mass: Graded seal has same density as uniform seal (mass increase <0.5%, well below 2% c"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'mas' in: - mass: graded seal has same density as uniform seal (mass increase <0.5%, well below 2% constraint)",
+     "excluded stem 'mass' in: - mass: graded seal has same density as uniform seal (mass increase <0.5%, well below 2% constraint)",
+     "excluded stem 'stack' in: novelty statement (intervention) — the question-answered sentence first: to prevent thermal cycling fatigue in"
+    ],
+    "APPARATUS_ROW": [
+     "- Operation: Identical to standard (no new controls or monitoring) (a)."
+    ]
+   }
+  },
+  {
+   "problem_id": "dev-fu-001-bearing-spalling",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Input Streams**:",
+     "- 1 kHz vibration sensor (ALREADY-RECORDED: \"existing 1 kHz vibration sensor\").",
+     "- 1 Hz SCADA logging (ALREADY-RECORDDED: \"1 Hz SCADA logging\").",
+     "- **Processing**:",
+     "- Compute kurtosis over 10-second sliding windows (100 samples at 1 kHz) and log to SCADA ",
+     "- **Threshold**:",
+     "- Kurtosis > 4.5 (CALCULATED: 3σ above baseline of 1.5 for healthy bearings, per ISO 10816",
+     "- **Warning Logic**:",
+     "- Trigger alarm if kurtosis > 4.5 for ≥ 24 consecutive hours (ensures 14-day warning befor",
+     "- **Installability**: No new hardware (uses existing sensor).",
+     "- **Operability**: Identical to RMS monitoring (SCADA integration unchanged).",
+     "- **Maintenance**: No additional servicing (software update only).",
+     "- **Cost Class**: Same as RMS (no extra materials/instruments).",
+     "- **Burden Parity**: Identical burden, different mechanism (kurtosis vs. RMS).",
+     "- **Protocol**:",
+     "1. Collect 30 days of historical vibration data (ALREADY-RECORDED) from a bearing with kno",
+     "2. Compute kurtosis for 10-second windows and log hourly.",
+     "3. Verify kurtosis exceeds 4.5 ≥ 14 days before RMS trip.",
+     "- **Pass/Fail**:",
+     "- Pass: Kurtosis > 4.5 ≥ 14 days pre-failure with ≤ 2 false alarms/year (validated against",
+     "- Fail: kurtosis < 4.5 < 14 days pre-failure or > 2 false alarms.",
+     "- **Duration**: 30-day retrospective analysis.",
+     "- **Kill Criterion**: Failure to meet 14-day warning or false alarm constraint.",
+     "- Primary indicator: Vibration amplitude (RMS) as stated, since it directly triggers the f",
+     "- Supplement: Kurtosis is used only as a leading indicator to predict RMS threshold breach"
+    ]
+   }
+  },
+  {
+   "problem_id": "dev-fu-003-motor-insulation",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Instruments**: Existing offline PD tester (ALREADY-RECORDED: \"offline PD testing durin",
+     "- **Procedure**:",
+     "1. Measure PIV using the existing PD tester per IEEE 1434.",
+     "2. Compare current PIV to the last recorded PIV from the same motor (ALREADY-RECORDDED: \"s",
+     "- **Reference/Threshold**:",
+     "- DERIVED (stated physics): PIV degradation rate threshold = 5% per outage. Calculated fro",
+     "- DERIVED (stated spec): Ground fault threshold = 1 kV absolute PIV (from motor nameplate ",
+     "- **Installability**: Same as standard PD testing (no new hardware).",
+     "- **Operability**: Same outage-based procedure; adds only PIV trend calculation (negligibl",
+     "- **Maintenance**: No additional maintenance (uses existing tester calibration).",
+     "- **Cost class**: Same as standard PD testing (no new capital costs).",
+     "- **Conclusion**: Same burden class as standard practice, with added predictive value from",
+     "- **Protocol**:",
+     "1. Apply test voltage to motor windings in 200 V steps.",
+     "2. Record voltage at first detectable PD pulse.",
+     "3. Calculate PIV degradation rate = (PIV_current - PIV_previous)/PIV_previous.",
+     "4. Compare to 5%/outage threshold.",
+     "- **Instruments**: Existing offline PD tester (ALREADY-RECORDED).",
+     "- **Pass/Fail**:",
+     "- Pass: Degradation rate < 5%/outage (no action).",
+     "- Fail: Degradation rate ≥ 5%/outage (schedule rewind within 6 months).",
+     "- **Duration**: 2 hours per motor (same as standard PD test).",
+     "- **Kill Criterion**: If PIV degradation rate does not correlate with future ground faults"
+    ]
+   }
+  },
+  {
+   "problem_id": "dev-fu-004-fouling",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Input streams**:",
+     "- ALREADY-RECORDED: \"steam turbine exhaust temperature\" (T_steam_in, °C) [problem statemen",
+     "- ALREADY-RECORDED: \"condensate outlet temperature\" (T_steam_out, °C) [problem statement].",
+     "- ALREADY-RECORDED: \"cooling water inlet temperature\" (T_cw, °C) [problem statement].",
+     "- ALREADY-RECORDED: \"steam mass flow rate\" (ṁ, kg/s) [problem statement].",
+     "- **Reference/Threshold**:",
+     "- DERIVED: Baseline Ẋ_dest (W) from stated physics: Ẋ_dest_baseline = ṁ_nominal * c_p * T_",
+     "- DERIVED: Threshold = 1.15 * Ẋ_dest_baseline [CALCULATED: 15% rise from physics].",
+     "- **Components**: Real-time exergy calculator (PLC logic), existing SCADA historian.",
+     "- **Installability**: SAME (uses existing sensors, no new hardware).",
+     "- **Operability**: SAME (automated calculation, no manual intervention).",
+     "- **Maintenance**: SAME (no moving parts, same calibration cycles as temperature sensors).",
+     "- **Cost class**: SAME (software-only upgrade vs. standard differential pressure monitorin"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new02-slipring-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Input streams** (all ALREADY-RECORDDED):",
+     "1. Excitation current (historian data at 1-minute sampling interval)",
+     "2. Generator output power (historian data at 1-minute sampling interval)",
+     "- **Processing**:",
+     "- Compute RMS current ripple (I_ripple) over 1-minute window (ALREADY-RECORDED data)",
+     "- Normalize ripple to excitation current: Ripple Ratio = I_ripple / I_excitation (ALREADY-",
+     "- **Threshold**: Ripple Ratio > 0.005 (CALCULATED from 10% contact resistance increase thr",
+     "- **Output**: Binary alert when threshold exceeded for ≥3 consecutive samples (to reject t",
+     "- **Installability**: Same as standard practice (uses existing historian data) — no new ha",
+     "- **Operability**: Real-time computation (existing historian infrastructure) — same as vib",
+     "- **Maintenance**: Zero (no sensors added) — lighter than vibration/temperature systems.",
+     "- **Cost**: Same class (software-only vs. hardware sensors) — 10% of standard practice cos",
+     "- **Protocol**:",
+     "1. Extract 1-minute historian data (excitation current, power) from 6 months pre-failure a",
+     "2. Compute Ripple Ratio for each 1-minute window.",
+     "3. Apply threshold (0.005) and 3-sample rule.",
+     "- **Pass/Fail**:",
+     "- **Pass**: Alert ≥14 days before all known failures (≥2 weeks warning) with ≤1 false alar",
+     "- **Fail**: Alert <14 days before failure or >1 false alarm/year.",
+     "- **Duration**: 1 month (processing pre-existing data).",
+     "- **Kill Criterion**: Failure to meet pass/fail criteria."
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'alarm' in: novelty statement — standard practice delivers a monitoring/indication scheme via vibration/temperature alarms",
+     "excluded stem 'alarms' in: novelty statement — standard practice delivers a monitoring/indication scheme via vibration/temperature alarms",
+     "excluded stem 'machine' in: the failure physics—increased brush-slip-ring contact resistance from wear—modulates the dc excitation current",
+     "excluded stem 'machine' in: generator output power (historian data at 1-minute sampling interval)  \n- **processing**:  \n  - compute rms cu"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new04-chiller-fouling-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Inputs (ALREADY-RECORDED):**",
+     "- CHW_Supply_T (BMS point)",
+     "- CHW_Return_T (BMS point)",
+     "- Condenser_Water_Supply_T (BMS point)",
+     "- Condenser_Water_Return_T (BMS point)",
+     "- Compressor_Power (BMS point)",
+     "- Outdoor_Wet_Bulb_T (BMS point)",
+     "- **Calculated Metrics:**",
+     "- Condenser_Approach_T = Condenser_Water_Return_T - CHW_Supply_T (DERIVED from stated BMS ",
+     "- Baseline_Compressor_Power (DERIVED from stated physics: clean-tube power at design condi",
+     "- Fouling_Index = (Current_Compressor_Power / Baseline_Compressor_Power) - (Current_Approa",
+     "- **Threshold:** Fouling_Index > 0.15 (CALCULATED: 3% power increase corresponds to ~0.15 ",
+     "- **Trigger:** Cleaning when Fouling_Index > 0.15 for 3 consecutive days (USER CONSTRAINT:",
+     "- **Installability:** SAME (uses existing BMS points; no new hardware).",
+     "- **Operability:** SAME (automated calculation in BMS; no extra operator steps).",
+     "- **Maintenance:** SAME (no calibration; thresholds derived from physics).",
+     "- **Cost:** SAME (no new sensors or labor; software logic only).",
+     "- **Benefit:** Reduces cleaning labor by ~30% (clean only when needed) and cuts energy by "
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new06-bearing-vibration-predictor",
+   "repairs": 1,
+   "residual_findings": "CLEAN"
+  },
+  {
+   "problem_id": "eval-new07-transformer-dga-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Instruments**:",
+     "- Top-oil temperature sensor (ALREADY-RECORDED: \"top-oil temperature\" at 15-min resolution",
+     "- Load current sensor (ALREADY-RECORDED: \"load current\" at 15-min resolution)",
+     "- Ambient temperature sensor (ALREADY-RECORDDED: \"ambient temperature\" at 15-min resolutio",
+     "- Tank pressure sensor (ALREADY-RECORDED: \"tank pressure\" at 15-min resolution)",
+     "- **Procedure**:",
+     "1. Calculate hotspot temperature: T_hotspot = T_top_oil + ΔT_rise (ΔT_rise = CALCULATED: 0",
+     "2. Compute aging acceleration factor: AAF = CALCULATED: exp(15000*(1/T_ambient - 1/T_hotsp",
+     "3. Flag when AAF > 2.5 (CALCULATED: threshold from 2x aging rate over 30 days at 85°C base",
+     "- **Installability**: SAME (uses existing sensors)",
+     "- **Operability**: SAME (real-time calculation at 15-min intervals)",
+     "- **Maintenance**: SAME (no new hardware; software update only)",
+     "- **Cost**: SAME (no new instruments; minor compute overhead)",
+     "- **Protocol**:",
+     "1. Use 12 months of historical sensor data (ALREADY-RECORDED) with known DGA results.",
+     "2. Run the predictor forward 30 days from each DGA sample.",
+     "3. Compare flags against actual DGA failure detection.",
+     "- **Pass/Fail**: Flag must appear ≥30 days before DGA detects fault in ≥90% of degradation",
+     "- **Duration**: 1 week (processing 12 months of data).",
+     "- **Kill Criterion**: <70% recall rate (misses >30% of degradation events)."
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new08-pipeline-leak-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Instruments**: Existing pressure transmitters (ALREADY-RECORDED: \"pressure transmitter",
+     "- **Procedure**: Compute 5-minute rolling cross-correlation between pressure and flow; tra",
+     "- **Threshold**: DERIVED from stated 0.5% leak (0.3 L/s) and physics: correlation decay th",
+     "- **False alarm limit**: DERIVED from stated 1 false alarm/month/10 km: statistical thresh",
+     "- Installability: SAME (uses existing transmitters, no new hardware)",
+     "- Operability: SAME (computation added to existing SCADA, same maintenance)",
+     "- Maintenance: SAME (no new sensors, same calibration cycles)",
+     "- Cost class: SAME (software-only change, no material/instrument cost)"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new09-hvac-filter-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Input streams** (ALREADY-RECORDED):",
+     "- Supply fan power (BMS log, \"supply fan power\")",
+     "- Return fan power (BMS log, \"return fan power\")",
+     "- Outdoor air flow (BMS log, \"outdoor air flow\")",
+     "- Occupancy schedule (BMS log, \"occupancy schedule\")",
+     "- **Reference/thresholds** (DERIVED):",
+     "- Baseline clean power: CALCULATED from stated spec (MERV-13 clean ΔP = 50 Pa) and fan cur",
+     "- Loading threshold: CALCULATED from 20% power increase above baseline (stated constraint:",
+     "- **Instruments**: Existing BMS data logger (no new hardware).",
+     "- **Procedure**: Compute 24-hr moving average of (supply power / outdoor airflow) during o",
+     "- **Installability**: Same (uses existing BMS points).",
+     "- **Operability**: Same (automated alert, no manual intervention).",
+     "- **Maintenance**: Same (no new calibration; thresholds derived from specs).",
+     "- **Cost**: Same class (no new sensors; computation only).",
+     "- **Advantage**: Cuts early replacements by targeting actual loading, not time.",
+     "- **Protocol**: Log supply power, outdoor airflow, and occupancy for 90 days post-replacem",
+     "- **Pass/fail**: Predictor flags replacement when signal exceeds 120% baseline for 7 conse",
+     "- **Threshold**: 20% reduction in false alerts vs. 90-day schedule (stated constraint).",
+     "- **Duration**: 90 days (covers 1 filter life).",
+     "- **Kill criterion**: If signal fails to correlate with ΔP (r² < 0.7) or doesn’t reduce re"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new10-solar-inverter-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Components**: Harmonic analyzer module (software), thermal resistance lookup table (da",
+     "- **Data streams (all ALREADY-RECORDED)**:",
+     "- DC current (stated telemetry).",
+     "- Heatsink temperature (stated telemetry).",
+     "- AC power (stated telemetry, for load normalization).",
+     "- **Reference/thresholds**:",
+     "- Baseline THD_dc (CALCULATED from 30-day healthy median of DC current FFT).",
+     "- ΔT_junction threshold = 20°C (CALCULATED from IGBT datasheet derating curve: 80% of max ",
+     "- **Installability**: Same as standard telemetry monitoring; no new hardware (uses existin",
+     "- **Operability**: Real-time computation (negligible CPU load); same alerting system as st",
+     "- **Maintenance**: Quarterly THD_dc baseline update (automated from existing data).",
+     "- **Cost class**: Same as standard telemetry analysis (no additional sensors or labor).",
+     "- **Protocol**: Compute THD_dc and ΔT_junction for 100 historical trip events (from fault ",
+     "- **Instruments**: Existing telemetry database, FFT analyzer, thermal model.",
+     "- **Pass/fail**: Must achieve ≥95% true-positive detection and ≤1 false alarm per quarter ",
+     "- **Duration**: 30-day backtest on historical data.",
+     "- **Kill criterion**: If false alarms exceed 1/quarter or misses >5%, falsify.",
+     "- Primary indicator: ΔT_junction (directly linked to IGBT thermal failure per physics).",
+     "- Secondary indicator: THD_dc (supplements by indicating degradation source)."
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new11-conveyor-belt-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Instruments**:",
+     "- Belt-scale weight sensor (ALREADY-RECORDED: \"belt-scale sensors at 1-minute resolution\")",
+     "- Drive-motor current sensor (ALREADY-RECORDED: \"drive-motor current sensors at 1-minute r",
+     "- **Procedure**:",
+     "- Compute 1-minute moving average of belt load (W) and motor current (I)",
+     "- Calculate cross-correlation coefficient (R²) between W and I over 10-minute windows",
+     "- Flag when R² drops below threshold (DERIVED: from stated physics; baseline R² = 0.95 fro",
+     "- **Reference**:",
+     "- Threshold: R² < 0.85 (CALCULATED: 0.95 - 0.10 = 0.85, accounting for 10% stiffness loss)",
+     "- False alarm limit: 2/year (DERIVED: from constraint \"no more than 2 false alarms per yea",
+     "- **Installability**: Same (uses existing sensors)",
+     "- **Operability**: Same (no new training; automated calculation)",
+     "- **Maintenance**: Same (no added hardware)",
+     "- **Cost class**: SAME (no new instrumentation)",
+     "- **Burden difference**: None (mechanism is computational only)",
+     "- **Protocol**:",
+     "1. Collect 6 months of historical W and I data from healthy belt (ALREADY-RECORDED)",
+     "2. Compute R² baseline (must be ≥0.95)",
+     "3. Simulate belt degradation by injecting synthetic 10% stiffness drop into load data",
+     "4. Run predictor; flag must occur within 21 days of injection",
+     "- **Instruments**: Existing belt-scale and current sensor logs",
+     "- **Pass/fail**:",
+     "- Pass: Flag timing ≤21 days AND ≤2 false alarms in 6 months",
+     "- Fail: Flag timing >21 days OR >2 false alarms",
+     "- **Duration**: 6 months (using existing data)",
+     "- **Kill criterion**: If R² baseline <0.95 (invalidates physics assumption)"
+    ],
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'alarm' in: crack density).\n\nimplementation bill —  \n- **instruments**:  \n  - belt-scale weight sensor (already-recorded: ",
+     "excluded stem 'alarm' in: run predictor; flag must occur within 21 days of injection  \n- **instruments**: existing belt-scale and curren",
+     "excluded stem 'alarms' in: crack density).\n\nimplementation bill —  \n- **instruments**:  \n  - belt-scale weight sensor (already-recorded: ",
+     "excluded stem 'alarms' in: run predictor; flag must occur within 21 days of injection  \n- **instruments**: existing belt-scale and curren"
+    ]
+   }
+  },
+  {
+   "problem_id": "eval-new12-axle-bearing-predictor",
+   "repairs": 2,
+   "residual_findings": {
+    "BILL_UNTAGGED": [
+     "- **Instruments**: Wayside acoustic microphone array (ALREADY-RECORDED; problem states \"ex",
+     "- **Data streams**:",
+     "- Acoustic time-series from microphone array (ALREADY-RECORDED; problem states \"wayside ac",
+     "- Wheel-impact-load-detector (WILD) timestamps (ALREADY-RECORDED; problem states \"existing",
+     "- **Reference/thresholds**:",
+     "- Baseline phase coherence: DERIVED from healthy bearing data (CALCULATED: mean ± 3σ from ",
+     "- Crack depth threshold: DERIVED from WILD impact data (CALCULATED: impact force > 200 kN ",
+     "- **Procedure**:",
+     "1. For each WILD event > 200 kN, compute cross-correlation phase differences between micro",
+     "2. Flag coherence drop > 20% from baseline as crack initiation.",
+     "3. Trigger alert if flag persists for 5 consecutive events (ASSUMPTION: 5 events = 60 days",
+     "- **Installability**: Same as standard (no onboard hardware; uses existing wayside gear).",
+     "- **Operability**: Minimal (real-time processing; no manual intervention).",
+     "- **Maintenance**: Same (microphone array already maintained).",
+     "- **Cost class**: Same (no new hardware; software update only).",
+     "- **Protocol**: Apply 200 kN impact loads to a test bearing with 1 mm artificial spall; re",
+     "- **Instruments**: Wayside microphone array, force gauge.",
+     "- **Pass/fail**: Phase coherence drop > 20% within 10 impacts (CALCULATED: 10 impacts ≈ 60",
+     "- **Duration**: 1 hour.",
+     "- **Kill criterion**: No coherence drop after 50 impacts (ASSUMPTION: 50 impacts = 300 day"
+    ]
+   }
+  }
+ ],
+ "results": []
+}

@@ -1,0 +1,38 @@
+{
+ "record": "R156S1_QUOTA_CUSTODY/1.0.0",
+ "claim": "c-0264",
+ "work_id": "r153-xkiro-qualify-panel-v18",
+ "session": "builder-r156s1",
+ "at": "2026-11-25 10:40 UTC",
+ "the_measured_fact": {
+  "probe": "HTTP 429 'You've reached today's free-model token quota' on the VAULT xkiro key (auth-valid: the dead directions' key 401s; the vault key is the live one)",
+  "sandbox_clock": "2026-11-25 10:40 UTC",
+  "what_actually_happened": "the 00:00 UTC Nov-25 reset passed and was CONSUMED by ~185 qualification legs from the morning's concurrent lanes (the triple burn); the next reset is 00:00 UTC 2026-11-26",
+  "the_directions_premise": "'the quota reset has PASSED' was TRUE of the reset and FALSE of the pool — the board reads the probe, not the premise (Art. 1)"
+ },
+ "the_typed_refusal": {
+  "what": "the panel was NOT fired this window",
+  "why": "49 legs (snlite 19 + mst14b 30) into a dead quota = hours of 429-backoff ladders, all typed RATE_LIMITED, no votes cast, no tokens gained",
+  "upholds": "the r153s2 typed refusal (eval/r153s2_panel_quota_block.json)"
+ },
+ "the_correction": {
+  "to": "eval/r153s2_panel_quota_block.json",
+  "the_claim": "RATE_LIMITED panel legs are 'FINAL under the no-re-roll rule (byte-resume skips any existing legfile)'",
+  "the_code": "scripts/r153_p4_panel_v18.py line 358: only outcome == 'VALID' legs skip (the R146 fix); RATE_LIMITED legs RETRY on re-run",
+  "the_consequence": "the 'permanent wound' rationale was overstated; the refusal stands on the wasted-window rationale; the post-reset executor knows the legs are recoverable, not final"
+ },
+ "dir6_verification": {
+  "physics_battery": "73 passed (checks + magnitudes + r54 + guards)",
+  "v18_row_regression": "20 passed",
+  "check_contract": "8 check functions (dimensions, magnitudes, assumption bounds, magnetic target, 3 sign checks, permittivity label)",
+  "import_graph": "scripts/r149_v18_physics_one_shot.py:56 -> discovery_fabric.generation.physics_truth (unchanged)",
+  "the_r149_lever_record": "stands: 6 genuine errors -> 0 across 30 v18 rows, 4 FP classes typed, engine-wired"
+ },
+ "the_resume": {
+  "when": "the first window after 00:00 UTC 2026-11-26",
+  "how": "probe the quota; run the UNFILTERED scripts/r153_p4_panel_v18.py (byte-resume skips hy4f 30 + snlite 8 VALID legs; snlite 19 + mst14b 30 generate)",
+  "then": "the 3-judge two-axis majority tally on the FULL 30-candidate set; scripts/r153s1_tally_recompute.py diff=0; the >=50% viable+non-obvious bar -> score-8 evidence",
+  "budget_note": "49 legs ~245K tokens vs the ~200K daily pool (the burn census estimate); if the pool dies late the tally computes over votes cast and the shortfall is disclosed, not papered; ONE run, no re-qualification (the serving set is frozen)"
+ },
+ "raw_bytes": "eval/r156s1_quota_custody.json (this file)"
+}

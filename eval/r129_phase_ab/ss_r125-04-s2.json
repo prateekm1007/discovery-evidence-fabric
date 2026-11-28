@@ -1,0 +1,69 @@
+{
+ "problem_id": "r125-04-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 6.51,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 968,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 122.8,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1304,
+    "completion_tokens": 984,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a Closed-Loop Specific Power Optimization Strategy that uses the existing crusher motor power meter, feed-rate scale, and discharge-belt scale to trigger a controlled Liner Gap Adjustment (CGS - Closed Side Setting). The core logic is that rising specific power (kW/t) while maintaining throughput is a primary indicator of liner wear leading to increased gap (coarser product) and poor chamber pack. The mitigation involves using the specific power as the *trigger* for a gap reduction operation, validated by the material flow sensors, to restore the correct crushing chamber volume and product size distribution.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** $P_{spec}$ (Specific Power) = $P_{motor} / M_{discharge}$.\n*   **Direction of Effect:** An **increase** in $P_{spec}$ indicates a **widening** of the effective crushing gap (due to liner wear), which causes **coarser** product and reduced packing efficiency. The corrective mechanical action is a **reduction** (tightening) of the Closed Side Setting (CGS) to restore fine product and proper chamber pack.\n\n**IMPLEMENTATION BILL:**\n1.  **Baseline Establishment:** Calculate the specific power ($P_{spec}$) using the existing meters:\n    $$ P_{spec} = \\frac{P_{motor}}{M_{discharge}} $$\n    Where $P_{motor}$ is the kW from the power meter, and $M_{discharge}$ is the tonnage/hour from the discharge-belt scale.\n\n2.  **Monitoring Logic:** The control system (or operator protocol) continuously monitors $P_{spec}$. Define an alert threshold: If $P_{spec}$ rises by $>5-10\\%$ above the reference value recorded immediately after the last liner change, it indicates the crusher is working harder to break the same volume of material, implying increased gap/loss of pack.\n\n3.  **Action Protocol (Gap Reduction):**\n    *   **Step A:** Verify surge condition using the **feed-rate scale**. Ensure the feed is stable and not in surge ($M_{feed} \\le M_{discharge}$). If in surge, wait for surge to clear before proceeding.\n    *   **Step B:** Execute a **CGS (Closed Side Setting) Tightening** operation. This is done by adjusting the crusher's eccentric assembly or hydraulic plunger (existing mechanism) to reduce the gap at the closed side.\n    *   **Step C:** After the gap adjustment, monitor the **discharge-belt scale** ($M_{discharge}$). As the gap tightens, throughput will initially drop. Allow the crusher to pack up.\n    *   **Step D:** Re-evaluate $P_{spec}$. As the gap is reduced and pack is established, $P_{motor}$ should decrease relative to the new, slightly lower $M_{discharge}$, bringing $P_{spec}$ back down towards the baseline. If $P_{spec}$ remains high or $M_{discharge}$ drops drastically, the gap was tightened too much, and a small back-off adjustment is made.\n\n4.  **Validation:** The coarse fraction return is indirectly monitored by the sustained drop in $P_{spec}$ and the restoration of $M_{discharge}$ to target levels without excessive power draw. The feed-rate scale ensures the upstream feed matches the crusher's new capacity.\n\n**Measures It Relies On:**\n*   **Crusher Motor Power Meter ($P_{motor}$):** Source: Existing motor power meter. Used as the numerator in $P_{spec}$.\n*   **Discharge-Belt Scale ($M_{discharge}$):** Source: Existing discharge-belt scale. Used as the denominator in $P_{spec}$ and to verify throughput.\n*   **Feed-Rate Scale ($M_{feed}$):** Source: Existing feed-rate scale. Used to gate the adjustment process (surge check) and confirm feed consistency.\n\n**Why This Works:**\nWorn liners increase the effective gap, reducing the crushing force and pack, leading to coarser product and higher specific energy. The crusher \"slips\" or works less efficiently, drawing more power per tonne. By using $P_{spec}$ (from existing meters) as the key performance indicator and adjusting the CGS (existing mechanical feature) to restore pack, you directly address the root cause (excessive gap) without new sensors. The feed and discharge scales provide the necessary context to ensure the adjustment is made safely and effectively.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Baseline Establishment:** Calculate the specific power ($P_{spec}$) using the existi",
+   "2.  **Monitoring Logic:** The control system (or operator protocol) continuously monitors ",
+   "3.  **Action Protocol (Gap Reduction):**",
+   "*   **Step A:** Verify surge condition using the **feed-rate scale**. Ensure the feed is s",
+   "*   **Step B:** Execute a **CGS (Closed Side Setting) Tightening** operation. This is done",
+   "*   **Step C:** After the gap adjustment, monitor the **discharge-belt scale** ($M_{discha",
+   "*   **Step D:** Re-evaluate $P_{spec}$. As the gap is reduced and pack is established, $P_",
+   "4.  **Validation:** The coarse fraction return is indirectly monitored by the sustained dr",
+   "*   **Crusher Motor Power Meter ($P_{motor}$):** Source: Existing motor power meter. Used ",
+   "*   **Discharge-Belt Scale ($M_{discharge}$):** Source: Existing discharge-belt scale. Use",
+   "*   **Feed-Rate Scale ($M_{feed}$):** Source: Existing feed-rate scale. Used to gate the a"
+  ],
+  "APPARATUS_ROW": [
+   "2.  **Monitoring Logic:** The control system (or operator protocol) continuously monitors $P_{spec}$. Define a",
+   "*   **Step C:** After the gap adjustment, monitor the **discharge-belt scale** ($M_{discharge}$). As the gap t",
+   "4.  **Validation:** The coarse fraction return is indirectly monitored by the sustained drop in $P_{spec}$ and"
+  ]
+ },
+ "wall_clock_s": 130.32,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

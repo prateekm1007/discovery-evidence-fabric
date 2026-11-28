@@ -1,0 +1,54 @@
+{
+ "problem_id": "HO8-13-li-formation-sei",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip 7c9c8ffb6)",
+ "executor_id": "builder-r44s1@holdout-v8-generation",
+ "machine": {
+  "machine": "V8.0",
+  "base": "V7.7 (r40_machine_v77) with the R42-verdict generation binds (claims c-0060)",
+  "request_model": "glm-4-plus",
+  "repair_budget": 3,
+  "k_gen": 1
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T04:03:42.611761Z",
+ "a1_answer": "**NOVELTY STATEMENT (INTERVENTION)**  \nTo mitigate uneven SEI formation causing first-cycle capacity loss spread in NMC/graphite cells, the intervention is a temperature setpoint retuning during formation. Standard practice uses a constant temperature profile; this mitigation introduces a controlled temperature ramp-down during the latter half of the formation cycle to homogenize SEI growth kinetics across the electrode stack. The adjacent-technique clearance is standard isothermal formation; this is distinct by intentionally varying temperature to modulate local reactivity. The mechanism attacks the failure driver (non-uniform SEI nucleation/growth rates) by reducing thermal gradients that exacerbate local electrolyte decomposition.\n\n**PHYSICS CHECK**  \nDIRECTION-OF-EFFECT: driving variable = local electrolyte decomposition rate; the mechanism moves it down by 15–25% (via reduced thermal activation energy at lower T in later stages); this reduces SEI thickness spread. The governing relation is the Arrhenius equation: \\( k = A e^{-E_a/RT} \\). A 5°C drop in T (from 35°C to 30°C) during the second half of formation reduces \\( k \\) by ~18%, slowing decomposition in hotspots and evening SEI growth.\n\n**IMPLEMENTATION BILL**  \n- **CANDIDATE CLASSES**:  \n  1. Electrolyte additive chemistry — modifies SEI precursor chemistry to promote uniform nucleation  \n  2. Temperature setpoint retuning — exploits Arrhenius dependence to homogenize decomposition rates  \n  3. Current-step/soak scheduling — adjusts local ion flux to balance SEI precursor availability  \n  SELECTED: Temperature setpoint retuning — non-duty-cycle candidates (additive, current) cannot directly address thermal gradients in the cell stack.  \n\n| Item | Tag | Description |  \n|------|-----|-------------|  \n| (c) | Formation oven temperature setpoint | Retune from constant 35°C to 35°C (0–50% cycle), 32°C (51–100% cycle) |  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- **Installation burden**: Same (no hardware; setpoint change in existing PLC).  \n- **Operational burden**: Same (no additional labor; existing oven control used).  \n- **Operational cost**: Zero (schedule runs during production; no throughput loss).  \n\n**EXECUTABLE TEST**  \n- **Protocol**: Form 100 cells at standard 35°C (control) and 100 cells at retuned profile (test). Measure first-cycle capacity spread (σ/μ) via in-line coulombic efficiency.  \n- **Instruments**: Existing formation line data acquisition (voltage, current, temperature).  \n- **Pass/fail**: Test group shows ≥20% reduction in capacity spread vs. control (p<0.05, t-test).  \n- **Duration**: 1 full formation cycle (48 hours).  \n- **Kill criterion**: If temperature control instability causes >1°C deviation, abort and revert.  \n\n**MECHANISM CLASS: Thermal gradient modulation**",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Non-uniform SEI nucleation/growth rates across the electrode stack due to thermal gradients causing local electrolyte decomposition rate variations | ingredient: Reduces local electrolyte decomposition rate by lowering temperature, thereby slowing SEI formation in hotspots to homogenize growth kinetics | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Non-uniform SEI nucleation/growth rates across the electrode stack due to thermal gradients causing local electrolyte decomposition rate variations",
+   "ingredient_action": "Reduces local electrolyte decomposition rate by lowering temperature, thereby slowing SEI formation in hotspots to homogenize growth kinetics",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- **CANDIDATE CLASSES**:",
+    "1. Electrolyte additive chemistry — modifies SEI precursor chemistry to promote uniform nu",
+    "2. Temperature setpoint retuning — exploits Arrhenius dependence to homogenize decompositi",
+    "3. Current-step/soak scheduling — adjusts local ion flux to balance SEI precursor availabi",
+    "- **Installation burden**: Same (no hardware; setpoint change in existing PLC).",
+    "- **Operational burden**: Same (no additional labor; existing oven control used).",
+    "- **Operational cost**: Zero (schedule runs during production; no throughput loss).",
+    "- **Protocol**: Form 100 cells at standard 35°C (control) and 100 cells at retuned profile",
+    "- **Instruments**: Existing formation line data acquisition (voltage, current, temperature",
+    "- **Pass/fail**: Test group shows ≥20% reduction in capacity spread vs. control (p<0.05, t",
+    "- **Duration**: 1 full formation cycle (48 hours).",
+    "- **Kill criterion**: If temperature control instability causes >1°C deviation, abort and "
+   ],
+   "DUTY_CYCLE_PREFERENCE_UNPROVEN": [
+    "the SELECTED class is duty-cycle-shaped while a non-duty-cycle candidate is enumerated — state the PHYSICS that rejects the non-duty-cycle candidate (the preference bind); convenience is not a physics reason"
+   ],
+   "SIGNALS_USED_UNDECLARED": [
+    "the bill carries no SIGNALS USED: line — list every online signal the mechanism requires to actuate or trigger (each with its source: existing sensor / permitted measure / derived from permitted signals) or the explicit 'none (open-loop)'"
+   ]
+  }
+ },
+ "sha256_16": "6753d5707159071b"
+}

@@ -1,0 +1,52 @@
+{
+ "problem_id": "r123-12-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [fresh set] + bind check + bare reviewer fixes)",
+ "authored_bill": "**Mitigation Proposal: Thermostat-Band Widening and Compressor Duty-Cycle Optimization**\n\n**Mechanism:**\nThe root cause of the symptoms (lengthened pull-down, rising suction temperature at constant duty, increased short-cycling) is typically a mismatch between the control setpoints and the actual heat load/heat ingress of the store. When heat load increases slightly (e.g., door leaks, ambient changes), the existing tight control band causes the compressors to reach the \"stop\" temperature quickly, but they cannot maintain it long enough before the temperature rises back to the \"start\" point, leading to short cycling. This short cycling prevents the compressors from running long enough to pull the suction temperature down effectively, causing the upward drift in suction temperature and longer pull-down times.\n\n**Implementation:**\n1.  **Adjust Room Thermostat Hysteresis:** Using the existing room thermostat array, widen the control band (hysteresis) between the \"compressor start\" and \"compressor stop\" temperature setpoints. For example, if the current band is 0.5°C (start at +2.0°C, stop at +1.5°C), widen it to 1.0°C (start at +2.0°C, stop at +1.0°C). This reduces the frequency of cycles, allowing each cycle to run longer.\n2.  **Modify Setpoints Based on Suction/Discharge Feedback:** Utilize the existing suction and discharge temperature transducers to implement a manual or rule-based setpoint shift. If the discharge temperature trends upward or the suction temperature does not drop as expected during a full compressor runtime cycle (as monitored by the runtime counters), manually lower the \"compressor stop\" setpoint of the room thermostat array. This forces the compressors to run longer to achieve a lower room temperature, which in turn pulls down the suction temperature more effectively before the cycle stops.\n3.  **Monitor Runtime Counters for Validation:** Track the compressor runtime counters over a 24-hour period. The goal is to increase the \"duty time per cycle\" (runtime before stopping) rather than the total number of cycles. A successful mitigation will show fewer cycles with longer individual runtimes, stabilizing the suction temperature lower during the pull-down phase.\n\n**Measures Relied Upon:**\n*   **Room Thermostat Array:** Used to adjust the start/stop temperature band and setpoint targets.\n*   **Suction/Discharge Temperature Transducers:** Used as qualitative indicators of system performance (e.g., high discharge temp indicates potential high load or low suction; low suction temp during full runtime indicates effective cooling). They guide the direction of setpoint adjustments.\n*   **Compressor Runtime Counters:** Used to measure cycle duration and frequency, providing the metric to verify that short cycling is reduced and that the new operating point provides sufficient cooling capacity within each cycle.\n\nThis approach uses no new hardware, only existing sensors and control adjustments, to compensate for the increased thermal load or degraded heat exchange efficiency by optimizing the control logic to allow longer compressor runs.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycling' and the stated failure driver 'cycle' are the same action class (t",
+  "UNPRICED_DUTY_CYCLE: the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, qu"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycling' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ],
+  "UNPRICED_DUTY_CYCLE": [
+   "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Thermostat-Band Widening and Compressor Duty-Cycle Optimization**\n\n**Mechanism:**\nThe root cause of the symptoms (lengthened pull-down, rising suction temperature at constant duty, increased short-cycling) is a mismatch between the control setpoints and the actual heat load/heat ingress of the store. When heat load increases slightly, the existing tight control band causes the compressors to stop too early, leading to short cycling. This prevents the compressors from running long enough to effectively pull the suction temperature down.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** The control hysteresis (bandwidth) of the room thermostat.\n*   **Direction:** Increasing the hysteresis bandwidth (widening the gap between start and stop temperatures) causes the compressor runtime per cycle to **increase** and the cycle frequency to **decrease**. This extended runtime allows the system to reach a lower steady-state suction temperature before the stop point is hit, effectively reversing the upward suction temperature drift.\n\n**Implementation Bill:**\n1.  **Action:** Widen the room thermostat control band (hysteresis) by 0.5°C.\n    *   *Parameters:* Change stop setpoint from +1.5°C to +1.0°C (keeping start at +2.0°C).\n    *   *Cost:* $0.00 (Configuration change only).\n2.  **Action:** Implement rule-based setpoint shift using Suction/Discharge feedback.\n    *   *Parameters:* If discharge temperature trends up >5% or suction temperature fails to drop below +45°C within the first 10 minutes of a cycle, lower the \"compressor stop\" setpoint by 0.2°C increments until suction stabilizes.\n    *   *Cost:* $0.00 (Manual/Rule-based adjustment; no new hardware).\n3.  **Action:** Validate via Runtime Counters.\n    *   *Parameters:* Monitor 24-hour runtime data. Target metric: Reduce total cycles/hour by ≥20% while increasing average runtime/cycle by ≥25%.\n    *   *Cost:* $0.00 (Data analysis of existing counters).\n\n**Measures Relied Upon:**\n*   **Room Thermostat Array:** Used to adjust the start/stop temperature band and setpoint targets.\n*   **Suction/Discharge Temperature Transducers:** Used as qualitative indicators to guide setpoint adjustments (high discharge indicates high load; low suction during runtime indicates effective cooling).\n*   **Compressor Runtime Counters:** Used to verify that short cycling is reduced (fewer, longer runs).\n\n**Operational Cost & Risk Analysis:**\n*   **Energy Throughput:** Widening the band may increase total room temperature variance, potentially increasing average room temperature slightly. This is an acceptable trade-off for eliminating short cycling, which is energy-inefficient. The extended runtime per cycle reduces the no-load running time and associated energy waste during short cycles.\n*   **Availability:** Risk is low. Changes are reversible via configuration. No mechanical components are altered.\n*   **Throughput:** Cold store availability is maintained; the system remains online during the transition.\n\nThis approach uses no new hardware, only existing sensors and control adjustments, to compensate for the increased thermal load or degraded heat exchange efficiency by optimizing the control logic to allow longer compressor runs.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Action:** Widen the room thermostat control band (hysteresis) by 0.5°C.",
+   "*   *Parameters:* Change stop setpoint from +1.5°C to +1.0°C (keeping start at +2.0°C).",
+   "*   *Cost:* $0.00 (Configuration change only).",
+   "2.  **Action:** Implement rule-based setpoint shift using Suction/Discharge feedback.",
+   "*   *Parameters:* If discharge temperature trends up >5% or suction temperature fails to d",
+   "*   *Cost:* $0.00 (Manual/Rule-based adjustment; no new hardware).",
+   "3.  **Action:** Validate via Runtime Counters.",
+   "*   *Parameters:* Monitor 24-hour runtime data. Target metric: Reduce total cycles/hour by",
+   "*   *Cost:* $0.00 (Data analysis of existing counters).",
+   "*   **Room Thermostat Array:** Used to adjust the start/stop temperature band and setpoint",
+   "*   **Suction/Discharge Temperature Transducers:** Used as qualitative indicators to guide",
+   "*   **Compressor Runtime Counters:** Used to verify that short cycling is reduced (fewer, ",
+   "*   **Energy Throughput:** Widening the band may increase total room temperature variance,",
+   "*   **Availability:** Risk is low. Changes are reversible via configuration. No mechanical",
+   "*   **Throughput:** Cold store availability is maintained; the system remains online durin"
+  ],
+  "APPARATUS_ROW": [
+   "*   *Parameters:* Monitor 24-hour runtime data. Target metric: Reduce total cycles/hour by ≥20% while increasi"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycling' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ]
+ }
+}

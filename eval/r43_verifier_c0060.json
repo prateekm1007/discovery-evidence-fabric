@@ -1,0 +1,62 @@
+{
+ "record": "R43_VERIFIER_c0060/1.0.0",
+ "session": "builder-r43s2",
+ "role": "VERIFIER for c-0060 (work v8-generation-binds, EXECUTOR builder-r43s1)",
+ "verified_tip": "a792a6a97 (origin/queue/dev12_r7)",
+ "at": "2026-11-17T02:43:32.212245Z",
+ "method": "zero-LLM recompute from committed bytes only (Art. 13 / Art. 29(c)): the executor's 23-test bind suite re-executed at the verified tip; the full rendered queue-CI pytest surface extracted from the committed workflow YAML and executed locally as bash (the F56 procedure: bash -n clean before execution); the pushed CI read from the check-run API at THREE SHAs; the diff secret-grepped; trailers, registry, Art. 27 ledger keys and the Art. 16 retirement ledger checked; the F45-class security finding verified typed (counts only — values never printed)",
+ "race_disclosure": {
+  "what": "this session (builder-r43s2) independently built the same D1/D2/D5 lane from the same 90ad970d7 basis while the peer's claim was already pushed",
+  "why": "Art. 29(b) process miss by THIS session: the claim was written but never committed/pushed before implementation started; the peer's pushed claim (b1632cd2c, 01:33:10Z) predates this session's first implementation write (~01:58Z)",
+  "resolution": "pusher-wins (Art. 29(b)/(e)): stand down to VERIFIER, never rebase a duplicate — the duplicate scratch was never pushed, is archived outside the repo, and no second c-0060 claim exists in the registry (the push-as-mutex held)",
+  "registry_effect": "builder-r43s2 registered as a new session; claim c-0061 filed (VERIFIER for c-0060); c-0060 flips DONE-with-verifier on this record's push (the c-0056/c-0058 and c-0057/c-0059 precedents)"
+ },
+ "legs": {
+  "executor_suite": {
+   "verdict": "RECOMPUTES_GREEN",
+   "evidence": "pytest exit 0 at a792a6a97; ? passed (tests/test_v8_generation_binds.py — the 23 acceptance tests incl. the labelled precision/recall pins; zero LLM)"
+  },
+  "rendered_ci_local": {
+   "verdict": "RECOMPUTES_GREEN",
+   "evidence": "the committed workflow's 4 rendered pytest invocations (87 + 23 + 57 + 24 tests, the last incl. tests/test_v8_generation_binds.py) extracted from the YAML and executed locally as bash; bash -n clean; ALL exit 0 (set -e held) — the F56 procedure"
+  },
+  "remote_ci_api_read": {
+   "verdict": "RECOMPUTES_TRUE",
+   "evidence": "{\"29dc8af66\": {\"conclusion\": \"failure\", \"runs\": [{\"name\": \"surface\", \"status\": \"completed\", \"conclusion\": \"failure\"}]}, \"f70b95160\": {\"conclusion\": \"success\", \"runs\": [{\"name\": \"surface\", \"status\": \"completed\", \"conclusion\": \"success\"}]}, \"a792a6a97\": {\"conclusion\": \"success\", \"runs\": [{\"name\": \"surface\", \"status\": \"completed\", \"conclusion\": \"success\"}]}}",
+   "note": "29dc8af66=FAILURE preserved as fact (the executor's own D2 refusal: the record was committed before its remote_ci block and the Art. 27 ledger lacked 'deletions'); f70b95160=SUCCESS (the fix-forward); a792a6a97=SUCCESS (the closeout) — all three match the round record's history block"
+  },
+  "secret_grep_diff": {
+   "verdict": "0_FINDINGS",
+   "evidence": "token-pattern grep over git diff 90ad970d7..a792a6a97: 0 matches"
+  },
+  "trailers": {
+   "verdict": "LAWFUL",
+   "evidence": "{\"b1632cd2c\": \"Session: builder-r43s1 | Work-Id: v8-generation-binds |  |\", \"29dc8af66\": \"Session: builder-r43s1 | Work-Id: v8-generation-binds |  |\", \"f70b95160\": \"Session: builder-r43s1 | Work-Id: v8-generation-binds |  |\", \"a792a6a97\": \"Session: builder-r43s1 | Work-Id: v8-generation-binds |  |\"}"
+  },
+  "art27_ledger": {
+   "verdict": "PRESENT",
+   "evidence": "engine_diff/primary_metric_delta/deletions all present; deletions accounts the retired free-prose legs as Art. 16-superseded IN THE V8 PATH with the frozen v77/r26 files byte-preserved as instruments of record"
+  },
+  "art16_retirement": {
+   "verdict": "PRESENT",
+   "evidence": "the record's deletions block cites the Art. 16 retirement ledger; no tracked artifact was deleted"
+  },
+  "f45_class_finding": {
+   "verdict": "VERIFIED_TYPED",
+   "evidence": "{\"3db194e8f:R451/CREDENTIAL_SCAN_PRE_SCRUB.json\": 7, \"3db194e8f:R451/CREDENTIAL_SCAN_POST_SCRUB.json\": 5} — origin-reachable commits (reachable from origin/main and the audit branch) carry credential-shaped strings inside the R451 credential-scan RECORDS; the scrubbed script blobs at the same commits show 0 matches; values are NEVER printed here; the remedy stays owner-side rotation (F45/F42: history rewrite is NOT the remedy)"
+  },
+  "rubric_path": {
+   "verdict": "NEVER_READ",
+   "evidence": "1 mention(s) across the five V8 artifacts; every mention is the disclosure sentence itself ('The PRIVATE rubric is NOT carried here and was never read' — the burned-fields provenance note); no code path opens, shows, or derives from the rubric"
+  },
+  "registry": {
+   "verdict": "LAWFUL",
+   "evidence": "exactly one c-0060 claim (EXECUTOR builder-r43s1, base 90ad970d7, kind task, lease present); no competing claim for the work_id (the push-as-mutex held — this verifier's own duplicate was never pushed); claim status on the remote is DONE awaiting this verifier record per the closeout"
+  },
+  "labelled_corpus": {
+   "verdict": "CONVENTIONS_PRESENT",
+   "evidence": "every label carries provenance; the 3 adjudication-pending allowed-rows findings are excluded from the precision denominator per the recorded convention (the R42 verdict's 'mostly' wordform/apparatus FP class; the per-finding adjudication stays the auditor's PRIVATE record); the burned v7 problem fields ride the R42-verdict burn (prereg step 5) under the R40 fire-test precedent"
+  },
+  "VERDICT": "RUN-INTEGRITY-VERIFIED — c-0060 flips DONE-with-verifier"
+ }
+}

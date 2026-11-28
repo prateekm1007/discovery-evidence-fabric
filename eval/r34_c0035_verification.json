@@ -1,0 +1,79 @@
+{
+ "record_type": "VERIFICATION_RECORD",
+ "verifies": [
+  "c-0034 (canonical v5 one-shot — void state)",
+  "c-0035 (AM32 D1/D2/D3/D5 execution by builder-r20s2)"
+ ],
+ "verifier": "builder-r34b",
+ "verifier_lineage": "RACE-12 loser -> VERIFIER per Art. 29(b)/(e); the loser's parallel implementation is preserved out-of-repo at /home/z/r34_race_evidence_canonical_session/ (never pushed, never rebased)",
+ "method": "recompute from committed bytes ONLY (Art. 13/29(c)); zero LLM calls; executor instruments re-run in a THROWAWAY WORKTREE so committed bytes were never clobbered",
+ "determinism": {
+  "r34_served_model_attestation.py": "re-run byte-equal to the committed eval/holdout_v5_attestation.json — canonical VOID 0/12 equal, quarantined duplicate VOID 0/12, tier-2 basis (committed summary 30x glm-4-plus)",
+  "r34_ledger_backfill_recompute.py": "re-run byte-equal to the committed eval/holdout_v5_ledger_recompute.json — 12/12 EXACT; rerun backfilled=[] (the git-show HEAD anchor preserved the backfill flags — flags cannot be laundered by reruns, confirmed)"
+ },
+ "independent_correlation": {
+  "scope": "all 39 canonical-run attempts vs the run-day gateway log (UNCOMMITTED, gitignored — exists in THIS container, the canonical-run side)",
+  "n_attempts": 39,
+  "hash_exact": 39,
+  "unresolved": 0,
+  "ambiguous": 0,
+  "serving_tally": {
+   "route_model self-report -> nvidia/nemotron-3-ultra-550b-a55b": 9,
+   "zai-org/GLM-5.3 -> glm-4-plus": 30
+  },
+  "per_row_verdict": "all 12 rows SUBSTITUTED (every row carries at least one substituted attempt)",
+  "correlation_rule": "gateway log content_sha256[:16] == attempts[].sha256_16",
+  "conclusion": "CONCUR — VOID 0/12 is correct; every zai attempt served glm-4-plus for the requested zai-org/GLM-5.3 with zero exceptions"
+ },
+ "findings": [
+  {
+   "id": "V1",
+   "severity": "CI/REPRO BLOCKER (v6 gate)",
+   "finding": "scripts/r34_served_model_attestation.py crashes on a fresh clone: gateway_window() opens ENGINE_RUNS/zai_gateway_calls.jsonl unconditionally — the file is GITIGNORED so a fresh clone/worktree raises FileNotFoundError (proven in a clean worktree at 72123903d). The executor's container happened to hold the file (0 run-day entries), so the crash was invisible to them. Art. 18 fresh-clone reproduction fails as-is.",
+   "proposed_fix": "one-line existence guard at the top of gateway_window(): 'if not GW_LOG.exists(): return {}' (the ledger script's read loop needs the same guard); executor-side or next-round, forward-only"
+  },
+  {
+   "id": "V2",
+   "severity": "INFO (evidence upgrade)",
+   "finding": "the executor attested zai rows at WINDOW level ('the log has no per-row correlation field') — false in the strict sense: content_sha256[:16] == attempts[].sha256_16 correlates EVERY attempt hash-exactly (39/39 here). The v6 committed-slice requirement should name this correlation as the attestation basis so serving identity is per-attempt provable, not window-inferred"
+  },
+  {
+   "id": "V3",
+   "severity": "CI BLOCKING (remediated here)",
+   "finding": "registry schema violations at 72123903d: c-0034.status='CLOSED-VOID' and c-0035.status='EXECUTION-COMPLETE-PENDING-VERIFICATION' are outside work-claims/v1 STATUSES; c-0035.kind='instrument-fix-and-typed-records' is outside KINDS — 5/6 Art. 29 CI checks RED at the canonical tip (one more check was already red at 5f2204657 for the unregistered stand-down canonical sweep)",
+   "remediation": "this commit: statuses normalized to DONE on the TIP (terminal truths; void/verification typed in notes), kind normalized to 'task' on the tip (the executor's values preserved in git-history snapshots and registered in claim_kind_violations[] + a NEW claim_status_violations[] list, both F42 forward-only), the 5f2204657 sweep registered in canonical_claim_violations[] (F36-pattern), and the Art. 29 test amended to extend the F42 snapshot-tolerance pattern from kinds to statuses (their execution baked out-of-enum statuses into an immutable snapshot at 72123903d — without the disclosure path the canonical test could never pass again without forbidden history rewrite; the TIP remains always-strict); Art. 29 suite re-run after push"
+  },
+  {
+   "id": "V4",
+   "severity": "NOTE (design)",
+   "finding": "the D1 gate fires at END-of-run (post-rows, pre-scoring) — satisfies AM32's pre-scoring requirement; a stop-the-line variant (void at the FIRST substituted row) would additionally save generation quota on doomed runs; not a correctness defect"
+  },
+  {
+   "id": "V5",
+   "severity": "NOTE (custody)",
+   "finding": "the custody gap is CONFIRMED (ENGINE_RUNS/ gitignored since R399 archive; the run-day log was never committed); the bytes survive in THIS container and corroborate the committed tier-2 summary exactly (30x glm-4-plus); the v6 committed-slice requirement (already in the driver) closes the gap forward"
+  },
+  {
+   "id": "V6",
+   "severity": "NOTE (D5)",
+   "finding": "the D5 correction is accepted: the r33_preflight byte_note edit is an explicit Art. 4 correction (original text retained verbatim + CORRECTED annotation appended; pre-correction bytes in git history); the units reconciliation matches this verifier's independent measurement (48 x U+2014 = 96 surplus bytes; 17514 bytes = 17418 chars; blob e79f9176b806c091 stable at all tips)"
+  }
+ ],
+ "d2_records_accepted": {
+  "burn": "eval/holdout_v5_burn_record.json BURNED-INVALID — accepted (basis correct; burned_at carries the known IST-mislabeled-Z clock pattern, true UTC recoverable from the commit's git date)",
+  "v6_request": "eval/holdout_v6_request.json — accepted; the verified-model-window precondition + committed gateway-log slice as mandatory artifacts are the right binding conditions"
+ },
+ "art29_ci": {
+  "at_5f2204657_before_execution": "1 suite red — the canonical-coverage test failing on 128193c92 (the R32 round-record commit pushed the 18 battery rows under Work-Id 'r32-round-record', which has no claim; the rows belong to c-0031 whose paths cover the dir) — pre-existing since R32",
+  "at_72123903d_before_remediation": "5 red — the schema-invalid statuses (CLOSED-VOID / EXECUTION-COMPLETE-PENDING-VERIFICATION) cascaded through every registry-dependent check; the kind was also out-of-enum",
+  "remediation_in_this_commit": "tip statuses -> DONE (typed in notes), tip kind -> 'task' (executor values preserved in snapshots + registered in claim_kind_violations[] and a NEW claim_status_violations[] list), the Art. 29 test amended to extend the F42 snapshot-tolerance from kinds to statuses (tip stays always-strict), 128193c92 + 5f2204657 registered in canonical_claim_violations[], VERIFIER claims c-0036/c-0037 filed",
+  "after_this_commit": "Art. 29 suite 9/9 PASSED (pytest -q: '......... [100%]') — first full green since the R32 trailer defect"
+ },
+ "engine_check": "ad0432bbd..HEAD -- discovery_fabric/ = EMPTY (machine core byte-unchanged through the R34 executions — Art. 27 NO CAPABILITY CHANGE holds)",
+ "filed_at": "2026-11-16T13:15:05Z",
+ "session": "builder-r34b",
+ "work_ids": [
+  "r33-holdout-v5-oneshot (c-0036)",
+  "r34-attestation-gate-ledger-durability (c-0037)"
+ ]
+}

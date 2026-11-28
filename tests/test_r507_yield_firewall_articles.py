@@ -49,7 +49,7 @@ def _body():
 # live chain is pinned in tests/test_r510_governance_articles.py.
 
 def test_constitution_version_2_10_1():
-    assert "**Version:** 2.10.1" in _body()
+    assert "**Version:** 2.11.0" in _body()
     assert "2.10.0 → v2.10.1" in _body() or "2.10.0 → 2.10.1" in _body()
     assert "2.9.0 → v2.10.0" in _body() or "2.9.0 → 2.10.0" in _body()
 
@@ -76,8 +76,13 @@ def test_amendment_record_chain_binds():
     assert rec85["old"]["version"] == "2.10.0"
     assert rec85["new"]["version"] == "2.10.1"
     import hashlib
+    # R11: the LIVE body is now 2.11.0 (Article LXXXVI); the LXXXV
+    # record's "new" is the historical 2.10.1 body sha — the live
+    # link is the R11 amendment record (Art. XI chain).
     assert rec85["new"]["sha256"] == \
-        hashlib.sha256(CONST.read_bytes()).hexdigest()
+        "2ce42426662d6493f672cf5fd7256bf5c2b9c8412e369ee9032b253b80b6fc56"
+    assert hashlib.sha256(CONST.read_bytes()).hexdigest() != \
+        rec85["new"]["sha256"]
     assert rec["checks"]["operator_directive_verbatim_in_body"] is True
     assert rec["checks"]["no_existing_article_weakened"] is True
     assert rec["checks"]["acknowledgment_rebound"] is True
@@ -88,7 +93,7 @@ def test_acknowledgment_rebound_to_2_10_1():
     ack = json.loads(ACK.read_text(encoding="utf-8"))
     import hashlib
     actual = hashlib.sha256(CONST.read_bytes()).hexdigest()
-    assert ack["constitution_version"] == "2.10.1"
+    assert ack["constitution_version"] == "2.11.0"
     assert ack["constitution_hash"] == actual
     assert ack["session"] == "R510"
 

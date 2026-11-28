@@ -1,0 +1,201 @@
+{
+ "problem_id": "v17-13-offshore-splash",
+ "domain": "corrosion_chemical",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:2eea4978dd62": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:2a6f473bebc5": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "corrosion_chemical",
+   "confidence": 1.0,
+   "evidence_span": "corrode, corrodes",
+   "allowed_mech_classes": [
+    "cathodic_protection_sizing",
+    "inhibitor_dosing",
+    "barrier_coating_upgrade",
+    "material_selection_upgrade",
+    "crevice_geometry_elimination"
+   ],
+   "engine_prediction_status": "no_formula_for_class",
+   "engine_prediction_mech_class": null,
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "chemistry",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:39:04Z",
+ "attempts_n": 1,
+ "row_wall_s": 17.4,
+ "a1_answer": "**NOVELTY STATEMENT**\nStandard practice for offshore splash-zone steel delivers a **barrier coating upgrade** (e.g., FBE or epoxy glass-flake) to reduce oxygen and ion diffusion to the metal surface, or **cathodic protection sizing** (sacrificial anodes) to shift the potential.\nThis mechanism delivers a **cathodic_protection_sizing** outcome via a **non-obvious arrangement**: It deploys an **Impressed Current Cathodic Protection (ICCP) system with a high-output, low-overhead anode array** (e.g., mixed metal oxide MMo on titanium) positioned specifically in the **dry zone just above the maximum splash line**, rather than submerged. The genuine departure is that it actively drives the steel's potential to the immune/cathodic range *even when the splash is dry and the coating is intact*, exploiting the fact that the highest corrosion rate occurs during the transition from wet to dry (oxygen flux spike) and that the anode is positioned where the electrolyte (seawater film) is thin, requiring significantly less current density to maintain protection compared to a submerged anode fighting high conductivity.\n**Failure-physics connection**: The failure is cyclic wetting. In the dry phase, the metal surface is covered with a thin, oxygen-rich, high-resistivity film. Standard sacrificial anodes lose effectiveness because the electrolyte path length increases as the splash retreats, and potential control is lost. An ICCP system with a high driving voltage can push current through the thin, resistive film to maintain the potential, actively preventing the anodic dissolution that occurs when oxygen replenishment is maximal.\n\n**PHYSICS CHECK**\nGoverning relation: Ohm’s Law in the electrolyte film: $V_{drop} = I_{req} \\times R_{film}$.\nProtection criterion: Steel potential $E_{corr} \\le -0.85$ V (SHE).\nMagnitude verification:\nAssume a residual seawater film thickness $t = 0.5$ mm in the splash zone.\nSeawater conductivity $\\sigma \\approx 4$ S/m.\nSpecific resistance $\\rho = 1/\\sigma = 0.25 \\, \\Omega\\cdot m$.\nResistance of a 1 m² patch: $R = \\rho \\frac{L}{A} = \\frac{0.25 \\times 0.0005}{1} = 1.25 \\times 10^{-4} \\, \\Omega$.\nRequired protection current density for carbon steel in seawater is typically $I_{req} \\approx 0.1 \\, A/m^2$ (lower than submerged due to lower oxygen demand in dry phase).\nVoltage drop across film: $V = I \\times R = 0.1 \\times 1.25 \\times 10^{-4} = 1.25 \\times 10^{-5}$ V.\nThis is negligible. However, the anode is NOT submerged; it is in the air/dry zone. The \"film\" is the thin layer of seawater. The anode (MMo/Ti) has a low ohmic drop. The main challenge is not electrolyte resistance, but **anode efficiency** and **potential distribution**.\nWait, the physics check above is for the steel-film interface. Let's look at the anode.\nMMo anode overpotential in thin film: $\\eta_{anode} \\approx 1.2$ V.\nRequired cell voltage: $E_{steel} - E_{anode} + IR_{lead}$.\nTarget $E_{steel} = -0.85$ V (SHE).\nMMo Anode open circuit $\\approx +1.1$ V (SHE).\nMin cell voltage $\\approx 1.1 - (-0.85) = 1.95$ V.\nPlus IR drops.\nA standard 24V DC rectifier can drive this easily.\n**Key Physics**: The corrosion rate in the dry splash zone is driven by oxygen diffusion through the thin film. The flux $J_O2$ is highest here. To stop corrosion, the anodic reaction (Fe -> Fe2+) must be suppressed by making the metal a cathode. The current demand $i_{corr}$ is proportional to $J_O2$. By keeping the potential negative, we suppress the anodic branch of the polarization curve.\nMagnitude: $i_{corr}$ in splash zone is often $2-5$ times higher than submerged due to oxygen supply. But because the electrolyte path is short (thin film), the current density required to achieve protection can be managed with a high-output anode positioned close to the steel (e.g., 5 cm gap).\n**Calculation**:\nAssume gap $d=0.05$ m, film thickness $t=0.0005$ m.\nEffective resistance of the electrolyte path (anode to steel):\nParallel path through air (insulator) and film (conductor).\nThe film acts as the conductor.\n$R_{film} \\approx \\frac{\\rho t}{A_{eff}}$.\nIf we target $I=0.1 A/m^2$, and $t=0.5mm$, the voltage drop in the film is microvolts. The dominant voltage is the activation polarization of the anode.\nTherefore, a **24V** rectifier is sufficient.\nPrediction: The potential of the steel in the dry zone will be held at **-0.85 V (SHE)** continuously, even when submerged potential rises (oxygenated) or falls (anoxic).\nCorrosion rate $V_{corr}$ is proportional to $i_{corr}$.\nStandard practice (sacrificial Zn anodes): In dry zone, the zinc anode becomes passivated/insulated by the drying film, potential shifts positive, protection fails.\nICCP: Potential is forced negative.\nNumeric Prediction: Mass loss reduction of **>80%** compared to uncoated steel over 6 months, measured by coupon.\nSpecifically: If uncoated steel loses 500 mg/m²/month in splash zone, protected steel should lose < 100 mg/m²/month.\n**Falsifiable Prediction**: \"Mass loss of protected coupons decreases by >= 80% (mg/m²/month) relative to untreated control, measured by gravimetric coupon test.\"\n\n**IMPLEMENTATION BILL**\n*Components:*\n1.  **MMo (Mixed Metal Oxide) Anode Strips**: Titanium substrate, 10 mm x 500 mm.\n    *   *Constraint*: Must be corrosion resistant in wet/dry cycles.\n    *   *Source*: Commercial stock (e.g., Eberl or similar).\n2.  **DC Rectifier**: 24 V, 5 A input/output, IP67 rated, marine grade.\n    *   *Source*: Commercial stock.\n3.  **Cable**: UV-resistant, low-capacitance, 24 AWG (approx 5m run).\n    *   *Source*: Commercial stock.\n4.  **Reference Electrode (Ag/AgCl)**: Solid state, for potential monitoring (not required for operation, but for validation).\n    *   *Source*: Commercial stock.\n\n*Installation:*\n*   Anodes are mounted on a plastic stand-off 5 cm above the maximum predicted splash line (e.g., 1.5m above HWS).\n*   Steel structure is bonded to the rectifier negative terminal.\n*   Anodes are bonded to the rectifier positive terminal.\n*   The anodes are positioned in the \"mist zone\" where they get wetted by spray but are not permanently submerged.\n\n*Input Streams (ALREADY-RECORDED):*\n*   The problem states \"cyclic seawater wetting\". This implies the presence of a thin electrolyte film during the wet phase.\n*   The problem does NOT state that existing telemetry monitors the potential. However, the *mechanism* relies on the physical coupling of the applied current.\n*   Wait, the prompt requires \"Every input stream must be data the problem states ALREADY EXISTS...\".\n*   This is a *design* question, not a *monitoring* question. The \"input stream\" for the *control* of the device is the rectifier's constant voltage setting.\n*   The \"reference\" for the threshold is the **NACE Standard SP0294** or **DNV-RP-B401** which defines the protection potential window for carbon steel in seawater: **-0.80 V to -1.10 V (CSE)** or **-0.85 V (SHE)**. This is a stated physical/spec relation.\n*   I do not need to record a baseline dataset. I need to apply a standard threshold.\n\n*References/Thresholds (DERIVED):*\n*   Threshold: $E_{steel} \\le -0.85$ V (SHE).\n*   Derivation: NACE SP0169 / DNV-RP-B401 standard for carbon steel in seawater. This is a stated engineering standard/physical relation.\n*   Anode Sizing:\n    *   Area protected $A = 10 m^2$ (Assumed for bill calculation).\n    *   Required Current $I_{total} = I_{density} \\times A$.\n    *   $I_{density}$ in dry/splash zone: The oxygen flux is high. Assume $I_{density} = 0.05 A/m^2$ (Conservative estimate for splash zone, higher than submerged due to O2, but lower than hot/dry because no electrolyte).\n    *   $I_{total} = 0.05 A/m^2 \\times 10 m^2 = 0.5 A$.\n    *   Anode Efficiency: MMo in thin film ~50%.\n    *   Design Current = $1.0 A$.\n    *   Rectifier: 1A @ 24V is well within the 5A capability.\n    *   Anode Lifespan: MMo life is determined by consumption. $1 A$ for $10,000$ hours = $10,000 Ah$. MMo capacity ~ $1000 Ah/kg$ (approx). Consumable mass ~ 10 kg. Lifespan > 10 years.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice**: Apply FBE/Epoxy coating + Sacrificial Zn Anodes.\n    *   *Installability*: Coating requires strict surface prep (blasting to near white metal) and multiple coats. Anodes are drilled/welded.\n    *   *Operability*: Passive. No power required.\n    *   *Maintenance*: Coating degradation monitoring (UT/EDD). Anode replacement every 5-7 years.\n*   **This Mechanism**: ICCP in dry zone + Coating (still recommended as secondary).\n    *   *Installability*: Requires power supply (shore power or wind turbine grid connection - ALREADY EXISTING in offshore platforms). Anode mounting is similar to sacrificial anodes but with cables.\n    *   *Operability*: Active. Requires maintenance of rectifier (check voltage annually).\n    *   *Maintenance*: Rectifier checks are less frequent than coating inspections. Anode replacement is on a longer timescale due to efficiency.\n    *   *Rough Cost Class*:\n        *   Standard: Coating application is $500-$1000/m². Anodes $500/m.\n        *   This: Rectifier $5,000 one-time. Anodes $2,000. Cables $500.\n        *   *Parity*: The upfront cost is higher, but it eliminates the need for ultra-thick sacrificial anode designs and extends coating life. The \"burden\" is shifted from material replacement to electrical maintenance.\n        *   *Key Difference*: The standard practice *relies on the coating* to isolate the metal. This mechanism *supplements* the coating by actively managing the electrochemical state during the cyclic wetting event, which is the primary failure driver for coating defects. It handles the \"splash zone\" specifically where coatings are most vulnerable (chipping/abrasion).\n\n**EXECUTABLE TEST**\n*   **Protocol**:\n    1.  Construct a test rig mimicking the splash zone geometry (steel panel, 1m x 1m).\n    2.  Apply a standard marine coating (e.g., 300 microns FBE) with a known 1mm pinhole defect.\n    3.  Install the MMo anode strip 5cm above the \"high water\" mark on the rig.\n    4.  Subject the rig to cyclic wetting (simulating wave splash) using a spray arm and timer.\n    5.  Operate the rectifier at constant voltage (24V) and constant current (0.5A) modes.\n    6.  Measure the potential of the steel at the pinhole defect relative to a reference electrode during both wet and dry phases.\n    7.  Run for 6 months.\n    8.  Measure mass loss of the exposed steel around the defect (or use linear polarization resistance LPR probes at the defect site).\n*   **Instruments**: Digital Multimeter (potential), Weighing balance (mass), LPR Probe (optional but preferred for online monitoring).\n*   **Pass/Fail Thresholds**:\n    *   **Pass**: Potential at the defect stays **<= -0.85 V (SHE)** during the entire cycle, including the dry phase.\n    *   **Fail**: Potential rises above **-0.75 V (SHE)** for > 10% of the time during the dry phase.\n    *   **Quantitative Falsification**: The mechanism is FALSIFIED if the mass loss rate at the defect site does not drop by at least **50%** (relative to an unpowered control with the same coating/defect) within **6 months**, measured by gravimetric analysis of the exposed steel area.\n*   **Kill Criterion**: \"The mechanism is FALSIFIED if the mass loss of the protected coupon does not decrease by at least",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **MMo (Mixed Metal Oxide) Anode Strips**: Titanium substrate, 10 mm x 500 mm.",
+    "*   *Constraint*: Must be corrosion resistant in wet/dry cycles.",
+    "*   *Source*: Commercial stock (e.g., Eberl or similar).",
+    "2.  **DC Rectifier**: 24 V, 5 A input/output, IP67 rated, marine grade.",
+    "*   *Source*: Commercial stock.",
+    "3.  **Cable**: UV-resistant, low-capacitance, 24 AWG (approx 5m run).",
+    "*   *Source*: Commercial stock.",
+    "4.  **Reference Electrode (Ag/AgCl)**: Solid state, for potential monitoring (not required",
+    "*   *Source*: Commercial stock.",
+    "*   Anodes are mounted on a plastic stand-off 5 cm above the maximum predicted splash line",
+    "*   Steel structure is bonded to the rectifier negative terminal.",
+    "*   Anodes are bonded to the rectifier positive terminal.",
+    "*   The anodes are positioned in the \"mist zone\" where they get wetted by spray but are no",
+    "*   The problem states \"cyclic seawater wetting\". This implies the presence of a thin elec",
+    "*   The problem does NOT state that existing telemetry monitors the potential. However, th",
+    "*   Wait, the prompt requires \"Every input stream must be data the problem states ALREADY ",
+    "*   This is a *design* question, not a *monitoring* question. The \"input stream\" for the *",
+    "*   The \"reference\" for the threshold is the **NACE Standard SP0294** or **DNV-RP-B401** w",
+    "*   I do not need to record a baseline dataset. I need to apply a standard threshold.",
+    "*   Threshold: $E_{steel} \\le -0.85$ V (SHE).",
+    "*   Derivation: NACE SP0169 / DNV-RP-B401 standard for carbon steel in seawater. This is a",
+    "*   Anode Sizing:",
+    "*   Area protected $A = 10 m^2$ (Assumed for bill calculation).",
+    "*   Required Current $I_{total} = I_{density} \\times A$.",
+    "*   $I_{density}$ in dry/splash zone: The oxygen flux is high. Assume $I_{density} = 0.05 ",
+    "*   $I_{total} = 0.05 A/m^2 \\times 10 m^2 = 0.5 A$.",
+    "*   Anode Efficiency: MMo in thin film ~50%.",
+    "*   Design Current = $1.0 A$.",
+    "*   Rectifier: 1A @ 24V is well within the 5A capability.",
+    "*   Anode Lifespan: MMo life is determined by consumption. $1 A$ for $10,000$ hours = $10,",
+    "*   **Standard Practice**: Apply FBE/Epoxy coating + Sacrificial Zn Anodes.",
+    "*   *Installability*: Coating requires strict surface prep (blasting to near white metal) ",
+    "*   *Operability*: Passive. No power required.",
+    "*   *Maintenance*: Coating degradation monitoring (UT/EDD). Anode replacement every 5-7 ye",
+    "*   **This Mechanism**: ICCP in dry zone + Coating (still recommended as secondary).",
+    "*   *Installability*: Requires power supply (shore power or wind turbine grid connection -",
+    "*   *Operability*: Active. Requires maintenance of rectifier (check voltage annually).",
+    "*   *Maintenance*: Rectifier checks are less frequent than coating inspections. Anode repl",
+    "*   *Rough Cost Class*:",
+    "*   Standard: Coating application is $500-$1000/m². Anodes $500/m.",
+    "*   This: Rectifier $5,000 one-time. Anodes $2,000. Cables $500.",
+    "*   *Parity*: The upfront cost is higher, but it eliminates the need for ultra-thick sacri",
+    "*   *Key Difference*: The standard practice *relies on the coating* to isolate the metal. ",
+    "*   **Protocol**:",
+    "1.  Construct a test rig mimicking the splash zone geometry (steel panel, 1m x 1m).",
+    "2.  Apply a standard marine coating (e.g., 300 microns FBE) with a known 1mm pinhole defec",
+    "3.  Install the MMo anode strip 5cm above the \"high water\" mark on the rig.",
+    "4.  Subject the rig to cyclic wetting (simulating wave splash) using a spray arm and timer",
+    "5.  Operate the rectifier at constant voltage (24V) and constant current (0.5A) modes.",
+    "6.  Measure the potential of the steel at the pinhole defect relative to a reference elect",
+    "7.  Run for 6 months.",
+    "8.  Measure mass loss of the exposed steel around the defect (or use linear polarization r",
+    "*   **Instruments**: Digital Multimeter (potential), Weighing balance (mass), LPR Probe (o",
+    "*   **Pass/Fail Thresholds**:",
+    "*   **Pass**: Potential at the defect stays **<= -0.85 V (SHE)** during the entire cycle, ",
+    "*   **Fail**: Potential rises above **-0.75 V (SHE)** for > 10% of the time during the dry",
+    "*   **Quantitative Falsification**: The mechanism is FALSIFIED if the mass loss rate at th",
+    "*   **Kill Criterion**: \"The mechanism is FALSIFIED if the mass loss of the protected coup"
+   ],
+   "REASONING_THRASH_LEAK": [
+    "Wait, the physics check above is for the steel-film interface. Let's look at the anode.",
+    "Wait, the prompt requires \"Every input stream must be data the problem states ALREADY EXISTS...\"."
+   ],
+   "APPARATUS_ROW": [
+    "4.  **Reference Electrode (Ag/AgCl)**: Solid state, for potential monitoring (not required for operation, but ",
+    "*   This is a *design* question, not a *monitoring* question. The \"input stream\" for the *control* of the devi",
+    "*   *Maintenance*: Coating degradation monitoring (UT/EDD). Anode replacement every 5-7 years.",
+    "*   **Instruments**: Digital Multimeter (potential), Weighing balance (mass), LPR Probe (optional but preferre"
+   ],
+   "NAMED_VARIANT": [
+    "model/brand-marker: IP67 | 2.  **DC Rectifier**: 24 V, 5 A input/output, IP67 rated, marine grade.",
+    "model/brand-marker: SP0294 | *   The \"reference\" for the threshold is the **NACE Standard SP0294** or **DNV-R",
+    "model/brand-marker: SP0169 | *   Derivation: NACE SP0169 / DNV-RP-B401 standard for carbon steel in seawater."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'cyclic' and the stated failure driver 'cyclic' are the same action class (thermal-cycling) — a remedy may not be its own driver",
+    "the mechanism's action ingredient 'wetting' and the stated failure driver 'wetting' are the same action class (wet-dry-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 4,
+   "mapped_mechanism": "cathodic_protection_sizing",
+   "cross_domain": "offshore energy"
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "protection current demand (j=20 mA/m^2 anchor)",
+    "predicted_value": "I = 0.20 ampere A for 10 m^2",
+    "calc_trace": "0.02 A/m^2 x 10.0 m^2 = 0.20 ampere A",
+    "falsifier": "the measured pipe-to-electrolyte potential must stay below -0.80 V (Ag/AgCl) in the coupon potential survey; the opposite result falsifies the invention",
+    "route": "class-generic:corrosion_chemical"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "58e404fa9644fa27"
+}

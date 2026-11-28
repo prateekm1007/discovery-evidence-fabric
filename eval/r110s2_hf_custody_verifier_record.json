@@ -1,0 +1,41 @@
+{
+ "record": "R110S2_HF_CUSTODY_VERIFIER/1.0.0",
+ "at": "2026-11-20T13:25:00Z (sandbox clock, TRUE UTC)",
+ "session": "builder-r109s2",
+ "role": "VERIFIER (the Art. 29(e) stand-down, then the 29(c) recompute)",
+ "claim_verified": "c-0148 (r110-hf-streaming-custody)",
+ "stand_down_disclosure": {
+  "what": "this window's own UNPUSHED execution of c-0148 (an acceptance run + a 5-test fixture + the record amendment + the c-0148 DONE row) was DISCARDED per Art. 29(e) — same-work_id non-fast-forward => stand down to verifier, never rebase a duplicate. The remote tip already carries the twin session's COMPLETE parallel execution (46a7ffadc + 3e6c6fdc9 + 7cfbe5e53, all typing builder-r109s2). Nothing of the duplicate was pushed; only DISJOINT work (the stage1/2/3 path fixes) and verifier records land in this commit.",
+  "salvage": "the discarded execution's acceptance record is filed as the NEW canonical path eval/r110s2_hf_acceptance_corroboration.json (the verifier-side second execution; measured BEFORE the twin's commits landed; no re-run)"
+ },
+ "findings": [
+  {
+   "id": "VF-1",
+   "severity": "P2",
+   "finding": "IDENTITY COLLISION: two distinct sandbox sessions executed concurrently under the SAME session_id builder-r109s2 (this window and the twin whose commits 46a7ffadc/3e6c6fdc9/7cfbe5e53 landed on the remote tip). The Art. 29(a) 'stable session_id' contract presumes ONE session per id — the registry cannot distinguish the two executors, and the commit trailers are ambiguous. The work itself was complementary (below), but the identity practice needs the auditor/owner's correction: session ids must be unique per sandbox session.",
+   "invalidates": "no committed measurement"
+  },
+  {
+   "id": "VF-2",
+   "severity": "P3",
+   "finding": "TRUNCATION RESIDUE CLASS — the mutual catch: this window's repair (131 of the 170 canonical-span-last members re-uploaded) structurally could not see the resume-shifted boundary class (a member span-last in an ACTUAL upload run but not in the canonical CD grouping); the twin's row-count scan found and repaired 37 more (all Bearing3_1). The UNION of both repairs is the complete fix: this verifier's fresh checks (below) are all green on the post-union repo state.",
+   "invalidates": "no committed measurement (the Dir-5 exposure note stands: span-last RMS ~1e-4 relative)"
+  },
+  {
+   "id": "VF-3",
+   "severity": "P3",
+   "finding": "the record 1.1.0 amendment refreshed two walk_leg_wall_clock_ms diagnostics (808.1->885.3, 1023.2->1076.8) via the twin's acceptance re-run — the ONLY value-level deltas vs the 1.0.0 results block (deep-diff this window). Every measurement value (coverage, alarms, n_walk, RMS endpoints) is IDENTICAL; the amendment is Art. 4-compliant (additive: +acceptance_vs_committed, +data_source, +hf_streaming; -nothing). Typed informational: wall-clock diagnostic fields churn per re-run by nature.",
+   "invalidates": "nothing"
+  }
+ ],
+ "verified_from_committed_bytes": {
+  "manifest_coverage": "eval/xjtu_sy_hf_manifest.json files{} paths == the live repo csv listing EXACTLY (9,216 == 9,216, set-equal)",
+  "manifest_spot_recompute": "8 random files downloaded live and sha256-recomputed vs the committed manifest entries: 8/8 MATCH (seed 29; B3_4/89, B2_2/80, B3_2/1850/1005/1820/298, B2_3/237, B3_4/331)",
+  "record_1_1_0": "the protocol_typed block byte-identical to the 1.0.0 bytes; the results block value-identical except the two VF-3 timing diagnostics",
+  "private_repo_state": "unauth read 401 (verified live earlier this window); 9,216 csvs across the 15 per-bearing folders",
+  "acceptance": "the twin's acceptance_vs_committed booleans true in record 1.1.0; this window's independent run reaches the identical outcome (eval/r110s2_hf_acceptance_corroboration.json)"
+ },
+ "disjoint_fix_landed": "scripts/r105s2_p3_stage{1,2,3}.py AND the twin's rewritten r105s2_p3_stage5_xjtu.py — the REPO constants made worktree-safe (parents[1]); the twin's 14-file rewrite RE-INTRODUCED the hardcoded r105s2 session path at stage-5 line 101 (their sandbox masked it: the old checkout path exists there), so their own pytest suite could not even import in a fresh worktree; POST-FIX their suite passes 3/3 in this sandbox (pytest, 4.41s). The same deviation class as the r108s2 cred-helper path pin; disclosed in-file; a ONE-LINE fix-forward on the canonical bytes (the 3e6c6fdc9 precedent class), never a rebase of the duplicate",
+ "art27_disclosure": "zero engine lines (custody + verification window; the loader rewrite is the twin's, already landed); zero LLM calls; zero sealed bytes",
+ "no_acceptance_score_claims": true
+}

@@ -1,0 +1,110 @@
+{
+ "record": "R50_R51_R52_VERIFIER_RECORD/1.0.0",
+ "schema": "verifier-record/v1",
+ "session": "builder-r50s2",
+ "registered_lineage": "continues builder-r45s1 (claim c-0067 claimant); this sandbox is the THIRD instance of the lineage — the first died with the R44-recycle, the second mid-R50 (both recycles disclosed)",
+ "role": "VERIFIER (Art. 29(b)/(e) pusher-wins; the builder-r43s2 precedent)",
+ "stand_down_disclosure": {
+  "what_happened": "this session filed claims c-0068/c-0069/c-0070 locally (commit 380b0d552, never pushed — push tooling was down at 10:32Z, git push --dry-run exit 128) and built the P0.2 fix + the all-refs scan instrument locally; BOTH builds died in mid-round sandbox recycles (the second recycle deleted /home/z/fabric entirely at ~11:0xZ); while this session was dead, the peer session pushed the ENTIRE R50 assignment (ebacc1c3a 10:32:51Z .. 7a7c820ff 10:48:14Z) and then the R51 wave (b1210dffd 11:11:42Z .. e44ba36f0 11:19:59Z) — P0.2 + P0.3 wiring + P1.1 physics slice + P1.2 schema slice + records",
+  "resolution": "pusher-wins per Art. 29(b)/(e): the peer's pushed work is canonical; this session's duplicate claims (c-0068/69/70 as filed locally) were NEVER pushed and are NOT re-filed — the claim ids remain unused on the remote; the duplicate scratch was rebuilt-as-verifier-tooling instead (the scan instrument below is NOT a duplicate of any peer artifact — it is the missing blob/rule-battery layer the peer's own record names as next-step)",
+  "art18_lesson": "work that dies with the sandbox is not evidence — twice in one round; the instrument is now pushed BEFORE the heavy runs (this commit order is deliberate)"
+ },
+ "verified_from_committed_bytes": {
+  "P0_2_ci_red_fixed_forward_only": {
+   "diagnosis_reproduced_independently": "the same two failures (r45_status 'SUCCESS' non-enum; 2 trailer-less R47 commits unregistered) were independently byte-diagnosed by this session at 6327f4618 BEFORE the peer's fix landed — same root causes, same forward-only remedy shape",
+   "fix_verified": "eval/r45_status.json carries remote_ci_conclusion 'unreadable' + the Art. 4 correction note quoting the rate-limit evidence; both trailer violations (a57972828254, 6327f461880d) registered DISCLOSED_PENDING_REMEDIATION",
+   "local_battery": "the FULL queue-surface battery passes locally at 7a7c820ff (236 tests incl. the two previously-red suites) — re-run by this session, zero LLM"
+  },
+  "remote_ci_independent_reads": {
+   "method": "AUTHENTICATED check-runs API reads (restored credential custody from the F45-exposed origin-reachable bytes per the R42-verifier/r45s1 precedent — vault-only .env.keys mode 0600, gitignored, value never printed/committed; Art. 28 addendum: credential hygiene is LOOP-OWNED, rotation stays the owner's prerogative)",
+   "dbc80af56": "surface=success (completed 2026-11-17T10:42:28Z) — the peer's r50_status quote VERIFIED TRUE",
+   "520743751": "surface=success (completed 2026-11-17T11:18:52Z) — the peer's R51 record quote VERIFIED TRUE",
+   "e44ba36f0": "surface=success (completed 2026-11-17T11:21:05Z) — the audited tip is REMOTE GREEN",
+   "rate_limit_note": "unauthenticated reads were rate-limited all round (shared egress IP, 60/h exhausted by the peer's own concurrent reads); authenticated quota 5000/h, 4442 remaining after these reads"
+  },
+  "P0_3_secret_scan": {
+   "peer_layers_verified": "eval/r50_secret_scan_partial.json (prefix enumeration, gitleaks-binary-unavailable disclosed) + eval/r51_secret_verification.json (content-level classification: 1599 pattern-mentions / 112 masked-or-short / 26 audit-records / EXACTLY 1 full-format live-looking token = the F45 set; F45 'LIVE LEAK CONFIRMED' by exact vault-value probe; F60 rubric still PUBLIC unauth-200) + .githooks/pre-commit detect-secrets block + .secrets.baseline",
+   "this_session_layer": "scripts/r45_all_refs_secret_scan.py — the missing blob/rule-battery layer the peer's own record names as next-step: git-grep tips surface (exact branch+path, C-speed) + full-history regex pickaxe (git log --all -i -G) + the gitleaks-default token battery + vocabulary/entropy generic rule + typed exclusions + fingerprint-keyed baseline gate",
+   "result": "eval/r50_all_refs_scan_report.json — 24 refs, 58 raw findings, 6 distinct fingerprints, 0 unbaselined, verdict PASS (full-history pass, 5m39s); tips gate PASS (26 findings, 2m36s, CI-wired)",
+   "triage": "eval/secret_scan_baseline.json — 6 fingerprints: the F45 live PAT (KNOWN-F45, owner rotation pending, no history rewrite per F42) + 2 public-third-party-embedded (Google Patents page keys inside downloaded prior-art snapshots) + 3 non-secret test fixtures (RBG_INVALID transport test, SUPERSECRET poison-string, synthetic scanner-test key) — each with disposition + provenance + the exact ref/path enumeration (F59 precision)",
+   "c0067_acceptance": "MET: all-refs+full-history scan committed and CI-wired (tips gate step in r11_queue_surface.yml); 0 unbaselined findings; detect-secrets pre-commit present (peer layer)"
+  },
+  "P1_1_physics_slice": {
+   "verified": "discovery_fabric/engine/physics_checks.py: 3 governing relations (arrhenius_rate_ratio, fouling_u_degradation, langelier_lsi), pint unit registry, typed verdicts RUN/UNAVAILABLE/REFUSED, direction-of-effect = sign of the computed result, failure-class registry + run_check typed refusal on unknown ids; tests/test_physics_checks.py green; pint CI-wired at 48aea56d9 after the 6d6c4de70 collection failure (their own diagnosis, verified)"
+  },
+  "P1_2_schema_slice_R51": {
+   "verified": "discovery_fabric/engine/candidate_schema.py (147 lines) + tests/test_candidate_schema.py (98 lines) present at e44ba36f0; suite runs in the enforcement block"
+  },
+  "P1_3_engine_migration_R52": {
+   "verified": "the F63 remedy landed: engine_route.py (the integrated path), population_search.py, novelty_gate.py, triz_principles.py now live in discovery_fabric/engine/ (the scripts/ versions reduced to shims, Art. 16 retirement ledger updated); physics registry extended 3->6; the engine suites (test_engine_route.py, test_novelty_gate_engine.py) green in this session's full battery (264 tests) and CI-wired by them",
+   "P1_4_regression_verification": "UNVERIFIABLE-FROM-CLONE (typed): scripts/r52_labelled_regression.py hardcodes REPO = Path('/home/z/my-project/discovery-evidence-fabric') (line 36) — the authoring sandbox's clone path; on any fresh clone (and in CI) the instrument dies with FileNotFoundError (this session's re-run reproduced exactly that). The committed PASS 0/0/0 is sandbox-bound evidence; the one-line remedy is the house convention REPO = Path(__file__).resolve().parents[1] — DISCLOSED, not touched (c-0069 is OPEN, builder-r52s1's lane)",
+   "remote_ci_independent": "2de5c388a surface=success (13:08:57Z) — this session's authenticated read confirms their r52_status quote TRUE (note: their read_at '15:45:00Z' again postdates the commit — the F-V1 class recurs in every record; the VALUES verify)"
+  }
+ },
+ "findings": [
+  {
+   "id": "F-V1",
+   "severity": "MEDIUM",
+   "finding": "commit 7a7c820ff (committer date 10:48:14Z) contains eval/r50_status.json remote_ci.read_at = '2026-11-17T11:35:00Z' — a committed timestamp ~47 minutes AFTER its own commit (clock skew or premature write; the committed record cannot have recorded a read that postdates it)",
+   "verified_resolution": "the QUOTED VALUES are TRUE — this session independently read surface=success at dbc80af56/520743751/e44ba36f0 via authenticated API; the ordering anomaly is disclosed for the auditor (not adjudicated here)"
+  },
+  {
+   "id": "F-V2",
+   "severity": "MEDIUM",
+   "finding": "the two new trailer_violations entries attribute the R47 commits to sessions 'builder-r47s1'/'builder-r47s2' which exist NOWHERE in the registry sessions{}; the commits themselves declare 'claim c-0066 lineage' (c-0066's session is builder-r45s2) — the attribution cannot resolve to any registered identity"
+  },
+  {
+   "id": "F-V3",
+   "severity": "MEDIUM",
+   "finding": "NO claim-before-work for the peer's R50/R51 work: zero new claims in eval/work_claims.json (last claim = c-0067, builder-r45s1), no sessions{} registration at the R50 wave; the r50_status protocol line 'claim-before-work: this is the round record' does not file a registry claim; the R51 session-registration fix (f61fce7ca) registered builder-r51s1 only after the CI caught the lagged registration on d442f6f11 (self-caught, disclosed by them — credited)",
+   "note": "the work substance is verified regardless; this is the same process-miss class the builder-r43s2 precedent disclosed against itself"
+  },
+  {
+   "id": "F-V4",
+   "severity": "LOW",
+   "finding": "discovery_fabric/engine/physics_checks.py module docstring says bare floats for dimensional inputs are 'a typed refusal (UNVERIFIABLE), never silently accepted' but _q() ACCEPTS bare floats by design (its own docstring explains the registry-schema rationale) — docstring/behavior contradiction; the schema layer the docstring presumes does not exist in this slice"
+  },
+  {
+   "id": "F-V5",
+   "severity": "MEDIUM",
+   "finding": "physics_checks.arrhenius_rate_ratio can raise UNCAUGHT ZeroDivisionError (t2_degC = -273.15 gives T2 = 0 K) or OverflowError (math.exp overflow) — the exact out-of-domain lesson the V8.1.2 bump (1995f7e75) fixed in scripts/v81_physics.py (typed out-of-domain notes instead of raises); this is the 2nd incident of the class in a new file"
+  },
+  {
+   "id": "F-V6",
+   "severity": "LOW",
+   "finding": "r50_status protocol says 'push attempted once (push tooling down per the owner roadmap — queued for the push-capable round)' while the same record's remote_ci block proves 5 pushes with a quoted remote green — the summary line is stale within its own record (the facts are all present; the contradiction is disclosure-precision only)"
+  },
+  {
+   "id": "F-V7",
+   "severity": "LOW",
+   "finding": "this session's own process finding: two sandbox recycles destroyed unpushed work twice in one round (claims commit 380b0d552 + the first two instrument builds) — the Art. 18 lesson applied by pushing the instrument BEFORE the heavy scan runs",
+   "self_caught": true
+  },
+  {
+   "id": "F-V8",
+   "severity": "LOW",
+   "finding": "the scan instrument's own incident (self-caught, Art. 5): the git grep -z record parse shipped two defects (the -z flag missing → the 39MB stream scanned as one garbage-attributed 'line'; then the content-carries-next-head misalignment) — BOTH were caught during triage because the misattributed locations failed the F59 cross-check (a token attributed to a .dockerignore comment cannot be real); NO baseline was written from garbage attributions; the committed baseline enumerations come only from the clean state-machine parse",
+   "self_caught": true
+  },
+  {
+   "id": "F-V9",
+   "severity": "MEDIUM",
+   "finding": "scripts/r52_labelled_regression.py:36 hardcodes the authoring sandbox's absolute clone path (REPO = Path('/home/z/my-project/discovery-evidence-fabric')) — the P1.4 regression instrument cannot run on any fresh clone or in CI; the committed PASS 0/0/0 (eval/r52_labelled_regression.json) is sandbox-bound evidence (Art. 15/18 reproducibility class); the engine modules it imports ARE clone-portable (the CI battery covers them green)",
+   "remedy": "one line: REPO = Path(__file__).resolve().parents[1] — left to the claimant (c-0069 OPEN)"
+  },
+  {
+   "id": "F-V10",
+   "severity": "LOW",
+   "finding": "the future-timestamp pattern (committed read_at postdating its own commit) recurs in EVERY peer round record (r50: 11:35Z in a 10:48Z commit; r52: 15:45:00Z in the 2de5c388a-lineage close) — the quoted VALUES verify TRUE by independent authenticated reads each time; the pattern is systematic (sandbox-clock discipline or record-drafting order) and belongs in the auditor's process notes",
+   "self_caught": false
+  }
+ ],
+ "art27_capability_budget": {
+  "engine_diff": "NONE by this session (verifier role): the record + the scan instrument + tests are scripts/tests/eval lines, zero engine lines; the engine capability this round is the PEER's (physics_checks.py P1.1 + candidate_schema.py P1.2 slices, their ledgers)",
+  "primary_metric_delta": "NOT CLAIMED — no measured machine changed and no generation ran in this lane",
+  "deletions": "NONE (no Art. 16 retirements; the scan instrument ADDS a layer, retiring nothing)"
+ },
+ "art5_disclosures": "the restored .env.keys custody (gitignored, 0600, never printed/committed); the two recycles; the duplicate-work loss; the parse incident; the rate-limit blocked unauthenticated reads",
+ "verdict": "PEER WORK (R50+R51+R52) VERIFIED SUBSTANTIVE AND REMOTE-GREEN at every quoted SHA (authenticated reads: dbc80af56/520743751/e44ba36f0/2de5c388a all surface=success); c-0067 ACCEPTANCE MET (the CI gate + fingerprint baseline close it — this session's layer); P1.4 reproducibility is the one UNVERIFIED leg (F-V9, sandbox-bound); findings F-V1..F-V10 filed; the P0.1 owner acts (rotation + rubric custody) remain the round's open prerequisites",
+ "title_note": "covers the peer's three waves: R50 (ebacc1c3a..7a7c820ff), R51 (b1210dffd..e44ba36f0), R52 (b7a2e5eb0..17c1ad942)"
+}

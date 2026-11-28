@@ -1,0 +1,927 @@
+{
+ "record": "R116_C0161_VERIFIER_RECOMPUTE/1.0.0",
+ "at": "2026-11-21T21:20:52Z (sandbox clock, TRUE UTC)",
+ "claim": "c-0165 (verifier recompute; work id r116-c0161-verifier-recompute)",
+ "verifies": "claim c-0161, eval/r113_engine_bare_result.json (executor builder-r114s2-c9c03209)",
+ "role": "Art. 29(c) VERIFIER record + Art. 19 test-4 independent tally recompute — zero LLM, zero quota, no re-run",
+ "raw_basis": "eval/r113_engine_bare_raw/ (items.jsonl + 30 author + 30 bare + 30 eng, 91 files + usage)",
+ "matcher": "the committed SPECTER2 stack through the engine's own load_specter2_encoder (core_mechanism_gate) — the same entry the executor's runner used",
+ "weights_provenance": "allenai/specter2_base pytorch_model.bin 439740465 bytes sha256[:12] 801eda968fad (re-verified this window, matches the prereg) + adapter present, active (Stack[specter2]), encoder smoke ordered",
+ "scoring_semantics_pinned_from": "scripts/r113_engine_bare_run.py read line-by-line; gen text = RAW FILE verbatim both arms; the runner's sentence split and rank rule reimplemented verbatim (independence: the executor's module was never imported for scoring)",
+ "tau": {
+  "committed": 0.1412,
+  "mine": 0.1412,
+  "extremes_match": true,
+  "midpoint_check": true,
+  "pair_counts_match": true,
+  "n_pos_pairs": 175,
+  "n_neg_pairs": 5250,
+  "verdict": "CONFIRMED",
+  "note": "tau is DERIVED, not assumed: the calibration pairs are recomputed from the corpus bytes and the committed extremes/midpoint are checked independently"
+ },
+ "per_item_agreement": {
+  "exact_rows": 60,
+  "total": 60,
+  "note": "an exact row = all six scored fields (elements/survey covered + recall, rank, dist_to_gt_main) equal to the record within 5e-4",
+  "representation": "raw-file-verbatim (both arms, the probe-verified r110 convention; no alternative representation was tried — the r113 runner encodes the raw file text directly, one code path)"
+ },
+ "bootstrap_recomputed": {
+  "element_recall": {
+   "mean_diff": -0.01,
+   "ci95": [
+    -0.0656,
+    0.0333
+   ],
+   "n_pairs": 30
+  },
+  "survey_recall": {
+   "mean_diff": -0.0067,
+   "ci95": [
+    -0.02,
+    0.0
+   ],
+   "n_pairs": 30
+  },
+  "hit1": {
+   "mean_diff": -0.0667,
+   "ci95": [
+    -0.2667,
+    0.1
+   ],
+   "n_pairs": 30
+  },
+  "mrr": {
+   "mean_diff": -0.0556,
+   "ci95": [
+    -0.1639,
+    0.0444
+   ],
+   "n_pairs": 30
+  }
+ },
+ "verdicts": {
+  "element_recall": {
+   "verdict": "CONFIRMED",
+   "mine": {
+    "mean_diff": -0.01,
+    "ci95": [
+     -0.0656,
+     0.0333
+    ],
+    "n_pairs": 30
+   },
+   "record": {
+    "mean_diff": -0.01,
+    "ci95": [
+     -0.0656,
+     0.0333
+    ],
+    "n_pairs": 30
+   }
+  },
+  "survey_recall": {
+   "verdict": "CONFIRMED",
+   "mine": {
+    "mean_diff": -0.0067,
+    "ci95": [
+     -0.02,
+     0.0
+    ],
+    "n_pairs": 30
+   },
+   "record": {
+    "mean_diff": -0.0067,
+    "ci95": [
+     -0.02,
+     0.0
+    ],
+    "n_pairs": 30
+   }
+  },
+  "hit1": {
+   "verdict": "CONFIRMED",
+   "mine": {
+    "mean_diff": -0.0667,
+    "ci95": [
+     -0.2667,
+     0.1
+    ],
+    "n_pairs": 30
+   },
+   "record": {
+    "mean_diff": -0.0667,
+    "ci95": [
+     -0.2667,
+     0.1
+    ],
+    "n_pairs": 30
+   }
+  },
+  "mrr": {
+   "verdict": "CONFIRMED",
+   "mine": {
+    "mean_diff": -0.0556,
+    "ci95": [
+     -0.1639,
+     0.0444
+    ],
+    "n_pairs": 30
+   },
+   "record": {
+    "mean_diff": -0.0556,
+    "ci95": [
+     -0.1639,
+     0.0444
+    ],
+    "n_pairs": 30
+   }
+  }
+ },
+ "primary_typed_consequence": "element_recall CI covers 0 (mean -0.0100, CI [-0.0656, 0.0333]) — the executor's TYPED_NEGATIVE branch stands on independent recompute; the weak-stage retirement remains the auditor's call per the prereg's acceptance branch",
+ "overall_verdict": "CONFIRMED — all four bootstrap metrics reproduce at 4dp from the committed raw bytes; the typed negative is verifier-verified",
+ "findings": [],
+ "per_item_mismatches": [],
+ "per_item_rows": {
+  "pc-01": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 4,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 0.6667,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0888,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 4,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 0.6667,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0787,
+    "record_match": true
+   }
+  },
+  "pc-02": {
+   "n_elements": 6,
+   "n_survey": 5,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 3,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0515,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 5,
+    "rank_of_generation": 3,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0514,
+    "record_match": true
+   }
+  },
+  "pc-03": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0472,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 3,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0718,
+    "record_match": true
+   }
+  },
+  "pc-04": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 4,
+    "survey_covered": 4,
+    "rank_of_generation": 4,
+    "element_recall": 0.6667,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.25,
+    "dist_to_gt_main": 0.0588,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 4,
+    "survey_covered": 4,
+    "rank_of_generation": 4,
+    "element_recall": 0.6667,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.25,
+    "dist_to_gt_main": 0.0659,
+    "record_match": true
+   }
+  },
+  "pc-05": {
+   "n_elements": 6,
+   "n_survey": 5,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0785,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 1,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0653,
+    "record_match": true
+   }
+  },
+  "pc-06": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0686,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0849,
+    "record_match": true
+   }
+  },
+  "pc-07": {
+   "n_elements": 6,
+   "n_survey": 5,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 1,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0421,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 1,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0402,
+    "record_match": true
+   }
+  },
+  "pc-08": {
+   "n_elements": 5,
+   "n_survey": 5,
+   "bare": {
+    "elements_covered": 2,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 0.4,
+    "survey_recall": 0.8,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0452,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 1,
+    "survey_covered": 3,
+    "rank_of_generation": 1,
+    "element_recall": 0.2,
+    "survey_recall": 0.6,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0604,
+    "record_match": true
+   }
+  },
+  "pc-09": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0387,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 3,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0737,
+    "record_match": true
+   }
+  },
+  "pc-10": {
+   "n_elements": 5,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0725,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 2,
+    "survey_covered": 4,
+    "rank_of_generation": 3,
+    "element_recall": 0.4,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.125,
+    "record_match": true
+   }
+  },
+  "pc-11": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0695,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0786,
+    "record_match": true
+   }
+  },
+  "pc-12": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0545,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0521,
+    "record_match": true
+   }
+  },
+  "pc-13": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0529,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0672,
+    "record_match": true
+   }
+  },
+  "pc-14": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 3,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0713,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 3,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0713,
+    "record_match": true
+   }
+  },
+  "pc-15": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0703,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0675,
+    "record_match": true
+   }
+  },
+  "pc-16": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0523,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0699,
+    "record_match": true
+   }
+  },
+  "pc-17": {
+   "n_elements": 5,
+   "n_survey": 3,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 3,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0617,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 3,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0444,
+    "record_match": true
+   }
+  },
+  "pc-18": {
+   "n_elements": 5,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0539,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0892,
+    "record_match": true
+   }
+  },
+  "pc-19": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0625,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 4,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.25,
+    "dist_to_gt_main": 0.0968,
+    "record_match": true
+   }
+  },
+  "pc-20": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0681,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.059,
+    "record_match": true
+   }
+  },
+  "pc-21": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0408,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0579,
+    "record_match": true
+   }
+  },
+  "pc-22": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0529,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0673,
+    "record_match": true
+   }
+  },
+  "pc-23": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 4,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.25,
+    "dist_to_gt_main": 0.0799,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 3,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.067,
+    "record_match": true
+   }
+  },
+  "pc-24": {
+   "n_elements": 5,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0534,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0564,
+    "record_match": true
+   }
+  },
+  "pc-25": {
+   "n_elements": 6,
+   "n_survey": 5,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0751,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0658,
+    "record_match": true
+   }
+  },
+  "pc-26": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0541,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0671,
+    "record_match": true
+   }
+  },
+  "pc-27": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 5,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0782,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 2,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.5,
+    "dist_to_gt_main": 0.0808,
+    "record_match": true
+   }
+  },
+  "pc-28": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0631,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0861,
+    "record_match": true
+   }
+  },
+  "pc-29": {
+   "n_elements": 6,
+   "n_survey": 4,
+   "bare": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0497,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 6,
+    "survey_covered": 4,
+    "rank_of_generation": 1,
+    "element_recall": 1.0,
+    "survey_recall": 1.0,
+    "hit1": 1,
+    "mrr": 1.0,
+    "dist_to_gt_main": 0.0525,
+    "record_match": true
+   }
+  },
+  "pc-30": {
+   "n_elements": 6,
+   "n_survey": 5,
+   "bare": {
+    "elements_covered": 4,
+    "survey_covered": 5,
+    "rank_of_generation": 3,
+    "element_recall": 0.6667,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0664,
+    "record_match": true
+   },
+   "engine": {
+    "elements_covered": 5,
+    "survey_covered": 5,
+    "rank_of_generation": 3,
+    "element_recall": 0.8333,
+    "survey_recall": 1.0,
+    "hit1": 0,
+    "mrr": 0.3333333333333333,
+    "dist_to_gt_main": 0.0726,
+    "record_match": true
+   }
+  }
+ },
+ "digest": "8a3559023a64"
+}

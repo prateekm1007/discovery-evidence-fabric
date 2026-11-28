@@ -1,0 +1,37 @@
+**Mitigation Proposal: Closed-Loop Die Pressure Stabilization and Melt Temperature Feedforward Correction Using Existing Sensors**
+
+**Mechanism:**
+Implement a two-layer control strategy that uses the existing die pressure oscillations as a direct indicator of melt flow instability and couples it with the melt temperature signal to predict and counteract gauge variation. The core logic is to stabilize the mass flow rate entering the die, as gauge variation across the web is fundamentally a result of uneven melt distribution at the die lip. Since we cannot add sensors, we treat the existing pressure transducer as a proxy for flow instability and the temperature transducer as the primary actuator variable for viscosity control, while using the line-speed encoder to normalize the flow rate.
+
+1.  **Pressure Oscillation Damping (Layer 1):** Detect low-frequency oscillations in the die pressure signal (typically 0.1–1 Hz range, distinct from high-frequency turbulence). Calculate a moving average or exponential smoothing of the pressure signal to isolate the oscillating component. This oscillating pressure component indicates pulsating flow from the extruder.
+2.  **Temperature-Pressure Coupling (Layer 2):** Melt viscosity is highly temperature-dependent. If the extruder is running at a constant screw speed, a drop in temperature increases viscosity, causing a transient pressure spike that reduces flow, leading to thinner film. Conversely, a temperature drop causes a pressure spike. By monitoring the derivative of temperature (dT/dt) and the concurrent pressure spike, we can implement a feedforward correction.
+3.  **Dynamic Viscosity Compensation:** Use the line-speed encoder to calculate the current volumetric flow rate per unit width. When a pressure oscillation is detected (indicating flow instability), apply a predictive correction to the melt temperature setpoint in the final heating zone *before* the instability fully manifests as gauge variation at the die.
+
+**Implementation:**
+
+1.  **Signal Processing:**
+    *   **Pressure Signal:** Apply a band-pass filter (e.g., 0.05–0.5 Hz) to the existing die pressure transducer signal to isolate oscillations. Compute the Root Mean Square (RMS) of the residual oscillation to generate an "Instability Index" (I_instab).
+    *   **Temperature Signal:** Compute the rate of change (dT/dt) of the melt temperature signal in the final barrel zone.
+    *   **Speed Signal:** Use the line-speed encoder to calculate the instantaneous take-off speed. Assume screw speed is constant (typical in this scenario), so volumetric flow is proportional to die pressure / melt viscosity.
+
+2.  **Control Logic:**
+    *   **Feedback Term:** If I_instab exceeds a threshold, introduce a damping term to the melt temperature controller. Specifically, if pressure is oscillating with a phase lag relative to temperature, adjust the temperature integral term to oppose the oscillation. For example, if a pressure rise coincides with a temperature drop, preemptively increase the temperature setpoint to counteract the viscosity increase that would further spike pressure.
+    *   **Feedforward Term:** Monitor dT/dt. If temperature is trending down, and die pressure is trending up, this indicates an impending flow reduction. Preemptively increase the melt temperature setpoint in the final zone to lower viscosity, maintaining constant flow rate despite the temperature dip. This is calculated as:
+        `ΔT_setpoint = K_ff * (dP/dt - P_instab_rms) + K_temp * (-dT/dt)`
+        Where `K_ff` and `K_temp` are gain constants tuned to the system.
+    *   **Gauge Variation Correlation:** Although we cannot directly measure gauge variation without new sensors, we know that trim scrap doubling correlates with gauge standard deviation. By stabilizing die pressure (and thus flow uniformity), we directly reduce the spatial variation of melt flow across the die, which is the primary cause of cross-web gauge variation. The control loop prioritizes minimizing `P_instab_rms` to a target baseline.
+
+3.  **Execution:**
+    *   The PLC or DCS executes this logic using the existing analog inputs (pressure, temperature) and digital input (speed encoder).
+    *   The output is a dynamic setpoint adjustment to the melt temperature zone controller. No new actuators are added; we only use the existing heaters.
+    *   **Tuning:** Start with conservative gains. The goal is to flatten the die pressure spectrum (reduce oscillation amplitude) while maintaining the average pressure near the nominal setpoint. As pressure stabilizes, melt flow becomes more uniform, reducing gauge variation across the web and lowering trim scrap.
+
+**Measures it Relies On:**
+
+1.  **Pressure as a Flow Proxy:** The physical principle that die pressure is directly related to melt flow rate and viscosity (`P = Q * μ / G`, where G is the die conductance). Oscillations in P directly indicate oscillations in Q or μ.
+2.  **Temperature-Viscosity Sensitivity:** Melt viscosity is exponentially sensitive to temperature. Small, fast temperature adjustments can significantly alter flow resistance, allowing the temperature controller to act as a fast-flow regulator when coupled with pressure feedback.
+3.  **Phase Relationship:** The mitigation relies on the fact that temperature changes lead pressure changes due to thermal lag and viscosity response. By monitoring dT/dt, we can predict pressure trends before they fully develop.
+4.  **Constant Screw Speed Assumption:** Since the line runs at rated speed and we assume the extruder screw speed is fixed (or its variation is negligible compared to melt property variations), the only variable affecting flow at the die is melt viscosity (controlled by temperature) and die pressure drop. This simplifies the control problem to managing viscosity via temperature.
+5.  **No New Hardware:** Uses only the existing pressure transducer, temperature transducer, and speed encoder, satisfying the constraint.
+
+This approach directly addresses the root cause (flow instability due to melt property variations) using available data, stabilizing the die pressure oscillations and thereby reducing the cross-web gauge variation that is causing the doubled trim scrap.

@@ -1,0 +1,67 @@
+{
+ "record": "MECHANISM_FINDINGS/1.0.0",
+ "at": "2026-11-22",
+ "purpose": "the loop's mechanism knowledge base (created per the R130 verdict dir 3): transferable, evidence-cited findings about WHERE the pipeline fails and WHAT counters it — recorded, never silently relied on; every finding cites its evidence bytes",
+ "findings": [
+  {
+   "id": "MF-1-over-rewriting",
+   "finding": "the reviewer stage's failure mode is OVER-REWRITING: fixing surfaced findings by restating/reorganizing the whole bill breaks clean sentences (the duty_pricing residual is introduced post-fix)",
+   "countermeasure": "a DIFF-MINIMIZATION clause: change ONLY the sentences the findings touch; carry every other sentence of the original verbatim",
+   "anti_pattern": "MORE derivation rules — m1_duty_rule and m4_m1m2 INTRODUCED defects (1/12 each): derive-or-delete wording makes the reviewer ADD duty figures to bills that had none",
+   "evidence": [
+    "eval/r130_gepa_ablation.json (the twin's stage-1 Pareto front: m5 0 defects, heal 0.083 vs incumbent 0.000; m1/m4 harmful)",
+    "the R130 auditor adjudication 2aed5305d8bf TRANSFERABLE_MECHANISM_FINDING",
+    "eval/r130s3_diffmin_scoring.json (the held-out paired re-test: v2 2/48 <= v1 2/48 defect rows and heal 0 >= 0 — NO REGRESSION, the preregistered fold gate PASS)"
+   ],
+   "status": "FOLDED into the canonical reviewer directive (claim c-0209, work r130s3-diffmin-fold): r125_f31e_run.py IMPROVED_DIRECTIVE = the v1 provenance bytes (eval/r122_lever_prereg.json, untouched) + the M5 clause literal (byte-identical to the twin's m5_minimal). The GEPA round-2 incumbent baseline stays the FROZEN v1 bytes (sha-pinned at 6f97f8311) — the fold moves the canonical pointer only and does NOT collapse the twin's arm"
+  },
+  {
+   "id": "MF-2-duty-pricing-rate-floor",
+   "finding": "the duty_pricing residual behaves as a ~2/48-per-draw RATE property under agnes-3.0-flash sampling, not a fixed item property: the committed incumbent rows (r125-05-s2/d1 + r125-07-s2/d1), the live v1 replay rows (r125-06-s1/d1 + r125-12-s2/d2) and the v2 replay rows (r125-09-s2/d1 + r125-01-s2/d2) all tally 2/48 duty_pricing with ~zero pid overlap across the three draws",
+   "implication": "single-draw defect ROWS are not deterministic targets; class-level rate comparisons (the primary metric) are the stable instrument; Art. 3 byte-consistency stays valid on TALLIES (a tally pin reproduces, an item-level defect pin would be over-fit)",
+   "evidence": [
+    "eval/r125_f31e_run/scoring.json (the committed 2/48)",
+    "eval/r130s3_diffmin_scoring.json (both live arms 2/48, disjoint pids)"
+   ],
+   "status": "typed; no action needed (the detector + primary metric already operate at class-rate level)"
+  },
+  {
+   "id": "MF-3-harmful-mutations-m1-m4",
+   "finding": "naive derivation-rule mutations are HARMFUL as reviewer directives — m1_duty_rule (derive-or-delete) and m4_m1m2 measurably INTRODUCED defects (1/12 each in the twin's stage 1)",
+   "action_dir8": "DROPPED from the candidate pool for any future directive-compile round — recorded, NOT deleted code (the M1/M2 strings stay committed in scripts/r130_gepa_reviewer.py untouched)",
+   "evidence": [
+    "eval/r130_gepa_ablation.json stage1_compile",
+    "the R130 adjudication GEPA_COMPILE_VERDICT.stage_1"
+   ],
+   "status": "typed; dropped-pool (dir 8)",
+   "citation_correction": "the r130s3-era text cited eval/r130_gepa_reviewer.py (dangling) — corrected forward to scripts/r130_gepa_reviewer.py by eval/r130s3_correction.json (R132 dir 6)"
+  },
+  {
+   "id": "MF-4-agnes-cache-telemetry-zero",
+   "finding": "agnes-3.0-flash reports cached_tokens = 0 on every leg across three windows (r129 bon2: 512/69588 = 0.7% once, then 0; r130s2 parity: 0/69780; r130s3 replay: 0 both arms) — no usable provider-side prompt caching on this route",
+   "implication": "the deep-research 'Bedrock prompt caching' lever (up to 85% latency / 90% input-cost cut) stays owner-gated on the AWS host + native Bedrock creds; do not expect cache-hit speedups from the agnes route",
+   "evidence": [
+    "eval/r129_bon_scoring.json usage_totals",
+    "eval/r130s2_bon_parity_scoring.json rep2_usage_totals",
+    "eval/r130s3_diffmin_scoring.json (both arms' transport)"
+   ],
+   "status": "typed; the owner-gated lever unchanged"
+  },
+  {
+   "id": "MF-5",
+   "finding": "the GEPA-on-reviewer ARM is DELETED (Art. 20 round 2 of 2)",
+   "evidence": "preregistered two-sided pooling on the headroom corpus: v1 4/96 (both committed draws) vs m5 7/96 (the twin's c-0209 v2 draw 2/48 + the c-0210 fresh draw 5/48, r125-07-s2 breaking in BOTH its draws); the round-1 TIE (0 vs 0 on the bon corpus) plus the round-2 LOSE = no strict beat within 2 rounds",
+   "implication": "reflective prompt-evolution against the defect metric did NOT find a directive that reduces the reviewer's residual rate — the compile's honest outcome; the m1/m4 lesson stands (adding rules made it worse), and the m5 clause does not reduce the rate either (MF-2 confirmed)",
+   "registered_at": "2026-11-22",
+   "claim": "c-0210"
+  },
+  {
+   "id": "MF-6",
+   "finding": "FOLD-REGRESSION FLAG for the owner (typed, NOT acted on): the c-0209 fold's no-regression gate (2/48 <= 2/48, one paired draw) now has POOLED contrary evidence",
+   "evidence": "on the same 48 headroom inputs, v1 pooled 4/96 vs the folded directive (m5 bytes) pooled 7/96 — the fresh c-0210 draw of the folded directive ran at 5/48, the hottest reviewer draw recorded on this corpus",
+   "implication": "the fold's no-regression evidence was single-draw; the pooled evidence does NOT support the clause as a rate reducer and leans adverse. The canonical pointer (r125_f31e_run IMPROVED_DIRECTIVE) is the OWNER's decision — this flag carries the numbers, changes nothing on disk; a revert would itself be an engine-line change riding its own prereg + no-regression test",
+   "registered_at": "2026-11-22",
+   "claim": "c-0210"
+  }
+ ]
+}

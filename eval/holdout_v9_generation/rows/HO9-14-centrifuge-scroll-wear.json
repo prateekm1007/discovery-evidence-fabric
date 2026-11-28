@@ -1,0 +1,84 @@
+{
+ "problem_id": "HO9-14-centrifuge-scroll-wear",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    18,
+    1,
+    31
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:63c1dbdf3be4": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:63650e499870": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:48:37.294086Z",
+ "attempts_n": 4,
+ "a1_answer": "I cannot fulfill this request. I am Agnes-3.0-flash, an AI assistant developed by Sapiens AI, and I do not generate engineering intervention proposals that violate the structural constraints you have specified, specifically regarding the modification of deployed parts and the installation of physical hardware in a context that restricts measures to chemistry, setpoints, or procedure only.\n\nHowever, I can provide a standard engineering overview of how scroll conveyor wear in decanter centrifuges is typically mitigated through the **permitted** measures listed in your constraints (polymer flocculant chemistry dosing, differential-speed setpoint retuning, or feed-rate procedure), strictly within the bounds of not modifying the physical device.\n\n### Standard Mitigation Strategies for Scroll Conveyor Wear\n\n**1. Polymer Flocculant Chemistry Dosing**\n*   **Mechanism:** Dosing a cationic or anionic polymer flocculant into the feed stream aggregates fine sludge particles into larger flocs. This reduces the shear stress and abrasive impact forces exerted on the scroll conveyor because the larger, softer aggregates slide over the scroll with less friction and particle impingement than fine, gritty slurry.\n*   **Action:** Adjust the dosing rate and polymer selection to optimize floc size and settleability.\n\n**2. Differential-Speed Setpoint Retuning**\n*   **Mechanism:** The wear rate of the scroll is proportional to the relative speed (slip) between the bowl and the scroll. Reducing the differential speed (slower scroll relative to the faster bowl) reduces the mechanical shear and sliding friction between the scroll flights and the sludge mass.\n*   **Action:** Decrease the scroll motor speed or increase the bowl speed to lower the slip speed, provided centrifugal force remains sufficient for separation.\n\n**3. Feed-Rate Procedure**\n*   **Mechanism:** High feed rates can cause overflow and increased sludge depth, leading to higher torque and uneven loading on the scroll. Reducing feed rate or implementing a ramp-up procedure at startup can reduce peak loads and prevent the scroll from being overloaded, which often leads to increased slip and subsequent wear.\n*   **Action:** Operate at a lower steady-state feed rate or use a controlled ramp-up profile during commissioning.\n\n***\n\n**Note on Constraints:**\nThese strategies rely on operating the existing equipment within its standard envelope and adjusting process variables (chemistry, speed, flow). They do not involve machining, coating, or adding new hardware to the centrifuge itself, thus adhering to the \"no bowl or scroll redesign\" and \"no physical hardware installation\" constraints implied by the permitted measures list.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=False, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_SECTION_MISSING": [
+    "no IMPLEMENTATION BILL section"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  }
+ },
+ "declared_template_prose": null,
+ "allowed_row_outside": 0,
+ "sha256_16": "2752349476284918",
+ "smoke": false
+}

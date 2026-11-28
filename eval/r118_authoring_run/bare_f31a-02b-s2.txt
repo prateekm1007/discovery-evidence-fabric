@@ -1,0 +1,24 @@
+**Mitigation Proposal: Adaptive Duty-Cycle Rescheduling of Spray-Defoamer Based on Effluent Solids Load**
+
+**Mechanism:**
+The proposed mitigation shifts the spray-defoamer dosing pump from its current fixed-time schedule to an event-driven adaptive schedule. Instead of continuous or fixed-interval spraying, the pump operates in short, high-intensity bursts triggered only when foam accumulation is imminent. The trigger mechanism relies on correlating the high organic load (influent COD/BOD) with the onset of sludge carryover. By tightening the dosing windows specifically during the high-load periods where foaming is generated, the system prevents foam from reaching the effluent weir, thereby stopping the carryover of solids into the treated water. This approach prioritizes foam prevention at the source (the foam blanket) rather than trying to dissipate foam after it has formed and mixed with solids.
+
+**Implementation:**
+1.  **Sensors & Controls:** Install or utilize existing foam-level sensors (e.g., capacitance probes or level sensors at the perimeter of the clarifier) near the effluent weir. Connect these sensors to the Variable Frequency Drive (VFD) or the on/off relay of the spray-defoamer pump.
+2.  **Logic Programming:** Program the control system (PLC) with a "High-Load Mode." During periods of known high organic load (identified by influent flow and COD/BOD data), the system activates the adaptive logic.
+    *   *Trigger:* If foam level rises above 10% of the sensor threshold, the pump activates for 30 seconds.
+    *   *Hysteresis:* The pump stops when foam level drops below 5% to prevent over-dosing.
+    *   *Maximum Duty Cycle:* Cap the daily dose at a safety limit (e.g., 80% of the previous fixed schedule's total volume) to prevent chemical overdose, which can itself cause sludge dispersal issues.
+3.  **Spray Nozzle Adjustment:** Ensure the spray nozzles are aimed at the foam accumulation zone, not the entire tank, to maximize efficiency per liter used.
+4.  **Baseline Comparison:** Maintain a log of the previous fixed-schedule total liters used per day for cost comparison.
+
+**Measures It Relies On (Operational Cost Statement):**
+*   **Primary Measure (Chemical Cost):** The operational cost is derived from the **liters of defoamer consumed per day**.
+    *   *Cost Equation:* `Daily Defoamer Cost = (Total Liters Dosed / Day) × (Price Per Liter)`
+    *   *Expected Outcome:* The adaptive schedule is expected to reduce total liters consumed by 20–40% compared to the fixed schedule, because dosing occurs only when foam is present, rather than continuously or at arbitrary times. This directly lowers the operational cost.
+    *   *Savings Calculation:* `Annual Savings = [(Old Avg Liters/Day - New Avg Liters/Day) × 365] × Price Per Liter`
+*   **Secondary Measure (Performance KPI):** The efficacy is measured by **TSS (Total Suspended Solids) in the effluent**.
+    *   *Target:* Maintain effluent TSS below the regulatory limit (e.g., <30 mg/L). A successful mitigation shows a reduction in TSS spikes during high-load events, proving that solids carryover has been stopped.
+    *   *Risk Cost:* If TSS remains high despite reduced chemical use, the control logic (trigger threshold or spray duration) must be re-tuned, incurring minor engineering labor costs but no additional chemical cost.
+
+This mitigation balances operational risk (solids carryover) against direct operational cost (defoamer expenditure), satisfying the constraint by explicitly linking the schedule change to a measurable cost outcome.

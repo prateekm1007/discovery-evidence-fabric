@@ -1,0 +1,91 @@
+{
+ "problem_id": "f31a-05b-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a **Time-Dependent Manual Greasing Protocol** that replaces the current frequency-based approach with a dose-controlled, volume-based regimen. By strictly limiting the grease quantity per interval and extending the interval, this prevents the accumulation of excess grease that causes \"washover\" (where the bearing rotates the surplus grease outward, thinning the film and generating shear heat), while ensuring the film remains adequate.\n\n**Implementation:**\n1.  **Quantify the Dose:** Measure the exact volume of the existing OEM grease pack required to fill the bearing’s free volume without overflow. Use a calibrated syringe or grease gun with a volumetric counter to dispense only 2–3 strokes (or equivalent cc) per greasing event, rather than the typical \"until fresh grease appears\" method.\n2.  **Extend the Interval:** Based on the observed \"weeks\" failure mode, extend the manual greasing interval from the current (presumably frequent) schedule to a longer cycle (e.g., every 500–1000 hours, or bi-weekly/monthly, depending on operational hours) where the measured low dose is applied.\n3.  **Standardize the Manual Route:** Train the maintenance crew to use only the calibrated tool at the designated manual grease point. Record the exact dose and timestamp in the log. No over-greasing is permitted.\n\n**Measures It Relies On:**\n*   **Calibrated Manual Dispensing Tool:** A grease gun with a volumetric counter or a pre-filled syringe to ensure precise, low-volume dosing.\n*   **Revised Maintenance Schedule:** An updated work order or logbook entry specifying the new extended interval and fixed low dose.\n*   **Operator Training:** Ensuring maintenance staff understand that \"until clean grease emerges\" is prohibited; only the calculated low dose is applied.\n*   **Compliance with Constraints:** No hardware changes (still manual route, same OEM grease), no automation.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\n**MECHANISM CLASS:** High-Volume Pulsed Manual Greasing with Periodic Flushing Duty Split.\nStandard practice involves periodic manual greasing at a fixed interval with a small volume designed to replenish the static film. This mitigation departs by applying a **high-volume, low-frequency pulsed duty** to the existing manual grease gun. The departure is the **arrangement** (duty cycle and volume per application) rather than the component (the gun and grease are unchanged). The mechanism utilizes the excess volume not merely to top up the bearing but to actively scour the bearing exterior and overflow channel, physically displacing the washed-out, thin grease before it can starve the film, thereby maintaining a saturated, thick lubricant layer at the race contact.\n\nPHYSICS CHECK\n**DIRECTION-OF-EFFECT:** driving variable = *effective grease film thickness* ($h_{eff}$); the mechanism moves it **UP** by increasing the local grease inventory and purging diluted contaminants; this **REDUCES** the spalling rate driven by asperity contact.\nGoverning relation: Bearing spalling rate $\\dot{S} \\propto \\frac{1}{h_{eff}^n}$ where $h_{eff}$ is the effective film thickness. Washover thins $h_{eff}$ via dilution and mechanical stripping.\nMagnitude verification: Standard practice maintains $h_{eff} \\approx h_{min}$ (starvation threshold). This mechanism, by injecting 3-5 times the standard volume per event, creates a temporary reservoir effect. Even if 80% is lost to washover, the residual inventory keeps $h_{eff}$ above the critical spalling threshold $h_{spall}$. The integral of contact stress over the duty cycle is reduced by keeping the bearing in the elastohydrodynamic (EHD) regime rather than the mixed-film regime.\n\nIMPLEMENTATION BILL\nEvery row is tagged per the PROCUREMENT RULE.\n1.  **Equipment:** Existing manual grease gun (stated in constraint \"existing manual greasing route\"). **(a)**\n2.  **Material:** Existing OEM grease pack (stated in constraint \"OEM pack is fixed\"). **(a)**\n3.  **Operation (Standard):** Standard manual greasing procedure using the grease gun. **(c)**\n4.  **Operation (New Duty):** Modify the operational procedure to perform **High-Volume Pulsed Greasing**. Instead of the standard small-volume fill, the operator applies a high volume (e.g., 4-6 strokes of the gun) at a reduced frequency (e.g., weekly instead of daily/shift, depending on washover rate). The high volume forces grease out of the existing overflow drain/vent (stated infrastructure), acting as a flush. **(c)**\n5.  **Procedure:** No new hardware. No automatic lubricators. No change to grease spec. **(c)**\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installation/Commissioning:** 0 hours. No new hardware installation. The standard practice already uses the gun and the grease point. The only change is the operator's procedure log.\n*   **Material Cost:** Same grease type. Volume per event increases, but frequency decreases. Net annual grease consumption is comparable to or slightly lower than standard practice (due to less frequent but larger flushes preventing loss-to-failure).\n*   **Labor Cost:** Slightly higher per event (more strokes), but lower total events per week. Net labor burden is **same class** (manual task).\n*   **Operational Loss:** Zero. The greasing is performed during existing maintenance windows or at a rate that does not require stopping the screen deck. The \"pulsed\" nature means no continuous derate.\n\nEXECUTABLE TEST\n**Protocol:**\n1.  Select two identical screen decks in the plant.\n2.  **Control:** Operate with standard manual greasing interval and volume.\n3.  **Test:** Operate with the High-Volume Pulsed Manual Greasing procedure (e.g., 1 high-volume pulse per week vs. standard daily small fills).\n4.  **Instrumentation:** Use existing visual inspection checklists and bearing temperature indicators (if present) or acoustic emission probes *for diagnostic purposes only* (not part of the mitigation mechanism, but part of the test observation). Note: The mitigation mechanism itself requires no new sensors.\n5.  **Duration:** 3 months.\n6.  **Pass/Fail Threshold:**\n    *   **Pass:** Test bearing shows no spalling or fluting after 3 months, while Control bearing shows early-stage spalling (consistent with historical \"within weeks\" failure mode).\n    *   **Kill Criterion:** If the test bearing shows spalling at the same rate as control, or if the high-volume pulse causes seal extrusion/damage (indicating volume is too high), the mechanism fails. Adjust pulse volume down until seal integrity is maintained and spalling is prevented.\n\nCONSTRAINT BIND\n*   **Allowed Measures:** Existing manual greasing route.\n*   **Exclusions:** No automatic lubricators. No grease-spec change.\n*   **Compliance:** The solution uses only the manual gun (allowed) and the existing grease (allowed). It adds no automatic hardware. It changes only the procedure (duty/volume).\n\nRISK/TENSION\n*   **Seal Integrity:** High-volume pulsed greasing can extrude seals if the volume exceeds the bearing's capacity to vent/leak off excess. The \"Executable Test\" must verify that the high volume does not destroy the labyrinth seals. If seals fail, the mechanism fails. The physical limit is set by the existing seal's leak-off rate, which is a stated constraint of the equipment's current state.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 1933,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5740,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Labor/Operations:** The intervention increases the *number* of manual greasing event",
+     "*   **Parity Conclusion:** Same-or-lower burden class. The mechanism does not add equipmen"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 7672,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **MECHANISM CLASS:** Procedural Duty-Split & High-Volume Manual Greasing",
+     "*   **Installation:** 0 hours. No hardware changes.",
+     "*   **Commissioning:** 0 hours.",
+     "*   **Operation (Burden):** The operator must perform the \"shock dose\" injection once per ",
+     "*   **Operational Loss Pricing:** The screen deck is restricted to high-speed operation fo",
+     "*   *Loss:* 1 hour of full-throttle screening per 9-hour cycle.",
+     "*   *Magnitude:* ~11% reduction in peak throughput capacity if the process cannot run at l",
+     "*   *Trade-off:* This loss is offset by the extension of bearing life from \"weeks\" to \"mon",
+     "*   *Net:* Positive.",
+     "*   **Parity Conclusion:** Same-or-lower burden class. The mechanism adds no hardware, onl"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 5365,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Installation/Commissioning:** 0 hours. No new hardware installation. The standard pr",
+     "*   **Material Cost:** Same grease type. Volume per event increases, but frequency decreas",
+     "*   **Labor Cost:** Slightly higher per event (more strokes), but lower total events per w",
+     "*   **Operational Loss:** Zero. The greasing is performed during existing maintenance wind"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "derived feature input 'dilution and mechanical stripping' is not derivable from the permitted signals"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Installation/Commissioning:** 0 hours. No new hardware installation. The standard pr",
+    "*   **Material Cost:** Same grease type. Volume per event increases, but frequency decreas",
+    "*   **Labor Cost:** Slightly higher per event (more strokes), but lower total events per w",
+    "*   **Operational Loss:** Zero. The greasing is performed during existing maintenance wind"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "derived feature input 'dilution and mechanical stripping' is not derivable from the permitted signals"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ]
+  }
+ }
+}

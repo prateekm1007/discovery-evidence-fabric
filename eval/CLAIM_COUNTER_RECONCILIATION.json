@@ -1,0 +1,20 @@
+{
+ "record": "CLAIM_COUNTER_RECONCILIATION/1.0.0 (the R131 verdict dir 7 / finding R131-F5)",
+ "the_divergence": "two counter authorities diverged: refs/claims/counter (a bare numeric file 'claim_counter' = 203, allocated by claim_id_counter.py — the dir-1 machinery's own lineage, last pushed 2026-11-22 14:46Z) vs eval/claim_next_id.txt (= c-0212, the queue-branch c-0xxx lineage every session since c-0207 has actually used with the refs/claims/next lock)",
+ "the_reconciliation": {
+  "single_authority": "eval/claim_next_id.txt on queue/dev12_r7 + the refs/claims/next lock ref (pushed WITH each claim commit) — the authority every live session already uses",
+  "numeric_ref": "refs/claims/counter is RETIRED-but-PRESERVED: its value (203) is recorded here; future sessions do NOT update it and do NOT allocate from it (deleting the remote ref would rewrite history — not done, forward-only)",
+  "mapping_note": "the two lineages never aliased: the numeric 203 counts claim_id_counter.py allocations; the c-0xxx lineage counts work_claims.json entries. No claim was double-issued (c-0207..c-0211 all unique, monotonic, each with a work_claims entry)"
+ },
+ "c_0206_typed_record": {
+  "claim_id": "c-0206",
+  "finding": "c-0206 is ABSENT from eval/work_claims.json (the c-0205 -> c-0207 gap the auditor's R131-F5 flagged)",
+  "the_typed_truth": "this session cannot reconstruct WHO allocated c-0206 or for what — the allocation left no committed record (the gap predates this session's window; no R130-verdict work names c-0206). Typed as ALLOCATED-BUT-UNRECORDED: the id is consumed (never re-issued), the work it named is UNKNOWN and claimed by no session",
+  "action": "none possible forward: the id stays consumed; every future claim's uniqueness + monotonicity is checked against work_claims.json (the authority above)"
+ },
+ "timestamp_discipline": {
+  "finding": "the R131 prereg said 'typed_at 23:05Z' while its push commit carries 19:36Z — the sandbox clock runs AHEAD of the git-observed UTC (measured skew this window: ~3.5h)",
+  "the_rule_typed": "all records from this session now stamp 'sandbox clock' WITHOUT a false Z suffix; TRUE UTC is quoted only where read from the git push timestamps themselves (the D2 remote_ci read blocks). No record claims a true-UTC stamp from the sandbox wall clock."
+ },
+ "at": "2026-11-23 (sandbox clock)"
+}

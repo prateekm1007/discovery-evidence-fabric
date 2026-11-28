@@ -1,0 +1,41 @@
+{
+ "record": "R146_LEVER_INTEGRATION_EVIDENCE/1.0.0",
+ "at": "2026-11-24 (sandbox clock)",
+ "executor": "builder-r146s1 (the c-0250 strength lane)",
+ "lever": {
+  "name": "the MOOSE-Chem inspiration-retrieval -> hypothesis path, integrated into the canonical generation",
+  "modules": [
+   "discovery_fabric/generation/inspiration_retrieval.py (retrieve_inspiration, inspiration_prompt_block)",
+   "discovery_fabric/generation/mechanism_map.py (the typed failure-class constraint the analogies condition)",
+   "discovery_fabric/generation/novelty_gate.py (the gate the cross-domain input conditions)"
+  ],
+  "import_graph_evidence": [
+   "scripts/r146_v17_strengthened_one_shot.py:240 calls ir.retrieve_inspiration(sel.failure_class)",
+   "scripts/r146_v17_strengthened_one_shot.py:253 calls ir.inspiration_prompt_block(insp) into the typed plan",
+   "scripts/r146_v17_strengthened_one_shot.py:367-368 feeds the analogies' first from_domain into the novelty gate (the cross_domain input)",
+   "scripts/r146_v17_strengthened_one_shot.py:301 carries the hypothesis_ranking block in the winner trace",
+   "scripts/r146_v17_s2_one_shot.py (the s2 lane's driver) imports the same modules into its typed plan"
+  ],
+  "generation_contract": "the analogies ride the prompt (the cross-domain transfer demand); the gate's strong condition is conditioned on the analogies' from_domain (2 markers + mapped when a cross-domain input is present)"
+ },
+ "measured_gain": {
+  "v16_weak_baseline": {"strong": "4/30", "pct": 13.3,
+   "source": "V112 / R145-F1 (the auditor's read + the novelty gate's conservative count)"},
+  "v17_strengthened_generation_time": {"strong": "16/30", "pct": 53.3,
+   "source": "the canonical run's recorded gate (eval/holdout_v17_strengthened_generation/), byte-faithfully reproduced 30/30 by eval/holdout_v17_strengthened_screen.json"},
+  "v17_strengthened_conservative_floor": {"strong": "9/30", "pct": 30.0,
+   "source": "the xdomain-blind recompute from the row bytes alone (needs 3 STRONG_MARKERS without the cross-domain input) — typed AT the >=30% bar"},
+  "dev_arm_iteration": {"pass1": "0/4 gate-strong (the content carried, the falsification/test-vehicle language missing)",
+   "pass2": "3/4 gate-strong after the mandatory-wording demand", "source": "eval/holdout_v17_s2_dev/ (typed DEV, never scored)"},
+  "honest_typing": "the gain is measured on the builder's screen instrument (the novelty gate), NOT on the auditor's sealed rubric scoring — the >=30% strong acceptance is the AUDITOR's act (Art. 7/10/14); both gate readings typed",
+  "run_distinction": "the gain's subject is the SEALED-bytes strengthened run (eval/holdout_v17_strengthened_generation/, digest 2eb520f695aaf1ab, problem ids verified against the audit-branch sealed set); the twin's c-0250 run (eval/holdout_v17_generation_r146/, 5/30=16.7% pre-signal) ran on a DIFFERENT NON-sealed problem set (v17-01-rail-shelling, v17-06-solar-backlash, no sealed digest) — its numbers are measures on that set and are not comparable to the sealed-bytes gate numbers; typed to prevent cross-set cherry-picking in either direction"
+ },
+ "per_class_gaps": {
+  "zero_strong_classes": ["electrical_insulation", "fatigue_crack", "leakage_sealing"],
+  "note": "3 of 10 classes produced 0 gate-strong rows even at generation time (the analogies' from_domain domains are thinner there) — the typed next strengthening target if the auditor's scoring lands below the bar; disclosed, not hidden"
+ },
+ "dir8_cross_check": {
+  "worldwide": "d87a64758 (ScienceOne 100 / AstaBench / HypoBench checked; no published transfer-distance ranking met the integration bar)",
+  "dead_modules": "23cf16675 (novelty_v34.py + obviousness_v39.py pruned with import-graph evidence; PRUNED_MODULES with per-path epochs)"
+ }
+}

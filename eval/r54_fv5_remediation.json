@@ -1,0 +1,35 @@
+{
+ "record": "R54_FV5_REMEDIATION/1.0.0",
+ "claim": "c-0073",
+ "session": "builder-r54s2",
+ "work_id": "r54-fv5-physics-hardening",
+ "base_sha": "576a1195c",
+ "finding_lineage": {
+  "id": "F-V5",
+  "origin": "verifier-filed by builder-r50s2 (c-0070 lane, eval/r51_verifier_record.json) after live reproduction during the R53 P1-gate measurement on the r53s1 lineage: run_check('arrhenius_rate_ratio', t2_degC=0 K) raised an uncaught ZeroDivisionError through the integrated route",
+  "local_remedy": "fixed on the r53s1 local lineage under the local c-0073 lane (R53, commit 0e82bc531: 0 K guard + saturation bounds + npsh guard order + dewpoint guards + 4 regression pins)",
+  "relay_gap": "the relay that landed the r53s1 content on the remote lineage (folded into remote c-0071) did NOT carry the physics hardening — verified at the remote tip by code inspection (no out_of_domain guards) and by LIVE reproduction before this claim was filed",
+  "relay_gap_typed": "this is the same finding surfacing on a second lineage after an incomplete relay — typed here per Art. 4 so the record is never silently rewritten; the remote lineage's own R54 audit (AM49 'physics: 6 relations pint 21 tests') verified test coverage, not the out-of-domain raise behavior"
+ },
+ "live_reproduction_at_remote_tip": {
+  "at": "probe run on the working tree at 576a1195c (bytes identical for physics_checks.py; evidence pinned by the probes below, re-verified at the claims commit e7128eadd)",
+  "probe_1": "run_check('arrhenius_rate_ratio', ea_kj_mol=80.0, t1_degC=60.0, t2_degC=-273.15) -> uncaught ZeroDivisionError: float division by zero (1/T2 at T2=0 K)",
+  "probe_2": "run_check('npsh_margin', patm_kpa=101.325, pvap_kpa=12.3, rho_kg_m3=0.0, suction_head_m=2.0, friction_loss_m=1.5, npshr_m=3.0) -> uncaught ZeroDivisionError: float division by zero (the rho/pvap guard existed but ran AFTER the head division)",
+  "probe_3": "run_check('dewpoint_frost_margin', t_air_degC=-243.04, rh_percent=60.0, t_surface_degC=10.0) -> uncaught ZeroDivisionError: float division by zero (a*t/(b+t) at the Magnus floor)",
+  "violation": "Art. 3 typed-refusal discipline: out-of-domain input through the registry's only entry point must return typed REFUSED, never raise — every caller (engine_route, the P1 measurement, CI steps) would crash on garbage input instead of degrading typed"
+ },
+ "remedy": {
+  "arrhenius_rate_ratio": "0 K domain guard (T1/T2 <= 0 K after conversion -> typed out_of_domain REFUSED) + exponent saturation bounds (the V8.1.2 1995f7e75 pattern: exponent > 709.78 -> ratio 1e308, < -745 -> 0.0, the clamp disclosed in-band via detail['saturated']; in-range values unaffected) + ZeroDivisionError added to the typed except class",
+  "npsh_margin": "the rho/pvap domain guard moved BEFORE the head division (typed out_of_domain REFUSED) — same guard, correct order",
+  "dewpoint_frost_margin": "Magnus-Tetens floor guard (b + t <= 0 -> typed out_of_domain REFUSED at the -243.04 degC validity floor) + degenerate guard (abs(a - alpha) < 1e-12 -> typed out_of_domain REFUSED) + ZeroDivisionError added to the typed except class",
+  "regression_pins": "4 pins appended to tests/test_physics_checks.py (zero-K refusal both sides, saturation disclosure upper+lower+no-clamp-in-range, absurd-dry-bulb refusal, zero-rho refusal)"
+ },
+ "content_preservation_evidence": {
+  "p1_measurement": "scripts/r54_p1_unit_checked_measurement.py re-run post-fix: eval/r54_p1_unit_checked.json BYTE-IDENTICAL (sha256 fd410bdcdc6ea307b9565d8593372616460e08715c832d6616b70a8bb8871386 before == after) — the committed 36/36 = 1.0 P1_UNIT_CHECKED_PASS evidence is untouched",
+  "labelled_regression": "scripts/r52_labelled_regression.py re-run post-fix: verdict PASS 0/0/0, the committed artifact byte-identical (git diff clean)",
+  "reference_scenarios": "all 12 committed REFERENCE_SCENARIOS still verdict RUN with unchanged values (arrhenius 1.0016369747921925, npsh 6.6883 m, dewpoint -6.698 delta_degC — bit-identical to pre-fix)"
+ },
+ "battery": "tests/test_physics_checks.py 14/14 green post-fix (10 pre-existing + 4 new F-V5 pins); the full CI battery re-run at the round commit (see the round record)",
+ "residual_typed": "the dewpoint degenerate guard (a == alpha) is defensive — no natural input reached it in the live probes (rh 1e-6 computes normally); the saturation bounds are likewise stress-path armor (the V8.1.2 pattern) — none of the 12 committed scenarios or labelled rows enters these domains, so the P1 evidence base is value-identical",
+ "llm_calls": 0
+}

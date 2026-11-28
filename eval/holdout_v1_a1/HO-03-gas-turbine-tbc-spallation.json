@@ -1,0 +1,29 @@
+{
+ "problem_id": "HO-03-gas-turbine-tbc-spallation",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 7.8,
+   "chars": 3183
+  },
+  {
+   "kind": "repair_1",
+   "latency_s": 7.7,
+   "chars": 3137,
+   "findings_disclosed": [
+    "NYQUIST_UNSAMPLED"
+   ]
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "166f8893a9c929d9",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVEL-AND-FEASIBLE IDEATION\n\nSTEP 1 — INVENT THE OBSERVABLE:\nStandard practice tracks coating surface temperature and thermal gradients. Our observable is the **bond-coat oxidation rate** inferred from oxygen partial pressure gradients at the interface, which directly correlates with the spall-initiating mechanism that standard practice ignores.\n\nSTEP 2 — MAKE THE IMPLEMENTATION BORING:\nThe bond-coat oxidation rate is computable from existing exhaust gas oxygen sensors and surface thermocouples using standard Arrhenius kinetics and Fick's law diffusion equations.\n\nNOVELTY STATEMENT:\nStandard practice tracks surface temperature as a proxy for thermal stress, but the leading observable is the bond-coat oxidation rate, which directly measures the oxygen diffusion driving the oxide scale growth that causes coating delamination. The connection to failure physics is that the volumetric expansion of the growing oxide scale at the interface creates compressive stress exceeding the coating's adhesion strength.\n\nPHYSICS CHECK:\nThe oxidation rate follows the parabolic rate law: dx/dt = k/P_O2, where k = A*exp(-Q/RT). For MCrAlY at 1150°C, Q = 280 kJ/mol and A = 1.2×10^-4 kg²/m⁴s. At P_O2 = 0.01 atm (typical for gas turbines), the calculated oxidation rate is 2.3×10^-8 m/s, corresponding to 83 micrometers after 24,000 hours - sufficient to cause spallation given the 400-micrometer total coating thickness constraint.\n\nIMPLEMENTATION BILL:\n- Components: Existing surface thermocouples (Type S), existing exhaust gas oxygen sensors\n- Materials: Standard data acquisition system\n- Instruments: Signal conditioning equipment, existing control system\n- Procedure: \n  1. Sample exhaust gas oxygen content at 1 Hz (ASSUMPTION: existing sensor can be tapped without modification)\n  2. Measure coating surface temperature at 1 Hz (USER CONSTRAINT: 1150°C)\n  3. Calculate oxidation rate using embedded microcontroller with pre-programmed Arrhenius equation\n  4. Log cumulative oxidation depth\n  5. Alert when oxidation rate exceeds threshold\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: SAME - uses existing sensor infrastructure\n- Operability: SAME - requires no additional operator intervention\n- Maintenance: SAME - thermocouple and oxygen sensor maintenance unchanged\n- Cost class: SAME - computational cost negligible compared to standard thermal monitoring\nThe approach achieves SAME deployment burden while monitoring a different physical phenomenon directly tied to the failure mechanism.\n\nEXECUTABLE TEST:\nProtocol: Accelerated thermal cycling test in laboratory furnace with controlled atmosphere\nInstruments: Furnace with programmable cycles, oxygen sensor, surface thermocouple, sample coating coupons\nPass/fail threshold: Coating shows no spallation after 600 thermal cycles (1150°C peak, 50°C minimum)\nDuration: 300 hours (simulating 600 cycles with 30-minute cycles)\nKill criterion: Any spallation observed on coupon surface before 600 cycles\nFalsification criterion: If oxidation rate exceeds 4.6×10^-8 m/s (2× calculated baseline), the approach is falsified as it fails to predict the failure condition."
+}

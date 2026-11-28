@@ -1,0 +1,160 @@
+{
+ "problem_id": "v17-16-rail-axle",
+ "domain": "fatigue_crack",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P18",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:f7a19cb47d52": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:9d69fae5f96d": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:500855afe476": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "fatigue_crack",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "fatigue_crack",
+   "n_analogies": 0,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:19:30Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.0,
+ "a1_answer": "## NOVELTY STATEMENT\nThe standard practice delivers a material/hardness modification or increased inspection frequency at the wheel-seat fillet, relying on higher yield strength or earlier detection to prevent failure.\nThe proposed mechanism departs by implementing **resonance_avoidance_stiffening**: it locally increases the stiffness of the wheel-seat fillet region to shift the first local bending frequency of the axle below the dominant wheel-rail impact forcing frequency, thereby preventing resonant amplification of the cyclic stress amplitude.\nThe failure-physics connection is that fatigue crack initiation at the fillet is driven by the peak stress range; by detuning the local structural mode from the operational forcing spectrum, the dynamic stress amplification factor is reduced, lowering the effective fatigue stress below the crack-initiation threshold without changing the material hardness or inspection interval.\n\n## PHYSICS CHECK\nThe governing physical relation is the natural frequency of a constrained beam segment, approximated as $f_n = \\frac{1}{2\\pi}\\sqrt{\\frac{K_{eff}}{m_{eff}}}$. Increasing local stiffness $K_{eff}$ at the fillet lowers the first natural frequency $f_n$.\nMagnitude verification: Assume a typical axle local mode frequency is initially 45 Hz and the dominant wheel-rail impact forcing frequency is 50 Hz. If the forcing frequency is fixed by train speed and wheel diameter, and the axle is tuned so that its first local mode shifts to 30 Hz, the ratio $f_n/f_{forcing}$ moves from 0.9 (near resonance, high Q-factor amplification) to 0.6 (off-resonance, low amplification). This shift reduces the dynamic stress multiplier, directly lowering the peak cyclic stress at the fillet.\n\n## IMPLEMENTATION BILL\n1. **Component**: Modified wheel-seat fillet geometry with a localized stiffening rib or thickened pad cast into the axle material at the fillet root.\n   - **Input Stream**: ALREADY-RECORDED wheel-rail impact acceleration spectra and axle natural frequency estimates from existing vibration telemetry and FEA models of the current axle design.\n   - **Reference/Threshold**: DERIVED from stated physics: target frequency shift calculated as $f_{new} = f_{old} \\cdot \\sqrt{K_{old}/K_{new}}$.\n2. **Material**: Same axle steel grade as original (e.g., EVO or 700L), no exotic materials added.\n   - **Rationale**: Maintains burden class parity with standard practice (same material family), avoiding new supply chain issues.\n3. **Procedure**: Precision machining or casting modification of the fillet profile to add 5–10 mm of material thickness in a ring pattern around the fillet, validated by updated FEA for static and dynamic loads.\n   - **Input Stream**: ALREADY-RECORDED static load limits from wheel-load measurements.\n\n## BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: Same as standard practice; the axle is replaced or refurbished in the same workshop. No new installation hardware required.\n- **Operability**: No change in operational parameters; the axle operates under identical speed and load profiles.\n- **Maintenance**: Slightly higher machining/casting cost during manufacture, but no change in field maintenance intervals.\n- **Cost Class**: Marginally higher manufacturing cost due to material removal/addition and FEA validation, but no new sensors or monitoring systems. Overall burden class remains SAME as standard practice, but with a fundamentally different physical mechanism (tuning vs. hardening).\n\n## EXECUTABLE TEST\n1. **Protocol**: Construct two test axles: (A) original design, (B) design with localized fillet stiffening.\n2. **Instruments**: Laser vibrometer to measure frequency response functions (FRF) and strain gauges at the fillet root under simulated wheel-rail impacts.\n3. **Pass/Fail Thresholds**: \n   - FRF peak at the forcing frequency for (B) must be at least 50% lower in amplitude than for (A).\n   - Strain range at the fillet for (B) must be reduced by at least 30% compared to (A) at the same input load.\n4. **Duration**: 48-hour continuous vibration test at the operational forcing frequency.\n5. **Kill Criterion**: The mechanism is FALSIFIED if the strain range at the fillet does not reduce by at least 30% within the 48-hour test window on the bench rig.\n\n## CONSTRAINT BIND\nThe monitored indicator is the **strain range at the wheel-seat fillet**, which is the PRIMARY stated indicator of fatigue crack initiation. The forcing frequency and static load are secondary inputs used to validate the tuning, but the decision metric is the local cyclic stress (strain) at the fillet.\n\n## DESIGN_POINT\nThe mechanism acts through a calculated stiffness increase of 50% in the local fillet region, derived from the requirement to shift the first natural frequency from 45 Hz to 30 Hz (a 1.5x shift). This assumes the local mode is dominated by the fillet stiffness and that mass change is negligible. The target dynamic stress reduction is 30%, based on typical Q-factor values of 2–3 for axle structures, where moving off-resonance from $f_n/f_{forcing} = 0.9$ to 0.6 reduces the amplification factor from ~2 to ~1.3, yielding a ~30% stress reduction.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "implied enhancement factor (the stated 50% gain)",
+  "predicted_value": "the measured quantity must reach 1.50x the baseline",
+  "calc_trace": "1 + 0.50 = 1.50",
+  "falsifier": "the measured gain must reach 1.50x baseline in the stated test protocol; the opposite result falsifies the invention",
+  "route": "implied-claim"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "resonance_avoidance_stiffening",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Fatigue crack initiation at the wheel-seat fillet is driven by high cyclic stress amplitudes, often exacerbated by resonant amplification when the axle's natural frequency approaches the dominant wheel-rail impact forcing frequency. | ingredient: The localized stiffening rib increases the effective stiffness ($K_{eff}$) of the fillet region, which shifts the natural frequency away from the forcing frequency, thereby reducing the dynamic stress amplification and lowering the cyclic stress range at the fillet. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Fatigue crack initiation at the wheel-seat fillet is driven by high cyclic stress amplitudes, often exacerbated by resonant amplification when the axle's natural frequency approaches the dominant wheel-rail impact forcing frequency.",
+   "ingredient_action": "The localized stiffening rib increases the effective stiffness ($K_{eff}$) of the fillet region, which shifts the natural frequency away from the forcing frequency, thereby reducing the dynamic stress amplification and lowering the cyclic stress range at the fillet.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Component**: Modified wheel-seat fillet geometry with a localized stiffening rib or t",
+    "- **Input Stream**: ALREADY-RECORDED wheel-rail impact acceleration spectra and axle natur",
+    "- **Reference/Threshold**: DERIVED from stated physics: target frequency shift calculated ",
+    "2. **Material**: Same axle steel grade as original (e.g., EVO or 700L), no exotic material",
+    "- **Rationale**: Maintains burden class parity with standard practice (same material famil",
+    "3. **Procedure**: Precision machining or casting modification of the fillet profile to add",
+    "- **Input Stream**: ALREADY-RECORDED static load limits from wheel-load measurements.",
+    "- **Installability**: Same as standard practice; the axle is replaced or refurbished in th",
+    "- **Operability**: No change in operational parameters; the axle operates under identical ",
+    "- **Maintenance**: Slightly higher machining/casting cost during manufacture, but no chang",
+    "- **Cost Class**: Marginally higher manufacturing cost due to material removal/addition an",
+    "1. **Protocol**: Construct two test axles: (A) original design, (B) design with localized ",
+    "2. **Instruments**: Laser vibrometer to measure frequency response functions (FRF) and str",
+    "3. **Pass/Fail Thresholds**:",
+    "- FRF peak at the forcing frequency for (B) must be at least 50% lower in amplitude than f",
+    "- Strain range at the fillet for (B) must be reduced by at least 30% compared to (A) at th",
+    "4. **Duration**: 48-hour continuous vibration test at the operational forcing frequency.",
+    "5. **Kill Criterion**: The mechanism is FALSIFIED if the strain range at the fillet does n"
+   ],
+   "APPARATUS_ROW": [
+    "- **Cost Class**: Marginally higher manufacturing cost due to material removal/addition and FEA validation, bu"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'cyclic' and the stated failure driver 'fatigue' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "cb27f972c9f76598"
+}

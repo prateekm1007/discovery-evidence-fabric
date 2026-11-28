@@ -1,0 +1,22 @@
+**Mitigation Proposal: Closed-Loop Die Pressure Stabilization via Line-Speed Modulation**
+
+**Mechanism:**
+The oscillating die pressure is the primary driver of the widened gauge variation and increased trim scrap. Since pressure fluctuations in a melt extrusion line are directly proportional to the volumetric flow rate through the die, and the line speed is currently held constant at rated speed, the melt accumulates or starves in the die channel, causing pressure spikes and drops that manifest as thickness non-uniformity. The mitigation mechanism is to create a feedback loop that actively modulates the line speed (take-off speed) in anti-phase with the measured die pressure oscillations. By increasing line speed slightly during pressure peaks and decreasing it slightly during pressure troughs, the volumetric flow demand is dynamically matched to the instantaneous melt supply, dampening the pressure oscillations and stabilizing the film gauge. This leverages the physical coupling between take-off speed, melt volume, and die pressure.
+
+**Implementation:**
+1.  **Signal Acquisition:** The control system samples two existing signals:
+    *   `P(t)`: The instantaneous melt pressure from the installed die pressure transducer.
+    *   `V_ref`: The rated line speed from the line-speed encoder.
+2.  **Error Calculation:** Compute the pressure deviation `e_p(t)` as the difference between the instantaneous pressure `P(t)` and the rolling average or setpoint pressure `P_set` (derived from historical data or a simple moving average filter applied to `P(t)` to isolate the oscillation component).
+3.  **Control Law:** Apply a P-only (proportional) control action to the line speed to avoid integral windup and maintain stability, given the fast dynamics of pressure oscillations. The new target speed `V_cmd(t)` is calculated as:
+    `V_cmd(t) = V_ref + K_v * e_p(t)`
+    Where `K_v` is a gain factor (with units of speed per pressure unit) tuned conservatively to ensure the speed correction does not exceed the mechanical limits of the take-off rolls. The sign of `K_v` is chosen so that a positive pressure deviation (pressure high) results in a positive speed change (speed up), and vice versa, to counteract the flow dynamics.
+4.  **Execution:** The control system outputs `V_cmd(t)` to the line-speed encoder’s reference input, overriding the constant rated speed setpoint with this dynamically adjusted speed. The change in line speed alters the melt draw-off rate, reducing the pressure oscillation amplitude.
+5.  **Trim Scrap Reduction:** As die pressure stabilizes, the film gauge variation narrows. The existing trim width settings, which were widened to compensate for the gauge variation, can be tightened back toward the original specification, directly reducing trim scrap.
+
+**Measures Relied On:**
+*   **Existing Sensors/Measurements:**
+    *   Melt pressure transducer (provides `P(t)`).
+    *   Line-speed encoder (provides `V_ref` and accepts `V_cmd(t)` as a new setpoint).
+    *   Melt temperature transducers (used only for monitoring; no new control action is taken on temperature, as the constraint requires using only existing measurements, and temperature control loops are typically slower and less directly coupled to the pressure oscillations than speed).
+*   **Control System Capability:** The existing PLC or DCS must be capable of running a real-time control loop for line speed modulation based on the pressure feedback. No new hardware sensors are added; only the control logic is modified to use the existing pressure transducer input to influence the existing speed encoder output.

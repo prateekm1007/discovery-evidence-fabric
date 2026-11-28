@@ -1,0 +1,36 @@
+{
+ "record": "VERIFICATION — r178s1-ci-fix-dir8-decision (builder-r178s1, claims c-0288 fix + c-0289)",
+ "verifier": "builder-r176s1 (the other lane; Art. 29(c) verifier role)",
+ "verified_at": "2026-11-27T19:47:00Z",
+ "basis_sha": "528de3237 (remote queue tip, byte-verified via fetch; fast-forward from 10e51e82d)",
+ "verdict": "VERIFIED with one LOW finding (engine-share basis mismatch; the Art.27 gate passes under every recomputed basis)",
+ "checks": [
+  {
+   "check": "remote surface CI at the fixed tip",
+   "method": "GET /commits/528de3237/check-runs (the API, not the log)",
+   "result": "PASS — surface completed/success at 528de3237 (was failure at 10e51e82d)"
+  },
+  {
+   "check": "local battery on the verifier tree",
+   "method": "pytest tests/test_grid_candidate_verification.py tests/test_r178_problem_router.py -q at 528de3237",
+   "result": "PASS — 14/14 (the previously failing test_grid_stays_conditional now green)"
+  },
+  {
+   "check": "the pinned line restored verbatim",
+   "method": "grep -c 'if not self._naive_survivor and not adjudication_blocked:' discovery_fabric/engine/run.py",
+   "result": "PASS — count 1; the pin guard keeps its exact literal; the route check moved inside the guard (SKIPPED_ROUTE_MITIGATION_CHEAP_ARM typed record path present; the R399 evidence-gate skip retained for architecture-route problems)"
+  },
+  {
+   "check": "DIR-8 root count from bytes",
+   "method": "git ls-tree HEAD --name-only | wc -l at 528de3237",
+   "result": "PASS — 218 root entries; R177's 213 was indeed a dotfile artifact; the typed decision ACCEPT ROOT 218 is byte-consistent"
+  },
+  {
+   "check": "Art.27 engine-line share recompute",
+   "method": "git diff --numstat 1f6f83225 528de3237, engine = discovery_fabric/engine/**",
+   "result": "LOW FINDING — the record states basis 'numstat over 1f6f83225..HEAD' with 198/407 = 48.6%, but that basis recomputes to 218 engine / 525 total = 41.5% (198/407 matches the SHIP COMMIT 10e51e82d alone, excluding the fix commit's 30 engine lines and the eval records). The >=30% capability gate passes under both bases, so the round record stands; the discrepancy is a basis-labeling error only"
+  }
+ ],
+ "stand_down_note": "this lane prepared the same repair as work_id r176s1-grid-pin-refresh (local claim c-0289, never pushed); upon seeing 528de3237 the duplicate was dropped per Art. 29(e) and this lane converted to verifier. The parallel lane's fix (restore the pin literal in run.py, route check inside the guard) is preferred over the dropped approach (relax the pin) because it preserves the frozen pin's exact literal while extending the guard",
+ "no_self_certification": "the verifier lane did not author the verified work; sessions are distinct (builder-r176s1 vs builder-r178s1)"
+}

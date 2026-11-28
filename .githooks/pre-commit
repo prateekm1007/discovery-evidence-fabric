@@ -1,0 +1,109 @@
+#!/bin/sh
+# pre-commit — F21 integrity guard (R11, 2026-11-14).
+#
+# Every commit made by this clone passes the audit-branch guard: no
+# builder commits to audit/* branches, no builder edits to auditor-
+# namespace files. Operator override: AUDIT_NAMESPACE_UNLOCK=1.
+#
+# Discovery: if the guard script itself is missing (deleted, botched
+# checkout), FAIL CLOSED — an absent guard must not silently admit
+# auditor-namespace edits (Art. XVII).
+# R39 fix (found by the F53 refusal-path test): `exec` REPLACES the
+# process — everything after it was dead code and the marker check
+# never ran. Run the guard and propagate its failure instead.
+python3 "$(dirname "$0")/../discovery_fabric/audit_branch_guard.py" || exit $?
+
+# F53 (AM36 D3): conflict markers are blocked at COMMIT time, not only
+# caught before push — an added line in the staged diff must never open
+# or close a merge-conflict block. Exact-7 tokens only (audited: no
+# tracked line matches, so false positives are none); --no-verify is
+# the typed escape and must be disclosed in the commit message.
+if git diff --cached -U0 --no-color |
+   grep -qE '^\+(<{7}($|[ ])|={7}$|>{7}($|[ ]))'; then
+  echo "pre-commit: CONFLICT MARKERS found in the staged diff — commit refused (F53/AM36 D3; resolve the merge or use --no-verify and disclose it in the commit message)" >&2
+  exit 1
+fi
+
+# R40b (c-0054): every STAGED *.json must parse — the R40 round record
+# landed as INVALID JSON (Python-literal style) because the R39b
+# per-commit JSON-validation lesson was session-local discipline and
+# did not bind the other session (the F32/F52/F53 class, 5th
+# instance). Validating the INDEX version (git show :file) so the
+# check reads exactly what would be committed. --no-verify is the
+# typed escape and must be disclosed in the commit message.
+status=0
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  if ! git show ":$f" | python3 -m json.tool >/dev/null 2>&1; then
+    echo "pre-commit: $f is not valid JSON — commit refused (c-0054; fix the record or use --no-verify and disclose it in the commit message)" >&2
+    status=1
+  fi
+done <<EOF
+$(git diff --cached --name-only --diff-filter=ACMR -- '*.json')
+EOF
+[ "$status" -eq 0 ] || exit 1
+
+# ROADMAP P0.3 (claim lineage c-0066): detect-secrets pre-commit — the
+# staged files pass the secret scanners before any commit. Typed
+# behavior: findings REFUSE the commit (fix, baseline via
+# `detect-secrets audit`, or --no-verify with disclosure); a missing
+# module degrades to a typed warning so fresh clones without the dep
+# can still commit — the authoritative all-refs scan is CI-side
+# (eval/r50_secret_scan_partial.json), not hook-side.
+if python3 -c "import detect_secrets" >/dev/null 2>&1; then
+  STAGED=$(git diff --cached --name-only --diff-filter=ACMR | tr '\n' ' ')
+  if [ -n "$(echo "$STAGED" | tr -d ' ')" ]; then
+    # audited baseline (builder-r50s1, 2026-11-17): the D2 rule and the
+    # Art.29 registry REQUIRE commit-SHA fields (pushed_sha/base_sha/
+    # sha) and constitution md5 identities in the records — those typed
+    # non-secret fields live in .secrets.baseline with the audit note;
+    # the hook flags only NEW findings (detect-secrets pre-commit mode
+    # reads the staged diff itself and filters against the baseline).
+    if [ -f .secrets.baseline ] && command -v detect-secrets-hook >/dev/null 2>&1; then
+      detect-secrets-hook --baseline .secrets.baseline
+      HITS=$?
+      [ "$HITS" -ne 0 ] && HITS=1 || HITS=0
+    else
+      # shellcheck disable=SC2086
+      HITS=$(python3 -m detect_secrets scan $STAGED 2>/dev/null \
+             | python3 -c "import sys,json;d=json.load(sys.stdin);print(sum(len(v) for v in d.get('results',{}).values()))" 2>/dev/null || echo ERR)
+    fi
+    if [ "$HITS" = "ERR" ]; then
+      echo "pre-commit: detect-secrets scan FAILED to run — treat as no-findings ONLY if you accept the typed degradation; refusing (remove the hook line or --no-verify with disclosure)" >&2
+      exit 1
+    fi
+    if [ "${HITS:-0}" -gt 0 ]; then
+      echo "pre-commit: detect-secrets flags $HITS finding(s) in the staged diff — commit refused (ROADMAP P0.3; fix, baseline, or --no-verify and disclose)" >&2
+      exit 1
+    fi
+  fi
+else
+  echo "pre-commit: detect-secrets module unavailable — secret scan SKIPPED for this commit (typed degradation; pip install detect-secrets)" >&2
+fi
+
+# R128 dir-1 (owner): the no-red-close + claim-collision guards.
+#
+# (a) Whenever a round record (eval/r*_status.json) is staged, the two
+#     gates whose absence produced the last red round-closes (the
+#     missing pushed_sha scalar + the Art. 27 ledger) run BEFORE the
+#     commit is allowed: a red suite refuses the commit locally, so a
+#     red tip can only happen via the typed --no-verify escape (which
+#     must then be disclosed in the commit message).
+# (b) Whenever the claims registry or the counter is staged, the
+#     allocation guard verifies every new claim id came monotonically
+#     from eval/claim_next_id.txt (the counter advances in the same
+#     commit; refs/claims/next is the cross-session lock pushed after
+#     the commit — a non-FF ref push = the other session advanced it
+#     first = re-derive before pushing claims).
+STAGED_STATUS=$(git diff --cached --name-only | grep -E '^eval/r[0-9]+s?[0-9]*_status\.json$' || true)
+if [ -n "$STAGED_STATUS" ]; then
+  echo "pre-commit: round record staged — running the remote-CI + Art. 27 gates (dir 1)"
+  python3 -m pytest tests/test_remote_ci_rule.py tests/test_article27_capability_budget.py -q -p no:warnings >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "pre-commit: the round-record gates are RED — commit refused (dir 1: no red round-closes; fix the record or use --no-verify and DISCLOSE it in the commit message)" >&2
+    exit 1
+  fi
+fi
+if git diff --cached --name-only | grep -qE '^eval/(work_claims\.json|claim_next_id\.txt)$'; then
+  python3 "$(dirname "$0")/../scripts/r128_claim_guard.py" || exit $?
+fi

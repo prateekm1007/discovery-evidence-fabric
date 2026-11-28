@@ -1,0 +1,18 @@
+{
+ "record": "V8_EXECUTION_GATE_F60/1.0.0",
+ "session": "builder-r47s1",
+ "finding": "F60 (AM44, HIGH): the PRIVATE rubrics are publicly readable — unauthenticated raw read of audit/holdout_v7/holdout_v7_rubric_PRIVATE.json returned HTTP 200 (8385 bytes) on the PUBLIC repo's audit branch; the v8 rubric/problems sit on the same public branch. The selection_sha256 seal protects problem INTEGRITY, not rubric CONFIDENTIALITY.",
+ "gate_state": "BLOCKED — the sealed v8 execution (rows 10-30 and any scoring) is paused pending the OWNER-side custody fix. The external researcher's fix-first ordering (move/encrypt the rubric BEFORE v8 runs) is adopted as a hard gate.",
+ "what_stands": [
+  "rows 1-9 of the V8.1.2 run (392e71e92) were generated WITHOUT any rubric access — the c-0060 verifier's rubric_path NEVER_READ binds every builder session; they remain valid generation artifacts",
+  "the packet's problem-integrity seal (f65b9d8b selection_sha256, recomputed EXACT at every launch) is unaffected by the confidentiality exposure",
+  "scoring (auditor step 4) must NOT proceed against an exposed rubric: the holdout claim dies if the scoring key is public at score time"
+ ],
+ "owner_remedy_mechanics (any one suffices, then the gate re-opens by owner/auditor statement)": [
+  "1. move audit/holdout_v*/ and the PRIVATE rubrics to a PRIVATE repository or private gist; scrub the files from the public audit branch history (filter-repo/BFG), because git history keeps them reachable even after deletion",
+  "2. or encrypt at rest: age -p (or openssl enc -aes-256-cbc -pbkdf2) with a passphrase ONLY the owner holds; commit only the ciphertext; delete the plaintext from the branch AND its history",
+  "3. after either: rotate any credential reachable from that branch (the researcher's note: the PAT string is public; treat every credential in the branch tree as exposed — F45 owner rotation covers this)"
+ ],
+ "resumption_condition": "the owner (or the auditor on the owner's statement) declares custody restored on the audit branch; the builder then resumes rows 10-30 and the auditor scores under restored custody — or, if the owner instead accepts the exposure and re-authorizes, the record must carry that authorization verbatim",
+ "work_id": "r47-v8-execution-gate"
+}

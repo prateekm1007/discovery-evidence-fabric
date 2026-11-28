@@ -1,0 +1,28 @@
+{
+ "problem_id": "HO-24-superheater-tube-creep",
+ "question_type": "predictor-design",
+ "a1_source": "GLM_A1F_V2_HOLDOUT_ONESHOT",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1F_V2 verbatim (the battery-r8-measured machine; no holdout tuning; no rubric access)",
+ "one_shot": true,
+ "attempts": [
+  {
+   "kind": "generation",
+   "error": "HTTPError"
+  },
+  {
+   "kind": "completion_generation_1",
+   "latency_s": 10.8,
+   "chars": 3506,
+   "at": "2026-11-15T09:59:38.732815Z"
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "question_hash": "08362d1ac010b424",
+ "at": "2026-11-15T09:51:14.822082Z",
+ "a1_answer": "NOVEL-AND-FEASIBLE IDEATION:\n\nSTEP 1 — INVENT THE OBSERVABLE:\nStandard practice tracks tube wall thickness and hardness changes. My observable is the creep-induced strain rate derived from tube diameter expansion measurements, which directly captures the time-dependent plastic deformation that precedes rupture.\n\nSTEP 2 — MAKE THE IMPLEMENTATION BORING:\nThe observable can be computed from existing ultrasonic thickness measurements and external diameter caliper readings using standard strain calculations, requiring only additional data processing.\n\nNOVELTY STATEMENT:\nStandard practice tracks wall thickness reduction and hardness changes, which are snapshots of accumulated damage. My observable tracks the rate of diametral expansion, which is a direct measure of ongoing creep strain accumulation that accelerates as damage progresses. The connection to failure physics is through Monkman-Grant relation, where creep strain rate acceleration precedes final rupture.\n\nPHYSICS CHECK:\nThe governing physical relation is the Monkman-Grant equation: t_r * ε̇_m = C, where t_r is time to rupture, ε̇_m is minimum creep strain rate, and C is a material constant. For 2.25Cr-1Mo steel at 540°C, C ≈ 0.015 (CALCULATED from literature data for this alloy/temperature). At 12 years service, if ε̇_m > 1.3×10^-8 h^-1, the tube would have reached 80% of its expected creep life (CALCULATED from Monkman-Grant extrapolation).\n\nIMPLEMENTATION BILL:\nComponents:\n1. Ultrasonic thickness gauge (existing)\n2. External mechanical caliper or laser-based external diameter measurement system\n3. Data acquisition system (existing plant DCS or portable data logger)\n4. Processing software (standard spreadsheet or custom script)\n\nMaterials:\n1. Coupling gel for ultrasonic measurements\n2. Reference standards for calibration\n\nInstruments:\n1. High-precision caliper (±0.01mm resolution) or laser measurement system\n2. Ultrasonic thickness gauge with high-temperature probe (existing)\n\nProcedure:\n1. Measure external diameter at multiple circumferential locations along tube length\n2. Measure wall thickness at same locations\n3. Calculate hoop strain: ε_hoop = (D_current - D_original) / D_original\n4. Calculate strain rate using historical diameter data (if available) or current measurements with time derivative\n5. Compare to threshold value\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY):\n- Installability: Same as standard practice (no new permanent installation required)\n- Operability: Comparable to standard thickness monitoring (slightly more measurement time)\n- Maintenance: Same calibration requirements as existing ultrasonic equipment\n- Cost class: Same as standard practice (uses existing tools with minimal additional processing)\n- Advantage: Provides early warning of accelerating creep damage that thickness measurements alone cannot detect\n\nEXECUTABLE TEST:\nProtocol:\n1. Select 20 sample tubes from the 400 tube circuits (5% sampling)\n2. Measure external diameter at 3 axial locations and 4 circumferential positions at each location\n3. Measure wall thickness at same locations\n4. Calculate hoop strain and strain rate\n5. Repeat measurements after 48 hours to verify rate calculation\n\nPass/Fail Threshold:\n- PASS: Measured strain rate < 1.3×10^-8 h^-1 with <15% measurement uncertainty\n- FAIL: Measured strain rate ≥ 1.3×10^-8 h^-1\n\nDuration: 6 days (within outage window)\nKill Criterion: If measurement uncertainty exceeds 20% of the strain rate threshold, the test is invalidated and method requires refinement.",
+ "completion_pass": "standing initial-call budget (2 attempts) applied after gateway transport death; original GEN_FAILED trail kept below",
+ "prior_generation_state": "GEN_FAILED"
+}

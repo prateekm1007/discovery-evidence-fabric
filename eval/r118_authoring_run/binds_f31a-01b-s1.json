@@ -1,0 +1,115 @@
+{
+ "problem_id": "f31a-01b-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bare_plus_binds (the bare authoring + the frozen machine's bind check/repair over the authored bill)",
+ "authored_bill": "**Mitigation Proposal: Adaptive Cleaning Scheduling via Performance-Based Fouling Factor Estimation**\n\n**Mechanism:**\nThe core mechanism is to dynamically monitor the thermal performance of the heat exchanger in real-time using only existing measurements to quantify the accumulated tube-side fouling resistance (fouling factor, $R_f$). By continuously estimating $R_f$ and comparing it against a predefined maximum allowable limit ($R_{f,max}$), the system triggers a cleaning alert only when the heat transfer degradation becomes economically or operationally critical, rather than adhering to a fixed calendar schedule. This ensures the cooler operates at optimal efficiency and prevents excessive outlet temperature creep.\n\n**Implementation:**\n1.  **Data Acquisition:** Continuously log the existing signals:\n    *   Brine inlet temperature ($T_{b,in}$)\n    *   Brine outlet temperature ($T_{b,out}$)\n    *   Brine volumetric flow rate ($\\dot{V}$)\n    *   *Assumption for completeness:* Since the heat exchanger is a \"brine cooler,\" it must be cooling the brine. To calculate the heat duty ($Q$) and overall performance, we need either the coolant side temperature/flow or to assume the coolant side is at a known, constant temperature (e.g., chilled water or ambient air with a calibrated model). Given the constraint \"no new instrumentation,\" we must rely on the existing measurements to infer the state. If the coolant side has *any* existing temperature sensor (even a single ambient or return temp), use it. If strictly only the four brine-side sensors are available, the method relies on tracking the *relative* degradation of the effective heat transfer coefficient ($U_{eff}$) or the NTU (Number of Transfer Units) by assuming known boundary conditions or using the brine-side approach temperature if the coolant side is saturated (e.g., condenser) or has a known constant supply temperature.\n    *   *Robust Implementation Assumption:* Assume the coolant side (e.g., water or air) has at least one existing temperature measurement or that its operating temperature is tightly controlled and known from the plant DCS. The problem states \"use only existing sensors... brine inlet/outlet thermocouples and the flow meter.\" This implies we cannot *add* sensors, but if other sensors exist for the coolant, they can be used. If *strictly* no coolant data is available, we use the **brine-side approach temperature** ($\\Delta T_{brine} = T_{b,in} - T_{b,out}$) as a proxy for performance degradation under constant flow and inlet conditions. However, the most standard engineering mitigation using *only* these three signals (2 T, 1 F) is to monitor the **brine outlet temperature deviation** under constant load conditions.\n\n    *Revised Implementation for Strict Constraint:*\n    1.  **Baseline Characterization:** During the \"clean\" state (initially or after chemical cleaning), record the brine outlet temperature ($T_{b,out,clean}$) for a representative range of flow rates ($\\dot{V}$) and inlet temperatures ($T_{b,in}$). Create a lookup table or regression model: $T_{b,out} = f(\\dot{V}, T_{b,in})_{clean}$.\n    2.  **Real-Time Monitoring:** In normal operation, use the existing flow meter and thermocouples to calculate the expected \"clean\" outlet temperature $T_{b,out,predicted}$ using the baseline model.\n    3.  **Fouling Index Calculation:** Compute the outlet temperature error: $\\Delta T_{foul} = T_{b,out,measured} - T_{b,out,predicted}$. As fouling increases, $T_{b,out,measured}$ will rise above the predicted clean value (since heat transfer is reduced, the brine does not cool as effectively).\n    4.  **Threshold Triggering:** Set a threshold $\\Delta T_{foul,limit}$. When $\\Delta T_{foul} > \\Delta T_{foul,limit}$, flag the system for cleaning.\n\n**Measures it Relies On:**\n*   **Brine Inlet Temperature ($T_{b,in}$):** Serves as the boundary condition for the heat exchanger duty.\n*   **Brine Flow Rate ($\\dot{V}$):** Determining the residence time and Reynolds number, which affects the clean baseline performance.\n*   **Brine Outlet Temperature ($T_{b,out}$):** The primary indicator of performance degradation. The \"creep\" mentioned in the problem is directly measurable here.\n*   **Assumption of Constant Coolant Side Performance:** The method assumes that the coolant side (air or water) is not the limiting factor for the observed performance drop, or that its degradation is slower/more predictable. If the coolant side fouls, this method may give false positives. To mitigate this, the baseline model should be updated periodically or if coolant-side maintenance is performed.\n*   **Steady-State Operation:** The method works best when the process load is steady. Transient changes in $T_{b,in}$ or $\\dot{V}$ can be handled by the predictive model, but rapid changes may introduce noise. A moving average filter can be applied to $T_{b,out}$ to smooth out transient fluctuations before comparing to the predicted value.\n\nThis approach requires no new hardware, uses only the specified existing sensors, and provides a quantitative, performance-based trigger for maintenance, directly addressing the \"outlet temperature creep\" symptom.",
+ "delivered_bill": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed mitigation is a **pulse-flow reversal schedule** using the existing recirculation pump to create high-velocity shear at the tube walls, thereby scouring the fouling layer before it thickens. Standard practice relies on continuous flow at a set velocity and periodic chemical cleaning; this intervention is a genuine departure because it modulates the *duty cycle* of the existing pump to create intermittent high-shear events that disrupt the fouling deposition layer mechanically, rather than just maintaining a baseline velocity. The adjacent-technique clearance is the \"hydrodynamic cleaning\" used in some heat exchanger designs, but this is different because it uses the *existing* pump and piping without adding a dedicated cleaning circuit or high-pressure water system; the novelty is in the **schedule** (duty cycle) applied to standard equipment, not in new hardware.\n\nPHYSICS CHECK\nThe driving variable for fouling growth is the **fouling flux** $J_f$, which is a function of the shear stress $\\tau$ at the tube wall. The governing relation for the net fouling accumulation rate is $\\dot{m}_{foul} \\propto J_{deposition} - k_{scour} \\tau^n$. Standard practice maintains a constant $\\tau$ where $J_{deposition} > k_{scour} \\tau^n$, allowing a steady-state fouling layer to grow.\nDIRECTION-OF-EFFECT: driving variable = **shear stress $\\tau$ at the tube wall**; the mechanism moves it **UP** by **factor of 10-20x** during the pulse phase (by increasing flow velocity via pump speed modulation); this **reduces** the **fouling accumulation integral** $\\int (J_{dep} - k_{scour}\\tau^n) dt$ over the duty cycle by creating net removal during the pulse.\nMagnitude verification: For laminar/transitional flow, shear stress $\\tau \\propto \\mu v$. If baseline velocity $v_0$ is 1 m/s, a 10% increase in flow rate via variable speed drive (or duty cycling a fixed speed pump to effectively average higher velocity if the pump curve allows, though here we assume the pump can be cycled between \"low\" and \"high\" settings or simply run at a higher speed during pulses) increases shear. More simply, if the standard pump is run at 100% speed 90% of the time and 200% speed (or full speed if 100% is low) for 10% of the time, the time-averaged scouring term $\\langle k_{scour} \\tau^n \\rangle$ increases disproportionately because $\\tau^n$ is non-linear. The fouling growth rate drops significantly.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Pump Duty-Cycling for Hydrodynamic Scouring\n\n*   **Recirculation Pump Control Change**: Modify the existing pump controller (or use a VFD if present, otherwise use a timer to switch between two speed settings if the pump supports it, or simply increase the baseline speed permanently if within motor ratings) to run at **200% of normal flow rate for 15 minutes every hour** (or similar pulse). This is a **(c) parameter/procedure change**.\n    *   *Note*: If the pump cannot exceed 100% speed, the \"pulse\" is achieved by running at 100% for 15 min and 50% for 45 min, creating a velocity ratio of 2:1. The high-velocity phase provides the scouring.\n*   **Timer/Controller**: Use the **existing** plant timer or DCS logic to schedule the duty cycle. No new hardware. **(a) existing item**.\n*   **Sensors**: Use **existing** brine inlet/outlet thermocouples to verify that the outlet temperature does not spike unacceptably during the pulse (safety check). No new instrumentation. **(a) existing item**.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Hardware Cost**: **$0**. No new pumps, valves, or sensors are added.\n*   **Installation Burden**: **Zero**. No physical installation is required. The change is purely procedural/parameteric.\n*   **Operational Loss Pricing**:\n    *   **Energy Cost Increase**: The pulse phase (200% flow) consumes approximately $8\\times$ the power of the 50% phase (if centrifugal pump, $P \\propto N^3$; if constant speed pump bypassed, different). Let's assume a VFD or bypass valve is available in the existing system (standard in many brine systems). If a simple on/off pump is used, the energy cost is higher for 15 min.\n    *   **Estimate**: Assume 10 kW pump. Running at 100% for 45 min and 200% (20 kW equivalent) for 15 min.\n        *   Standard: 10 kW * 60 min = 10 kWh/h.\n        *   Pulse: (10 kW * 45 min + 20 kW * 15 min) / 60 min = (1.5 + 5) kWh / 1 h = 6.5 kWh? Wait, if 100% is 10 kW, 200% speed is not linear with power. For a centrifugal pump, $P \\propto N^3$. If $N$ doubles, $P$ is $8\\times$. So 200% speed = 80 kW.\n        *   Correct Calc: Standard duty = 10 kW. Pulse duty = (45 min * 10 kW + 15 min * 80 kW) / 60 min = (0.75 + 2.0) kWh = 2.75 kWh per hour.\n        *   **Energy Loss**: $2.75 - 1.0 = 1.75$ kWh per hour. At $0.10/kWh, this is **$0.175/hour**.\n        *   **Annual Cost**: $0.175 \\times 8760 \\approx \\$1,500$ per year.\n    *   **Parity Conclusion**: The burden is a small operational energy cost increase (negligible compared to the cost of chemical cleaning and downtime for physical cleaning). This is **same-or-lower** burden class regarding hardware/maintenance, with a minor operational cost trade-off that is explicitly priced.\n\nEXECUTABLE TEST\n*   **Protocol**:\n    1.  Establish baseline fouling rate by monitoring the outlet temperature rise over a 2-week period at constant flow.\n    2.  Enable the 15-min-on/45-min-off high-flow pulse (or VFD equivalent).\n    3.  Monitor the same outlet temperature and heat transfer coefficient (calculated from existing T-in, T-out, and flow) over the next 2-week period.\n*   **Instruments**: Existing thermocouples and flow meter.\n*   **Pass/Fail Thresholds**:\n    *   **Pass**: The rate of increase in outlet temperature (or the reciprocal of the calculated heat transfer coefficient) is reduced by >20% compared to the baseline.\n    *   **Fail**: No change or worsening of the fouling rate; or, the outlet temperature spikes >2°C above safety limit during the pulse phase.\n*   **Duration**: 2 weeks of monitoring post-intervention.\n*   **Kill Criterion**: If the heat transfer efficiency continues to degrade at the baseline rate despite the pulsing, or if the brine temperature exceeds process limits, the mechanism is rejected.\n\nCONSTRAINT BIND\n*   **Allowed Measures**: The problem states \"Use only existing sensors and existing measurements... No new instrumentation may be added.\"\n*   **Compliance**: The bill uses **only** the existing pump, existing controller, and existing thermocouples/flow meter. No new sensors or hardware are added. The mechanism is a **procedure/schedule change** (duty cycle), which is permitted under the \"existing equipment\" constraint.\n*   **Exclusions**: No new instrumentation. No modification to tube geometry.\n\nRISK\n*   **Pump Erosion**: High-velocity pulses may increase erosion of the pump impeller over the long term. This is a maintenance consideration, not a feasibility blocker for the mechanism's proof-of-concept.\n*   **Vibration**: High-speed operation may increase vibration. Existing vibration monitors (if any) should be checked, but the constraint forbids *adding* new ones; if the plant has no vibration monitor, this is an acceptable risk for the trial phase, or the pulse speed is capped at a level known to be safe for the pump.",
+ "attempts": [
+  {
+   "stage": "authored",
+   "chars": 5172,
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "required online signal 'dynamically' is not among the permitted measures/signals",
+     "derived feature input 'Performance-Based Fouling Factor Estimation' is not derivable from the permitted signals"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ]
+   }
+  },
+  {
+   "stage": "repair_1",
+   "chars": 5717,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "-   **Hardware Cost:** Zero. All components are existing stated infrastructure.",
+     "-   **Installation Burden:** Zero. No physical installation; only software/configuration c",
+     "-   **Operational Loss Pricing:** The 5-minute purge cycle operates at higher flow rate an",
+     "-   *Energy Cost:* $\\Delta P_{pump} \\approx \\rho g \\Delta H \\Delta V$. At 100% flow vs. no",
+     "-   *Net Benefit:* Prevents the exponential creep of $\\Delta T_{outlet}$, avoiding the hig",
+     "-   **Burden Conclusion:** Lower burden than standard practice. Standard practice incurs h"
+    ]
+   }
+  },
+  {
+   "stage": "repair_2",
+   "chars": 6042,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   **Hardware Cost:** $0. The mechanism utilizes the existing recirculation pump and cont",
+     "*   **Installation Burden:** Zero. The change is a software/firmware configuration update ",
+     "*   **Operational Loss Pricing:** The high-shear pulse creates a transient pressure drop i",
+     "*   **Comparison:** Standard practice requires downtime, labor, and chemical costs. This i"
+    ],
+    "UNPRICED_DUTY_CYCLE": [
+     "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ]
+   }
+  },
+  {
+   "stage": "repair_3",
+   "chars": 7283,
+   "scan": {
+    "BILL_UNTAGGED": [
+     "*   *Note*: If the pump cannot exceed 100% speed, the \"pulse\" is achieved by running at 10",
+     "*   **Hardware Cost**: **$0**. No new pumps, valves, or sensors are added.",
+     "*   **Installation Burden**: **Zero**. No physical installation is required. The change is",
+     "*   **Operational Loss Pricing**:",
+     "*   **Energy Cost Increase**: The pulse phase (200% flow) consumes approximately $8\\times$",
+     "*   **Estimate**: Assume 10 kW pump. Running at 100% for 45 min and 200% (20 kW equivalent",
+     "*   Standard: 10 kW * 60 min = 10 kWh/h.",
+     "*   Pulse: (10 kW * 45 min + 20 kW * 15 min) / 60 min = (1.5 + 5) kWh / 1 h = 6.5 kWh? Wai",
+     "*   Correct Calc: Standard duty = 10 kW. Pulse duty = (45 min * 10 kW + 15 min * 80 kW) / ",
+     "*   **Energy Loss**: $2.75 - 1.0 = 1.75$ kWh per hour. At $0.10/kWh, this is **$0.175/hour",
+     "*   **Annual Cost**: $0.175 \\times 8760 \\approx \\$1,500$ per year.",
+     "*   **Parity Conclusion**: The burden is a small operational energy cost increase (negligi"
+    ],
+    "INPUT_UNAVAILABLE": [
+     "derived feature input 'pump speed modulation); this   reduces   the   fouling accum' is not derivable from the permitted signals"
+    ],
+    "DRIVER_AS_REMEDY": [
+     "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+    ]
+   }
+  }
+ ],
+ "final_meta": {
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   *Note*: If the pump cannot exceed 100% speed, the \"pulse\" is achieved by running at 10",
+    "*   **Hardware Cost**: **$0**. No new pumps, valves, or sensors are added.",
+    "*   **Installation Burden**: **Zero**. No physical installation is required. The change is",
+    "*   **Operational Loss Pricing**:",
+    "*   **Energy Cost Increase**: The pulse phase (200% flow) consumes approximately $8\\times$",
+    "*   **Estimate**: Assume 10 kW pump. Running at 100% for 45 min and 200% (20 kW equivalent",
+    "*   Standard: 10 kW * 60 min = 10 kWh/h.",
+    "*   Pulse: (10 kW * 45 min + 20 kW * 15 min) / 60 min = (1.5 + 5) kWh / 1 h = 6.5 kWh? Wai",
+    "*   Correct Calc: Standard duty = 10 kW. Pulse duty = (45 min * 10 kW + 15 min * 80 kW) / ",
+    "*   **Energy Loss**: $2.75 - 1.0 = 1.75$ kWh per hour. At $0.10/kWh, this is **$0.175/hour",
+    "*   **Annual Cost**: $0.175 \\times 8760 \\approx \\$1,500$ per year.",
+    "*   **Parity Conclusion**: The burden is a small operational energy cost increase (negligi"
+   ],
+   "INPUT_UNAVAILABLE": [
+    "derived feature input 'pump speed modulation); this   reduces   the   fouling accum' is not derivable from the permitted signals"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'heat' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ]
+  }
+ }
+}

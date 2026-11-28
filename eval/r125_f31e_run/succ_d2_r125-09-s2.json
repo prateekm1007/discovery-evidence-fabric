@@ -1,0 +1,56 @@
+{
+ "draw": "d2",
+ "problem_id": "r125-09-s2",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "successor (bare author [F31e draw] + canonical F97-fixed check + improved-directive reviewer)",
+ "improved_directive_len": 567,
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Exhaust Damper Control via Corner-to-Center Temperature Gradient**\n\n**Mechanism:**\nThe uneven curing is caused by excessive heat loss at the corners, likely due to turbulent air flow or negative pressure zones created by the static position of the exhaust damper. The mitigation involves dynamically modulating the existing exhaust damper position during the heating and soak phases of the cycle to reduce air velocity at the corners and improve thermal uniformity. By minimizing the temperature differential (gradient) between the corner zones and the center zone, the system ensures that corner parts heat uniformly with the center, eliminating the need to extend the cycle time solely to compensate for lagging corners.\n\n**Implementation:**\n1.  **Signal Selection:** Utilize the existing **oven zone thermocouples**. Assign specific TCs to represent \"Corner\" zones (e.g., TC-C1, TC-C4) and \"Center\" zones (e.g., TC-C2, TC-C3). Use the existing **exhaust damper position feedback** sensor to know the current damper state.\n2.  **Control Algorithm:** Implement a proportional control loop on the existing PLC/Controller using only these signals:\n    *   Calculate the instantaneous Temperature Gradient ($\\Delta T$): $\\Delta T = T_{center\\_avg} - T_{corner\\_avg}$.\n    *   Define a Target Gradient Band (e.g., $\\Delta T < 5^\\circ C$).\n    *   **Logic:**\n        *   If $\\Delta T > 5^\\circ C$ (Corners are colder than center): The controller commands the **exhaust damper to close partially** (reduce opening) to decrease air velocity and heat loss at the corners, allowing them to catch up.\n        *   If $\\Delta T < 0^\\circ C$ or is within the target band: Hold damper at the baseline setpoint (calibrated during a commissioning run to ensure adequate exhaust without over-cooling corners).\n        *   If $\\Delta T$ remains negative for an extended period (Corners hotter than center, risk of hot spots): Open the damper slightly to increase air flow and cool the corners.\n3.  **Cycle Integration:** The **cycle timer** triggers the start of this active damping phase during the \"Soak\" period, just before or as the set temperature is reached. The damper remains modulated until the end of the soak period, then locks at a neutral position for the cool-down phase to prevent thermal shock.\n\n**Measures Relied On:**\n*   **Thermocouple Readings:** Continuous temperature data from the existing corner and center zone TCs to calculate the real-time gradient.\n*   **Exhaust Damper Position Feedback:** Continuous confirmation of the damper's actual physical position to prevent actuator hunting or over-travel, enabling precise closed-loop correction.\n*   **Cycle Timer:** Synchronization of the active control window with the standard curing phase to ensure mitigation occurs only when thermal uniformity is critical for resin/cure chemistry.\n*   **Constraint Adherence:** No new sensors are added; only the existing TCs, damper feedback, and timer are repurposed for a dynamic control logic instead of their previous open-loop/static setpoint usage.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (the"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Exhaust Damper Control via Corner-to-Center Temperature Gradient**\n\n**Direction-of-Effect:**\n*   **Driving Variable:** The temperature differential ($\\Delta T$) between the center and corner zones.\n*   **Direction:** When corners lag (cooler), the damper closes to reduce convective heat loss from the corners, allowing them to warm. When corners lead (hotter), the damper opens to increase airflow and cool the corners. The effect is to minimize $\\Delta T$ toward zero.\n\n**Mechanism:**\nThe uneven curing is caused by excessive heat loss at the corners, likely due to turbulent air flow or negative pressure zones created by the static position of the exhaust damper. The mitigation involves dynamically modulating the existing exhaust damper position during the heating and soak phases of the cycle to reduce air velocity at the corners and improve thermal uniformity. By minimizing the temperature differential (gradient) between the corner zones and the center zone, the system ensures that corner parts heat uniformly with the center, eliminating the need to extend the cycle time solely to compensate for lagging corners.\n\n**Implementation:**\n\n**IMPLEMENTATION BILL**\n1.  **Signal Selection:**\n    *   *Input $T_{center\\_avg}$:* Derived from existing oven zone thermocouples. Formula: $T_{center\\_avg} = (TC-C2 + TC-C3) / 2$.\n    *   *Input $T_{corner\\_avg}$:* Derived from existing oven zone thermocouples. Formula: $T_{corner\\_avg} = (TC-C1 + TC-C4) / 2$.\n    *   *Input $Pos_{damper}$:* Directly from existing exhaust damper position feedback sensor.\n    *   *Input $t_{cycle}$:* Directly from existing cycle timer.\n2.  **Control Algorithm:** Implement a proportional control loop on the existing PLC/Controller using only these signals:\n    *   Calculate the instantaneous Temperature Gradient ($\\Delta T$): $\\Delta T = T_{center\\_avg} - T_{corner\\_avg}$.\n    *   Define a Target Gradient Band (e.g., $|\\Delta T| \\leq 5^\\circ C$).\n    *   **Logic:**\n        *   If $\\Delta T > 5^\\circ C$ (Corners are colder than center): The controller commands the **exhaust damper to close partially** (decrease $Pos_{damper}$ from baseline) to decrease air velocity and heat loss at the corners, allowing them to catch up.\n        *   If $\\Delta T < -5^\\circ C$ (Corners are hotter than center): The controller commands the **exhaust damper to open partially** (increase $Pos_{damper}$ from baseline) to increase air flow and cool the corners.\n        *   If $|\\Delta T| \\leq 5^\\circ C$ (Within target band): Hold damper at the baseline setpoint (calibrated during a commissioning run to ensure adequate exhaust without over-cooling corners).\n3.  **Cycle Integration:** The **cycle timer** ($t_{cycle}$) enables the active control logic specifically during the \"Soak\" period (defined by timer state). The damper remains modulated within the baseline range until the end of the soak period, then locks at a neutral position for the cool-down phase to prevent thermal shock.\n\n**Measures Relied On:**\n*   **Thermocouple Readings:** Continuous temperature data from the existing corner (TC-C1, TC-C4) and center (TC-C2, TC-C3) zone TCs to calculate the real-time gradient ($\\Delta T$).\n*   **Exhaust Damper Position Feedback:** Continuous confirmation of the damper's actual physical position to prevent actuator hunting or over-travel, enabling precise closed-loop correction relative to the baseline setpoint.\n*   **Cycle Timer:** Synchronization of the active control window with the standard curing phase to ensure mitigation occurs only when thermal uniformity is critical for resin/cure chemistry.\n*   **Constraint Adherence:** No new sensors are added; only the existing TCs, damper feedback, and timer are repurposed for a dynamic control logic instead of their previous open-loop/static setpoint usage.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Signal Selection:**",
+   "*   *Input $T_{center\\_avg}$:* Derived from existing oven zone thermocouples. Formula: $T_",
+   "*   *Input $T_{corner\\_avg}$:* Derived from existing oven zone thermocouples. Formula: $T_",
+   "*   *Input $Pos_{damper}$:* Directly from existing exhaust damper position feedback sensor",
+   "*   *Input $t_{cycle}$:* Directly from existing cycle timer.",
+   "2.  **Control Algorithm:** Implement a proportional control loop on the existing PLC/Contr",
+   "*   Calculate the instantaneous Temperature Gradient ($\\Delta T$): $\\Delta T = T_{center\\_",
+   "*   Define a Target Gradient Band (e.g., $|\\Delta T| \\leq 5^\\circ C$).",
+   "*   **Logic:**",
+   "*   If $\\Delta T > 5^\\circ C$ (Corners are colder than center): The controller commands th",
+   "*   If $\\Delta T < -5^\\circ C$ (Corners are hotter than center): The controller commands t",
+   "*   If $|\\Delta T| \\leq 5^\\circ C$ (Within target band): Hold damper at the baseline setpo",
+   "3.  **Cycle Integration:** The **cycle timer** ($t_{cycle}$) enables the active control lo",
+   "*   **Thermocouple Readings:** Continuous temperature data from the existing corner (TC-C1",
+   "*   **Exhaust Damper Position Feedback:** Continuous confirmation of the damper's actual p",
+   "*   **Cycle Timer:** Synchronization of the active control window with the standard curing",
+   "*   **Constraint Adherence:** No new sensors are added; only the existing TCs, damper feed"
+  ],
+  "CONVERSION": [
+   "ADDED_PROCESS_STEP: curing on a row that does not ride existing/unchanged infrastructure: *   **Cycle Timer:** Synchronization of the active control window with the standard curing phase to ensure mitigation occurs only when thermal uniformity is cri",
+   "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: *   **Cycle Timer:** Synchronization of the active control window with the standard curing phase to ensure mitigation occurs only when thermal uniformity is cri"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+  ]
+ }
+}

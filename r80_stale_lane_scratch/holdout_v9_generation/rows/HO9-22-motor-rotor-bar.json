@@ -1,0 +1,101 @@
+{
+ "problem_id": "HO9-22-motor-rotor-bar",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:6daf57a1c893": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:22804a056ac7": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:9e7f1e37f028": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T07:46:56.113806Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**\n**Standard Practice:** Delivers a monitoring/indication scheme using a NEW air-gap flux probe (rotor bar signature analyzer) to measure $I_2$ sideband amplitudes; mechanism is direct measurement of broken-bar oscillation.\n**My Mechanism:** Delivers the SAME class (leading indicator) using ONLY existing stator current, temperature, and speed data; mechanism departure is inferring rotor circuit degradation via **thermal-time-constant drift** and **torque-density variance** derived from existing electrical telemetry, bypassing the need for spatial flux mapping.\n**Failure-Physics Connection:** A broken rotor bar creates an open circuit in the rotor loop, increasing effective rotor resistance ($R_2'$) and reducing effective inductance. This manifests electrically as increased slip-dependent current harmonics and thermally as altered stator loss distribution, detectable via drift in the temperature rise rate ($dT/dt$) relative to load (stator current squared) and speed, without requiring new sensors.\n\n**PHYSICS CHECK**\n**Governing Relation:** The stator temperature $\\theta$ is governed by thermal balance: $C \\frac{d\\theta}{dt} + \\theta = k \\cdot P_{loss}(I_{stator}, \\omega)$. For a healthy rotor, $k$ is stable. A broken bar increases rotor copper loss (due to higher $R_2'$) and unbalanced torque, causing a drift in the thermal time constant $\\tau_{eff}$ and a shift in the temperature plateau vs. load curve.\n**Magnitude Verification:** For a 400 V motor, a single broken bar increases rotor loss by ~5-10% and causes 5-15% torque ripple. The stator current RMS increases slightly (<2%) but the *variance* of current over the mechanical period increases significantly. The thermal lag means the temperature deviation from the expected steady-state curve (derived from nameplate $R_1, R_2, X_2$) grows with accumulated energy. A 45-day warning requires detecting drift in $\\tau_{eff}$ or the coefficient $k$ before catastrophic fatigue failure. The signal-to-noise ratio of the thermal drift is sufficient if the motor operates in varying load cycles.\n**DIRECTION-OF-EFFECT:** Driving variable = **Rotor Circuit Integrity (effective $R_2'$)**; the mechanism moves it **down** by **detecting the increase in effective resistance/loss via thermal drift**; this **reduces** the **failure driver** (unbalanced magnetic pull / local overheating) by triggering maintenance before the thermal fatigue limit is exceeded.\n\n**IMPLEMENTATION BILL**\n*Constraint Check:* Use only existing stator current, winding temperature, and speed. No new sensors. No air-gap flux probe.\n*Permitted Set:* Pure parameter/procedure changes (analysis of existing data). No physical intervention on the motor.\n\n1.  **MECHANISM CLASS:** Thermal-Electrical Drift Inference\n    *   **Data Input (ALREADY-RECORDED):** Stator Current ($I_{abc}$), Winding Temperature ($T_w$), Speed ($\\omega$). *Source: Existing motor control system/PLC tags.*\n    *   **Processing (FIRMWARE/LOGIC):** Calculate Stator Loss Proxy $P_{proxy} = K_1 \\cdot I_{rms}^2 \\cdot \\frac{\\omega}{\\omega_{sync}}$ (approximation based on equivalent circuit). Calculate Expected Temperature $T_{exp}$ using first-order thermal model calibrated to nameplate data at commissioning (CALCULATED from stated specs: motor kW, efficiency class, thermal resistance).\n    *   **Indicator:** Drift Index $\\Delta \\tau = \\frac{T_{measured} - T_{exp}}{I_{rms}^2}$.\n    *   **Reference/Threshold (DERIVED):** Baseline $\\tau_{base}$ is derived from the motor's nameplate thermal time constant (stated spec) and the initial operating log (ALREADY-RECORDED healthy data from start-up period). Threshold is set at 15% drift from baseline.\n    *   **Procurement Tag:** (a) Existing PLC/Controller hardware (no new cost). (b) Existing temperature/current sensors (no new cost). (c) Standard firmware algorithm update (low cost).\n\n2.  **MECHANISM CLASS:** Torque-Density Variance (Supplement)\n    *   **Data Input (ALREADY-RECORDED):** Speed ($\\omega$), Stator Current ($I$).\n    *   **Processing:** Calculate Instantaneous Electrical Power $P_e \\approx \\sqrt{3} V I \\cos\\phi$ (assuming V is stable or measured from busbar, if V is not available, use $I \\cdot \\omega$ proxy with slip correction). Calculate Mechanical Power $P_m \\approx T \\cdot \\omega$. The ratio $P_m/P_e$ is efficiency. A broken bar causes pulsating torque, visible as high-frequency noise in the speed feedback or current magnitude.\n    *   **Indicator:** Variance of the residual torque error over a 1-hour rolling window.\n    *   **Reference:** Standard deviation of healthy residuals (DERIVED from initial 1000 hours of log data).\n    *   **Procurement Tag:** (a) Existing speed feedback (encoder/PLC). (b) Existing current telemetry. (c) Standard statistical routine.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Standard Practice Burden:** Installable air-gap flux probe (HIGH cost, ~$5k–$10k), mounting hardware, calibration campaign (HIGHER burden).\n*   **My Approach Burden:** Software update to existing PLC/SCADA (LOW cost, <$500), no new hardware installation, no downtime for sensor integration.\n*   **Parity:** SAME monitoring outcome (early warning), DIFFERENT mechanism (thermal-electrical inference vs. spatial flux mapping).\n*   **Operational Loss:** Zero operational loss. The algorithm runs on existing data. No throughput reduction.\n*   **Maintenance:** Zero additional physical maintenance.\n\n**EXECUTABLE TEST**\n*   **Protocol:** Simulate a rotor bar break by injecting synthetic data into the algorithm: 10% increase in stator loss proxy and 5% variance in torque residual.\n*   **Instruments:** PC with recorded dataset from the specific motor (ALREADY-RECORDED).\n*   **Pass/Fail Threshold:** Algorithm must flag \"Drift Index > 15%\" within 45 days of the simulated fault injection. False Positive Rate < 1 FA/year (verified against 1 year of healthy data).\n*   **Kill Criterion:** If the drift signal is buried in thermal noise of the environment (i.e., ambient temperature fluctuations mask the rotor effect), the method fails for low-load motors. For this 400V LV motor at typical industrial loads, thermal signal is distinct from ambient.\n\n**CONSTRAINT BIND**\n*   **Primary Indicator:** Stator Current (defines electrical loss) and Winding Temperature (defines thermal state). The problem states \"rotor-bar-break\" failure is preceded by increased loss. The primary indicator for *prediction* is the **Drift Index** derived from $T_w$ and $I$.\n*   **Why:** The drift index directly tracks the physical degradation mechanism (increased $R_2'$). Speed is used as a normalization variable to correct for load-dependent losses.\n*   **Exemplar-Reality:** No new physical products. Uses \"Standard PLC Trending Functions\" (stocked class: generic industrial automation features).\n*   **Premise-Validity:** Uses only stated inputs: stator current, winding temperature, speed. No air-gap probe. No new sensors.\n*   **Cost-Pricing:** No setpoint modulation. The system is a *predictor*, not a *controller*. It triggers a maintenance alert. Operational cost is zero. The \"cost\" is the alert threshold tuning, which is a one-time engineering task.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **MECHANISM CLASS:** Thermal-Electrical Drift Inference",
+    "*   **Data Input (ALREADY-RECORDED):** Stator Current ($I_{abc}$), Winding Temperature ($T",
+    "*   **Processing (FIRMWARE/LOGIC):** Calculate Stator Loss Proxy $P_{proxy} = K_1 \\cdot I_",
+    "*   **Indicator:** Drift Index $\\Delta \\tau = \\frac{T_{measured} - T_{exp}}{I_{rms}^2}$.",
+    "*   **Reference/Threshold (DERIVED):** Baseline $\\tau_{base}$ is derived from the motor's ",
+    "2.  **MECHANISM CLASS:** Torque-Density Variance (Supplement)",
+    "*   **Data Input (ALREADY-RECORDED):** Speed ($\\omega$), Stator Current ($I$).",
+    "*   **Processing:** Calculate Instantaneous Electrical Power $P_e \\approx \\sqrt{3} V I \\co",
+    "*   **Indicator:** Variance of the residual torque error over a 1-hour rolling window.",
+    "*   **Reference:** Standard deviation of healthy residuals (DERIVED from initial 1000 hour",
+    "*   **Standard Practice Burden:** Installable air-gap flux probe (HIGH cost, ~$5k–$10k), m",
+    "*   **My Approach Burden:** Software update to existing PLC/SCADA (LOW cost, <$500), no ne",
+    "*   **Parity:** SAME monitoring outcome (early warning), DIFFERENT mechanism (thermal-elec",
+    "*   **Operational Loss:** Zero operational loss. The algorithm runs on existing data. No t",
+    "*   **Maintenance:** Zero additional physical maintenance.",
+    "*   **Protocol:** Simulate a rotor bar break by injecting synthetic data into the algorith",
+    "*   **Instruments:** PC with recorded dataset from the specific motor (ALREADY-RECORDED).",
+    "*   **Pass/Fail Threshold:** Algorithm must flag \"Drift Index > 15%\" within 45 days of the",
+    "*   **Kill Criterion:** If the drift signal is buried in thermal noise of the environment ",
+    "*   **Primary Indicator:** Stator Current (defines electrical loss) and Winding Temperatur",
+    "*   **Why:** The drift index directly tracks the physical degradation mechanism (increased",
+    "*   **Exemplar-Reality:** No new physical products. Uses \"Standard PLC Trending Functions\"",
+    "*   **Premise-Validity:** Uses only stated inputs: stator current, winding temperature, sp",
+    "*   **Cost-Pricing:** No setpoint modulation. The system is a *predictor*, not a *controll"
+   ]
+  }
+ },
+ "declared_template_prose": "** thermal-electrical drift inference",
+ "allowed_row_outside": 0,
+ "sha256_16": "eef328e06f1879ba",
+ "smoke": false
+}

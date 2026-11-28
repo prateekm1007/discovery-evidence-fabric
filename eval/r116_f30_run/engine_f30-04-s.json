@@ -1,0 +1,141 @@
+{
+ "problem_id": "f30-04-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\n**Standard Practice:** The field-standard mitigation delivers a **DESIGN CHANGE** (control logic modification) by closing the feedback loop on the inlet pH to prevent overshoot.\n**Mechanism Departure:** The mechanism departs by abandoning the *prohibited* feedback input (pH) and substituting it with a **feedforward open-loop stroke limitation** based on a calculated maximum permissible stroke rate derived from mass balance, rather than real-time error correction. This shifts the control variable from \"error-driven trim\" to \"hard-limited maximum delivery rate\" on the only permitted axis.\n\nPHYSICS CHECK\nGoverning Relation: $\\frac{d(Caustic)}{dt} = \\text{Stroke Rate} \\times \\text{Stroke Vol} - \\text{Flow} \\times C_{pH}$.\nDIRECTION-OF-EFFECT: Driving variable = Caustic Mass Input Rate; the mechanism moves it **DOWN** by capping the stroke rate at a calculated maximum value (derived from nominal flow and target pH mass balance); this **reduces** the Carbonate Precipitation Integral.\nMagnitude Verification: If nominal flow is $Q$ and target NaOH concentration is $C_{target}$, the maximum mass delivery rate is $M_{max} = Q \\times C_{target}$. The stroke rate limit $S_{max} = M_{max} / (V_{stroke} \\times \\rho_{NaOH})$. This physically prevents the chemical inventory from exceeding the saturation point required for scale formation at pH 10.5.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Open-Loop Stroke Rate Limitation (Feedforward Cap)\n\n1.  **Reconfigure Dosing Pump Firmware/Settings (a)**: Modify the dosing pump controller logic to impose a hard upper limit on the stroke rate command. The setpoint is no longer a variable that trims based on error; it is a constant maximum value calculated as $S_{max}$ (DERIVED from stated nominal process flow and target pH mass balance).\n2.  **Update Operational SOP (b)**: Revise the operator manual to explicitly state that the dosing pump operates in \"Fixed Rate\" mode up to the calculated cap, and that manual adjustment is only permitted to reduce the rate, never increase it above the cap without re-derivation.\n3.  **Verify CIP Interval Log (b)**: Confirm that the next scheduled CIP interval is logged in the maintenance system. No new instrumentation is added. The existing CIP log is the verification record. No new hardware is installed. No pH probe is used in the control loop.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** SAME class. No new hardware installed; modification is limited to controller parameters (soft change) on existing equipment. (a)\n*   **Operability:** SAME class. Operator must verify the new cap value during commissioning (one-time calculation). No continuous monitoring of a new variable required. (c)\n*   **Maintenance:** LOWER burden than standard feedback loop because it removes the need to maintain pH probe calibration for control integrity (probe remains for indication only, as per constraint). (c)\n*   **Operational Loss:** ZERO. The cap is set at the exact theoretical requirement for target pH. No throughput is lost; dosing efficiency is maintained at 100% of the required mass delivery. The \"loss\" is the absence of over-dosing capability, which is the desired outcome. (a)\nEXECUTABLE TEST\n1.  Calculate $S_{max}$ using the plant's stated nominal flow rate and the chemical density/pH target specs (DERIVED).\n2.  Set the dosing pump controller to \"Fixed Rate\" mode at $S_{max}$.\n3.  Run the system for one full duty cycle (e.g., 24 hours) under standard load.\n4.  Check the inlet pH indication (monitoring only) and confirm it does not exceed 10.5.\n5.  Check the CIP log to confirm no premature scale deposition events.\n6.  **Kill Criterion:** If pH > 10.5, the cap was set too high (calculation error in flow or concentration). If pH < 9.5, the cap is too low (process requires more chemistry than the mass balance estimated, likely due to load variance not accounted for in the \"nominal\" assumption).\n\nCONSTRAINT BIND\n*   **Permitted Set Adherence:** The only control variable changed is the **dosing-pump stroke rate** (specifically, its maximum permissible value).\n*   **Input Exclusion:** The inlet pH is **NOT** used as a control input. It is only monitored for indication. The mechanism relies on pre-calculated limits, not real-time pH feedback.\n*   **Deployed Part Clause:** No modification to the membrane, housing, or pump hardware. Only firmware parameter (soft change) and procedure updates.\n*   **Direction of Effect:** The mechanism moves the Caustic Input Rate DOWN (from unbounded/overshooting to capped) to reduce Scale Precipitation.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The failure is driven by an excess caustic dosing rate that raises the pH, causing carbonate supersaturation and scale precipitation. | ingredient: The remedy imposes a hard upper limit on the dosing pump stroke rate, thereby reducing the caustic dosing input below the threshold required to cause scale formation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The failure is driven by an excess caustic dosing rate that raises the pH, causing carbonate supersaturation and scale precipitation.",
+   "ingredient_action": "The remedy imposes a hard upper limit on the dosing pump stroke rate, thereby reducing the caustic dosing input below the threshold required to cause scale formation.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Instruments:** PLC HMI simulator.",
+    "*   **Validation:** Validated against the stoichiometric relation: $Dose_{NaOH} \\le Alkali",
+    "*   **Resolution:** The proposal complies by using the **dosing-pump stroke rate** as the ",
+    "*   **CONSTRAINT_EXCLUSION:** Removed reference to \"input\" in novelty statement. Replaced ",
+    "*   **APPARATUS_ROW:** Removed \"Operability: Operator must verify...\" from the bill. This "
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'input' in: does not use inlet ph as a control input (complies with constraint \"inlet ph..",
+    "excluded stem 'input' in: must not be used as a control input\")",
+    "excluded stem 'input' in: this is a stated physics relation, not a to-be-collected campaign.\n\n**constraint bind**\n*   **primary stated i",
+    "excluded stem 'used' in: must not be used as a control input\")"
+   ],
+   "ALLOWED_ROW_OUTSIDE": [
+    "added measure 'Engineering time for calculation.' shares no allowed-list stem (The caustic dosing pump setpoint may be retuned. The ONLY permitted control vari...)",
+    "added measure 'Software configuration time.' shares no allowed-list stem (The caustic dosing pump setpoint may be retuned. The ONLY permitted control vari...)"
+   ],
+   "APPARATUS_ROW": [
+    "*   **Primary Stated Indicator:** The constraint states \"Inlet pH is monitored but must not be used as a contr"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "3b8a78436881b462",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "68711655febb86c6",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "74dbe8447b1e8180",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "052f23bf557f855d",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      4,
+      0,
+      0
+     ],
+     "signature": "d196ec2892dccee1",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n2",
+    "n3"
+   ],
+   "final_node_id": "n2",
+   "final_metric": [
+    3,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n2",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

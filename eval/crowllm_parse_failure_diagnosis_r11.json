@@ -1,0 +1,24 @@
+{
+ "record": "CROWLLM_PARSE_FAILURE_DIAGNOSIS/1.0.0",
+ "at": "2026-11-14T15:10:00Z",
+ "context": "the v2 calibration (crowllm_judge_calibration_r11_v2.json) served 20/30 valid with 20/20 correct among valid, but 10 pairs JUDGE_PARSE_FAILED (accuracy 0.667 < 0.8 gate FAIL). This is the bounded one-sample live diagnosis of the parse-failure shape.",
+ "method": "one live judgment call on eval-new04-chiller-fouling-predictor (a v2 parse-failed pair), raw output inspected; bounded: single call, no large spend",
+ "finding": {
+  "shape": "PROVIDER_TOKEN_CORRUPTION",
+  "evidence": "first-attempt output contained the corrupted token '\"B1\": .src1' — the free pool injected the literal marker '.src' into a JSON integer value, making the object unparseable (json.loads fails on '.src1'). The engine's ONE parse-retry re-asked and the second attempt returned a complete valid rubric JSON (all keys A1-A6/B1-B6 + prefer).",
+  "corruption_class": "provider-side (the router's model-serving layer corrupts tokens under free-pool load); NOT a prompt or engine defect — the same prompt parses clean on the retry",
+  "recovery_rate": "engine parse-retry recovered this sample; 10/30 pairs exhausted the ONE retry with still-corrupt output (or transport-failed the retry) in the v2 run"
+ },
+ "implication": {
+  "gate": "UNCHANGED — FAIL stands (a parse failure counts as WRONG, Art. XXV; corrupted output is never repaired into a verdict)",
+  "candidate_repair_next_session": "widen the parse-retry ladder 1x -> 2x for THIS rung only (re-asking is honest — the model re-serves, nothing is guessed or repaired client-side); measured expectation: with corruption bursts clearing in seconds, a second retry should recover a large fraction of the 10; re-run the 30-pair calibration after",
+  "d4_d5_now": "stay on the xkiro mistral post-00:00Z path (post_reset_queue.sh, unchanged)"
+ },
+ "artifacts": {
+  "v1": "eval/crowllm_judge_calibration_r11.json (0/30 breaker-killed)",
+  "v2": "eval/crowllm_judge_calibration_r11_v2.json (20/30 valid, 20/20 correct, gate FAIL 0.667)",
+  "gate": "eval/crowllm_gate_r11.json (full-length 3/3 PASS)",
+  "registration_commit": "112cd3030",
+  "calibration_commit": "a66ed5a38"
+ }
+}

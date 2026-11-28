@@ -1,0 +1,87 @@
+{
+ "record": "R105S2_P3_STAGE2_FM_ARMS/1.0.0",
+ "ran_at": "2026-11-19T21:22:05Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r105s2",
+ "claim": "c-0125 (p3-realdata-conformal-validation; stage 2)",
+ "arms": [
+  "chronos-bolt-base (amazon, Apache-2.0)",
+  "TimeMoE-50M (Maple728, Apache-2.0, ICLR'25 Spotlight)"
+ ],
+ "protocol_typed": {
+  "one_step": "TRUE-history walk (non-recursive), per-unit batched context -> ONE FM call per unit",
+  "conformal": "split conformal (|resid| quantile at 0.9 over the fit-half one-step residuals) — DISCLOSED: not enbpi; the stage-1 prototype arm keeps enbpi",
+  "subsamples": {
+   "FD001": "ALL 100 units (the failing drift channel ch14)",
+   "FD002": "40 units seed 17 (the passing control ch1)",
+   "FD003/FD004": "typed STAGE 3",
+   "CWRU": "4 paired normal+IR files (B/OR legs prototype-typed)"
+  },
+  "context": 96
+ },
+ "results": {
+  "FD001/chronos-bolt-base": {
+   "n_units": 100,
+   "n_evaluated": 59,
+   "n_failed": 41,
+   "coverage_median": 0.8462,
+   "coverage_min": 0.0825,
+   "healthy_fa_median": 0.2,
+   "gate_coverage_ge_090": false
+  },
+  "FD002/chronos-bolt-base": {
+   "n_units": 40,
+   "n_evaluated": 22,
+   "n_failed": 18,
+   "coverage_median": 0.8608,
+   "coverage_min": 0.1327,
+   "healthy_fa_median": 0.2,
+   "gate_coverage_ge_090": false
+  },
+  "FD001/TimeMoE-50M": {
+   "n_units": 100,
+   "n_evaluated": 59,
+   "n_failed": 41,
+   "coverage_median": 0.4514,
+   "coverage_min": 0.05,
+   "healthy_fa_median": 0.2,
+   "gate_coverage_ge_090": false
+  },
+  "CWRU/chronos-bolt-base": {
+   "hp0": {
+    "normal_file": 97,
+    "fault_file": 105,
+    "q": 0.0036,
+    "healthy_fa_rate": 0.0,
+    "fault_alarm_rate": 0.6
+   },
+   "hp1": {
+    "normal_file": 98,
+    "fault_file": 106,
+    "q": 0.0057,
+    "healthy_fa_rate": 0.0849,
+    "fault_alarm_rate": 0.2
+   },
+   "hp2": {
+    "normal_file": 99,
+    "fault_file": 107,
+    "q": 0.004,
+    "healthy_fa_rate": 0.0472,
+    "fault_alarm_rate": 0.4
+   },
+   "hp3": {
+    "normal_file": 100,
+    "fault_file": 108,
+    "q": 0.0045,
+    "healthy_fa_rate": 0.0943,
+    "fault_alarm_rate": 0.8333
+   }
+  }
+ },
+ "timings": {
+  "batched_call_ms_median": 150.5,
+  "batched_call_ms_p90": 346.9,
+  "note": "the <=2min median-inference gate input; the per-unit wall-clock is the batched-call cost — the gate arithmetic (per-machine median) is the auditor's"
+ },
+ "honest_expected_finding": "stage 1 showed the STATIC fit-once conformal FAILS (0.50) on the FD001 drift channel — the FM arms here test whether a stronger predictor + split conformal closes that; if not, the typed remedy is ADAPTIVE/sliding conformal (stage 3)",
+ "no_acceptance_or_score_claims": true
+}

@@ -1,0 +1,114 @@
+{
+ "problem_id": "v17-02-choke-erosion",
+ "domain": "oil-gas-wellhead",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P40",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P40",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:5b0db8fc1f8d": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:c0232b8258a9": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "abrasion_erosion",
+   "winner_measure_class": "geometry",
+   "winner_principle_id": "P40",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "abrasion_erosion",
+     "admitted": true,
+     "rank": 1,
+     "basis": "geometry is admitted class #2 for the abrasion_erosion failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:19:54Z",
+ "attempts_n": 1,
+ "row_wall_s": 14.5,
+ "a1_answer": "**NOVELTY STATEMENT**\nThe standard practice for choke trim erosion delivers a **DESIGN CHANGE** by upgrading the trim material to a harder alloy (e.g., Stellite) or using standard sacrificial bushings.\nMy mechanism delivers the same design class via a **GEOMETRIC BOUNDARY REDIRECT**: it replaces the high-velocity, straight-through erosion path with a **vortex-generated stagnation zone** where sand-laden flow is forced into a recirculating loop, impinging on a sacrificial, renewable surface at low normal velocity, while the main flow path is deflected tangentially.\nThe departure is from \"harder material resists impact\" to \"flow physics redirects kinetic energy into a sacrificial boundary layer,\" using a geometry that turns the erosion-prone straight path into a centrifugal separation and impingement zone.\n**Failure-physics connection:** Abrasion erosion follows the Bitter formula ($E \\propto \\rho v^2$); by redirecting the flow vector away from the seat face and into a tangential impingement zone on a sacrificial insert, the normal velocity on the primary trim is reduced by a geometric factor, shifting the wear to a planned boundary.\n\n**PHYSICS CHECK**\nThe governing relation is the conservation of angular momentum for a swirl-inducing geometry. When the choke body is angled such that the inlet flow enters a conical cavity with a tangential offset, the flow acquires a swirl component $u_\\theta$. The radial pressure gradient $\\frac{\\partial p}{\\partial r} = \\rho \\frac{u_\\theta^2}{r}$ creates a low-pressure core at the center, pushing sand particles outward against the wall (centrifugal effect). The primary trim seat is shielded by this outer high-momentum, particle-rich layer which impinges on a sacrificial insert rather than the precision-machined seat.\nMagnitude verification: For a typical wellhead pressure differential $\\Delta P \\approx 50 \\text{ bar}$, flow velocity $v \\approx \\sqrt{\\frac{2\\Delta P}{\\rho}} \\approx \\sqrt{\\frac{2 \\cdot 5 \\cdot 10^6}{400}} \\approx 158 \\text{ m/s}$. In a standard straight choke, the normal impact velocity on the seat is ~158 m/s. In the vortex geometry, the tangential velocity $u_\\theta \\approx 0.8 v \\approx 126 \\text{ m/s}$ is redirected to the wall. The normal component on the seat face is reduced to near zero for the mean flow, while the sacrificial insert handles the radial impact at a lower effective normal velocity due to the angled incidence. The energy absorption in the sacrificial insert is $\\propto v_{normal}^2$, which is significantly lower than the straight-through impact on the primary trim.\n\n**IMPLEMENTATION BILL**\n*   **Component 1: Vortex-Redirecting Choke Body.**\n    *   Material: Hardened Alloy (e.g., 4140H steel), same class as standard.\n    *   Geometry: The bore is not straight; it features a conical section with a tangential inlet nozzle offset from the centerline by distance $d$.\n    *   Tag: **DERIVED** from stated geometry (standard choke bore diameter and standard pressure class dictate the conical volume). The offset $d$ is calculated to achieve a swirl ratio of 0.8 at nominal flow.\n*   **Component 2: Sacrificial Ceramic Insert.**\n    *   Material: Alumina ($Al_2O_3$) or Silicon Carbide (SiC).\n    *   Location: Mounted on the outer wall of the conical section, facing the tangential flow.\n    *   Tag: **ALREADY-RECORDED** in the sense that sacrificial insert materials are standard practice in slurry pumps and mineral processing (stated inspiration). The specific shape is a conical segment.\n*   **Component 3: Primary Trim (Seat).**\n    *   Material: Standard Stellite or hardfaced alloy.\n    *   Tag: **ALREADY-RECORDED** standard trim material. The mechanism protects this part by ensuring the main flow does not impinge on it normally.\n*   **Instruments/Procedures:**\n    *   Input Stream: **Pressure** at upstream and downstream of the choke (stated in problem as available signal).\n    *   Input Stream: **Visual Inspection** of the sacrificial insert during scheduled maintenance (stated signal).\n    *   Reference/Threshold: The pressure drop $\\Delta P$ is used to infer flow velocity. The threshold for replacing the insert is defined by the **VISUAL INSPECTION** limit of wear on the insert. The physics relation $\\Delta P \\propto v^2$ allows estimation of impact energy on the insert.\n    *   Derivation: The required insert thickness is derived from the maximum calculated impact energy at the design flow, using standard erosion life equations for ceramics. **CALCULATED** from stated pressure and standard flow rates.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:** Same as standard. The choke body fits into the same body connection. The insert is press-fit or bolted into the conical section. No new plumbing.\n*   **Operability:** Identical. No control changes. The valve opens/closes normally.\n*   **Maintenance:** The standard practice involves replacing the entire trim or re-honing the seat. My mechanism involves swapping the sacrificial insert. This is **LIGHTER** burden because the insert is cheaper than a Stellite seat and can be replaced without removing the valve body. The primary trim (seat) now lasts significantly longer, reducing the frequency of high-cost valve rebuilds.\n*   **Cost Class:** The choke body machining is more complex (conical/tangential) than standard straight bore, adding ~10-20% machining cost. The insert is cheap ceramic. Net cost per failure event is lower because the high-cost seat is protected. **SAME CLASS** overall, with shifted cost from frequency to complexity.\n\n**EXECUTABLE TEST**\n*   **Protocol:** Fabricate a 1:1 scale model of the standard straight choke and the vortex-redirect choke. Subject both to identical sand-laden flow at the design pressure differential $\\Delta P_{design}$.\n*   **Instruments:** High-speed camera for flow visualization (schlieren or PIV) to confirm vortex formation and particle trajectory. Erosion test rig with standard sand (e.g., 50-mesh silica) at known concentration.\n*   **Pass/Fail Thresholds:**\n    1.  **Particle Trajectory:** High-speed imaging must show >90% of particles impinging on the sacrificial insert and <5% on the primary seat face for the vortex design. (Standard design will show >50% on seat).\n    2.  **Erosion Rate:** After $10^6$ particle impacts (simulated by time), the depth of erosion on the primary seat of the vortex design must be <10% of the depth on the standard design. The insert erosion must be measurable and replaceable.\n*   **Duration:** Test duration scaled to 3 months of operational equivalent flow.\n*   **Kill Criterion:** If the vortex core impinges particles on the seat at the design flow, the geometry is invalid. The tangential offset $d$ must be adjusted to ensure the low-pressure core remains on-axis, shielding the seat.\n\n**CONSTRAINT BIND**\nThe primary stated indicator is **pressure** (implied by \"choke\" and standard wellhead monitoring, though the prompt says \"pressure\" in signals_used). The visual inspection is secondary. The mechanism relies on pressure to infer the flow state and thus the erosion rate. The trust in the scheme comes from the **stated physics** of centrifugal separation and the **already-recorded** standard practice of using sacrificial inserts in slurry applications. No new instrumentation is required; the existing pressure transducers and scheduled visual inspections are sufficient to manage the lifecycle of the insert.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component 1: Vortex-Redirecting Choke Body.**",
+    "*   Material: Hardened Alloy (e.g., 4140H steel), same class as standard.",
+    "*   Geometry: The bore is not straight; it features a conical section with a tangential in",
+    "*   Tag: **DERIVED** from stated geometry (standard choke bore diameter and standard press",
+    "*   **Component 2: Sacrificial Ceramic Insert.**",
+    "*   Material: Alumina ($Al_2O_3$) or Silicon Carbide (SiC).",
+    "*   Location: Mounted on the outer wall of the conical section, facing the tangential flow",
+    "*   Tag: **ALREADY-RECORDED** in the sense that sacrificial insert materials are standard ",
+    "*   **Component 3: Primary Trim (Seat).**",
+    "*   Material: Standard Stellite or hardfaced alloy.",
+    "*   Tag: **ALREADY-RECORDED** standard trim material. The mechanism protects this part by ",
+    "*   **Instruments/Procedures:**",
+    "*   Input Stream: **Pressure** at upstream and downstream of the choke (stated in problem ",
+    "*   Input Stream: **Visual Inspection** of the sacrificial insert during scheduled mainten",
+    "*   Reference/Threshold: The pressure drop $\\Delta P$ is used to infer flow velocity. The ",
+    "*   Derivation: The required insert thickness is derived from the maximum calculated impac",
+    "*   **Installability:** Same as standard. The choke body fits into the same body connectio",
+    "*   **Operability:** Identical. No control changes. The valve opens/closes normally.",
+    "*   **Maintenance:** The standard practice involves replacing the entire trim or re-honing",
+    "*   **Cost Class:** The choke body machining is more complex (conical/tangential) than sta",
+    "*   **Protocol:** Fabricate a 1:1 scale model of the standard straight choke and the vorte",
+    "*   **Instruments:** High-speed camera for flow visualization (schlieren or PIV) to confir",
+    "*   **Pass/Fail Thresholds:**",
+    "1.  **Particle Trajectory:** High-speed imaging must show >90% of particles impinging on t",
+    "2.  **Erosion Rate:** After $10^6$ particle impacts (simulated by time), the depth of eros",
+    "*   **Duration:** Test duration scaled to 3 months of operational equivalent flow.",
+    "*   **Kill Criterion:** If the vortex core impinges particles on the seat at the design fl"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ],
+   "DIRECTION_UNPROVEN": [
+    "the sign/integral check cannot judge the direction from the bill — state the governing relation and the sign the mechanism imposes"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "4de0448668b09cff"
+}

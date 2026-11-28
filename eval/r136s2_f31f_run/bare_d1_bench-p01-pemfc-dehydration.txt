@@ -1,0 +1,31 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+The core issue is that at 80°C and 1.5 A/cm², the membrane’s water activity drops below the critical threshold for proton conductivity, leading to high ionic resistance and thermal runaway in local hotspots. The constraint limits *cathode* humidification load, but does not restrict *anode* humidification or internal water redistribution. The most effective mitigation is to implement an **Anode-Recirculated Humidification Loop with a High-Efficiency Inter-Stack Water Recovery System**. This approach increases the water activity on the anode side to drive water flux into the membrane via capillary action (electro-osmotic drag is opposed by back-diffusion and capillary forces when anode relative humidity > cathode relative humidity), thereby maintaining membrane hydration without significantly increasing the *cathode* humidifier energy load. The key is to decouple membrane hydration from cathode humidity control.
+
+**Implementation:**
+1.  **Anode Loop Upgrade:** Convert the anode exhaust system from a dump-to-atmosphere or minimal-recycle configuration to a closed-loop recirculation system with a dedicated anode humidifier.
+2.  **Water Recovery Unit:** Install a membraneless or membrane-based water recovery unit in the anode exhaust stream that extracts water vapor and returns it to the anode loop at high relative humidity (RH_anode > 80%).
+3.  **Cathode Setpoint Adjustment:** Operate the cathode humidifier at a minimal sufficient RH (e.g., 40-50% at 80°C) to maintain catalyst layer hydration, keeping the parasitic load well below 10%.
+4.  **Control Logic:** Implement a real-time control algorithm that modulates the anode humidifier temperature and flow rate to maintain a transmembrane water activity gradient favoring inward diffusion (from anode to cathode through the membrane) or at least preventing outward net loss. The goal is to keep the membrane water content (λ) above 5.0.
+
+**Measures it Relies On:**
+*   **Anode Humidifier Capacity:** Sufficient heat exchange area to raise anode gas RH without excessive energy penalty (anode load is not constrained, only cathode load is).
+*   **Water Recovery Efficiency:** The recovery system must achieve >70% water recovery from anode exhaust to minimize make-up water and maintain anode loop RH.
+*   **Membrane Back-Diffusion:** Relies on the physical principle that water back-diffusion from higher anode RH to lower cathode RH can counteract electro-osmotic drag at 1.5 A/cm², provided the anode RH is high enough.
+*   **Cathode Humidifier Load < 10%:** The cathode humidifier operates at a setpoint that keeps its fan/heater energy consumption under 10% of total system power. Since the anode does most of the hydration work, the cathode demand is reduced.
+
+**Falsification Test:**
+To falsify this approach, conduct the following test:
+1.  **Test Setup:** Operate the PEMFC stack at 80°C and 1.5 A/cm² with the proposed anode-recirculated humidification loop active and the cathode humidizer set to 40% RH.
+2.  **Measurement:** Continuously monitor:
+    *   Membrane temperature distribution via infrared thermography (to detect hotspots).
+    *   Stack voltage under load step changes.
+    *   Cathode humidifier power consumption (watts).
+    *   Anode exhaust humidity.
+3.  **Falsification Condition:** The approach is falsified if, under these conditions, **any** of the following occur:
+    *   Membrane temperature exhibits localized hotspots exceeding 85°C (indicating ionic resistance degradation persists).
+    *   Cathode humidifier parasitic load exceeds 10% of total system electrical output.
+    *   The stack voltage drops by more than 50 mV over a 1-hour steady-state test at 1.5 A/cm² due to membrane dehydration (confirmed by post-test membrane conductivity measurement showing λ < 4.0).
+
+If the membrane remains hydrated (no hotspots, stable voltage) and cathode load stays below 10%, the mitigation is validated. If dehydration persists or the cathode load exceeds the limit, the approach fails.

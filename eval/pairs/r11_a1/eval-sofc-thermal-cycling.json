@@ -1,0 +1,449 @@
+{
+ "a1_version": "r11_a1/1.0.0",
+ "problem_id": "eval-sofc-thermal-cycling",
+ "baseline_sha_source": "{'pipeline_answer_sha256': 'ABSENT', 'baseline_answer_sha256': 'ABSENT', 'evidence_sha256': 'dfe9aebc72bd1f8a46a5aa480b37e5f01388842e810c06daebccdcab6e1cca4d', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 18,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 17.5,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Glass-Ceramic Seal with Nanoscale Dispersed ZrO\u2082 Particles",
+    "mechanism": "Nanoscale ZrO\u2082 particles in glass-ceramic seal reduce thermal expansion mismatch via constrained sintering.",
+    "failure_link": "Mitigates microcrack initiation in seal by lowering differential expansion (thermal-cycling-fatigue).",
+    "cost_to_test": "$5K (10 samples, 2 weeks: sintering + SEM/thermal expansion testing).",
+    "standard_solution": "Conventional glass-ceramic seal (e.g., Ba-Ca-Al-Si-O) with 0.15 intergranular glass phase.",
+    "departure": "Adds 5\u201310 vol% ZrO\u2082 nanoparticles (5\u201310 nm) to glass phase, increasing CTE match to electrolyte/anode."
+   },
+   {
+    "lever": "process",
+    "name": "Gradient-Deposition Cathode via Aerosol Deposition",
+    "mechanism": "Aerosol deposition creates a functionally graded LSM cathode with CTE tailored to electrolyte.",
+    "failure_link": "Reduces cathode-electrolyte interfacial cracking by matching CTE gradients (thermal-cycling-fatigue).",
+    "cost_to_test": "$12K (5 stacks, 3 weeks: deposition + thermal shock testing).",
+    "standard_solution": "Uniform LSM cathode spray-coated or screen-printed onto electrolyte.",
+    "departure": "Layered LSM with increasing Sr content (and thus CTE) toward electrolyte interface via aerosol deposition."
+   },
+   {
+    "lever": "design",
+    "name": "Modular Compression Seal with Elastic Interlayer",
+    "mechanism": "Elastomeric interlayer (e.g., YSZ-doped glass-ceramic composite) absorbs differential strain.",
+    "failure_link": "Prevents seal microcracking by decoupling rigid components (thermal-cycling-fatigue).",
+    "cost_to_test": "$8K (3 prototypes, 2 weeks: assembly + leak/voltage testing).",
+    "standard_solution": "Monolithic glass-ceramic seal directly bonded to metal interconnects.",
+    "departure": "Adds 50\u2013100 \u00b5m thick elastomeric interlayer (e.g., YSZ-reinforced glass) between seal and interconnect."
+   },
+   {
+    "lever": "controls",
+    "name": "Dynamic Heating Rate Ramp with CTE-Synchronized Profiles",
+    "mechanism": "Adaptive heating/cooling ramps minimize transient thermal gradients via real-time CTE feedback.",
+    "failure_link": "Reduces thermal shock by limiting peak strain rates (thermal-cycling-fatigue).",
+    "cost_to_test": "$20K (1 stack, 1 week: furnace + thermocouple array + PID tuning).",
+    "standard_solution": "Fixed 5\u00b0C/min heating/cooling rate for all cycles.",
+    "departure": "Piezoelectric CTE sensors trigger rate adjustments (e.g., slow near 300\u2013500\u00b0C where CTE mismatch peaks)."
+   },
+   {
+    "lever": "operations",
+    "name": "Intermittent Thermal Soak at 500\u00b0C During Cycling",
+    "mechanism": "500\u00b0C soak relieves residual stresses via creep in glass-ceramic seal.",
+    "failure_link": "Prevents microcrack accumulation by periodic stress relaxation (thermal-cycling-fatigue).",
+    "cost_to_test": "$3K (1 stack, 1 day: modified cycle protocol + voltage monitoring).",
+    "standard_solution": "Direct 25\u00b0C\u2192800\u00b0C\u219225\u00b0C cycling without intermediate holds.",
+    "departure": "Adds 10-minute 500\u00b0C hold every 5 cycles to enable stress relaxation."
+   },
+   {
+    "lever": "measurement",
+    "name": "In-Situ Acoustic Emission Monitoring of Microcrack Initiation",
+    "mechanism": "Ultrasonic sensors detect microcrack nucleation via stress wave emission during thermal cycling.",
+    "failure_link": "Enables predictive maintenance by quantifying crack growth rate (thermal-cycling-fatigue).",
+    "cost_to_test": "$15K (1 stack, 2 weeks: sensor integration + cycle testing).",
+    "standard_solution": "Post-mortem SEM/leak testing after failure.",
+    "departure": "Embedded piezoelectric transducers log acoustic events during cycling to correlate with voltage/leakage trends."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "f64e0a36cbf18bbd",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Glass-Ceramic Seal with Nanoscale Dispersed ZrO\u2082 Particles\",\n      \"mechanism\": \"Nanoscale ZrO\u2082 particles in glass-ceramic seal reduce thermal expansion mismatch via constrained sintering.\",\n      \"failure_link\": \"Mitigates microcrack initiation in seal by lowering differential expansion (thermal-cycling-fatigue).\",\n      \"cost_to_test\": \"$5K (10 samples, 2 weeks: sintering + SEM/thermal expansion testing).\",\n      \"standard_solution\": \"Conventional glass-ceramic seal (e.g., Ba-Ca-Al-Si-O) with 0.15 intergranular glas",
+  "raw_tail": " Acoustic Emission Monitoring of Microcrack Initiation\",\n      \"mechanism\": \"Ultrasonic sensors detect microcrack nucleation via stress wave emission during thermal cycling.\",\n      \"failure_link\": \"Enables predictive maintenance by quantifying crack growth rate (thermal-cycling-fatigue).\",\n      \"cost_to_test\": \"$15K (1 stack, 2 weeks: sensor integration + cycle testing).\",\n      \"standard_solution\": \"Post-mortem SEM/leak testing after failure.\",\n      \"departure\": \"Embedded piezoelectric transducers log acoustic events during cycling to correlate with voltage/leakage trends.\"\n    }\n  ]\n}\n```"
+ },
+ "critique": {
+  "wall_s": 17.3,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "[2] Gradient-Deposition Cathode via Aerosol Deposition",
+   "[1] Glass-Ceramic Seal with Nanoscale ZrO\u2082",
+   "[5] Intermittent Thermal Soak at 500\u00b0C During Cycling"
+  ],
+  "standard_solution": "Homogeneous glass-ceramic seal + uniform LSM cathode + fixed heating/cooling ramps (no active mitigation).",
+  "raw_sha256": "37a4e651ba98872b",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"[1] Glass-Ceramic Seal with Nanoscale ZrO\u2082\",\n      \"plausibility\": \"Plausible. ZrO\u2082 dispersion reduces CTE mismatch via constrained sintering; validated in glass-ceramic systems.\",\n      \"constraint_audit\": {\n        \"500 cycles\": \"ok\",\n        \"5\u00b0C/min\": \"ok\",\n        \"OCV >1.0V\": \"ok\",\n        \"leakage <1%\": \"ok\",\n        \"mass <2%\": \"ok (nanoscale additions negligible)\"\n      },\n      \"difference_from_standard\": \"Standard: homogeneous glass-ceramic seal. Novelty: nanoscale ZrO\u2082 dispersion *actively* lowers CTE via constrained sintering, not j",
+  "top1_match": "FELL_BACK_TO_CANDIDATE_1"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Glass-Ceramic Seal with Nanoscale Dispersed ZrO\u2082 Particles",
+  "mechanism": "Nanoscale ZrO\u2082 particles in glass-ceramic seal reduce thermal expansion mismatch via constrained sintering.",
+  "failure_link": "Mitigates microcrack initiation in seal by lowering differential expansion (thermal-cycling-fatigue)."
+ },
+ "compose": {
+  "wall_s": 15.3,
+  "transport_ok": true,
+  "answer_sha256": "1c9b1b050be042fc"
+ },
+ "strict_relabel": {
+  "n_relabels": 1,
+  "n_user_constraint_relabels": 0,
+  "relabels": [
+   {
+    "parameter": "",
+    "value": "Heating rate = 5 \u00b0C/min",
+    "new_label": "ASSUMPTION",
+    "cited_record": "doi:10.1038/s41598-025-34342-3",
+    "why": "value not found in the cited record"
+   }
+  ],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 27.5
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 26,
+    "assumption": 0,
+    "unbound_numbers": 0,
+    "all_numbers": 26,
+    "claims": [
+     {
+      "parameter": "PARAMETER: ZrO\u2082 particle size = 50 nm (rationale: 50 nm balances sintering constraint with dispersibility; literature on glass-ceramic composites shows 30\u2013100 nm optimal for CTE tuning [doi:10.1002/ad",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "advs",
+       "balances",
+       "ceramic",
+       "composites",
+       "constraint",
+       "dispersibility",
+       "glass",
+       "literature",
+       "optimal",
+       "particle",
+       "rationale",
+       "shows",
+       "sintering",
+       "size",
+       "tuning"
+      ],
+      "pairs": [
+       {
+        "value": "50",
+        "unit": "nm"
+       },
+       {
+        "value": "50",
+        "unit": "nm"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: ZrO\u2082 volume fraction = 10% (rationale: 10 vol% ZrO\u2082 reduces CTE by ~20% in glass matrices while maintaining seal viscosity; derived from [doi:10.1038/s41598-025-34342-3]\u2019s ZrO\u2082-glass system",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "derived",
+       "fraction",
+       "glass",
+       "maintaining",
+       "matrices",
+       "rationale",
+       "reduces",
+       "seal",
+       "systems",
+       "viscosity",
+       "volume",
+       "while"
+      ],
+      "pairs": [
+       {
+        "value": "10",
+        "unit": "%"
+       },
+       {
+        "value": "20",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": true
+     },
+     {
+      "parameter": "PARAMETER: Cathode gradient thickness = 50 \u00b5m (rationale: 50 \u00b5m gradient spans the thermal boundary layer at the electrolyte interface, validated in [doi:10.1021/acsomega.5c12945] for LSM/YSZ coatings",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "acsomega",
+       "boundary",
+       "cathode",
+       "coatings",
+       "electrolyte",
+       "gradient",
+       "interface",
+       "layer",
+       "rationale",
+       "spans",
+       "thermal",
+       "thickness",
+       "validated"
+      ],
+      "pairs": [
+       {
+        "value": "50",
+        "unit": "\u00b5m"
+       },
+       {
+        "value": "50",
+        "unit": "\u00b5m"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Seal intergranular glass phase fraction = 0.15 (User Constraint).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "constraint",
+       "fraction",
+       "glass",
+       "intergranular",
+       "phase",
+       "seal",
+       "user"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Heating rate = 5 \u00b0C/min \u2014 value not stated in the cited record \u2014 matches user\u2019s thermal cycling constraint.\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "cited",
+       "constraint",
+       "cycling",
+       "heating",
+       "matches",
+       "rate",
+       "record",
+       "thermal",
+       "user"
+      ],
+      "pairs": [
+       {
+        "value": "5",
+        "unit": "\u00b0c"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: Seal ZrO\u2082 dispersion method = high-energy ball milling + tape casting (rationale: ensures uniform 50 nm dispersion; scalable per [doi:10.1038/s41467-026-69110-y]).\n\nFALSIFICATION TEST:\nn = ",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "after",
+       "anode",
+       "ball",
+       "between",
+       "casting",
+       "cathode",
+       "cell",
+       "circuit",
+       "criterion",
+       "cycled",
+       "cycles",
+       "cycling",
+       "dispersed",
+       "dispersion",
+       "energy",
+       "ensures",
+       "exceeding",
+       "fail",
+       "falsification",
+       "fatigue",
+       "flow",
+       "fuel",
+       "graded",
+       "high",
+       "increase",
+       "independent",
+       "interface",
+       "leakage",
+       "mass",
+       "method",
+       "microcrack",
+       "milling",
+       "open",
+       "pass",
+       "rationale",
+       "retain",
+       "scalable",
+       "seal",
+       "stack",
+       "stacks",
+       "supported",
+       "suppression",
+       "tape",
+       "test",
+       "thermal",
+       "uniform",
+       "validates",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "50",
+        "unit": "nm"
+       },
+       {
+        "value": "25",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "800",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "5",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "90",
+        "unit": "%"
+       },
+       {
+        "value": "1",
+        "unit": "%"
+       },
+       {
+        "value": "1.0",
+        "unit": "v"
+       },
+       {
+        "value": "500",
+        "unit": "cycles"
+       },
+       {
+        "value": "2",
+        "unit": "%"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "TYPED_SKIP_BASELINE_ABSENT",
+  "a0plus_answer_sha256": null,
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION:\nReplace the homogeneous glass-ceramic seal with a **nanoscale ZrO\u2082-dispersed glass-ceramic composite** (10 vol% ZrO\u2082, 50 nm particle size) to constrain sintering and reduce thermal expansion mismatch. Pair this with a **functionally graded cathode** (LSM/YSZ gradient via aerosol deposition) to match the electrolyte\u2019s CTE profile. The combined intervention decouples seal stress from thermal cycling while preserving interfacial integrity.\n\nMECHANISM:\nNanoscale ZrO\u2082 particles in the seal **constrain glass matrix sintering**, lowering the composite\u2019s effective coefficient of thermal expansion (CTE) via particle-matrix interfacial pinning. The graded cathode **dampens stress concentrations** at the cathode-electrolyte interface by spatially varying CTE, preventing microcrack nucleation during thermal transients.\n\nDEPARTURE FROM STANDARD:\nStandard: homogeneous glass-ceramic seal with passive CTE tuning via composition.\nDifference: **active CTE suppression** via nanoscale ZrO\u2082 dispersion (constrained sintering) *and* **functionally graded cathode** (aerosol-deposited LSM/YSZ gradient) to eliminate differential expansion at both interfaces.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: ZrO\u2082 particle size = 50 nm (rationale: 50 nm balances sintering constraint with dispersibility; literature on glass-ceramic composites shows 30\u2013100 nm optimal for CTE tuning [doi:10.1002/advs.77388]).\nASSUMPTION PARAMETER: ZrO\u2082 volume fraction = 10% (rationale: 10 vol% ZrO\u2082 reduces CTE by ~20% in glass matrices while maintaining seal viscosity; derived from [doi:10.1038/s41598-025-34342-3]\u2019s ZrO\u2082-glass systems).\nASSUMPTION PARAMETER: Cathode gradient thickness = 50 \u00b5m (rationale: 50 \u00b5m gradient spans the thermal boundary layer at the electrolyte interface, validated in [doi:10.1021/acsomega.5c12945] for LSM/YSZ coatings).\nASSUMPTION PARAMETER: Seal intergranular glass phase fraction = 0.15 (User Constraint).\nASSUMPTION PARAMETER: Heating rate = 5 \u00b0C/min \u2014 value not stated in the cited record \u2014 matches user\u2019s thermal cycling constraint.\nASSUMPTION PARAMETER: Seal ZrO\u2082 dispersion method = high-energy ball milling + tape casting (rationale: ensures uniform 50 nm dispersion; scalable per [doi:10.1038/s41467-026-69110-y]).\n\nFALSIFICATION TEST:\nn = 500 independent anode-supported cell stacks, cycled between 25 \u00b0C and 800 \u00b0C at 5 \u00b0C/min.\n**Pass/fail criterion**: \u226590% of stacks retain seal leakage <1% of fuel flow *and* open-circuit voltage >1.0 V after 500 cycles, with no stack exceeding 2% mass increase. The test validates **microcrack suppression in the ZrO\u2082-dispersed seal and graded cathode interface** under thermal-cycling-fatigue.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 14294,
+   "ttfb_ms": 14294,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 13996,
+   "ttfb_ms": 13996,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 12034,
+   "ttfb_ms": 12034,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 50.3,
+ "infra_time_s": {
+  "queue_wait": 0.0,
+  "gateway_setup": 0.0,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

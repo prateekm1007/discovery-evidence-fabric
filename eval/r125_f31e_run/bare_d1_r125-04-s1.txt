@@ -1,0 +1,22 @@
+**Mitigation Proposal: Closed-Loop Power-Adjusted Discharge Choke Setting Control**
+
+**Mechanism:**
+The failure mode—coarsened product, excessive recycle of coarse fraction, and elevated specific energy consumption (kWh/tonne)—indicates that the cone crusher's closed side setting (CSS) or choke point is too wide, or the liner wear has altered the effective crushing chamber shape, preventing adequate reduction. The mitigation uses the **motor power per tonne (specific power)** as a real-time proxy for crusher load and crushing efficiency. Since specific power rises when the crusher is "starved" of load or when the CSS is too wide causing incomplete reduction and high recycle, the system dynamically adjusts the hydraulic cylinder position (choke/CSS) to minimize specific power within a target range, effectively closing the setting until adequate crushing occurs.
+
+**Implementation:**
+1.  **Calculate Specific Power (SP):** Continuously compute SP = (Motor Power / Discharge Belt Scale Rate). Use 1-minute moving averages to smooth noise. Feed-rate scale is used to normalize power if the crusher is running under variable load, but the discharge scale is the primary mass flow reference for "per tonne."
+2.  **Define Target SP Window:** Establish an optimal SP band based on historical data from the last liner change. E.g., Target SP = 12–15 kWh/tonne. If SP < 10 kWh/tonne, the crusher is likely over-crushing or under-loaded (less likely here). If SP > 18 kWh/tonne, the crusher is struggling (coarse product, high recycle, wide CSS).
+3.  **Control Logic:**
+    *   If SP > Upper Limit (18 kWh/tonne): Command the hydraulic control valve to **close** the choke/CSS (reduce discharge opening). This increases load on the crusher, increases residence time, and forces finer breakage.
+    *   If SP < Lower Limit (10 kWh/tonne): Command the hydraulic control valve to **open** the choke/CSS. This reduces excessive crushing and lowers power.
+    *   Use a simple PI controller with SP as the error signal against the target setpoint. Rate-of-change limits prevent hydraulic slugging.
+4.  **Safety Interlock:** If discharge belt scale reads zero or very low (belt not running or jammed), disable CSS adjustment. If motor power exceeds 110% of rated continuous power for >30 seconds, force open CSS to prevent overload.
+
+**Measures It Relies On:**
+*   **Motor Power Meter:** Provides instantaneous crushing load. High power at low throughput indicates inefficient, coarse crushing.
+*   **Discharge Belt Scale:** Provides actual throughput (t/h). Essential for normalizing power to kWh/tonne. Without this, absolute power cannot distinguish between "heavy crushing" and "high throughput."
+*   **Feed-Rate Scale:** Used as a secondary check to ensure the crusher is not being starved or overloaded by incoming material, which could confound SP trends. It helps validate that SP changes are due to CSS/liner issues, not just feed variability.
+*   **Existing Hydraulic CSS Actuator/Control Valve:** The actuator is already present; only its control signal is modified. No new sensors are added; the control loop is implemented in the existing PLC/DCS using only the listed sensors.
+
+**Why This Works:**
+Worn liners and coarse product cause the crusher to operate at a higher CSS than optimal, leading to lower breakage per pass and high recycle. This increases the work index (specific energy) because the material is repeatedly crushed at a less efficient size range. By closing the CSS until specific power stabilizes at the historical optimum, the crusher is forced back into its efficient crushing zone, reducing coarse product size and lowering kWh/tonne, directly addressing the failure mode using only existing instruments.

@@ -1,0 +1,49 @@
+{
+ "problem_id": "eval-new04-chiller-fouling-predictor",
+ "arm": "baseline",
+ "dev_source": "dev12",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T19:20:30.963413Z",
+ "attempts_n": 4,
+ "a1_answer": "**NOVELTY STATEMENT**  \n- Standard practice delivers: MONITORING/INDICATION scheme using fixed monthly cleaning cadence.  \n- Departure: MECHANISM CLASS: Dynamic fouling threshold based on real-time condenser approach temperature deviation from physics-based clean-tube baseline.  \n- Failure physics: Fouling reduces heat transfer efficiency, raising condenser approach temperature (condenser water outlet temp - refrigerant saturation temp). The threshold detects when this rise exceeds expected seasonal variation, triggering cleaning only when needed.  \n\n**PHYSICS CHECK**  \nGoverning relation: Condenser approach temperature (ΔT_app) = T_cond_out - T_sat. Fouling increases ΔT_app by reducing U-value (heat transfer coefficient).  \nDIRECTION-OF-EFFECT: driving variable = ΔT_app; the mechanism moves it DOWN by cleaning when ΔT_app exceeds threshold; this REDUCES the failure driver (fouling-induced energy penalty).  \nMagnitude verification: At full load, a 0.5°F rise in ΔT_app increases compressor power ~1.5% (typical U-value sensitivity). Threshold set at 1.0°F to ensure >3% energy reduction.  \n\n**IMPLEMENTATION BILL**  \n(a) BMS data logger (already installed)  \n(b) Computational module (e.g., PLC or edge device)  \n(c) Cleaning trigger logic (firmware update)  \n- Inputs (ALREADY-RECORDED):  \n  - Chilled water supply/return temperature (BMS log)  \n  - Condenser water supply/return temperature (BMS log)  \n  - Compressor power (BMS log)  \n  - Outdoor wet-bulb temperature (BMS log)  \n- Reference/Threshold (DERIVED from stated physics):  \n  - Clean-tube ΔT_app baseline = T_sat - T_cond_out (calculated from refrigerant pressure/temperature relation per chiller nameplate specs).  \n  - Threshold = baseline + 1.0°F (CALCULATED: 1.0°F ensures >3% energy savings per physics check).  \n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**  \n- Installability: No hardware changes; uses existing BMS and computational resources.  \n- Operability: Automated trigger; no operator intervention beyond standard cleaning procedure.  \n- Maintenance: Zero added maintenance; firmware update only.  \n- Cost class: Same as standard practice (no new equipment); labor savings from reduced cleaning frequency.  \n\n**EXECUTABLE TEST**  \n- Protocol: Log ΔT_app and compressor power at full load for 30 days. Trigger cleaning when ΔT_app > baseline + 1.0°F. Measure compressor energy before/after cleaning.  \n- Instruments: Existing BMS data; no new sensors.  \n- Pass/fail: Cleaning trigger reduces compressor energy by ≥3% vs. fixed cadence.  \n- Duration: 1 month (covers fouling accumulation and cleaning events).  \n- Kill criterion: Energy savings <3% or false trigger rate >10%.  \n- Validation: Uses ALREADY-RECORDED data; no new collection.  \n\n**CONSTRAINT BIND**  \nPrimary indicator: Condenser approach temperature (ΔT_app), as it directly quantifies fouling impact. Secondary indicator (compressor power) supplements but does not replace ΔT_app.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Inputs (ALREADY-RECORDED):",
+    "- Chilled water supply/return temperature (BMS log)",
+    "- Condenser water supply/return temperature (BMS log)",
+    "- Compressor power (BMS log)",
+    "- Outdoor wet-bulb temperature (BMS log)",
+    "- Reference/Threshold (DERIVED from stated physics):",
+    "- Clean-tube ΔT_app baseline = T_sat - T_cond_out (calculated from refrigerant pressure/te",
+    "- Threshold = baseline + 1.0°F (CALCULATED: 1.0°F ensures >3% energy savings per physics c",
+    "- Installability: No hardware changes; uses existing BMS and computational resources.",
+    "- Operability: Automated trigger; no operator intervention beyond standard cleaning proced",
+    "- Maintenance: Zero added maintenance; firmware update only.",
+    "- Cost class: Same as standard practice (no new equipment); labor savings from reduced cle",
+    "- Protocol: Log ΔT_app and compressor power at full load for 30 days. Trigger cleaning whe",
+    "- Instruments: Existing BMS data; no new sensors.",
+    "- Pass/fail: Cleaning trigger reduces compressor energy by ≥3% vs. fixed cadence.",
+    "- Duration: 1 month (covers fouling accumulation and cleaning events).",
+    "- Kill criterion: Energy savings <3% or false trigger rate >10%.",
+    "- Validation: Uses ALREADY-RECORDED data; no new collection."
+   ]
+  }
+ },
+ "declared_template_prose": "dynamic fouling threshold based on real-time condenser approach temperature devi",
+ "allowed_row_outside": 0,
+ "sha256_16": "2980be08f35d5d95",
+ "smoke": false
+}

@@ -1,0 +1,51 @@
+{
+ "record": "R65_VERDICT_EXECUTION_PLAN/1.0.0",
+ "session": "builder-r60s1",
+ "received": "2026-11-18T06:05-06:15Z (auditor verdict via owner relay, channel zai-web)",
+ "verdict_summary": "Owner Directive Executed: 429 blocker dissolved, glm-4-plus retired; v9 one-shot unblocked; directions 1-7 (retire, elevate, update V77 gate, claim c-0082, run one-shot, adoption record, auditor scoring vs prateekm1007/def-rubric-custody)",
+ "constitution_reads": {
+  "epistemic_v3_2_0": "FULL read this session @ dade20f9c (md5 9a5ae1cd verified); re-verified UNCHANGED at origin/queue/dev12_r7 tip a968c445d (diff = 0 lines) — the in-session full read stands",
+  "auditor_v1_3_0": "FULL read this session @ 152c16896 (md5 d40a92a1 verified); audit branch head now a293b63e3 (R65/AM59/V58) — constitution file unchanged there"
+ },
+ "findings_verified_byte_exact": {
+  "f1_gate_hardcoding": "scripts/r60_v9_one_shot.py:292 require_registered_model(V77_REQUEST_MODEL) before gateway start; :580 assert m.V77_REQUEST_MODEL == 'glm-4-plus' (freeze guard); V77_REQUEST_MODEL defined scripts/r40_machine_v77.py:84",
+  "f2_registry": "discovery_fabric/engine/route_adapter.py:105-149 ROUTE_REGISTRY['registered'] = zai-gateway/glm-4-plus (R36); xkiro+agnes wired as alternates (generator-leg transports, vault_key_name fields, c-0078 provenance)",
+  "f3_p1_intact": "physics registry deterministic pint math, zero LLM (not re-derived here; auditor-verified a293b63e3 lineage, P1 108/108=1.0)",
+  "f4_v9_freeze": "rubric isolation + MEASURED_PATH (engine_route -> mechanism_space) verified in the instrument docstring + code; one-shot integrity: eval/holdout_v9_generation/ DOES NOT EXIST (never fired, zero partial rows)"
+ },
+ "new_facts_from_fetch": "parallel lane pushed 05:34-05:58Z: builder-r64s1 c-0087 (v9 preflight pack, 7/7 guards) + builder-r64s2 c-0088 (provider census + re-registration proposal). CENSUS (f8d5321bb): xkiro reachable, 69 models incl. 18 flagship ids; agnes reachable, 10 models; NO glm family on either; NO qwen anywhere. The r64s2 census at ~05:50Z used live keys — proving that session's sandbox is keyed (vaults are session-local, CORR-3)",
+ "model_selection": {
+  "provider": "xkiro",
+  "basis": "the only roster carrying flagship families (agnes = agnes-brand only, 10 models, pro tiers credit-gated 403 at $0 per the R539 measurement; xkiro = free-tier router, c-0078 end-to-end qualified)",
+  "probe_order_live_serving_validation": [
+   "anthropic/claude-opus-5.5",
+   "openai/gpt-6.1-terra",
+   "google/gemini-3.1-pro",
+   "x-ai/grok-4.7",
+   "moonshotai/kimi-k3-agent",
+   "anthropic/claude-sonnet-5.5",
+   "openai/gpt-5.6-terra"
+  ],
+  "probe_protocol": "one candidate at a time, R36 lesson (catalog-listed != servable): tiny completion + served==requested id + non-empty visible content + browser UA (Cloudflare 1010 contract, R58 typed); first clean server wins; the probe result is the registration provenance",
+  "owner_hint_deviation_typed": "'like qwen 3.8' UNSATISFIABLE IN NAME: zero qwen/* ids in either roster (census f8d5321bb; qwen3.8-max:free left the xkiro catalog before R8 — recorded in the llm_registry xkiro spec). Satisfied in kind: a top-tier flagship id from the probe order above. The owner may override with one word before the claim push."
+ },
+ "re_freeze_manifest_one_commit": [
+  "scripts/r40_machine_v77.py:84 V77_REQUEST_MODEL -> new id (the frozen machine's constant)",
+  "scripts/r11_a1f_v3_generate.py:162 gen_call hardcoded 'glm-4-plus' -> new id (same-stack literal; sweep or type untouched-path reason)",
+  "scripts/r60_v9_one_shot.py:580 freeze-guard assert -> new id",
+  "discovery_fabric/engine/route_adapter.py ROUTE_REGISTRY: registered -> xkiro base_url + new model + provenance (R65 verdict + census + live serving probe); glm-4-plus -> retired block; require_registered_model route label update",
+  "discovery_fabric/engine/model_routing.py:264-270 role pins (synthesis/attack/composer/bulk/judge_last_resort -> (zai, glm-4-plus)) -> re-pin / retire per Art. 16",
+  "scripts/r64_v9_preflight.py:29,166 + tests/test_r64_v9_preflight.py:79,81 preflight pins -> new id",
+  "eval/retirement_ledger.json: Art. 16 entry — glm-4-plus (zai-gateway, R36 registration, ENVIRONMENT_GRANT) retired BY owner directive + auditor verdict R65; reason: capability insufficient + grant-level 429 exhaustion; successor: the new registered route",
+  "scripts/zai_gateway.mjs: xkiro upstream mode (XKIRO_API_KEY from vault, browser UA, model passthrough, pacing re-tuned for xkiro) — backward-compatible env-selected, default unchanged",
+  "auditor-side (flagged, not builder-executable): v9 PREREGISTRATION MANDATORY_RUN_ARTIFACTS[1] pins registered glm-4-plus — the auditor's custody amendment names the new id (verdict direction 3 covers the attestation side)"
+ ],
+ "execution_chain": "keys re-delivered -> vault restore + digest verify (CORR-3) -> PUSH unpushed records (r64_incident_vault_lost, r64_owner_directive_transport, this plan) -> claim c-0082 (scope per verdict ordering: the registration + the sealed one-shot; claim-before-work, before any v9 problem read) -> re-freeze commit (manifest above, one commit) -> dry-run (zero LLM) -> SMOKE on 2 burned HO7 rows (the instrument's own live-fire discipline on the new route) -> the sealed run 30/30 (resume-safe rows, persistent events, gateway slice + served==registered attestation) -> attest + scoring request",
+ "c_0079_closure": {
+  "typing": "CLOSED__ROUTE_RETIRED (structural): the P2 ablation is matched-route (baseline 36/36 + challenger 4/36, both on the registered glm-4-plus); the R65 retirement makes the challenger resume impossible; 4/36 committed partial is FINAL; not marked DONE (partial, not completed measurement); auditor confirmation flagged for the next verdict",
+  "watch_disposition": "cron job 536147 (c-0079 challenger resume watch) DELETED this turn — forced-stop condition met (the verdict retires the route the watch serves; a keyed sandbox would otherwise risk a wrongful glm-4-plus resume attempt at the 21:36Z firing)",
+  "lease": "formally lapses 2026-11-19T00:00:00Z; the claim-registry edit rides the first push (unpushed registry edits are forbidden)"
+ },
+ "capability_gate_this_session": "this sandbox is KEYLESS (vault destroyed 05:28Z reprovision; re-verified this turn: no .env.keys, web vault DB 0 rows, no key names in env). All push-gated steps blocked here. The verdict's 'blocker dissolved' is TRUE at the workflow level (r64s2's keyed sandbox live-probed both alternates 05:50Z) and FALSE in this sandbox. Two lawful execution paths: (a) owner re-delivers the 3 keys here (CORR-3: XKIRO_API_KEY f6c09bee9bde / AGNES_API_KEY d0c666a3842f + AGNES_BASE_URL / GH_PAT f1ebca5f9b62) -> this session executes the chain end-to-end; (b) the keyed parallel session executes -> the c-0082 claim push is the lock (Art. 29(b)) and decides the executor",
+ "discipline_held": "zero z-ai probes; zero LLM calls; zero engine lines touched (claim-before-work — the same read-only discipline the c-0088 lane held); freeze intact; seal intact; no v9 problem read"
+}

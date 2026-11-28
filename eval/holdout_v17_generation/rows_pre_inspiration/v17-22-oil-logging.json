@@ -1,0 +1,108 @@
+{
+ "problem_id": "v17-22-oil-logging",
+ "domain": "commercial-refrigeration",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P3",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:3640ffc3a863": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:25158b4cb06a": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:a4f76943f599": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "phase_carryover_liquid",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "phase_carryover_liquid",
+     "admitted": true,
+     "rank": 1,
+     "basis": "configuration is admitted class #2 for the phase_carryover_liquid failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:13:01Z",
+ "attempts_n": 1,
+ "row_wall_s": 11.3,
+ "a1_answer": "## NOVELTY STATEMENT\n**Standard Practice Delivery Class:** A design change (fluidic configuration modification) that prevents liquid oil carryover into low-temperature evaporators by improving phase separation or redirecting flow paths.\n**Novel Mechanism Departure:** A \"Velocity-Gravitational Trap\" configuration modification that exploits the density and viscosity differential between hot, low-viscosity liquid oil and cold, high-viscosity refrigerant to force oil migration to the suction side *before* the temperature drop, using passive geometry (a localized enlargement and angled return) rather than active pumping or external heaters.\n**Failure-Physics Connection:** Oil logging occurs because oil migrates with vapor; at the evaporator outlet, temperature drops cause oil viscosity to rise exponentially, arresting flow. The mechanism works by maintaining a high-velocity, high-temperature zone where oil viscosity remains low, forcing it to the suction line via momentum and gravity before the refrigerant cools.\n\n## PHYSICS CHECK\n**Governing Relation:** Viscosity of POE (Polyol Ester) oil follows the Arrhenius relation: $\\mu = \\mu_0 \\exp\\left(\\frac{E_a}{RT}\\right)$. For typical R-404A/R-410A systems, $\\mu$ at 0°C is ~10–100x higher than at 60°C. The force required to move oil $F \\propto \\mu \\cdot v$.\n**Magnitude Verification:** At evaporator outlet (0°C), oil velocity $v_{oil} \\approx 0$ (logged). At compressor suction (40–60°C), oil velocity $v_{oil} > 0.5$ m/s (flowing). The trap is placed at the point where vapor temperature is highest (post-economizer or pre-TXV discharge) and velocity is highest. By placing a 15–20% diameter enlargement here, the local vapor velocity $V_{vapor}$ is maintained above the \"oil carry-off\" threshold ($V_{min} \\approx 1.5 \\times \\sqrt{\\frac{\\rho_{oil}}{\\rho_{vapor}}}$). This ensures shear stress $\\tau = \\rho_{vapor} V_{vapor}^2 / 2$ exceeds the adhesive force of the oil film, stripping oil to the gravity-assisted return path.\n\n## IMPLEMENTATION BILL\n*   **Component 1: Passive Velocity-Gravitational Trap (Geometry Modification)**\n    *   **Action:** Fabricate a localized \"bellows\" or toroidal enlargement (20% ID increase) on the liquid line or suction line branch immediately upstream of the compressor suction, where the refrigerant temperature is highest.\n    *   **Input Stream:** **ALREADY-RECORDED** Suction pressure and Suction temperature (standard sensor data). Used to confirm the operating point is within the high-viscosity-to-low-viscosity transition zone.\n    *   **Reference/Threshold:** **DERIVED** from stated physics. Threshold: Minimum vapor velocity $V_{min}$ to prevent oil stagnation. Calculation: $V_{min} = 0.5 \\times \\sqrt{\\frac{\\rho_{oil}}{\\rho_{vapor}}} \\times \\frac{\\mu_{oil,hot}}{\\mu_{oil,cold}}$. Inputs: $\\rho_{oil}$ (~900 kg/m³), $\\rho_{vapor}$ (from P-T chart at suction P), $\\mu_{ratio}$ (ARRHENIUS CALCULATED from nameplate oil grade).\n*   **Component 2: Angled Gravity Return Branch (Configuration Modification)**\n    *   **Action:** Install a downward-angled branch (15°) from the bottom of the \"bellows\" enlargement, terminating at the compressor suction manifold. No check valve required if flow is unidirectional; if bidirectional, use a high-Cv, low-pressure-drop passive check valve (standard inventory).\n    *   **Input Stream:** **ALREADY-RECORDED** Compressor head pressure and discharge temperature. Used to verify $\\Delta P$ across the branch is sufficient to overcome viscous drag without active pump.\n    *   **Reference/Threshold:** **DERIVED** from stated specs. The branch diameter must be $\\geq$ 1.25x the main line ID to minimize $\\Delta P$. Friction loss calculated via Darcy-Weisbach using **CALCULATED** oil viscosity at mean branch temperature.\n*   **Component 3: Suction Line Sizing Verification (Procedure)**\n    *   **Action:** Verify existing suction line ID. If ID < 1\" for R-404A in supermarket applications, replace with larger ID or install a parallel bypass.\n    *   **Input Stream:** **ALREADY-RECORDED** Pipe dimensions from BOM (Bill of Materials) or nameplate.\n    *   **Reference/Threshold:** **DERIVED** from flow rate. $Q_{vapor} = \\dot{m} / \\rho_{vapor}$. Ensure $V_{vapor} < 15$ m/s to avoid erosion but $> V_{min}$ to carry oil.\n\n## BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** **SAME CLASS.** Standard practice often involves adding oil pumps or heater bands (active). This solution is passive geometry. Installation is less complex than active pumps; comparable to standard piping modifications.\n*   **Operability:** **LOWER BURDEN.** No active components, no electricity, no controls. Zero maintenance.\n*   **Maintenance:** **LOWER BURDEN.** No seals, no moving parts. Standard practice with active pumps requires annual seal checks.\n*   **Cost Class:** **LOWER.** Fabrication of a bellows/angle branch is low-cost sheet metal/forged part. Active pumps cost $200–500. This is ~$50–100.\n*   **Conclusion:** Same feasibility class (passive mechanical), but lower operational burden and higher reliability due to lack of active components.\n\n## EXECUTABLE TEST\n**Protocol:**\n1.  **Baseline Recording:** Use **ALREADY-RECORDED** telemetry from the rack's data logger for 7 days. Record Suction Temp ($T_s$), Suction Pressure ($P_s$), and Discharge Temp ($T_d$).\n2.  **Simulation:** Using **CALCULATED** $\\mu(T)$ curve for the specific POE oil (from supplier datasheet, **ALREADY-EXISTING** data), simulate oil residence time in the evaporator without the trap.\n3.  **Trap Verification:** Calculate $V_{vapor}$ at the trap location using **ALREADY-RECORDED** $P_s$ and $T_s$ to get $\\rho_{vapor}$, and mass flow $\\dot{m}$ from rack capacity specs (**ALREADY-EXISTING**).\n4.  **Pass/Fail Threshold:**\n    *   Pass if $V_{vapor} > V_{min}$ (CALCULATED).\n    *   Pass if $\\Delta T$ between trap location and evaporator outlet is $> 15^\\circ$C (ensures viscosity drop is sufficient).\n    *   Kill Criterion: If $V_{vapor} < 0.5 \\times V_{min}$, the existing pipe size is insufficient; geometry change requires pipe replacement (fail to passive trap, escalate to pipe upsizing).\n\n## CONSTRAINT BIND\n**Primary Stated Indicator:** \"Loss of capacity from oil logging.\" The primary indicator of mitigation is **Oil Return Rate** (kg/hr), which is proxied by **Suction Superheat** and **Evaporator Pressure Drop**.\n**Secondary Indicator:** Suction Temperature.\n**Justification:** The primary indicator is oil logging (capacity loss). The mechanism directly addresses oil return. Suction superheat is the standard field indicator for evaporator performance; an increase in superheat due to poor oil return is the failure signature. The trap aims to stabilize superheat by ensuring oil does not insulate the coil. The constraint \"no user variables\" is respected as all inputs are derived from standard rack telemetry and physical properties.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Component 1: Passive Velocity-Gravitational Trap (Geometry Modification)**",
+    "*   **Action:** Fabricate a localized \"bellows\" or toroidal enlargement (20% ID increase) ",
+    "*   **Input Stream:** **ALREADY-RECORDED** Suction pressure and Suction temperature (stand",
+    "*   **Reference/Threshold:** **DERIVED** from stated physics. Threshold: Minimum vapor vel",
+    "*   **Component 2: Angled Gravity Return Branch (Configuration Modification)**",
+    "*   **Action:** Install a downward-angled branch (15°) from the bottom of the \"bellows\" en",
+    "*   **Input Stream:** **ALREADY-RECORDED** Compressor head pressure and discharge temperat",
+    "*   **Reference/Threshold:** **DERIVED** from stated specs. The branch diameter must be $\\",
+    "*   **Component 3: Suction Line Sizing Verification (Procedure)**",
+    "*   **Action:** Verify existing suction line ID. If ID < 1\" for R-404A in supermarket appl",
+    "*   **Input Stream:** **ALREADY-RECORDED** Pipe dimensions from BOM (Bill of Materials) or",
+    "*   **Reference/Threshold:** **DERIVED** from flow rate. $Q_{vapor} = \\dot{m} / \\rho_{vapo",
+    "*   **Installability:** **SAME CLASS.** Standard practice often involves adding oil pumps ",
+    "*   **Operability:** **LOWER BURDEN.** No active components, no electricity, no controls. ",
+    "*   **Maintenance:** **LOWER BURDEN.** No seals, no moving parts. Standard practice with a",
+    "*   **Cost Class:** **LOWER.** Fabrication of a bellows/angle branch is low-cost sheet met",
+    "*   **Conclusion:** Same feasibility class (passive mechanical), but lower operational bur",
+    "1.  **Baseline Recording:** Use **ALREADY-RECORDED** telemetry from the rack's data logger",
+    "2.  **Simulation:** Using **CALCULATED** $\\mu(T)$ curve for the specific POE oil (from sup",
+    "3.  **Trap Verification:** Calculate $V_{vapor}$ at the trap location using **ALREADY-RECO",
+    "4.  **Pass/Fail Threshold:**",
+    "*   Pass if $V_{vapor} > V_{min}$ (CALCULATED).",
+    "*   Pass if $\\Delta T$ between trap location and evaporator outlet is $> 15^\\circ$C (ensur",
+    "*   Kill Criterion: If $V_{vapor} < 0.5 \\times V_{min}$, the existing pipe size is insuffi"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "5170105fac0e2923"
+}

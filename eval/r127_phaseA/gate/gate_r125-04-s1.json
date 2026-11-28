@@ -1,0 +1,64 @@
+{
+ "problem_id": "r125-04-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "phaseA speed gate (frozen v1 reviewer bytes + response_format contract; bare arm byte-identical to F31e)",
+ "calls": [
+  {
+   "leg": "author",
+   "attempts": 1,
+   "latency_s": 8.87,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 814,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.27,
+   "usage": {
+    "prompt_tokens": 1150,
+    "completion_tokens": 1318,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "raw_head": "{\n  \"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Discharge Size Control via Specific Po",
+   "schema_parsed_first_try": true
+  }
+ ],
+ "parse_retries": 0,
+ "authored_bill": "**Mitigation Proposal: Closed-Loop Discharge Size Control via Specific Power Ratio**\n\n**Mechanism:**\nThe failure mode described—coarsened product with high recycle and elevated specific power (kW/tonne)—indicates that the cone crusher’s Closed Side Setting (CSS) has effectively increased due to liner wear, or the operating point has shifted to a less efficient crushing chamber volume. This reduces the crusher’s efficiency, causing it to process the same load with higher energy per ton and produce more over-size that must be returned. The mitigation mechanism is to dynamically adjust the crusher’s operating load to compensate for the reduced crushing efficiency by lowering the throughput to restore an optimal specific power baseline, thereby reducing the tendency to produce coarse material and lowering the recycle load. Instead of trying to mechanically \"tighten\" the CSS (which is difficult without stopping and is limited by liner condition), we use the power-to-flow ratio to stabilize the process at a lower, more efficient operating point.\n\n**Implementation:**\n1.  **Calculate Specific Power (SP):** Using the existing motor power meter ($P_{motor}$) and the discharge-belt scale (or feed-scale, assuming steady state) ($Q$), the control system calculates the real-time Specific Power: $SP = P_{motor} / Q$ (kW/tonne).\n2.  **Establish Baseline:** Use the known specific power value from the last liner change ($SP_{ref}$) as the target reference. This value represents the efficient crushing zone for the new liners. As liners wear, $SP$ naturally rises for the same CSS and feed.\n3.  **Adjust Feed Rate:** Implement a simple feedback control loop (or an operator-assisted setpoint calculation) that adjusts the feed rate from the feed-rate scale’s control system (or upstream feeder speed) to keep $SP$ at or slightly below $SP_{ref} + \\Delta$, where $\\Delta$ is a small allowable tolerance.\n    *   If $SP > SP_{ref} + \\Delta$ (indicating inefficient crushing/coarse product), **decrease** the feed rate.\n    *   If $SP < SP_{ref} - \\Delta$ (indicating under-utilization), **increase** the feed rate.\n4.  **Result:** By reducing the feed rate, the crusher chamber remains filled but operates at a lower load per pass, which reduces the tendency to \"slip\" or produce coarse material due to excessive pressure/heat. More importantly, it reduces the total volume of coarse overflow/recycle, stabilizing the downstream crushing circuit. The primary goal is to lower the energy cost and reduce the coarse fraction returning to the crusher by ensuring the crusher is not overloaded relative to its current (worn) liner geometry.\n\n**Measures it Relies On:**\n*   **Motor Power Meter ($P_{motor}$):** Provides the real-time energy input to the crusher.\n*   **Discharge-Belt Scale or Feed-Rate Scale ($Q$):** Provides the real-time mass flow rate. *Note: Using the discharge scale is more direct for the \"product\" side, but the feed scale is often the controlled variable. The ratio $P/Q$ is valid for both at steady state.*\n*   **Historical Reference ($SP_{ref}$):** The specific power value recorded at the last liner change, stored in the DCS/PLC as a setpoint.\n*   **No New Sensors:** The solution uses only the existing power meter and scale. No CSS encoder, laser scanner, or new vibration sensor is required.\n\n**Why this works for the constraint:**\nIt directly addresses the \"coarsened product\" and \"high power per tonne\" symptoms by forcing the crusher to operate at its most efficient electrical load point, which correlates with optimal crushing performance for the current liner wear state. It reduces the recycle load by preventing the crusher from being overloaded into the inefficient, coarse-producing regime.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Discharge Size Control via Specific Power Ratio**\n\n**Mechanism:**\nThe failure mode described—coarsened product with high recycle and elevated specific power (kW/tonne)—indicates that the cone crusher’s Closed Side Setting (CSS) has effectively increased due to liner wear, or the operating point has shifted to a less efficient crushing chamber volume. This reduces the crusher’s efficiency, causing it to process the same load with higher energy per ton and produce more over-size that must be returned. The mitigation mechanism is to dynamically adjust the crusher’s operating load to compensate for the reduced crushing efficiency by lowering the throughput to restore an optimal specific power baseline, thereby reducing the tendency to produce coarse material and lowering the recycle load. Instead of trying to mechanically \"tighten\" the CSS (which is difficult without stopping and is limited by liner condition), we use the power-to-flow ratio to stabilize the process at a lower, more efficient operating point.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is the Specific Power (SP). The direction of effect is: **Increasing SP indicates a shift towards inefficient/coarse-crushing regimes, which drives the control action to DECREASE the feed rate (Q).** Decreasing the feed rate reduces the mass flow, which in turn reduces the chamber load and allows the crusher to stabilize at a more efficient specific power point, ultimately reducing the coarse fraction output.\n\n**Implementation:**\n1.  **Calculate Specific Power (SP):** Using the existing motor power meter ($P_{motor}$) and the feed-rate scale ($Q_{feed}$), the control system calculates the real-time Specific Power: $SP = P_{motor} / Q_{feed}$ (kW/tonne). *Note: The feed-rate scale is explicitly selected as the denominator because it is the direct input control variable and ensures the ratio represents energy per unit of material entering the chamber, avoiding steady-state assumption risks associated with discharge lag.*\n2.  **Establish Baseline:** Use the known specific power value from the last liner change ($SP_{ref}$) as the target reference. This value represents the efficient crushing zone for the new liners. As liners wear, $SP$ naturally rises for the same CSS and feed. The value $SP_{ref}$ is a constant derived from historical performance data recorded in the DCS/PLC prior to the wear-induced drift.\n3.  **Adjust Feed Rate:** Implement a simple feedback control loop that adjusts the feed rate setpoint of the upstream feeder (which is measured by the feed-rate scale) to keep $SP$ at or slightly below $SP_{ref} + \\Delta$, where $\\Delta$ is a small allowable tolerance.\n    *   If $SP > SP_{ref} + \\Delta$ (indicating inefficient crushing/coarse product), **decrease** the feed rate.\n    *   If $SP < SP_{ref} - \\Delta$ (indicating under-utilization), **increase** the feed rate.\n4.  **Result:** By reducing the feed rate, the crusher chamber remains filled but operates at a lower load per pass, which reduces the tendency to \"slip\" or produce coarse material due to excessive pressure. More importantly, it reduces the total volume of coarse overflow/recycle, stabilizing the downstream crushing circuit. The primary goal is to lower the energy cost and reduce the coarse fraction returning to the crusher by ensuring the crusher is not overloaded relative to its current (worn) liner geometry.\n\n**Measures it Relies On:**\n*   **Motor Power Meter ($P_{motor}$):** Provides the real-time energy input to the crusher. This is a directly permitted sensor.\n*   **Feed-Rate Scale ($Q_{feed}$):** Provides the real-time mass flow rate of material entering the crusher. This is a directly permitted sensor. The proposal explicitly uses this scale rather than the discharge-belt scale to ensure the control loop acts on the direct input variable.\n*   **Historical Reference ($SP_{ref}$):** The specific power value recorded at the last liner change. This is not a live measurement but a derived constant calculated from the ratio of $P_{motor}$ to $Q_{feed}$ during the reference period, stored in the DCS/PLC as a setpoint.\n*   **Tolerance ($\\Delta$):** A static control parameter defined by the process engineer, derived from operational constraints, not a real-time sensor.\n*   **No New Sensors:** The solution uses only the existing power meter and feed-rate scale. No CSS encoder, laser scanner, or new vibration sensor is required.\n\n**IMPLEMENTATION BILL:**\n*   **Hardware Changes:** None. Utilizes existing DCS/PLC I/O channels for the motor power meter and feed-rate scale.\n*   **Software/Logic Changes:** \n    *   Add a calculation block in the DCS/PLC to compute $SP = P_{motor} / Q_{feed}$.\n    *   Implement a PID or on/off control loop (or operator-assisted setpoint calculator) that compares the calculated $SP$ against $SP_{ref} + \\Delta$ and $SP_{ref} - \\Delta$.\n    *   Configure the output of this loop to adjust the speed setpoint of the upstream feeder (which drives the feed-rate scale measurement).\n*   **Commissioning Steps:** \n    1.  Verify baseline $SP_{ref}$ values from the last liner change.\n    2.  Tune the control loop gain to prevent oscillation in feed rate.\n    3.  Enable the loop in \"auto\" mode and monitor for reduction in coarse fraction return and stabilization of specific power.\n\n**Why this works for the constraint:**\nIt directly addresses the \"coarsened product\" and \"high power per tonne\" symptoms by forcing the crusher to operate at its most efficient electrical load point, which correlates with optimal crushing performance for the current liner wear state. It reduces the recycle load by preventing the crusher from being overloaded into the inefficient, coarse-producing regime. All inputs and controls are derived strictly from the permitted existing sensors (motor power, feed-rate scale) and stored constants, adhering to the \"no new instrumentation\" constraint.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Hardware Changes:** None. Utilizes existing DCS/PLC I/O channels for the motor power",
+   "*   **Software/Logic Changes:**",
+   "*   Add a calculation block in the DCS/PLC to compute $SP = P_{motor} / Q_{feed}$.",
+   "*   Implement a PID or on/off control loop (or operator-assisted setpoint calculator) that",
+   "*   Configure the output of this loop to adjust the speed setpoint of the upstream feeder ",
+   "*   **Commissioning Steps:**",
+   "1.  Verify baseline $SP_{ref}$ values from the last liner change.",
+   "2.  Tune the control loop gain to prevent oscillation in feed rate.",
+   "3.  Enable the loop in \"auto\" mode and monitor for reduction in coarse fraction return and"
+  ],
+  "APPARATUS_ROW": [
+   "3.  Enable the loop in \"auto\" mode and monitor for reduction in coarse fraction return and stabilization of sp"
+  ]
+ },
+ "wall_clock_s": 21.16,
+ "status": "DELIVERED_REVIEWED"
+}

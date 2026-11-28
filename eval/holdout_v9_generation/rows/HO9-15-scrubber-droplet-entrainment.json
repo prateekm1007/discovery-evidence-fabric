@@ -1,0 +1,74 @@
+{
+ "problem_id": "HO9-15-scrubber-droplet-entrainment",
+ "question_type": "intervention-proposal",
+ "executor_id": "builder-r60s1@holdout-v9-generation",
+ "machine": "r60_v9_one_shot/1.0.0 — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; V77_REQUEST_MODEL=agnes-3.0-flash)",
+ "run": "holdout-v9-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "duty_cycle",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9c1a999cb712": "novel",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:aabae326c495": "reject-duplicate"
+  },
+  "physics_inputs_supplied": null,
+  "physics_inputs_note": "the v9 problems carry constraint TEXT (user_variables are text lines, not structured numerics) — the route records PENDING_INPUTS typed gaps, never fabricated results (Art. 8: unknown stays unknown)"
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T08:50:13.449374Z",
+ "attempts_n": 3,
+ "a1_answer": "MECHANISM CLASS: Open-loop liquid-gas ratio (L/G) and gas-velocity setpoint reduction\n\nNOVELTY STATEMENT (INTERVENTION)\nThis intervention proposes to prevent stack droplet entrainment by reducing the gas velocity through the scrubber to 3.5 m/s and lowering the liquid-to-gas ratio to 20 L/m³, executed solely through existing Variable Frequency Drive (VFD) parameter retuning and slurry pH setpoint adjustment. Standard practice maintains fixed, high-velocity gas flows and high L/G ratios to maximize chemical removal efficiency, accepting high entrainment rates. This mitigation is a departure because it trades absolute chemical removal margin for physical separation stability; by reducing gas velocity below the droplet carryover threshold, it eliminates the momentum transfer required to lift fine mists into the stack. The adjacent technique clearance is the use of \"slipstreaming\" or low-load operation in centrifugal fans, where reducing duty point prevents fluid instability; here, we apply a similar duty-point reduction specifically to the scrubber's liquid and gas phases to alter the droplet formation regime. The mechanism attacks the driving physics of entrainment by reducing the Weber number of the liquid film, thereby increasing the droplet detachment size and preventing the generation of sub-micron mists that are capable of being carried by the bulk gas stream.\n\nPHYSICS CHECK\nThe governing physical relation for droplet entrainment in a wet scrubber is the Critical Weber Number ($We_c$) or the Sauter Mean Diameter (SMD) scaling with gas velocity ($u_g$). The force balance for droplet detachment from the liquid film is:\n$$We = \\frac{\\rho_g u_g^2 L}{\\sigma} \\le We_{crit}$$\nwhere $\\rho_g$ is gas density, $u_g$ is gas velocity, $L$ is characteristic length (film thickness), and $\\sigma$ is surface tension.\nMagnitude verification:\nStandard practice: $u_g = 5.0$ m/s.\nProposed: $u_g = 3.5$ m/s.\nRatio of Webers: $(3.5/5.0)^2 = 0.49$.\nThe inertial force driving droplet break-up and entrainment is reduced by approximately 51%. This reduction moves the operating point below the critical threshold for fine mist generation ($We < We_{crit}$ for the specific film thickness present in the packed bed), ensuring that the droplets formed are too large to be entrained by the gas stream, thus reducing the failure driver (entrainment mass flux) significantly.\n\nDIRECTION-OF-EFFECT: driving variable = gas velocity ($u_g$); the mechanism moves it down by 30% (5.0 to 3.5 m/s); this reduces the inertial driving force for droplet entrainment.\n\nIMPLEMENTATION BILL\n1. **VFD Program Update**: Modify the existing VFD parameter set for the gas fan to set a new base speed corresponding to 3.5 m/s gas velocity in the scrubber cross-section. Tag: (c) Parameter change on stated equipment.\n2. **Slurry pH Retuning**: Adjust the dosing valve opening for the lime slurry injection to maintain the slurry pH at the upper limit of the chemical removal requirement (e.g., pH 6.8 instead of 7.2), allowing for a lower total liquid flow rate. Tag: (c) Procedure/parameter change on stated equipment.\n3. **Liquid-to-Gas Ratio Setpoint**: Reduce the recirculation pump flow rate setpoint in the existing DCS/PLC to achieve an L/G ratio of 20 L/m³ (down from the standard 30-40 L/m³). Tag: (c) Parameter change on stated equipment.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallation: 0 hours (no hardware changes).\nCommissioning: <1 hour (updating PLC/VFD recipes).\nOperation: No new consumables.\nMaintenance: No change in wear rates; slightly lower mechanical stress on fan blades due to reduced speed.\nOperational Loss: The gas fan energy consumption is reduced by $(3.5/5.0)^3 \\approx 0.34$ or 66% of the fan power. This is a net operational gain. The chemical absorption efficiency may drop slightly, but is maintained within specification by the pH retuning.\nConclusion: The burden is lower than standard practice due to the elimination of hardware modifications and the reduction in energy cost.\n\nEXECUTABLE TEST\nProtocol:\n1. Run the scrubber at the proposed setpoints: $u_g = 3.5$ m/s, L/G = 20 L/m³, pH = 6.8.\n2. Measure stack outlet droplet concentration using a standard impaction method (e.g., ISO 11885) or optical particle counter calibrated for water/mist.\n3. Measure the pressure drop across the scrubber bed to verify film stability.\nPass/Fail Threshold:\n- Stack droplet concentration < 10 mg/m³ (typical stack limit for visible mists).\n- Gas velocity at the scrubber exit plane measured via pitot tube or VFD feedback must be stable at 3.5 m/s ± 0.2 m/s.\nDuration: 48 hours continuous operation.\nKill Criterion: If stack droplet concentration > 10 mg/m³ for more than 1 hour, or if slurry level in the basin rises uncontrollably due to recirculation imbalance, the test fails.\n\nFEASIBILITY BIND\n1. **Permitted-Set Clause**: The measures are drawn exclusively from the permitted set: gas-velocity setpoint retuning (VFD change) and slurry chemistry/pH retuning. No physical parts are installed.\n2. **Direction-of-Effect Clause**: The mechanism moves gas velocity down, which reduces the entrainment driver. The direction is correct.\n3. **Premise-Validity Clause**: The system states a gas fan (implied by \"5 m/s gas\") and slurry recirculation. Modifying their setpoints is valid.\n4. **Cost-Pricing Clause**: The operational loss is negative (energy saving) for the gas fan. The potential loss in chemical removal efficiency is mitigated by the pH retuning, maintaining compliance.\n\nINPUT-AVAILABILITY CLAUSE\nRequired Inputs:\n- Gas Flow Rate: Derived from VFD frequency output or existing flow meter. Source: Stated infrastructure (VFD).\n- Slurry pH: Derived from existing pH probe/loop. Source: Stated infrastructure (slurry chemistry retuning implies pH control exists).\nAll inputs are permitted and available from the stated infrastructure.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 2,
+  "residual_findings": {}
+ },
+ "declared_template_prose": "open-loop liquid-gas ratio (l/g) and gas-velocity setpoint reduction",
+ "allowed_row_outside": 0,
+ "sha256_16": "30c70f27e11e9214",
+ "smoke": false
+}

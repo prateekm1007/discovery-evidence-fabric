@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-24-hydro-turbine",
+ "domain": "power",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P13"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:4b6b4f131983": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:961bcf6e5061": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:66d69ddb1397": "reject-duplicate"
+  }
+ },
+ "generated_at": "2026-11-23T22:24:52Z",
+ "attempts_n": 1,
+ "row_wall_s": 14.1,
+ "a1_answer": "# NOVELTY STATEMENT\n\n**Standard Practice:** The field-standard practice for preventing runner cavitation erosion at part-load delivers a **DESIGN CHANGE** (typically geometric modification of the runner inlet or outlet to increase local pressure above vapor pressure) or a **MONITORING/INDICATION** scheme (vibration/acoustic monitoring).\n**Mechanism Departure:** This proposal delivers the same outcome class via a **CONFIGURATION INTERVENTION**: actively shifting the operating point away from the critical part-load flow regime where suction-side pressure dips below vapor pressure, by utilizing **Direct Transfer (TRIZ P5)** of available potential energy (flow rate) into a secondary, non-eroding duty stream. Instead of altering the runner geometry to \"survive\" low pressure, the mechanism prevents the low-pressure condition by diverting flow when the specific speed ($n_s$) and flow coefficient ($\\phi$) enter the cavitation-prone envelope, maintaining runner operation in a high-load, high-pressure regime or safely shutting down to zero-flow until grid demand justifies operation outside the erosion zone. The failure-physics connection is that cavitation intensity is exponentially related to the sub-cavitation number ($\\sigma$); by enforcing a minimum $\\sigma$ via flow diversion, the vapor bubble formation (and subsequent collapse/erosion) is physically precluded rather than mitigated.\n\n# PHYSICS CHECK\n\n**Governing Relation:**\nThe cavitation number is defined as:\n$$ \\sigma = \\frac{P_{local} - P_{vapor}}{\\frac{1}{2}\\rho V^2} $$\nErosion occurs when $\\sigma < \\sigma_{critical}$, where $P_{local}$ is the minimum pressure on the suction side of the blade. At part-load, flow velocity $V$ decreases, but the angle of attack relative to the blades increases, causing flow separation and a deeper pressure drop ($P_{local}$ decreases) on the suction side. The pressure coefficient on the suction side ($C_p$) is a function of the flow coefficient $\\phi = Q / (n D^3)$ and the blade geometry.\n\n**Magnitude Verification:**\nFor a typical Pelton or Francis runner, $P_{vapor} \\approx 2.3 \\, \\text{kPa}$ at $20^\\circ\\text{C}$. Head $H = 100 \\, \\text{m}$ implies stagnation pressure $P_{stagnation} \\approx \\rho g H \\approx 981 \\, \\text{kPa}$. At full load, $\\sigma$ is typically $> 5$. At $20\\%$ load, the relative velocity on the blade suction side can drop such that $P_{local}$ approaches $P_{vapor}$. By diverting $80\\%$ of the flow to a secondary busbar or thermal sink (or simply throttling to maintain a minimum $n$ and $Q$ ratio that keeps $\\sigma > 3$), the local pressure is maintained above $P_{vapor} + \\Delta P_{safety}$, where $\\Delta P_{safety}$ accounts for transient pressure drops. The calculation shows that maintaining $\\sigma > 3$ requires keeping the flow coefficient $\\phi$ within a window $[\\phi_{min}, \\phi_{max}]$ that does not enter the separation region of the velocity triangle.\n\n# IMPLEMENTATION BILL\n\n**Components & Materials:**\n1.  **Modular Diversion Valve (MDV):** A hardened stainless steel (AISI 316L) valve manifold installed on the turbine penstock downstream of the gate valve but upstream of the runner. Designed to bypass the turbine runner to a discharge channel or a thermal recovery heat exchanger (if available).\n    *   *Tag:* **ALREADY-EXISTING INFRASTRUCTURE ADAPTATION** (Using standard penstock routing; material class matches standard penstock material).\n2.  **Flow Rate Sensor:** An ultrasonic transit-time flow meter installed on the main penstock.\n    *   *Tag:* **ALREADY-RECORDED** (Stated telemetry: \"flow_rate\").\n3.  **Pressure Transducer:** A piezoelectric pressure sensor located at the runner inlet flange.\n    *   *Tag:* **ALREADY-RECORDED** (Stated telemetry: \"pressure\").\n4.  **Control Logic Unit (PLC):** A standard industrial PLC program that calculates the specific speed $n_s$ and flow coefficient $\\phi$ in real-time.\n    *   *Tag:* **DERIVED** (Inputs are already recorded; calculation is purely algorithmic based on stated specs $D$, $n$).\n5.  **Secondary Duty Actuator:** An electric pump or turbine coupled to the diversion line to utilize the diverted flow for grid support or thermal storage, preventing energy waste.\n    *   *Tag:* **ALREADY-EXISTING DUTY CLASS** (Assumes the plant has existing secondary load capability or grid interconnect for export; material class is standard electrical/mechanical).\n\n**Procedure:**\n1.  Calculate $\\phi_{current} = \\frac{Q_{measured}}{n_{measured} D^3}$.\n2.  Compare $\\phi_{current}$ to the **CALCULATED** cavitation boundary $\\phi_{cav}$ (derived from manufacturer's runner test curves or standard $n_s$ limits for the specific runner type).\n3.  If $\\phi_{current} < \\phi_{cav\\_threshold}$ (indicating high risk of suction side separation), activate the MDV to divert excess flow to the secondary duty.\n4.  Maintain runner at $\\phi = \\phi_{cav\\_threshold}$ until grid demand allows return to optimal efficiency point.\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n\n| Category | Standard Practice | Proposed Mechanism | Comparison |\n| :--- | :--- | :--- | :--- |\n| **Installability** | Requires wet-end shutdown for runner modification or installation of acoustic sensors. | Requires valve installation in dry section (penstock). No wet-end work. | **LOWER BURDEN** (No runner access needed). |\n| **Operability** | Passive (geometric) or continuous monitoring. | Active diversion; reduces turbine availability time at part-load. | **HIGHER BURDEN** (Reduces energy capture at low load). |\n| **Maintenance** | Sensor calibration (acoustic) or runner inspection. | Valve actuator maintenance; flow sensor calibration. | **SAME CLASS** (Standard valve/meter maintenance). |\n| **Cost Class** | High (runner rework) or Medium (sensors). | Medium (valve + PLC). | **SAME CLASS**. |\n| **Net Effect** | Prevents erosion but may cause high efficiency loss. | Prevents erosion and maintains grid compliance; slight efficiency loss due to diversion losses. | **TRADE-OFF:** Acceptable energy loss vs. catastrophic runner failure cost. |\n\n# EXECUTABLE TEST\n\n**Protocol:**\n1.  **Simulation/Replay Test:** Use historical SCADA data (ALREADY-RECORDED `flow_rate` and `pressure`) from a period where part-load operation occurred.\n2.  **Recomputation:** Run the proposed PLC logic offline against the data.\n3.  **Threshold Definition:** Define the cavitation risk zone using the manufacturer's stated $n_s$ and the physical limit $\\sigma > 3.0$ (CALCULATED from standard head $H$ and vapor pressure $P_v$ at recorded temperature).\n4.  **Pass Criterion:** The algorithm must identify all intervals where $\\phi_{current} < \\phi_{cav\\_threshold}$ and flag them for diversion.\n5.  **Falsification/Kill Criterion:** If the algorithm flags diversion during intervals where the recorded vibration data (if available) or post-inspection records show **NO** cavitation erosion (i.e., false positives exceed 5% of total operating hours), the mechanism is too conservative and degrades efficiency unnecessarily. If it misses intervals where erosion **IS** confirmed by inspection records (false negatives > 0%), the mechanism fails.\n6.  **Duration:** Analysis of 12 months of historical data.\n\n**Validation Source:** Post-inspection records of runner blades (ALREADY-EXISTING MAINTENANCE DATA) correlated with historical part-load operating periods.\n\n# CONSTRAINT BIND\n\n**Primary Stated Indicator:** `pressure` at the runner inlet and `flow_rate` are the PRIMARY stated indicators. The mechanism uses these directly to compute the physical variable $\\phi$ (flow coefficient) which dictates the cavitation state.\n**Secondary Indicator:** `flow_rate` alone is insufficient; `pressure` alone is insufficient. The combination is required to calculate the non-dimensional operating point.\n**Why Primary:** The failure physics (cavitation) is a function of local pressure and velocity, both of which are proxies for the non-dimensional flow coefficient derived from `flow_rate` and rotational speed. The threshold for failure is defined by the minimum allowable $\\sigma$, which is a direct function of these two variables.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "31a206209536d7a6"
+}

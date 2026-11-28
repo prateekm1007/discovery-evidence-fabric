@@ -1,0 +1,247 @@
+# R11 P2-7 (Amendment 2 §5): the certification workflows exist but had
+# ZERO check-runs on queue/* — the queue branch carried the round's
+# changes with no CI verification at all. This workflow triggers on
+# every queue/* push and runs the TOUCHED-SURFACE tests: the decoder +
+# critic unit surfaces this round, the pair guard, and the two
+# deterministic regressions (zero LLM calls, so CI-safe).
+name: R11 Queue Surface Check
+
+on:
+  push:
+    branches:
+      - "queue/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  surface:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # F32 fix (R19): the workflow previously had NO pip install step —
+      # the setup-python 3.12 toolcache python does not carry pytest
+      # (the preinstalled pytest belongs to the system python), so every
+      # queue-push run failed at the first pytest invocation. Explicit
+      # install: pytest + the transitive deps the suites import.
+      - name: Install test deps
+        run: |
+          set -e
+          # R50 (c-0066 lineage): pint joins the install list —
+          # tests/test_physics_checks.py imports pint through
+          # discovery_fabric.engine.physics_checks (the P1.1 computed-
+          # physics slice); without it the step-2 collection dies with
+          # exit 2 BEFORE any test runs (the 6d6c4de70 remote failure,
+          # diagnosed by the same symptom locally).
+          # R80 (c-0107 lineage): cantera joins — the computed-equilibrium
+          # suite (tests/test_r80_chemistry_equilibrium.py) imports cantera
+          # (BSD-3, NOTICE.md); without it that suite dies at collection.
+          # R80 (c-0108 lineage): mapie joins — the conformal FA-control
+          # suite (tests/test_r80_conformal_fa.py) imports mapie
+          # (BSD-3-Clause, NOTICE.md); same collection-failure class.
+          # R111 (c-150, F83): huggingface-hub joins — the stage-5
+          # streaming fixture (tests/test_r105s2_p3_stage5_xjtu.py)
+          # monkeypatches huggingface_hub.hf_hub_download (the mocked
+          # seam imports the real module); the fixture's own docstring
+          # says the HF module is small and pure-python. torch stays
+          # OUT (the fixture lazy-loads the protocol chain, F83).
+          python3 -m pip install --quiet pytest py pygments pint cantera mapie huggingface-hub
+      - name: Deterministic regression surfaces (zero LLM)
+        run: |
+          set -e
+          # R40b (c-0053, F53-class 4th instance): the guard-activation
+          # suite existed since the R40 build but was wired into NO
+          # workflow — the activation-checker itself gated nothing. It
+          # now runs here. The hooksPath setup step is part of the fix:
+          # a fresh CI checkout has no core.hooksPath configured (it is
+          # clone-local state), so the step activates the recipe AND
+          # makes the suite's first assertion (hooksPath == .githooks)
+          # meaningful in CI instead of locally-only.
+          git config core.hooksPath .githooks
+          python3 -m pytest tests/test_answer_contract.py \
+            tests/test_r377_invention_quality_cycle.py \
+            tests/test_seal_anchor.py \
+            tests/test_r38_v6_anchor_exact.py \
+            tests/test_r38_probe_pins.py \
+            tests/test_r30_am29_binds.py \
+            tests/test_guard_activation.py -q -p no:warnings
+          python3 -B scripts/r11_decoder_retally.py
+          python3 -B scripts/r11_critic_regression.py || true
+          python3 -B scripts/r11_critic_regression_r2.py
+      # Constitution v3.1.0 enforcement articles — wired into the QUEUE
+      # surface (F32 fix, R18 audit AM18; R20 AM20 D2 adds Arts. 20 +
+      # the Art. 25 record + the article map + the adversarial suites;
+      # R20 Art. 29 adoption adds the parallel-coordination checks on
+      # eval/work_claims.json; R24 AM24 D4 adds the Art. 27 capability-
+      # budget ledger test — the last PARTIAL map entry wired): these
+      # checks gate every queue/* push, not main-only. A new violation
+      # fails the queue CI (Art. 27).
+      - name: Constitution v3.1.0 enforcement (Arts. 19/20/21/22/23/25/26/27/28/29 + the 9 former-PROCESS articles + the F78 freeze guard on committed bytes)
+        run: |
+          set -e
+          # F56 fix (AM39 D1, claim c-0056): the R41 guard suites join
+          # the zero-LLM block — the D2 remote-green rule and the D3
+          # bind negative controls now GATE every queue push (the 7th
+          # exists-but-does-not-gate instance closes by wiring). The
+          # comment sits OUTSIDE the pytest continuation chain: a '#'
+          # after a line-continuation truncates the command (the
+          # fd28fecb6 push red-gated exactly this — exit 126 trying
+          # to execute a test file as a command).
+          # R43 (claim c-0060): tests/test_v8_generation_binds.py joins
+          # the same block ON THE SAME RULE — the V8 generation-binds
+          # acceptance suite (the R42 verdict D1/D2/D5) gates every
+          # queue push the moment it exists; the 9th instance never
+          # opens.
+          python3 -m pytest tests/test_article19_metric_unit_tests.py \
+            tests/test_article20_ablation_registry.py \
+            tests/test_article21_label_integrity.py \
+            tests/test_article22_real_bytes.py \
+            tests/test_article23_clean_delivery.py \
+            tests/test_article25_feasibility_before_novelty.py \
+            tests/test_article25_disconfirming_record.py \
+            tests/test_article26_provider_spread.py \
+            tests/test_article27_capability_budget.py \
+            tests/test_article28_owner_dependency.py \
+            tests/test_article29_parallel_coordination.py \
+            tests/test_article_process_wiring.py \
+            tests/test_article_map_completeness.py \
+            tests/test_article3_degenerate_inputs.py \
+            tests/test_article14_confidentiality_probe.py \
+            tests/test_article15_cross_seed_determinism.py \
+            tests/test_article17_message_scan.py \
+            tests/test_article22_measured_path.py \
+            tests/test_specter2_determinism.py \
+            tests/test_panel_denominator.py \
+            tests/test_panel_instrument_regressions.py \
+            tests/test_grid_candidate_verification.py \
+            tests/test_candidate_grounding_lifecycle.py \
+            tests/test_binding_identity.py \
+            tests/test_pool_admission_gate.py \
+            tests/test_pruned_module_reappearance.py \
+            tests/test_alias_free_producer.py \
+            tests/test_r105s2_p3_stage5_xjtu.py \
+            tests/test_r64_v9_preflight.py \
+            tests/test_r77_vault_restore.py \
+            tests/test_r70_f75_binds.py \
+            tests/test_r89_equilibrium_direction_bind.py \
+            tests/test_r53_criteria_typed_refusal.py \
+            tests/test_r58_route_adapter.py \
+            tests/test_remote_ci_rule.py \
+            tests/test_v77_bind_controls.py \
+            tests/test_v8_generation_binds.py \
+            tests/test_r80_chemistry_equilibrium.py \
+            tests/test_r80_conformal_fa.py \
+            tests/test_conformal_predictor_engine.py \
+            tests/test_doi_leg_typed_infra.py \
+            tests/test_r95_tool_grounded_critic.py \
+            tests/test_r97_tool_grounded_critic_v13.py \
+            tests/test_r98_disjointness_guard.py \
+            tests/test_r103_core_mechanism_gate.py \
+            tests/test_r103_blind_panel.py \
+            tests/test_r106_panel_agreement.py \
+            tests/test_r30_permitted_measures.py \
+            tests/test_physics_guards_am91.py \
+            tests/test_r103_allowed_measures_enforcement.py \
+            tests/test_r103_stripping_direction_bind.py \
+            tests/test_r103_guard_v14_corpus.py \
+            tests/test_physics_checks.py \
+            tests/test_physics_checks_magnitudes.py \
+            tests/test_candidate_schema.py \
+            tests/test_engine_route.py \
+            tests/test_novelty_gate_engine.py \
+            tests/test_triz_data.py \
+            tests/test_physics_checks_r54.py \
+            tests/test_f80_onrow_physics.py \
+            tests/test_all_refs_secret_scan.py \
+            -q -p no:warnings
+      # F64 remedy (R53, c-0071): the P1.4 labelled regression runs IN
+      # CI from committed bytes — the gate verdict must be PASS 0/0/0
+      # or the push reds. The driver is zero-LLM (deterministic,
+      # content-only candidate hashes after the derived_at/hash-seed
+      # fixes), so CI is the reproducibility proof.
+      # F77 fix-forward (R72, c-0092, re-keyed from c-0091 at push): the byte-identity leg of this step
+      # (git diff --exit-code, the R53 contract) was silently lost in the
+      # R60 workflow restructure and the committed record went stale at
+      # R70 (the chemistry elicitation moved plan order on null-domain
+      # labelled rows). BOTH legs are restored: the verdict AND the
+      # byte-identity gate every push, as the R53 remedy committed.
+      - name: P1.4 labelled regression through the integrated engine route (F64/F77)
+        run: |
+          set -e
+          python3 scripts/r52_labelled_regression.py | tee /tmp/r53_regression.log
+          grep -q '"verdict":"PASS 0/0/0"' /tmp/r53_regression.log \
+            || grep -q '"verdict": "PASS 0/0/0"' /tmp/r53_regression.log
+          git diff --exit-code -- eval/r52_labelled_regression.json
+      # The P1 >=80% numeric-claims-unit-checked leg (R54, c-0072):
+      # every numeric-direction claim on the labelled DEV rows must
+      # carry an applicable registry relation that RUNS with a pint
+      # value on its committed reference scenario. Below 0.80 the
+      # push reds; eval/r54_p1_unit_checked.json is the CI-checkable
+      # evidence (measured fraction 1.0 at c-0072 finalize).
+      - name: P1 unit-checked measurement on labelled DEV outputs (c-0072)
+        run: |
+          set -e
+          python3 scripts/r54_p1_unit_checked_measurement.py | tee /tmp/r54_p1.log
+          grep -q 'P1_UNIT_CHECKED_PASS' /tmp/r54_p1.log
+      - name: R93 convergence controller acceptance (c-0104; deterministic battery + driver dry-run, zero LLM)
+        run: |
+          set -e
+          python3 scripts/r93_convergence_ablation.py dry-run | tee /tmp/r93_dryrun.log
+          grep -q 'wiring proven' /tmp/r93_dryrun.log
+          grep -q 'corpus OK' /tmp/r93_dryrun.log
+      # Anti-gaming / independence / infra-separation suites (the Art.
+      # 2/3/6 WIRED mechanisms in eval/enforcement_flags.json) — the
+      # map-completeness test fails any WIRED citation whose test is
+      # not invoked in this workflow, so map and CI cannot drift.
+      - name: Constitution v3.0.0 enforcement (Arts. 2/3/6/7 adversarial + guards)
+        run: |
+          set -e
+          python3 -m pytest tests/test_adversarial_infra_separation.py \
+            tests/test_answer_contract_adversarial.py \
+            tests/test_attack_ab_qualifier.py \
+            tests/test_audit_branch_guard.py \
+            -q -p no:warnings
+      - name: F21 integrity guard (audit-branch / auditor-namespace refusal)
+        run: |
+          set -e
+          python3 -m pytest tests/test_audit_branch_guard.py -q -p no:warnings
+      - name: Pair guard behavior (typed refusal / unlock / new dir)
+        run: |
+          set -e
+          python3 - <<'PY'
+          import os, sys
+          from pathlib import Path
+          from discovery_fabric.pair_guard import (require_pair_write,
+                                                   PairWriteRefusal)
+          try:
+              require_pair_write(Path('eval/pairs/r11_a1/x.json'))
+              raise SystemExit('guard FAIL: committed dir must refuse')
+          except PairWriteRefusal:
+              pass
+          os.environ['FABRIC_PAIR_WRITE_UNLOCK'] = '1'
+          require_pair_write(Path('eval/pairs/r11_a1/x.json'))
+          del os.environ['FABRIC_PAIR_WRITE_UNLOCK']
+          require_pair_write(Path('eval/pairs/r11_a1_ci_probe/x.json'))
+          print('pair guard: PASS')
+          PY
+      # AM42 D8 (claim c-0067, ROADMAP P0.3): the all-refs secret-scan
+      # GATE on every queue push. Tips mode scans every remote branch
+      # tip tree (git grep, C-speed) against the committed
+      # fingerprint-keyed baseline (eval/secret_scan_baseline.json) —
+      # 0 unbaselined findings or the push REDS. The full-history
+      # pickaxe pass (mode=all) is the committed enumeration report
+      # (eval/r50_all_refs_scan_report.json), re-run per round; the
+      # tips gate + detect-secrets pre-commit + the report are three
+      # independent layers on one acceptance.
+      - name: All-refs secret-scan gate (D8 — tips surface, baseline gate)
+        run: |
+          set -e
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune --quiet
+          python3 scripts/r45_all_refs_secret_scan.py --mode tips

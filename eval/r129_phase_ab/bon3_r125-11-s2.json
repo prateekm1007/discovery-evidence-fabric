@@ -1,0 +1,91 @@
+{
+ "problem_id": "r125-11-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 5.5,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 652,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 129.32,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 1688,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 4.8,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 247,
+    "completion_tokens": 754,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 3.78,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1086,
+    "completion_tokens": 1097,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "Mitigation: Closed-loop die-pressure damping using a feedforward+feedback control algorithm implemented on the existing PLC/SCADA, with trim-width reduction via optimized melt temperature setpoint.\n\nMechanism:\n1. Pressure oscillation source: The oscillation in die pressure is driven by fluctuations in extruder screw speed (pump output), which cause variations in melt flow rate through the die. The driving variable is screw speed command. The direction of effect is that an increase in screw speed command instantaneously increases melt volumetric flow rate, which increases pressure drop across the die, thereby raising die pressure. Conversely, a decrease in screw speed command lowers die pressure.\n2. Feedback damping: Compute a low-pass filtered derivative of the die pressure error (P_measured \u2212 P_setpoint) and feed it as a corrective bias to the extruder screw speed command. This adds dynamic damping that attenuates limit-cycle oscillations without changing the steady-state pressure target.\n3. Feedforward compensation: Use the line-speed encoder to predict pressure change due to throughput variations. When speed deviates from rated, pre-adjust screw speed in the opposite direction of the expected pressure shift, reducing transient swings.\n4. Thermal stabilization: Adjust melt temperature setpoint slightly upward (within material limits) to reduce melt viscosity. Lower viscosity reduces the pressure drop required to push the melt through the die, thereby lowering the steady-state die pressure for a given flow rate, which lowers the gain of the pressure loop and makes the system less prone to oscillation. Use the existing temperature transducers to verify the new steady-state melt temperature and fine-tune.\n5. Trim reduction: With stabilized pressure and speed, the cross-web gauge profile becomes more uniform. Implement a soft-margin trim control that only cuts where the gauge deviation exceeds specification, using the now-stable pressure signal to reduce over-trim. Since no new sensors are allowed, rely on the existing pressure and temperature channels plus speed encoder to infer edge quality trends and adjust trim width conservatively.\n\nImplementation:\n- In the PLC: Create a dedicated control block for \u201cPressure Damping\u201d that runs at 100 ms.\n  - Inputs: P_measured (from melt pressure transducer), P_setpoint (operator input), P_error = P_measured \u2212 P_setpoint (derived), d(P_error)/dt (filtered derivative of P_error), V_speed (from line-speed encoder), V_setpoint (rated speed from HMI), T_melt (from melt temperature transducer).\n  - Output: \u0394ScrewSpeed_bias added to the base screw speed command.\n  - Algorithm: \u0394ScrewSpeed_bias = Kp\u00b7P_error + Kd\u00b7d(P_error)/dt + Kff\u00b7(V_setpoint \u2212 V_speed). Tune Kp, Kd, Kff online using historical data where oscillations were present; target is zero net pressure oscillation amplitude and reduced cross-web gauge spread.\n- Temperature control: Modify the melt temperature controller to hold a new setpoint that is 3\u20135 \u00b0C higher than before, within the resin\u2019s maximum processing temperature. Verify via T_melt that the material does not degrade; if it does, reduce the offset.\n- Trim control: Change the trim-width calculation from a fixed value to a function of P_stability_index = 1 / (\u03c3_P over 5 min), where \u03c3_P is the standard deviation of P_measured over a 5-minute moving window. When \u03c3_P drops, reduce trim width by up to 20 % of the original scrap width, in 2 % increments every 10 minutes, monitoring trim-off weight and defect rate. If defects rise, revert.\n\nImplementation Bill:\n- PLC Programing: Add new control block \u201cPressure Damping\u201d in the extruder PLC. Estimate: 8 hours. Engineer: Control Systems Engineer.\n- Control Tuning: Online tuning of Kp, Kd, Kff using historical data and live operation. Estimate: 4 hours. Engineer: Process Engineer.\n- Setpoint Adjustment: Modify melt temperature controller setpoint in SCADA. Estimate: 1 hour. Operator: Line Supervisor.\n- Trim Logic Update: Rewrite trim-width calculation block in PLC to use P_stability_index. Estimate: 6 hours. Engineer: Control Systems Engineer.\n- Validation: Run line at rated speed for 24 hours to confirm pressure stability and reduced trim scrap. Estimate: 24 hours. Team: Line Operators and Engineers.\n- Total Estimated Effort: 43 hours.\n\nMeasures it relies on (all existing):\n- Melt pressure transducer: Provides P_measured for error, derivative, standard deviation, and stability index.\n- Melt temperature transducer: Provides T_melt to confirm thermal setpoint safety and stability.\n- Line-speed encoder: Supplies V_speed for feedforward calculation and validates rated speed.\n- HMI/SCADA production logs: Provides trim-off weight and defect counts for trim control feedback.\n- No new sensors: The entire solution is a re-tune and re-architecture of the existing control loops, plus a data-driven trim-width strategy that uses only the above signals and production logs already available in the HMI/SCADA.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "- PLC Programing: Add new control block \u201cPressure Damping\u201d in the extruder PLC. Estimate: ",
+   "- Control Tuning: Online tuning of Kp, Kd, Kff using historical data and live operation. E",
+   "- Setpoint Adjustment: Modify melt temperature controller setpoint in SCADA. Estimate: 1 h",
+   "- Trim Logic Update: Rewrite trim-width calculation block in PLC to use P_stability_index.",
+   "- Validation: Run line at rated speed for 24 hours to confirm pressure stability and reduc",
+   "- Total Estimated Effort: 43 hours.",
+   "- Melt pressure transducer: Provides P_measured for error, derivative, standard deviation,",
+   "- Melt temperature transducer: Provides T_melt to confirm thermal setpoint safety and stab",
+   "- Line-speed encoder: Supplies V_speed for feedforward calculation and validates rated spe",
+   "- HMI/SCADA production logs: Provides trim-off weight and defect counts for trim control f",
+   "- No new sensors: The entire solution is a re-tune and re-architecture of the existing con"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 140.26,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

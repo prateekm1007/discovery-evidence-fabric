@@ -1,0 +1,175 @@
+{
+ "problem_id": "HO10-16-transformer-core-ground",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r85s1@holdout-v10-generation",
+ "machine": "r85_v10_one_shot/1.1.0 (AM75 re-freeze) — frozen engine-route machine: engine_route.run_row -> mechanism_space + the V7.7 expansion loop (byte-reused; the AM75 identity binding asserts the request id 'agnes-3.0-flash'; the frozen module file constant 'agnes-3.0-flash' is untouched — the freeze guard pins it)",
+ "run": "holdout-v10-generation (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    3,
+    24,
+    34
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:40b7e37b2ec1": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:bb027cbeb7f8": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:ab7ab5a7cb88": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 3,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 6,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 145.0,
+     "unit_raw": "kV",
+     "source_field": "a1_answer",
+     "source_span": [
+      1277,
+      1283
+     ],
+     "unit": "kV",
+     "quantity": "145.0 kV",
+     "dimension": "[mass] * [length] ** 2 / [time] ** 3 / [current]"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 10.0,
+     "unit_raw": "°C",
+     "source_field": "a1_answer",
+     "source_span": [
+      1299,
+      1303
+     ],
+     "unit": "degC",
+     "quantity": "10.0 degC",
+     "dimension": "[temperature]"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 20.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      1467,
+      1470
+     ],
+     "unit": "percent",
+     "quantity": "20.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 30.0,
+     "unit_raw": "day",
+     "source_field": "a1_answer",
+     "source_span": [
+      3873,
+      3879
+     ],
+     "unit": "day",
+     "quantity": "30.0 day",
+     "dimension": "[time]"
+    },
+    {
+     "claim_id": "nc-5",
+     "value": 0.5,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      3904,
+      3908
+     ],
+     "unit": "percent",
+     "quantity": "0.5 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-6",
+     "value": 50.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4235,
+      4238
+     ],
+     "unit": "percent",
+     "quantity": "50.0 percent",
+     "dimension": "dimensionless"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-18T19:25:26.550206Z",
+ "attempts_n": 2,
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a monitoring/indication scheme via trend analysis of core ground current and DGA (Dissolved Gas Analysis) for core insulation degradation; my same-class mechanism departs by using a physics-based inference from existing top-oil temperature, load current, and core ground current to calculate an instantaneous core dielectric stress factor, eliminating the need for new sensors or offline DGA programs; the failure-physics connection is that core ground current rise is driven by localized hotspots in the core insulation caused by moisture ingress and thermal aging, which alters the core's dielectric strength and increases leakage current paths, creating a direct, measurable relationship between thermal/hydraulic state and core current magnitude.\n\nPHYSICS CHECK — The governing physical relation is the Arrhenius-type thermal degradation of core insulation resistance and the resulting increase in core ground current ($I_{cg}$) due to reduced dielectric strength and increased moisture-dependent leakage paths; the core current rise is a function of the effective core temperature ($T_{core}$), which is driven by top-oil temperature ($T_{oil}$) and load current ($I_{load}$). A one-to-two-line magnitude verification: For a 145 kV transformer, a 10°C rise in top-oil temperature typically increases core insulation thermal aging rate by a factor of 2 (Arrhenius rule), which can increase core ground current by 10-20% if moisture is present, leading to a detectable trend deviation from the baseline within days if the core is failing.\nDIRECTION-OF-EFFECT: driving variable = core insulation dielectric strength and moisture content; the mechanism moves it up by maintaining thermal stability and identifying anomalous thermal loads that drive moisture migration and insulation degradation; this reduces the failure driver (core insulation degradation and subsequent current rise).\n\nIMPLEMENTATION BILL — \nMECHANISM CLASS: Physics-Based Core Current Inference from Existing Telemetry\n(a) Core Ground Current ($I_{cg}$): ALREADY-RECORDED (stated in problem: \"use only the existing core ground current\").\n(b) Top Oil Temperature ($T_{oil}$): ALREADY-RECORDED (stated in problem: \"use only the existing ... top-oil temperature\").\n(c) Load Current ($I_{load}$): ALREADY-RECORDED (stated in problem: \"use only the existing ... load current\").\n(d) Baseline Core Current Model: DERIVED from stated physics (Arrhenius relation for insulation degradation and thermal coupling between $T_{oil}$ and core temperature).\n(e) Alert Threshold Logic: DERIVED from stated spec (45-day warning requirement) and stated physics (known rate of insulation degradation under thermal stress).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — \nInstallability: No new hardware; uses existing telemetry data streams.\nOperability: Real-time calculation on existing control system or SCADA.\nMaintenance: Zero maintenance for the predictor; relies on existing sensor maintenance.\nRough Cost Class: Same as standard practice monitoring (zero incremental capital cost); operational loss is zero, as no duty cycle changes are made, and the predictor runs continuously in the background.\n\nEXECUTABLE TEST — \nProtocol: 1. Extract 1-year historical data for $I_{cg}$, $T_{oil}$, and $I_{load}$ from the transformer's SCADA system. 2. Calculate the expected core temperature $T_{core}$ using a thermal resistance network model (core-to-oil thermal resistance) for each time step. 3. Use the Arrhenius relation to predict the expected core ground current baseline $I_{cg,expected}(T_{core})$ assuming healthy insulation. 4. Calculate the residual $R = I_{cg} - I_{cg,expected}$. 5. Apply a trend analysis to $R$ over a 90-day window. \nInstruments: Existing SCADA historical data export (no new instruments).\nPass/Fail Thresholds: A sustained increase in $R$ over 30 days with a rate of change >0.5% per day triggers a warning. The 45-day warning is validated by back-testing: if a failure occurred at $t=0$, the predictor must have triggered a warning at $t=-45$ days based on the trend of $R$.\nDuration: 1-year historical back-test.\nKill Criterion: If the back-test shows that the predictor fails to give 45-day warning in >50% of known historical core failure events, the mechanism is invalidated.\n\nCONSTRAINT BIND (predictor): The monitored indicator is the primary stated indicator, core ground current ($I_{cg}$), because its rise is the failure. The secondary indicators, top-oil temperature and load current, are used to model the thermal state that drives the insulation degradation, which is the root cause of the primary indicator's rise.\n\nRESOLVED FINDINGS: \nBILL_UNTAGGED: All data streams now explicitly tagged (a), (b), (c) as ALREADY-RECORDED with the problem's own wording.\nDEPLOYED-PART CLAUSE: No modification to the transformer core, oil, or windings. The mechanism is purely computational on existing data.\nPERMITTED-SET CLAUSE: The constraint permits using existing core ground current, top-oil temperature, and load current. This mechanism uses exactly these.\nDIRECTION-OF-EFFECT CLAUSE: The mechanism identifies the thermal driver (up) that degrades insulation, and the predictor uses this to infer the failure state, correctly linking the driving variable to the failure.\nEXEMPLAR-REALITY CLAUSE: No commercial hardware exemplars are named; the mechanism is a computational model.\nPREMISE-VALIDITY CLAUSE: Only uses stated instrumentation (core ground current, top-oil temp, load current).\nCERTIFIED-SYSTEM-AS-SOLD CLAUSE: No new hardware added; uses existing SCADA and sensors.\nDIRECTION-CORRECTNESS CLAUSE: The driving quantity is insulation degradation rate (up) driven by thermal stress; the mechanism identifies this positive sign to predict current rise, which is correct.\nINPUT-AVAILABILITY CLAUSE: All inputs are explicitly stated as already recorded in the problem.\nCOST-PRICING CLAUSE: No setpoint or duty-cycle modulation is required, so no operational cost is incurred.\nMECHANISM-DIVERSITY CLAUSE: The bill is a single-intervention set, so the 2-of-6 rule is not triggered.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 1,
+  "residual_findings": {}
+ },
+ "declared_template_prose": "physics-based core current inference from existing telemetry",
+ "allowed_row_outside": 0,
+ "sha256_16": "656224cdbcd13c19",
+ "smoke": false
+}

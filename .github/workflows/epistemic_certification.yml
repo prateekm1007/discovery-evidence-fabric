@@ -406,6 +406,17 @@ jobs:
           python -m pytest tests/test_r394_benchmark.py tests/test_r396_release_gate.py \
             tests/test_r397_physics_stage.py tests/test_r399_gates.py \
             tests/test_r399_routing_states.py -q
+      - name: Constitution v3.0.0 enforcement articles (19 metric unit tests, 21 label integrity, 26 provider spread) — real committed bytes
+        run: |
+          python -m pytest tests/test_article19_metric_unit_tests.py \
+            tests/test_article21_label_integrity.py \
+            tests/test_article26_provider_spread.py -q
+      - name: Constitution v3.0.0 enforcement articles (22 real bytes, 23 clean delivery, 25 feasibility-before-novelty, 28 owner timeout) — real committed bytes
+        run: |
+          python -m pytest tests/test_article22_real_bytes.py \
+            tests/test_article23_clean_delivery.py \
+            tests/test_article25_feasibility_before_novelty.py \
+            tests/test_article28_owner_dependency.py -q
       - name: CAD executability proof + kernel suite (R401-WC2)
         run: |
           python - <<'PY'

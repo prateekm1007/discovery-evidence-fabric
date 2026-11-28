@@ -1,0 +1,21 @@
+**Mitigation Proposal: Optimized Impeller Eye Geometry with Induced Pre-Swirl**
+
+**Mechanism**
+The root cause of the erosion is that at 85% of the Best Efficiency Point (BEP) flow, the local angle of attack at the vane leading edges (LEs) becomes too high, causing severe flow separation and localized pressure drops that fall below the vapor pressure of the cooling water. This triggers cavitation bubble formation and subsequent collapse near the LEs. The mitigation involves redesigning the impeller eye (inlet section) to induce a pre-swirl (tangential velocity component) in the incoming flow and slightly increasing the eye diameter. This pre-swirl aligns the relative velocity vector with the vane LE angle at the 85% BEP operating point, effectively reducing the effective angle of attack and raising the local static pressure at the LEs, thereby preventing the pressure from dropping to vapor pressure.
+
+**Implementation**
+1.  **Geometric Redesign:** Modify the impeller eye profile to introduce a fixed pre-swirl angle of 10–15 degrees relative to the axial direction. This is achieved by shaping the guide vanes or the suction port curvature to impart tangential momentum to the water before it strikes the impeller LEs.
+2.  **Eye Diameter Increase:** Slightly increase the impeller eye diameter (within housing limits) to reduce the absolute velocity at the inlet ($V_1$), which directly increases the local static pressure ($P_{1} \propto P_{total} - \frac{1}{2}\rho V_1^2$).
+3.  **NPSH Adjustment:** Ensure the system piping is configured to maintain the required NPSH$_A$ > NPSH$_{3}$ + 1.5 m at the new 85% BEP operating point. The increased static pressure from the lower $V_1$ and aligned flow should reduce NPSH$_{3}$ (NPSH required for 3% head drop), allowing the 1.5 m margin constraint to be met without excessive static head.
+
+**Measures Relied Upon**
+*   **NPSH Margin Verification:** Continuous monitoring of suction pressure, temperature, and liquid height to confirm NPSH$_A$ - NPSH$_{3}$ > 1.5 m at 85% BEP flow.
+*   **Acoustic & Vibration Monitoring:** Use high-frequency acoustic sensors and vibration accelerometers on the pump casing to detect cavitation noise (broadband high-frequency energy) and structural fatigue signatures.
+*   **Head-Flow Curve Validation:** Confirm that the head delivery at 85% BEP is stable and does not exhibit the "head drop" or "nose curve" instability associated with incipient cavitation.
+*   **Material Inspection Protocol:** Periodic ultrasonic thickness gauging and visual inspection of vane LEs to verify no erosion pits exceeding 0.1 mm depth after 5 years of operation.
+
+**Concrete Falsification Test**
+To falsify this approach, conduct a **Cavitation Inception Test** at the target operating condition:
+1.  **Test Condition:** Operate the modified pump at exactly 85% of the BEP flow rate with the cooling water at its maximum expected temperature (lowest vapor pressure margin).
+2.  **Measurement:** Gradually reduce the suction pressure (increase NPSH required) until a 1% head drop occurs (standard incipient cavitation threshold). Measure the NPSH$_{i}$ at this point.
+3.  **Falsification Criterion:** If the NPSH$_{i}$ at 85% BEP flow is greater than (NPSH$_A$ - 1.5 m), OR if acoustic/vibration sensors detect sustained cavitation noise levels above 25 dB above background at the full NPSH$_A$ margin (i.e., when NPSH margin is exactly 1.5 m), the mitigation is falsified. This would indicate that the pre-swirl and eye diameter changes did not sufficiently raise the local LE pressure to prevent cavitation bubble formation at the required operating point, thus failing to meet the 5-year vane life constraint.

@@ -1,0 +1,485 @@
+{
+ "composer_version": "answer_composer/1.5.0",
+ "n_llm_calls": 3,
+ "question_type": "intervention-proposal",
+ "started_at": "2026-11-23T14:24:02+00:00Z",
+ "prompt_sha256": "12c181c13573d039fb9f926b778ae30ff199683966787190babcc1f3ea394cd7",
+ "provider_route": [
+  {
+   "provider": "agnes",
+   "provider_attempted": "agnes",
+   "model": "agnes-3.0-flash",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 4320,
+   "ttfb_s": 4.32,
+   "gateway_hang": false,
+   "failure_type": null,
+   "fallback_provider": null
+  }
+ ],
+ "model": "agnes-3.0-flash",
+ "cost_provenance": {
+  "model_id": "agnes-3.0-flash",
+  "model_revision": "agnes router; agnes-3.0-flash / agnes-2.5-flash / agnes-2.0-flash measured live 2026-09-26 (tiny completions + 3/3 FIELD-line compliance); no per-model revision pin exposed by the router — recorded honest (Art. VI)",
+  "transport": "https://apihub.agnes-ai.com/v1/chat/completions",
+  "local_or_remote": "REMOTE",
+  "license": "provider serving terms (operator-supplied key; flash served at $0 balance, pro gated)",
+  "cost_basis": "FREE_TIER_API",
+  "account_domain": "OWNER_AGNES_ACCOUNT",
+  "policy": "ZERO_PAID_COST",
+  "policy_version": "model_cost_policy/1.1.0"
+ },
+ "output_sha256": "e38f5b53a25a70ab2980df4fd3b79ad8913332a7f7c122cf3cfcd9d715c0d69d",
+ "truncation": {
+  "first_call_finish_reason": "stop",
+  "first_call_truncated": false,
+  "n_truncation_retries": 0,
+  "repair_finish_reason": "stop",
+  "repair_truncated": false
+ },
+ "constraint_audit_arm": "on",
+ "constraint_check_first_pass": {
+  "state": "PARSED",
+  "n_violations": 0,
+  "verdicts": [
+   {
+    "constraint_index": 1,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 2,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 3,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 4,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   }
+  ],
+  "restates_device": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "restates_constraint": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  }
+ },
+ "consistency_check_first_pass": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_first_pass": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n",
+   "intervention contract: EVIDENCE-BACKED source [title:51fb232572a1fac8] does not jointly support its parameter (same_number_wrong_quantity)",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1080/15567036.2023.2216170] does not jointly support its parameter (value_not_in_source)",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.1080/15567036.2023.2216170] does not jointly support its parameter (substring_number)",
+   "intervention contract: EVIDENCE-BACKED source [doi:10.2298/tsci230609046z] does not jointly support its parameter (same_number_wrong_quantity)",
+   "intervention contract: EVIDENCE-BACKED source [title:51fb232572a1fac8] does not jointly support its parameter (substring_number)"
+  ]
+ },
+ "constraint_audit_first_pass": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "contract_after_repair_1": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n"
+  ]
+ },
+ "constraint_audit_after_repair_1": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0
+ },
+ "consistency_after_repair_1": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0
+ },
+ "repaired": true,
+ "repair_rounds_used": 1,
+ "contract_after_repair_2": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n"
+  ]
+ },
+ "constraint_audit_after_repair_2": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0
+ },
+ "consistency_after_repair_2": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0
+ },
+ "downgrade_arm": "on",
+ "downgrade": {
+  "applied": true,
+  "n_relabels": 0,
+  "n_citations_dropped": 0,
+  "n_jargon_stripped": 0,
+  "relabels": [],
+  "citations_dropped": [],
+  "valid_after_downgrade": false
+ },
+ "answer": "This intervention adds a localized thermal monitoring and active airflow modulation system to the existing rooftop air-cooled condenser to prevent coil freezing during low-load shoulder-season nights. The design integrates non-invasive thermal sensors and a feedback control loop that adjusts fan speed, avoiding any refrigerant modification or extended downtime.\n\nPARAMETER: Sensor grid density — 1 sensor per 0.25 m^2 of coil face — ASSUMPTION\nPARAMETER: Fan speed modulation range — 100% to 30% of rated speed — ASSUMPTION\nPARAMETER: Target coil surface temperature setpoint — 2.5 C above expected dew point — ASSUMPTION\nPARAMETER: Ambient wind speed compensation threshold — 3 m/s to 12 m/s — ASSUMPTION\n\nThe mechanism relies on mapping local heat exchange rates to identify vapor-free zones where standard radiator boundary models fail and local stagnation creates freezing risk. Under low electric load, the condenser rejects less heat, but localized airflow patterns and ambient wind direction can create \"cold spots\" or stagnation zones that drop below freezing even when the average coil temperature is safe. The control system monitors these zones in real-time. When a sensor detects a rapid temperature drop indicating ice formation risk, it modulates the fan speed to create localized airflow changes that maintain coil temperature above the setpoint, preventing the mechanical stress that cracks the refrigerant circuit. This active modulation preserves the existing refrigerant charge by preventing the thermal gradient extremes that cause tube cracking.\n\nThe expected measurable effect is a 100% reduction in shoulder-season freeze incidents over a 6-month test period, maintained by keeping all monitored coil sections above the 2.5 C margin. The intervention respects the constraint of no refrigerant change by using only airflow modulation and sensor integration; it does not touch the refrigerant circuit. It respects the downtime constraint because the installation of the sensor array and control board can be completed in under 2 hours during a scheduled maintenance window, requiring only external connections to the existing fan motor terminals.\n\nFalsification test:\nTest Temperature: Simulated ambient of 0 C with 5 m/s crosswind\nDuration: 48 hours continuous\nSample Size n: 3\nNumeric Pass/Fail Criteria: Pass if zero ice crystals are visually detected on the coil surface and no tube cracking occurs; Fail if any ice accumulation exceeds 1 mm thickness or if a refrigerant leak is detected by pressure drop.\n\nThis proposal is UNVERIFIED and requires the specified 48-hour frozen chamber test to validate the control logic and sensor placement assumptions.",
+ "contract": {
+  "valid": false,
+  "violations": [
+   "intervention contract: falsification test states no sample size n"
+  ],
+  "bindings": {
+   "evidence_bound": 9,
+   "assumption": 2,
+   "unbound_numbers": 1,
+   "all_numbers": 12,
+   "claims": [
+    {
+     "parameter": "PARAMETER: Sensor grid density — 1 sensor per 0.25 m^2 of coil face — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "coil",
+      "density",
+      "face",
+      "grid",
+      "sensor"
+     ],
+     "pairs": [
+      {
+       "value": "0.25",
+       "unit": "m"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Fan speed modulation range — 100% to 30% of rated speed — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "modulation",
+      "range",
+      "speed"
+     ],
+     "pairs": [
+      {
+       "value": "100",
+       "unit": "%"
+      },
+      {
+       "value": "30",
+       "unit": "%"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Target coil surface temperature setpoint — 2.5 C above expected dew point — ASSUMPTION",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "above",
+      "coil",
+      "expected",
+      "point",
+      "setpoint",
+      "surface",
+      "temperature"
+     ],
+     "pairs": [
+      {
+       "value": "2.5",
+       "unit": "c"
+      }
+     ],
+     "conversion_recorded": false
+    },
+    {
+     "parameter": "PARAMETER: Ambient wind speed compensation threshold — 3 m/s to 12 m/s — ASSUMPTION\n\nThe mechanism relies on mapping local heat exchange rates to identify vapor-free zones where standard radiator boun",
+     "label": "assumption",
+     "cited": null,
+     "source_kind": null,
+     "quantity": [
+      "above",
+      "accumulation",
+      "active",
+      "airflow",
+      "ambient",
+      "array",
+      "assumptions",
+      "average",
+      "because",
+      "below",
+      "board",
+      "boundary",
+      "cause",
+      "chamber",
+      "change",
+      "changes",
+      "charge",
+      "circuit",
+      "coil",
+      "cold",
+      "compensation",
+      "completed",
+      "condenser",
+      "connections",
+      "constraint",
+      "continuous",
+      "control",
+      "cracking",
+      "cracks",
+      "create",
+      "creates",
+      "criteria",
+      "crosswind",
+      "crystals",
+      "detected",
+      "detects",
+      "direction",
+      "does",
+      "downtime",
+      "drop",
+      "duration",
+      "during",
+      "effect",
+      "electric",
+      "even",
+      "exceeds",
+      "exchange",
+      "existing",
+      "expected",
+      "external",
+      "extremes",
+      "fail",
+      "falsification",
+      "formation",
+      "free",
+      "freeze",
+      "freezing",
+      "frozen",
+      "gradient",
+      "heat",
+      "hour",
+      "hours",
+      "identify",
+      "incidents",
+      "indicating",
+      "installation",
+      "integration",
+      "intervention",
+      "keeping",
+      "leak",
+      "less",
+      "load",
+      "local",
+      "localized",
+      "logic",
+      "maintain",
+      "maintained",
+      "maintenance",
+      "mapping",
+      "margin",
+      "measurable",
+      "mechanical",
+      "mechanism",
+      "models",
+      "modulates",
+      "modulation",
+      "monitored",
+      "monitors",
+      "month",
+      "motor",
+      "numeric",
+      "occurs",
+      "only",
+      "pass",
+      "patterns",
+      "period",
+      "placement",
+      "preserves",
+      "pressure",
+      "preventing",
+      "proposal",
+      "radiator",
+      "rapid",
+      "rates",
+      "real",
+      "reduction",
+      "refrigerant",
+      "rejects",
+      "relies",
+      "requires",
+      "requiring",
+      "respects",
+      "risk",
+      "safe",
+      "sample",
+      "scheduled",
+      "season",
+      "sections",
+      "sensor",
+      "setpoint",
+      "shoulder",
+      "simulated",
+      "size",
+      "speed",
+      "spots",
+      "stagnation",
+      "standard",
+      "stress",
+      "surface",
+      "system",
+      "temperature",
+      "terminals",
+      "test",
+      "thermal",
+      "thickness",
+      "threshold",
+      "time",
+      "touch",
+      "tube",
+      "unverified",
+      "using",
+      "validate",
+      "vapor",
+      "visually",
+      "when",
+      "where",
+      "wind",
+      "window",
+      "zero",
+      "zones"
+     ],
+     "pairs": [
+      {
+       "value": "3",
+       "unit": "m"
+      },
+      {
+       "value": "12",
+       "unit": "m"
+      },
+      {
+       "value": "100",
+       "unit": "%"
+      },
+      {
+       "value": "2.5",
+       "unit": "c"
+      },
+      {
+       "value": "0",
+       "unit": "c"
+      },
+      {
+       "value": "5",
+       "unit": "m"
+      },
+      {
+       "value": "1",
+       "unit": "mm"
+      }
+     ],
+     "conversion_recorded": false
+    }
+   ]
+  },
+  "question_type": "intervention-proposal"
+ },
+ "constraint_audit": {
+  "state": "CONSTRAINT_AUDIT_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "constraint_check": {
+  "check_version": "constraint_check/1.0.0",
+  "state": "PARSED",
+  "n_constraints": 4,
+  "verdicts": [
+   {
+    "constraint_index": 1,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 2,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 3,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   },
+   {
+    "constraint_index": 4,
+    "verdict": "COMPLIES",
+    "quote": "",
+    "quote_verified": null
+   }
+  ],
+  "restates_device": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "restates_constraint": {
+   "yes": false,
+   "quote": "",
+   "quote_verified": null
+  },
+  "n_violations": 0,
+  "verified_quotes": 0,
+  "n_unverified_quotes": 0
+ },
+ "consistency_check": {
+  "state": "CONSISTENCY_PASS",
+  "n_violations": 0,
+  "violations": []
+ },
+ "state": "COMPOSED_CONTRACT_DOWNGRADED",
+ "tech_sanity": {
+  "enabled": false,
+  "flag": "ENGINE_TECH_SANITY",
+  "findings": [],
+  "n_findings": 0
+ },
+ "caveats": [
+  "Note: some supporting details in this answer could not be verified against the retrieved records and are labeled as engineering assumptions; the falsification test is the precondition for relying on them."
+ ],
+ "finished_at": "2026-11-23T14:24:18+00:00Z",
+ "admitted_candidates": [
+  {
+   "candidate_id": "cand:A2:r138-fresh-04-hvac-coil-freezing:c34cac10a7583d6c",
+   "attack_verdict": "PASS",
+   "hypothesis": false
+  }
+ ]
+}

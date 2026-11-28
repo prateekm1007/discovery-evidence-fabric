@@ -1,0 +1,124 @@
+{
+ "problem_id": "r125-04-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm": "bon2-bindselect (the r129 prereg; selection by bill_defect_classes on delivered bytes, tie -> candidate 1, typed-fail -> +inf)",
+ "wall_clock_s": 289.3,
+ "candidates": [
+  {
+   "candidate": "c1",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 2,
+     "latency_s": 124.51,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 772,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 1,
+     "latency_s": 3.57,
+     "usage": {
+      "prompt_tokens": 1108,
+      "completion_tokens": 1026,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n\"corrected_proposal\": \"Mitigation Proposal\\n\\nMechanism:\\nImplement a closed-loop control strategy",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal**\n\n**Mechanism:**\nImplement a closed-loop control strategy for the crusher cavity pressure (or setpoint) by modulating the feed rate based on real-time specific power consumption. The core concept is to maintain the crusher at its most efficient operating point (typically where specific energy is minimized) by using the power meter to infer the state of the crushing cavity. Since the product has coarsened and power per tonne has increased, the current operation is inefficient, likely due to an overly open closed-side setting (CSS) or insufficient compression. By dynamically adjusting the feed rate to match the crusher's capacity at a fixed, optimized CSS, we ensure consistent compression and breakage, preventing the accumulation of uncrushed coarse material (\"ringing\") and stabilizing specific power.\n\n**Implementation:**\n1.  **Fix the Closed-Side Setting (CSS):** Manually set the crusher's hydraulic or mechanical CSS to a value slightly finer than the current stable operating point. This ensures that any coarse material that does return is forced back into the crushing chamber until it is reduced to size, breaking the cycle of coarse product retention. Do not make it so tight that it causes choking; aim for the point where power begins to stabilize.\n2.  **Establish Baseline Specific Power:** Calculate the historical average specific power (kW·h/tonne) at the last liner change using the motor power meter and discharge-belt scale data. Define this as the target \"efficient\" specific power threshold ($SP_{target}$).\n3.  **Develop a Feed Rate Control Algorithm:**\n    *   **Input 1:** Real-time Power from the motor power meter ($P_{motor}$).\n    *   **Input 2:** Real-time Discharge Rate from the discharge-belt scale ($M_{discharge}$).\n    *   **Calculated Variable:** Real-time Specific Power ($SP_{real} = P_{motor} / M_{discharge}$).\n    *   **Control Action:** Compare $SP_{real}$ to $SP_{target}$.\n        *   If $SP_{real} > SP_{target}$ (High specific power, indicating coarse product/low compression), **reduce** the feed rate via the feed-rate scale controller. This slows the influx of material, allowing the fixed CSS to crush the existing coarse fraction in the chamber more thoroughly, increasing compression and reducing specific power back toward the target.\n        *   If $SP_{real} < SP_{target}$ (Low specific power, potentially indicating under-compression or empty chamber), **increase** the feed rate, up to the maximum allowable, to fill the chamber and maintain efficient compression.\n    *   **Rate Limiting:** Apply a slow ramp-up/ramp-down rate to the feed rate setpoint to prevent sudden surges or starvages that could destabilize the crusher.\n\n**Measures it Relies On:**\n*   **Motor Power Meter:** Provides the numerator for specific power calculation. It indirectly reflects the energy required to compress the material; a sudden drop in power for a given tonnage indicates poor crushing (coarse product passing through without being broken).\n*   **Discharge-Belt Scale:** Provides the denominator (mass flow rate) for specific power calculation. It confirms that material is actually being processed, distinguishing between low power due to low flow (starvation) and low power due to easy crushing.\n*   **Feed-Rate Scale/Controller:** The actuator used to adjust the input mass flow rate, enabling the dynamic adjustment needed to maintain optimal chamber compression.\n*   **Existing CSS Actuation:** Relies on the ability to manually set and hold a fixed CSS position, which is standard in cone crushers and does not require new instrumentation.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "Mitigation Proposal\n\nMechanism:\nImplement a closed-loop control strategy for the crusher cavity pressure (or setpoint) by modulating the feed rate based on real-time specific power consumption. The core concept is to maintain the crusher at its most efficient operating point (typically where specific energy is minimized) by using the power meter to infer the state of the crushing cavity. Since the product has coarsened and power per tonne has increased, the current operation is inefficient, likely due to an overly open closed-side setting (CSS) or insufficient compression. By dynamically adjusting the feed rate to match the crusher's capacity at a fixed, optimized CSS, we ensure consistent compression and breakage, preventing the accumulation of uncrushed coarse material (\"ringing\") and stabilizing specific power.\n\nDIRECTION-OF-EFFECT:\nDriving Variable: Real-time Specific Power ($SP_{real}$) derived from motor power and discharge mass flow.\nMechanism Direction: When $SP_{real}$ exceeds $SP_{target}$, the control loop decreases the feed rate. The reduction in material influx relative to the fixed CSS allows the crusher to apply sustained compressive force to the trapped coarse fraction, increasing the compression depth and fracture efficiency. This increases the mass of fines produced per unit of energy, thereby driving $SP_{real}$ back down toward $SP_{target}$. Conversely, if $SP_{real}$ falls below $SP_{target}$, the feed rate is increased to maintain chamber fill and prevent starvation, ensuring the power input is utilized for effective crushing rather than friction or air crushing.\n\nImplementation:\n1. Fix the Closed-Side Setting (CSS): Manually set the crusher's hydraulic or mechanical CSS to a value slightly finer than the current stable operating point. This ensures that any coarse material that does return is forced back into the crushing chamber until it is reduced to size, breaking the cycle of coarse product retention. Do not make it so tight that it causes choking; aim for the point where power begins to stabilize.\n2. Establish Baseline Specific Power: Calculate the historical average specific power (kW·h/tonne) at the last liner change using the motor power meter and discharge-belt scale data. Define this as the target \"efficient\" specific power threshold ($SP_{target}$).\n3. Develop a Feed Rate Control Algorithm:\n* Input 1: Real-time Power from the motor power meter ($P_{motor}$).\n* Input 2: Real-time Discharge Rate from the discharge-belt scale ($M_{discharge}$).\n* Calculated Variable: Real-time Specific Power ($SP_{real} = P_{motor} / M_{discharge}$).\n* Control Action: Compare $SP_{real}$ to $SP_{target}$.\n* If $SP_{real} > SP_{target}$ (High specific power, indicating coarse product/low compression), reduce the feed rate via the feed-rate scale controller. This slows the influx of material, allowing the fixed CSS to crush the existing coarse fraction in the chamber more thoroughly, increasing compression and reducing specific power back toward the target.\n* If $SP_{real} < SP_{target}$ (Low specific power, potentially indicating under-compression or empty chamber), increase the feed rate, up to the maximum allowable, to fill the chamber and maintain efficient compression.\n* Rate Limiting: Apply a slow ramp-up/ramp-down rate to the feed rate setpoint to prevent sudden surges or starvages that could destabilize the crusher.\n\nMeasures it Relies On:\n* Motor Power Meter: Permitted sensor. Provides the numerator for specific power calculation. It indirectly reflects the energy required to compress the material; a sudden drop in power for a given tonnage indicates poor crushing (coarse product passing through without being broken).\n* Discharge-Belt Scale: Permitted sensor. Provides the denominator (mass flow rate) for specific power calculation. It confirms that material is actually being processed, distinguishing between low power due to low flow (starvation) and low power due to easy crushing.\n* Feed-Rate Scale/Controller: Permitted actuator/sensor combination. The feed-rate scale measures the input mass flow rate, which is used to adjust the input mass flow rate, enabling the dynamic adjustment needed to maintain optimal chamber compression.\n* Existing CSS Actuation: Relies on the ability to manually set and hold a fixed CSS position, which is standard in cone crushers and does not require new instrumentation.\n\nIMPLEMENTATION BILL:\n* Hardware: None (Utilizes existing motor power meter, discharge-belt scale, and feed-rate controller).\n* Software: Configuration of existing PLC/DCS logic to implement the $SP_{real}$ calculation and feed rate modulation algorithm.\n* Labor: 4 hours for manual CSS adjustment; 8 hours for control algorithm configuration and tuning; 4 hours for operator training on the new setpoint limits.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "* Hardware: None (Utilizes existing motor power meter, discharge-belt scale, and feed-rate",
+     "* Software: Configuration of existing PLC/DCS logic to implement the $SP_{real}$ calculati",
+     "* Labor: 4 hours for manual CSS adjustment; 8 hours for control algorithm configuration an"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  },
+  {
+   "candidate": "c2",
+   "calls": [
+    {
+     "leg": "author",
+     "transport_attempts": 1,
+     "latency_s": 4.96,
+     "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 766,
+      "cached_tokens": 0
+     }
+    },
+    {
+     "leg": "reviewer",
+     "transport_attempts": 2,
+     "latency_s": 124.22,
+     "usage": {
+      "prompt_tokens": 1102,
+      "completion_tokens": 665,
+      "cached_tokens": 0
+     },
+     "raw_head": "{\n\"corrected_proposal\": \"**Mitigation Proposal: Closed-Loop Power-Based Set-Point Adjustment**\\n\\n**",
+     "schema_parsed_first_try": true
+    }
+   ],
+   "parse_retries": 0,
+   "authored_bill": "**Mitigation Proposal: Closed-Loop Power-Based Set-Point Adjustment**\n\n**Mechanism:**\nImplement a real-time control loop that treats **specific power consumption (kW/t)** as the primary feedback signal for crushing efficiency, using it to dynamically adjust the crusher’s **Closed Side Setting (CSS)** or, if CSS is not directly adjustable via the existing interface, to modulate the **feed rate** to match the current crushing capacity. The core logic relies on the observation that coarsened product and returning coarse fraction (recycle) increase the workload per tonne, raising the specific power draw. By correlating power per tonne with product size quality, the system can automatically tighten the crush or reduce throughput to prevent coarse material from passing through and overloading the crusher.\n\n**Implementation:**\n1.  **Signal Processing:** Configure the existing PLC/DCS to calculate `Specific Power (SP) = Motor Power (kW) / Discharge Belt Scale Flow Rate (t/h)`. Use the feed-rate scale to monitor total material input for context, but rely on the discharge scale for the output denominator to isolate the crushing process efficiency.\n2.  **Baseline & Threshold:** Establish a baseline SP value from the last liner change (when performance was known to be good). Define an upper threshold for `SP_high` (indicating excessive load/coarse product) and a lower threshold for `SP_low` (indicating potential starvation or overly tight CSS, though less likely here).\n3.  **Control Logic:**\n    *   **If `SP > SP_high`:** This indicates the crusher is working too hard per tonne, likely due to coarse product passing through (open CSS) or excessive recycle. The controller should **reduce the feed rate** (via the feed-belt conveyor speed or gate opening, if controllable via existing I/O) to decrease the total load, allowing the crusher to achieve a finer discharge at a stable, lower power level. Alternatively, if the crusher has an automatic CSS adjustment feature linked to power, trigger a \"tighten\" command to reduce the CSS, ensuring the product is crushed finer before discharge.\n    *   **If `SP` is stable within baseline:** Maintain current feed rate.\n    *   **If `SP` drops significantly below baseline:** Monitor for potential belt slippage or empty discharge; no action required for coarseness, but flag for maintenance.\n4.  **Integration:** Use the existing discharge-belt scale to verify that the flow rate is responding to feed-rate changes. Use the motor power meter as the actuator feedback. No new sensors are added; only existing PLC logic and control loops are modified.\n\n**Measures it Relies On:**\n*   **Motor Power Meter:** Provides real-time load on the crusher. An increase in kW at constant or decreasing flow rate is a direct indicator of harder crushing work, typically due to coarser product needing more compression cycles or excessive recycle material being re-crushed.\n*   **Discharge-Belt Scale:** Provides the mass flow rate of crushed product. Dividing power by this flow rate yields specific power, a key KPI for crushing efficiency. A rising specific power indicates degraded performance (coarser discharge requiring more energy per ton).\n*   **Feed-Rate Scale:** Used to correlate input load with output performance. If feed rate is high and specific power rises, reducing feed rate is the logical mitigation to allow the crusher to achieve finer particle size without excessive power draw.\n\nThis approach uses only existing instrumentation to detect the coarsening trend via increased specific power and mitigates it by adjusting process variables (feed rate) to restore optimal crushing conditions, thereby reducing coarse fraction recurrence and stabilizing power consumption per tonne.",
+   "surfaced_findings": [
+    "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+    "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+   ],
+   "surfaced_scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "delivered_bill": "**Mitigation Proposal: Closed-Loop Power-Based Set-Point Adjustment**\n\n**Mechanism:**\nImplement a real-time control loop that treats **specific power consumption (kW/t)** as the primary feedback signal for crushing efficiency, using it to dynamically adjust the **feed rate** to match the current crushing capacity. The core logic relies on the observation that coarsened product and returning coarse fraction (recycle) increase the workload per tonne, raising the specific power draw. By correlating power per tonne with product size quality, the system can automatically reduce throughput to prevent coarse material from passing through and overloading the crusher.\n\n**DIRECTION-OF-EFFECT:**\nThe driving variable is **Specific Power (SP)**. The direction of effect is that an **increase** in SP indicates that the crusher is performing harder work per tonne (typically due to coarse material or excessive recycle). The corrective action to counteract this increase is to **decrease** the **Feed Rate**.\n\n**Implementation:**\n1.  **Signal Processing:** Configure the existing PLC/DCS to calculate `Specific Power (SP) = Motor Power (kW) / Discharge Belt Scale Flow Rate (t/h)`.\n2.  **Baseline & Threshold:** Establish a baseline SP value from the last liner change. Define an upper threshold for `SP_high` (indicating excessive load/coarse product).\n3.  **Control Logic:**\n    *   **If `SP > SP_high`:** The controller reduces the feed rate via the feed-belt conveyor speed to decrease the total load, allowing the crusher to achieve a finer discharge at a stable power level.\n    *   **If `SP` is stable within baseline:** Maintain current feed rate.\n    *   **If `SP` drops significantly below baseline:** Flag for maintenance check on belt slip or empty discharge.\n4.  **Integration:** Use the existing discharge-belt scale to verify that the flow rate is responding to feed-rate changes. Use the motor power meter as the actuator feedback.\n\n**IMPLEMENTATION BILL:**\n*   **Existing PLC/DCS Logic:** Configure calculation for Specific Power using existing I/O.\n*   **Existing Feed-Belt VFD/Drive:** Access to speed control or gate actuator command for feed rate adjustment.\n*   **No New Hardware:** Utilize existing Motor Power Meter, Discharge-Belt Scale, and Feed-Rate Scale.\n\n**Measures it Relies On (Signal Provenance):**\n*   **Specific Power (SP):** Derived from the **Motor Power Meter** (Numerator) and the **Discharge-Belt Scale** (Denominator). Formula: `SP = Motor Power (kW) / Discharge-Belt Scale Flow Rate (t/h)`.\n*   **Feed Rate Command:** Derived from the **Feed-Rate Scale** reading, used as the context variable and the actuator target for the control loop.\n*   **Discharge Flow Rate:** Comes directly from the **Discharge-Belt Scale**.\n*   **Motor Load:** Comes directly from the **Motor Power Meter**.",
+   "post_review_scan": {
+    "BILL_UNTAGGED": [
+     "*   **Existing PLC/DCS Logic:** Configure calculation for Specific Power using existing I/",
+     "*   **Existing Feed-Belt VFD/Drive:** Access to speed control or gate actuator command for",
+     "*   **No New Hardware:** Utilize existing Motor Power Meter, Discharge-Belt Scale, and Fee",
+     "*   **Specific Power (SP):** Derived from the **Motor Power Meter** (Numerator) and the **",
+     "*   **Feed Rate Command:** Derived from the **Feed-Rate Scale** reading, used as the conte",
+     "*   **Discharge Flow Rate:** Comes directly from the **Discharge-Belt Scale**.",
+     "*   **Motor Load:** Comes directly from the **Motor Power Meter**."
+    ],
+    "ALLOWED_ROW_OUTSIDE": [
+     "added measure 's the context variable and the actuator target' shares no allowed-list stem (Use only existing sensors and existing measurements: the crusher motor power met...)"
+    ]
+   },
+   "status": "DELIVERED_REVIEWED"
+  }
+ ],
+ "selection_scores": [
+  0,
+  0
+ ],
+ "selected_candidate": "c1",
+ "selection_tie": true,
+ "delivered_bill": "Mitigation Proposal\n\nMechanism:\nImplement a closed-loop control strategy for the crusher cavity pressure (or setpoint) by modulating the feed rate based on real-time specific power consumption. The core concept is to maintain the crusher at its most efficient operating point (typically where specific energy is minimized) by using the power meter to infer the state of the crushing cavity. Since the product has coarsened and power per tonne has increased, the current operation is inefficient, likely due to an overly open closed-side setting (CSS) or insufficient compression. By dynamically adjusting the feed rate to match the crusher's capacity at a fixed, optimized CSS, we ensure consistent compression and breakage, preventing the accumulation of uncrushed coarse material (\"ringing\") and stabilizing specific power.\n\nDIRECTION-OF-EFFECT:\nDriving Variable: Real-time Specific Power ($SP_{real}$) derived from motor power and discharge mass flow.\nMechanism Direction: When $SP_{real}$ exceeds $SP_{target}$, the control loop decreases the feed rate. The reduction in material influx relative to the fixed CSS allows the crusher to apply sustained compressive force to the trapped coarse fraction, increasing the compression depth and fracture efficiency. This increases the mass of fines produced per unit of energy, thereby driving $SP_{real}$ back down toward $SP_{target}$. Conversely, if $SP_{real}$ falls below $SP_{target}$, the feed rate is increased to maintain chamber fill and prevent starvation, ensuring the power input is utilized for effective crushing rather than friction or air crushing.\n\nImplementation:\n1. Fix the Closed-Side Setting (CSS): Manually set the crusher's hydraulic or mechanical CSS to a value slightly finer than the current stable operating point. This ensures that any coarse material that does return is forced back into the crushing chamber until it is reduced to size, breaking the cycle of coarse product retention. Do not make it so tight that it causes choking; aim for the point where power begins to stabilize.\n2. Establish Baseline Specific Power: Calculate the historical average specific power (kW·h/tonne) at the last liner change using the motor power meter and discharge-belt scale data. Define this as the target \"efficient\" specific power threshold ($SP_{target}$).\n3. Develop a Feed Rate Control Algorithm:\n* Input 1: Real-time Power from the motor power meter ($P_{motor}$).\n* Input 2: Real-time Discharge Rate from the discharge-belt scale ($M_{discharge}$).\n* Calculated Variable: Real-time Specific Power ($SP_{real} = P_{motor} / M_{discharge}$).\n* Control Action: Compare $SP_{real}$ to $SP_{target}$.\n* If $SP_{real} > SP_{target}$ (High specific power, indicating coarse product/low compression), reduce the feed rate via the feed-rate scale controller. This slows the influx of material, allowing the fixed CSS to crush the existing coarse fraction in the chamber more thoroughly, increasing compression and reducing specific power back toward the target.\n* If $SP_{real} < SP_{target}$ (Low specific power, potentially indicating under-compression or empty chamber), increase the feed rate, up to the maximum allowable, to fill the chamber and maintain efficient compression.\n* Rate Limiting: Apply a slow ramp-up/ramp-down rate to the feed rate setpoint to prevent sudden surges or starvages that could destabilize the crusher.\n\nMeasures it Relies On:\n* Motor Power Meter: Permitted sensor. Provides the numerator for specific power calculation. It indirectly reflects the energy required to compress the material; a sudden drop in power for a given tonnage indicates poor crushing (coarse product passing through without being broken).\n* Discharge-Belt Scale: Permitted sensor. Provides the denominator (mass flow rate) for specific power calculation. It confirms that material is actually being processed, distinguishing between low power due to low flow (starvation) and low power due to easy crushing.\n* Feed-Rate Scale/Controller: Permitted actuator/sensor combination. The feed-rate scale measures the input mass flow rate, which is used to adjust the input mass flow rate, enabling the dynamic adjustment needed to maintain optimal chamber compression.\n* Existing CSS Actuation: Relies on the ability to manually set and hold a fixed CSS position, which is standard in cone crushers and does not require new instrumentation.\n\nIMPLEMENTATION BILL:\n* Hardware: None (Utilizes existing motor power meter, discharge-belt scale, and feed-rate controller).\n* Software: Configuration of existing PLC/DCS logic to implement the $SP_{real}$ calculation and feed rate modulation algorithm.\n* Labor: 4 hours for manual CSS adjustment; 8 hours for control algorithm configuration and tuning; 4 hours for operator training on the new setpoint limits.",
+ "selected_defect_classes": [],
+ "status": "DELIVERED_REVIEWED"
+}

@@ -1,0 +1,206 @@
+{
+ "record": "R105S2_P3_STAGE5_XJTU/1.1.0",
+ "ran_at": "2026-11-20T13:07:10Z (sandbox clock, TRUE UTC)",
+ "executor": "builder-r109s2",
+ "claim": "c-0148 item (4)+(5): the HF streaming path",
+ "data_source": "hf_streaming",
+ "hf_streaming": {
+  "data_source": "hf_streaming",
+  "hf_repo": "prateekm1/xjtu-sy-bearing-rar",
+  "hf_repo_type": "dataset",
+  "streaming_mode": "per-bearing-folder",
+  "max_local_footprint_mb": 2,
+  "max_local_footprint_note": "steady-state peak = ONE csv (~1.5MB) held in /tmp, deleted immediately after its RMS is taken; the one-span upload/manifest buffers (<=64MB) belong to the upload lane, not this loader",
+  "integrity_check": "sha256 per file vs the committed manifest (eval/xjtu_sy_hf_manifest.json + the repo root copy)",
+  "manifest_file": "eval/xjtu_sy_hf_manifest.json"
+ },
+ "dataset": {
+  "n_files": 173,
+  "bearings": {
+   "Bearing3_1": 73,
+   "Bearing3_2": 100
+  },
+  "sampled_cadence_typed": "every 25th (Bearing3_2) / 30th (Bearing3_1) minute of life — a SAMPLE within the disk ceiling; the full-resolution re-extract is typed when disk allows",
+  "measured_cadence_disclosure": {
+   "note": "the typed cadence above did not match the extracted sample exactly; the measured minute-index steps are recorded per bearing (the sample is irregular, not fixed-cadence)",
+   "Bearing3_1": {
+    "files": 73,
+    "minute_index_first": 47,
+    "minute_index_last": 2538,
+    "step_median": 27,
+    "step_range": [
+     25,
+     55
+    ]
+   },
+   "Bearing3_2": {
+    "files": 100,
+    "minute_index_first": 1,
+    "minute_index_last": 2484,
+    "step_median": 23,
+    "step_range": [
+     7,
+     119
+    ]
+   },
+   "archive_lives_minutes": {
+    "Bearing3_1": 2538,
+    "Bearing3_2": 2496
+   }
+  },
+  "citation": "B. Wang, Y. Lei, N. Li, N. Li, IEEE Trans. Reliability 69(1):401-412, 2020, DOI 10.1109/TR.2018.2882682 (requested citation)",
+  "csv_structure_verified": {
+   "file": "Bearing3_1/47.csv (HF repo prateekm1/xjtu-sy-bearing-rar)",
+   "first_two_lines": [
+    "Horizontal_vibration_signals,Vertical_vibration_signals",
+    "0.29202699661254883,0.13744830153882504"
+   ],
+   "note": "the task context described 5 columns (Hour, Minute, Second, Microsecond, vibration); the extracted sample actually carries a header + 2 columns (Horizontal_vibration_signals, Vertical_vibration_signals) — the sampler rewrote the raw 6-column files",
+   "n_data_columns": 2,
+   "rows_per_file": [
+    32768,
+    32768
+   ],
+   "rms_column": "last column (Vertical_vibration_signals) — the typed 'last column is the vibration signal' rule, kept"
+  },
+  "alarm_per_machine_year_conversion": "NOT-APPLICABLE: the sampled cadence is ~23-27-minute intervals of life, not the native 1-minute cadence — the CWRU-style per-machine-year conversion would misstate the duty; disclosed, not computed",
+  "hf_repo": "prateekm1/xjtu-sy-bearing-rar",
+  "hf_repo_type": "dataset",
+  "streaming_mode": "per-bearing-folder, one csv at a time (fetch -> RMS -> delete; peak local footprint = one csv)",
+  "tmp_dir": "/tmp/hf_cache_stage5 (cleaned after the run)",
+  "sample_selection": "pinned by the committed attribution record (73 + 100 minutes), so the HF path reproduces the committed 173-file sample exactly",
+  "integrity": {
+   "sha256_checked": 173,
+   "mismatches": 0,
+   "manifest_coverage": "173/173"
+  },
+  "flat_dir_attribution": {
+   "note": "not needed on the HF path: files are stored under per-bearing folders; the committed attribution map is cross-checked (counts + archive-life bounds) and kept",
+   "n_ambiguous": 0,
+   "n_no_match": 0
+  }
+ },
+ "protocol_typed": {
+  "channel": "RMS of the vibration column per file (float64), files ordered by numeric minute index",
+  "walk": "stage-3 committed sliding_walk vs static_walk on the FULL channel — fit half, walk half (the degradation side)",
+  "sliding": "k=100, min_prime=20 (typed)",
+  "static": "split-conformal fit-once q (p3s2.fit_resid_q)",
+  "arm": "chronos-bolt-base (p3s2.BoltArm, one-shot predict_batch on the context matrix)",
+  "ctx_committed": 96
+ },
+ "results": {
+  "Bearing3_1": {
+   "n_points": 73,
+   "minute_index_first": 47,
+   "minute_index_last": 2538,
+   "measured_step_median": 27,
+   "rows_per_file_min": 32768,
+   "rows_per_file_max": 32768,
+   "rms_first5": [
+    0.494629,
+    0.509805,
+    0.49553,
+    0.537398,
+    0.527928
+   ],
+   "rms_last5": [
+    0.611349,
+    0.701569,
+    1.153921,
+    2.787113,
+    11.541787
+   ],
+   "rms_last_over_first_ratio": 6.5473,
+   "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation",
+   "sliding": {
+    "n_walk": 37,
+    "coverage": 0.8108,
+    "alarms": 1,
+    "alarms_per_1000": 27.027
+   },
+   "static": {
+    "n_walk": 37,
+    "coverage": 0.8108,
+    "alarms": 1,
+    "alarms_per_1000": 27.027
+   },
+   "protocol_adaptation": {
+    "reason": "sampled channel n=73 < committed floor 2*CTX+min_prime=212 (the sampled ~23-27-minute cadence, not a protocol re-fit)",
+    "ctx_adapted": 26,
+    "ctx_kept_committed_for_typed_attempt": 96,
+    "k_kept": 100,
+    "min_prime_kept": 20,
+    "committed_inequality_kept": "n >= 2*CTX + min_prime",
+    "modules_set_consistently": [
+     "p3s3.CTX",
+     "p3s2.CTX"
+    ],
+    "committed_walk_bytes_untouched": true,
+    "walk_leg_wall_clock_ms": 885.3,
+    "typed_attempt_error_verbatim": "unit 73 < 2*CTX+20 (typed floor)",
+    "typed_attempt_wall_clock_ms": 0.0
+   }
+  },
+  "Bearing3_2": {
+   "n_points": 100,
+   "minute_index_first": 1,
+   "minute_index_last": 2484,
+   "measured_step_median": 23,
+   "rows_per_file_min": 32768,
+   "rows_per_file_max": 32768,
+   "rms_first5": [
+    1.118261,
+    1.066713,
+    1.114664,
+    1.240771,
+    1.125072
+   ],
+   "rms_last5": [
+    2.402682,
+    1.635869,
+    2.262397,
+    1.969904,
+    3.125512
+   ],
+   "rms_last_over_first_ratio": 2.0115,
+   "protocol_status": "typed_floor_violation_then_disclosed_ctx_adaptation",
+   "sliding": {
+    "n_walk": 50,
+    "coverage": 0.66,
+    "alarms": 3,
+    "alarms_per_1000": 60.0
+   },
+   "static": {
+    "n_walk": 50,
+    "coverage": 0.56,
+    "alarms": 4,
+    "alarms_per_1000": 80.0
+   },
+   "protocol_adaptation": {
+    "reason": "sampled channel n=100 < committed floor 2*CTX+min_prime=212 (the sampled ~23-27-minute cadence, not a protocol re-fit)",
+    "ctx_adapted": 40,
+    "ctx_kept_committed_for_typed_attempt": 96,
+    "k_kept": 100,
+    "min_prime_kept": 20,
+    "committed_inequality_kept": "n >= 2*CTX + min_prime",
+    "modules_set_consistently": [
+     "p3s3.CTX",
+     "p3s2.CTX"
+    ],
+    "committed_walk_bytes_untouched": true,
+    "walk_leg_wall_clock_ms": 1076.8,
+    "typed_attempt_error_verbatim": "unit 100 < 2*CTX+20 (typed floor)",
+    "typed_attempt_wall_clock_ms": 0.0
+   }
+  }
+ },
+ "acceptance_vs_committed": {
+  "target": "the stage-5 walk pair executed from HF-sourced bytes must match the committed 173-file sample numbers (claim c-0148 item (5))",
+  "committed_record_sha256": "f0394c864807088c188269fd2d61f50bd17befcb508052b54cc212d3fe1d2384",
+  "fields_compared": "per bearing: n_points, minute bounds, rows/file bounds, protocol_status, rms_first5/last5, per leg: n_walk, coverage, alarms, alarms_per_1000",
+  "identical": true,
+  "diffs": []
+ },
+ "honest_note": "the RMS life-course is non-stationary (run-to-failure); the sliding-vs-static comparison is the drift lesson re-measured on real bearing data",
+ "no_acceptance_claims": true
+}

@@ -1,0 +1,400 @@
+{
+ "a1_version": "r11_a1/1.0.0",
+ "problem_id": "eval-new05-liion-balance-drift",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '2b00644f033513277b35a47fbfae5da8ff4f336725bc70032691d05b7d2e2a1c', 'baseline_answer_sha256': '8b27dae1c659dd238e6eb6240c8a23cd379c9e1ceeb603d257bf39f6f113d8de', 'evidence_sha256': '15060ab53da795f43de79ed5dcc9eb97db5ea878d144455589bc4474cb091d8b', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 28,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 11.8,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive",
+    "mechanism": "Embedding Li-ion conductive polymer (e.g., PEO-LiTFSI) in cathode to homogenize lithium diffusion across temperature gradients.",
+    "failure_link": "Mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot/cold cells (thermal gradient-induced capacity drift).",
+    "cost_to_test": "$5K (10 cells, 3-month cycling at 15\u00b0C gradient; 1 week rig time).",
+    "standard_solution": "Standard NMC-811 with no additives; relies solely on passive balancing.",
+    "departure": "Active lithium-ion transport coupling via conductive polymer, not just passive material."
+   },
+   {
+    "lever": "process",
+    "name": "Thermal Gradient-Equalized Cell Assembly",
+    "mechanism": "Alternate cell orientation (flipped cathodes/anodes) to average thermal gradients via internal resistance mismatches.",
+    "failure_link": "Reduces voltage spread by counteracting temperature-induced IR drop asymmetry (series imbalance drift).",
+    "cost_to_test": "$3K (1 module, 2-week thermal cycling; 3 days rig time).",
+    "standard_solution": "Uniform cell orientation; no gradient compensation.",
+    "departure": "Purposeful asymmetry in cell stacking to offset thermal gradients."
+   },
+   {
+    "lever": "design",
+    "name": "Modular 1A Balancer with Dynamic Cell Grouping",
+    "mechanism": "Split 13-cell string into 3 subgroups (5+4+4) with independent 1A balancers, dynamically reallocated via BMS.",
+    "failure_link": "Isolates thermal zones; limits spread to subgroup max (35 mV) via adaptive balancing.",
+    "cost_to_test": "$8K (1 module, 6-month cycling; 2 weeks rig time).",
+    "standard_solution": "Single-string 1A balancer; fixed cell grouping.",
+    "departure": "Software-defined, thermally adaptive subgroups instead of fixed hardware."
+   },
+   {
+    "lever": "controls",
+    "name": "Pulse-Balancing with Thermal Feedback",
+    "mechanism": "Trigger 1A balancing pulses only when cell-to-cell \u0394T > 5\u00b0C, using RTDs to detect thermal divergence.",
+    "failure_link": "Prevents balancing during stable thermal states; targets only cells diverging due to gradient (self-discharge spread).",
+    "cost_to_test": "$4K (1 module, 1-month cycling; 1 week rig time).",
+    "standard_solution": "Time-based or voltage-threshold balancing; no thermal input.",
+    "departure": "Thermal-triggered balancing, not fixed intervals or voltage."
+   },
+   {
+    "lever": "operations",
+    "name": "Gradient-Reversing Thermal Cycling",
+    "mechanism": "Periodically reverse top-to-bottom airflow (every 24h) to average thermal gradients over time.",
+    "failure_link": "Mitigates cumulative capacity drift by equalizing thermal exposure across cells (calendar life).",
+    "cost_to_test": "$2K (1 module, 3-month cycling; 1 week rig time).",
+    "standard_solution": "Static thermal management; no gradient reversal.",
+    "departure": "Active thermal gradient oscillation, not passive cooling."
+   },
+   {
+    "lever": "measurement",
+    "name": "Impedance-Spectroscopy-Based State-of-Health (SoH) Fingerprinting",
+    "mechanism": "Use broadband dielectric spectroscopy (BDS) to track cell impedance drift per cell; flag outliers before voltage spread exceeds 35 mV.",
+    "failure_link": "Detects early self-discharge/aging asymmetry (capacity spread) via impedance, not just voltage.",
+    "cost_to_test": "$12K (10 cells, 6-month aging; 1 month lab time).",
+    "standard_solution": "Voltage-based balancing triggers; no impedance monitoring.",
+    "departure": "Impedance-based SoH prediction, not voltage-only balancing."
+   }
+  ],
+  "raw_sha256": "2ae5a729921931e4",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive\",\n      \"mechanism\": \"Embedding Li-ion conductive polymer (e.g., PEO-LiTFSI) in cathode to homogenize lithium diffusion across temperature gradients.\",\n      \"failure_link\": \"Mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot/cold cells (thermal gradient-induced capacity drift).\",\n      \"cost_to_test\": \"$5K (10 cells, 3-month cycling at 15\u00b0C gradient; 1 week rig time).\",\n      \"standard_solution\": \"Standard NMC-811 with no ad"
+ },
+ "critique": {
+  "wall_s": 14.2,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "[2] Thermal Gradient-Equalized Cell Assembly",
+   "[4] Pulse-Balancing with Thermal Feedback",
+   "[5] Gradient-Reversing Thermal Cycling"
+  ],
+  "standard_solution": "Passive cell-to-cell balancing with fixed 1A current, triggered by voltage thresholds (e.g., 35 mV). Fails here due to insufficient current for large thermal gradients and no adaptive thermal compensation.",
+  "raw_sha256": "f32e64ef6495da03",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"[1] Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive\",\n      \"plausibility\": \"Plausible. Li-ion conductive additives can homogenize Li+ diffusion, but PEO-LiTFSI\u2019s ionic conductivity drops sharply below 60\u00b0C\u2014ineffective in cold cells.\",\n      \"constraint_audit\": {\n        \"13-cell series NMC-811\": \"ok\",\n        \"15 C gradient\": \"ok\",\n        \"1 A balancer\": \"ok\",\n        \"no footprint increase\": \"ok\",\n        \"35 mV spread\": \"ok\",\n        \"10-year life\": \"ok\"\n      },\n      \"difference_from_standard\": \"Standard: passive balancing. This ",
+  "top1_match": "FELL_BACK_TO_CANDIDATE_1"
+ },
+ "chosen": {
+  "lever": "materials",
+  "name": "Gradient-Tolerant NMC-811 with Li-Ion Conductive Additive",
+  "mechanism": "Embedding Li-ion conductive polymer (e.g., PEO-LiTFSI) in cathode to homogenize lithium diffusion across temperature gradients.",
+  "failure_link": "Mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot/cold cells (thermal gradient-induced capacity drift)."
+ },
+ "compose": {
+  "wall_s": 9.2,
+  "transport_ok": true,
+  "answer_sha256": "a42cf1d724ca5831"
+ },
+ "strict_relabel": {
+  "n_relabels": 1,
+  "n_user_constraint_relabels": 0,
+  "relabels": [
+   {
+    "parameter": "",
+    "value": "**NMC-811 Li+ diffusivity anisotropy** = 1.2\u00d7 at 60\u00b0C vs. 20\u00b0C",
+    "new_label": "ASSUMPTION",
+    "cited_record": "doi:10.1021/jacs.5c15171",
+    "why": "value not found in the cited record"
+   }
+  ],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 25.0
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "intervention-proposal",
+   "bindings": {
+    "evidence_bound": 17,
+    "assumption": 2,
+    "unbound_numbers": 1,
+    "all_numbers": 20,
+    "claims": [
+     {
+      "parameter": "PARAMETER: **PEO-LiTFSI loading** = 5 wt% (rationale: balances ionic conductivity enhancement with cathode volumetric capacity retention; validated in prior NMC composites at 3\u20137 wt% [doi:10.1021/jacs",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "balances",
+       "capacity",
+       "cathode",
+       "composites",
+       "conductivity",
+       "enhancement",
+       "ionic",
+       "jacs",
+       "litfsi",
+       "loading",
+       "prior",
+       "rationale",
+       "retention",
+       "validated",
+       "volumetric"
+      ],
+      "pairs": [],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **polymer ionic conductivity** = 1\u00d710\u207b\u2075 S/cm at 20\u00b0C (rationale: PEO-LiTFSI\u2019s reported range; cold-cell inefficacy mitigated by cathode-level homogenization).\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "cathode",
+       "cell",
+       "cold",
+       "conductivity",
+       "homogenization",
+       "inefficacy",
+       "ionic",
+       "level",
+       "litfsi",
+       "mitigated",
+       "polymer",
+       "range",
+       "rationale",
+       "reported"
+      ],
+      "pairs": [
+       {
+        "value": "20",
+        "unit": "\u00b0c"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **thermal gradient mitigation threshold** = 70% reduction in Li+ diffusion asymmetry (rationale: empirical target to offset 15\u00b0C gradient effects; derived from NMC-811\u2019s 20% capacity drift/",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "asymmetry",
+       "capacity",
+       "derived",
+       "diffusion",
+       "drift",
+       "effects",
+       "empirical",
+       "gradient",
+       "jacs",
+       "mitigation",
+       "offset",
+       "rationale",
+       "reduction",
+       "thermal",
+       "threshold"
+      ],
+      "pairs": [
+       {
+        "value": "70",
+        "unit": "%"
+       },
+       {
+        "value": "15",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "20",
+        "unit": "%"
+       },
+       {
+        "value": "10",
+        "unit": "\u00b0c"
+       }
+      ],
+      "conversion_recorded": true
+     },
+     {
+      "parameter": "PARAMETER: **NMC-811 Li+ diffusivity anisotropy** = 1.2\u00d7 at 60\u00b0C vs. 20\u00b0C \u2014 value not stated in the cited record.\nASSUMPTION",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "anisotropy",
+       "cited",
+       "diffusivity",
+       "record"
+      ],
+      "pairs": [
+       {
+        "value": "60",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "20",
+        "unit": "\u00b0c"
+       }
+      ],
+      "conversion_recorded": false
+     },
+     {
+      "parameter": "PARAMETER: **module thermal resistance** = 0.5\u00b0C/W (rationale: baseline for 15\u00b0C gradient under 3 kW discharge; aligns with pouch-cell modules [doi:10.4271/2006-01-3099]).\n\nFALSIFICATION TEST:\nn = 12 ",
+      "label": "assumption",
+      "cited": null,
+      "source_kind": null,
+      "quantity": [
+       "aligns",
+       "asymmetry",
+       "baseline",
+       "bottom",
+       "cell",
+       "cells",
+       "cycled",
+       "diffusion",
+       "discharge",
+       "every",
+       "exceed",
+       "fail",
+       "falsification",
+       "gradient",
+       "measured",
+       "module",
+       "modules",
+       "pass",
+       "pouch",
+       "rationale",
+       "reduction",
+       "remains",
+       "resistance",
+       "rest",
+       "spread",
+       "test",
+       "thermal",
+       "voltage"
+      ],
+      "pairs": [
+       {
+        "value": "0.5",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "15",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "3",
+        "unit": "kw"
+       },
+       {
+        "value": "15",
+        "unit": "\u00b0c"
+       },
+       {
+        "value": "35",
+        "unit": "%"
+       },
+       {
+        "value": "35",
+        "unit": "mv"
+       },
+       {
+        "value": "35",
+        "unit": "mv"
+       }
+      ],
+      "conversion_recorded": false
+     }
+    ]
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT",
+  "a0plus_answer_sha256": "920e4cad3354876ce5c3512869d73eb702f3b24040fd64b8c15c162ebd317c2b",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED DESIGN INTERVENTION:\nEmbed a **Li-ion conductive polymer (PEO-LiTFSI)** directly into the NMC-811 cathode matrix to homogenize lithium diffusion across the 15\u00b0C thermal gradient. This mitigates self-discharge spread by reducing lithium plating/stripping asymmetry in hot and cold cells, enabling the 1A balancer to maintain <35 mV spread. The intervention leverages the cathode\u2019s existing volume without altering module footprint or balancer hardware.\n\nMECHANISM:\nThermal gradients induce lithium diffusion asymmetry in NMC-811 cathodes, causing capacity drift and self-discharge spread. The PEO-LiTFSI additive creates a secondary ionic conduction pathway that compensates for temperature-dependent Li+ mobility, equalizing plating/stripping rates across cells.\n\nDEPARTURE FROM STANDARD:\nStandard: passive balancing (electronic current shunting). This actively homogenizes Li+ transport via material science, targeting the root cause (thermal-induced diffusion asymmetry) rather than symptomatically correcting voltage spread.\n\nLABELED PARAMETERS:\nASSUMPTION PARAMETER: **PEO-LiTFSI loading** = 5 wt% (rationale: balances ionic conductivity enhancement with cathode volumetric capacity retention; validated in prior NMC composites at 3\u20137 wt% [doi:10.1021/jacs.5c15171]).\nASSUMPTION PARAMETER: **polymer ionic conductivity** = 1\u00d710\u207b\u2075 S/cm at 20\u00b0C (rationale: PEO-LiTFSI\u2019s reported range; cold-cell inefficacy mitigated by cathode-level homogenization).\nASSUMPTION PARAMETER: **thermal gradient mitigation threshold** = 70% reduction in Li+ diffusion asymmetry (rationale: empirical target to offset 15\u00b0C gradient effects; derived from NMC-811\u2019s 20% capacity drift/10\u00b0C [doi:10.1021/jacs.5c15171]).\nASSUMPTION PARAMETER: **NMC-811 Li+ diffusivity anisotropy** = 1.2\u00d7 at 60\u00b0C vs. 20\u00b0C \u2014 value not stated in the cited record.\nASSUMPTION PARAMETER: **module thermal resistance** = 0.5\u00b0C/W (rationale: baseline for 15\u00b0C gradient under 3 kW discharge; aligns with pouch-cell modules [doi:10.4271/2006-01-3099]).\n\nFALSIFICATION TEST:\nn = 12 modules, cycled for 10 years at 15\u00b0C top-to-bottom gradient, with voltage spread measured at rest every 3 months. **Fail** if >35% of cells exceed 35 mV spread; **pass** if spread remains <35 mV via Li+ diffusion asymmetry reduction.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 8595,
+   "ttfb_ms": 8595,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 11058,
+   "ttfb_ms": 11058,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 5861,
+   "ttfb_ms": 5861,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 35.3,
+ "infra_time_s": {
+  "queue_wait": 0.0,
+  "gateway_setup": 0.0,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "problem_id": "bench-p01-pemfc-dehydration",
+ "question_type": "intervention-proposal",
+ "a1_source": "GLM_A1_INT_INTERVENTION_GLM",
+ "generator": "zai-org/GLM-5.3 (zai gateway, sandbox environment grant, live)",
+ "contract": "SYS_A1_INT verbatim (F31 intervention contract; committed before generation)",
+ "type_gate": {
+  "verdict": "MATCH",
+  "reason": "proposes a mitigation (section=True, verbs=True)"
+ },
+ "attempts": [
+  {
+   "kind": "generation",
+   "latency_s": 9.2,
+   "chars": 3224
+  }
+ ],
+ "critic_verdict": "CLEAN",
+ "critic_anchors": [],
+ "generation_state": "GENERATED",
+ "at": "2026-11-15T11:09:02.254885Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nTo prevent membrane dehydration under high current density while maintaining 1.5 A/cm² at 80°C without increasing cathode humidification parasitic load above 10%, I propose integrating a localized electroosmotic water management system within the bipolar plates. Standard practice relies on external humidification of reactant gases and thermal management, which becomes inefficient at high current densities. My intervention directly manipulates water migration at the membrane interface through an electric field, contrasting with adjacent techniques that use hydrophilic coatings or pore structures to retain water. The mechanism exploits the electroosmotic effect where an applied electric field across the membrane thickness transports water molecules from the anode to cathode side, counteracting dehydration without adding humidification load.\n\nPHYSICS CHECK\nThe governing relation is Helmholtz-Smoluchowski equation for electroosmotic flow: v = εζE/η, where v is fluid velocity, ε is permittivity, ζ is zeta potential, E is electric field, and η is viscosity. For a PEMFC, this translates to water flux J_w = (εζ/δ)·(V/δ), where δ is membrane thickness and V is applied potential. At 80°C, with ζ ≈ -50 mV, δ = 50 μm, and V = 0.3 V, J_w ≈ 1.2×10⁻⁸ mol/cm²·s, sufficient to replace water lost by electro-osmotic drag (≈1.0×10⁻⁸ mol/cm²·s at 1.5 A/cm²), maintaining hydration without additional humidification.\n\nIMPLEMENTATION BILL\n1. Micro-embedded electrodes: Laser-drilled platinum microelectrodes (50 μm diameter) in bipolar plates at membrane interfaces\n2. Insulating layers: 5 μm SiO₂ coatings between electrodes and flow fields\n3. Control system: Potentiostat with current density feedback (0-1 V range, ±0.01 mV precision)\n4. Power supply: Low-current DC source (0-5 V, 0-100 mA) with ripple <1 mV\n5. Installation: Precision laser drilling of bipolar plates, electrode insertion, SiO₂ deposition via CVD\n6. Procedure: Apply 0.3 V potential across membrane during operation when current density >1.2 A/cm²\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Similar complexity to current bipolar plate manufacturing (adds laser drilling step)\n- Operability: Comparable to existing control systems (adds one control parameter)\n- Maintenance: Slightly higher (electrode inspection every 5000 hours) but no additional consumables\n- Cost: ~15% increase in stack manufacturing cost, offset by 5-10% efficiency gain at high load\n- Burden conclusion: Slightly higher initial burden with comparable operational burden, justified by performance gain\n\nEXECUTABLE TEST\nProtocol: Operate fuel cell stacks at 1.5 A/cm² and 80°C with and without the intervention, measuring membrane resistance via in-situ impedance spectroscopy every 100 hours. Instruments: 4-point probe resistance measurement, IR thermography for hot spot detection, humidity sensors at inlets/outlets. Pass/fail: Intervention must maintain membrane resistance within 10% of initial value after 500 hours, with no temperature hotspots >5°C above average. Duration: 500 hours continuous operation. Kill criterion: If membrane resistance increases by >20% or hotspots develop in either stack, the intervention fails."
+}

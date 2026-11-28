@@ -1,0 +1,21 @@
+{
+ "record": "R148_MODULE_HYGIENE_VERIFICATION/1.0.0",
+ "at": "2026-11-24 (sandbox clock)",
+ "verifier": "builder-r147s1",
+ "subject": "eval/r148_module_hygiene_scan.json (R148_MODULE_HYGIENE_SCAN: 72 zero-importer candidates, 38 'provably dead', disposition DEFERRED-PRUNE with the reappearance guard)",
+ "verdict": {
+  "disposition_confirmed": "DEFERRED-PRUNE is CONFIRMED CORRECT — the prune must NOT run on this census",
+  "census_downgraded": "from 'provably dead' to 'candidate — rescan required'",
+  "evidence": [
+   {"module": "discovery_fabric/benchmark/equation_integrity.py", "census_says": "dead", "actual_importer": "tests/test_e21d_domain_reasoning.py", "cause": "the scan's import regex missed the direct test import (or excluded tests/)"},
+   {"module": "discovery_fabric/benchmark/numerical_provenance.py", "census_says": "dead", "actual_importer": "tests/test_r379_technical_engine.py", "cause": "same class"},
+   {"module": "discovery_fabric/connectors/openalex/mapper.py", "census_says": "dead", "actual_importer": "discovery_fabric/retrieval_fabric/abstract_enrichment.py", "cause": "the scan missed the package-form import in the production path"},
+   {"module": "discovery_fabric/physics_stack/mechanism_physics.py", "census_says": "dead", "actual_importer": "discovery_fabric/physics_stack/__init__.py (the package re-export) — AND it is the natural base for the c-0258 physics-correctness lever (mechanism-level physics checks)", "cause": "the __init__ re-export was not counted; the forward-plan collision unpriced"}
+  ],
+  "sampling": "4 of 38 checked, 4 false positives (100% of the sample failed) — the census method needs a rescan with package-form imports ('from discovery_fabric.benchmark import equation_integrity'), __init__ re-exports, test-directory imports, and the c-0258 lever's planned imports before ANY prune commit",
+  "harm_prevented": "a prune on this census would break the test suite (2 test imports), the retrieval fabric (abstract_enrichment), and would delete the physics_stack module the DIR-7 lever needs"
+ },
+ "typed_disposition_for_DIR8": "the 38-module prune stays DEFERRED with the reappearance guard (the s1-b lane's disposition, now evidence-backed); the rescan requirements are typed above; the prune may only commit AFTER (a) a corrected census with the 4 false-positive classes fixed and (b) the c-0258 lever's import needs are known — the lever may resurrect modules (the reappearance guard's purpose)",
+ "f30_note": "F30 (the AIDE re-authorization per P3) carries the standing delegated-owner typing from the V114 checklist; no builder-side act",
+ "f45_note": "F45 (the history-exposed credentials) stays ESCALATED-STANDING-OWNER — rotation is the account-level act; builder containment re-verified this window (secret-grep 0 live, env-only vault)"
+}

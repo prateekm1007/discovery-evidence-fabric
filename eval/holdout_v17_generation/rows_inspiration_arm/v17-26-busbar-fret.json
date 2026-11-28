@@ -1,0 +1,127 @@
+{
+ "problem_id": "v17-26-busbar-fret",
+ "domain": "ev-powertrain",
+ "question_type": "invention",
+ "executor_id": "builder-r144s1@holdout-v17-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r144_v17_one_shot/1.0.0 — the generation-strength one-shot on the LANDED engine (the twin's c-0243 levers: failure_mechanism_map population reorder + the quantitative-testability scan + the off-target scan live inside machine_generate_v79), with THIS lane's wiring completion: the failure_physics conditioning carried onto the r85 challenger path (the r60 wiring was inert on this path, the F61 class) using the twin's own map functions. Problem-only, agnes-3.0-flash pinned, one-shot; the v17 set is the builder-authored CANDIDATE set (the seal + rubrics + scoring stay the AUDITOR's act).",
+ "run": "holdout-v17-generation (one-shot, problem-only, the landed generation-strength engine)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P3",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:449d24d22095": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:fd6311882d9f": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:64877697d99e": "borderline-judge"
+  },
+  "failure_physics": {
+   "family": "thermal_fatigue_crack",
+   "winner_measure_class": "configuration",
+   "winner_principle_id": "P5",
+   "winner_rule": "non_schedule_first",
+   "map_tags": {
+    "mechanism_fit": {
+     "family": "thermal_fatigue_crack",
+     "admitted": true,
+     "rank": 4,
+     "basis": "configuration is admitted class #5 for the thermal_fatigue_crack failure physics"
+    },
+    "map_reordered": true
+   }
+  }
+ },
+ "generated_at": "2026-11-24T04:25:06Z",
+ "attempts_n": 1,
+ "row_wall_s": 17.7,
+ "a1_answer": "# NOVELTY STATEMENT\n*   **Standard Practice:** The standard intervention for fretting/loosening busbar joints under thermal cycling is a **DESIGN CHANGE (procedure/material modification)** involving the application of anti-galling compounds (e.g., copper-doped molybdenum disulfide), the use of prevailing torque fasteners (e.g., thread-locking collars or wedge-lock washers), or the transition to welded/crimped terminations to mechanically suppress micro-slip at the contact interface.\n*   **My Mechanism Departure:** A **CONFIGURATION** change that eliminates the reliance on static frictional preload by introducing a **thermally compliant interlayer** (a shape-memory alloy spring clip or a low-modulus elastomer shunt) in parallel with the fastener stack, converting the joint from a \"clamped bolt\" system to a \"preloaded spring\" system that maintains constant normal pressure across the entire thermal cycle range.\n*   **Failure-Physics Connection:** Fretting fatigue is driven by interfacial micro-slip (Amplitude of slip $\\Delta x$) relative to the normal load $N$. Standard bolts lose effective clamp force $F_c$ as the busbar and fastener cool/dilate at different rates (thermal mismatch $\\Delta L_{thermal}$). The compliant interlayer stores mechanical energy such that the joint's total normal force $N_{total} = N_{bolt} + N_{spring}$ remains above the critical fretting threshold $N_{crit}$ despite the thermal contraction of the copper busbar, thereby keeping the slip amplitude below the damage-per-cycle limit.\n\n# PHYSICS CHECK\n*   **Governing Relation:** Hertzian contact mechanics and the fretting wear/fatigue threshold. The joint remains intact if the interfacial pressure distribution prevents gross sliding. The critical condition for fretting damage is:\n    $$ \\tau_{interface} \\leq \\mu \\cdot P_{nom} $$\n    where $\\mu$ is the dynamic coefficient of friction and $P_{nom}$ is the nominal normal pressure.\n    As the busbar cools (e.g., from $40^\\circ C$ to $-20^\\circ C$), the bolt relaxes. If the bolt is rigid steel, $\\Delta F_{bolt} = -K_{bolt} \\Delta L_{thermal, Cu}$. The compliant layer introduces a restoring force $F_{compliant} = K_{comp} (L_0 - L_{current})$.\n*   **Magnitude Verification:**\n    *   **ASSUMPTION:** Copper busbar CTE $\\alpha_{Cu} \\approx 17 \\mu m/mK$, Steel bolt CTE $\\alpha_{St} \\approx 12 \\mu m/mK$.\n    *   **CALCULATED:** For a $100mm$ bolt length and $\\Delta T = -60K$, the differential contraction is $\\Delta L_{diff} = (\\alpha_{Cu} - \\alpha_{St}) \\cdot L \\cdot \\Delta T \\approx 5 \\mu m/mK \\cdot 100mm \\cdot 60K = 300 \\mu m$.\n    *   A standard M8 bolt with stiffness $K \\approx 200 N/\\mu m$ loses $\\approx 60 kN$ of clamp force.\n    *   **CALCULATED:** A compliant interlayer (e.g., a beryllium-copper spring washer or SMA clip) with stiffness $K_{comp} = 50 N/\\mu m$ and pre-compression capability of $300 \\mu m$ maintains a constant $N_{comp} = 15 kN$ regardless of the thermal drop, provided the displacement is within its elastic/spring range. This ensures the total normal load stays above the $N_{crit}$ required to prevent slip under vibration loads.\n\n# IMPLEMENTATION BILL\n*   **Input Streams:**\n    1.  **ALREADY-RECORDED:** \"Thermal cycling data from vehicle range specification\" (stated in EV powertrain context as the operating envelope).\n    2.  **ALREADY-RECORDED:** \"Busbar geometry and material properties\" (stated specs: Copper, cross-sectional area, bolt spacing).\n    3.  **ALREADY-RECORDED:** \"Fastener torque specs and bolt grade\" (stated nameplate/assembly data).\n*   **Reference/Thresholds:**\n    1.  **DERIVED:** Critical Normal Load $N_{crit}$. **Calculation:** Derived from stated vibration spectra of the EV powertrain and stated friction coefficients of the Cu-Cu interface. $N_{crit} = F_{vib, max} / \\mu_{dynamic}$.\n    2.  **DERIVED:** Thermal Expansion Differential $\\Delta L_{thermal}$. **Calculation:** Derived from stated CTE of Copper and Steel and the stated temperature range of the thermal cycle.\n*   **Components/Procedure:**\n    1.  **Component:** **Thermally Compliant Interlayer** (e.g., BeCu spring washer or NiTi SMA clip). Material class: Metallic spring element.\n    2.  **Procedure:** During assembly, install the compliant interlayer under the bolt head or between the busbar and end-plate. Set the initial bolt torque to **USER CONSTRAINT** (standard torque spec) to ensure the interlayer is pre-compressed to the \"kink point\" where it takes load as the bolt relaxes thermally.\n    3.  **Instrument:** No new sensors. The mechanism is purely mechanical. Trust is derived from the **stated physics** of elastic energy storage.\n\n# BURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Standard Practice Burden:** Apply anti-galling compound (maintenance: re-apply every 5 years or on overhaul), use prevailing torque fasteners (installation: high skill requirement for correct preload), or weld (installation: requires specialized shop equipment, non-serviceable).\n*   **My Approach Burden:**\n    *   **Installability:** **SAME CLASS.** The compliant interlayer is a passive mechanical part installed like a washer. No electronics, no software.\n    *   **Operability:** **SAME CLASS.** Zero runtime power, zero monitoring.\n    *   **Maintenance:** **LOWER CLASS.** Anti-galling compounds degrade and require periodic re-torquing. Spring/SMA interlayers are stable and require no maintenance unless the joint is opened.\n    *   **Cost:** **SAME CLASS.** A precision-machined spring washer or SMA clip costs $0.50-$2.00 per joint, comparable to prevailing torque fasteners ($1.50-$3.00).\n*   **Conclusion:** **SAME burden class, DIFFERENT mechanism.** The novelty is that it solves the thermal drift problem via mechanical compliance rather than friction management or permanent joining.\n\n# EXECUTABLE TEST\n*   **Protocol:**\n    1.  Fabricate 10 test coupons of the standard busbar joint with M8 bolts, 5 without the interlayer (control) and 5 with the compliant interlayer (test).\n    2.  Mount coupons in a thermal chamber.\n    3.  Apply a static vertical vibration load equivalent to **CALCULATED** $F_{vib, max}$ (derived from vehicle NVH data) using a shaker table.\n    4.  Cycle temperature from $40^\\circ C$ to $-20^\\circ C$ over 100 cycles.\n    5.  After each cycle, measure the bolt torque (via a calibrated torque wrench or strain gage on the bolt shank, which is **ALREADY-RECORDED** equipment in a test lab) and measure the interfacial slip displacement (using a laser displacement sensor, a standard lab instrument).\n*   **Pass/Fail Thresholds:**\n    *   **Control (Standard):** Expected to show a drop in bolt torque by >20% at the cold end, leading to measurable interfacial slip > $10 \\mu m$ per cycle (fretting damage threshold).\n    *   **Test (Interlayer):** Expected to maintain bolt torque variation <5% and interfacial slip < $1 \\mu m$ per cycle (below the damage threshold) across the entire temperature range.\n*   **Kill Criterion:** If the test joint exhibits slip amplitude > $5 \\mu m$ at the coldest temperature, the interlayer stiffness $K_{comp}$ is insufficient. **Falsification:** The mechanism fails if the slip amplitude in the test group is statistically indistinguishable from the control group (i.e., the interlayer does not prevent thermal relaxation).\n*   **Validation Source:** Validated against **stated physics** of elastic deformation and **ALREADY-RECORDED** lab instrumentation (torque wrench, laser displacement sensor). No new commissioning campaign is required; the test is a standard mechanical durability test.\n\n# CONSTRAINT BIND\n*   **Primary Stated Indicator:** The problem states the failure is \"fretting and loosening.\" The primary indicator of this failure is **interfacial slip displacement** (or bolt torque loss, which causes the slip).\n*   **Secondary Indicator:** Bolt torque is a secondary indicator that predicts slip. My mechanism acts on the **primary** indicator (slip prevention) by stabilizing the normal load $N$. The test measures the **primary** indicator (slip) directly via laser displacement, ensuring the constraint is met.\n*   **Mechanism Adherence:** The typed plan specifies \"DIRECT_TRANSFER\" with \"P5 (Defectlessness)\" and \"configuration.\" This mechanism transfers the load from the \"defective\" thermal-mismatched bolt to the \"compliant\" interlayer, changing the configuration of the load path. It acts on the \"geometry/configuration\" class admitted in the physics family \"thermal_fatigue_crack.\"\n\n# RISK FIELD\n*   **Material Fatigue:** The compliant interlayer (especially SMA) may undergo fatigue over millions of thermal cycles. **Mitigation:** Design the spring washer for a safety factor of 2 on elastic limit. If SMA is used, ensure the temperature range is well below the martensite transformation temperature to remain in the elastic austenitic state.\n*   **Assembly Variability:** If the interlayer is not installed with sufficient pre-compression, it may \"bottom out\" or be ineffective. **Mitigation:** Provide a simple go/feel gauge for assembly to ensure the correct stack height.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "*   **Input Streams:**",
+    "1.  **ALREADY-RECORDED:** \"Thermal cycling data from vehicle range specification\" (stated ",
+    "2.  **ALREADY-RECORDED:** \"Busbar geometry and material properties\" (stated specs: Copper,",
+    "3.  **ALREADY-RECORDED:** \"Fastener torque specs and bolt grade\" (stated nameplate/assembl",
+    "*   **Reference/Thresholds:**",
+    "1.  **DERIVED:** Critical Normal Load $N_{crit}$. **Calculation:** Derived from stated vib",
+    "2.  **DERIVED:** Thermal Expansion Differential $\\Delta L_{thermal}$. **Calculation:** Der",
+    "*   **Components/Procedure:**",
+    "1.  **Component:** **Thermally Compliant Interlayer** (e.g., BeCu spring washer or NiTi SM",
+    "2.  **Procedure:** During assembly, install the compliant interlayer under the bolt head o",
+    "3.  **Instrument:** No new sensors. The mechanism is purely mechanical. Trust is derived f",
+    "*   **Standard Practice Burden:** Apply anti-galling compound (maintenance: re-apply every",
+    "*   **My Approach Burden:**",
+    "*   **Installability:** **SAME CLASS.** The compliant interlayer is a passive mechanical p",
+    "*   **Operability:** **SAME CLASS.** Zero runtime power, zero monitoring.",
+    "*   **Maintenance:** **LOWER CLASS.** Anti-galling compounds degrade and require periodic ",
+    "*   **Cost:** **SAME CLASS.** A precision-machined spring washer or SMA clip costs $0.50-$",
+    "*   **Conclusion:** **SAME burden class, DIFFERENT mechanism.** The novelty is that it sol",
+    "*   **Protocol:**",
+    "1.  Fabricate 10 test coupons of the standard busbar joint with M8 bolts, 5 without the in",
+    "2.  Mount coupons in a thermal chamber.",
+    "3.  Apply a static vertical vibration load equivalent to **CALCULATED** $F_{vib, max}$ (de",
+    "4.  Cycle temperature from $40^\\circ C$ to $-20^\\circ C$ over 100 cycles.",
+    "5.  After each cycle, measure the bolt torque (via a calibrated torque wrench or strain ga",
+    "*   **Pass/Fail Thresholds:**",
+    "*   **Control (Standard):** Expected to show a drop in bolt torque by >20% at the cold end",
+    "*   **Test (Interlayer):** Expected to maintain bolt torque variation <5% and interfacial ",
+    "*   **Kill Criterion:** If the test joint exhibits slip amplitude > $5 \\mu m$ at the colde",
+    "*   **Validation Source:** Validated against **stated physics** of elastic deformation and",
+    "*   **Primary Stated Indicator:** The problem states the failure is \"fretting and loosenin",
+    "*   **Secondary Indicator:** Bolt torque is a secondary indicator that predicts slip. My m",
+    "*   **Mechanism Adherence:** The typed plan specifies \"DIRECT_TRANSFER\" with \"P5 (Defectle",
+    "*   **Material Fatigue:** The compliant interlayer (especially SMA) may undergo fatigue ov",
+    "*   **Assembly Variability:** If the interlayer is not installed with sufficient pre-compr"
+   ],
+   "APPARATUS_ROW": [
+    "*   **Operability:** **SAME CLASS.** Zero runtime power, zero monitoring."
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'thermal cycling' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "DRIVER_CLASS_AS_REMEDY": [
+    "the mechanism's action ingredient 'thermal cycling' and the stated failure driver 'thermal cycling' are the same action class (thermal-cycling) — a remedy may not be its own driver"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "21935f0515c0dee4"
+}

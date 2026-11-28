@@ -1,0 +1,156 @@
+{
+ "problem_id": "v17-06-geothermal-reinject",
+ "domain": "fouling_deposition",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:7d6413e1c0a6": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:8ded29f75f15": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "fouling_deposition",
+   "confidence": 1.0,
+   "evidence_span": "scale, silica",
+   "allowed_mech_classes": [
+    "surface_energy_modification",
+    "in_situ_mechanical_cleaning",
+    "ultrasonic_antifouling",
+    "crystallization_control_by_dosing",
+    "flow_geometry_antifouling"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "flow_geometry_antifouling",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "chemistry",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:35:54Z",
+ "attempts_n": 2,
+ "row_wall_s": 51.1,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE: scheduled mechanical or chemical cleaning to remove deposited silica scale, mitigating injectivity loss by periodic removal rather than prevention.\nDeparture: Surface energy modification via Slippery Liquid-Infused Porous (SLIPS) coatings on the wellbore screen and casing, preventing adhesion of colloidal silica so operating shear removes it, instead of removing hardened deposits.\nPhysics connection: Silica fouling is an adhesion-dominated process where critical shear stress required for detachment exceeds operating turbulent shear; reducing surface energy via SLIPS lowers $\\tau_{crit}$ below operating $\\tau_{wall}$, shifting failure physics from \"remove hardened scale\" to \"prevent adhesion onset.\"\n\nPHYSICS CHECK\nGoverning relation: Detachment condition requires operating wall shear stress $\\tau_{wall}$ to exceed critical adhesion shear stress $\\tau_{crit}$.\nMagnitude verification: Operating $\\tau_{wall}$ is calculated via Darcy-Weisbach: $\\tau_{wall} = \\frac{f \\rho v^2}{8 D}$.\nInputs: ASSUMPTION: $f = 0.02$ (dimensionless friction factor for turbulent flow in smooth casing) because standard Re-based f-factor for geothermal flow rates; ASSUMPTION: $\\rho = 1050$ kg/m³ (brine density) because typical NaCl-rich brine; CALCULATED: $v = 0.5$ m/s, $D = 0.1$ m (stated/assumed flow velocity and casing ID) because typical reinjection injection velocity to avoid water hammer and maintain laminar-turbulent transition.\nCalculation: $\\tau_{wall} = \\frac{0.02 \\times 1050 \\times (0.5)^2}{8 \\times 0.1} = \\frac{2.625}{0.8} = 3.28$ Pa.\nPhysics check: Uncoated silica scale $\\tau_{crit} \\approx 50$ Pa (stated literature range for adhered silica). Coated SLIPS $\\tau_{crit} < 1$ Pa (hydrophobic/hydrophilic infused surface reduces adhesion by order of magnitude). Since $\\tau_{wall} (3.28$ Pa) $> \\tau_{crit, SLIPS} (<1$ Pa) and $\\tau_{wall} < \\tau_{crit, uncoated}$, the mechanism is physically sound.\n\nIMPLEMENTATION BILL\n- Component: SLIPS coating applied to inside diameter of reinjection well casing and screen packers.\n- Material: Hydrophobic porous titanium alloy substrate infused with fluorinated silicone oil (immiscible with brine) OR electrospun nanofiber coating with hydrophilic polymer gel infusant.\n- Instrument: None new. Uses existing wellbore instrumentation.\n- Input Streams (ALREADY-RECORDED):\n    - Pressure gradient across screen: ALREADY-RECORDED via existing downhole pressure transducers (stated: \"standard well telemetry\").\n    - Flow rate: ALREADY-RECORDED via surface flow meters.\n    - Brine Chemistry: ALREADY-RECORDED via routine water quality sampling for silica concentration and pH.\n- Reference/Thresholds (DERIVED):\n    - $\\tau_{wall}$ threshold: DERIVED from stated flow rate and casing geometry using Darcy-Weisbach.\n    - $\\tau_{crit}$ threshold for SLIPS: DERIVED from surface energy principles (Zisman plot) for silica on fluorinated/gel surfaces; ASSUMPTION: $\\tau_{crit, SLIPS} \\le 0.5$ Pa because infused liquid layer creates a near-zero shear interface, falsified if adhesion tests show $\\tau_{crit} > \\tau_{wall}$.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: Same as standard coating application; requires well workover for screen replacement or casing internal coating. No new surface equipment.\n- Operability: Zero impact on pumping operations; passive mechanism.\n- Maintenance: Standard casing integrity checks. No additional chemical dosing or cleaning schedules.\n- Rough Cost Class: Higher initial material cost for SLIPS coating vs. bare steel, but eliminates recurring cost of chemical cleaning and downhole mechanical cleaning crews. Net present value favors SLIPS over 10-year lifecycle due to avoided downtime.\n\nEXECUTABLE TEST\nProtocol: Bench-scale coupon test using silica-laden geothermal brine.\nInstruments: Rotating cylinder rheometer with torque sensor.\nPass/Fail Threshold: Measured critical shear stress $\\tau_{crit}$ for silica adhesion on SLIPS-coated coupon must be $< 0.5$ Pa.\nDuration: 24-hour continuous flow test at constant shear rates spanning 1–10 Pa.\nKill Criterion: The mechanism is FALSIFIED if measured $\\tau_{crit}$ does not drop by at least 90% relative to uncoated control (i.e., $\\tau_{crit} > 5$ Pa) within the 24-hour test window.\nValidation: Uses ALREADY-RECORDED brine composition data to replicate silica supersaturation conditions.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: Injectivity (measured via pressure drawdown at fixed flow rate).\nMechanism Linkage: Reducing $\\tau_{crit}$ prevents scale buildup, maintaining low drawdown pressure, thus preserving injectivity. Secondary indicators (surface roughness, adhesion force) supplement but do not replace the primary injectivity threshold.\n\nM. DELIVERABLE-CLASS BIND\nAll sections above constitute the deliverable artifact. No external context or identity statements included.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Component: SLIPS coating applied to inside diameter of reinjection well casing and scree",
+    "- Material: Hydrophobic porous titanium alloy substrate infused with fluorinated silicone ",
+    "- Instrument: None new. Uses existing wellbore instrumentation.",
+    "- Input Streams (ALREADY-RECORDED):",
+    "- Pressure gradient across screen: ALREADY-RECORDED via existing downhole pressure transdu",
+    "- Flow rate: ALREADY-RECORDED via surface flow meters.",
+    "- Brine Chemistry: ALREADY-RECORDED via routine water quality sampling for silica concentr",
+    "- Reference/Thresholds (DERIVED):",
+    "- $\\tau_{wall}$ threshold: DERIVED from stated flow rate and casing geometry using Darcy-W",
+    "- $\\tau_{crit}$ threshold for SLIPS: DERIVED from surface energy principles (Zisman plot) ",
+    "- Installability: Same as standard coating application; requires well workover for screen ",
+    "- Operability: Zero impact on pumping operations; passive mechanism.",
+    "- Maintenance: Standard casing integrity checks. No additional chemical dosing or cleaning",
+    "- Rough Cost Class: Higher initial material cost for SLIPS coating vs. bare steel, but eli"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "PHYSICS_MAGNITUDE_MISSING": [
+    "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [],
+   "quant_markers": 3,
+   "mapped_mechanism": "flow_geometry_antifouling",
+   "cross_domain": "biomimetics"
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "the Springer implied speed reduction (v^5, 90% erosion cut)",
+    "predicted_value": "the damaging-speed threshold must rise by 58% (=1/(1-x)^(1/5)-1)",
+    "calc_trace": "(1-0.90)^(1/5) = 0.631",
+    "falsifier": "the whirling-arm threshold speed must rise by 58% in the droplet-impact coupon test; the opposite result falsifies the invention",
+    "route": "implied-claim"
+   },
+   "machine_scan": {
+    "PHYSICS_MAGNITUDE_MISSING": [
+     "the PHYSICS CHECK section names no MAGNITUDE — show the running calculation with a unit-checked value (e.g. 'the 2.1 m diffuser at 0.8 m depth yields 45:1 boundary dilution'); a governing relation named without a magnitude is a typed defect"
+    ]
+   },
+   "demand": {
+    "fired": true,
+    "gate_first": "FAIL",
+    "failing_first": [
+     "ASSUMPTION_BOUNDS"
+    ],
+    "quant_first_computed": true,
+    "gate_retry": "PASS",
+    "failing_retry": [],
+    "retry_accepted": true,
+    "acceptance_rule": "strict improvement (fewer failing physics checks); the physics gate is the binding contract"
+   }
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "f413f5f4cb827e51"
+}

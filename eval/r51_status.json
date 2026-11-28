@@ -1,0 +1,71 @@
+{
+ "record": "R51_BUILDER_STATUS/1.0.0",
+ "session": "builder-r51s1",
+ "work_id": "r51-p03-verify-p12-schema",
+ "claim": "c-0068",
+ "base_sha": "7a7c820ff",
+ "round": "R51 (roadmap 4->9: P0.3 content verification + P1.2 schema slice)",
+ "protocol": [
+  "FULL constitution reads: byte-identity re-verified at the round-open tips (EPISTEMIC @ 7a7c820ff md5 525536896f8000a17fab124fac845ca0; AUDITOR @ 604c3efc4 md5 abe1c4127bfc9e53b0f29c16e14892d5) \u2014 identical to the prior FULL reads, which stand; no new auditor verdict since 604c3efc4",
+  "claim-before-work: c-0068 registered OPEN in eval/work_claims.json before any artifact was written",
+  "secret-grep staged diff: run before the push (quoted in remote_ci note)"
+ ],
+ "art27_capability_budget": {
+  "engine_diff": "ADDED: discovery_fabric/engine/candidate_schema.py (the P1.2 mechanism_candidate/1.1.0 extension layer \u2014 four enum fields measure_class/signals_used/principle_id/mechanism_class, wrap-only over the byte-stable 1.0.0 core, candidate_hash never recomputed, validator reads schema fields never prose); tests/test_candidate_schema.py (7 zero-LLM tests, wired into the queue-surface step-2 block); scripts/r51_secret_verification.py (the P0.3 content-level verifier \u2014 tooling, not engine). UNCHANGED: mechanism_space.py (the 1.0.0 core and its hash inputs are untouched by design), r43_machine_v8.py and every frozen artifact.",
+  "primary_metric_delta": "NOT CLAIMED \u2014 no generation ran; the schema delta is measured at the P1.4 labelled-row regression (the schema path must match the prose scanners' P/R on the labelled v6/v7 rows) and at the D2d matched-budget DEV ablation.",
+  "deletions": "NONE \u2014 the prose-regex scanner retirement is SCHEDULED, not claimed: the Art. 16 ledger takes the entry only when the schema path has proven P/R parity on the labelled rows (P1.4). Sequencing typed here so no retirement is silently claimed.",
+  "engine_line_share": "engine code this round: candidate_schema.py ~170 lines of ~340 changed lines total (excluding the report JSON) \u2014 ~50%, meets the >=30% rule"
+ },
+ "P0_3_content_level_verification": {
+  "file": "eval/r51_secret_verification.json",
+  "method": "content-level classification of every r50 prefix hit (provider-format regexes ghp_36+/gho_36+/github_pat_82+/nvapi-30+/sk-or-60+; pattern-context and audit-path context checks) + F45 exact-value presence scan (the vault value compared in-process, never printed) + F60 unauth raw probes",
+  "classification": "the r50 prefix set decomposes into pattern_mention (regex fragments in scanners/tests/audit scripts), masked_or_short (sub-format-length strings), audit_record (files that ARE credential-audit/security records) \u2014 and exactly ONE full_format hit",
+  "full_format_note": "the single full_format hit IS the F45 token \u2014 the content-level scan and the exact-value scan converge on the same live credential; no SECOND live full-format token exists on any ref",
+  "f45": {
+   "verdict": "LIVE LEAK CONFIRMED (re-verified 2026-11-17)",
+   "exact_locations": [
+    "refs/remotes/origin/r448/visual-lab:scripts/r447_canonical_space_record.py",
+    "refs/remotes/origin/r448/visual-lab:scripts/r447_hf_deploy.py"
+   ],
+   "note": "the vault GH_PAT value itself sits plaintext on the public r448/visual-lab branch in two scripts \u2014 F59-precision branch+path set for the owner's rotation+scrub act"
+  },
+  "f60": {
+   "verdict": "STILL PUBLIC (re-verified 2026-11-17)",
+   "probe": "unauth raw read of audit/holdout_v7/holdout_v7_rubric_PRIVATE.json on audit/r11-auditor-verdict-20261114 returned HTTP 200 with 8385 bytes \u2014 byte-identical to the recorded F60 finding; the path is absent from main (404 there) but live on the public audit branch"
+  }
+ },
+ "P0_1_owner_escalation": {
+  "escalation_n": 2,
+  "cadence": "once per round until done (risk register)",
+  "asks": [
+   "rotate the GitHub PAT (the vault value is plaintext on r448/visual-lab at scripts/r447_canonical_space_record.py and scripts/r447_hf_deploy.py) and the 2 Aug-18 keys; treat every credential that touched public history as burned",
+   "move/encrypt every *_PRIVATE.json to private custody (age/openssl, owner-held passphrase) + scrub public history \u2014 the v8 gate stays CLOSED until the verbatim custody-restored statement",
+   "after this act, auditor agents manage custody and no further owner acts remain in the plan"
+  ]
+ },
+ "P1_2_schema_extension": {
+  "file": "discovery_fabric/engine/candidate_schema.py",
+  "design": "wrap-only: the 1.0.0 core stays byte-stable (committed runs carry it; candidate_hash covers its required fields); extend_to_1_1 wraps with the four enum fields and validate_candidate_schema returns typed findings (MECHANISM_CLASS_UNSTATED, MEASURE_CLASS_NOT_ALLOWED, SIGNAL_NOT_PERMITTED, PRINCIPLE_UNASSIGNED as the typed P2 gate, SCHEMA_VERSION_MISMATCH)",
+  "art25_discipline": "an unstated restriction never fires (Art. XXV) \u2014 no allowed-measures or permitted-signal declaration on the problem means no violation, tested explicitly",
+  "tests": "tests/test_candidate_schema.py 7/7 green; wired into the queue-surface step-2 block",
+  "retirement_sequencing": "the prose-regex scanners (scan_mechanism_class_v8 et al., scripts/r43_v8_binds.py) retire via the Art. 16 ledger ONLY after the schema path matches their P/R on the labelled rows (P1.4) \u2014 no deletion is claimed this round"
+ },
+ "remote_ci": {
+  "pushed_sha": "520743751",
+  "remote_ci_conclusion": "success",
+  "read_at": "2026-11-17T12:45:00Z",
+  "check_runs": [
+   {
+    "name": "surface",
+    "conclusion": "success"
+   }
+  ],
+  "note": "quoted from the check-runs API read (GET /commits/520743751/check-runs -> surface=success). Push audit trail: d442f6f11 FAILURE (session registration lagged the claim \u2014 4 article29 assertions), f61fce7ca (registration fix, work commit), 520743751 SUCCESS. The round's green is a REMOTE quoted green. The record-close commit re-triggers CI; its conclusion lands in the next round's record per the D2 procedure."
+ },
+ "next_round": [
+  "P1.3 engine-route integration: extend_to_1_1 + validate_candidate_schema wired after assemble_candidate in the machine route (knowledge_first_item -> contracts -> assemble -> 1.1.0 schema -> physics_checks -> binds); contract negative-cases ride the 14/14 probe",
+  "P1.4 labelled-row regression (schema path P/R parity) then the Art. 16 scanner retirement with real entries",
+  "D2d matched-budget DEV ablation (plan layer: eval/v82_dev_plan_population.json; novelty gate bands 0.85/0.70)",
+  "P0.3 residual: gitleaks in CI when the binary is available; the detect-secrets baseline audit trail is committed"
+ ]
+}

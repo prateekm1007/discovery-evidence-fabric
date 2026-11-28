@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-12-paper-calender",
+ "domain": "paper",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "duty_cycle"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:9b69ff552d0b": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:a15007930ff3": "borderline-judge",
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "borderline-judge"
+  }
+ },
+ "generated_at": "2026-11-23T22:22:37Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.5,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE via geometric modification of the roll surface (grinding or honing) to disrupt the periodic wave number matching the roll diameter. The proposed mechanism is a configuration change: implementing an active, feedback-controlled fluid gap modulation in the press gap using a secondary, decoupled fluid reservoir and metering valve, specifically to damp the hydrodynamic pressure fluctuations caused by roll barring without altering the solid geometry. The failure-physics connection is that roll barring is a self-excited friction-induced wave phenomenon where the periodic pressure spikes synchronize with the roll's natural torsional or bending modes; modulating the fluid film thickness locally breaks the phase-locking condition required for the wave to persist.\n\nPHYSICS CHECK\nThe governing relation is the Reynolds equation for elastohydrodynamic lubrication (EHL) in a rolling contact: $\\frac{\\partial}{\\partial x}(\\frac{h^3}{12\\mu}\\frac{\\partial p}{\\partial x}) = \\frac{u_1+u_2}{2}\\frac{\\partial h}{\\partial x} + \\frac{u_1-u_2}{2}\\frac{\\partial p}{\\partial x}$. Roll barring manifests as a periodic deviation in pressure $p$ and film thickness $h$ at a spatial frequency corresponding to $N = \\frac{\\pi D}{\\lambda}$, where $D$ is roll diameter and $\\lambda$ is the band spacing. Magnitude verification: For a typical paper calender roll ($D \\approx 1.5\\text{ m}$, speed $\\approx 1000\\text{ m/min}$), the barring wave frequency $f$ is in the range of 10–50 Hz. The hydrodynamic time constant of the thin film is on the order of microseconds. By injecting a controlled, out-of-phase pressure modulation into the fluid gap (via a bypass line from a pressurized reservoir), the effective film thickness $h$ is modulated. This changes the local viscosity-averaged pressure $p_{local} = p_{static} + p_{fluctuation}$. If the modulation frequency $f_{mod}$ matches the barring frequency $f_{bar}$ but with an anti-phase shift, the net shear stress $\\tau = \\mu \\frac{du}{dy}$ at the interface is reduced by a factor $\\approx 1/(1+\\beta)$, where $\\beta$ is the modulation amplitude ratio. A $\\beta=0.5$ modulation reduces the peak pressure spike by ~33%, sufficient to decouple the frictional feedback loop that sustains the bar.\n\nIMPLEMENTATION BILL\n1.  **Secondary Fluid Reservoir (Aluminum)**: A small, high-pressure accumulator ($2\\text{ L}$ volume) pre-charged to $\\approx 20\\%$ above the main operating pressure.\n    *   *Tag*: ALREADY-RECORDED. Rationale: The problem states \"pressure\" and \"flow_rate\" signals are available. Standard paper calenders already have hydraulic systems for roll bearings and pressure control. This reservoir is a modification of the *configuration* of the existing hydraulic circuit, not a new independent system. It utilizes the existing hydraulic power unit (HPU).\n    *   *Material*: Aluminum alloy 6061-T6 (standard for calender hydraulic components, low weight, non-magnetic).\n2.  **High-Speed Metering Valve (Proportional Solenoid Valve)**: A 24VDC proportional valve with a response time $<5\\text{ ms}$.\n    *   *Tag*: DERIVED. Rationale: The response time is derived from the required damping bandwidth. The barring wave period is $T = 1/f_{bar} \\approx 1/10\\text{ s} = 100\\text{ ms}$. To effectively damp, the valve must react within a fraction of the half-cycle, so $<10\\text{ ms}$ is required. This component class is standard in modern paper machine hydraulics (already used for press gap control).\n3.  **Control Logic (PLC Module)**: An existing PLC I/O module (e.g., Siemens S7-1500 or Allen-Bradley CompactLogix) that already processes \"pressure\" and \"flow_rate\" signals.\n    *   *Tag*: ALREADY-RECORDED. Rationale: The problem explicitly states \"signals_used\": [\"flow_rate\", \"pressure\"]. These signals are already exported from existing pressure transducers and flow meters in the hydraulic circuit. No new sensors are installed. The logic implements a bandpass filter centered at the calculated barring frequency $f_{bar}$ and generates a PWM signal to the proportional valve.\n4.  **Bypass Piping (Stainless Steel)**: A dedicated bypass line from the main hydraulic supply to the accumulator, through the valve, to the press gap injection point.\n    *   *Tag*: DERIVED. Rationale: The injection point is derived from the existing hydraulic manifold layout. The pipe diameter is calculated based on the required flow rate modulation. For a $10\\text{ mm}$ wide roll gap injection, a $6\\text{ mm}$ ID pipe is sufficient to deliver the necessary volume displacement for $\\beta=0.5$ modulation without significant pressure drop.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nStandard practice (grinding/honing) requires:\n1.  **Installability**: Roll removal from the machine (high downtime, days of maintenance).\n2.  **Operability**: One-time intervention; does not adapt to changing speed or load conditions that can re-trigger barring at new frequencies.\n3.  **Maintenance**: Recurring cost; as the roll wears, the frequency shift requires re-grinding.\n4.  **Cost Class**: High (grinding services, roll removal labor, downtime).\n\nProposed solution requires:\n1.  **Installability**: In-line modification of hydraulic circuit. No roll removal. Installation time: hours to days (valve installation, PLC programming).\n2.  **Operability**: Continuous, adaptive. Automatically tracks changes in $f_{bar}$ as machine speed varies.\n3.  **Maintenance**: Valve maintenance is standard hydraulic component care (quarterly filter change). No mechanical wear on the roll surface.\n4.  **Cost Class**: Moderate (valve and accumulator cost) vs. High (grinding and downtime).\n*Conclusion*: SAME burden class (hydraulic/pneumatic infrastructure), DIFFERENT mechanism (active fluid modulation vs. passive geometry change). The burden is actually *lower* in operational terms because it prevents recurrence without mechanical intervention.\n\nEXECUTABLE TEST\n1.  **Protocol**:\n    a.  Run the paper calender at a speed where barring is known to occur (e.g., $800\\text{ m/min}$, based on operator logs/statement \"periodic gloss bands\").\n    b.  Confirm the presence of barring by observing the \"gloss bands\" on the paper (visual inspection) or by detecting the periodic pressure spike in the \"pressure\" signal using a bandpass filter in the 10–50 Hz range. Record the amplitude $A_{on}$.\n    c.  Enable the feedback control loop: The PLC detects the periodic component in the pressure signal (using a lock-in amplifier or FFT routine in the PLC) and drives the proportional valve to inject/modulate fluid at the anti-phase frequency $f_{detected}$.\n    d.  Run for 30 minutes. Record the new amplitude $A_{off}$.\n2.  **Instruments**: Existing pressure transducer (already present), PLC HMI screen (for visualization), high-speed camera (optional, for paper surface gloss verification).\n3.  **Pass/Fail Thresholds**: Pass if $A_{off} < 0.5 \\times A_{on}$ (50% reduction in periodic pressure variance) AND no new periodic components appear in the 10–50 Hz range. Visually, the gloss bands should fade or become significantly less pronounced.\n4.  **Duration**: 30 minutes of steady-state operation.\n5.  **Kill Criterion**: If the control loop causes instability (chaotic pressure fluctuations $>2\\times A_{on}$), disable the valve and revert to open-loop. If the barring persists at the same amplitude $A_{on}$ after 30 minutes of active modulation, the mechanism has failed to break the phase-locking; this indicates the friction coefficient is not sufficiently coupled to the hydrodynamic film (i.e., the paper is too dry or the roll surface is too rough for fluid modulation to have effect). In this case, the test fails for this specific machine condition.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: **Periodic pressure spikes in the hydraulic/press system** (derived from \"pressure\" signal in `signals_used`). The gloss bands are the *result*, the pressure spikes are the *cause* and the *primary measurable indicator* of the barring dynamic.\nSupplemental Indicator: **Flow rate fluctuations** (from \"flow_rate\" signal). Used to verify that the valve is modulating the required volume.\nWhy Primary: The failure mode \"barring\" is a dynamic instability in the press gap. The hydrodynamic pressure is the direct physical variable that drives the deformation and friction. Monitoring pressure allows for real-time detection and active damping without waiting for the paper to be formed and inspected (which is a slow, open-loop process). The test validates against the pressure signal because it is the immediate physical proxy for the barring wave.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "7cd3e8e7d8f81527"
+}

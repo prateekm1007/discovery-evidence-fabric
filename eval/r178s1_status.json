@@ -1,0 +1,62 @@
+{
+ "record": "R178S1_BUILDER_STATUS/1.0.0",
+ "session": "builder-r178s1",
+ "lane": "DIR-3 SHIP (the mitigation route split) + DIR-8 resolver decision + DIR-1 bootstrap + DIR-2 verifier standby",
+ "round_date": "2026-11-27",
+ "sandbox_clock": "TRUE UTC",
+ "base_state": "queue tip 1f6f83225 at session start (builder-r176s1's run-in-flight checkpoint: the c-0283 invention run IN FLIGHT, 0/24 pairs, third judge seat + generation checkpointing amendments); the direction pins ce16b31c6 (constitution) + ac55c3a12 (audit)",
+ "claims": {
+  "c-0288": "r178s1-dir3-ship-mitigation-route-split (task) — the SHIPPED route split (10e51e82d + the CI fix commit)",
+  "c-0289": "r178s1-dir8-resolver-decision (task) — the typed decision memo + this record"
+ },
+ "completed": [
+  "DIR 1 (every item): constitutions digest-verified at the pinned SHAs — EPISTEMIC at ce16b31c6 (153ac62efca36c2d) and AUDITOR at ac55c3a12 (3775f869a1c19a96), both byte-identical to the prior session's full-read bytes (the same sha at both commit pins — the full-read requirement carries to these exact bytes); ledger V138 read from the committed AUDIT_LEDGER.json (score 3; CTAI burn confirmed+stripped; DIR-3 mitigation kill delivered; DIR-2 invention test in flight; DIR-8 honest negative; P5 lease correction — every item matches the direction); vault 11/11 via r77_vault_restore.py (digests only); secret-grep 0 live at the tips; check-runs ce16b31c6 + 1b5e930b5 surface completed/success read from the API",
+  "DIR 3 SHIPPED (the direction's SHIP item, claim c-0288): discovery_fabric/engine/problem_router.py (problem_router/1.0.0) — the TYPED problem-class router; the problem's OWN declared question_type is authority (never re-derived): intervention-proposal (the f31e mitigation shape) -> CHEAP_ARM; novel-mechanism (the r176 invention shape) -> ARCHITECTURE unchanged; unknown/missing -> ARCHITECTURE conservatively. Conductor wiring at POST_RANK_GRID: the typed route skip record (SKIPPED_ROUTE_MITIGATION_CHEAP_ARM, carrying the measured basis — 1/12 genuine value-add, 7/12 dominance ties, 0.75 non-loss is the cheap recipe's own) persists at the section head; the route verdict OUTRANKS the R399 evidence gate for the record; ONLY the exploration grid is skipped — the ensemble best-of-N, the cheap screen, and the composer's deterministic validate-repair verifier (contract + constraint + consistency) stay on for EVERY route. tests/test_r178_problem_router.py: 6 unit + 3 integration (the r399 offline fixture chain) — mitigation -> typed route skip + zero grid specs on disk (non-vacuity proven by re-running the fixture and reading the persisted status), invention -> architecture runs, unclassified -> architecture. Regression batteries around the site GREEN (r399_gates/routing_states, grid_candidate_verification, article29/27, remote_ci, r510_dryrun, r395_workspace)",
+  "DIR 3 SHIP INCIDENT (self-caught, disclosed): the first push (10e51e82d) went RED on CI — tests/test_grid_candidate_verification.py::test_grid_stays_conditional PINS the exact source line 'if not self._naive_survivor and not adjudication_blocked:' and my guard extension broke the literal. Fixed by restoring the pinned line verbatim and gating INSIDE the guard (the route check precedes the R399 evidence gate for the record; the elif route branch generates nothing). The fix commit carries this disclosure; the local battery that missed it (the file was not in my regression set) is now in it",
+  "DIR 3 REBUILD INCIDENT (self-caught by the non-FF rejection, disclosed in the ship commit): the first build of the ship commit (6d209e0ac, NEVER pushed) was parented on the rolled-back sandbox state (the sandbox came back at fad0baec6 — pre-R177) and would have rolled the claims registry back (losing c-0283..c-0287); the non-FF push rejection caught it; rebuilt on the true remote tip 1f6f83225 with the registry verified intact before staging. LESSON (both incidents): (a) re-verify the fetch state after any sandbox recycle BEFORE claiming (the registry tail is the check); (b) pinned-source tests mean source-line edits need the pinning test in the local battery first",
+  "DIR 8 TYPED DECISION (claim c-0289, eval/r178s1_dir8_resolver_decision.json): ACCEPT ROOT 218 — the resolver refactor is NOT authorized this round (typed refusal with basis): (1) capability-first — the refactor moves no scoreboard metric while risking the exact CI breakage the R388 audit prevents; (2) the DIR-8 freeze itself forbids governance-motivated engine work before an invention win; (3) 108 referenced dirs are live-surface-wired (engine modules, tests, workflows, registries) — a multi-window measured-path project; (4) reversible later, the reverse is not true. REVISIT CONDITION: only after (a) a measured genuine invention win (AM53), (b) explicit owner authorization, (c) its own claim with the R144 re-freeze discipline. ROOT COUNT CORRECTED from bytes: the committed tree has 218 root entries (the R177 record's '213' was an ls -1 dotfile artifact — .dockerignore/.gitattributes/.githooks/.github/.gitignore/.secrets.baseline{,.json} were missed); the direction's 218 is right; the R177 scrub's 12-dir removal stands (225 true -> 218 true)",
+  "FREEZE STATUS: no new constitution articles, no new round folders this session (all bytes in eval/ + scripts/ + engine/ + tests/); the freeze lifts only on a measured genuine invention win",
+  "DIR 6: the P5 v2 lease c-0275 is LIVE to 2026-11-28T00:00Z (verified from the registry bytes at the true tip) — NO takeover; re-check at expiry (the one-shot run's bytes decide)",
+  "DIR 2 (VERIFIER standby, the TOP item): the c-0283 run is IN FLIGHT in the executor's sandbox (their checkpoint commit 1f6f83225: 0/24 pairs complete, generation checkpointing per item, third judge seat tr-deepseek live, ctai quota-windowed, snlite daily-quota'd until ~midnight UTC; the drive wrapper byte-resumes). NO run bytes on the remote at this session's close — the verifier recompute (AM53 genuine-win scoring from the pair bytes, Wilson CI, dominance-tie + plain-win exclusion audit, per-seat split) executes the moment their pairs land",
+  "DIR 4: the ablation harness (R177, scripts/r177s1_ablation_harness.py) is READY and reads the r176 corpus (present at the tip); the runs stay gated on the c-0283 executor's measured pairs landing first (no duplicate generation while their lease is live — the ablation arms re-generate candidates on the same corpus; running now would collide with their in-flight run through the shared seats)"
+ ],
+ "findings": [
+  "R178-F1 (sandbox recycle + non-FF save): the sandbox came back at the pre-R177 state (fad0baec6) with the local branch believing it was current; the first ship commit was parented there and would have rolled the claims registry back (c-0283..c-0287 lost) — the non-FF push rejection caught it. The rebuild is on the true tip with the registry verified. The check that prevents the class: read the registry tail (last claim id + counter) against the REMOTE tip before any claim registration",
+  "R178-F2 (pinned-source tests): test_grid_stays_conditional pins the exact conductor source line; a guard edit broke the pin and CI went RED despite a green local battery (the pinning test was not in the local set). The fix restores the pinned line verbatim; the local battery for the site now includes the pinning test. Typed as an instrument lesson: source-line pins make run.py edits battery-first on the pinning tests (grep 'in SRC' tests before editing)",
+  "R178-F3 (root count corrected): the committed tree's root entry count is 218 (the direction's number); the R177 record's 213 undercounted by the 7 dotfiles an ls -1 hides. Correction is forward-only in this record (Art. 4); the r177s1_status.json text stands as history with this record correcting it",
+  "R178-F4 (DIR-2 seat window, from the executor's checkpoint bytes): ctai is quota-windowed, snlite daily-quota'd until ~midnight UTC, tr-deepseek live — the run is progressing on the third seat with per-item generation checkpoints; the judge-seat per-pair split is recorded per pair, so the verifier recompute can audit per-seat consistency when the pairs land"
+ ],
+ "next_bound": [
+  "VERIFIER on the c-0283 judged pairs the moment they land on the remote: recompute the tally from the pair bytes (auditor Art. 13), the AM53 genuine-win classification (champion in {departure, contradiction, relaxation} AND blind WIN; dominance ties and plain best-of-N wins excluded and reported separately), the Wilson CI vs the >=50% bar, the per-seat split, and the canary/leak asserts",
+  "DIR 4 ablation arms on the landed corpus (the harness is ready; <=12-call budget; the tournament arm is the predicted retiree)",
+  "DIR 6 at 2026-11-28T00:00Z: if c-0275 has no run bytes, the P5 v2 one-shot run executes as the lawful takeover (one generation, Art. 29(c)); if their bytes land first, verifier duty instead",
+  "DIR 5 stays gated on the DIR-2 DEV gate passing (no holdout spend while unmet)"
+ ],
+ "owner_requests": [
+  "rotate the burned CTAI credential (R177-F1 class, still BURNED until rotated)",
+  "the DIR-8 resolver-refactor decision is now TYPED as accept-218 (this record); an owner override authorizing the refactor would reopen it under the revisit conditions",
+  "holdout custody + seeded specimens + external expert/lab contacts remain the standing owner acts for DIR 5/7"
+ ],
+ "art27_capability_budget": {
+  "engine_diff": "MEASURED: discovery_fabric/engine/run.py +32/-5 (the DIR-3 route-split wiring + the pinned-line CI fix) and discovery_fabric/engine/problem_router.py +166 (the new typed router) — the engine-line share is measured from the actual numstat diff of this round's commits (1f6f83225..HEAD)",
+  "engine_line_share_measured": 48.6,
+  "share_basis": "numstat over 1f6f83225..HEAD: engine lines 198/407 total changed lines",
+  "primary_metric_delta": "NO scoreboard metric moved this window (the honest negative, typed): the DIR-3 SHIP is an engine route-split (cost-shape change: mitigation problems no longer pay the exploration grid — the measured 8.3% value-add leg — with the verifier intact), NOT a capability change; the scoreboard gate (score 4) is the c-0283 invention run's genuine-win share, which was 0/24 judged pairs at this window's close (in flight; the run is now THIS session's DIR-2 drive per AM54)",
+  "deletions": "ZERO deletions this round (no R-dirs, no articles, no claim kinds; the R177 12-dir archive stands as-is; DIR-8's typed decision ACCEPTS root 218 — see eval/r178s1_dir8_resolver_decision.json)"
+ },
+ "base_sha": "1f6f83225",
+ "remote_ci": {
+  "pushed_sha": "10e51e82d",
+  "remote_ci_conclusion": "failure",
+  "check_runs": [
+   {
+    "name": "surface",
+    "status": "completed",
+    "conclusion": "failure"
+   }
+  ],
+  "cause": "tests/test_grid_candidate_verification.py::test_grid_stays_conditional pins the exact conductor source line; the ship commit's guard extension broke the pin (R178-F2, the pinned-source-test class)",
+  "fix": "THIS commit restores the pinned line verbatim and gates the route INSIDE the guard, ordered before the R399 evidence gate; the pinning test is green locally and added to the site battery; the D2 disclosure: the red conclusion is QUOTED from the API, never asserted green",
+  "note": "per the D2 refusal path, a red conclusion is recorded as quoted evidence with the fix in the same commit — the round-close procedure re-reads the API for THIS commit's own conclusion at session close"
+ }
+}

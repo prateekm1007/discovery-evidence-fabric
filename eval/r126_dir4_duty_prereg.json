@@ -1,0 +1,27 @@
+{
+ "record": "R126_DIR4_DUTY_PRICING_PREREG/1.0.0",
+ "claim": "c-0197 (work id r126-duty-pricing-residual-lever)",
+ "session": "builder-r121s1-3e8a41d7",
+ "authority": "the R126 verdict direction 4: 'duty_pricing residual lever: the 2/48 F31e residuals are duty_pricing (F97 doesn't touch it). Improve the reviewer's duty-pricing fix prompts. Accept: duty_pricing residual drops on a re-test, damage stays <=0.25.'",
+ "the_root_cause_being_targeted": "BOTH F31e residual rows (d1/r125-05-s2, d1/r125-07-s2) are DAMAGE rows: the bare bills were clean on every class; the reviewer, while repairing BILL_SECTION_MISSING + PHYSICS_DIRECTION_UNSTATED, INTRODUCED duty-cycle modulation ('Configure PID or ON-OFF loop', 'duty cycle duration') without the OPERATIONAL COST line. The current frozen directive (eval/r122_lever_prereg.json, 567 bytes) governs INPUT derivation only and carries no duty-cycle language — the reviewer cannot know the pricing rule. Negative space: 12/48 delivered bills modulate duty cycles; 10 carry the cost line and pass; only the 2 residuals lack it",
+ "the_lever": {
+  "kind": "reviewer-directive extension (the R122 lineage: the frozen predecessor bytes are imported VERBATIM, the clause APPENDED — never re-typed)",
+  "base_directive": "the eval/r122_lever_prereg.json improved_directive_bytes (567 bytes, the r123/r125 frozen instrument) imported byte-exact",
+  "the_clause": "eval/r126_duty_clause_bytes.txt (605 bytes) — CONDITIONAL, mirroring the detector's own rule: the OPERATIONAL COST line is required ONLY when the proposal modulates a duty cycle / on-off loop / schedule (including one the reviewer introduces), quantified or bounded (throughput/energy/availability); no modulation -> no cost line. Rejected alternative (typed): an unconditional 'always add OPERATIONAL COST' instruction — it would fire on the 36 no-modulation rows and invite the reviewer to invent costs, changing clean deliveries",
+  "directive_v2_bytes": 1172,
+  "detector_unchanged": "scripts/r40_machine_v77.py @ 92485038719557e4 (the re-freeze #4 canonical) — this lever touches the REVIEWER PROMPT, not the detector; no re-freeze"
+ },
+ "the_retest": {
+  "protocol": "identical to the F31e execution (the twin's c-0191 runner): the reviewer arm ONLY over the COMMITTED F31e bare bytes (both draws, 48 rows), zero authoring calls, the improved-directive-v2 bytes, agnes-3.0-flash, AGNES backoff, digests-only, byte-skip resume; no-findings items deliver themselves at zero cost",
+  "the_arithmetic": "worst case 48 reviewer calls; the 2 residual rows + any row whose findings require a rewrite consume calls",
+  "scoring": "the unmodified wrapper (scripts/r121_successor_score.py bill_defect_classes) + seed-127 paired bootstrap, both per-draw and pooled"
+ },
+ "the_gates": {
+  "g1_duty_residual_drops": "pooled duty_pricing successor residual < 2/48 (the F31e measured value; a drop to 0 or 1 passes; 2 or more FAILS)",
+  "g2_damage_le_025": "pooled damage rate <= 0.25 (the verdict's own bound)",
+  "g3_no_class_regression": "input_availability successor residual stays 0 AND the successor defect rate overall does not exceed the F31e measured 2/48 on any single other class",
+  "honest_negative": "if g1 fails, the lever is typed a no-improvement and the directive-v2 does NOT replace the frozen instrument (the r122 bytes stay canonical)"
+ },
+ "ordering_guarantee": "this prereg + the claim register in ONE push BEFORE any run byte (no re-test call has started)",
+ "invalidates": "NOTHING (the F31e records, the c-0194/c-0196 verification, the r122 frozen directive all stand; this is a NEW instrument version tested alongside)"
+}

@@ -1,0 +1,30 @@
+**Mitigation Proposal: Blower-Train Load Balancing via Ammeter-Correlated Airflow Reallocation**
+
+**1. Mechanism**
+The core issue is not a lack of total aeration capacity, but inefficient distribution: the uneven airflow split implies that one train is saturated (low mass transfer efficiency due to excessive bubble coalescence or hydraulic short-circuiting) while the other is underutilized. The mitigation mechanism is to **dynamically rebalance the airflow between the blower trains** to equalize the hydraulic load on the diffusers, thereby maximizing the overall oxygen transfer efficiency (KLa) and recovering the DO setpoint without increasing total blower output.
+
+The key insight is that **Blower Motor Ammeter readings are proportional to the power input**, and for a given blower type and pressure, power correlates strongly with the *product* of airflow and pressure. More importantly, in a fixed-speed or V-controlled blower system with fixed pressure settings, the ammeter serves as a proxy for the *instantaneous airflow* through that specific train. The existing "uneven split" seen in the airflow meters indicates that the resistance or demand on one train is higher than the other. By adjusting the relative airflow to equalize the ammeter readings (as a proxy for balanced hydraulic load/power per train), we minimize the square of the deviation in flow rates, which optimizes the combined oxygen transfer efficiency assuming identical diffuser performance.
+
+**2. Implementation**
+*   **Control Logic:** Implement a supervisory load-balancing algorithm in the existing DCS/PLC (using only existing I/O).
+    *   **Signal Acquisition:** Read the two blower motor ammeters ($I_{Train1}$, $I_{Train2}$) and the two airflow meters ($Q_{Train1}$, $Q_{Train2}$).
+    *   **Error Calculation:** Calculate the imbalance error: $E_{imbalance} = |I_{Train1} - I_{Train2}|$. (Using ammeters avoids noise in mechanical airflow meters and directly reflects the energy input driving the flow).
+    *   **Adjustment Strategy:** If $E_{imbalance}$ exceeds a set threshold (e.g., 5% of rated current), initiate a "rebalancing" phase:
+        *   Decrease the pressure/flow setpoint of the train with the *higher* ammeter reading.
+        *   Simultaneously increase the pressure/flow setpoint of the train with the *lower* ammeter reading.
+        *   The adjustments must be made such that the *sum* of the two blower powers (or total airflow, if total pressure is constant) remains constant. This is a **zero-sum redistribution** of the available blower capacity.
+        *   Use the airflow meters to verify the direction of change and prevent one train from stalling or exceeding its maximum differential pressure.
+    *   **DO Feedback Loop:** The primary goal is DO control. The existing DO controller should remain the master. However, its output should be split equally between the two trains *only* after the load-balancing logic has minimized $E_{imbalance}$. In practice, the load-balancing logic acts as a "trim" adjustment on the individual train setpoints. If the total DO demand rises (due to peak organic load), the master DO controller increases the *total* blower output. The load-balancing logic then ensures this increased total is distributed evenly to maintain high KLa.
+
+*   **Safety Interlocks:**
+    *   If the total DO is still below setpoint after achieving $E_{imbalance} < threshold$ and both trains are at their individual maximum airflow/pressure limits, then trigger an alarm for "Aeration Capacity Limit Reached."
+    *   Ensure that no single train's airflow exceeds its maximum mechanical limit (checked via the airflow meter high-high alarm).
+
+**3. Measures It Relies On**
+*   **Blower Motor Ammeters:** Used as a real-time, high-speed proxy for the relative load (power/flow) on each blower train. The assumption is that for identical blower types and operating pressures, equal current implies equal airflow (or at least equal hydraulic power input), which is a robust indicator of balanced train loading. This avoids reliance on potentially noisy or drifting mechanical airflow meters for the control loop, using them only for verification and safety limits.
+*   **Blower Airflow Meters:** Used to verify the actual airflow distribution and to enforce individual train maximum flow limits. They provide the absolute value of $Q_{Train1}$ and $Q_{Train2}$ for safety interlocks and for calculating the total aeration capacity utilization.
+*   **DO Probes:** The ultimate process variable. The system's success is measured by the DO level returning to and maintaining the setpoint. The DO probes confirm that the load-balancing strategy effectively increases the dissolved oxygen concentration by improving the oxygen transfer efficiency of the combined system.
+
+**Why this works under the constraint:**
+*   **No new instrumentation:** Uses only the listed ammeters, airflow meters, and DO probes.
+*   **Addresses root cause:** The uneven split causes one train to operate in a less efficient region (often higher energy per kg O2 transferred due to coalescence or maldistribution) and the other to be underused. By forcing the system to operate both trains at similar load points (via ammeter matching), the aggregate KLa is maximized for a given total power input. This recovers DO without needing more total blower output, effectively squeezing out the latent efficiency in the existing equipment.

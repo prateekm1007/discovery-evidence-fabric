@@ -1,0 +1,104 @@
+{
+ "problem_id": "r125-09-s1",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 9.65,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 958,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author2",
+   "attempts": 1,
+   "latency_s": 8.34,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 912,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 8.23,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 752,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 124.08,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1284,
+    "completion_tokens": 836,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "DRIVER_CLASS_AS_REMEDY: the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (the"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle' and the stated failure driver 'cycle' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Implement \"Exhaust Damper Modulated Thermal Uniformity Control\"**\n\n**Mechanism:**\nThe uneven cure quality, specifically the lag at the corners, is caused by uneven airflow distribution within the curing oven. Hot air channels through the center, leaving cooler, stagnant air at the corners. The primary driver of this non-uniformity is the static exhaust damper position, which restricts convective circulation. By dynamically modulating the exhaust damper during the hold phase, the internal pressure and airflow pattern are altered. A specific damper position increases forced convection into the corners, raising the corner temperature rate relative to the center. The mechanism relies on the existing zone thermocouples to detect this temperature differential and the exhaust damper position feedback to actuate the change. The control objective is to minimize the temperature differential by adjusting the damper, thereby equalizing cure rates without relying on time-based extension as the primary correction method.\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Exhaust Damper Position (actuated via position feedback loop).\n*   **Mechanism Effect:** Moving the exhaust damper to a partially closed position (reducing exhaust flow) increases internal static pressure and forces convective air flow from the center toward the corners. This increases the heat transfer coefficient at the corner zones.\n*   **Signal Direction:** The driving variable (Damper Position) causes the measured output (T_corner_avg) to increase relative to T_center_avg. The control loop drives the damper in the direction that reduces the negative temperature differential (T_corner - T_center) toward zero.\n\n**IMPLEMENTATION BILL:**\n*   **Inputs:** \n    *   T_corner_avg: Calculated average temperature from the two coldest existing corner zone thermocouples.\n    *   T_center_avg: Calculated average temperature from the two hottest existing center zone thermocouples.\n    *   Damper_Position_FB: Existing exhaust damper position feedback signal.\n    *   Cycle_Timestamp: Existing cycle timer signal for sequencing.\n*   **Processing:**\n    *   Error_Calculation: Error = (T_corner_avg - T_center_avg). Target is 0. If T_corner_avg < T_center_avg, the corners are lagging.\n    *   Damper_Command: If Error < -2\u00b0C (corners colder), command Damper_Position_FB to move toward the \"High-Circulation\" setpoint determined in calibration. This setpoint is derived from the baseline test where the damper position that minimized \u0394T was recorded.\n*   **Actuation:**\n    *   Exhaust Damper Motor/Actuator: Moves damper based on Damper_Command.\n*   **Sequence Logic:**\n    *   Phase 1 (Heating): Damper held at standard open position.\n    *   Phase 2 (Uniformity Compensation): Initiated when T_center_avg reaches 95% of setpoint. Damper modulates to minimize |Error|.\n    *   Phase 3 (Hold): Once |Error| < 2\u00b0C for 5 minutes, damper locks at current position. Cycle completes when all zones hold target temperature for the required cure time.\n\n**Why this works within constraints:**\n*   No new sensors are added; only existing thermocouples, damper feedback, and timer are utilized.\n*   The mechanism explicitly addresses the physical driver (airflow stagnation) by modulating the damper, rather than relying on the \"Cycle\" action class (time extension) as the primary remedy for the \"cycle\" driver issue. The time extension is now a secondary outcome of achieving thermal uniformity, not the primary control action.\n*   All inputs are derived from permitted measurements: T_corner_avg and T_center_avg are direct readings from existing thermocouples; Damper_Position is direct reading from existing feedback; Cycle_Timestamp is from the existing timer.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Inputs:**",
+   "*   T_corner_avg: Calculated average temperature from the two coldest existing corner zone",
+   "*   T_center_avg: Calculated average temperature from the two hottest existing center zone",
+   "*   Damper_Position_FB: Existing exhaust damper position feedback signal.",
+   "*   Cycle_Timestamp: Existing cycle timer signal for sequencing.",
+   "*   **Processing:**",
+   "*   Error_Calculation: Error = (T_corner_avg - T_center_avg). Target is 0. If T_corner_avg",
+   "*   Damper_Command: If Error < -2\u00b0C (corners colder), command Damper_Position_FB to move t",
+   "*   **Actuation:**",
+   "*   Exhaust Damper Motor/Actuator: Moves damper based on Damper_Command.",
+   "*   **Sequence Logic:**",
+   "*   Phase 1 (Heating): Damper held at standard open position.",
+   "*   Phase 2 (Uniformity Compensation): Initiated when T_center_avg reaches 95% of setpoint",
+   "*   Phase 3 (Hold): Once |Error| < 2\u00b0C for 5 minutes, damper locks at current position. Cy",
+   "*   No new sensors are added; only existing thermocouples, damper feedback, and timer are ",
+   "*   The mechanism explicitly addresses the physical driver (airflow stagnation) by modulat",
+   "*   All inputs are derived from permitted measurements: T_corner_avg and T_center_avg are "
+  ],
+  "CONVERSION": [
+   "ADDED_PROCESS_STEP: cure on a row that does not ride existing/unchanged infrastructure: *   Phase 3 (Hold): Once |Error| < 2\u00b0C for 5 minutes, damper locks at current position. Cycle completes when all zones hold target temperature for the required "
+  ],
+  "DRIVER_CLASS_AS_REMEDY": [
+   "the mechanism's action ingredient 'Cycle_Timestamp' and the stated failure driver 'cycle' are the same action class (thermal-cycling) \u2014 a remedy may not be its own driver"
+  ]
+ },
+ "wall_clock_s": 148.21,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

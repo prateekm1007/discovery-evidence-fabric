@@ -1,0 +1,127 @@
+{
+ "problem_id": "f30-02-s",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a DESIGN CHANGE via continuous chemical dosing to break foam. This proposal delivers the SAME OUTCOME CLASS (foam mitigation) via a MECHANISM DEPARTURE: time-varying pulse-width modulation (PWM) of the dosing duty cycle rather than steady-state continuous flow, exploiting the non-linear decay kinetics of the surfactant. The failure-physics connection is that foam stability is a function of surfactant concentration $C_s$; by maintaining $C_s$ below the critical foam stability threshold (CFT) during 28 of 30 minutes, the mechanism prevents solid accumulation that leads to carryover, while the 2-minute pulse provides a rapid transient suppression spike.\n\nPHYSICS CHECK\nGoverning relation: Foam stability $\\sigma \\propto C_s^n$ (where $n>1$ for non-ideal surfactants). Damage integral $D = \\int_0^T \\sigma(t) \\, dt$.\nDIRECTION-OF-EFFECT: driving variable = surfactant concentration at the air-liquid interface; the mechanism moves it DOWN by approximately 93% on average (from 100% dosing to ~7% duty cycle baseline with peaks); this REDUCES the failure driver (foam volume and solid load) by keeping the time-averaged stability factor below the critical carryover threshold.\nMagnitude verification: If continuous dosing provides $\\sim$20% over-stabilization, a 6.7% duty cycle (2 min / 30 min) reduces the time-averaged concentration by a factor of 3. Assuming a residence time of the foam fraction is short relative to the 30-min interval, the system operates in a \"burst-suppress\" regime. The physical direction is correct: lowering the time-integral of stabilizer concentration lowers the probability of foam reaching the weir.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Time-Modulated Chemical Dosing\n\n1. **Defoamer Dosing Pump Controller Reconfiguration** (c)\n   *   *Spec:* Reprogram the existing VFD or PLC timer loop controlling the spray-defoamer pump to a 2-minute ON / 28-minute OFF cycle. (c)\n   *   *Input Source:* ALREADY-RECORDED plant HMI/PLC tag for pump run status. No new sensor. (a)\n   *   *Tag:* (a)\n\n2. **Defoamer Inventory Reduction Protocol**\n   *   *Spec:* Update the chemical consumption forecasting model to reflect the new duty cycle. (c)\n   *   *Tag:* (a)\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability:** Zero hardware installation. Modifies software configuration of existing pump. (a)\n*   **Operability:** Lower operator attention due to automated cycle. (c)\n*   **Maintenance:** Same as continuous dosing.\n*   **Rough Cost Class:** Operational cost reduction.\n*   **UNPRICED_OPERATIONAL_LOSS:** The operational loss is a potential temporary spike in foam height during the 28-minute OFF period if the initial burst is insufficient to fully collapse the foam body. This is bounded by the physical residence time of the foam; if $t_{foam\\_collapse} < 30$ min, the loss is zero. If $t_{foam\\_collapse} > 30$ min, the risk of carryover increases. We assume $t_{foam\\_collapse}$ is on the order of minutes for defoamer-affected foam, so the risk is acceptable. (a)\nEXECUTABLE TEST\nProtocol:\n1.  Record baseline foam height at the weir over a 2-hour period with continuous dosing.\n2.  Switch to the 2-min/28-min pulse schedule.\n3.  Monitor foam height and effluent TSS (Total Suspended Solids) for 4 hours.\nPass/Fail Thresholds:\n*   Foam height at weir must remain below the weir lip for >95% of the 4-hour test duration.\n*   Effluent TSS must not exceed the permit limit.\nKill Criterion: If foam overtops the weir during the OFF period, the pulse duration (2 min) is too short to establish the suppression layer; increase pulse width to 5 min and retest. If TSS exceeds limits, the dose volume per pulse is too low; increase pulse duration or flow rate (within pump capacity).\n\nCONSTRAINT BIND\n*   **Primary Indicator:** Foam Height / Overtopping.\n*   **Cost Statement:** The constraint requires an operational cost statement.\n    *   *Cost:* Defoamer usage is reduced by factor $1 - (2/30) = 0.933$.\n    *   *Calculation:* If continuous dosing costs $X per day, new cost is $0.067X$.\n    *   *Trade-off:* The \"cost\" given up is the continuous buffer of high $C_s$. The trade is net positive because the 2-minute pulse is hypothesized to be kinetically sufficient to break the foam structure, and the 28-minute OFF period allows the defoamer to act without continuous dilution losses in the settling zone.\n*   **Constraint Compliance:**\n    *   *Permitted Set:* The constraint permits re-scheduling the pump. This is a procedure/parameter change, not a physical hardware modification.\n    *   *Deployed Part Clause:* The pump and defoamer system are used AS-IS. No machining or new hardware.\n    *   *Exemplar-Reality:* The defoamer is a standard chemical commodity.\n    *   *Direction-of-Effect:* Moving the concentration down (time-averaged) reduces the failure driver (stability). Correct direction.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The foam is generated by high surfactant concentration from the sludge carryover itself, which increases the thermodynamic stability of the air-liquid interface. | ingredient: The defoamer actively imposes a physical mechanism to reduce interfacial surface tension and break up the foam structure, thereby directly mitigating the stability driver. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The foam is generated by high surfactant concentration from the sludge carryover itself, which increases the thermodynamic stability of the air-liquid interface.",
+   "ingredient_action": "The defoamer actively imposes a physical mechanism to reduce interfacial surface tension and break up the foam structure, thereby directly mitigating the stability driver.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE",
+   "divergence": "the model labeled INVERTED but the sign comparison derives CORRECT — typed DIVERGENT (fail-open, disclosed; the derived verdict is authoritative)"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "2. **Defoamer Inventory Reduction Protocol**",
+    "*   **Maintenance:** Same as continuous dosing.",
+    "*   **Rough Cost Class:** Operational cost reduction."
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "ebe7e491ad9d9f51",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "c099def6beb49ef7",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "9512e22e2a2fd775",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "0b139997b1a0794d",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "4947edb34129cbaf",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n2"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    1,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

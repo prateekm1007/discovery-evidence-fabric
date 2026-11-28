@@ -1,0 +1,22 @@
+**Verdict:** The draft proposal **violates the physical direction** and **misprices the duty cycle/physics**, leading to a worsening of the failure mode rather than mitigation.
+
+**Reasoning:**
+
+1.  **Inversion of Physical Direction (Arrhenius Violation):**
+    *   The constraint explicitly states that **Arrhenius aging applies** with an activation energy ($E_a$) of ~80 kJ/mol for the dry-out leg.
+    *   The Arrhenius equation ($k = A e^{-E_a/RT}$) dictates that reaction rates (and thus electrolyte consumption/dry-out) **increase exponentially with temperature**.
+    *   The draft claims "the warmer plates slow the dry-out leg." This is **physically incorrect**. Raising the temperature from, say, 18°C to 26°C will **accelerate** the electrolyte dry-out rate significantly. It does not slow it.
+
+2.  **Exacerbation of Failure Mode:**
+    *   The problem is "Electrolyte dry-out accelerates... at sustained high ambient temperature."
+    *   The mitigation strategy is to **raise** the room setpoint to the maximum allowed (26°C).
+    *   This action directly increases the thermal stress on the VRLA string, further accelerating the exact failure mechanism (dry-out) that is causing capacity fade. It moves the system *away* from a stable state and *toward* faster failure.
+
+3.  **Misconception of "Stratified Acid Layers":**
+    *   VRLA (Valve Regulated Lead-Acid) batteries are designed with **absorbed glass mats (AGM)** or gel electrolytes that immobilize the electrolyte. They do not suffer from "stratified acid layers" in the way flooded lead-acid batteries do. There is no free liquid acid layer to "drive off."
+    *   Even if this were a flooded battery, heating the room would not "drive off" stratification; stratification is mitigated by equalization charging (which the problem states is already happening, but capacity still fades). Heating would only increase water loss (evaporation), which is detrimental.
+
+4.  **Constraint Violation in Intent:**
+    *   While the constraint allows adjusting setpoints within 18-26°C, it does not *mandate* moving to 26°C. The engineer has misinterpreted the range as a direction to "get warmer" to fix a thermal problem, when the thermal problem is exacerbated by heat. The correct direction, if temperature adjustment is the lever, would be to **lower** the setpoint toward 18°C to minimize the Arrhenius rate constant and slow down the dry-out process.
+
+**Conclusion:** The draft fails because it relies on a false premise that heat slows the specific degradation mechanism (dry-out) when physics (Arrhenius) dictates that heat accelerates it. It inverts the required physical direction for mitigation.

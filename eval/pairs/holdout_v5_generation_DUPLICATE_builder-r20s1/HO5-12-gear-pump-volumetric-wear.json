@@ -1,0 +1,128 @@
+{
+ "problem_id": "HO5-12-gear-pump-volumetric-wear",
+ "question_type": "predictor-design",
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers: MONITORING/INDICATION scheme trending absolute volumetric efficiency η_v against a commissioned healthy baseline.  \nMy mechanism delivers: MONITORING/INDICATION scheme trending pressure-normalized slip coefficient C_slip = (Q_th − Q_act)/ΔP against a physics-derived threshold from nameplate specs.  \nFailure-physics connection: Tip/end-plate wear increases clearance c; slip flow Q_slip ∝ c³·ΔP/μ for laminar leakage; thus C_slip = Q_slip/ΔP ∝ c³/μ grows monotonically with wear, independent of operating pressure fluctuations, providing a direct wear measure without a commissioned baseline.\n\nPHYSICS CHECK\nGoverning relation: Q_slip = (K·c³/μ)·ΔP (laminar flow in clearances, K = geometry constant) → C_slip = Q_slip/ΔP = K·c³/μ.  \nMagnitude verification: For typical external gear pump at 60 cSt, 40 bar, η_v_rated ≈ 0.92 (catalog). Q_th = D·N. C_slip_rated = (1−η_v_rated)·Q_th/ΔP_rated = 0.08·Q_th/40 bar. At 8% η_v drop: η_v_crit = 0.92·η_v_rated = 0.8464. C_slip_crit = (1−η_v_crit)·Q_th/ΔP_rated = 0.1536·Q_th/40 bar. Ratio C_slip_crit/C_slip_rated = 1.92. Since C_slip ∝ c³, clearance increases by 1.92^(1/3) ≈ 1.24× (24% clearance growth) to reach the 8% η_v drop — consistent with wear progression to near-seizure. CALCULATED from stated specs: η_v_rated (catalog), D (nameplate), N (nameplate), ΔP_rated = 40 bar (USER CONSTRAINT), μ = 60 cSt (USER CONSTRAINT).\n\nIMPLEMENTATION BILL\n| Component / Input | Source / Tag | Derivation / Note |\n|---|---|---|\n| Downstream flow Q_act | ALREADY-RECORDED (constraint: \"downstream flow meter\") | Direct sensor stream |\n| Discharge pressure P_dis | ALREADY-RECORDED (constraint: \"discharge pressure\") | Direct sensor stream |\n| Suction pressure P_suc | ALREADY-RECORDED (constraint: \"suction pressure\") | Direct sensor stream |\n| Motor speed N | DERIVED (stated spec: motor nameplate rated speed) or ALREADY-RECORDED (if VFD frequency logged) | Constant or VFD signal; no new sensor |\n| Pump displacement D | DERIVED (stated spec: pump nameplate) | Fixed geometry |\n| Rated volumetric efficiency η_v_rated | DERIVED (stated spec: pump catalog/data sheet) | Published at 40 bar, 60 cSt |\n| Compute platform | Existing plant historian / edge PLC (standard-practice bill) | No new hardware |\n| Daily C_slip computation | Algorithm on existing platform | C_slip_daily = median[(D·N − Q_act)/(P_dis − P_suc)] over hours with ΔP > 20 bar (ASSUMPTION: minimum pressure for valid slip signal) and ≥4 hrs operation (ASSUMPTION: data quality filter) |\n| Trend estimator | Theil-Sen slope on daily C_slip vs. time | Robust to outliers, no distributional assumption |\n| Threshold C_slip_crit | CALCULATED from stated specs | C_slip_crit = (1 − 0.92·η_v_rated)·D·N / ΔP_rated |\n| Alarm rule | Software configuration | Trigger when (C_slip_crit − C_slip_current) / slope ≤ 21 days (USER CONSTRAINT) |\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- Installability: SAME — uses only existing sensors (suction/discharge pressure, flow meter, motor current available but not required) and existing historian/PLC; no wiring, no mounting.\n- Operability: SAME — fully automated daily computation; no operator rounds, no manual entry.\n- Maintenance: SAME — no added hardware to calibrate, clean, or replace.\n- Cost class: SAME — software-only configuration change on existing infrastructure; zero capital, zero consumables.\n- Operational loss: ZERO — no process interruption, no bypass, no recipe change.\n- Conclusion: SAME burden class, DIFFERENT mechanism (physics-normalized slip coefficient with spec-derived threshold vs. baseline-dependent η_v trending).\n\nEXECUTABLE TEST\nProtocol:\n1. Extract ≥12 months of ALREADY-RECORDED sensor data (Q_act, P_suc, P_dis, I_motor) from the target pump’s historian.\n2. Compute daily median C_slip for each day with ≥4 operating hours at ΔP > 20 bar.\n3. Fit Theil-Sen linear regression to C_slip vs. time (days since commissioning).\n4. For each day, project days-to-threshold = (C_slip_crit − C_slip_current) / slope (slope > 0 required).\n5. Flag alarm on any day where projected days-to-threshold ≤ 21.\n6. Validate on this same recorded dataset against two criteria:\n   a) FALSE ALARM RATE: Count alarms occurring in the first 50% of the pump’s recorded life (ASSUMPTION: low-wear period). PASS if ≤1 alarm per year of operation. FAIL if >1.\n   b) LEAD TIME: If the recorded history contains a ≥8% η_v drop (η_v = Q_act/(D·N) evaluated at ΔP ≈ 40 bar), verify an alarm was triggered ≥21 days before that drop. PASS if yes. FAIL if no alarm or lead <21 days.\n7. Kill criterion: FAIL on either (a) or (b) → predictor rejected; do not deploy.\n\nCONSTRAINT BIND (predictor)\nPrimary stated indicator: Volumetric efficiency η_v (the constraint defines failure as \"volumetric efficiency drops 8 percent\" — η_v is the quantity whose threshold defines the failure). The predictor uses C_slip as a leading indicator that SUPPLEMENTS η_v by providing a pressure-normalized, physics-referenced wear trajectory; C_slip never replaces η_v — the 8% drop is defined on η_v, and C_slip_crit is derived from the η_v value corresponding to that drop. Motor current (available per constraint) is not required for the core predictor but may supplement speed verification if VFD data is absent.",
+ "meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "- Installability: SAME — uses only existing sensors (suction/discharge pressure, flow mete",
+    "- Operability: SAME — fully automated daily computation; no operator rounds, no manual ent",
+    "- Maintenance: SAME — no added hardware to calibrate, clean, or replace.",
+    "- Cost class: SAME — software-only configuration change on existing infrastructure; zero c",
+    "- Operational loss: ZERO — no process interruption, no bypass, no recipe change.",
+    "- Conclusion: SAME burden class, DIFFERENT mechanism (physics-normalized slip coefficient "
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 1805,
+   "latency_s": 175.2,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_SECTION_MISSING": [
+     "no IMPLEMENTATION BILL section"
+    ]
+   },
+   "sha256_16": "38d57998876fa752"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 6136,
+   "latency_s": 154.3,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "FLAG",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: Software-only update to existing PLC/SCADA — identical effort to adding ",
+     "- Operability: Continuous background task; CPU load <1 % on modern PLC — negligible vs. pe",
+     "- Maintenance: No hardware maintenance; firmware updates only — same as standard practice ",
+     "- Rough cost class: Low (firmware license ~$2k) vs. standard practice (alarm block ~$1k) —",
+     "- Operational loss: Zero (no production interruption for installation).",
+     "1. Obtain ALREADY-RECORDED historian data from at least one identical pump that has run to",
+     "2. Replay the sensor streams (suction/discharge pressure, motor current, flow meter) throu",
+     "3. Compare the module’s predicted time‑to‑8 %‑drop against the actual crossing time in the",
+     "4. Count false alarms (warnings issued when actual crossing >21 days later or never occurs",
+     "- Lead time ≥ 21 days in ≥ 95 % of wear events (USER CONSTRAINT).",
+     "- False alarm rate ≤ 1 per pump per year (USER CONSTRAINT)."
+    ]
+   },
+   "sha256_16": "8d3d801cee351944",
+   "findings_disclosed": [
+    "USER_LABEL_FABRICATED_CONSTRAINT",
+    "BILL_UNTAGGED: - Installability: Software-only update to existing PLC/SCADA — identical effort to adding ; - Operability: Con"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 2134,
+   "latency_s": 6.0,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3.5-bolt-e4b",
+   "fallback_reason": "nvidia/nemotron-3-ultra-550b-a55b empty content (typed)",
+   "critic_verdict": "FLAG",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {},
+   "sha256_16": "562d719cd0931227",
+   "findings_disclosed": [
+    "USER_LABEL_FABRICATED_CONSTRAINT"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 5286,
+   "latency_s": 136.8,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "FLAG",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "observable/indicator design present"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Installability: SAME — uses only existing sensors (suction/discharge pressure, flow mete",
+     "- Operability: SAME — fully automated daily computation; no operator rounds, no manual ent",
+     "- Maintenance: SAME — no added hardware to calibrate, clean, or replace.",
+     "- Cost class: SAME — software-only configuration change on existing infrastructure; zero c",
+     "- Operational loss: ZERO — no process interruption, no bypass, no recipe change.",
+     "- Conclusion: SAME burden class, DIFFERENT mechanism (physics-normalized slip coefficient "
+    ]
+   },
+   "sha256_16": "0a53173d45f770b4",
+   "findings_disclosed": [
+    "USER_LABEL_FABRICATED_CONSTRAINT",
+    "BILL_UNTAGGED: - Installability: SAME — uses only existing sensors (suction/discharge pressure, flow mete; - Operability: SAM"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T12:07:13Z"
+}

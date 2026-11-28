@@ -1,0 +1,19 @@
+**Mitigation Proposal**
+
+**Mechanism:**
+Implement a **Dual-Reference Electrode Configuration** with **Algorithmic Drift Compensation**. This design introduces a second, non-glucose-specific reference electrode (typically a redox mediator like ferrocene or an unmodified carbon electrode) positioned adjacent to the working glucose electrode on the same sensing tip. This second electrode measures the baseline current and impedance changes caused by protein fouling and tissue encapsulation independently of glucose concentration. By monitoring the ratio or difference between the working electrode signal and the reference electrode signal, the device can distinguish between true glucose variations and signal attenuation caused by physical biofouling.
+
+**Implementation:**
+1.  **Hardware:** Fabricate the sensor tip to include two distinct electrode sites: Site A (Working, glucose-permeable enzyme layer) and Site B (Reference, non-glucose-reactive but susceptible to identical fouling).
+2.  **Signal Processing:** The microcontroller continuously samples currents ($I_{work}$) and ($I_{ref}$) from both sites.
+3.  **Algorithm:** Apply a drift correction algorithm where the calibrated glucose output is derived from the normalized signal: $Glucose_{corrected} \propto (I_{work} / I_{ref})$. Since both electrodes experience similar physical impedances from the encapsulation layer, the ratio cancels out the common-mode attenuation caused by protein buildup, preserving accuracy without manual recalibration.
+
+**Measures it Relies On:**
+*   **Common-Mode Rejection:** Relies on the physical assumption that the fouling layer (protein/tissue) affects the current flow from both closely-spaced electrodes nearly identically.
+*   **Signal Stability:** Requires the reference electrode to have a stable, non-zero background current to allow for reliable ratioing.
+*   **Calibration Robustness:** The initial calibration curve (mapping the ratio to glucose concentration) must be robust enough to maintain <10% MARD over 14 days.
+
+**Concrete Falsification Test:**
+**"Accelerated Fouling Stability Test":**
+Expose a batch of the dual-reference sensors to a simulated biological fouling medium (e.g., a mixture of bovine serum albumin (BSA) and tissue extract) at accelerated rates in a flow-cell system that mimics 14 days of wear in <48 hours. Simultaneously spike the medium with constant, known glucose concentrations.
+*   **Falsification Criterion:** If the *uncorrected* working electrode signal drifts by >10% but the *ratio-corrected* output ($I_{work}/I_{ref}$) still exceeds the 10% MARD threshold against the known glucose standard after the accelerated fouling period, the mitigation approach is falsified. Additionally, if the reference electrode's own baseline current varies by >5% due to differential fouling gradients between the two sites, the assumption of common-mode rejection is falsified.

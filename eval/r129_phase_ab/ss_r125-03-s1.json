@@ -1,0 +1,66 @@
+{
+ "problem_id": "r125-03-s1",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 3.9,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 257,
+    "completion_tokens": 708,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 9.64,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1047,
+    "completion_tokens": 1252,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Closed-Loop Water Dosage Correction via Mixer Current Profile Analysis**\n\n**Direction-of-Effect**\n*   **Driving Variable:** Mixer Motor Current Peak/Integral ($I_{mix}$) during the mixing phase.\n*   **Direction of Mechanism:** An increase in Mixer Motor Current indicates an increase in mixture viscosity and resistance to shear, which corresponds to a decrease in concrete slump (stiffer mix). Conversely, a decrease in current indicates a decrease in viscosity and an increase in slump (wetter mix). Therefore, a positive deviation in current from the expected baseline requires a *reduction* in water dosage for the next batch to maintain target consistency, while a negative deviation requires an *increase* in water dosage.\n*   **Driving Variable 2:** Air Temperature ($T_{air}$). An increase in $T_{air}$ accelerates evaporation and hydration kinetics, leading to higher mixture viscosity and thus *higher* expected motor current for the same water-to-cement ratio. Therefore, the control logic must *decrease* the water setpoint for subsequent batches as air temperature rises to compensate for increased moisture loss/viscosity increase.\n\n**Mechanism**\nThe root cause of the consistency drift is likely that the aggregate moisture content varies significantly between shifts due to environmental changes tracked by the existing air thermometer, causing the plant's static water addition to result in varying slumps. The mixer motor current is a direct, real-time proxy for the viscosity (shear resistance) of the concrete mix inside the drum. By establishing a baseline \u201ctarget\u201d current profile for a standard, well-specified batch, we use the deviation of the actual current profile from this baseline to infer the necessary adjustment for the *next* batch's water dosage. This creates a feedback loop using only existing measurements: the batch scale records (mass of dry aggregate/cement), the air thermometer (environmental context), and the mixer current meter (process state).\n\n**Implementation**\n1.  **Baseline Characterization:** During a known \u201cgood\u201d shift, record the mixer motor current time-series profile for a standard batch. Define the integral (area under the curve) or peak current value as the reference metric, $I_{ref}$. Establish a lookup or regression model correlating $I_{ref}$ with the average air temperature ($T_{air}$ from the **Plant Air Thermometer**) and total aggregate mass ($M_{aggregate}$ from the **Batch Scale Records**).\n2.  **In-Batch Monitoring:** For each subsequent batch, continuously monitor the mixer current profile using the **Mixer Motor Current Meter**. Calculate a real-time deviation index, $D = \\frac{I_{actual}}{I_{expected}(T_{air}, M_{aggregate})} - 1$, where $I_{expected}$ is the predicted baseline current adjusted for the current air temperature (from **Plant Air Thermometer**) and aggregate mass (from **Batch Scale Records**).\n3.  **Post-Batch Water Adjustment:** At the end of the mixing cycle for batch $n$, if $D$ is positive (mix is stiffer than expected), automatically reduce the water setpoint for batch $n+1$ proportionally. If $D$ is negative (mix is wetter than expected), increase the water setpoint for batch $n+1$. The water setpoint is the mass of water to be added, derived from the plant\u2019s existing dosing controls.\n4.  **Constrain Updates:** Limit the step change in water dosage between consecutive batches to a safe maximum (e.g., \u00b12% of total batch mass) to prevent abrupt consistency shifts and ensure operator safety. Log the adjustments along with the **Batch Scale Records** for traceability.\n\n**Implementation Bill**\n*   **Software/Control Logic Updates:** Modify the existing PLC ladder logic or SCADA HMI scripts to read inputs from the **Mixer Motor Current Meter**, **Plant Air Thermometer**, and **Batch Scale Records**. Implement the deviation calculation algorithm ($D$) and the conditional logic for adjusting the next batch\u2019s water setpoint register.\n*   **Data Logging Configuration:** Enable or configure existing data logging tags to record $I_{actual}$, $T_{air}$, $M_{aggregate}$, and the calculated $D$ value for each batch to support audit and trend analysis.\n*   **Setpoint Register Access:** Verify read/write access to the water dosing pump/setpoint register within the existing control architecture to allow the logic to modify the next batch\u2019s water quantity within the constrained limits.\n*   **No New Hardware:** No new sensors, actuators, or communication hardware are installed or purchased. All inputs are sourced from the specified existing instrumentation.\n\n**Input Derivations and Sources**\n*   **$I_{actual}$:** Sourced directly from the **Mixer Motor Current Meter** (real-time analog/digital signal).\n*   **$T_{air}$:** Sourced directly from the **Plant Air Thermometer** (existing temperature sensor input).\n*   **$M_{aggregate}$:** Sourced directly from the **Batch Scale Records** (mass measurement of aggregate input for the specific batch).\n*   **$I_{expected}$:** Derived from the baseline characterization model using the current values of $T_{air}$ and $M_{aggregate}$. The formula is defined during the Baseline Characterization step as a function of these two permitted inputs.\n*   **Water Setpoint ($W_{n+1}$):** Sourced from the existing plant control system\u2019s water dosing register. The new value is calculated as $W_{n} + \\Delta W$, where $\\Delta W$ is derived from the deviation index $D$ and the constrained limit.\n*   **Removed Inputs:** Any reference to humidity sensors, aggregate moisture probes, or slump meters that are not part of the permitted list has been removed or derived implicitly through the current/temperature/mass correlation model.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Software/Control Logic Updates:** Modify the existing PLC ladder logic or SCADA HMI ",
+   "*   **Data Logging Configuration:** Enable or configure existing data logging tags to reco",
+   "*   **Setpoint Register Access:** Verify read/write access to the water dosing pump/setpoi",
+   "*   **No New Hardware:** No new sensors, actuators, or communication hardware are installe",
+   "*   **$I_{actual}$:** Sourced directly from the **Mixer Motor Current Meter** (real-time a",
+   "*   **$T_{air}$:** Sourced directly from the **Plant Air Thermometer** (existing temperatu",
+   "*   **$M_{aggregate}$:** Sourced directly from the **Batch Scale Records** (mass measureme",
+   "*   **$I_{expected}$:** Derived from the baseline characterization model using the current",
+   "*   **Water Setpoint ($W_{n+1}$):** Sourced from the existing plant control system\u2019s water",
+   "*   **Removed Inputs:** Any reference to humidity sensors, aggregate moisture probes, or s"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 14.55,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

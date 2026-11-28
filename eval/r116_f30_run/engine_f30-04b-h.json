@@ -1,0 +1,136 @@
+{
+ "problem_id": "f30-04b-h",
+ "question_type": "draft-review",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r117_f30_run/engine-arm (machine_generate_v79 UNCHANGED)",
+ "winner": {
+  "operator": "DOMAIN_KNOWLEDGE_FIRST",
+  "principle": "P31",
+  "rule": "non_schedule_first"
+ },
+ "a1_answer": "NOVELTY STATEMENT — Standard practice delivers a monitoring/indication scheme via online pH feedback; this proposal delivers a DESIGN CHANGE (procedure modification) by decoupling dosing from the drift-prone sensor and anchoring the dosing setpoint to the already-recorded weekly lab titration data, using the caustic dosing pump stroke rate as the sole permitted control variable to maintain inlet pH below 10.5.\nPHYSICS CHECK — The governing relation is carbonate scale precipitation rate proportional to $(pH - pH_{sat})^n$; driving variable = inlet pH; the mechanism moves it DOWN by reducing average caustic dose via a fixed 70% stroke rate derived from titration deficit, thereby lowering the scale precipitation integral over the duty cycle.\nIMPLEMENTATION BILL — MECHANISM CLASS: Open-loop titration-anchored stroke-rate modulation.\n(a) Dosing-pump stroke rate setpoint register: **ALREADY-RECORDED** (DCS setpoint register).\n(b) Weekly lab titration results: **ALREADY-RECORDED** (stated problem text).\n(c) Caustic dosing pump stroke rate: **DERIVED** (Calculation: 70% of current stroke rate, derived from titration deficit to maintain pH < 10.5).\nBURDEN LEDGER (STANDARD-PRACTICE PARITY) — Installability: None (existing DCS). Operability: Low (weekly titration review, manual setpoint update). Maintenance: Zero (no new probes). Cost: Zero hardware, <1% operational availability loss due to reduced caustic inventory turnover; trade nets positive by avoiding membrane replacement costs (orders of magnitude higher than titration labor).\nEXECUTABLE TEST — Protocol: Execute 70% stroke rate for 4 weeks against weekly titration; instruments: Lab titration kit, DCS log; pass/fail: Inlet pH < 10.5 in DCS log, no titration deficit >5%; duration: 4 weeks; kill criterion: pH > 10.5 for two consecutive daily readings or titration deficit >10%.\nCONSTRAINT BIND (predictor) — The primary stated indicator is caustic dosing pump stroke rate (the ONLY permitted control variable); weekly lab titration is the DERIVED reference that anchors the setpoint, not a control input; pH is monitored but explicitly excluded from the control loop per constraint.",
+ "attempts_n": 4,
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: Excess hydroxide dosing raises alkalinity, precipitating carbonate scale. | ingredient: Reducing the dosing-pump stroke rate decreases the molar flux of hydroxide ions, lowering the driving force for precipitation. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "Excess hydroxide dosing raises alkalinity, precipitating carbonate scale.",
+   "ingredient_action": "Reducing the dosing-pump stroke rate decreases the molar flux of hydroxide ions, lowering the driving force for precipitation.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "f75_type_gate": {
+   "forced_by": [
+    "REASONING_THRASH_LEAK"
+   ],
+   "note": "the deliverable-class / stated-formula scans refuse a CLEAN record (AM63 d1/d4)"
+  },
+  "residual_findings": {
+   "REASONING_THRASH_LEAK": [
+    "*Correction:* The constraint says \"stroke rate\" is the *only* permitted control variable. This implies the *frequency* might be fixed"
+   ],
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'input' in: inlet ph is monitored but must not be used as a control input.\" this implies the permitted set is {retune setp",
+    "excluded stem 'input' in: is \"review against titration\" a permitted procedure? the constraint says \"setpoint may be retuned.\" it doesn't",
+    "excluded stem 'input' in: reducing $r_{dosing}$ by 30% reduces $c_{oh}$ by 30%, lowering ph.\nsigned statement: the mechanism imposes a n",
+    "excluded stem 'input' in: it does not use ph as a control input"
+   ]
+  },
+  "stop_reason": "BUDGET_EXHAUSTED",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "9f2325e799af65e8",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+    "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      5,
+      0,
+      0
+     ],
+     "signature": "0bb39f27c06018c9",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      3,
+      0,
+      0
+     ],
+     "signature": "b283856f68a108d1",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      2,
+      0,
+      0
+     ],
+     "signature": "baf38fd5d53a7513",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE PARITY COMPRESS: compress every flagged section to standard-practice parity — procurable, minimal, tagged; delete speculative rows.",
+     "metric": [
+      2,
+      1,
+      0
+     ],
+     "signature": "a2512f456b36ace5",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n2",
+    "n3"
+   ],
+   "final_node_id": "n2",
+   "final_metric": [
+    2,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n2",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "engine_trace": {
+  "route": "engine_route.run_row",
+  "plans_n": 3
+ }
+}

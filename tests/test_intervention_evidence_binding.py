@@ -49,8 +49,9 @@ def test_predictor_threshold_tied_to_indicator():
             "title": "ISO 10816-3"}]
     ans = ("INDICATOR: bearing vibration RMS band excess. "
            "THRESHOLD: RMS > 4.5 mm/s with units. "
-           "VALIDATION PROTOCOL: n=12 machines; pass if band excess above "
-           "threshold 3 shifts; fail otherwise.")
+           "VALIDATION PROTOCOL: n=12 machines monitored 90 days; "
+           "pass if band excess above threshold 3 shifts; fail "
+           "otherwise.")
     res = validate_answer(ans, "predictor-design", packet=pkt,
                           user_variables=["4.5 mm/s RMS"])
     assert res["valid"] is True, res["violations"]

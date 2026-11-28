@@ -1,0 +1,71 @@
+{
+ "problem_id": "HO8-05-caster-mold-breakout",
+ "question_type": "intervention-proposal",
+ "problem_ref": "audit/holdout_v8/holdout_v8_problems.json@f65b9d8bea2dd655… (audit tip af6b5b311)",
+ "executor_id": "builder-r45s2@holdout-v8-generation-v81",
+ "machine": {
+  "machine": "V8.1.1",
+  "base": "V8.0 (r43_machine_v8, frozen) + AM42 D1 computed-physics layer (scripts/v81_physics.py) + D2 population search with TRIZ seeding (scripts/triz_principles.py)",
+  "request_model": "glm-4-plus",
+  "k_candidates": 3,
+  "repair_budget": 3,
+  "direction_llm": "selected candidate only",
+  "v81_1_fix": "candidate-plan enumeration dedupes INSIDE the loop (always exactly 3 distinct (class, principle) plans); the V8.1 attempt produced cands=2 on its first row (HO8-01) — that run was stopped and its single row VOIDED-BUILD-DEFECT (eval/v81_run_voided_v81_defect/)"
+ },
+ "machine_request_model": "glm-4-plus",
+ "generated_at": "2026-11-17T07:39:46.741141Z",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)\nThe proposed mitigation is a coordinated three‑parameter phased schedule that sequences mold‑flux grade, casting speed, and oscillation mark during the critical start‑up period to maintain slag film thickness above the sticking threshold.  \nStandard practice uses a single mold‑flux grade for the entire heat, holds casting speed constant at the target 1.2 m/min (USER CONSTRAINT), and keeps the oscillation mark fixed.  \nThis mitigation departs by introducing a time‑phased procedure: for the first 10 % of cast length (ASSUMPTION) a high‑basicity flux (Grade H) is fed, casting speed is reduced by 5 % (CALCULATED: 1.14 m/min), and the oscillation mark is set deeper (−5 mm vs. standard −3 mm, ASSUMPTION); thereafter all parameters return to their nominal values.  \nAdjacent‑technique clearance: the closest existing practice is a single‑parameter start‑up speed reduction or a ladle‑by‑ladle flux grade change; the novelty is the coordinated multi‑parameter schedule that simultaneously raises flux viscosity and lowers slag consumption only when the shell is thinnest.  \nMechanism: the driving failure mechanism is insufficient slag film thickness (h) leading to shell‑mold adhesion. Film thickness scales with the ratio of flux viscosity (η) to casting speed (V_c) for a given flux feed rate (h ∝ η/V_c). The phased schedule increases η by ≈30 % (ASSUMPTION: η_H = 0.65 Pa·s vs. η_S = 0.5 Pa·s) and decreases V_c by 5 %, raising η/V_c by 36.7 % (CALCULATED) during the most vulnerable period, pushing h above the critical sticking threshold.\n\nPHYSICS CHECK\nGoverning relation: h ≈ k·(η/V_c) where k groups flux feed rate, slag density, and thermal properties (constant for a given caster). Sticker breakout occurs when h < h_c.  \nMagnitude verification:  \n- Standard: η_S = 0.5 Pa·s (ASSUMPTION), V_c = 1.2 m/min (USER CONSTRAINT) → η/V_c = 0.417 (CALCULATED).  \n- Intervention phase: η_H = 0.65 Pa·s (ASSUMPTION), V_c = 1.14 m/min (CALCULATED) → η/V_c = 0.570 (CALCULATED).  \n- Ratio increase = (0.570−0.417)/0.417 = 36.7 % (CALCULATED).  \n- Assumed critical threshold (η/V_c)_c = 0.5 (ASSUMPTION). Standard operation is below threshold; intervention phase exceeds it, directly reducing the driving mechanism.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Coordinated multi‑parameter phased schedule (flux grade, casting speed, oscillation mark)\n\nCANDIDATE CLASSES\n1. Flux chemistry modification (material state) — increases slag viscosity to thicken lubricating film.  \n2. Casting speed modulation (duty cycle) — reduces slag consumption rate to allow film buildup.  \n3. Oscillation mark/level procedure (geometry/arrangement) — optimizes slag entrainment and meniscus stability.  \n4. Coordinated multi‑parameter phased schedule (arrangement) — combines the above in a time‑sequenced procedure to attack the failure driver during the most vulnerable period.  \nSELECTED: Coordinated multi‑parameter phased schedule — physics justification: the failure driver (insufficient film thickness) is most sensitive to the η/V_c ratio during start‑up; a single‑parameter change cannot simultaneously address viscosity and consumption rate without compromising productivity; the phased schedule delivers the required ratio increase only when needed, minimizing operational loss.\n\nBill rows (each tagged per PROCUREMENT RULE):\n1. Flux grade selection procedure: switch from standard flux (Grade S) to high‑basicity flux (Grade H) for the first 10 % of cast length, then revert to Grade S. — (c) parameter/procedure change on existing flux addition system.  \n2. Casting speed setpoint schedule: reduce speed setpoint by 5 % (to 1.14 m/min) for the first 10 % of cast length, then ramp to 1.2 m/min. — (c) parameter change on existing speed control.  \n3. Oscillation mark procedure: set oscillation mark to −5 mm for the first 10 % of cast length, then return to standard −3 mm. — (c) parameter change on existing oscillation control.  \n\nOPERATIONAL COST: 5 % speed reduction for 10 % of cast duration. Assuming a 100 m cast at 1.2 m/min (83.3 min, CALCULATED), 10 % = 8.33 min (CALCULATED). Production loss = 0.05 × 8.33 min = 0.417 min per cast (CALCULATED) ≈ 0.5 % throughput loss per cast (CALCULATION).  \n\nSIGNALS USED: none (open‑loop time‑based schedule).\n\nBURDEN LEDGER (STANDARD‑PRACTICE PARITY)\nStandard practice bill:  \n- Row A: Single flux grade procurement (catalog item).  \n- Row B: Constant casting speed setpoint (parameter).  \n- Row C: Fixed oscillation mark (parameter).  \n\nIntervention bill:  \n- Row 1: Two flux grades (both catalog items, same procurement class) — replaces Row A, same procurement process, no new vendor qualification.  \n- Row 2: Speed schedule (parameter change) — replaces Row B, same control system, no additional commissioning.  \n- Row 3: Oscillation mark schedule (parameter change) — replaces Row C, same control system.  \n\nRow‑by‑row comparison: each intervention row is the same CLASS of procurement/operation as the standard row (catalog purchase, parameter set). No new hardware, no custom development, no added process steps. Total install/commissioning burden is identical (procedure documentation update only). Conclusion: same burden class.\n\nEXECUTABLE TEST\nProtocol: Run 10 consecutive heats under standard practice (control) and 10 heats with the intervention schedule (test) in alternating order to cancel drift.  \nInstruments: Existing breakout detection (mold thermocouples, thermal cameras), mold level sensor (±0.5 mm), casting speed recorder, flux grade logging.  \nPass/fail thresholds:  \n- Zero sticker breakouts in all 10 intervention heats (control may exhibit 1–2).  \n- Mold level variation ≤ ±2 mm during the phased period.  \n- No increase in other surface defects (e.g., transverse cracks).  \nDuration: Minimum 10 heats per condition (≈20 heats total).  \nKill criterion: Any sticker breakout in intervention heats, or measured throughput loss > 1 % per cast (vs. predicted 0.5 %), terminates the trial.",
+ "final_meta": {
+  "critic_verdict": "FLAG",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "direction_check": {
+   "direction": "DIRECTION_CHECK_UNAVAILABLE",
+   "reason": "HTTPError: HTTP Error 401: Unauthorized"
+  },
+  "population": {
+   "n_candidates": 3,
+   "selected": "cand_2",
+   "target_class": "thermal-load relief",
+   "triz_principle": 35,
+   "candidate_scores": [
+    [
+     5,
+     0,
+     0
+    ],
+    [
+     3,
+     0,
+     0
+    ],
+    [
+     4,
+     0,
+     0
+    ]
+   ]
+  },
+  "residual_findings": {
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DUTY_CYCLE_PREFERENCE_UNPROVEN": [
+    "the SELECTED class is duty-cycle-shaped while a non-duty-cycle candidate is enumerated — state the PHYSICS that rejects the non-duty-cycle candidate (the preference bind); convenience is not a physics reason"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but carries no QUANTIFIED OPERATIONAL COST line — state the operational cost as a number with a unit (throughput, energy, availability lost per day or per cycle) or an explicit zero WITH the off-production reason; the unquantified phrase no longer prices a duty cycle"
+   ],
+   "COMPUTED_PHYSICS_UNCOMPUTABLE_NO_INPUTS": [
+    "the PHYSICS CHECK section carries no parseable number+unit inputs — state the governing relation with explicit quantities (typed UNCOMPUTABLE; the Art. 9 labelled-assumption path applies)"
+   ],
+   "DIRECTION_CHECK_UNAVAILABLE": [
+    "typed fail-open: HTTPError: HTTP Error 401: Unauthorized (the authoritative read stays the auditor's)"
+   ]
+  }
+ },
+ "sha256_16": "6ef47d7d7c9b1884"
+}

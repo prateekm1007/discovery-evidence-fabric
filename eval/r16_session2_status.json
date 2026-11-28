@@ -1,0 +1,61 @@
+{
+ "record": "R16_SESSION2_STATUS/1.0.0",
+ "at": "2026-11-15T13:10:28.699389Z",
+ "ack": "EPISTEMIC_CONSTITUTION.md v3.0.0 (d1cf5a129) read IN FULL on fetch and acknowledged: 28 articles, the headline finding accepted (the failures were unenforced rules, not missing ones), disposition ledger verified, builder acknowledgment clause exercised by this record.",
+ "article19_metric_unit_tests": {
+  "wired": "metric core extracted VERBATIM from the audited r11 driver into eval/battery_metrics.py (parse_axes / majority_of / median_axes_of / row_metrics / summarize) + tests/test_article19_metric_unit_tests.py with ALL FOUR required tests, wired as a named step in .github/workflows/epistemic_certification.yml (epistemic-core tier)",
+  "decoder_bug_found_and_fixed": "the driver's majority decoder used max(pref_counts, key=...) — on a pref split with NO strict plurality (3-way split, or 1-1 after a failed draw) it returned an ARBITRARY winner: the exact ties->wins class Art. 19 targets. Fixed to strict plurality (split without majority decodes 'tie'). Verified ZERO impact on committed records: scan of battery r10 (30 rows) + r11 (30 rows) found 0 rows lacking a strict plurality — the disclosed fix changes future decodes only",
+  "independent_recompute": "ALL per-row decoded metrics (majority, median axes, novelty delta, feasibility gaps) recompute EXACTLY from the raw judge draws for every committed row in battery r11 (30/30) and r10 (30/30); all summaries (r11: 4 views incl. per-type; r10: 2) recompute exactly after the test's own view-filtering bug was fixed (the recorded summaries are filtered views; first recompute attempt ran them over the full row set — checker bug, fixed, NOT a record bug)",
+  "baseline_clone_slot_swap_all_ties": "clone battery -> novelty clause FAILS (no format credit); slot-swap -> all signed metrics flip exactly, |gap| invariant, prefer inverts, summary means mirror; all-ties -> unanimous/3-way/1-1 splits all decode 'tie' (regression pins the fixed bug); parse_axes rejects out-of-range/garbage"
+ },
+ "article21_label_integrity": {
+  "wired": "tests/test_article21_label_integrity.py — runs the machine-checkable core (USER CONSTRAINT span match vs problem text; ASSUMPTION justification; CALCULATED evaluability from labeled inputs; citation structural resolution) on ALL committed bytes of the live arms (60 records, r11_a1w_r1 + r11_a1t_r1)",
+  "findings_on_live_bytes": "5 unique REAL findings on 3 committed records (dev-fu-003-motor-insulation, eval-new04-chiller-fouling-predictor, eval-new08-pipeline-leak-predictor): decorative label misuse — 'USER CONSTRAINT:'/​'CALCULATED:' prefixes carrying standard-practice/departure prose instead of the named content type. All 3 are predictor-type records (the byte-identical reused set). Per Art. 4/5 the JUDGED BYTES are untouched (the defect does not change the judged axes); findings disclosed to the auditor here and pinned in tests/fixtures/article21_disclosed_findings.json — CI fails on any NEW finding (not in the ledger) and on stale ledger entries",
+  "queued": "typed label discipline in the generation contracts (a label names the content type; content must be of that type) for the next generation round"
+ },
+ "article26_provider_spread": {
+  "wired": "tests/test_article26_provider_spread.py — judge != every generator on every committed row (crowllm/Qwen judge vs zai/GLM generator), >=2 distinct providers per substance claim (generator+judge; B arm is curated standard-practice text, not provider-generated — disclosed), k=3 draws on every valid row, no identical draw payloads (no cached failures). GREEN on first run"
+ },
+ "article27_capability_budget": {
+  "report": "ENGINE DIFF this round: eval/battery_metrics.py NEW (shared metric core), scripts/r11_battery_a1w_r11.py refactor (behavior-preserving except the strict-plurality majority fix), 3 test files, 1 workflow step. PRIMARY-METRIC DELTA: none — NO CAPABILITY CHANGE. Instrumentation round only; battery r11 numbers unchanged and now byte-verified by the recompute. No diagnostic-only commits (every artifact gates a decision or enforces an article)",
+  "note": "Art. 19 is itself the enforcement of Art. 6 (anti-gaming): the four metric unit tests are Art. 6's named CI check"
+ },
+ "enforcement_map_28_articles": {
+  "wired_this_round": [
+   "19 (+6 via 19)",
+   "21",
+   "26"
+  ],
+  "covered_by_preexisting_suites": {
+   "7 (repo/canonical authority)": "test_audit_branch_guard.py, test_r443_state_integrity.py, test_r544_*",
+   "10/2 (verifier separation, strict judge contract)": "test_judge_strict_contract.py",
+   "15 (transport/reproducibility)": "test_transport_budget.py, test_rate_limit_backoff.py, test_r445_transport_timeout_override.py",
+   "16 (retirement)": "test_cemetery_*.py, test_r452_blender_retirement.py",
+   "17 (secrets)": "test_secret_scanning.py + lightweight workflow secret scan"
+  },
+  "flagged_NOT_yet_individually_CI_tied": [
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "8",
+   "9",
+   "11",
+   "12",
+   "13",
+   "14",
+   "18",
+   "20",
+   "22",
+   "23",
+   "24",
+   "25",
+   "27",
+   "28"
+  ],
+  "flag_note": "per the owner's rule — an article without a passing CI check is not enforced. Queue order proposed: 22 (real-bytes acceptance) + 23 (clean delivery) next round, then 20/25/28; 27's enforcement is the report schema this record instantiates"
+ },
+ "art28_counter": "holdout v2 awaiting owner authorization since AM16 D2: round 1/3 (escalation at 3)",
+ "owner_actions_still_requested": "name the executing session in one-shot authorizations (F25); authorize holdout v2"
+}

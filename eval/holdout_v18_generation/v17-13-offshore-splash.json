@@ -1,0 +1,159 @@
+{
+ "problem_id": "v17-13-offshore-splash",
+ "domain": "corrosion_chemical",
+ "question_type": "invention",
+ "executor_id": "builder-r148s1@v18-physics-one-shot",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r148_v18_physics_one_shot/1.0.0 — the physics-correct one-shot: the r146 engine (the r144 binds + the EPO scaffold + the MOOSE-Chem inspiration + the novelty_strength lever + the generation-time quant contract) with the PHYSICS-TRUTH gate added: the PHYSICS_TRUTH_BIND at generation + the typed check registry validated post-generation (GENUINE_PHYSICS_ERROR rows are repaired/retried, never emitted); every assumption carries a falsifiable bound. Problem-only, agnes-3.0-flash pinned.",
+ "run": "v18-physics-one-shot (one-shot, problem-only, the physics-truth gate demanded at generation)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P31",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "chemistry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DOMAIN_KNOWLEDGE_FIRST",
+   "principle_id": "P31",
+   "measure_class": "chemistry",
+   "signals_used": [
+    "ph",
+    "conductivity"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:DOMAIN_KNOWLEDGE_FIRST:8957cc06017b": "novel",
+   "cand:MS:DIRECT_TRANSFER:2eea4978dd62": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:2a6f473bebc5": "borderline-judge"
+  },
+  "failure_physics": {
+   "failure_class": "corrosion_chemical",
+   "winner_measure_class": "chemistry",
+   "winner_principle_id": "P31",
+   "winner_rule": "non_schedule_first"
+  },
+  "inspiration": {
+   "failure_class": "corrosion_chemical",
+   "n_analogies": 2,
+   "evidence_hashes": [],
+   "route": "discovery_fabric.generation.inspiration_retrieval.retrieve_inspiration"
+  },
+  "physics_gate": {
+   "route": "discovery_fabric.generation.physics_validate.validate_row",
+   "checks": [
+    "PH-SIGN-01",
+    "PH-SIGN-02",
+    "PH-SIGN-03",
+    "PH-MECH-01",
+    "PH-MAG-01",
+    "PH-UNIT-01"
+   ],
+   "max_physics_retries": 3
+  }
+ },
+ "generated_at": "2026-11-24T15:19:00Z",
+ "attempts_n": 1,
+ "row_wall_s": 12.5,
+ "a1_answer": "NOVELTY STATEMENT\n*   Standard practice delivers a DESIGN CHANGE (hardware/material modification) via a passive diffusion barrier (coating) or static potential control (ICCP/sacrificial anodes) to mitigate cyclic wetting corrosion.\n*   Mechanism departure: This proposal delivers the same DESIGN CHANGE outcome class (physical protection against corrosion flux) but replaces the passive/static mechanism with an **active, closed-loop electrochemical barrier** that modulates the local solution chemistry at the steel interface to shift the Pourbaix stability window.\n*   Failure-physics connection: Cyclic wetting causes pitting because the dry-out/re-wet cycles create high localized chloride concentrations and oxygen ingress that breach the passive film. By actively dosing a specific film-forming cation (inhibitor class) triggered by the wetting cycle (signal from existing sensors), the local corrosion potential ($E_{corr}$) is suppressed below the pitting potential ($E_{pit}$) during the critical re-wetting phase, preventing pit initiation.\n\nPHYSICS CHECK\nThe governing relation is the suppression of the anodic pit initiation rate $i_{an}$ by shifting the effective pitting potential $E_{pit}$ to a more noble value via adsorbed inhibitor films. The physical requirement is that the inhibitor concentration $C_{inh}$ at the steel surface during the first $t_{critical}$ of re-wetting must exceed the critical threshold $C_{crit}$ required to maintain the passive film.\nMagnitude verification: For seawater chloride ($Cl^-$) concentrations of ~0.5–1.0 M, standard film-forming inhibitors (e.g., organosilanes or modified amines) typically require ppm-level surface coverage. However, in the splash zone, dilution and scour are high. The mechanism relies on the **electrochemical feedback** where a local drop in pH (acidification from corrosion cells) or a spike in conductivity (influx of electrolyte) triggers a pulse of inhibitor. The physical limit is the mass transfer rate of the inhibitor; the driving force is the wetting event.\n*Calculation*: Assume the splash zone re-wetting rate is ~$10 \\mu m/min$ (typical wave impact). The inhibitor film formation time is ~$10 s$. The design point must ensure $C_{surface} > C_{crit}$ within $10 s$ of the wave impact.\n\nIMPLEMENTATION BILL\n1.  **Component**: Electrochemical Sensor Array.\n    *   *Status*: **ALREADY-RECORDED** (Problem states \"stated sensor\" for pH and conductivity; standard splash zone monitoring includes these).\n    *   *Function*: Provides real-time $pH$ and $Conductivity (\\kappa)$ signals.\n2.  **Component**: Pulsed Inhibitor Injection System.\n    *   *Material*: High-density polyethylene (HDPE) reservoir containing aqueous film-forming inhibitor (e.g., benzotriazole or a modern organosilane derivative).\n    *   *Instrument*: Electromagnetic micro-pump capable of $0.1$ to $1.0 L/min$ pulses.\n    *   *Service*: No external power required for storage; pump is battery-powered (standard in remote offshore assets) or solar-assisted.\n3.  **Procedure**: Logic controller algorithm.\n    *   *Rule*: If ($\\kappa$ drops by >10% AND $pH$ drops by >0.2 units relative to 1-hour baseline), trigger a $30$-second inhibitor pulse.\n    *   *Rationale*: A drop in conductivity and pH during a dry-out period followed by a rapid rise indicates wave impact and subsequent corrosion cell activation (acidification from $H_2$ evolution and $O_2$ reduction). The pulse injects inhibitor precisely when the passive film is most vulnerable (re-wetting).\n4.  **Reference/Threshold Derivation**:\n    *   *Threshold*: $\\Delta \\kappa_{crit} = 10\\%$ of baseline. **DERIVED** from stated physical relation: In fresh air, conductivity is near zero (dry). In wet seawater, it is ~$50 mS/cm$. A $10\\%$ drop in a wet baseline indicates local depletion or drying; a sudden rise indicates wetting. The trigger is the *transient* signature of re-wetting.\n    *   *Pulse Volume*: Calculated to maintain $C_{inh}$ in the splash film thickness (~$100 \\mu m$) for 1 hour post-impact. **CALCULATED**: Volume $V = A_{splash} \\times t_{wetting} \\times Q_{flow}$. Assuming a $1 m^2$ panel, $1 min$ wetting, and a target concentration of $50 ppm$ in the boundary layer, the dose is ~$50 mg$. This is a tiny fraction of a $1 L$ pulse, ensuring sufficient margin.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n*   **Installability**: Standard practice (coatings) requires surface prep and application. This system requires mounting a sensor (already present) and a small pump/reservoir on the structure. **SAME** burden class: modular, bolt-on hardware.\n*   **Operability**: Coatings are passive (zero operation). This system is active (requires power and maintenance of reservoir). **HEAVIER** burden: Requires periodic reservoir refill (e.g., annually) and battery swap.\n*   **Maintenance**: Coatings require inspection for disbondment. This system requires checking pump function and reservoir level. **SAME** burden class: routine visual/instrument check.\n*   **Rough Cost Class**: Coating application is low cost per $m^2$ but frequent re-application. Inhibitor dosing has higher CAPEX (pump, controller, sensors) but lower OPEX (long-life reservoir, no recoating). The cost class is **COMPARABLE** for the lifecycle of the asset (10+ years), with this method shifting cost from labor-intensive painting to automated maintenance.\n\nEXECUTABLE TEST\n*   **Protocol**: Expose a coupon of the same steel grade in a simulated splash zone rig (chamber with periodic wave impact).\n    *   **Group A (Control)**: Standard FBE coating, no inhibitor.\n    *   **Group B (Proposed)**: Standard FBE coating + Active Inhibitor Dosing System triggered by pH/conductivity spikes.\n*   **Instruments**: Corrosion Potential (LPR) probe and Electrochemical Impedance Spectroscopy (EIS) on the coupon surface, plus the pH/Conductivity sensors on the rig.\n*   **Pass/Fail Threshold**: The mechanism is FALSIFIED if the **corrosion potential ($E_{corr}$) of Group B does not shift to a value >$50 mV$ more noble than Group A** during the re-wetting phase within **24 hours** of the test cycle.\n    *   *Alternative Metric*: Mass loss. Falsified if mass loss in Group B is not **$\\leq 20\\%$** of the mass loss in Group A after 1000 wet/dry cycles.\n*   **Duration**: 30 days (simulating 1000+ cycles).\n*   **Kill Criterion**: The mechanism is falsified if **$E_{corr}$** does not change by at least **$50 mV$** (towards noble) within **1 hour** of the re-wetting event compared to the un-inhibited control, OR if **mass loss** does not drop by at least **$50\\%$** over 1000 cycles.\n\nDESIGN POINT\n*   **Primary Stated Indicator**: **pH** and **Conductivity** (from `signals_used`). These are the primary indicators because the failure (corrosion) is an electrochemical process driven by ionic activity (conductivity) and hydrogen ion concentration (pH), which are directly measurable and stated in the problem's plan layer.\n*   **Mechanism Magnitude**: The system acts through a **$10\\%$ relative change in Conductivity** and a **$0.2 pH unit drop** as the trigger signal.\n*   **Inhibitor Dosage**: **$50 mg/L$** (ASSUMPTION: standard film-forming inhibitor efficiency in seawater is in the 10-100 ppm range; 50 ppm is a mid-range value for high-shear splash zones).\n*   **Response Time**: **$< 30$ seconds** from trigger to peak surface concentration.\n\nCONSTRAINT BIND\n*   The monitored indicators (pH, conductivity) are the **PRIMARY** stated indicators from the typed plan. They define the state of the corrosive environment.\n*   The secondary indicator (Corrosion Potential/Mass Loss) is used **ONLY** for the falsification test to prove the mechanism works; it does not drive the control loop in operation. The control loop is driven exclusively by the stated pH/conductivity transients, which are already recorded/exported by standard sensors.\n*   No new instrumentation is deployed beyond the standard splash zone sensors (pH/conductivity) and the added inhibitor dosing hardware. The reference thresholds are derived from the physical behavior of the wet/dry cycle (baseline conductivity $\\approx 0$ when dry, $\\approx 50 mS/cm$ when wet) and standard electrochemical criteria for pitting resistance.",
+ "quant_prediction": {
+  "status": "computed",
+  "quantity": "protection current demand (j=20 mA/m^2 anchor)",
+  "predicted_value": "I = 0.02 ampere A for 1 m^2",
+  "calc_trace": "0.02 A/m^2 x 1.0 m^2 = 0.02 ampere A",
+  "falsifier": "the measured pipe-to-electrolyte potential must stay below -0.80 V (Ag/AgCl) in the coupon potential survey; the opposite result falsifies the invention",
+  "route": "class-generic:corrosion_chemical"
+ },
+ "physics_validation": {
+  "record": "physics_validate/1.0.0 — the generation-time physics-truth gate: a TYPED check registry (sign / magnitude / formula / mechanism-class-at-scale) with falsifiable assumption bounds. Coverage = the registry, honestly typed; NOT a general physics oracle. GENUINE_PHYSICS_ERROR is never re-labeled an assumption dispute (DIR 6).",
+  "verdict": "PASS",
+  "checks_run": [
+   "PH-SIGN-01",
+   "PH-SIGN-02",
+   "PH-SIGN-03",
+   "PH-MECH-01",
+   "PH-MAG-01",
+   "PH-UNIT-01"
+  ],
+  "genuine_physics_errors": [],
+  "n_errors": 0,
+  "assumption_bounds": [],
+  "n_assumption_bounds": 0,
+  "quant_status_seen": "computed"
+ },
+ "generation_checks": {
+  "failure_class": null,
+  "selected_mech_class": "inhibitor_dosing",
+  "off_target": true,
+  "novelty": "weak",
+  "genuine_physics_errors": 0,
+  "assumption_bounds": 0
+ },
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "direction_check": {
+   "direction": "CORRECT",
+   "reason": "driver: The established physical driver is the electrochemical dissolution of steel due to the breakdown of the passive film by chloride ions in high-oxygen, high-chloride seawater environments during wetting cycles, which accelerates the anodic current and corrosion rate. | ingredient: The active ingredient (film-forming inhibitor) imposes a physical barrier that suppresses the anodic current and shifts the pitting potential to more noble values, thereby reducing the corrosion rate integral over the duty cycle. | ingredient sign vs driver: OPPOSITE -> CORRECT",
+   "established_driver": "The established physical driver is the electrochemical dissolution of steel due to the breakdown of the passive film by chloride ions in high-oxygen, high-chloride seawater environments during wetting cycles, which accelerates the anodic current and corrosion rate.",
+   "ingredient_action": "The active ingredient (film-forming inhibitor) imposes a physical barrier that suppresses the anodic current and shifts the pitting potential to more noble values, thereby reducing the corrosion rate integral over the duty cycle.",
+   "sign_of_ingredient_vs_driver": "OPPOSITE"
+  },
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1.  **Component**: Electrochemical Sensor Array.",
+    "*   *Status*: **ALREADY-RECORDED** (Problem states \"stated sensor\" for pH and conductivity",
+    "*   *Function*: Provides real-time $pH$ and $Conductivity (\\kappa)$ signals.",
+    "2.  **Component**: Pulsed Inhibitor Injection System.",
+    "*   *Material*: High-density polyethylene (HDPE) reservoir containing aqueous film-forming",
+    "*   *Instrument*: Electromagnetic micro-pump capable of $0.1$ to $1.0 L/min$ pulses.",
+    "*   *Service*: No external power required for storage; pump is battery-powered (standard i",
+    "3.  **Procedure**: Logic controller algorithm.",
+    "*   *Rule*: If ($\\kappa$ drops by >10% AND $pH$ drops by >0.2 units relative to 1-hour bas",
+    "*   *Rationale*: A drop in conductivity and pH during a dry-out period followed by a rapid",
+    "4.  **Reference/Threshold Derivation**:",
+    "*   *Threshold*: $\\Delta \\kappa_{crit} = 10\\%$ of baseline. **DERIVED** from stated physic",
+    "*   *Pulse Volume*: Calculated to maintain $C_{inh}$ in the splash film thickness (~$100 \\",
+    "*   **Installability**: Standard practice (coatings) requires surface prep and application",
+    "*   **Operability**: Coatings are passive (zero operation). This system is active (require",
+    "*   **Maintenance**: Coatings require inspection for disbondment. This system requires che",
+    "*   **Rough Cost Class**: Coating application is low cost per $m^2$ but frequent re-applic"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "DRIVER_AS_REMEDY": [
+    "the mechanism's active ingredient 'cyclic' matches the problem's stated failure driver — a remedy may not be the driver (HO4-03 class: cycling to heal cycling-driven cracking)"
+   ],
+   "QUANT_TEST_MISSING": [
+    "the EXECUTABLE TEST section has no NUMERIC pass/fail threshold with units — state the falsifiable quantity, its unit, and the comparison (e.g. '>= 45:1 dilution', '< 0.2 mm wear depth per 1000 h'); a qualitative 'the failure rate drops' is not a falsifier"
+   ],
+   "UNPRICED_DUTY_CYCLE": [
+    "the bill modulates a duty cycle or schedule but prices no operational cost (throughput/energy/availability, quantified or bounded) — the OPERATIONAL COST line is mandatory"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "machine_shape": "R121 successor: bare author + bind check + findings surfaced (autonomous repair + AIDE ceremony retired, Art. 20)"
+ },
+ "declared_template_prose": null,
+ "sha256_16": "c6ef65a6e696c0f8"
+}

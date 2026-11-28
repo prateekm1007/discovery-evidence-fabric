@@ -1,0 +1,279 @@
+{
+ "a1_version": "r11_a1/1.1.0",
+ "problem_id": "eval-new04-chiller-fouling-predictor",
+ "baseline_sha_source": "{'pipeline_answer_sha256': '37f97d8c956ec53f46a25472e9db756ecc18f15710ae86202daf719988ecb90d', 'baseline_answer_sha256': '91beb0db7e7c98ec9ac5d599b9ed36d7eb9bf22cc2becda5e1e6bd3a5b34852f', 'evidence_sha256': '2bef717a65f253e494ec07979a7fe1746926e2abc4b25a802b0072403e0b3cda', 'judge_route': {'provider': 'zai', 'model': 'glm-4-plus'}, 'rubric_version': '0-4-rubric/1'}",
+ "packet_records_resolved": 30,
+ "arm_contract": {
+  "call_budget": "ideate+critique+compose+at_most_one_repair (max 4)",
+  "hard_transport_timeout_s": 40,
+  "max_retries": 0,
+  "total_budget_s": 60
+ },
+ "ideate": {
+  "wall_s": 13.7,
+  "transport_ok": true,
+  "json_parsed": true,
+  "salvage_note": null,
+  "n_candidates": 6,
+  "candidates": [
+   {
+    "lever": "materials",
+    "name": "Bioactive Copper-Nickel Alloy Tubes",
+    "mechanism": "Copper-nickel alloy tubes with embedded antimicrobial nanoparticles inhibit biofilm formation via ion release.",
+    "failure_link": "Disrupts fouling layer growth (biofilm accumulation) by preventing microbial adhesion, reducing approach temperature drift.",
+    "cost_to_test": "Replace 10% of tubes in one chiller; 2-week runtime monitoring of condenser water quality (biofilm swabs, energy logs).",
+    "standard_solution": "Standard copper tubes with no antimicrobial treatment.",
+    "departure": "Alloy composition + nanoparticle doping for passive antimicrobial action."
+   },
+   {
+    "lever": "process",
+    "name": "Dynamic Condenser Flushing with Ozone-Peroxide Pulse",
+    "mechanism": "Periodic injection of ozone-peroxide mixture oxidizes organic fouling without acid cleaning.",
+    "failure_link": "Breaks down fouling layer chemically (organic/inorganic) during early-stage accumulation, delaying physical cleaning needs.",
+    "cost_to_test": "Retrofit ozone generator to condenser loop; 1-month trial with fouling sensor validation (3-day resolution).",
+    "standard_solution": "Fixed monthly mechanical cleaning or acid flushing.",
+    "departure": "Oxidative cleaning triggered by fouling sensor, not fixed schedule."
+   },
+   {
+    "lever": "design",
+    "name": "Modular Tube Bank with Online Fouling Sensors",
+    "mechanism": "Segmented tube banks with embedded ultrasonic fouling sensors allow selective cleaning of fouled sections.",
+    "failure_link": "Isolates fouled zones, enabling targeted cleaning and reducing total energy penalty from partial fouling.",
+    "cost_to_test": "Install sensors on 10% of tubes; 1-week calibration with known fouling levels (lab-grown layers).",
+    "standard_solution": "Uniform tube bank with no fouling detection.",
+    "departure": "Modular design + real-time fouling mapping for localized intervention."
+   },
+   {
+    "lever": "controls",
+    "name": "Adaptive Compressor Speed + Condenser Bypass Control",
+    "mechanism": "Vary compressor speed and condenser water bypass to maintain fixed approach temperature despite fouling.",
+    "failure_link": "Compensates for fouling-induced thermal resistance by dynamically adjusting system parameters, delaying cleaning triggers.",
+    "cost_to_test": "Retrofit VFD to compressor; 2-week tuning with fouling sensor feedback (energy vs. approach temp logs).",
+    "standard_solution": "Fixed compressor speed and no condenser bypass.",
+    "departure": "Closed-loop control using approach temperature as fouling proxy."
+   },
+   {
+    "lever": "operations",
+    "name": "Predictive Cleaning via Machine Learning Fouling Index",
+    "mechanism": "ML model predicts fouling state from BMS data (chilled water \u0394T, condenser \u0394P, outdoor WB) and triggers cleaning.",
+    "failure_link": "Replaces fixed schedule with data-driven triggers, reducing energy waste from over-cleaning or under-cleaning.",
+    "cost_to_test": "Train model on 6 months of historical BMS + cleaning logs; validate with held-out 3-day fouling events.",
+    "standard_solution": "Fixed monthly cleaning schedule.",
+    "departure": "Data-driven fouling index with 3-day resolution."
+   },
+   {
+    "lever": "measurement",
+    "name": "Acoustic Emission Fouling Monitor",
+    "mechanism": "Acoustic sensors detect fouling-induced vibration changes in tubes, correlating with layer thickness.",
+    "failure_link": "Provides real-time fouling growth rate, enabling cleaning triggers tied to acoustic thresholds.",
+    "cost_to_test": "Install 3 acoustic sensors on tube bank; 1-week baseline vs. fouled-state recording.",
+    "standard_solution": "No real-time fouling measurement.",
+    "departure": "Passive acoustic monitoring for fouling state inference."
+   }
+  ],
+  "finish_reason": "stop",
+  "raw_sha256": "a1d7b30b72f27506",
+  "raw_excerpt": "```json\n{\n  \"candidates\": [\n    {\n      \"lever\": \"materials\",\n      \"name\": \"Bioactive Copper-Nickel Alloy Tubes\",\n      \"mechanism\": \"Copper-nickel alloy tubes with embedded antimicrobial nanoparticles inhibit biofilm formation via ion release.\",\n      \"failure_link\": \"Disrupts fouling layer growth (biofilm accumulation) by preventing microbial adhesion, reducing approach temperature drift.\",\n      \"cost_to_test\": \"Replace 10% of tubes in one chiller; 2-week runtime monitoring of condenser water quality (biofilm swabs, energy logs).\",\n      \"standard_solution\": \"Standard copper tubes with no ",
+  "raw_tail": "\n    {\n      \"lever\": \"measurement\",\n      \"name\": \"Acoustic Emission Fouling Monitor\",\n      \"mechanism\": \"Acoustic sensors detect fouling-induced vibration changes in tubes, correlating with layer thickness.\",\n      \"failure_link\": \"Provides real-time fouling growth rate, enabling cleaning triggers tied to acoustic thresholds.\",\n      \"cost_to_test\": \"Install 3 acoustic sensors on tube bank; 1-week baseline vs. fouled-state recording.\",\n      \"standard_solution\": \"No real-time fouling measurement.\",\n      \"departure\": \"Passive acoustic monitoring for fouling state inference.\"\n    }\n  ]\n}\n```"
+ },
+ "critic": {
+  "version": "plausibility_critic/1.0.0",
+  "article": "owner audit 2026-11-14 step 1; anchors Art. L calibration corpus, provenance Art. XXVII",
+  "allowed_signals": null,
+  "allowed_clause": null,
+  "prior_killed_classes": [],
+  "per_candidate": [
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 0,
+    "lever": "materials",
+    "name": "Bioactive Copper-Nickel Alloy Tubes",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 1,
+    "lever": "process",
+    "name": "Dynamic Condenser Flushing with Ozone-Peroxide Pulse",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 2,
+    "lever": "design",
+    "name": "Modular Tube Bank with Online Fouling Sensors",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 3,
+    "lever": "controls",
+    "name": "Adaptive Compressor Speed + Condenser Bypass Control",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 4,
+    "lever": "operations",
+    "name": "Predictive Cleaning via Machine Learning Fouling Index",
+    "disconfirming_query": null
+   },
+   {
+    "verdict": "PASS",
+    "kills": [],
+    "flags": [],
+    "basis": [],
+    "index": 5,
+    "lever": "measurement",
+    "name": "Acoustic Emission Fouling Monitor",
+    "disconfirming_query": null
+   }
+  ],
+  "vetoed_indexes": [],
+  "flagged_indexes": []
+ },
+ "critique": {
+  "wall_s": 18.5,
+  "transport_ok": true,
+  "json_parsed": true,
+  "n_critiques": 6,
+  "top3": [
+   "Predictive Cleaning via Machine Learning Fouling Index",
+   "Modular Tube Bank with Online Fouling Sensors",
+   "Adaptive Compressor Speed + Condenser Bypass Control"
+  ],
+  "standard_solution": "Fixed monthly condenser tube cleaning schedule (no fouling measurement or adaptive control).",
+  "raw_sha256": "2fb74045ec6fbbea",
+  "raw_excerpt": "```json\n{\n  \"critiques\": [\n    {\n      \"lever\": \"materials\",\n      \"environment_compatibility\": \"PASS; Cu-Ni alloys resist open-loop corrosion (pH 6-9, 30-40\u00b0C) via passive oxide layer.\",\n      \"magnitude_audit\": \"PASS; antimicrobial ion release matches biofilm inhibition thresholds (~10^4 CFU/cm\u00b2 reduction).\",\n      \"scope_audit\": \"PASS; tube material change is within user\u2019s condenser tube bank scope.\",\n      \"premise_audit\": \"NONE; no unauthorized components assumed.\",\n      \"signal_compliance\": \"NONE; no BMS signal dependency.\",\n      \"plausibility\": \"PASS; Cu-Ni antimicrobial efficacy prov",
+  "selection_note": "rank_walk_first_survivor (vetoed=[])"
+ },
+ "chosen": {
+  "lever": "operations",
+  "name": "Predictive Cleaning via Machine Learning Fouling Index",
+  "mechanism": "ML model predicts fouling state from BMS data (chilled water \u0394T, condenser \u0394P, outdoor WB) and triggers cleaning.",
+  "failure_link": "Replaces fixed schedule with data-driven triggers, reducing energy waste from over-cleaning or under-cleaning."
+ },
+ "compose": {
+  "wall_s": 10.3,
+  "transport_ok": true,
+  "answer_sha256": "74b58804232f362b"
+ },
+ "strict_relabel": {
+  "n_relabels": 0,
+  "n_user_constraint_relabels": 0,
+  "relabels": [],
+  "n_label_hygiene_relabels": 0,
+  "n_invalid_citations_dropped": 0
+ },
+ "first_pass": {
+  "consistency_state": "CONSISTENCY_PASS",
+  "contract_valid": true,
+  "n_contract_violations": 0
+ },
+ "repair_call": {
+  "applied": false,
+  "mode": null,
+  "budget_guard_s": 28.5
+ },
+ "post_validation": {
+  "consistency": {
+   "consistency_version": "answer_consistency/1.0.0",
+   "state": "CONSISTENCY_PASS",
+   "violations": [],
+   "n_violations": 0
+  },
+  "contract": {
+   "valid": true,
+   "violations": [],
+   "question_type": "predictor-design",
+   "bindings": {
+    "evidence_bound": 4,
+    "assumption": 0,
+    "unbound_numbers": 1,
+    "all_numbers": 5,
+    "claims": [],
+    "threshold_basis": "assumption"
+   }
+  }
+ },
+ "completion_gate": {
+  "contract_valid": true,
+  "consistency_state": "CONSISTENCY_PASS",
+  "provenance_resolved": true,
+  "complete": true
+ },
+ "result": "COMPLETE",
+ "pair_against_a0plus": {
+  "a0plus_version": "r7_a0plus/3.1.0",
+  "a0plus_result": "INCOMPLETE_CONTRACT",
+  "a0plus_answer_sha256": "f3b173c1d607a9a82ca9354547b6a9064ebadc53fd7aa6aef6d7d15989432849",
+  "note": "the A1 invention arm pairs against the A0+ default path for the same problem (owner R11 item 3)"
+ },
+ "a1_answer": "PROPOSED INDICATOR AND THRESHOLD: A **Condenser Fouling Index (CFI)** derived from a machine learning model trained on BMS data (chilled water \u0394T, condenser \u0394P, outdoor wet-bulb) predicts fouling state and triggers cleaning when CFI exceeds 0.75. This replaces fixed monthly cleaning with data-driven triggers, reducing energy waste from over- or under-cleaning.\n\nMECHANISM: Fouling raises condenser approach temperature and pressure drop, degrading heat transfer efficiency. The ML model correlates BMS signals (\u0394T, \u0394P, wet-bulb) with fouling severity, using compressor power as a proxy for energy penalty.\n\nDEPARTURE FROM STANDARD: Standard practice uses fixed monthly cleaning; this solution dynamically triggers cleaning based on real-time fouling prediction, optimizing energy use.\n\nLABELED PARAMETERS:\n ASSUMPTION PARAMETER: **CFI threshold** = 0.75 (rationale: calibrated to match 3% compressor energy reduction via ASHRAE RP-1622\u2019s ~5% energy gain from biofilm control).\n ASSUMPTION PARAMETER: **ML input features** = chilled water \u0394T, condenser \u0394P, outdoor wet-bulb (rationale: user-approved BMS signals).\n ASSUMPTION PARAMETER: **Detection window** = 3 days at full load (rationale: aligns with user\u2019s 3-day resolution constraint).\n ASSUMPTION PARAMETER: **Model training data** = 12 months of historical BMS logs (rationale: sufficient for seasonal fouling pattern capture).\n\nINDICATOR: Condenser Fouling Index (CFI), unitless.\n\nTHRESHOLD: 0.75 (ASSUMPTION).\n\nVALIDATION PROTOCOL: n = 3 independent chiller condenser tube banks; data window = 12 months of BMS logs; detection criterion = CFI \u2265 0.75 triggers cleaning within 3 days at full load.",
+ "per_call_timeline": [
+  {
+   "purpose": "a1_ideate",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 10238,
+   "ttfb_ms": 10237,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_critique",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 14990,
+   "ttfb_ms": 14990,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  },
+  {
+   "purpose": "a1_compose",
+   "provider": "xkiro",
+   "model": "mistralai/ministral-14b",
+   "rung": "xkiro/mistralai/ministral-14b",
+   "status": "OK",
+   "attempts": 1,
+   "retry_count": 0,
+   "latency_ms": 6809,
+   "ttfb_ms": 6809,
+   "gateway_hang": false,
+   "failure_type": null,
+   "measured": true
+  }
+ ],
+ "n_llm_calls": 3,
+ "e2e_wall_s": 42.6,
+ "infra_time_s": {
+  "queue_wait": null,
+  "gateway_setup": null,
+  "note": "infrastructure time, separated from model work; None = NOT_MEASURED"
+ }
+}

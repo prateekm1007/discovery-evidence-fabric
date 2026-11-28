@@ -1,0 +1,71 @@
+{
+ "problem_id": "r125-05-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 124.33,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 253,
+    "completion_tokens": 716,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.68,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1054,
+    "completion_tokens": 1237,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Dynamic Throughput Restoration via Differential Pressure-to-Fill-Index Correlation**\n\n**DIRECTION-OF-EFFECT:**\n*   **Driving Variable:** Mill-Feed Rate (input mass per unit time).\n*   **Direction of Mechanical Effect:** Increasing the Mill-Feed Rate increases the solid volume within the mill grinding zone, which **increases** the differential pressure (DP) across the mill and **decreases** the material residence time per unit mass. Conversely, decreasing the Mill-Feed Rate **decreases** the DP and **increases** the residence time.\n*   **Resulting Outcome:** To restore specific surface area (fineness), which requires increased comminution time, the Mill-Feed Rate must be **decreased** to move the operating point to a higher DP region (steeper pressure signature), thereby **increasing** residence time until fineness targets are met. Throughput is then restored in small increments **only** as long as the DP remains above the calibrated **DP_min_fineness** threshold, ensuring fineness does not drop below target.\n\n**Mechanism:**\nThe flattening of the mill internal pressure signature indicates that the material residence time inside the mill has decreased, leading to insufficient comminution time per unit mass, which directly causes the drop in specific surface area (fineness). The proposed mitigation involves using the **Mill Differential Pressure (DP) transmitter** as a real-time proxy for the **Ball Charge Fill Level/Bed Depth** within the critical grinding zone. By correlating the DP reading against the **Mill-Feed Rate Meter**, the operator can dynamically adjust throughput. To restore fineness, the operator initially reduces feed rate to increase DP (and thus residence time) until the pressure signature steepens and fineness is restored. Then, to maximize production without losing fineness, the operator increases the feed rate in small increments (steps) only while the DP remains above a calibrated \"minimum fineness threshold\" (**DP_min_fineness**). This effectively shifts the operating point back along the \"steepness\" of the pressure signature, ensuring sufficient residence time for grinding while reclaiming lost throughput.\n\n**IMPLEMENTATION BILL:**\n1.  **Baseline Calibration:**\n    *   **Input:** Mill DP (from Mill Differential Pressure Transmitter) and Mill-Feed Rate (from Mill-Feed Rate Meter).\n    *   **Action:** During a period of stable, acceptable fineness (using lab data as reference), record pairs of DP and Feed Rate. Identify the DP value corresponding to the *minimum* acceptable specific surface area target. Define this value as **DP_min_fineness**.\n2.  **Automated or Operator-Guided Step-Up Protocol:**\n    *   **Input:** Real-time Mill Differential Pressure (from Mill DP Transmitter).\n    *   **Condition 1 (Fineness Restoration):** If current fineness is below target (indicated by flattened DP signature or historical trend), **decrease** the Mill-Feed Rate (via the Mill-Feed Rate Meter control) in 1-2% increments every 5-10 minutes. Continue decreasing feed rate until DP rises sufficiently to indicate increased residence time and fineness improvement.\n    *   **Condition 2 (Throughput Maximization):** Once fineness is restored and stable, **increase** the Mill-Feed Rate in 1-2% increments every 5-10 minutes.\n    *   **Limit:** Continue increasing feed rate only as long as the real-time DP remains strictly above **DP_min_fineness**.\n    *   **Guardrail:** If DP approaches or drops below **DP_min_fineness**, immediately **halt** throughput increases. If DP drops below **DP_min_fineness**, **reduce** the feed rate until DP recovers to the target band above the threshold.\n3.  **Secondary Guardrail (Optional but Recommended):**\n    *   **Input:** Bucket-Elevator Ammeter Reading (from Bucket-Elevator Ammeter).\n    *   **Action:** Monitor drive load. If the ammeter reading trends downward significantly during feed rate increases, it may indicate a loss of solid material contact or improper charge distribution. In this case, prioritize the DP signal over the feed rate step-up, as DP is the more direct indicator of the grinding zone's material bed depth and residence time. Pause throughput restoration until ammeter and DP trends stabilize.\n\n**Measures It Relies On:**\n*   **Mill Differential Pressure Transmitter:** Provides the primary signal indicating the effective bed depth/residence time. A stable, high DP (above threshold) correlates with sufficient grinding time for fineness. *Source: Existing Mill DP Transmitter.*\n*   **Mill-Feed Rate Meter:** Allows precise, controlled adjustments to the input load, enabling the step-up/down process. *Source: Existing Mill-Feed Rate Meter.*\n*   **Bucket-Elevator Ammeter:** Acts as a sanity check. A stable ammeter reading during feed rate changes confirms that the material flow is consistent and the charge is behaving normally. A sudden drop in ammeter could signal a void or charge miscalibration, prompting a pause in throughput restoration. *Source: Existing Bucket-Elevator Ammeter.*\n\n**Why This Works Under the Constraint:**\nNo new sensors are used. The method leverages the existing DP transmitter to solve the \"flattened pressure signature\" issue by using it not just as a diagnostic, but as a *control variable* to set the safe maximum throughput. It directly addresses the root cause (residence time/fineness) by linking pressure (proxy for residence time) to feed rate (throughput), allowing the mill to operate at the highest possible rate that still guarantees the required specific surface area, while explicitly directing operators to reduce feed rate first to restore fineness before cautiously increasing it.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Baseline Calibration:**",
+   "*   **Input:** Mill DP (from Mill Differential Pressure Transmitter) and Mill-Feed Rate (f",
+   "*   **Action:** During a period of stable, acceptable fineness (using lab data as referenc",
+   "2.  **Automated or Operator-Guided Step-Up Protocol:**",
+   "*   **Input:** Real-time Mill Differential Pressure (from Mill DP Transmitter).",
+   "*   **Condition 1 (Fineness Restoration):** If current fineness is below target (indicated",
+   "*   **Condition 2 (Throughput Maximization):** Once fineness is restored and stable, **inc",
+   "*   **Limit:** Continue increasing feed rate only as long as the real-time DP remains stri",
+   "*   **Guardrail:** If DP approaches or drops below **DP_min_fineness**, immediately **halt",
+   "3.  **Secondary Guardrail (Optional but Recommended):**",
+   "*   **Input:** Bucket-Elevator Ammeter Reading (from Bucket-Elevator Ammeter).",
+   "*   **Action:** Monitor drive load. If the ammeter reading trends downward significantly d",
+   "*   **Mill Differential Pressure Transmitter:** Provides the primary signal indicating the",
+   "*   **Mill-Feed Rate Meter:** Allows precise, controlled adjustments to the input load, en",
+   "*   **Bucket-Elevator Ammeter:** Acts as a sanity check. A stable ammeter reading during f"
+  ],
+  "APPARATUS_ROW": [
+   "*   **Action:** Monitor drive load. If the ammeter reading trends downward significantly during feed rate incr"
+  ]
+ },
+ "wall_clock_s": 130.02,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

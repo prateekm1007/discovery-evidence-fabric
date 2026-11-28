@@ -1,0 +1,135 @@
+{
+ "problem_id": "v17-08-freeze-concentration",
+ "domain": "nucleation_phase_change",
+ "question_type": "invention",
+ "executor_id": "builder-r147s1-physics-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "v12 machine (r97) + the strength kit + the r149 physics-truth gate",
+ "run": "holdout-v18-physics-generation (the SEALED physics-truth one-shot: the r149 lever — the gate demanded at generation time, ONE typed regeneration on fail)",
+ "sealed_problems_digest16": "2eb520f695aaf1ab",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P30",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:4e11bc11a7ba": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:7a25333dbc4b": "reject-duplicate",
+   "cand:MS:FAILURE_PATH_INVERSION:097322cf4f69": "borderline-judge"
+  },
+  "strength_kit": {
+   "failure_class": "nucleation_phase_change",
+   "confidence": 1.0,
+   "evidence_span": "freeze, uncontrolled ice",
+   "allowed_mech_classes": [
+    "controlled_nucleation_sites",
+    "acoustic_ultrasonic_nucleation",
+    "dissolved_gas_management",
+    "superheat_pressure_path_control",
+    "nucleation_inhibitor_dosing"
+   ],
+   "engine_prediction_status": "parameters_required",
+   "engine_prediction_mech_class": "controlled_nucleation_sites",
+   "inspiration_analogies_n": 2,
+   "inspiration_spans_n": 0,
+   "winner_measure_class": "configuration",
+   "winner_rule": "non_schedule_first"
+  },
+  "r149_lever": {
+   "physics_truth_conditioning": true,
+   "physics_checks_n": 8,
+   "regression_case": false
+  }
+ },
+ "generated_at": "2026-11-24T15:37:18Z",
+ "attempts_n": 1,
+ "row_wall_s": 11.8,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice: Adds insulation or increases heat flux to keep the bulk temperature away from the phase boundary.\nMechanism departure: **controlled_nucleation_sites** (engineered heterogeneous nucleation via textured/seeded surfaces). This pins the \"where\" and \"when\" of ice formation, converting stochastic bursts into a controlled, predictable phase-change front, removing the supercooling instability that causes uncontrolled solute trapping.\nFailure-physics connection: Freeze concentration in juice occurs because homogeneous nucleation is kinetically hindered, leading to large supercooling (ΔT_s) until a spontaneous burst initiates ice in the liquid core, trapping solutes. Heterogeneous nucleation lowers the critical radius for ice crystal formation ($r^*$) and reduces the free energy barrier, forcing nucleation to initiate at the solid-liquid interface rather than in the bulk.\n\nPHYSICS CHECK\nGoverning physical relation: Heterogeneous nucleation rate $J$ is exponentially dependent on the nucleation barrier. The critical radius $r^*$ is given by $r^* = \\frac{2\\gamma_{is}\\cos\\theta}{\\Delta g_v}$, where $\\gamma_{is}$ is ice-surface interfacial energy, $\\theta$ is the contact angle, and $\\Delta g_v$ is the volumetric free energy difference.\nMagnitude verification: For juice (aqueous solution), the homogeneous nucleation supercooling is ~10 K. Heterogeneous nucleation on a properly textured, hydrophilic surface (low $\\theta$) reduces the nucleation barrier significantly, typically lowering the required supercooling to 1–2 K for onset. The mechanism works because the surface provides a pre-existing template that reduces the interfacial area penalty of forming the ice nucleus, shifting the nucleation from the unstable bulk to the stable wall boundary layer.\n\nIMPLEMENTATION BILL\nComponents:\n1. **Textured Heat Exchanger Walls**: Modification of the standard plate or tube heat exchanger surfaces used in juice freezing.\n   - **Material**: Stainless Steel (316L) or Food-Grade Aluminum.\n   - **Configuration**: Laser-engraved micro-channels or reentrant cavities on the cold-side surface. These act as \"pinning sites\" for ice nucleation.\n   - **Already-Recorded**: The problem states the device is the \"stated in the problem\" context of a juice freezing process, implying existing heat exchanger hardware where surfaces can be modified. No new sensors are added; the control logic relies on the existing temperature/pressure monitoring of the fluid stream.\n2. **Pressure/Flow Control Valve**: Adjusts the residence time of juice in the heat exchanger.\n   - **Signal**: Uses existing `flow_rate` and `pressure` telemetry (stated in signals_used).\n   - **Procedure**: Modulate flow rate to maintain the juice supercooling at a specific low value (e.g., 1 K below theoretical freezing point of the solution) to trigger nucleation at the engineered sites rather than spontaneously in the bulk.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: SAME class. Requires only surface modification of existing heat exchanger plates/tubes or replacement with textured variants. No major plant rebuild.\n- **Operability**: SAME class. No new operator tasks. The system runs on existing pumps and valves.\n- **Maintenance**: SLIGHTLY HIGHER. Textured surfaces may require more rigorous CIP (Clean-in-Place) to prevent biological growth in crevices, but this is a procedural change, not a hardware addition.\n- **Cost**: SAME ORDER OF MAGNITUDE. Laser texturing or manufacturing textured plates is comparable to standard heat exchanger fabrication costs.\n- **Feasibility Earned**: The mechanism relies on surface engineering (material science/thermal engineering) which is standard in boiling and freezing enhancement. It does not require new instrumentation (no new sensors) but uses the \"physics\" of the surface to change the failure mode from \"random trapping\" to \"controlled frontal freezing.\"\n\nEXECUTABLE TEST\nProtocol:\n1. **Bench Rig**: Use a parallel-plate heat exchanger with two sides: one side polished (control), one side laser-textured with micro-cavities (test).\n2. **Medium**: Apple juice with known brix (e.g., 12 Brix).\n3. **Measurement**: Use inline temperature sensors (already stated as part of the device's monitoring) and visual observation of the freezing front via a transparent test section or high-speed imaging (if available; otherwise, inferred from pressure drop spikes).\n4. **Pass/Fail Threshold**: \n   - **Control**: Supercooling exceeds 5 K before spontaneous nucleation (uncontrolled ice).\n   - **Test**: Nucleation initiates at the textured surface when supercooling is < 2 K, and the ice front propagates uniformly from the walls.\n   - **Quantitative Prediction**: The variance in \"time to nucleation\" ($\\sigma_t$) for the textured surface must be less than 10% of the mean time, whereas the polished surface will show >50% variance (stochastic). Alternatively, measure the \"solute concentration in the residual ice\" — the mechanism aims to reduce trapping. A proxy for trapping is the \"freezing front velocity.\" \n   - **Kill Criterion**: The mechanism is FALSIFIED if the nucleation temperature $T_{nuc}$ on the textured surface does not decrease by at least 3 K relative to the polished control surface within a 5-minute cooling window at a constant heat flux of 10 kW/m².\n5. **Test Vehicle**: Bench-scale parallel-plate heat exchanger rig with embedded RTD sensors.\n\nCONSTRAINT BIND\nPrimary Stated Indicator: **Supercooling / Nucleation Onset Temperature**.\nReason: The failure is \"uncontrolled ice,\" which is defined by the stochastic nature of the onset. The threshold that defines the failure is the deviation from the expected freezing point. By pinning the nucleation sites, the primary indicator becomes the deterministic onset temperature at the wall. Secondary indicators (pressure drop, flow rate) supplement this by providing the residence time control but do not replace the thermal signal of when phase change begins.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "1. **Textured Heat Exchanger Walls**: Modification of the standard plate or tube heat exch",
+    "- **Material**: Stainless Steel (316L) or Food-Grade Aluminum.",
+    "- **Configuration**: Laser-engraved micro-channels or reentrant cavities on the cold-side ",
+    "- **Already-Recorded**: The problem states the device is the \"stated in the problem\" conte",
+    "2. **Pressure/Flow Control Valve**: Adjusts the residence time of juice in the heat exchan",
+    "- **Signal**: Uses existing `flow_rate` and `pressure` telemetry (stated in signals_used).",
+    "- **Procedure**: Modulate flow rate to maintain the juice supercooling at a specific low v",
+    "- **Installability**: SAME class. Requires only surface modification of existing heat exch",
+    "- **Operability**: SAME class. No new operator tasks. The system runs on existing pumps an",
+    "- **Maintenance**: SLIGHTLY HIGHER. Textured surfaces may require more rigorous CIP (Clean",
+    "- **Cost**: SAME ORDER OF MAGNITUDE. Laser texturing or manufacturing textured plates is c",
+    "- **Feasibility Earned**: The mechanism relies on surface engineering (material science/th"
+   ],
+   "PHYSICS_DIRECTION_UNSTATED": [
+    "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+   ],
+   "MECHANISM_CLASS_UNSTATED": [
+    "the bill does not declare 'MECHANISM CLASS: <one phrase>' — the diversity cap needs the declaration"
+   ]
+  },
+  "findings_disclosed": null,
+  "novelty_gate": {
+   "novelty": "strong",
+   "reject": false,
+   "reasons": [
+    "generic surface pattern present but a mapped mechanism dominates: ['passive insulation as a cure-all']"
+   ],
+   "quant_markers": 2,
+   "mapped_mechanism": "controlled_nucleation_sites",
+   "cross_domain": "pharmaceutical processing"
+  },
+  "physics_gate": {
+   "verdict": "PASS",
+   "failing": [],
+   "checks": [],
+   "coverage_note": "the gate screens the verified error classes plus dimensional/own-input arithmetic; the r148-qualified panel remains the acceptance instrument"
+  },
+  "quant_contract": {
+   "final_computed": true,
+   "final_quant_test_missing": false,
+   "generic_quant": {
+    "status": "computed",
+    "quantity": "implied enhancement factor (the stated 10% gain)",
+    "predicted_value": "the measured quantity must reach 1.10x the baseline",
+    "calc_trace": "1 + 0.10 = 1.10",
+    "falsifier": "the measured gain must reach 1.10x baseline in the stated test protocol; the opposite result falsifies the invention",
+    "route": "class-generic:nucleation_phase_change"
+   },
+   "machine_scan": {},
+   "demand": null
+  }
+ },
+ "declared_template_prose": null,
+ "sha256_16": "6603aa65028a2f73"
+}

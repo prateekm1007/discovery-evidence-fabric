@@ -1,0 +1,67 @@
+{
+ "record": "R89_EQUILIBRIUM_DIRECTION_BIND_STATUS/1.0.0",
+ "session": "builder-r89s1",
+ "date": "2026-11-18",
+ "claim": "c-0101 (work_id r89-equilibrium-direction-bind, kind task, base d4e524141)",
+ "directive": "AM76/V76 (auditor R88) direction 1: build the thermodynamic/equilibrium-direction bind (the HO10-03 class); acceptance = HO10-03 fires typed INVERTED_EQUILIBRIUM, sign-consistent controls silent, wired into critic + CI",
+ "constitution_reads_pre_claim": {
+  "EPISTEMIC_CONSTITUTION.md": "v3.3.0 @ queue/dev12_r7 d4e524141, FULL (preamble + Arts. 1-29 + amendment records v3.0.0-v3.3.0)",
+  "AUDITOR_CONSTITUTION.md": "v1.3.0 @ audit 3ed6e0f2c, FULL (14 articles + amendments v1.1.0/v1.2.0/v1.3.0)",
+  "audit_artifacts": "eval/holdout_v10_auditor_score.json + eval/holdout_v10_burn_record.json + AM76 + V76 @ 3ed6e0f2c"
+ },
+ "custody_first": {
+  "art": "17 v3.3.0",
+  "restore": "scripts/r77_vault_restore.py; owner HF master token digest 33bc7af22c62 MATCH vs the committed v3.3.0 AM record; 6 keys restored to .env.keys (0600, gitignored): GH_PAT f1ebca5f9b62, AGNES_API_KEY d0c666a3842f, AGNES_API_KEY_2 5c4dffd28fe4, AGNES_BASE_URL e592ff32df1f, XKIRO_API_KEY f6c09bee9bde - all COMMITTED_RECORD_MATCH"
+ },
+ "the_bind": {
+  "typed_key": "INVERTED_EQUILIBRIUM",
+  "module": "scripts/r70_stated_formula_scan.py (scan_equilibrium_direction, merged into scan_stated_formula_direction - the frozen machine call site r40_machine_v77.py:490 gains it untouched)",
+  "legs": {
+   "E1": "T-up claimed to volatilize/gas-shift a registry refractory oxide (TiO2/ZrO2/Al2O3/SiO2/Cr2O3/MgO/CaO/HfO2/Fe2O3/Fe3O4/NiO, formula+word forms); the claim must TARGET the species (ends <=140 chars before it, or the species sits inside the shift claim, or the volat verb directly follows) - the correct chlorinator statement with TiO2 as FEED stays silent",
+   "E2": "excess oxidant claimed to drive a Ti/Si/Al/Zr/Hf chloride-family equilibrium toward the volatile chloride or to reduce the deposition driving force (oxidation supplies oxygen - it yields the solid oxide, never the chloride; chlorinating-agent context silent)",
+   "E3": "T-up claimed to REDUCE coke formation (deliberate burn-off/regeneration silent)",
+   "exemptions": "volatile deposits NH4Cl/NH4HS/elemental S never fire (T-up sublimation is sign-consistent chemistry)"
+  },
+  "discipline": "deterministic zero-LLM; fires ONLY on trend AND claimed-direction AND registry-species conjunctions; anything outside the registry stays silent (typed honest)"
+ },
+ "disclosed_fix": {
+  "art": "5",
+  "what": "pre-existing R77 conservation-leg false-positive class: _CHEM_TO parsed the DEVICE NOUN 'oxidizer' as the verb oxidiz\\w+ ('the oxidizer wall temperature setpoint ... to slow' opened a phantom product window)",
+  "exposed_by": "the new negative control equil_n1_lower_t_oxide (the control pins the fix)",
+  "fix": "_DEVICE_NOUNS typed skip (oxidizer/reducer/converter/reactor/translator agent nouns are never reaction relations)"
+ },
+ "art29_self_catch": {
+  "what": "c-0101 claim kind 'capability_bind' outside the KINDS enum",
+  "caught_by": "tests/test_article29_parallel_coordination.py on the local enforcement battery BEFORE push",
+  "remedy": "the c-0035 F42 precedent: tip normalized to 'task', violation registered in claim_kind_violations[], the pushed snapshot 9f3369e9d preserves the original wording (Art. 4)"
+ },
+ "acceptance_evidence": {
+  "ho10_03_fires": "INVERTED_EQUILIBRIUM x2 from the COMMITTED scored bytes (Art. 22): leg E1 (T-up to volatilize the refractory TiO2) + leg E2 (excess O2 -> volatile TiCl4, 'oxidation cannot chlorinate') - the two AM76-cited inversion classes",
+  "sibling_rows": "29/29 v10 rows silent (zero noise on the scored corpus)",
+  "v9_corpus": "unchanged scored surface: HO9-05 CONSERV + HO9-30 formula-direction only; equilibrium silent everywhere (30/30)",
+  "labelled_controls": "14 controls (5 positives incl. the committed row + 9 sign-consistent negatives: lower-T oxide, NH4Cl sublimation, excess-oxidant-to-oxide, desorption-no-refractory, bare Le Chatelier, the CORRECT chlorinator direction, coke burn-off, steam+T-down coke) - positives fire, negatives silent, through the FULL merged scan",
+  "regressions": "r71_bind_recompute 7/7 MATCH; r52 labelled regression PASS 0/0/0 + eval/r52_labelled_regression.json byte-identical (git diff --exit-code clean); r54 P1_UNIT_CHECKED_PASS",
+  "frozen_bytes": "r40_machine_v77.py stays ff43c6056d7e4163; 15/15 freeze baselines matched (test_r64_v9_preflight 7/7); INVERTED_EQUILIBRIUM deliberately NOT added to the frozen F75_KEYS tuple (no frozen-byte edit; the finding enters the vio->problems repair path + residual disclosure exactly like the conservation leg)",
+  "ci_wiring": "tests/test_r89_equilibrium_direction_bind.py joins the v3.1.0 enforcement block in .github/workflows/r11_queue_surface.yml (gates every queue push)",
+  "secret_gates": "r45 all-refs tips scan PASS 0 unbaselined; manual staged-diff token grep 0 hits (detect-secrets hook degraded, typed)"
+ },
+ "local_battery": "the v3.1.0 enforcement chain (Arts. 19-29 + bind suites + freeze guard) + adversarial/audit-guard blocks + r11 decoder/critic regressions + r52 + r54 all PASS pre-push",
+ "remote_ci": {
+  "rule": "D2 - the green is the remote's",
+  "pushed_sha": "fedd56ee9ec205add3527be797b2cf287e8b62f8",
+  "conclusion": "success",
+  "read": "scripts/r41_remote_ci_read.py via the authenticated check-runs API; applied to eval/r89_remote_ci_read.json"
+ },
+ "art27": {
+  "engine_lines": "~300 of ~465 changed code lines (65%, >= 30% rule) - CAPABILITY round: the fifth bind is engine-critic surface",
+  "score_claimed": "none - the delta arrives with the v11 sealed one-shot under its own claim"
+ },
+ "am76_direction_ledger": {
+  "d1_equilibrium_bind": "DONE this round (this record)",
+  "d2_v11_fresh_sealed_set": "PENDING - AUDITOR-authored (domain-disjoint, n>=30, confidential custody, power pre-registered); zero v11 problem bytes read by the builder, none in-tree",
+  "d3_auditor_scores_v11": "PENDING - gate mean>=3.25, 0 inverted, CI95 lower bound > 3.0 -> score 6 -> BURN",
+  "d4_default_model": "standing: agnes-3.0-flash, 2-key rotation (d0c666a3842f + 5c4dffd28fe4 both digest-verified in the restored vault)",
+  "d5_repair_loop_convergence": "PENDING - measured on the v11 run at execution time (the bind short-circuits non-improving repairs by typing the defect into the repair directive)"
+ },
+ "probes": "zero probes outside the claim; zero gateway calls; zero LLM in the bind itself"
+}

@@ -1,0 +1,39 @@
+{
+ "problem_id": "dev-fu-004-fouling",
+ "arm": "baseline",
+ "dev_source": "dev12",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r58s1@r58-p2-dev-ablation-machine-leg",
+ "machine": "V7.7 frozen (scripts/r40_machine_v77.py, V77_REQUEST_MODEL=glm-4-plus)",
+ "arm_design": "baseline = the identical machine, no plan conditioning",
+ "typed_plan": null,
+ "winner_rule": null,
+ "plan_measure_class": null,
+ "generated_at": "2026-11-17T19:11:08.372840Z",
+ "attempts_n": 4,
+ "a1_answer": "NOVELTY STATEMENT  \nStandard practice delivers a MONITORING/INDICATION scheme using temperature differentials as a leading indicator. My mechanism departs by inferring fouling resistance from the *non-dimensional fouling accumulation rate* derived from existing temperature and flow measurements, leveraging the physics of convective heat transfer degradation. This works because biofouling linearly reduces the overall heat transfer coefficient, which manifests as a rising asymptote in the log of thermal resistance over time.  \n\nPHYSICS CHECK  \nGoverning relation: \\( R_{fouling} = \\frac{1}{U} - \\frac{1}{U_{clean}} \\), where \\( U \\) is the degraded heat transfer coefficient. The fouling growth rate \\( \\frac{dR_{fouling}}{dt} \\) is proportional to biofilm formation kinetics.  \nMagnitude verification: For a 300 MW condenser, \\( U_{clean} \\approx 3000 \\, \\text{W/m}^2\\text{K} \\). A 15% \\( U \\)-decrease (typical at derating) gives \\( R_{fouling} \\approx 5 \\times 10^{-5} \\, \\text{m}^2\\text{K/W} \\). The non-dimensional rate \\( \\frac{dR_{fouling}/dt}{R_{fouling}} \\) is CALCULATED as \\( 0.02 \\, \\text{day}^{-1} \\) from historical data, detectable weeks before failure.  \n\nDIRECTION-OF-EFFECT:  \nDriving variable = fouling resistance; the mechanism infers its upward trend by monitoring temperature/flow; this raises the failure driver (thermal resistance), which triggers early action to prevent derating.  \n\nIMPLEMENTATION BILL  \nMECHANISM CLASS: Fouling accumulation rate inference from existing telemetry  \n1. (a) Steam exhaust temperature measurement (ALREADY-RECORDED: \"steam exhaust temperature measurement\")  \n2. (b) Cooling water inlet temperature measurement (ALREADY-RECORDED: \"cooling water inlet/outlet temperature measurement\")  \n3. (c) Cooling water flow rate measurement (ALREADY-RECORDED: \"flow measurement\")  \n4. (d) Thermal resistance calculation: \\( R = \\frac{T_{steam} - T_{cw,in}}{Q} \\) (DERIVED: stated physics, \\( Q \\) from flow measurement)  \n5. (e) Non-dimensional fouling rate: \\( \\frac{d(\\ln R)}{dt} \\) (CALCULATED: time derivative of \\( R \\) from (d))  \n6. (f) Threshold: \\( 0.015 \\, \\text{day}^{-1} \\) (CALCULATED: 75% of historical failure rate, per stated data)  \n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \n- Installability: Same as standard practice (no new hardware, uses existing telemetry).  \n- Operability: Real-time computation on existing control system (e.g., DCS trend module).  \n- Maintenance: Zero (no calibration, no moving parts).  \n- Cost class: $0 (uses existing data; standard practice requires manual logging).  \n- Operational loss: None (setpoint/duty-cycle modulation not used).  \n\nEXECUTABLE TEST  \nProtocol: Record \\( T_{steam} \\), \\( T_{cw,in} \\), and flow rate for 60 days during normal operation. Compute \\( R \\) and \\( \\frac{d(\\ln R)}{dt} \\) daily.  \nPass/fail: Threshold = \\( 0.015 \\, \\text{day}^{-1} \\); predictor must fire at least 21 days before back-pressure hits derating limit.  \nKill criterion: If false trips occur during load swings (validated against stated load-swing data), mechanism fails.  \nDuration: 60 days (covers fouling growth cycle).  \n\nCONSTRAINT BIND  \nPrimary indicator: Back-pressure (defines derating limit). This predictor supplements it by inferring fouling resistance from temperature/flow, as required.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "BILL_UNTAGGED": [
+    "4. (d) Thermal resistance calculation: \\( R = \\frac{T_{steam} - T_{cw,in}}{Q} \\) (DERIVED:",
+    "5. (e) Non-dimensional fouling rate: \\( \\frac{d(\\ln R)}{dt} \\) (CALCULATED: time derivativ",
+    "6. (f) Threshold: \\( 0.015 \\, \\text{day}^{-1} \\) (CALCULATED: 75% of historical failure ra",
+    "- Installability: Same as standard practice (no new hardware, uses existing telemetry).",
+    "- Operability: Real-time computation on existing control system (e.g., DCS trend module).",
+    "- Maintenance: Zero (no calibration, no moving parts).",
+    "- Cost class: $0 (uses existing data; standard practice requires manual logging).",
+    "- Operational loss: None (setpoint/duty-cycle modulation not used)."
+   ]
+  }
+ },
+ "declared_template_prose": "fouling accumulation rate inference from existing telemetry",
+ "allowed_row_outside": 0,
+ "sha256_16": "08379ef7346eedcf",
+ "smoke": false
+}

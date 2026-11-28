@@ -1,0 +1,24 @@
+**Mitigation Proposal: Segregated Dead-End Looping with High-Frequency Flushing (HFL)**
+
+**Mechanism:**
+The primary driver of the failure is the stagnation of water in dead-end mains, which allows biofilm to mature and consume the disinfectant residual before it can exert long-term control. Nitrification occurs when biofilm accumulates sufficient biomass and organic matter to support ammonia-oxidizing bacteria. By converting static dead-end mains into low-flow dynamic loops (where feasible) or, more critically, implementing a scheduled, high-frequency mechanical flushing protocol specifically targeting these dead-end sections, we mechanically remove the mature biofilm and the organic nutrients (carbon source) required for nitrification. This restores the disinfectant residual to the farthest customer without increasing the chemical dose, because the biofilm’s capacity to consume chlorine is reduced by removing the mass of the biofilm itself rather than trying to kill it all chemically.
+
+**Implementation:**
+1.  **Mapping and Instrumentation:** Identify all dead-end mains in the distribution network. Install temporary or permanent high-flow meters and turbidity sensors at the ends of these dead-ends to monitor water age and quality.
+2.  **Controlled Flushing Protocol:** Deploy a scheduled flushing program where dead-end mains are opened and flushed at high velocity (typically >1.5 m/s) for short durations (e.g., 30–60 minutes) every 48–72 hours during summer months. This can be achieved by opening existing fire hydrants or dedicated flush valves connected to these mains, controlled by SCADA systems to ensure flow exceeds the threshold needed to shear biofilm off the pipe walls.
+3.  **Pressure Management:** Ensure that the flushing does not cause excessive pressure spikes in the system; use throttling valves to maintain safe pressure levels while achieving the required shear stress for biofilm removal.
+
+**Measures it Relies On:**
+*   **Reduction of Biofilm Biomass:** Frequent mechanical shearing prevents the biofilm from maturing to a stage where it can support nitrifying bacteria.
+*   **Removal of Organic Carbon Source:** Flushing removes accumulated organic matter (toxic compounds, leachates) that serves as a carbon source for heterotrophic bacteria, thereby starving the nitrifiers.
+*   **Preservation of Chlorine Residual:** By reducing the biofilm mass, the demand for chlorine is lowered, allowing the initial dose to maintain the required >1.0 mg/L residual at the farthest customer during peak demand without needing a boost.
+
+**Concrete Test to Falsify the Proposed Approach:**
+To falsify this approach, one would conduct a **A/B controlled flushing trial** during peak summer demand:
+
+1.  **Setup:** Divide a representative section of the distribution network into two equal halves. Half A receives the high-frequency flushing protocol (every 48 hours). Half B remains unflushed (baseline, standard maintenance only).
+2.  **Monitoring:** For a 4-week period, monitor **Nitrite (NO₂⁻)** concentrations and **Total Chlorine Residual (CTC)** at the farthest customer in each half.
+3.  **Falsification Criterion:** The approach is **falsified** (i.e., it fails to prevent/mitigate the failure under the constraint) if:
+    *   **Half A** (flushed) exhibits **any** episode where Nitrite exceeds the regulatory limit **AND** Total Chlorine Residual falls below 1.0 mg/L at the farthest customer, while **Half B** (unflushed) remains within limits for nitrite and chlorine residual.
+    *   Alternatively, if Half A shows no statistically significant reduction in nitrite episodes compared to Half B, the mitigation is deemed ineffective.
+    *   Crucially, if Half A maintains nitrite below limits but chlorine residual drops below 1.0 mg/L at the farthest customer, the constraint is violated, falsifying the feasibility of the method under the stated conditions.

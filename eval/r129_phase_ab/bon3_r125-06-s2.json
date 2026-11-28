@@ -1,0 +1,92 @@
+{
+ "problem_id": "r125-06-s2",
+ "arm": "bon3",
+ "n_candidates": 3,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.9,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 255,
+    "completion_tokens": 905,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 3.54,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 255,
+    "completion_tokens": 622,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "author3",
+   "attempts": 1,
+   "latency_s": 5.12,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 260,
+    "completion_tokens": 895,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 123.71,
+   "transport_attempts": 2,
+   "usage": {
+    "prompt_tokens": 1236,
+    "completion_tokens": 1227,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "### Mitigation Proposal: Closed-Loop \u201cAsh-Compensation\u201d Temperature Control Using Existing Sensors\n\n**Mechanism**\nInstead of holding the kettle zone at a single set-point, the control system dynamically raises the kettle temperature set-point in small increments when the sheet-entry pyrometer and production counter indicate that the molten zinc is becoming \u201csluggish\u201d (i.e., the sheet is emerging colder than expected for a given throughput). The rationale is that a thicker, more insulating ash/dross layer reduces heat transfer to the sheet; raising the kettle temperature increases the thermal driving force, partially offsetting the insulating effect of the dross and slowing its formation by reducing zinc oxidation at the surface (higher bulk temperature with better agitation via sheet passage can keep the surface hotter and less prone to local cold spots that encourage dross settling). Crucially, this compensation is bounded and reversible: when the pyrometer shows the sheet temperature returning to target, the set-point steps back down. This avoids the blind, open-loop temperature hikes that would melt the dross faster but also accelerate zinc burn-off, instead using the *existing* measurements to modulate only as much extra heat as the data justifies.\n\n**DIRECTION-OF-EFFECT**\n*   **Driving Variable:** The Thermal Index (TI) deviation, specifically when TI drops below the historical threshold (TI < TI_median - 2\u03c3).\n*   **Mechanism Direction:** The system increases the kettle zone temperature set-point (positive direction) to increase thermal driving force.\n*   **Physical Consequence:** This compensates for the negative effect of increased ash insulation (reduced heat transfer coefficient) by restoring the sheet exit temperature towards baseline, thereby stabilizing the thermal process until manual dross removal is triggered by the compensation limit.\n\n**Implementation**\n1.  **Define a Baseline Thermal Index (TI):** Every production counter increment (every sheet or fixed batch of sheets), calculate a real-time Thermal Index using the two existing sensors:\n    `TI = (T_sheet_entry - T_sheet_baseline) / (Sheets_per_hour_actual)`\n    Where `T_sheet_entry` is the average pyrometer reading over the last 50 sheets, and `T_sheet_baseline` is a rolling historical average for the same gauge/speed (can be stored in the PLC/SCADA historical database; this is using existing measurements, not new instrumentation).\n\n2.  **Deviation Detection:** The controller compares the current `TI` to the long-term historical median `TI_median`. If `TI` drops below `TI_median - (2 * \u03c3)`, where `\u03c3` is the historical standard deviation of TI (computed on existing data), the system flags an \u201cash insulation increase\u201d event.\n\n3.  **Stepwise Temperature Compensation:** Upon flagging, the PLC increases the kettle zone thermocouple control set-point by a fixed increment (e.g., +5 \u00b0C per event). This increment is small enough not to risk melting the dross into zinc or causing excessive burn-off, but large enough to be measurable by the pyrometer.\n\n4.  **Reversion Logic:** After each +5 \u00b0C step, the system waits for the next 50-sheet window. If `TI` recovers to within 1 standard deviation of `TI_median`, the set-point is held. If `TI` continues to drop or if the sheet-entry temperature exceeds a safety limit (derived from existing pyrometer alarm settings), the set-point is not further increased; instead, the system logs a \u201cdross removal required\u201d alarm to the operator HMI, prompting manual dross removal at the next scheduled opportunity (e.g., during a planned speed reduction or stop).\n\n5.  **Dross Removal Trigger Refinement:** The alarm for manual dross removal is no longer purely calendar-based (\u201cweekly\u201d) but is *predictive*: it is triggered when the number of consecutive +5 \u00b0C compensation steps exceeds a threshold (e.g., 4 steps, implying 20 \u00b0C of accumulated compensation), indicating the ash layer has exceeded the compensable limit. This aligns dross removal with actual degradation of heat transfer, not a fixed schedule.\n\n**Implementation Bill**\n1.  **Logic Update (PLC/SCADA):** Modify the existing PID controller loop to accept a variable set-point from a new compensation routine. No hardware changes; purely software logic update.\n2.  **Data Processing Routine:** Implement the calculation for `TI` and its statistical deviation using the existing historical database for `T_sheet_baseline`, `TI_median`, and `\u03c3`.\n3.  **Alarms & HMI:** Update the HMI to display the current compensation step count and trigger the predictive \u201cdross removal required\u201d alarm based on the 4-step threshold.\n4.  **Verification:** Simulate the logic with historical data to confirm that the 4-step threshold correlates with the previous weekly dross removal intervals under normal conditions.\n\n**Measures It Relies On**\n*   **T_sheet_entry:** Average temperature of the sheet as it enters the zinc bath, measured by the **sheet-entry pyrometer**.\n*   **T_sheet_baseline:** Historical average sheet entry temperature for the current gauge/speed, derived from the **sheet-entry pyrometer** historical database stored in the existing SCADA/PLC.\n*   **Sheets_per_hour_actual:** Actual production rate, derived from the **production counter** (increment per time interval).\n*   **Kettle Zone Temperature:** Actual temperature of the molten zinc, measured by the **kettle zone thermocouples** (used as the controlled variable for the PID loop).\n*   **TI, TI_median, \u03c3:** Derived indices calculated from the above permitted measurements and stored in the existing SCADA/PLC historical database.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Logic Update (PLC/SCADA):** Modify the existing PID controller loop to accept a vari",
+   "2.  **Data Processing Routine:** Implement the calculation for `TI` and its statistical de",
+   "3.  **Alarms & HMI:** Update the HMI to display the current compensation step count and tr",
+   "4.  **Verification:** Simulate the logic with historical data to confirm that the 4-step t",
+   "*   **T_sheet_entry:** Average temperature of the sheet as it enters the zinc bath, measur",
+   "*   **T_sheet_baseline:** Historical average sheet entry temperature for the current gauge",
+   "*   **Sheets_per_hour_actual:** Actual production rate, derived from the **production coun",
+   "*   **Kettle Zone Temperature:** Actual temperature of the molten zinc, measured by the **",
+   "*   **TI, TI_median, \u03c3:** Derived indices calculated from the above permitted measurements"
+  ],
+  "ALLOWED_ROW_OUTSIDE": [
+   "added measure 's the controlled variable' shares no allowed-list stem (Use only existing sensors and existing measurements: the kettle zone thermocoupl...)"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 142.39,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

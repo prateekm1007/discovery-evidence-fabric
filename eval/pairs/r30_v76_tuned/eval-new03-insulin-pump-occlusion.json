@@ -1,0 +1,129 @@
+{
+ "problem_id": "eval-new03-insulin-pump-occlusion",
+ "a1_source": "SYS_A1_INT_V72+V76/r30_v76_directive",
+ "question_type": "intervention-proposal",
+ "a1_answer": "NOVELTY STATEMENT (INTERVENTION)  \nWe propose a firmware-only adaptive occlusion detection algorithm that replaces the fixed pressure threshold with a dual-timescale pressure trend analysis to detect partial occlusions (>20% delivery deficit) within 2 hours and complete occlusions within 15 minutes, while maintaining ≤1 nuisance alarm per 14 days.  \nStandard practice: uses a single fixed pressure threshold (e.g., 15 psi) that triggers only when pressure exceeds that level, missing slow leaks and partial occlusions that stay below threshold.  \nOur mitigation: a dual-timescale algorithm that continuously computes a short-term pressure derivative (to catch rapid rises from complete occlusions) and a long-term pressure baseline drift (to catch slow pressure creep from partial occlusions/fibrin), with adaptive thresholds calibrated to the patient's basal rate and catheter compliance. This is a genuine departure because it uses the existing pressure sensor's dynamic signal rather than a static level.  \nAdjacent-technique clearance: The closest existing practice is \"trend-based occlusion detection\" used in some ICU infusion pumps (e.g., Alaris Guardrails) which uses a rolling average of pressure to detect occlusions. Our mitigation differs by using a dual-timescale derivative/baseline split tuned to subcutaneous insulin delivery's low-flow, high-compliance dynamics, and by incorporating a patient-specific compliance model updated at each set change, which ICU pumps do not do.  \nMechanism: The algorithm attacks the driving physics (pressure rise rate and baseline shift caused by flow restriction) by separating fast and slow pressure components, allowing lower effective thresholds for partial occlusions without increasing false alarms from motion artifacts.\n\nPHYSICS CHECK  \nGoverning physical relation: For a catheter with compliance C (ml/psi) and flow Q (ml/hr), a partial occlusion increasing resistance by factor R causes a pressure rise rate dP/dt = (Q × (R−1)) / C. For typical values: C ≈ 0.01 ml/psi (90 cm catheter), Q = 1 ml/hr basal, R = 1.25 (20% deficit), dP/dt ≈ 0.025 psi/hr. Over 2 hours, pressure rises 0.05 psi, far below fixed threshold (15 psi). The algorithm detects this by integrating the derivative over a 2-hour window, achieving a signal-to-noise ratio >5 against motion artifacts (typical motion artifact σ ≈ 0.01 psi). For complete occlusion (R → ∞), dP/dt ≈ Q/C = 100 psi/hr, detected within 15 min (pressure rise 25 psi).  \nDIRECTION-OF-EFFECT: driving variable = pressure rise rate (dP/dt) and baseline drift; the mechanism moves the effective detection threshold down by a factor of 100 for partial occlusions (from 15 psi to 0.15 psi equivalent) via derivative integration; this reduces the failure driver (late detection).\n\nIMPLEMENTATION BILL  \n1. Existing insulin pump with pressure sensor (stated infrastructure) — used as-is (a).  \n2. Firmware update implementing dual-timescale adaptive occlusion detection algorithm — parameter/procedure change on existing equipment (c). The firmware is delivered via standard over-the-air update mechanism (existing in pump). No new hardware.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)  \nStandard practice bill: pump hardware (a), firmware (c) for fixed-threshold algorithm. Our bill: same pump hardware (a), firmware (c) for adaptive algorithm. Installation: same OTA update process. Commissioning: same (no new calibration). Operation: algorithm runs on existing MCU, negligible extra CPU (<1% load). Maintenance: none. Operational loss: insulin delivery continues uninterrupted; algorithm only monitors and alarms, does not curtail delivery. Operational loss = 0. Burden class: same.\n\nEXECUTABLE TEST  \nProtocol: Bench-top test with insulin pump, 90 cm catheter, pressure sensor, and a programmable flow restrictor to simulate partial (20% deficit) and complete occlusions. Inject motion artifacts via a shaker table (0.5 Hz, 0.1 psi amplitude). Run 100 trials each: (1) normal, (2) partial occlusion at t=0, (3) complete occlusion at t=0. Record detection time and false alarms.  \nInstruments: Existing pump pressure sensor (no new instruments), flow restrictor, shaker table, data logger.  \nPass/fail thresholds: (a) Complete occlusion detection ≤15 min in ≥95% of trials. (b) Partial occlusion detection ≤2 hours in ≥90% of trials. (c) Nuisance alarms ≤1 per 14 days (extrapolated from 72-hour normal run with motion artifacts: ≤0.2 false alarms per 72 hours).  \nDuration: 72 hours per trial set (3 sets).  \nKill criterion: If any threshold fails, the algorithm is rejected.",
+ "meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "proposes a mitigation (section=True, verbs=True)"
+  },
+  "repairs": 3,
+  "residual_findings": {
+   "CONSTRAINT_EXCLUSION": [
+    "excluded stem 'factor' in: mechanism: the algorithm attacks the driving physics (pressure rise rate and baseline shift caused by flow res",
+    "excluded stem 'factor' in: direction-of-effect: driving variable = pressure rise rate (dp/dt) and baseline drift; the mechanism moves the"
+   ]
+  }
+ },
+ "attempts": [
+  {
+   "stage": "draft",
+   "chars": 5074,
+   "latency_s": 93.3,
+   "transport_tries": 1,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'factor' in: complete occlusion drives absolute pressure to the fixed threshold in <15 min (standard), while partial occlus"
+    ],
+    "NAMED_VARIANT": [
+     "model/brand-marker: FDA 510 | | Regulatory | IEC 60601, ISO 14971, FDA 510(k) | Software change only; same har"
+    ],
+    "PHYSICS_DIRECTION_UNSTATED": [
+     "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+    ]
+   },
+   "sha256_16": "ff8863f7d4edc320"
+  },
+  {
+   "stage": "repair_1",
+   "chars": 4904,
+   "latency_s": 55.2,
+   "transport_tries": 2,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'factor' in: |\n\nburden ledger (standard-practice parity)  \nstandard practice bill: firmware load (1× per product cycle), pr",
+     "excluded stem 'form' in: the departure is the use of a dynamic, model-based threshold that tracks the expected pressure waveform for th",
+     "excluded stem 'form' in: |\n\nburden ledger (standard-practice parity)  \nstandard practice bill: firmware load (1× per product cycle), pr"
+    ]
+   },
+   "sha256_16": "f5b38d3a3d8d3f3b",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'factor' in: |\n\nburden ledger (standard-practice parity)  \nstandard practice bill: firmware load"
+   ]
+  },
+  {
+   "stage": "repair_2",
+   "chars": 5960,
+   "latency_s": 71.2,
+   "transport_tries": 3,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "BILL_UNTAGGED": [
+     "- Hardware rows 1–3: identical to standard practice; same procurement, installation, maint",
+     "- Firmware row 4: standard practice loads firmware at manufacture; intervention requires a",
+     "- Operational loss: insulin delivery continues uninterrupted; algorithm only monitors and ",
+     "- Maintenance: no change.",
+     "- Cost class: same (software update)."
+    ],
+    "APPARATUS_ROW": [
+     "- Operational loss: insulin delivery continues uninterrupted; algorithm only monitors and alarms, does not cur"
+    ]
+   },
+   "sha256_16": "e66de93129f6b494",
+   "findings_disclosed": [
+    "BILL_UNTAGGED: - Hardware rows 1–3: identical to standard practice; same procurement, installation, maint; - Firmware row 4: ",
+    "APPARATUS_ROW: - Operational loss: insulin delivery continues uninterrupted; algorithm only monitors and alarms, does not cur"
+   ]
+  },
+  {
+   "stage": "repair_3",
+   "chars": 4576,
+   "latency_s": 113.2,
+   "transport_tries": 4,
+   "route": "nvidia",
+   "route_model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "fallback_reason": "primary HTTP 401 (typed: credential dead)",
+   "critic_verdict": "CLEAN",
+   "type_gate": {
+    "verdict": "MATCH",
+    "reason": "proposes a mitigation (section=True, verbs=True)"
+   },
+   "scan": {
+    "CONSTRAINT_EXCLUSION": [
+     "excluded stem 'factor' in: mechanism: the algorithm attacks the driving physics (pressure rise rate and baseline shift caused by flow res",
+     "excluded stem 'factor' in: direction-of-effect: driving variable = pressure rise rate (dp/dt) and baseline drift; the mechanism moves the"
+    ]
+   },
+   "sha256_16": "cb46e1cc68bf7d04",
+   "findings_disclosed": [
+    "CONSTRAINT_EXCLUSION: excluded stem 'factor' in: mechanism: the algorithm attacks the driving physics (pressure rise rate and baseli"
+   ]
+  }
+ ],
+ "generated_at": "2026-11-16T10:30:24.513969Z"
+}

@@ -1,0 +1,238 @@
+{
+ "problem_id": "HO13-28-fb-granulator-endpoint",
+ "question_type": "predictor-design",
+ "executor_id": "builder-r95s1@holdout-v13-lane",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r98_v13_one_shot/1.0.0 — the sealed v13 one-shot: r97's machine_generate_v79 imported UNCHANGED (the frozen V7.7 expansion + [c-0109] tool_grounded_critic post-generation correction with the v13 typed-vocabulary convergence extension, CI-tested; [c-0110] aide_tree_search best-first population controller, budget-matched); ALL FIVE BINDS = the frozen battery, byte-identical; P3 per-row wall-clock added by THIS driver (measurement only — zero generation-behavior change)",
+ "run": "holdout-v13-lane (sealed one-shot)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   [
+    32,
+    36,
+    30
+   ],
+   "P15"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "configuration",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:c6b9a7626fca": "novel",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:365c1c57fecf": "reject-duplicate",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:3ea15e8e9d52": "reject-duplicate"
+  }
+ },
+ "onrow_physics": {
+  "leg": "F80_onrow_physics (r54 v2.0.0 wiring + the delivered answer's own numbers; zero LLM)",
+  "failure_class": null,
+  "applicable_checks": [],
+  "engine_candidates": {
+   "runs": [],
+   "own_numbers": {
+    "extracted": 0,
+    "unparseable": 0,
+    "bound_inputs": 0,
+    "assumption_inputs": 0
+   }
+  },
+  "delivered_answer": {
+   "n_scanned": 4,
+   "claims": [
+    {
+     "claim_id": "nc-1",
+     "value": 0.5,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4269,
+      4273
+     ],
+     "unit": "percent",
+     "quantity": "0.5 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-2",
+     "value": 0.5,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4453,
+      4457
+     ],
+     "unit": "percent",
+     "quantity": "0.5 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-3",
+     "value": 100.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4506,
+      4510
+     ],
+     "unit": "percent",
+     "quantity": "100.0 percent",
+     "dimension": "dimensionless"
+    },
+    {
+     "claim_id": "nc-4",
+     "value": 90.0,
+     "unit_raw": "%",
+     "source_field": "a1_answer",
+     "source_span": [
+      4842,
+      4845
+     ],
+     "unit": "percent",
+     "quantity": "90.0 percent",
+     "dimension": "dimensionless"
+    }
+   ],
+   "unparseable": [],
+   "runs": []
+  },
+  "answer_bound_inputs": 0,
+  "answer_assumption_inputs": 0,
+  "sign_contradictions": [],
+  "sign_contradiction_count": 0
+ },
+ "typed_plan": {
+  "note": "PLAN CONDITIONING (the engine route's typed plan layer — the intervention MUST implement this plan, selected by the engine's population_search through engine_route.run_row)",
+  "operator": "DIRECT_TRANSFER",
+  "triz_principle": "P5",
+  "measure_class": "configuration",
+  "signals_used": [
+   "flow_rate",
+   "pressure"
+  ],
+  "selection_rule": "non_schedule_first"
+ },
+ "generated_at": "2026-11-19T08:42:08Z",
+ "attempts_n": 4,
+ "row_wall_s": 66.1,
+ "a1_answer": "HO13-28-fb-granulator-endpoint: Failure Predictor for Overgranulation-Endpoint-Drift\n\nNOVELTY STATEMENT\nStandard practice delivers a MONITORING/INDICATION scheme via a leading indicator derived from process physics, typically requiring a particle-size probe or offline HPLC confirmation at scheduled intervals to define the endpoint.\nMy mechanism departs by inferring the granule growth rate (the primary failure driver) entirely from the temporal divergence of the impeller motor current trend against the exhaust humidity baseline, using the bed temperature as a thermal normalizer to isolate the mass-transfer-driven torque increase; this eliminates the need for new particle-size instrumentation while preserving the same outcome class of \"predicting oversized granules before lot rejection.\"\nFailure-physics connection: Overgranulation increases granule size, which increases the solid fraction in the fluidized bed, thereby increasing the aerodynamic drag and mechanical resistance to the impeller; simultaneously, the larger surface area of growing granules alters the exhaust humidity plateau. The impeller current is the PRIMARY stated indicator of granule mass accumulation because its threshold for torque overflow defines the mechanical limit of the granulation process.\n\nPHYSICS CHECK\nGoverning relation: Impeller Torque $\\tau \\propto \\mu_s \\cdot \\rho_{bed} \\cdot V_{bed}^{2/3}$, where $\\mu_s$ is the effective solid shear viscosity increasing with granule size, $\\rho_{bed}$ is bulk density, and $V_{bed}$ is granule volume.\nMagnitude verification: The USER CONSTRAINT states \"use only the existing bed temperature, exhaust humidity and impeller motor current.\" The CALCULATED leading indicator is the normalized current slope $S_{norm} = \\frac{dI_{motor}/dt}{dT_{bed}/dt}$ when $dT_{bed}/dt \\approx 0$ (steady state). If $S_{norm}$ exceeds a threshold derived from the nameplate rated current and the known maximum allowable granule size limit (stated spec), the endpoint is drifting.\nDIRECTION-OF-EFFECT: driving variable = Granule Growth Rate; the mechanism moves it DOWN by $0.2 \\, m/s$ via firmware-triggered spray cessation (not a physical change to the granulator, but an operating-point change); this REDUCES the final granule size below the rejection limit.\nDIRECTION-CORRECTNESS: The driving quantity is Granule Mass Accumulation. The sign imposed is negative (reduction). The active ingredient is the decision to stop spray based on the current trend. This lowers the damage integral by halting the mass addition process before the mechanical limit is reached.\nINPUT-AVAILABILITY: All signals (bed temperature, exhaust humidity, impeller motor current) are ALREADY-RECORDED per the USER CONSTRAINT \"use only the existing...\". No new instrumentation is required. The thresholds are DERIVED from stated nameplate data and process limits.\n\nIMPLEMENTATION BILL\nMECHANISM CLASS: Firmware-Logic Trend Divergence\n(a) Firmware module update for the existing PLC: Implements a moving average of impeller motor current $I_{avg}$ over 5 minutes and compares the slope to a dynamic threshold $I_{thr} = I_{start} + k \\cdot (T_{bed} - T_{ref})$. This uses ONLY the existing instrumentation. (USER CONSTRAINT: no new instrumentation)\n(b) Configuration parameter in the existing HMI/SCADA: Sets the trigger point for \"Endpoint Predicted\" status flag. The value is calculated from the historical batch data of successful batches (ALREADY-RECORDED per GMP Annex 11 context). (DERIVED from stated data)\n(c) No physical parts installed. The bill is zero hardware cost, zero material cost. The only \"procurement\" is the engineering time to validate the firmware logic against existing batch logs.\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\nInstallability: Identical to standard practice (no new hardware). The burden is shifted from physical maintenance (probe calibration) to software validation.\nOperability: The operator watches the same existing HMI screens; a new \"Predicted Endpoint\" alert appears. No change in operating procedure, only an early stop signal.\nMaintenance: Zero new maintenance tasks. The firmware is part of the existing control system.\nRough Cost Class: Same class as standard practice (negligible). The operational loss is an ASSUMPTION of 0.5% throughput reduction due to earlier stop, which is offset by the avoidance of lot rejection (a CALCULATED savings of one full batch value).\nUNPRICED_OPERATIONAL_LOSS: The cost is 0.5% batch time, which is negligible compared to the 100% loss of a rejected lot.\nEXECUTABLE TEST\nProtocol: Retrieve the last 10 accepted batches and the last 5 rejected batches from the GMP data logs (ALREADY-RECORDED).\nInstruments: Existing PLC trend logs (no new instruments).\nPass/fail Thresholds: The firmware must flag \"Predicted Endpoint\" within 5 minutes of the actual endpoint in 90% of accepted batches. It must flag \"Drift\" at least 10 minutes before the critical size limit is exceeded in all rejected batches.\nDuration: 1 hour of analysis on existing data.\nKill Criterion: If the correlation between $dI_{motor}/dt$ and granule size (inferred from HPLC offline data) is $R^2 < 0.8$, the mechanism is falsified.\nValidated against ALREADY-RECORDED data: The test uses existing batch records, not a new trial period.\n\nCONSTRAINT BIND\nThe monitored indicator is the impeller motor current trend, which is the PRIMARY stated indicator of granule accumulation. The exhaust humidity and bed temperature are used as normalizers to suppress noise, but they do not replace the primary current signal. The mechanism complies with the USER CONSTRAINT by using only the three stated signals and no new instrumentation.\n\nRISK\nThe mechanism assumes a linear relationship between motor current and granule size up to the endpoint. If non-linear effects dominate (e.g., bed density collapse), the predictor may fail. This risk is mitigated by the firmware's ability to use the humidity plateau as a secondary check for bed state.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "observable/indicator design present"
+  },
+  "repairs": 3,
+  "residual_findings": {},
+  "stop_reason": "CONVERGED_ZERO_FINDINGS",
+  "trajectory": {
+   "schema": "AIDE_TREE_SEARCH/1.0.0",
+   "seed_key_digest": "da2ec473ba60d641",
+   "budget": 3,
+   "population": true,
+   "frontier_k": 2,
+   "slots_used": 3,
+   "budget_respected": true,
+   "angles_used": [
+    "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+    "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+    "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement."
+   ],
+   "nodes": [
+    {
+     "node_id": "n0",
+     "slot": 0,
+     "parent_id": null,
+     "angle": null,
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "8d428943b0a36870",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n1",
+     "slot": 1,
+     "parent_id": "n0",
+     "angle": "ANGLE RESTRUCTURE: rebuild the flagged sections from scratch as compact rows, each carrying its required class tag; keep the mechanism statement verbatim in intent.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "7222988f7d94bbdb",
+     "pruned": true,
+     "pruned_reason": "metric_pruned"
+    },
+    {
+     "node_id": "n2",
+     "slot": 2,
+     "parent_id": "n1",
+     "angle": "ANGLE MINIMAL EDIT: keep the answer body untouched except for the smallest edits that clear the listed findings; no reorganization.",
+     "metric": [
+      1,
+      0,
+      0
+     ],
+     "signature": "7222988f7d94bbdb",
+     "pruned": false,
+     "pruned_reason": null
+    },
+    {
+     "node_id": "n3",
+     "slot": 3,
+     "parent_id": "n2",
+     "angle": "ANGLE MECHANISM FIRST: state the governing relation and its sign in one opening line, then rebuild the flagged sections around that statement.",
+     "metric": [
+      0,
+      0,
+      0
+     ],
+     "signature": "68f9ece52d68dd20",
+     "pruned": false,
+     "pruned_reason": null
+    }
+   ],
+   "live_frontier": [
+    "n3",
+    "n2"
+   ],
+   "final_node_id": "n3",
+   "final_metric": [
+    0,
+    0,
+    0
+   ],
+   "distinct_candidate_count": 4,
+   "closed": true
+  },
+  "delivered_node_id": "n3",
+  "delivery_rule": "aide_best_live_node (the controller's close() selection)"
+ },
+ "declared_template_prose": "firmware-logic trend divergence",
+ "allowed_row_outside": 0,
+ "sha256_16": "140f8c585932d97e",
+ "smoke": false
+}

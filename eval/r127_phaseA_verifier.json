@@ -1,0 +1,35 @@
+{
+ "record": "R127_PHASEA_VERIFIER/1.1.0",
+ "claim": "c-0202 (role VERIFIER, rides the executor's work_id r127-phaseA-speed per the Art. 29 attribution rule — the c-0196 precedent)",
+ "collision_disclosed": "this claim was FIRST registered as c-0201 in this session's local commit; the executor's round-close (179c31b2a) independently registered THEIR c-0201 (a same-session arithmetic cross-check of their own re-run) — the recurring claim-id collision class (the R121 c-0179 and R125 precedents). Per those precedents the pushed claim keeps the id and this verification RE-REGISTERS as c-0202. Independence typed: the executor's c-0201 cross-check is SAME-SESSION (the executor recomputing its own run); THIS record is a DIFFERENT-SESSION independent verification (a different sandbox, no shared state), which is the stronger independence class Art. 2 asks for",
+ "executor": "builder-r117s1 (claim c-0200, work id r127-phaseA-speed)",
+ "verifier_session": "builder-r121s1-3e8a41d7",
+ "scope": "EXTENDED to the full PHASE-A accept: (a) the FIRST gate run bytes (the 62dcb639a state, verified when the re-run bytes were not yet on the branch — fetch clean at that time), (b) the AMENDMENT IMPLEMENTATION (the runner patch + the adapter pass-through — a code review their arithmetic cross-check did not perform), (c) the AMENDED RE-RUN bytes at 179c31b2a (all 24 records, byte-resume). From committed bytes only, ZERO LLM calls, ZERO re-runs (Art. 29(c))",
+ "independence": "different session, different sandbox; every number below recomputed by this session's own extraction loop from the committed gate records; the scorer imported unmodified (scripts/r121_successor_score.py bill_defect_classes @ 92485038719557e4)",
+ "recompute_results_FIRST_RUN": {
+  "status_census": "5 DELIVERED_REVIEWED + 19 TYPED_CALL_FAIL — exact agreement",
+  "root_cause_evidence": "all 19 failed legs typed 'RouteRefused: [rate_limited] agnes: HTTP 429: You've reached the API rate limit for free users' — 18 author legs + 1 reviewer leg; the infrastructure root cause confirmed (the pre-patch runner carried no transport backoff; instant 0.07-0.1 s fails)",
+  "delivered_defects": "0/5 under the canonical detector; parse_retries 0 on all 24 records; usage summed 6830 prompt / 0 cached — the executor's first-run telemetry reproduced to the token"
+ },
+ "recompute_results_AMENDED_RERUN": {
+  "status_census": "24/24 DELIVERED_REVIEWED — exact agreement",
+  "speed": "median 22.055 s / worst 144.16 s recomputed from the records' wall_clock_s — EXACT to the millisecond against the executor's gate_scoring.json; g1 (median <= 120 AND worst <= 300) MET",
+  "parse": "24 reviewer legs, all attempts=1, schema_parsed_first_try true on every leg, item-level parse_retries 0 on all 24 records — g2 (parse retries 0 by construction) MET; the parse path is fail-closed TYPED_PARSE_FAIL OUTSIDE any retry loop (verified in the patched runner source)",
+  "usage": "prompt 32894 / cached 0 summed across all legs — EXACT; hit-rate honestly 0.0 (g3 reported as preregistered)",
+  "defects": "0/24 delivered-defect items under the canonical detector (the F31e d1 baseline on the same items 2/24) — g4 MET with margin; zero per-class regressions",
+  "typed_fails": "0 typed_fail legs across the re-run records",
+  "backoffs": "the executor's '8 backoffs absorbed' is visible as wall-clock anomalies (the 126.91-144.16 s legs carry internal 120 s transport sleeps + successful retries inside call_with_transport_backoff) but is NOT independently recomputable from the committed records — see typed_note_two"
+ },
+ "instrument_invariance": {
+  "adapter": "the bbff71435 diff verified ADDITIVE transport-only: response_format Optional[dict]=None rebuilds the byte-identical 4-key body; the detector bytes UNCHANGED 92485038719557e4",
+  "variable_isolation": "the gate path imports the frozen v1 567-byte reviewer directive byte-exact; the c-0197 duty clause is NOT in the gate path — the prereg's isolation claim VERIFIED (and typed second-order by the executor: the schema contract ALONE showed 0 duty_pricing on the slice, n=24 indicative)",
+  "schema_contract": "FIX_SCHEMA is strict json_schema, one required field corrected_proposal, additionalProperties false — verified at the runner source"
+ },
+ "amendment_review": {
+  "patch": "call_with_transport_backoff restores the F31e transport pattern (4 attempts / 120 s); RouteRefused auth/missing_key re-raised IMMEDIATELY; parse failures live OUTSIDE the retry path entirely; workers 4->2 + 8 s spacing verified in the diff",
+  "typed_note_one": "the generic `except Exception` branch also backs off and retries — byte-consistent with the F31e precedent the amendment cites as the restored pattern, but slightly broader than the amendment's 'catching ONLY RouteRefused classes rate_limited/transport' wording. Typed as a wording-vs-implementation nuance, NOT a defect",
+  "typed_note_two": "the amendment committed to 'transport backoff attempts counted separately and reported', but the committed re-run records carry NO per-leg backoff-attempts field (calls[].attempts is the leg-level count = 1 everywhere; the absorbed backoffs are inferable only from the wall-clock anomalies). The '8 backoffs' figure in the round-close prose is therefore not recomputable from committed bytes. Typed as a MINOR reporting gap against the amendment's own commitment — no gate impact; suggested: a calls[].backoff_attempts field in any future instrument touch-up"
+ },
+ "corroboration": "the shared free-tier window account is corroborated from THIS side: my c-0197 re-test (48 reviewer calls, eval/r126_dir4_run/run.log) ran concurrently in the same window and absorbed its own 429 storm via the established backoff — the two lanes' concurrent traffic plausibly drove the rate window; no fault assigned, the coordination fact is typed",
+ "verdict": "VERIFIED END-TO-END — the first run's TYPED_NEGATIVE is honestly on the board; the amended re-run's PHASE-A ACCEPT (g1 speed, g2 parse, g3 cache reporting, g4 no-regression) reconciles EXACTLY from committed bytes under a different-session independent recompute; the amendment implementation is faithful with two typed nuances (one wording, one minor reporting gap). The executor's own c-0201 cross-check stands; THIS record adds the different-session independence class. NO new gate or score claims beyond the executor's own typing"
+}

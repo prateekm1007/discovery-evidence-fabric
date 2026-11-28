@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-06-semi-cmp-slurry",
+ "domain": "semiconductor",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P5",
+   "P22",
+   "P30"
+  ],
+  "plan_measure_classes": [
+   "configuration",
+   "control",
+   "configuration"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "DIRECT_TRANSFER",
+   "principle_id": "P5",
+   "measure_class": "configuration",
+   "signals_used": [
+    "flow_rate",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "CANDIDATE",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "cand:MS:DIRECT_TRANSFER:a9c7a447be40": "novel",
+   "cand:MS:FAILURE_PATH_INVERSION:0affa19e8f58": "borderline-judge",
+   "cand:MS:DOMAIN_KNOWLEDGE_FIRST:b6b7540eff32": "reject-duplicate"
+  }
+ },
+ "generated_at": "2026-11-23T22:21:26Z",
+ "attempts_n": 1,
+ "row_wall_s": 8.0,
+ "a1_answer": "NOVELTY STATEMENT\n- Standard practice delivers a DESIGN CHANGE: mechanical agitation (in-line stirrer) or thermal control within the slurry delivery loop to maintain particle suspension homogeneity, preventing settling-induced removal drift.\n- This mechanism’s departure: Replaces active mechanical stirring with a **static, passive flow-geometry modification** (a series of staggered baffles and micro-turbulence promoters inside the delivery tube) that uses the existing hydraulic energy (pressure differential) to maintain particle suspension via continuous inertial recirculation, eliminating moving parts and heat generation.\n- Failure-physics connection: Slurry settling is governed by Stokes’ law; the critical shear velocity to keep particles suspended is $u_c \\propto d^2 \\rho g / \\mu$. By introducing static obstacles, the local flow field generates high-shear zones that exceed $u_c$ at specific intervals, preventing particle deposition without adding external power or moving components.\n\nPHYSICS CHECK\n- Governing relation: Critical settling velocity for a sphere in a Newtonian fluid is $v_s = \\frac{\\rho_p d^2 g}{18 \\mu}$. Suspension is maintained if the fluid’s vertical velocity component $v_y > v_s$ or if local shear rate $\\dot{\\gamma} > \\dot{\\gamma}_{crit}$ disrupts the laminar sublayer.\n- Magnitude verification: Assuming 1 µm silica particles ($\\rho_p \\approx 2000$ kg/m³, $\\mu \\approx 1$ mPa·s), $v_s \\approx 5.6 \\times 10^{-7}$ m/s (CALCULATED). Typical CMP slurry flow rates in delivery lines (~0.5 L/min in a 1/8\" tube) yield average velocity ~0.3 m/s (ASSUMPTION). Even with a 10x reduction in effective cross-sectional area due to baffles, local velocities remain orders of magnitude above $v_s$, ensuring particles are kept in suspension. The static baffle design creates secondary vortices (Dean vortices) that constantly refresh the near-wall boundary layer where settling initiates.\n\nIMPLEMENTATION BILL\n1. **Component**: Static in-line turbulence generator (SL-TG).\n   - **Material**: 316L Stainless Steel or PTFE (PTFE preferred to avoid contamination; standard in CMP systems).\n   - **Geometry**: A cylindrical sleeve (OD matching delivery tube, ID reduced by 30%) containing 4-6 fixed, angled baffles spaced at 50 mm intervals.\n   - **Tag**: ALREADY-RECORDED (uses existing delivery line footprint; no new sensors required).\n2. **Reference/Threshold**: \n   - **Tag**: DERIVED (stated physics). The threshold for suspension is derived from Stokes’ Law using standard slurry particle size distribution (PSD) and viscosity (typically available in slurry data sheets or inferred from pump pressure drop).\n   - **Validation Baseline**: Historical removal rate uniformity data (wafer-to-wafer variation < 1%) already exists in fab logs as the \"healthy\" state. The intervention aims to restore drift back to this stated baseline.\n3. **Instrumentation**: None added. Uses existing pressure transducers at the pump outlet and CMP head inlet to verify no excessive pressure drop (i.e., clogging or excessive resistance).\n\nBURDEN LEDGER (STANDARD-PRACTICE PARITY)\n- **Installability**: Same class. The SL-TG is a drop-in module for the existing 1/8\" or 1/4\" delivery tubing. It requires no new plumbing, only a 2-hour installation window. Standard practice (agitation tank) requires a larger footprint and power connection.\n- **Operability**: Superior. No moving parts, no motor control, no maintenance of stirrers. Operates passively with existing pump pressure.\n- **Maintenance**: Lower. No seals, bearings, or motors to fail. Periodic inspection of baffle integrity (visual) every 6 months vs. monthly maintenance for agitators.\n- **Cost Class**: Same. PTFE/SS machining cost is negligible (<$500) compared to the cost of a small agitator assembly and control circuit.\n- **Conclusion**: SAME burden class (drop-in, low-cost), DIFFERENT mechanism (passive static vs. active dynamic).\n\nEXECUTABLE TEST\n- **Protocol**: \n  1. Install SL-TG in-line with the slurry delivery loop of a CMP tool.\n  2. Run a 10-wafer test pattern. Measure material removal rate (MRR) uniformity across wafers using standard metrology (ellipsometry or thickness mapping).\n  3. Allow the system to idle (no flow) for 4 hours (simulating inter-wafer dwell time or tool standby).\n  4. Run the next 10-wafer test pattern.\n- **Pass/Fail Threshold**: \n  - **Primary Indicator**: Wafer-to-wafer removal drift. \n  - **Pass**: Post-idle MRR variation < 0.5% of mean MRR. \n  - **Fail**: Post-idle MRR variation > 1.0% (indicating settling occurred during idle).\n  - **Control**: Compare with a baseline tool without SL-TG where idle time causes >1.5% drift.\n- **Duration**: 8 hours total (2 hours idle + 6 hours wafer processing).\n- **Kill Criterion**: If pressure drop across SL-TG exceeds 10% of nominal line pressure, remove baffles (risk of clogging). If MRR drift persists after flow resumption, check if slurry viscosity has changed or if baffle spacing is insufficient for the specific particle size.\n\nCONSTRAINT BIND\n- **Primary Stated Indicator**: Wafer-to-wafer removal drift. This is the direct consequence of settling. The SL-TG mechanism directly addresses the root cause (settling) to mitigate this indicator.\n- **Secondary Indicators**: Pressure drop and flow rate stability. These supplement by ensuring the mechanism isn’t causing hydraulic failures, but they do not replace the removal drift metric as the primary success measure.\n- **Data-Source Rule Adherence**: The test uses existing wafer MRR data (already recorded in fab logs) and standard physics (Stokes’ law) for derivation. No new baseline collection or commissioning tuning campaign is required; the physical geometry of the baffle is deterministic and fixed based on stated slurry properties.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "4d7cc8701103e039"
+}

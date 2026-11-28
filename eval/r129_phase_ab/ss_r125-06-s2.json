@@ -1,0 +1,63 @@
+{
+ "problem_id": "r125-06-s2",
+ "arm": "ss",
+ "n_candidates": 1,
+ "selected_candidate_defects_pre_fix": 0,
+ "calls": [
+  {
+   "leg": "author1",
+   "attempts": 1,
+   "latency_s": 4.82,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 260,
+    "completion_tokens": 873,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   }
+  },
+  {
+   "leg": "reviewer",
+   "attempts": 1,
+   "latency_s": 4.68,
+   "transport_attempts": 1,
+   "usage": {
+    "prompt_tokens": 1214,
+    "completion_tokens": 1240,
+    "cached_tokens": 0,
+    "cache_hit_rate": 0.0
+   },
+   "schema_parsed_first_try": true
+  }
+ ],
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Dynamic Thermal Index for Dross Accumulation and Kettle Condition Monitoring**\n\n**Mechanism**\nThe core issue is accelerated dross/ash formation and increased zinc consumption, which correlates strongly with localized hot spots, uneven thermal gradients, or a drifting baseline temperature that favors rapid oxidation of the zinc bath, even if the average temperature is \"held.\" The mitigation leverages the existing sensors to create a **Dross Accumulation Index (DAI)**. This index is a calculated metric that compares the thermal behavior of the kettle zone against the actual heat input required by the incoming sheet. By correlating the *energy deficit* (or surplus) in the kettle zone with the mass of sheet processed, the system detects when the zinc bath is acting as a heat sink (due to thick insulating dross layers or excessive evaporation) long before physical maintenance is required.\n\n**DIRECTION-OF-EFFECT STATEMENT**\n*   **Driving Variable:** The accumulation of insulating dross/ash on the kettle zone thermocouples.\n*   **Direction:** Increasing dross thickness acts as an electrical/thermal insulation barrier that shields the thermocouple junction from the true, hotter core of the molten zinc bath. Consequently, the thermocouple reading ($T_{kettle, measured}$) **decreases** relative to the actual bath temperature. This false low reading causes the existing temperature controller to increase burner output to compensate for the perceived temperature drop, resulting in an actual **increase** in the bath's core temperature and zinc evaporation rate.\n\n**Implementation**\n1.  **Baseline Establishment:** During a known clean-kettle period (e.g., immediately after a fresh dross removal), record the relationship between the sheet-entry pyrometer temperature ($T_{in}$), the production counter rate (tons/hour, $R$), and the average kettle zone thermocouple temperature ($T_{kettle}$). Establish a dynamic baseline model: $T_{kettle, baseline} = f(T_{in}, R)$. This accounts for the heat loss from the incoming cold steel and the heat addition from the burner/burner zone maintaining the bath.\n2.  **Real-Time Calculation:** Every minute, the PLC/SCADA system calculates the **Thermal Deviation ($\\Delta T$)**:\n    $$ \\Delta T = T_{kettle, measured} - T_{kettle, baseline}(T_{in}, R) $$\n3.  **Dross Accumulation Index (DAI) Integration:** Integrate $\\Delta T$ over time, weighted by the production rate to create the DAI:\n    $$ DAI = \\int_{t_0}^{t} \\frac{\\Delta T \\cdot R(t)}{R_{ref}} \\, dt $$\n    *   If $\\Delta T < 0$ consistently (Negative Deviation): The thermocouples are reading colder than the baseline prediction for the given load. This confirms the **insulating effect of accumulating dross** shielding the sensor from the hot bath. The controller overcompensates, raising the actual bath temperature above optimal, which accelerates zinc evaporation and consumption.\n    *   If $\\Delta T > 0$ consistently: The kettle zone is running hotter than expected. This may indicate a failure in the burner control logic or a significant change in sheet load characteristics not captured by the baseline, requiring separate investigation.\n4.  **Action Trigger:** Set thresholds on the DAI. When the DAI drifts significantly into the negative territory (indicating progressive sensor insulation by ash), trigger a maintenance alert for dross removal and zinc top-up. This shifts dross removal from a fixed \"weekly\" schedule to a condition-based schedule, ensuring removal happens only when the thermal signature proves the ash layer has thickened enough to cause sensor insulation and subsequent over-heating.\n\n**IMPLEMENTATION BILL**\n*   **Software Logic (PLC/SCADA):** Modification of existing control routine to calculate baseline model $f(T_{in}, R)$ using stored historical data from clean-kettle periods. Allocation of memory for integrating $\\Delta T \\cdot R(t)$ to generate DAI. No hardware changes required.\n*   **Configuration:** Setting initial DAI thresholds based on historical drift rates of thermocouple errors following known dross accumulation events. Verification of existing sensor signal ranges to ensure $T_{kettle, measured}$, $T_{in}$, and $R$ are within the linear operating range of the baseline model.\n*   **Operational Change:** Transitioning from calendar-based dross removal to condition-based alerts triggered by DAI limits.\n\n**Measures It Relies On**\n*   **Kettle Zone Thermocouples ($T_{kettle, measured}$):** **Source:** Existing installed kettle zone thermocouples. **Usage:** Provides the instantaneous measured temperature of the bath as sensed by the thermocouple. This is the primary variable affected by dross insulation.\n*   **Sheet-Entry Pyrometer ($T_{in}$):** **Source:** Existing installed sheet-entry pyrometer. **Usage:** Provides the temperature of the incoming cold sheet, which is the primary driver of the thermal load (heat sink effect) on the bath.\n*   **Production Counter ($R$):** **Source:** Existing installed production counter. **Usage:** Provides the throughput rate (tons/hour). **Derived Formula:** $R = \\frac{\\text{Change in Counter Reading}}{\\Delta t}$. This normalizes the thermal expectation against the mass flow of cold material entering the bath.\n*   **Baseline Model Parameters ($R_{ref}$):** **Source:** Derived from historical data of the above three permitted sensors during validated clean-kettle periods. **Usage:** Normalization constant for the DAI integral to make the index dimensionless or comparable across different production loads.",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "*   **Software Logic (PLC/SCADA):** Modification of existing control routine to calculate ",
+   "*   **Configuration:** Setting initial DAI thresholds based on historical drift rates of t",
+   "*   **Operational Change:** Transitioning from calendar-based dross removal to condition-b",
+   "*   **Kettle Zone Thermocouples ($T_{kettle, measured}$):** **Source:** Existing installed",
+   "*   **Sheet-Entry Pyrometer ($T_{in}$):** **Source:** Existing installed sheet-entry pyrom",
+   "*   **Production Counter ($R$):** **Source:** Existing installed production counter. **Usa",
+   "*   **Baseline Model Parameters ($R_{ref}$):** **Source:** Derived from historical data of"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ]
+ },
+ "wall_clock_s": 10.51,
+ "status": "DELIVERED",
+ "delivered_defects": []
+}

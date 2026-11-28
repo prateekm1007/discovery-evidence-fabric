@@ -1,0 +1,60 @@
+{
+ "problem_id": "v16-26-food-freeze",
+ "domain": "food",
+ "question_type": "invention",
+ "executor_id": "builder-r142s2@holdout-v16-generation",
+ "registered_model": "agnes-3.0-flash",
+ "machine": "r143_v16_one_shot/1.0.0 — the sealed v16 one-shot (the delegated owner's 30-problem cluster-disjoint set, problem-only): r105's pipeline UNCHANGED (the frozen v12 machine_generate_v79 + the [c-0109] tool_grounded_critic + the engine route), the v16 problems mapped without invention (device='(stated in the problem)', failure=the problem text verbatim, question=the standard invention question, user_variables=[] — problem-only by the prereg's design; the sealed rubrics score the invention)",
+ "run": "holdout-v16-generation (sealed one-shot, problem-only)",
+ "engine_trace": {
+  "measured_path": "discovery_fabric.engine.engine_route -> mechanism_space",
+  "route_schema": "engine_route/1.0.0",
+  "plans_n": 3,
+  "plan_principles": [
+   "P1",
+   "P5",
+   "P22"
+  ],
+  "plan_measure_classes": [
+   "geometry",
+   "configuration",
+   "control"
+  ],
+  "declared_domain_classes": null,
+  "winner_rule": "non_schedule_first",
+  "winner": {
+   "operator_id": "GEOMETRIC_TRANSFORMATION",
+   "principle_id": "P1",
+   "measure_class": "geometry",
+   "signals_used": [
+    "visual_inspection",
+    "pressure"
+   ]
+  },
+  "winner_schema_findings": {},
+  "winner_candidate_state": "NOT_A_CANDIDATE_NO_TESTABLE_PREDICTION",
+  "winner_physics": [],
+  "novelty_gate_verdicts": {
+   "noncand:MS:GEOMETRIC_TRANSFORMATION:5535f0fff989": "novel",
+   "cand:MS:DIRECT_TRANSFER:7faf43efb11b": "borderline-judge",
+   "cand:MS:FAILURE_PATH_INVERSION:7b7f58f5ae57": "borderline-judge"
+  }
+ },
+ "generated_at": "2026-11-23T22:25:15Z",
+ "attempts_n": 1,
+ "row_wall_s": 11.8,
+ "a1_answer": "NOVELTY STATEMENT\nStandard practice delivers a **design change** (surface insulation or controlled quench rate) that mitigates thermal shock; the novelty is a **geometric transformation** of the food interface using a **micro-perforated sacrificial shell** (TRIZ P1: Segmentation) to create a localized vapor cushion that dissipates the pressure wave before it reaches the brittle crust.\n\n**PHYSICS CHECK**\nThe governing relation is the **Hertz-Knudsen equation** for sublimation/desorption flux $J = P_{sat}(T_s) \\sqrt{\\frac{M}{2\\pi k_B T_s}}$. When cryogenic gas (e.g., N2, $T \\approx 77K$) contacts the food surface ($T_s \\approx 250K$), the rapid heat flux $\\dot{Q} \\approx h_{conv} \\Delta T$ causes surface moisture to boil explosively, generating a pressure spike $\\Delta P_{shock}$.\n*Calculation:* The thermal diffusivity of ice is high, but the thermal shock occurs at the interface. By inserting a perforated shell with porosity $\\phi > 0.3$, the gas velocity within the micro-cavities $v_{cav} \\approx \\Delta P_{shock} / (\\rho_{gas} \\sqrt{\\phi})$ drops below the threshold for cracking ($\\sigma_{tensile} < \\sigma_{fracture}$). The shell absorbs the impact energy via viscous dissipation in the tortuous path, converting kinetic energy to thermal energy within the gas, thereby reducing the thermal shock $\\Delta T$ seen by the outer crust by a factor of $\\sim 1/\\sqrt{\\phi}$.\n\n**IMPLEMENTATION BILL**\n1.  **Component:** Disposable, food-safe micro-perforated shell (PET or cellulose acetate) with a thickness of 0.5 mm.\n    *   *Material:* Standard food packaging material.\n    *   *Geometry:* Pre-formed to match the food item's contour (e.g., cylinder for sausage, sphere for dumpling). Perforation pattern: 10,000 holes/cm², diameter 0.1 mm.\n    *   *Tag:* ALREADY-RECORDED: \"Visual inspection\" of the shell integrity prior to freezing.\n2.  **Procedure:** Wrap the food item in the shell before immersion in the cryogenic liquid.\n    *   *Tag:* ALREADY-RECORDED: \"Pressure\" telemetry from the freezer tank level sensors (indirectly monitors gas volume expansion).\n3.  **Input Data:**\n    *   *Stated:* Visual inspection records of the food surface prior to freezing (to ensure no pre-existing cracks).\n    *   *Stated:* Tank pressure logs (to correlate with shell performance).\n    *   *Derived Threshold:* CALCULATED from stated specs: The shell's perforation diameter ($d=0.1$ mm) must be less than the mean free path of the food vapor at the boiling point to prevent bubble coalescence. *Rationale:* Ensures laminar flow within the shell, preventing bubble-induced mechanical stress on the crust.\n\n**BURDEN LEDGER (STANDARD-PRACTICE PARITY)**\n*   **Installability:** Standard practice requires modifying the freezer's quench rate controller (complex). This solution requires adding a disposable wrapper (simple, manual or automated). *Verdict:* Lower burden.\n*   **Operability:** No change to cryogenic fluid type or temperature. *Verdict:* Same burden.\n*   **Maintenance:** No new sensors. Visual inspection of the shell is part of existing QA. *Verdict:* Same burden.\n*   **Cost:** Add $0.05 per unit for the shell. Standard practice might save 5% of rejected goods. *Verdict:* Net positive if rejection rate > 0.5%.\n\n**EXECUTABLE TEST**\n*   **Protocol:**\n    1.  Prepare two batches of identical food items (e.g., chicken nuggets).\n    2.  Batch A: Control, no shell.\n    3.  Batch B: Test, wrapped in micro-perforated shell.\n    4.  Immerse both in liquid nitrogen for 60 seconds.\n    5.  Immediately cool to 0°C to stop reaction, then thaw.\n*   **Instruments:** High-speed camera (1000 fps) capturing the surface during the first 5 seconds of immersion; crack analyzer software.\n*   **Pass/Fail Threshold:**\n    *   *Pass:* Batch B shows < 5% surface area with cracks > 1 mm length, while Batch A shows > 20%.\n    *   *Fail:* Batch B shows > 15% cracking or \"shell migration\" (shell detaches before gas dissipation).\n*   **Duration:** 2 weeks (to manufacture shells and run 50 trials).\n*   **Kill Criterion:** If the shell itself melts or becomes rigid due to cold, invalidating the gas flow path.\n\n**CONSTRAINT BIND**\n*   **Primary Stated Indicator:** \"Visual_inspection\" of the crust cracks. This is the direct failure metric.\n*   **Secondary Stated Indicator:** \"Pressure\" logs. This is used only to confirm that the gas expulsion from the shell is occurring as expected (correlation, not causation).\n*   **Rationale:** The pressure sensor does not detect cracks; it only validates that the physical mechanism (gas flow) is active. The visual inspection is the only data that can falsify the success of the crack prevention.\n\n**RISK**\n*   **Shell Contamination:** The shell must be 100% biodegradable or edible to avoid post-freezing removal steps. If the shell is PET, it must be removed before consumption, adding a manual step.\n*   **Flow Blockage:** Ice formation inside the micro-perforations could block the gas path after 10 seconds, reducing effectiveness for longer freezes. *Mitigation:* Limit freeze time to < 30 seconds or use a larger pore size (0.2 mm) which is CALCULATED to still suppress bubble coalescence for most food vapors.",
+ "final_meta": {
+  "critic_verdict": "CLEAN",
+  "type_gate": {
+   "verdict": "MATCH",
+   "reason": "unknown question_type — not gated"
+  },
+  "repairs": 0,
+  "stop_reason": "FINDINGS_SURFACED_FOR_REVIEWER",
+  "delivered_node_id": null,
+  "delivery_rule": null
+ },
+ "declared_template_prose": null,
+ "sha256_16": "9f3d2eb305a986f5"
+}

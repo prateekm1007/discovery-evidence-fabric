@@ -1,0 +1,38 @@
+{
+ "pid": "bench-p02-leadacid-grid-corrosion",
+ "state": "OK",
+ "dominance_pool_ids": [
+  "cand:A2:bench-p02-leadacid-grid-corrosion:8054a354ca4f70db",
+  "r175-baseline-best-bench-p02-leadacid-grid-corrosion"
+ ],
+ "baseline_best_in_pool": true,
+ "pipeline_answer": "The supporting evidence packet does not contain specific metallurgical data, grid alloy compositions, or corrosion rate measurements for lead-acid battery positive plates. The available records discuss general failure modes [doi:10.1051/e3sconf/202018501058], relativistic effects on cell voltage [doi:10.48550/arxiv.1008.4872], and porous-electrode modeling [doi:10.48550/arxiv.1902.01771] [doi:10.48550/arxiv.1902.01774], but none provide the material parameters required to engineer a specific grid alloy or coating intervention. Therefore, the following proposal is based on standard industry practices for extending VRLA float life under low-antimony constraints, but it is UNVERIFIED by the provided evidence and needs the stated test.\n\nIntervention: Replace the standard lead-calcium-tin positive grid alloy with a lead-calcium-tin-silver alloy formulation. Silver addition stabilizes the passive layer and reduces corrosion creep at the grain boundaries without requiring antimony.\n\nPARAMETER: Antimony content — 0 percent — ASSUMPTION\nPARAMETER: Calcium content — 0.08 percent by weight — ASSUMPTION\nPARAMETER: Tin content — 1.5 percent by weight — ASSUMPTION\nPARAMETER: Silver content — 0.03 percent by weight — ASSUMPTION\nPARAMETER: Grid casting temperature — 480 C — ASSUMPTION\nPARAMETER: Float charge voltage — 2.27 V per cell — EVIDENCE-BACKED [user constraint C1]\nPARAMETER: Target service life — 15 years — EVIDENCE-BACKED [user constraint C1]\n\nExpected effect: The addition of 0.03% silver reduces the positive grid corrosion rate by approximately 20-30% compared to standard Pb-Ca-Sn alloys, maintaining grid cross-section integrity and internal resistance within service thresholds for 15 years at 2.27 V/cell. This respects Constraint C1 by eliminating antimony (0% < 2%) and targeting the 15-year life at the specified voltage. It addresses Constraint C3 (corrosion) by modifying the grid metallurgy to resist oxidation. It applies to Constraint C2 (VRLA positive plate) as the grid is the structural component subject to corrosion.\n\nFalsification test:\nTest temperature: 60 C ambient (accelerated aging condition).\nDuration: 90 days continuous float charge at 2.27 V per cell.\nSample size: n = 10 positive plates cast from the proposed Pb-Ca-Sn-Ag alloy vs n = 10 control Pb-Ca-Sn plates.\nPass/fail criteria: The average mass loss due to corrosion in the test group must be at least 15% lower than the control group, and no individual plate may show grid wire breach or resistance increase > 10% relative to initial value.",
+ "composer_state": "COMPOSED_CONTRACT_VALID",
+ "compose_error": null,
+ "compose_n_llm_calls": 1,
+ "compose_generator": {
+  "model": "qwen/qwen3.5-plus:free",
+  "provider_route": [
+   {
+    "provider": "xkiro",
+    "provider_attempted": "xkiro",
+    "model": "qwen/qwen3.5-plus:free",
+    "status": "OK",
+    "attempts": 1,
+    "retry_count": 0,
+    "latency_ms": 19928,
+    "ttfb_s": 19.928,
+    "gateway_hang": false,
+    "failure_type": null,
+    "fallback_provider": null
+   }
+  ]
+ },
+ "pipeline_answer_internal_no_dominance": "",
+ "call_accounting": {
+  "pipeline_total_calls": 14,
+  "baseline_total_calls": 14,
+  "pipeline_strict_within_budget": true
+ },
+ "wall_s": 20.0
+}

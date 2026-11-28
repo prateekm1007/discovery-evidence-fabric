@@ -1,0 +1,63 @@
+{
+ "problem_id": "r123-05-s1",
+ "registered_model": "agnes-3.0-flash",
+ "arm_construction": "shared authoring draw (F31b form)",
+ "authored_bill": "**Mitigation Proposal: Implement a Closed-Loop Excess Air Optimization Strategy**\n\n**Mechanism:**\nThe root cause of the rising stack temperature and degraded economizer approach (increased difference between stack gas temperature and feedwater temperature) at steady load is likely excessive excess air (oxygen in flue gas). High excess air increases the volume of flue gases, reducing the effectiveness of heat transfer in the economizer (which cools flue gases and heats feedwater). This results in higher exit flue gas temperatures (rising stack temperature) and wasted thermal energy, manifesting as increased fuel consumption per tonne of steam.\n\nThe mitigation utilizes the existing O2 trim analyzer to dynamically adjust the air-to-fuel ratio. By reducing excess air to the optimal minimum level (just above complete combustion), the flue gas volume decreases, improving heat transfer effectiveness in the economizer, lowering stack temperature, and increasing boiler efficiency.\n\n**Implementation:**\n1.  **Baseline Assessment:** At the current steady load, record the existing measurements:\n    *   Fuel flow (from fuel flow meter).\n    *   Stack temperature (from stack thermocouple).\n    *   Feedwater temperature (from feedwater thermocouple).\n    *   O2 concentration in flue gas (from O2 trim analyzer).\n    *   Calculate the current economizer approach: `Approach = Stack Temperature - Feedwater Temperature`.\n\n2.  **Control Strategy:**\n    *   Use the O2 trim analyzer signal as the primary feedback for adjusting the air damper position.\n    *   Set a target O2 percentage in the flue gas based on the specific fuel type and burner design (typically 2-4% for natural gas, higher for oil/coal). This target represents the \"trim\" that minimizes excess air while ensuring complete combustion.\n    *   Implement a cascade or feedforward/feedback loop:\n        *   **Primary Loop:** Maintain steam pressure/flow (load) using the fuel flow meter.\n        *   **Secondary Loop (O2 Trim):** Adjust the total air flow (primary air damper) to maintain the flue gas O2 at the optimized target setpoint. This target should be as low as safely possible without causing CO formation or unstable combustion (monitored visually or via existing CO sensors if available, but relying primarily on O2 stability and stack temperature response).\n    *   **Optimization Algorithm:** Gradually reduce the excess air (increase O2 target or adjust damper) in small steps while monitoring:\n        *   Stack temperature (should decrease).\n        *   Fuel flow (should decrease at constant steam load).\n        *   O2 analyzer reading (stability).\n        *   Ensure the O2 level does not drop below the safe lower limit to avoid incomplete combustion.\n\n3.  **Verification:**\n    *   After each adjustment, allow the system to stabilize.\n    *   Confirm that fuel per tonne of steam has decreased.\n    *   Confirm that stack temperature has decreased and the economizer approach has improved (reduced).\n\n**Measures Relied On:**\n*   **O2 Trim Analyzer:** Provides real-time measurement of excess air, enabling precise adjustment of the air-to-fuel ratio.\n*   **Fuel Flow Meter:** Used to maintain constant steam load and correlate fuel consumption with efficiency.\n*   **Stack Thermocouple:** Monitors the outcome of the optimization; a decrease in stack temperature validates improved heat transfer in the economizer and overall efficiency.\n*   **Feedwater Thermocouple:** Used in conjunction with the stack thermocouple to calculate the economizer approach temperature, providing a clear metric for the heat exchange performance of the economizer section.\n*   **Air Dampers (Existing):** The actuators used to adjust the air flow based on the O2 trim signal.\n\nThis approach directly addresses the symptom (high stack temp, poor economizer performance) by correcting the underlying cause (excessive excess air) using only the specified existing instrumentation.",
+ "surfaced_findings": [
+  "BILL_SECTION_MISSING: no IMPLEMENTATION BILL section",
+  "PHYSICS_DIRECTION_UNSTATED: the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mecha",
+  "INPUT_UNAVAILABLE: required online signal 'while' is not among the permitted measures/signals"
+ ],
+ "surfaced_scan": {
+  "BILL_SECTION_MISSING": [
+   "no IMPLEMENTATION BILL section"
+  ],
+  "PHYSICS_DIRECTION_UNSTATED": [
+   "the answer must carry an explicit DIRECTION-OF-EFFECT statement: the driving variable, the direction the mechanism moves it, and the effect on the failure driver (Art. 25 direction-of-effect; the auditor judges whether the stated direction is correct)"
+  ],
+  "INPUT_UNAVAILABLE": [
+   "required online signal 'while' is not among the permitted measures/signals"
+  ]
+ },
+ "delivered_bill": "**Mitigation Proposal: Implement a Closed-Loop Excess Air Optimization Strategy**\n\n**Mechanism:**\nThe root cause of the rising stack temperature and degraded economizer approach at steady load is likely excessive excess air (oxygen in flue gas). High excess air increases the volume of flue gases, reducing the effectiveness of heat transfer in the economizer (which cools flue gases and heats feedwater). This results in higher exit flue gas temperatures and wasted thermal energy, manifesting as increased fuel consumption per tonne of steam.\n\nThe mitigation utilizes the existing O2 trim analyzer to dynamically adjust the air-to-fuel ratio. By reducing excess air to the optimal minimum level (just above complete combustion), the flue gas volume decreases, improving heat transfer effectiveness in the economizer, lowering stack temperature, and increasing boiler efficiency.\n\n**DIRECTION-OF-EFFECT:**\n**Driving Variable:** O2 Concentration in Flue Gas (from O2 Trim Analyzer).\n**Mechanism Direction:** Decreasing the O2 setpoint (reducing excess air) decreases the total volumetric flow rate of flue gases.\n**Outcome:** The reduced flue gas mass flow and improved heat transfer coefficient leads to a **decrease** in Stack Temperature and a **decrease** in Fuel Flow at constant load, thereby improving the economizer approach.\n\n**IMPLEMENTATION BILL:**\n1.  **Signal Access & Baseline:**\n    *   Access the live digital/analog signal from the **O2 Trim Analyzer**.\n    *   Access the live signal from the **Fuel Flow Meter**.\n    *   Access the live signals from the **Stack Thermocouple** and **Feedwater Thermocouple**.\n    *   Record steady-state values for O2 %, Fuel Flow, Stack Temp, and Feedwater Temp. Calculate initial Economizer Approach = Stack Temp – Feedwater Temp.\n\n2.  **Control Loop Configuration (Existing Infrastructure):**\n    *   Configure the existing burner management system (BMS) or DCS loop controller to accept the O2 Trim Analyzer signal as the feedback variable for the air-to-fuel ratio loop.\n    *   Set the O2 target setpoint initially to the current measured value.\n    *   Ensure the Air Damper actuator is in automatic mode and responsive to the controller output.\n\n3.  **Optimization Execution:**\n    *   Lower the O2 target setpoint in increments (e.g., 0.2% steps).\n    *   For each step, allow the system to stabilize (typically 5-10 minutes).\n    *   Monitor the **Stack Thermocouple** for a decrease in temperature.\n    *   Monitor the **Fuel Flow Meter** for a decrease in fuel usage at the same steam load.\n    *   Monitor the **O2 Trim Analyzer** for stability.\n    *   **Stop Condition:** Continue lowering the O2 setpoint until either:\n        *   The Stack Temperature stops decreasing or begins to increase (indicating insufficient combustion).\n        *   The O2 reading becomes unstable or fluctuates wildly.\n        *   Visual inspection (if available) shows unstable flame or black smoke.\n        *   The O2 level reaches the calculated minimum safe limit for the specific fuel type.\n    *   Lock the O2 setpoint at the optimal value identified above.\n\n4.  **Verification:**\n    *   Confirm that Fuel Flow per tonne of steam is lower than the baseline.\n    *   Confirm that Stack Temperature is lower than the baseline.\n    *   Confirm that the Economizer Approach (Stack Temp – Feedwater Temp) has improved (decreased).\n\n**Measures Relied On:**\n*   **O2 Trim Analyzer:** Provides the feedback signal for the excess air optimization loop.\n*   **Fuel Flow Meter:** Used to verify load constancy and measure efficiency gains (fuel/ton steam).\n*   **Stack Thermocouple:** Monitors the thermal outcome; a decrease validates improved heat transfer.\n*   **Feedwater Thermocouple:** Used with the Stack Thermocouple to calculate the economizer approach metric.\n*   **Air Dampers:** Existing actuators manipulated by the controller to change the air flow.\n\n*Note: This proposal uses only existing sensors (O2, Fuel Flow, Stack T, FW T) and existing actuators (Air Dampers). No new instrumentation is installed.*",
+ "post_review_scan": {
+  "BILL_UNTAGGED": [
+   "1.  **Signal Access & Baseline:**",
+   "*   Access the live digital/analog signal from the **O2 Trim Analyzer**.",
+   "*   Access the live signal from the **Fuel Flow Meter**.",
+   "*   Access the live signals from the **Stack Thermocouple** and **Feedwater Thermocouple**",
+   "*   Record steady-state values for O2 %, Fuel Flow, Stack Temp, and Feedwater Temp. Calcul",
+   "2.  **Control Loop Configuration (Existing Infrastructure):**",
+   "*   Configure the existing burner management system (BMS) or DCS loop controller to accept",
+   "*   Set the O2 target setpoint initially to the current measured value.",
+   "*   Ensure the Air Damper actuator is in automatic mode and responsive to the controller o",
+   "3.  **Optimization Execution:**",
+   "*   Lower the O2 target setpoint in increments (e.g., 0.2% steps).",
+   "*   For each step, allow the system to stabilize (typically 5-10 minutes).",
+   "*   Monitor the **Stack Thermocouple** for a decrease in temperature.",
+   "*   Monitor the **Fuel Flow Meter** for a decrease in fuel usage at the same steam load.",
+   "*   Monitor the **O2 Trim Analyzer** for stability.",
+   "*   **Stop Condition:** Continue lowering the O2 setpoint until either:",
+   "*   The Stack Temperature stops decreasing or begins to increase (indicating insufficient ",
+   "*   The O2 reading becomes unstable or fluctuates wildly.",
+   "*   Visual inspection (if available) shows unstable flame or black smoke.",
+   "*   The O2 level reaches the calculated minimum safe limit for the specific fuel type.",
+   "*   Lock the O2 setpoint at the optimal value identified above.",
+   "4.  **Verification:**",
+   "*   Confirm that Fuel Flow per tonne of steam is lower than the baseline.",
+   "*   Confirm that Stack Temperature is lower than the baseline.",
+   "*   Confirm that the Economizer Approach (Stack Temp – Feedwater Temp) has improved (decre",
+   "*   **O2 Trim Analyzer:** Provides the feedback signal for the excess air optimization loo",
+   "*   **Fuel Flow Meter:** Used to verify load constancy and measure efficiency gains (fuel/",
+   "*   **Stack Thermocouple:** Monitors the thermal outcome; a decrease validates improved he",
+   "*   **Feedwater Thermocouple:** Used with the Stack Thermocouple to calculate the economiz",
+   "*   **Air Dampers:** Existing actuators manipulated by the controller to change the air fl"
+  ],
+  "APPARATUS_ROW": [
+   "*   Monitor the **Stack Thermocouple** for a decrease in temperature.",
+   "*   Monitor the **Fuel Flow Meter** for a decrease in fuel usage at the same steam load.",
+   "*   Monitor the **O2 Trim Analyzer** for stability.",
+   "*   **Stack Thermocouple:** Monitors the thermal outcome; a decrease validates improved heat transfer."
+  ]
+ }
+}

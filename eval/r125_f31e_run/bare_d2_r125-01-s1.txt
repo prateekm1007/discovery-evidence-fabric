@@ -1,0 +1,20 @@
+**Mitigation Proposal: Closed-Loop Material Compensation via Check-Weigher Feedback**
+
+**Mechanism:**
+The drift in part weight and increased screw recovery time indicates a degradation in material flow properties (likely due to moisture absorption, degradation, or inconsistent lot density) or a subtle shift in machine dynamics (e.g., wear) that is not fully compensated by the static barrel setpoints. Since part weight is directly proportional to the volume of material injected and the material's specific gravity/flow behavior, the existing check-weigher provides a direct, end-of-process feedback signal on the critical-to-quality attribute. The mechanism involves dynamically adjusting the injection shot volume or pressure parameters (within safe operational limits) to compensate for the observed weight drift, thereby stabilizing the screw recovery time and reducing scrap.
+
+**Implementation:**
+1.  **Data Collection & Correlation:** Use the existing cycle-time logger to tag each cycle’s check-weigher measurement with the corresponding barrel zone temperatures and screw recovery time. Calculate a rolling average of part weight (e.g., over the last 10–20 cycles) to filter out noise.
+2.  **Define Compensation Algorithm:** Implement a simple feedback loop in the machine’s controller (or HMI if supported, otherwise manually if automatic control is not available but logs exist) that adjusts the *injection shot size* (plunger stroke or screw shot volume) based on the deviation of the rolling average part weight from the target weight.
+    *   If weight > target: Decrease shot volume by a calculated step (e.g., 0.1–0.5% of current shot).
+    *   If weight < target: Increase shot volume by the same step.
+    *   *Note:* Since the problem states "scrap at the quality gate is trending up at the same barrel setpoints," the primary control variable should be shot volume, as temperature changes have slower dynamics and risk other defects. However, if shot volume is maxed out, a fine-tuning adjustment to the final barrel zone temperature (zone 3 or 4) may be used to alter melt viscosity and packing behavior, but this is secondary.
+3.  **Manual/Assisted Adjustment Protocol:** If the machine does not support automated closed-loop adjustment, use the cycle-time logger data to generate a "Shot Size Adjustment Card." The operator observes the check-weigher average every 5 minutes. If the drift exceeds a ±0.5g threshold, the operator manually adjusts the shot volume parameter according to a pre-defined lookup table derived from historical data correlating weight deviation with required shot volume changes.
+4.  **Monitor Screw Recovery Time:** Track screw recovery time alongside weight. If weight is stabilized but screw recovery time remains high, investigate material flow issues (e.g., moisture) by correlating check-weigher variability with specific barrel zone temperatures. If recovery time is high due to high viscosity, slightly increase the final barrel zone temperature (within material spec limits) to reduce melt viscosity, improving flow and packing, which should also stabilize weight.
+
+**Measures It Relies On:**
+*   **Check-Weigher:** Provides the direct, real-time measurement of part weight (the primary quality characteristic). Its variability (standard deviation) serves as a health indicator for process consistency.
+*   **Barrel Zone Thermocouples:** Used to monitor if temperature setpoints are being held and to correlate any necessary temperature adjustments with melt flow behavior. They ensure that any temperature changes are intentional and stable, not drift.
+*   **Cycle-Time Logger:** Essential for data association. It links each check-weigher measurement to the specific cycle, allowing for the calculation of rolling averages and for tracking the trend in screw recovery time. It enables the operator or controller to determine if the weight drift is consistent or random, guiding the magnitude of the correction.
+
+This approach leverages only the specified existing sensors to create a feedback-controlled process, reducing scrap by proactively correcting shot volume before parts fail the quality gate.

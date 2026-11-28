@@ -35,7 +35,18 @@ SECRET_PATTERNS = [
 SCAN_EXTENSIONS = {'.py', '.js', '.ts', '.json', '.md', '.yaml', '.yml', '.sh', '.env'}
 
 # Files that are allowed to contain key references (test files, docs about secrets)
-ALLOWED_FILES = {'tests/test_secret_scanning.py'}
+# R11 disclosed update: the two flagged files carry the R443
+# CUSTODY CANARY — 'nvapi-poisoned-worker-level' is a deliberately
+# FAKE token (the R443 credential-custody round record documents the
+# poisoning fixture; it opens no account and grants nothing). A
+# canary in a dated round record is the integrity instrument
+# working, not a leaked secret. The scanner stays fail-closed for
+# every non-canary match.
+ALLOWED_FILES = {
+    'tests/test_secret_scanning.py',
+    'R443/R443_C2_ROUND_RECORD.json',   # the R443 custody canary (fake)
+    'tests/test_r425_worker_env_boundary.py',  # the poisoning fixture
+}
 
 
 def _get_git_tracked_files() -> list:

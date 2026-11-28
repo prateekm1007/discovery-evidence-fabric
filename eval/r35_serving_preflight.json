@@ -1,0 +1,604 @@
+{
+  "record": "R35_SERVING_PREFLIGHT/1.0.0",
+  "claim": "c-0040",
+  "work_id": "r35-serving-preflight",
+  "session_id": "builder-r35s1",
+  "executed_at": "2026-11-16T13:36:30Z",
+  "purpose": "AM33 D1 gating precondition (typed unclaimed in c-0038 notes): verify whether ANY reachable keyed path SERVES the registered model zai-org/GLM-5.3 BEFORE the v6 seal burns. NOT problem-adjacent; zero seal exposure (no v6 problem byte read).",
+  "registered_model": "zai-org/GLM-5.3",
+  "registered_model_provenance": "discovery_fabric llm_registry / scripts/r34_served_model_attestation.py REGISTERED_MODEL (frozen V7.6 machine)",
+  "paths": [
+    {
+      "path": "A: NVIDIA NIM (integrate.api.nvidia.com/v1) with owner-rotated key (vault custody, tail AjyP)",
+      "catalog_probe": {
+        "http": 200,
+        "total_models": 33,
+        "glm_family": [
+          "z-ai/glm-5.3-flash"
+        ],
+        "exact_id_listed": false
+      },
+      "serving_probe_exact_id": {
+        "requested_model": "zai-org/GLM-5.3",
+        "http": 404,
+        "detail": "404 page not found — id not hosted"
+      },
+      "serving_probe_hosted_flash": {
+        "requested_model": "z-ai/glm-5.3-flash",
+        "http": 200,
+        "served_model": "z-ai/glm-5.3-flash",
+        "content_observation": "thinking model; max_tokens=8 truncated before content (content null, reasoning_content present, finish_reason length) — serving mechanism live"
+      },
+      "verdict": "REGISTERED MODEL NOT SERVABLE on this path; z-ai/glm-5.3-flash is a DIFFERENT model id (typed; no silent semantic promotion, Art. 8). Re-registering the frozen machine to the flash id is an AUDITOR decision (Art. 7 sealed instruments), never a builder action.",
+      "quota_cost": "2 chat calls"
+    },
+    {
+      "path": "B: loop-local zai gateway (127.0.0.1:8787, scripts/zai_gateway.mjs)",
+      "serving_probe": {
+        "requested_model": "zai-org/GLM-5.3",
+        "http": 200,
+        "served_model_response_field": "glm-4-plus",
+        "served_model_gateway_log": "glm-4-plus",
+        "ts": "2026-11-16T13:35:50.557Z",
+        "prompt_sha256": "ef227bc99b07c1d029e3c4af137b3189cbed76597282183832b8fbe26a62d3fe",
+        "content_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+        "latency_ms": 352,
+        "status": "OK"
+      },
+      "corroborating_shared_log_entries": "two same-day entries observed in the shared gateway log (11:58:49Z, 12:57:37Z), both requested zai-org/GLM-5.3 served glm-4-plus (included in the committed slice below)",
+      "verdict": "REGISTERED MODEL NOT SERVABLE on this path — the substitution persists (311/311 historical + 3/3 today).",
+      "quota_cost": "1 chat call"
+    },
+    {
+      "path": "C: crowllm judge route (Art. 26 pin: crowllm.com/v1/chat/completions, deepseek-v4-flash:free)",
+      "probe_1": {
+        "http": 503,
+        "error_code": "503 server_error",
+        "detail": "upstream provider error, request id 202611161336067953125658268d9d6Lzh1Sd2M — past the CF-1010 browser-signature block, authenticated (no 401/403)"
+      },
+      "probe_2_after_25s": {
+        "http": 200,
+        "served_model": "DeepSeek-V4-Flash",
+        "content": "READY",
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_tokens": 18,
+          "completion_tokens": 3,
+          "total_tokens": 21
+        }
+      },
+      "verdict": "JUDGE ROUTE LIVE — CROWLLM_API_KEY functional; c-0026 recalibration (c-0039 lane) may proceed; no route swap",
+      "quota_cost": "2 chat calls"
+    }
+  ],
+  "committed_gateway_log_slice": {
+    "note": "v6 mandatory-artifact prototype: a committed slice covering the probe window, per-call requested_model + served_model (the live log stays gitignored)",
+    "entries": [
+      {
+        "ts": "2026-11-16T11:55:21.626Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "3c80fa1f3fe46890edf939f961457ddd3fe38199e9633b4f74a95be24ee8113a",
+        "content_sha256": "a97dfb899c4eb04a40af6949c5cd238dab3d01f0dbd2da5054014a1a2fca4d4a",
+        "latency_ms": 7536,
+        "usage": {
+          "completion_tokens": 609,
+          "prompt_tokens": 4769,
+          "total_tokens": 5378
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:55:29.398Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "e9484695eaac178b0ccfa0b04fbfd57773db5fcc222e13142c6bed2a7d6034d2",
+        "content_sha256": "1c6012332410d2cdf304e187bf740822a38a5fc46b89e198d3329e0fe65699c4",
+        "latency_ms": 7760,
+        "usage": {
+          "completion_tokens": 667,
+          "prompt_tokens": 5965,
+          "total_tokens": 6632
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:55:35.377Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "2d136540a8ed820428c1cf276074d1ba9c62f07b99673d01add41b861686feb6",
+        "content_sha256": "3fbba49328f7c3fe8f5bba2a388a3b5ae3716d4e942d77f13835273683b53155",
+        "latency_ms": 5969,
+        "usage": {
+          "completion_tokens": 579,
+          "prompt_tokens": 5968,
+          "total_tokens": 6547
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:55:42.162Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "13f08b17e7ac8d56a85f431dfeeb71237525afd9d130ceee23aacc0ffe7a28ce",
+        "content_sha256": "74e6e42fa1e542c1346298279f8f1466cc8cfb1f63774d9ae8cc1828a250cc63",
+        "latency_ms": 6777,
+        "usage": {
+          "completion_tokens": 698,
+          "prompt_tokens": 6001,
+          "total_tokens": 6699
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:55:52.140Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "b2a9fb71aedc039ff09673799392ec60276fce7dcb12b2453550073eca9ddb3f",
+        "content_sha256": "3c5afed7488c8107964efae276421a83af2f8f43dc6136e758282389281866b1",
+        "latency_ms": 9967,
+        "usage": {
+          "completion_tokens": 972,
+          "prompt_tokens": 4769,
+          "total_tokens": 5741
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:55:59.030Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "1aa7c7dd25d34aff46d73deaf67df6452d80320923c362d5680b244b74a3c9f0",
+        "content_sha256": "40552654b9d21b93f6bb65fc628a1e2df4b99b96004e08a78d3bbdc7dd018d26",
+        "latency_ms": 6879,
+        "usage": {
+          "completion_tokens": 647,
+          "prompt_tokens": 5923,
+          "total_tokens": 6570
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:05.904Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "143f68b849c2189026f35d6b04f2a6ae4665ce0050cb2b6f0390a78547c02f76",
+        "content_sha256": "3e617a7beb7df8cd1aea53c18bd6f4001741e02f7502b632db4196a709f7efa6",
+        "latency_ms": 6865,
+        "usage": {
+          "completion_tokens": 644,
+          "prompt_tokens": 5940,
+          "total_tokens": 6584
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:12.159Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "2e360dacc3c9bc1f1c354a7f1c31b959b5d230bacdd4ea76e1ec868fe5c4309c",
+        "content_sha256": "f5a9ad575056b3943477327aebf25934861097b7268777ede31304b0551f5a61",
+        "latency_ms": 6247,
+        "usage": {
+          "completion_tokens": 548,
+          "prompt_tokens": 5961,
+          "total_tokens": 6509
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:20.410Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "934b36d6411626ded8ae8cf4d7a61569e282b4beea1bd10faf67d40afbb19e79",
+        "content_sha256": "a86e9548810dd6f42e0f9d9e54916a6115fe92ae7158d433d8de3874b1f46184",
+        "latency_ms": 8242,
+        "usage": {
+          "completion_tokens": 711,
+          "prompt_tokens": 1471,
+          "total_tokens": 2182
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:28.506Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "d4c3a2b8be22fd42579f610f88f04fbd4da023cafd82abe9be06eb4dbd62da65",
+        "content_sha256": "e6720b73b3cef892c153fea9d080f97798f7a8c0ed9cb1b6e9bc406a1e66ee3a",
+        "latency_ms": 8089,
+        "usage": {
+          "completion_tokens": 735,
+          "prompt_tokens": 2611,
+          "total_tokens": 3346
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:36.316Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "d1253c8d660829cfedd028e036c83dd561b9f9945acd9835dc187a1137823010",
+        "content_sha256": "65c06cfd1f373c2f75c9f15bc5ee360862407fcd78c87ddc2233ce76afcad361",
+        "latency_ms": 7802,
+        "usage": {
+          "completion_tokens": 724,
+          "prompt_tokens": 2603,
+          "total_tokens": 3327
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:42.935Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "d1253c8d660829cfedd028e036c83dd561b9f9945acd9835dc187a1137823010",
+        "content_sha256": "9b25fa08f6124cc8edc6b6762e3c0ba859a7ea0c059db1ee19287567a7b7ff42",
+        "latency_ms": 6612,
+        "usage": {
+          "completion_tokens": 690,
+          "prompt_tokens": 2603,
+          "total_tokens": 3293
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:50.078Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "684ccd648b4d422a7ca84bea7e487590c2434409cb1d01471ce7b58c9520e0b7",
+        "content_sha256": "d881d4c7038b56c8968e2d24c6a8f4f1a35b58e3dcf15f3f2550f58da4301f21",
+        "latency_ms": 7135,
+        "usage": {
+          "completion_tokens": 711,
+          "prompt_tokens": 1452,
+          "total_tokens": 2163
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:56:56.062Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "6599365f1f3f607558b30eb1ac2acfc7e0fd99c5ee2ee339fa60518f70f74e0c",
+        "content_sha256": "f081c81baa0a8768b594f47ed3687f053c786660162b368732fa564c29eda740",
+        "latency_ms": 5977,
+        "usage": {
+          "completion_tokens": 620,
+          "prompt_tokens": 2588,
+          "total_tokens": 3208
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:02.711Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "6599365f1f3f607558b30eb1ac2acfc7e0fd99c5ee2ee339fa60518f70f74e0c",
+        "content_sha256": "16bc5c0a281688980816b3ec91a73852cca3cca1ad259be6908cec1593ed7752",
+        "latency_ms": 6642,
+        "usage": {
+          "completion_tokens": 715,
+          "prompt_tokens": 2588,
+          "total_tokens": 3303
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:08.668Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "6599365f1f3f607558b30eb1ac2acfc7e0fd99c5ee2ee339fa60518f70f74e0c",
+        "content_sha256": "cc925aa5ed4d44216607d53a28bb730a51868053d2d0444bacbf6dd7dc0181cd",
+        "latency_ms": 5951,
+        "usage": {
+          "completion_tokens": 648,
+          "prompt_tokens": 2588,
+          "total_tokens": 3236
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:16.271Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "f56ce32b64689db05d2a2eed72722ada53a1fd6b6476d542f1e71ed3ee70046a",
+        "content_sha256": "8afc8c09942db92308756852687a52b59eb34243eaef310fd5bea9de9e6c17fd",
+        "latency_ms": 7596,
+        "usage": {
+          "completion_tokens": 818,
+          "prompt_tokens": 1479,
+          "total_tokens": 2297
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:22.443Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "e764604a904c8ef6739f5ad6219c7f7a4dd0224198021d15041e6c998868d580",
+        "content_sha256": "f3ef4e7c3740e46de64df3b3dfe23be862a6ebe1eb69d790962e8c368a60981f",
+        "latency_ms": 6165,
+        "usage": {
+          "completion_tokens": 577,
+          "prompt_tokens": 2615,
+          "total_tokens": 3192
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:29.118Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "02fe1a994e1e8a1466a4103edba25f96a85380329fb2cb7a208b749f28a2c54e",
+        "content_sha256": "60c6bfd2ac72bf28e4931cde454778abb24fc04a1770eff144e4a8c66e58f553",
+        "latency_ms": 6669,
+        "usage": {
+          "completion_tokens": 629,
+          "prompt_tokens": 2613,
+          "total_tokens": 3242
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:36.580Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "d5d7085e13eda0384c2c156b895b203496ffac3916fe32aab703a3d3f925d4fb",
+        "content_sha256": "d3124782c0307e73f85b2ca27e4f12019d2b48763bd46336317ef4492dccce18",
+        "latency_ms": 7456,
+        "usage": {
+          "completion_tokens": 807,
+          "prompt_tokens": 2612,
+          "total_tokens": 3419
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:43.716Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "1b26862f2e6bce0da9e9d6d21e243b68bae330f9034423fc95961e724ec56931",
+        "content_sha256": "c1eaef87c6f308847d30ed37a1327e56556d836901c99e2e7dd87790f4aedbb5",
+        "latency_ms": 7129,
+        "usage": {
+          "completion_tokens": 659,
+          "prompt_tokens": 1465,
+          "total_tokens": 2124
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:49.102Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "1842f1a383c2e423ddb7ecc261f4b4a098587c5f35e77796bf147130cb5bcd24",
+        "content_sha256": "9b86cca3d4151db54c458051c9c57425477e4dda529640248654ccca93ba0635",
+        "latency_ms": 5381,
+        "usage": {
+          "completion_tokens": 561,
+          "prompt_tokens": 2605,
+          "total_tokens": 3166
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:57:55.919Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "448303a90a55c431626f849c2533f085289a5ba5865a07b7ef5900652f9e7e1a",
+        "content_sha256": "713e7e1b0911321094ad4a8a504021ae40d5fe012d6500f6e3358215e07c8a0a",
+        "latency_ms": 6811,
+        "usage": {
+          "completion_tokens": 727,
+          "prompt_tokens": 2595,
+          "total_tokens": 3322
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:02.453Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "5f06a7ce392dea601ef9baae4e374a87c9780e8d93482ec63b882ba3510891f2",
+        "content_sha256": "01ad2689b4fd98f0e161c6614f7974071880b2f5a026e716b50a5a22ed944cf4",
+        "latency_ms": 6527,
+        "usage": {
+          "completion_tokens": 682,
+          "prompt_tokens": 2598,
+          "total_tokens": 3280
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:11.044Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "3cecbc1e92c84905fed17e1b58e267c24f550256826d62143d54c944a5e76672",
+        "content_sha256": "082cbe925c2733e808a18766c13fa49305d5a5260cb504959f6dd6dfac7e1186",
+        "latency_ms": 8584,
+        "usage": {
+          "completion_tokens": 791,
+          "prompt_tokens": 1469,
+          "total_tokens": 2260
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:19.594Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "c64098ccd2f8f7b2f2df00e7a0a0d9fb00a81ed1aaf78d543546379266707aab",
+        "content_sha256": "dd89e2b23699148fe8a03112d10aabaffb820847551d83334ed8c41ce6876ac4",
+        "latency_ms": 8543,
+        "usage": {
+          "completion_tokens": 664,
+          "prompt_tokens": 2609,
+          "total_tokens": 3273
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:27.535Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "d3155d7e4724c765bad6c13f5c8e7d4afd5f0e9ff097e3a413df0f983e9feb03",
+        "content_sha256": "d5bc7adea404b3ffa6a8c59474af132e2da6923fbc3eafcc72434ee3e203bb67",
+        "latency_ms": 7934,
+        "usage": {
+          "completion_tokens": 686,
+          "prompt_tokens": 2602,
+          "total_tokens": 3288
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:34.596Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "bfd19c53a3e98d1a41624f3a0e9274a551709db4846cad3e7cca0be278fad2c2",
+        "content_sha256": "3c6ec4b8692e03bf105a7e18ba2492bdccb81f758b226a7156fdea8706b32b1a",
+        "latency_ms": 7054,
+        "usage": {
+          "completion_tokens": 594,
+          "prompt_tokens": 2605,
+          "total_tokens": 3199
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:41.151Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "90942dc2fc6f23bc16d2938927440484825d1c0637c334e3c813cacecaf7bb9f",
+        "content_sha256": "864b94cad7f91354dcbd36bc07a3275af29511b9f7987da37b370e887df426b4",
+        "latency_ms": 6548,
+        "usage": {
+          "completion_tokens": 647,
+          "prompt_tokens": 1476,
+          "total_tokens": 2123
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T11:58:49.907Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "75af802da6fc080595d7c2bfd1fd4bc5facde34fba49165cc77e19f2eb5c7dac",
+        "content_sha256": "716ad40949de236f2a00cec95c939205e5ebf18586c603e621854e4389e49ee5",
+        "latency_ms": 8751,
+        "usage": {
+          "completion_tokens": 778,
+          "prompt_tokens": 2606,
+          "total_tokens": 3384
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T12:57:37.891Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 2,
+        "prompt_sha256": "dc8ffcfecb053e4c2f15e0ceed88356bfc10a6e7a5923be3c99fe2a494b950b1",
+        "content_sha256": "565339bc4d33d72817b583024112eb7f5cdf3e5eef0252d6ec1b9c9a94e12bb3",
+        "latency_ms": 361,
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 34,
+          "total_tokens": 36
+        },
+        "status": "OK"
+      },
+      {
+        "ts": "2026-11-16T13:35:50.557Z",
+        "model": "glm-4-plus",
+        "requested_model": "zai-org/GLM-5.3",
+        "thinking_mode": false,
+        "n_messages": 1,
+        "prompt_sha256": "ef227bc99b07c1d029e3c4af137b3189cbed76597282183832b8fbe26a62d3fe",
+        "content_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+        "latency_ms": 352,
+        "usage": {
+          "completion_tokens": 2,
+          "prompt_tokens": 20,
+          "total_tokens": 22
+        },
+        "status": "OK"
+      }
+    ]
+  },
+  "VERDICT": {
+    "verified_model_window": "CLOSED",
+    "serving_paths_equal_registered": "0 of 2 generator paths (NVIDIA NIM, zai gateway)",
+    "consequence": "typed infra block (Art. 15): the v6 one-shot is NOT taken — c-0038's own precondition (a born-VOID run will not be taken) is honored. The acceptance run stays unfalsifiable-by-construction under the current transport; nothing about the binds, the seal, or the scoring bar is weakened.",
+    "escalation_paths": [
+      "(1) gateway platform serves the true zai-org/GLM-5.3 id (re-probe cheap, claim-repeatable)",
+      "(2) operator supplies a keyed path serving the exact id (vault custody on arrival)",
+      "(3) auditor amendment re-registers the frozen machine's model id to a servable exact id (auditor-gated, Art. 7; builder never self-re-registers)"
+    ]
+  },
+  "verifier_role": "This session is VERIFIER for c-0038 (holdout-v6-generation) and c-0039 (r35-instrument-pins-c0026) per Art. 29(b): recompute from committed bytes, never re-run.",
+  "art_27": "NO CAPABILITY CHANGE (typed infra record; engine byte-unchanged)",
+  "secret_grep": "0 findings in staged diff"
+}

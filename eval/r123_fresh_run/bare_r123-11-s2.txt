@@ -1,0 +1,20 @@
+**Mitigation Proposal: Load-Dependent Thermal Derating Protocol**
+
+**Mechanism:**
+Implement a closed-loop, real-time control strategy that dynamically reduces the wind turbine’s power output (and thus the gearbox torque and frictional heat generation) specifically when the gearbox oil temperature exceeds a predefined safety threshold during high-load (rated wind) conditions. Since the vibration signature is unchanged, mechanical integrity is presumed intact; the issue is thermal capacity mismatch under high power. By reducing the input energy to the gearbox when it cannot dissipate heat efficiently, the thermal steady-state is lowered, preventing oil degradation or component overheating without requiring hardware changes.
+
+**Implementation:**
+1.  **Baseline Mapping:** Use historical data from the existing **gearbox oil temperature probes** and **nacelle anemometer** to create a "thermal envelope" map. For each wind speed bin, calculate the expected oil temperature under normal conditions. Identify the specific wind speed ranges where the *actual* oil temperature deviates upward from the *expected* baseline at rated power.
+2.  **Threshold Definition:** Set a dynamic threshold $T_{oil,max}(v)$ for oil temperature based on the current wind speed $v$ measured by the **nacelle anemometer**. For example, if the oil temperature exceeds $T_{baseline} + \Delta T_{margin}$ (where $\Delta T_{margin}$ is set to a safe value, e.g., 10°C above normal trend), trigger the derating mode.
+3.  **Control Action:** When the condition $T_{oil} > T_{oil,max}(v_{nacelle})$ is met during rated wind operation:
+    *   The turbine controller reduces the pitch angle of the blades to decrease aerodynamic torque, thereby lowering generator and gearbox torque.
+    *   This reduces the internal frictional heat generation in the gearbox.
+    *   The system maintains this derated state until the oil temperature trends back down below a hysteresis threshold (e.g., $T_{oil,max}(v) - 5°C$).
+4.  **Monitoring Loop:** Continuously monitor the **existing vibration sensors**. If vibration levels exceed alarm limits during the derating event, it indicates a mechanical fault (e.g., bearing wear) not previously detected, prompting immediate shutdown for inspection. Otherwise, the derating continues as a sustainable thermal mitigation.
+
+**Measures It Relies On:**
+*   **Gearbox Oil Temperature Probes:** To determine the actual thermal state of the lubricant and trigger the derating logic.
+*   **Nacelle Anemometer:** To provide the real-time wind speed input $v$, which is critical for calculating the expected thermal baseline and determining if the turbine is operating in the high-load (rated wind) regime where the thermal issue occurs.
+*   **Existing Vibration Sensors:** To serve as a safety interlock; if the upward temperature trend is actually masking a developing mechanical failure (e.g., internal spalling that hasn’t yet altered the *signature* but is causing friction), the vibration sensors will detect abnormal amplitudes and trigger a shutdown, preventing catastrophic damage during derating.
+
+This approach utilizes only existing sensors, requires no new instrumentation, and directly addresses the thermal excess by reducing the heat source (torque) rather than attempting to enhance heat dissipation (which would require servicing coolers or adding fans, contrary to the constraint).

@@ -1,0 +1,33 @@
+{
+  "record": "R67S1_TRANSPORT_FALSIFICATION/1.0.0",
+  "session": "builder-r60s1",
+  "date": "2026-11-18",
+  "context": "AM61 (b9a30b473) authorized the v9 one-shot on cohere/command-a-plus (registered 61d94b2a9, probed 0.7s served==requested). Pre-run discipline (R36 lesson: probe before burn): the script's sanctioned `smoke` live fire on BURNED non-v9 rows (HO7 packet) was executed BEFORE the sealed run. The smoke FALSIFIED the registered transport under the machine's real contract class. Zero v9 problem reads, zero v9 rows - the packet is UNBURNED (eval/holdout_v9_generation/rows/ absent). c-0082 lease live (until 2026-11-20T00:00:00Z); the run stays gated.",
+  "falsification_evidence": {
+    "method": "the frozen machine's own smoke path (machine_generate_v77 on burned HO7 rows) + sized probes on the EXACT prompt classes (system=contract_for_v72 19043 chars, user=problem json / problem json + V77_REPAIR_DIRECTIVE)",
+    "budget_ladder_on_command_a_plus": [
+      {"total_budget": 3624, "class": "render/repair", "result": "empty content finish=length x3+ (r64s4 probe saw 841 visible on a SHORT probe - the contract class was never probed at size)"},
+      {"total_budget": 8744, "class": "render", "result": "empty content finish=length x6 (gateway log 07:08-07:13Z)"},
+      {"total_budget": 12000, "class": "render", "result": "empty content, full runaway, 34.7s"},
+      {"total_budget": 16000, "class": "render", "result": "finish=stop, 4454 completion, 5301 visible, 20.5s (non-monotonic vs 12000: stochastic tail)"},
+      {"total_budget": 20000, "class": "render", "result": "OK (gateway 07:22:40Z) - then the REPAIR class ran away 5/5 (49fe819e, completion_tokens=20000 x5)"},
+      {"total_budget": 36000, "class": "repair (REAL machine repair prompt 796a2e7d)", "result": "empty content finish=length, 102s fresh runaway + cached replays; a nearby repair-proxy text stopped at 3496 (58.4s) - the tail is prompt-sensitive and heavier than any probed budget on the real prompt"}
+    ],
+    "upstream_caching_discovery": "identical retries (temp 0.0, same messages) replay the CACHED runaway completion at 85-106ms (gateway log latency_ms) - the machine's typed 5-try ladder cannot diversify; recovery depends on upstream cache expiry (~4 min) colliding with the ladder's 220s backoff window (one lucky recovery observed at try 5, 07:42:13Z)",
+    "model_metadata": "cohere/command-a-plus: capabilities.reasoning=true, reasoning_efforts.levels=[\"high\"] ONLY (default high; reasoning cannot be disabled or lowered via the API), max_output_tokens=64000, context 436000",
+    "root_cause": "forced reasoning_effort=high + the 19k-char V7.7 system contract triggers stochastic heavy-tail reasoning that on some prompts exceeds ANY probed budget with ZERO visible content; the machine's caller contract (2600 visible tokens) can be served only by luck",
+    "verdict": "cohere/command-a-plus is STRUCTURALLY UNRELIABLE as the registered generator id under the machine contract. The r64s4 registration evidence (0.7s short probe) did not cover the contract class. R36 lesson generalizes: registration without a SERVING path under the real contract falsifies."
+  },
+  "candidate_probes_r36_discipline": [
+    {"id": "cohere/command-a", "metadata": "reasoning=false, context 288000, max_output 8192, access_tier free", "render": "729 completion / 3044 visible, stop, 23.1s", "repair": "895 completion / 3582 visible, stop, 32.3s", "served_string": "exact", "verdict": "RELIABLE - zero reasoning overhead, completion well under budget on the worst class"},
+    {"id": "cohere/command-a-reasoning", "metadata": "reasoning=true, levels [none, high] (default high), max_output 32768", "render": "2959 completion / 3564 visible, stop, 29.0s", "repair": "3062 completion / 3464 visible, stop, 33.5s", "verdict": "serves at default high but completion sits ~85% of a 3600 budget - variance-risky without the effort knob; PREFERRED ONLY IF the effort=none knob is wired"}
+  ],
+  "request_to_auditor": "AM62 superseding the AM61 prereg pin: re-register cohere/command-a on xkiro (https://api.xkiro.com/v1) as the generator id. On the AM the builder executes the same conscious re-freeze chain as 61d94b2a9 (frozen lines: r40_machine_v77.py V77_REQUEST_MODEL + docstring, r60_v9_one_shot.py byte-reuse assert, guards test_r64_v9_preflight/test_r58_route_adapter/test_guard_activation, preflight plumbing string) + INFRA: gateway headroom re-sized for a non-reasoning id (1024 slack; completion observed 729-895 vs the 3624 total shape) + smoke green + the one-shot run. The auditor-owned prereg amendment rides the AM (AM61 pattern). c-0082 remains the executor lock; no new claim needed.",
+  "smoke_artifacts_committed": [
+    "eval/holdout_v9_generation/rows_smoke/HO7-01-zinc-ew-acid-mist.json (the one smoke row that completed, 07:56Z window)",
+    "eval/holdout_v9_generation/events_smoke.json (1 event)",
+    "ENGINE_RUNS/zai_gateway_calls.jsonl (append-only; carries the entire falsification evidence: 20+ empty-content lines across 4 budgets + the OK lines)"
+  ],
+  "gateway_infra_disclosure": "scripts/zai_gateway.mjs XKIRO_HEADROOM was raised 1024 -> 17400 -> 33400 during this falsification (each step committed in this commit's comment trail) - INFRA-only, frozen machine bytes untouched (sha16 re-verified: r60_v9_one_shot.py 15e7e712fa8a1a57, r40_machine_v77.py 0ccdf8fd9ee166d0 - identical to the preflight freeze baselines)",
+  "also_in_this_commit": "eval/r67_f74_hf_vault_setup.json - F74 RESOLVED (the owner granted repo.write on the custody token 33bc7af22c62; the Art. 17 v3.3.0 private HF vault prateekm1/operator-keys-vault is set up: 5 operator keys base64-encoded, restore path digest-verified BYTE-IDENTICAL, master HF token owner-delivered per Art. 17; HF scanner rejects raw-token uploads even to private repos - typed finding)"
+}

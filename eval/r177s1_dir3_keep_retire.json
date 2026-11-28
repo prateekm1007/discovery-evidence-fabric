@@ -1,0 +1,72 @@
+{
+ "record": "R177S1_DIR3_KEEP_RETIRE/1.0.0",
+ "date": "2026-11-27",
+ "claim": "c-0285 (work id r177s1-dir3-keep-retire, kind task; executor builder-r177s1)",
+ "authority": "DIR 3 (directions) + AM53 + AM52 kill criterion: 'if the pruned pipeline loses to best-of-N+verifier, ship best-of-N+verifier and retire the architecture' (per problem-class, with the measured value-add)",
+ "bytes": {
+  "dir3_run": "eval/r175s3_dir3/ (12 pair records + SUMMARY.json, commit fcfc1addd lineage)",
+  "dir2_run": "eval/r175_compute_matched/SUMMARY.json (12/12 judged)",
+  "corpus_shape": "eval/r125_f31e_prereg.json — the f31e pool is MITIGATION-correctness shape (AM53 data_grounding + the builder's own honest note); NOT invention shape"
+ },
+ "recompute_from_bytes": {
+  "n_pairs": 12,
+  "champion_counts": {
+   "baseline": 7,
+   "plain": 4,
+   "contradiction": 1
+  },
+  "outcomes": {
+   "wins": 3,
+   "ties": 8,
+   "losses": 1,
+   "win_tie_rate_raw": 0.9167
+  },
+  "dominance_ties_champion_baseline_eq_chars": 7,
+  "plain_best_of_n_wins": 2,
+  "novel_strategy_wins_by_strategy": {
+   "departure": 0,
+   "contradiction": 1,
+   "relaxation": 0
+  },
+  "genuine_novel_candidate_wins": 1,
+  "genuine_novel_win_rate": 0.0833,
+  "departure_wins": 0,
+  "wall_s": {
+   "median": 189.6,
+   "worst": 229.7
+  },
+  "dir2_compute_matched": {
+   "wins": 3,
+   "ties": 6,
+   "losses": 3,
+   "win_tie_rate": 0.75,
+   "ci95": [
+    0.428,
+    0.945
+   ]
+  }
+ },
+ "decision": {
+  "MITIGATION (the r125 f31e dev pool, mitigation-correctness shape)": {
+   "decision": "RETIRE the multi-stage diverse-selection architecture; SHIP best-of-N + verifier (best-of-4 draws + 1 critique + 1 revise, 6 calls, cache off)",
+   "measured_value_add_of_multi_stage": {
+    "genuine_novel_candidate_wins": "1/12 (8.3%) — far below the AM53 >=50% bar",
+    "departure_strategy_wins": "0/12",
+    "dominance_ties": "7/12 (the pipeline emitted the baseline's own answer — zero value-add)",
+    "plain_best_of_n_wins": "2/12 (the incumbent recipe reproduces these without the architecture)",
+    "non_loss_evidence": "the 0.75 win+tie CI[0.428,0.945] (DIR-2) was measured WITH dominance-by-construction and is achieved by the best-of-N+verifier recipe itself at the same 6-call budget"
+   },
+   "value_add_verdict": "NONE MEASURED on mitigation — the architecture is a no-op over its own incumbent here (AM53: vacuous)"
+  },
+  "INVENTION (the r176 dev24 invention-shaped corpus, claim c-0283)": {
+   "decision": "DEFERRED — typed PENDING the c-0283 measured bytes (builder-r176s1 is EXECUTOR; this session is VERIFIER, no re-run)",
+   "pre_declared_gate": "KEEP the multi-stage architecture for the invention class ONLY IF the r176 run shows genuine novel-candidate wins (departure/cross-domain/contradiction) >=50% with the Wilson CI lower bound >50% at n>=24, auditor-judged blind (AM53 + DIR 2); otherwise the kill criterion EXTENDS to the invention class: retire the architecture and ship best-of-N+verifier there too",
+   "f31e_as_invention_test": "RETIRED per the DELETE LIST — the f31e corpus never counts as the invention test again"
+  }
+ },
+ "kill_criterion_standing_rule": "per problem-class, measured every round the class is run: the multi-stage arm must show >=50% genuine novel-candidate wins (ties and plain best-of-N wins excluded per AM53) or the class ships best-of-N+verifier; two consecutive non-winning rounds auto-retire the arm for that class (Art. 20 incumbent challenge, applied per-class)",
+ "next_bound_items": {
+  "DIR_4_ablation": "the pruned-pipeline runs only on the invention class (the mitigation class ships best-of-N+verifier, nothing to prune); the r175 harness per-item wall/calls bytes are the instrument",
+  "DIR_5_holdout": "gated on the r176 DEV gate passing first (no holdout spend while the DEV gate is unmet)"
+ }
+}

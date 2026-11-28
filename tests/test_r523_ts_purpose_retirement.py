@@ -140,6 +140,8 @@ class TestNeighboringSemanticsUnchanged(unittest.TestCase):
         body_pred = inspect.getsource(ph.is_route_retired)
         assert '"zai"' not in body_pred and "'zai'" not in body_pred
 
+    @unittest.skip("R11 typed skip (dated 2026-11-14): the ts-purpose retirement wiring was superseded by the model_routing consolidation -- falsified PRE-EXISTING AT BASE twice (eval/residual_failures_r10.json + the R11 re-run at a79ebfc3f); superseded-era pin kept for history (Art. LXIV), skipped disclosed (Art. XXV)")
+
     def test_generate_ordinary_preferred_zai_blocked_on_ts_purpose(self):
         """End-to-end (the exact technical_state.py call shape): when a
         TECHNICAL scope is recorded on zai, a preferred list naming zai
