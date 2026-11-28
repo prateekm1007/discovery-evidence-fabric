@@ -1,0 +1,41 @@
+{
+ "record": "R187_BRANCH_RECONCILIATION/1.0.0",
+ "kind": "branch integrity repair (DIR 5) — no history rewrite, no temp branch left in the working repo",
+ "at": "2026-11-28",
+ "heads": {
+  "origin/main_before": "9f9164b8e",
+  "origin/queue/dev12_r7": "ce377bd3d048",
+  "audit_kill_ship_before": "eb62d6899",
+  "reconciled_branch": "audit/reconciled-main-20261128"
+ },
+ "measured_defect": {
+  "merge_base_main_and_queue": "936a82d4",
+  "commits_between_base_and_kill_ship": 1052,
+  "tree_diff_main_vs_queue_files": 8507,
+  "tree_diff_main_vs_kill_ship_files": 8508,
+  "consequence": "a fresh clone of the default branch main contained NONE of the kill-ship work (no problem_router.py, no r183 decision)"
+ },
+ "merge": {
+  "strategy": "git merge --no-ff origin/main <- audit/r183-kill-ship-20261128; conflict resolution to the kill-ship/queue lineage (--theirs during the merge) on 7 files, preserving all auto-merged main-only additions (R6 instruments, R516 benchmarks, new tests)",
+  "conflict_files": [
+   ".gitignore",
+   "MODULE_INVENTORY.json",
+   "discovery_fabric/engine/adapters.py",
+   "discovery_fabric/engine/answer_contract.py",
+   "discovery_fabric/engine/independent_attack.py",
+   "discovery_fabric/engine/mechanism_space.py",
+   "discovery_fabric/engine/run.py"
+  ],
+  "why_kill_ship_lineage": "the kill-ship work (problem_router/2.0.0 and the dual-reason grid record in run.py) is the production path under audit; main's two commits add instruments but are not the authoritative engine lineage; main-only additive files survive the merge",
+  "no_history_rewrite": true
+ },
+ "ci": {
+  "command": "python -m pytest tests/test_r178_problem_router.py tests/test_r399_gates.py tests/test_r399_routing_states.py tests/test_remote_ci_rule.py tests/test_article27_capability_budget.py tests/test_article19_metric_unit_tests.py -q",
+  "result": "43 passed",
+  "note": "the article27 engine-share recompute passes in the merged tree via the pre-registered typed enforcement exception (share 6.6% with main's 3000+ added test lines): no gate was gamed by adding engine lines"
+ },
+ "integrity": {
+  "secrets": "0 live values in tracked bytes; keys remain env-only/gitignored (.env.keys)",
+  "governance": "no new constitution articles, round folders or claim kinds"
+ }
+}
