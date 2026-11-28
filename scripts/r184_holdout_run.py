@@ -34,6 +34,9 @@ PLAIN = Path(os.environ.get(
         "r184_holdout.jsonl")))
 TR_MODEL = "deepseek/deepseek-v4.1-flash-1017-free"
 TR_BASE = "https://api.tokenrouter.com/v1"
+# JUDGE SEAT (substitution typed in the prereg 1.1.0): snlite via xkiro
+JUDGE_MODEL = "sensenova/sensenova-6.8-flash-lite"
+JUDGE_BASE = "https://api.xkiro.com/v1"
 AG_MODEL = "agnes-3.0-flash"
 CITE_PAT = re.compile(
     r"\b10\.\d{4,9}/\S+|\b(?:US|WO|EP|CN)\s?\d{6,}|\bet al\.?"
@@ -106,13 +109,20 @@ def agnes(prompt, keys, what=""):
 
 
 def judge(prompt, keys, what=""):
-    body = {"model": TR_MODEL, "max_tokens": 12000,
-            "include_reasoning": False,
+    # SEAT SUBSTITUTION (typed in eval/r184_holdout_prereg.json 1.1.0,
+    # AM52 reseat precedent, measured 2026-11-28 ~02:50Z): the
+    # preregistered tr-deepseek seat is unavailable (TOKENROUTER key
+    # absent from this vault; both xkiro deepseek rungs 503-maintenance).
+    # PRIMARY: snlite (sensenova/sensenova-6.8-flash-lite via xkiro —
+    # the AM51 QUALIFIED serving judge; probe 200; verdict-compliant;
+    # family != generator). Availability-only: same prompt, same bars.
+    body = {"model": JUDGE_MODEL, "max_tokens": 12000,
+            "temperature": 0,
             "messages": [{"role": "user", "content": prompt}]}
     last = None
     for attempt in range(1, 5):
-        st, rsp = _post(TR_BASE + "/chat/completions",
-                        keys["TOKENROUTER_API_KEY"], body)
+        st, rsp = _post(JUDGE_BASE + "/chat/completions",
+                        keys["XKIRO_API_KEY"], body)
         if st == 200:
             ch = (rsp.get("choices") or [{}])[0]
             txt = (ch.get("message") or {}).get("content") or ""
@@ -172,8 +182,24 @@ def verify(text):
 
 def load_corpus():
     pre = json.loads(PREREG.read_text(encoding="utf-8"))["corpus"]
-    raws = [json.loads(l) for l in PLAIN.read_text(
-        encoding="utf-8").splitlines() if l.strip()]
+    # CUSTODY (prereg 1.1.0): the plaintext is decrypted ONCE here from
+    # the committed Fernet ciphertext with the vault key (.env.holdout,
+    # the .env.keys class — never committed); the hash check runs
+    # BEFORE any generator call; the run claim is already pushed.
+    from cryptography.fernet import Fernet
+    cipher = json.loads((REPO / "eval" /
+                         "r184_sealed_holdout_PRIVATE.json")
+                        .read_text(encoding="utf-8"))
+    seal_key = None
+    for line in (REPO / ".env.holdout").read_text().splitlines():
+        if line.startswith("HOLDOUT_V13_SEAL_KEY="):
+            seal_key = line.split("=", 1)[1].strip()
+    if not seal_key:
+        raise RuntimeError("HOLDOUT_BURN: seal key absent from vault — "
+                           "no run performed")
+    pt = Fernet(seal_key.encode()).decrypt(
+        cipher["ciphertext"].encode())
+    raws = json.loads(pt)["items"]
     got_corpus = hashlib.sha256(b"".join(canon(r) for r in raws)).hexdigest()
     got_items = [hashlib.sha256(canon(r)).hexdigest() for r in raws]
     if (got_corpus != pre["corpus_hash_sha256"] or
@@ -238,7 +264,7 @@ def run_one(prob, keys, workers):
         "problem_id": pid, "status": "JUDGED",
         "generator": {"model": AG_MODEL, "transport": "direct-agnes-api",
                       "calls_baseline": 6, "calls_pipeline": 6},
-        "judge": {"seat": "tr-deepseek", "model": TR_MODEL,
+        "judge": {"seat": "snlite-xkiro", "model": JUDGE_MODEL,
                   "workers": workers},
         "baseline_text": baseline, "pipeline_text": pipeline,
         "deterministic_verifier": v,
