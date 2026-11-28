@@ -59,16 +59,15 @@ def test_invention_routes_to_cheap_arm_after_kill():
     assert "16/24" in v["basis"]
 
 
-def test_unknown_type_conservatively_takes_architecture():
+def test_unknown_type_takes_cheap_arm_after_kill():
     for problem in ({"question_type": ""},
                     {"question_type": "predictor-design"},
                     {}, {"question_type": "SOMETHING-NEW"}):
         v = route_for_problem(problem)
-        assert v["route"] == "ARCHITECTURE", problem
-        assert v["known"] is False
-        # nothing silently lost on an unclassified problem
+        assert v["route"] == "CHEAP_ARM", problem
+        assert v["known"] is False  # the missing class is typed, never invented
         d = route_disabled_stages(problem)
-        assert d["disabled_stages"] == []
+        assert d["disabled_stages"] == ["EXPLORATION_GRID"]
 
 
 def test_declared_type_is_authority_verbatim():
@@ -135,11 +134,14 @@ def test_conductor_skips_grid_for_mitigation(tmp_path, monkeypatch):
                          "SYNTHESIZE", "COLLISION", "ATTACK"])
     manifest = run2.run()
     grid = json.loads((tmp_path / "EXPLORATION_GRID.json").read_text())
-    assert grid["status"] == "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+    # R183: every class routes cheap; the fixture also has unverified
+    # evidence, so the record carries BOTH typed reasons (Art. XXV)
+    assert grid["status"] == "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+    assert grid["route_skip_status"] == "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
     assert grid["route"]["route"] == "CHEAP_ARM"
     assert grid["route"]["problem_class"] == "intervention-proposal"
     # the measured basis rides the record (Art. XXV)
-    assert "1/12" in grid["reason"]
+    assert "1/12" in grid["route"]["basis"]
     # NO grid candidates were generated
     assert not list(tmp_path.glob("INVENTION_SPECIFICATION_grid-*.json"))
     # the run record carries the route decision
@@ -165,11 +167,13 @@ def test_conductor_skips_grid_for_invention_after_kill(tmp_path):
                          "SYNTHESIZE", "COLLISION", "ATTACK"])
     run2.run()
     grid = json.loads((tmp_path / "EXPLORATION_GRID.json").read_text())
-    assert grid["status"] == "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
-    assert "R183 KILL" in grid["reason"]
+    assert grid["status"] == "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+    assert grid["route_skip_status"] == "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+    assert grid["route"]["route"] == "CHEAP_ARM"
+    assert "R183 KILL" in grid["route"]["basis"]
 
 
-def test_conductor_unclassified_takes_architecture(tmp_path):
+def test_conductor_unclassified_takes_cheap_arm(tmp_path):
     from tests.test_r399_gates import _rejected_run_env
     env = _rejected_run_env()
     env.problem = {k: v for k, v in MITIGATION.items()
@@ -185,4 +189,7 @@ def test_conductor_unclassified_takes_architecture(tmp_path):
                          "SYNTHESIZE", "COLLISION", "ATTACK"])
     run2.run()
     grid = json.loads((tmp_path / "EXPLORATION_GRID.json").read_text())
-    assert grid["status"] != "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+    assert grid["status"] == "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+    assert grid["route_skip_status"] == "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+    assert grid["route"]["route"] == "CHEAP_ARM"
+    assert grid["route"]["known"] is False

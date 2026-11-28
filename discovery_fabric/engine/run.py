@@ -2143,13 +2143,42 @@ class EngineRun:
                 _route_cheap = (_route["route"] == "CHEAP_ARM" and
                                 "EXPLORATION_GRID" in
                                 _route["disabled_stages"])
-                if _route_cheap:
-                    pass  # typed record already persisted above
                 _grid_entry = stage_entry.justify(
                     "EXPLORATION_GRID", self.env, self.failed_stages,
                     self._skipped_stages)
                 if _route_cheap:
-                    _grid_status = "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                    # R183: the grid is disabled on EVERY problem class by
+                    # the kill decision. The route-skip record persisted at
+                    # the section head is preserved; if the R399 evidence
+                    # gate ALSO fires, merge its typed attribution into
+                    # that record so the reason is never silently lost
+                    # (Art. XXV: a skip is a recorded refusal, never
+                    # absence; no grid candidates are generated on either
+                    # branch).
+                    _rec = json.loads(
+                        (self.out / "EXPLORATION_GRID.json").read_text(
+                            encoding="utf-8"))
+                    _ve = stage_entry.verified_evidence_prerequisite(
+                        self.env)
+                    if not _ve["satisfied"]:
+                        _rec["status"] = \
+                            "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+                        _rec["entry"] = _grid_entry
+                        _rec["reason"] = (
+                            _grid_entry.get("skip_reason")
+                            + "; the naive candidate stays dead (its own "
+                              "verification failed); no grid candidates "
+                              "were generated on unverified evidence "
+                              "(R399 W2.3); the grid is also disabled by "
+                              "route on every problem class after the "
+                              "R183 kill")
+                        _rec["route_skip_status"] = \
+                            "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                        _grid_status = \
+                            "SKIPPED_EVIDENCE_VERIFICATION_FAILED"
+                    else:
+                        _grid_status = "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+                    self._persist("EXPLORATION_GRID.json", _rec)
                 elif _grid_entry["entry_status"] == "SKIPPED":
                     self._persist("EXPLORATION_GRID.json", {
                         "status": "SKIPPED_EVIDENCE_VERIFICATION_FAILED",
