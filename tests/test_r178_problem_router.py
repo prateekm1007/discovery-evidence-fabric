@@ -49,12 +49,14 @@ def test_mitigation_routes_to_cheap_arm():
     assert "eval/r177s1_dir3_keep_retire.json" in v["basis"]
 
 
-def test_invention_routes_to_architecture():
+def test_invention_routes_to_cheap_arm_after_kill():
     v = route_for_problem(INVENTION)
-    assert v["route"] == "ARCHITECTURE"
+    assert v["route"] == "CHEAP_ARM"
     assert v["problem_class"] == "novel-mechanism"
     assert v["known"] is True
-    assert "AM53" in v["basis"]
+    # the byte-derived kill basis rides the typed record (Art. XXV)
+    assert "R183 KILL" in v["basis"] and "4/12" in v["basis"]
+    assert "16/24" in v["basis"]
 
 
 def test_unknown_type_conservatively_takes_architecture():
@@ -80,15 +82,15 @@ def test_route_disabled_stages_union_with_caller():
     d = route_disabled_stages(MITIGATION, extra=["COMPOSE", "RETRIEVE"])
     assert "EXPLORATION_GRID" in d["disabled_stages"]
     assert "COMPOSE" in d["disabled_stages"] and "RETRIEVE" in d["disabled_stages"]
-    # invention: the route adds NOTHING — the caller's set is untouched
+    # invention: post-kill the route also disables the grid
     d2 = route_disabled_stages(INVENTION, extra=["COMPOSE"])
-    assert d2["disabled_stages"] == ["COMPOSE"]
-    assert d2["route"] == "ARCHITECTURE"
+    assert d2["disabled_stages"] == ["EXPLORATION_GRID", "COMPOSE"]
+    assert d2["route"] == "CHEAP_ARM"
 
 
 def test_router_version_stamped():
     assert route_for_problem(MITIGATION)["router_version"] \
-        == ROUTER_VERSION == "problem_router/1.0.0"
+        == ROUTER_VERSION == "problem_router/2.0.0"
 
 
 # ---------------------------------------------------------------------------
@@ -146,10 +148,9 @@ def test_conductor_skips_grid_for_mitigation(tmp_path, monkeypatch):
     assert manifest is not None
 
 
-def test_conductor_runs_grid_for_invention(tmp_path):
-    """An INVENTION-shaped problem with the same fixture chain must NOT
-    take the route skip — the architecture runs unchanged (the AM53
-    gate is its standing acceptance)."""
+def test_conductor_skips_grid_for_invention_after_kill(tmp_path):
+    """An INVENTION-shaped problem now takes the same typed route skip:
+    the R183 kill decision retired the architecture for every class."""
     from tests.test_r399_gates import _rejected_run_env
     env = _rejected_run_env()
     env.problem = dict(INVENTION)
@@ -164,7 +165,8 @@ def test_conductor_runs_grid_for_invention(tmp_path):
                          "SYNTHESIZE", "COLLISION", "ATTACK"])
     run2.run()
     grid = json.loads((tmp_path / "EXPLORATION_GRID.json").read_text())
-    assert grid["status"] != "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+    assert grid["status"] == "SKIPPED_ROUTE_MITIGATION_CHEAP_ARM"
+    assert "R183 KILL" in grid["reason"]
 
 
 def test_conductor_unclassified_takes_architecture(tmp_path):

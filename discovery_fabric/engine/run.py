@@ -2084,15 +2084,15 @@ class EngineRun:
             _grid_status: Optional[str] = None
             _cctx.set_stage("POST_RANK_GRID")
             _pra_start("GRID")
-            # R178 DIR-3 SHIP: the problem-class route split. The
-            # typed router decides from the problem's OWN declared
-            # question_type (never re-derived here): mitigation
-            # problems (intervention-proposal) take the CHEAP arm —
-            # the exploration grid is DISABLED with a typed, persisted
-            # record carrying the measured basis (the r177s1 DIR-3
-            # recompute); invention-shaped problems (novel-mechanism)
-            # and unclassified problems run the full architecture
-            # unchanged (the conservative default loses nothing).
+            # R183 KILL SHIP: the typed router now sends EVERY problem
+            # class to the CHEAP arm (problem_router/2.0.0, basis
+            # eval/r183_kill_decision.json). The exploration grid is
+            # DISABLED with a typed, persisted record carrying the
+            # measured basis on both classes: mitigation 1/12 genuine
+            # (r177s1), invention 4/12 CI-lower 0.138 with paired
+            # collider delta 0.0 (r183). The skip label keeps its
+            # historical string for byte compatibility; the verifier
+            # legs are never disabled.
             from .problem_router import route_disabled_stages
             _route = route_disabled_stages(self.problem or {})
             if _route["route"] == "CHEAP_ARM" and \

@@ -1,5 +1,8 @@
-"""discovery_fabric/engine/problem_router.py — R178 DIR-3 SHIP: the
-problem-class route split (the kill criterion made engine policy).
+"""discovery_fabric/engine/problem_router.py — R183 KILL SHIP: every
+problem class routes to the cheap arm (the kill criterion made engine
+policy for invention as well as mitigation). Supersedes the R178
+problem-class route split (problem_router/1.0.0); the byte-derived
+basis is eval/r183_kill_decision.json.
 
 THE MEASURED BASIS (V138 / r177s1 DIR-3 record, all numbers recomputed
 from the committed pair bytes of eval/r175s3_dir3/ + eval/r175_compute_
@@ -10,11 +13,13 @@ one contradiction win), departure 0/12, dominance ties 7/12 (the
 pipeline emitted the baseline's own answer), plain best-of-N wins
 2/12; the compute-matched non-loss (0.75 win+tie CI[0.428,0.945]) is
 achieved by the best-of-N + critique + revise recipe itself at the
-same 6-call budget. Per the reviewer's kill criterion (AM52/AM53):
-ship best-of-N + verifier for mitigation; reserve the multi-stage
-architecture where it must PROVE invention value (question_type
-"novel-mechanism", the r176 shape — the AM53 gate is the standing
-acceptance there).
+same 6-call budget. THE R183 KILL EXTENDS THIS TO THE INVENTION CLASS
+(eval/r183_kill_decision.json, independent recompute
+eval/r183_collider_run/tally.json): genuine 4/12 (33.3%, Wilson CI lower
+0.138), paired collider delta 0.0, 0 collision champions; from 4 wins
+at n=12 even 12/12 remaining gives 16/24 < 17, so the >=17/24 gate is
+mathematically unreachable. Both measured classes now ship best-of-N +
+critique + revise + verifier.
 
 WHAT THIS MODULE DOES (deterministic, zero LLM):
   * classify(problem) -> a typed ROUTE verdict from the problem's own
@@ -26,12 +31,13 @@ WHAT THIS MODULE DOES (deterministic, zero LLM):
     unknown/missing question_type (ARCHITECTURE — the conservative
     default: the multi-stage path is the one that must justify itself,
     so unknown shapes keep the full gauntlet, never silently lose it);
-  * the grid-disable set the EngineRun conductor consumes: mitigation
-    problems run with the exploration grid DISABLED (typed
-    SKIPPED_ROUTE_MITIGATION_CHEAP_ARM, persisted in the grid record
-    with the measured basis) while ensemble + composer verifier stay
-    on (the cheap arm); invention-shaped problems run the full
-    architecture unchanged.
+  * the grid-disable set the EngineRun conductor consumes: BOTH measured
+    problem classes run with the exploration grid DISABLED (typed
+    SKIPPED_ROUTE_MITIGATION_CHEAP_ARM — the historical label is kept for
+    byte compatibility — persisted in the grid record with the measured
+    basis) while ensemble + composer verifier stay on (the cheap arm);
+    unclassified packets keep the conservative full-architecture
+    fallback until they are classified.
 
 WHAT IT DOES NOT DO: no routing on domain keywords, no heuristics, no
 prompt changes, no verifier weakening (the composer's deterministic
@@ -42,34 +48,35 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-ROUTER_VERSION = "problem_router/1.0.0"
+ROUTER_VERSION = "problem_router/2.0.0"
 
-#: question_type -> route. The two MEASURED classes are wired; any
-#: other declared type conservatively routes to the ARCHITECTURE (the
-#: full gauntlet) — unknown shapes never silently lose stages.
+#: question_type -> route. BOTH measured classes are now CHEAP_ARM:
+#: mitigation was retired at 1/12 genuine (8.3%, r177s1) and the
+#: invention class at 4/12 genuine (33.3%, CI lower 0.138, paired
+#: collider delta 0.0, 0 collision champions — eval/r183_kill_decision.json,
+#: independently recomputed in eval/r183_collider_run/tally.json).
+#: The >=17/24 gate was mathematically unreachable from the landed
+#: bytes (4 + 12 remaining = 16 < 17). An UNCLASSIFIED packet keeps the
+#: conservative full-architecture fallback until it is classified;
+#: the verifier still runs on every problem (never a cost lever).
 _KNOWN_ROUTES: Dict[str, str] = {
-    # the mitigation-correctness shape (f31e): the kill criterion
-    # measured the multi-stage grid at 8.3% genuine value-add — RETIRED
-    # for this class; the cheap arm (ensemble best-of-N + composer
-    # validate-repair verifier) serves it.
     "intervention-proposal": "CHEAP_ARM",
-    # the invention shape (r176): the multi-stage architecture runs;
-    # its standing acceptance is the AM53 genuine-novel-win gate.
-    "novel-mechanism": "ARCHITECTURE",
+    "novel-mechanism": "CHEAP_ARM",
 }
 
 #: the grid-disable set per route. CHEAP_ARM disables the exploration
 #: grid (the multi-candidate multi-angle generator — the measured
-#: no-op leg on mitigation); ARCHITECTURE disables nothing (the
+#: no-op leg on BOTH problem classes); ARCHITECTURE is retained only
+#: as a typed legacy value (no problem class routes to it now; the
 #: conductor's own disabled_stages list still applies on top).
 _GRID_DISABLE: Dict[str, List[str]] = {
     "CHEAP_ARM": ["EXPLORATION_GRID"],
     "ARCHITECTURE": [],
 }
 
-#: the measured basis string carried in every typed skip record (the
-#: numbers are the r177s1 DIR-3 recompute from committed bytes; the
-#: record cites the artifacts so the auditor can re-derive them).
+#: the byte-derived basis carried in every typed skip record. Two
+#: independent recomputes, one per problem class, both from committed
+#: pair bytes; the auditor can re-derive from the cited artifacts.
 _MITIGATION_BASIS = (
     "DIR-3 kill criterion (r177s1 eval/r177s1_dir3_keep_retire.json, "
     "V138): on mitigation problems the multi-stage exploration grid "
@@ -83,18 +90,22 @@ _MITIGATION_BASIS = (
 )
 
 _ARCHITECTURE_BASIS = (
-    "invention-shaped problem (question_type novel-mechanism, the r176 "
-    "corpus shape): the multi-stage architecture runs unchanged; its "
-    "standing acceptance is the AM53 genuine-novel-candidate-win gate "
-    "(>=50% genuine wins, dominance ties and plain best-of-N wins "
-    "excluded, auditor-judged blind, CI lower >50% at n>=24)"
+    "R183 KILL (eval/r183_kill_decision.json, independent recompute "
+    "eval/r183_collider_run/tally.json): the invention class is RETIRED "
+    "too — genuine novel-candidate wins 4/12 (33.3%, Wilson CI "
+    "[0.138,0.609]), paired collider delta 0.0, 0 collision champions, "
+    "dominance ties 4/12 and plain best-of-N wins 4/12 excluded per "
+    "AM53; from 4 wins at n=12 even 12/12 remaining gives 16/24 < 17, "
+    "so the >=17/24 score-4 gate is mathematically unreachable. Ship "
+    "best-of-N + critique + revise + verifier for every problem class."
 )
 
 _UNKNOWN_BASIS = (
-    "question_type missing or not in the measured route table — the "
-    "conservative default is the FULL architecture (no stage is "
-    "silently lost on an unclassified problem); classify the corpus "
-    "item to take a measured route"
+    "question_type missing or not in the measured route table — after "
+    "the R183 kill decision BOTH measured classes (mitigation + "
+    "invention) route to the cheap arm; an unclassified packet keeps the "
+    "conservative FULL-architecture fallback (no stage is silently lost "
+    "before it is classified); classify the item to take the cheap arm"
 )
 
 
@@ -116,8 +127,8 @@ def route_for_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
             "route": route,
             "problem_class": qtype,
             "known": True,
-            "basis": (_MITIGATION_BASIS
-                      if route == "CHEAP_ARM" else _ARCHITECTURE_BASIS),
+            "basis": (_MITIGATION_BASIS if qtype == "intervention-proposal"
+                      else _ARCHITECTURE_BASIS),
             "router_version": ROUTER_VERSION,
         }
     return {
@@ -148,13 +159,14 @@ def route_disabled_stages(problem: Dict[str, Any],
             disabled.append(stage)
     note = ""
     if verdict["route"] == "CHEAP_ARM":
-        note = ("mitigation class: the exploration grid is disabled by "
-                "the measured route (the cheap arm — ensemble best-of-N "
+        note = ("kill criterion: the exploration grid is disabled on "
+                "every problem class (the cheap arm — ensemble best-of-N "
                 "+ the composer validate-repair verifier — serves this "
                 "class); every verifier leg stays on")
     elif not verdict["known"]:
         note = ("unclassified problem: full architecture (conservative "
-                "default; nothing silently lost)")
+                "fallback; both measured classes route to the cheap "
+                "arm; classify the item to take that route)")
     return {
         "disabled_stages": disabled,
         "route": verdict["route"],
