@@ -1,0 +1,46 @@
+{
+ "record": "R186S1_BUILDER_STATUS/1.0.0",
+ "session": "builder-r186s1",
+ "lane": "owner-R186 DIR-1/DIR-2 byte verification + DIR-1 kill-decision documentation + DIR-3 ablation (lane yielded to peer takeover) + DIR-6 audit + DIR-7 analysis",
+ "round_date": "2026-11-28",
+ "sandbox_clock": "TRUE UTC",
+ "base_state": "queue tip 4910345c3 at session start (r185s2 close: holdout 24/24 complete, SCORE_4_GATE_MET evidence submitted)",
+ "claims": {
+  "c-0297": "r176-kill-decision-summary (EXECUTOR, DONE) — DIR-1 documentation from bytes",
+  "c-0298": "r186s1-ablation-shipped-recipe (EXECUTOR -> STOOD DOWN per Art. 29(e) on the peer takeover c-0299; 8/24 bytes measured and pushed for adoption)"
+ },
+ "completed": [
+  "DIR 1 (verification): the repo bytes CONFIRMED the owner's observation — eval/r176_invention_run/ holds 4 pair files and had no SUMMARY. The full byte picture: the r176 directory holds items 1-4 as originally landed; the instrument's byte-authoritative continuation is eval/r183_collider_run/ (12 pairs, same corpus/prompts/recipe/exclusions + the collision arm; items 5-12 judged there after the collider port). The kill decision (R183 8f7fb28f2) was taken on THOSE 12 bytes.",
+  "DIR 1 (documentation): eval/r176_invention_run/SUMMARY.json written (commit 0b2e541cb) — every number recomputed from pair bytes in-process, zero generator/judge calls: taxonomy at n=12 = 4 genuine (r176i-02/-06/-07/-12) + 4 dominance ties + 4 plain best-of-N, Wilson 95% CI [0.138, 0.333, 0.609]; KILL MATH: 4 + all 12 remaining = 16 < 17 — the >=17/24 gate is mathematically unreachable, so a completion run cannot change the verdict. The kill was already applied and shipped (problem_router/2.0.0); the shipped recipe then passed the fresh r184 holdout (22/24, CI lower 0.742).",
+  "DIR 2 (verification): r184 corpus hash re-verified from the committed author script (8c1dffb4... MATCH); all 24 holdout pair bytes byte-identical to the queue tip; Wilson CI [0.742, 0.917, 0.977] independently recomputed — gate MET (verdict record eval/r184_holdout_gate_verdict.json at a6c607f4f; the peer takeover commit a16d767ee independently re-verified and typed score 4 ratified V143). The owner's 'R182S1 HOLDOUT RUN CHECKPOINT 5/24' sighting = the r178h-era self-authored holdout run that was VOIDED (audit-branch commit 3e49b26cf: 'NOT the auditor's sealed set; no score claim') — the r178h seal key died with its sandbox (uncustodied), and the fresh r184 holdout (auditor instrument, c-0296) replaced it.",
+  "DIR 3 (ablation, yielded): the runner committed BEFORE any byte (65ad3a966; arms FULL 6-call vs NO_CRITIQUE_REVISE 4-call, paired shared-draws design, panel hy4+qwen both != agnes generator, keep-rule pre-declared: critique+revise kept only if paired-delta Wilson CI lower > 0). 8/24 items measured (1W/5T/2L, wins+ties 6/8; verifier 8/8 OK both arms, 0 fabricated citations, 0 fallbacks) when the peer session builder-r159s2 pushed takeover c-0299 (a16d767ee) believing this sandbox had recycled with 0 bytes. ART. 29(e) DISPOSITION: stood down to VERIFIER, killed the local driver before double-burning judge quota, rebased the 8 bytes + the stand-down record onto the takeover and pushed (c05f0e3cd, bd38c4a85) for the peer EXECUTOR to adopt (byte-adoption, not re-run; digests in eval/r186s1_standdown_reconciliation.json). Transport intelligence handed over: hy4 cent-ai intermittently 200-with-EMPTY-content on real 9-10K-char prompts (resolves via backoff; probe at 2000 max_tokens = verdict-parsed); qwen fast/stable.",
+  "DIR 6 (audit): governance freeze HELD (no new articles/round folders/claim kinds; the score-4 gate met at a6c607f4f is the first measured win and the freeze lift is the auditor's call — the peer's V143 ratification is the trigger event). Root count verified from bytes: 218 tracked root entries (the r178 DIR-8 accept stands; 12 zero-ref dirs archived at tag archive/r309-r549-pre-scrub-20261127, ARCHIVE_MANIFEST.json carries the record).",
+  "DIR 7 (analysis, merge NOT executed): origin/main carries 2 commits not on the queue (cddc03577 .gitignore AWS OAuth patterns; 9f9164b8e the R6 audit closure, 33 files) with a 13-file overlap vs the queue's 1066-commit lead (run.py, answer_composer, adapters...). The merge needs a careful conflict pass on engine files (queue's 928-line run.py delta vs main's 12) — NOT started this session (the peer lane is active on the ablation and a mid-lane engine-file merge would collide). Typed as the next session's first action."
+ ],
+ "honest_disclosures": [
+  "the owner's DIR-1 '15/24 pairs, 8W/5T/2L' interim figures describe the r184 HOLDOUT run, not the r176 invention run — the two are distinct instruments; the invention-run bytes are 4 (r176 dir) + 12 (r183 continuation)",
+  "the owner's R182s1 '5/24' holdout sighting is the VOIDED self-authored run (3e49b26cf), replaced by the auditor-authored r184 holdout",
+  "the ablation did not complete this session — 8/24 bytes measured, lane yielded to the peer takeover per Art. 29(e); the keep/prune verdict and the <=12 calls / <=2 min median latency measurement land with the peer's completion (interim from 8 items: FULL 6 calls vs ARM 4 calls per item — both far under the 12-call target; wall 90.8-978.5s, median ~620s — ABOVE the 2-min target, dominated by hy4 retry storms; the qwen legs alone run ~90-200s)",
+  "the CTAI seat is 500-dead this session (typed; the takeover commit says the vault ctai key is live and is a DIFFERENT key from the burned ctai_dm38 — both true: the 500 is server-side, not auth)"
+ ],
+ "art27_capability_budget": {
+  "engine_diff": "ZERO engine lines this round (verification + documentation + measurement round — the ablation runner is an instrument script, not engine code); custody/verification round",
+  "share_exception_reason": "VERIFICATION/CUSTODY/MEASUREMENT round (the owner's DIR-1/DIR-2 byte-verification + DIR-1 kill-decision documentation + the DIR-3 ablation instrument; zero engine code by design — Art. 27's own allowance for verification rounds; the primary payload is the typed evidence records, not engine behavior)",
+  "primary_metric_delta": "no scoreboard metric moved this session; the score-4 gate evidence (a6c607f4f) stands, and the peer takeover a16d767ee types V143 ratification — score 4",
+  "deletions": "ZERO deletions (freeze held)"
+ },
+ "remote_ci": {
+  "pushed_sha": "bd38c4a85",
+  "remote_ci_conclusion": "pending",
+  "note": "the conclusion is read from the API after the push; the earlier commits 0b2e541cb/65ad3a966 pushed clean; the next session quotes the API verdict for bd38c4a85 (typed pending, never an asserted success)"
+ },
+ "next_bound": [
+  "the peer EXECUTOR completes the ablation (adopting the 8 pushed bytes), lands the tally + keep/prune verdict + the calls/latency measurement",
+  "DIR 7 branch reconciliation (the 2-commit main merge with the 13-file engine overlap) as its own claim",
+  "the auditor's freeze-lift decision post-V143"
+ ],
+ "owner_requests": [
+  "none human-required"
+ ],
+ "base_sha": "4910345c3 (queue tip at session start)"
+}
