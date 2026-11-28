@@ -28,16 +28,16 @@ WHAT THIS MODULE DOES (deterministic, zero LLM):
     at the corpus, not silently re-routed);
   * route_for_problem(problem) -> {"route": "CHEAP_ARM"|"ARCHITECTURE",
     "problem_class": ..., "basis": ...} with a typed fallback for
-    unknown/missing question_type (ARCHITECTURE — the conservative
-    default: the multi-stage path is the one that must justify itself,
-    so unknown shapes keep the full gauntlet, never silently lose it);
+    unknown/missing question_type (CHEAP_ARM — after the R183 kill there
+    is no architecture class left; the missing class is still recorded
+    as problem_class + known=False, never silently invented);
   * the grid-disable set the EngineRun conductor consumes: BOTH measured
     problem classes run with the exploration grid DISABLED (typed
     SKIPPED_ROUTE_MITIGATION_CHEAP_ARM — the historical label is kept for
     byte compatibility — persisted in the grid record with the measured
     basis) while ensemble + composer verifier stay on (the cheap arm);
-    unclassified packets keep the conservative full-architecture
-    fallback until they are classified.
+    unclassified packets take the same cheap arm, with their missing
+    class recorded typed (known=False).
 
 WHAT IT DOES NOT DO: no routing on domain keywords, no heuristics, no
 prompt changes, no verifier weakening (the composer's deterministic
@@ -56,8 +56,8 @@ ROUTER_VERSION = "problem_router/2.0.0"
 #: collider delta 0.0, 0 collision champions — eval/r183_kill_decision.json,
 #: independently recomputed in eval/r183_collider_run/tally.json).
 #: The >=17/24 gate was mathematically unreachable from the landed
-#: bytes (4 + 12 remaining = 16 < 17). An UNCLASSIFIED packet keeps the
-#: conservative full-architecture fallback until it is classified;
+#: bytes (4 + 12 remaining = 16 < 17). An UNCLASSIFIED packet takes the
+#: same cheap arm (its missing class is recorded typed as known=False);
 #: the verifier still runs on every problem (never a cost lever).
 _KNOWN_ROUTES: Dict[str, str] = {
     "intervention-proposal": "CHEAP_ARM",
@@ -102,10 +102,11 @@ _ARCHITECTURE_BASIS = (
 
 _UNKNOWN_BASIS = (
     "question_type missing or not in the measured route table — after "
-    "the R183 kill decision BOTH measured classes (mitigation + "
-    "invention) route to the cheap arm; an unclassified packet keeps the "
-    "conservative FULL-architecture fallback (no stage is silently lost "
-    "before it is classified); classify the item to take the cheap arm"
+    "the R183 kill decision there is NO architecture class left: every "
+    "problem, classified or not, routes to the cheap arm (best-of-N + "
+    "critique + revise + verifier); the declared type is still recorded "
+    "verbatim as problem_class and known=False (typed, never invented); "
+    "the composer verifier runs on every problem"
 )
 
 
@@ -132,7 +133,7 @@ def route_for_problem(problem: Dict[str, Any]) -> Dict[str, Any]:
             "router_version": ROUTER_VERSION,
         }
     return {
-        "route": "ARCHITECTURE",
+        "route": "CHEAP_ARM",
         "problem_class": qtype or "<unclassified>",
         "known": False,
         "basis": _UNKNOWN_BASIS,
@@ -164,9 +165,9 @@ def route_disabled_stages(problem: Dict[str, Any],
                 "+ the composer validate-repair verifier — serves this "
                 "class); every verifier leg stays on")
     elif not verdict["known"]:
-        note = ("unclassified problem: full architecture (conservative "
-                "fallback; both measured classes route to the cheap "
-                "arm; classify the item to take that route)")
+        note = ("unclassified problem: the cheap arm (the R183 kill "
+                "retired the architecture for every packet; the missing "
+                "class is recorded typed, never invented)")
     return {
         "disabled_stages": disabled,
         "route": verdict["route"],
