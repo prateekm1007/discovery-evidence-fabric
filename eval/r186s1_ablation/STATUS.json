@@ -1,11 +1,14 @@
 {
- "record": "R186S1_ABLATION_STATUS/1.1.0",
- "session": "builder-r159s2",
- "date": "2026-11-28T14:0xZ",
+ "record": "R186S1_ABLATION_STATUS/1.2.0",
+ "session": "builder-r159s2 (r191s2 lane)",
+ "date": "2026-11-28T16:2xZ",
  "claim": "c-0299",
- "state": "IN-FLIGHT — 15/24 pair files complete (items 16-24 firing in this sandbox; the push carries all landed bytes; byte-resume from these files next session)",
- "interim_tally": {"items": 15, "WIN": 2, "TIE": 11, "LOSS": 2, "note": "interim only — the pre-declared keep-rule applies at n=24: critique+revise KEPT only if FULL beats NO_CRITIQUE_REVISE on wins+ties with paired-delta Wilson 95% CI lower > 0, else PRUNED (problem_router 2.1.0: 6->4 calls/item)"},
- "early_reading": "at 15/24 the FULL arm leads 2W vs 2L with 11 ties — the paired delta is NOT yet separating from zero; if this holds to n=24 the keep-rule will prune critique+revise (the honest outcome either way: a measured simplification)",
- "transport_state": "hy4 budget 4000 (fixed, working); qwen3.8 xkiro now cycling 429s with the 120s ladder (all legs eventually landing — free-lane shape, not a death); 0 interventions; 0 fabricated citations so far",
- "phase_verification": "eval/r187s2_phase_verification.json (same commit): the directions' Phase 1-3 verified from bytes with corrections typed (1/4 genuine by the field recipe, not 4/24; kill correctly applied; holdout seal chain intact and SPENT; router all-CHEAP_ARM)"
+ "state": "21/24 pair files complete; items 22-24 were IN-FLIGHT at session close (driver killed by the sandbox boundary; NO re-roll risk — the runner is byte-resume and one-shot per (item, leg); items 22-24 restart from zero legs next session)",
+ "interim_tally": {"n": 21, "WIN": 2, "TIE": 17, "LOSS": 2, "paired_delta": 0.0},
+ "keep_rule_reading": "at n=21 the paired delta is EXACTLY 0.000 — critique+revise shows NO net effect; the registered keep rule (paired-delta Wilson lower > 0) is already UNREACHABLE unless items 22-24 produce +3 wins (needs 3/3 WINS: probability ~nil given 17/21 ties). The keep-rule verdict will be formalized at n=24 next session: PRUNE critique+revise (6->4 calls/item, problem_router 2.1.0).",
+ "disclosures": [
+  "the OLD driver (PID 16196, from the pre-recycle session) was found ALIVE at session start racing the new driver on item 17 — killed immediately; item 17's judge legs may have been double-fired (judge quota only; the pair file itself is single-written). Typed here, never hidden.",
+  "qwen3.8 xkiro cycled 429s the whole session: every qwen leg either landed after the 120s ladder or typed TYPED_JUDGE_FAILURE after 4 attempts (honestly recorded in the pair votes; never re-rolled)"
+ ],
+ "resume_next_session": "1) probe seats; 2) python3 scripts/r186s1_ablation_run.py (items 22-24 resume); 3) tally + formal keep-rule verdict; 4) if PRUNE (expected): problem_router 2.1.0 with 4 calls/item; 5) then fire the 24-item single-arm latency run (scripts/r191s2_singlearm_latency.py — smoke-tested: item-01 96.5s/6 calls) and the 20-item MOOSE-Chem rediscovery run (scripts/inspiration_retrieval.py)"
 }
