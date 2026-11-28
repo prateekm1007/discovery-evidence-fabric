@@ -1,0 +1,56 @@
+{
+ "record": "R184_HOLDOUT_PREREG/1.0.0",
+ "kind": "sealed-holdout-preregistration",
+ "authored_at": "2026-11-28T03:20:00Z (sandbox clock, TRUE UTC)",
+ "authority": "owner DIR 5 (AM54 score-4 gate, re-scoped after R184-F1: the r178h seal key custody was lost in the recycle; the fresh seal rides the .env-keys-class vault discipline)",
+ "session": "builder-r184s1",
+ "claim": "c-0296 (the authoring claim; the RUN takes its own claim before execution — Art. 29(b))",
+ "question": "On a SEALED 24-item invention-shaped holdout (24 domains disjoint from the r176 DEV corpus; every plateau fundamental; every constraint excludes the incumbent mitigation by construction), does the SHIPPED recipe (best-of-N + critique + revise + verifier, 6 calls) beat the COMPUTE-MATCHED single-shot baseline (1 call, same budget ceiling) on blind judged WINS+TIES with Wilson 95% CI LOWER bound > 50%?",
+ "arms": {
+  "A_shipped_recipe": "4 plain draws + critique + revise (6 generator calls — the shipped CHEAP_ARM recipe, verbatim from scripts/r176_invention_run.py's baseline arm; router 2.0.0 policy)",
+  "B_compute_matched_single_shot": "1 single-shot draw, max_tokens ceiling equal to the sum ceiling of arm A (compute-matched on budget, not on calls — the baseline gets the SAME total token headroom)"
+ },
+ "judge": "blind two-pass, order-swapped (XY then YX), WIN only when the arm wins its non-swapped presentation on both passes (the r176 instrument verbatim); judge seat tr-deepseek (deepseek/deepseek-v4.1-flash-1017-free via TOKENROUTER, the live measured seat) != generator family (agnes); Art. 26 spread held",
+ "scoring_rule_predeclared": "Wilson score 95% CI on A-wins+ties over n=24; the gate is the CI LOWER bound > 50% (AM52/AM54: the score moves ONLY on a measured win over a compute-matched baseline)",
+ "exclusions": "NONE this time — both arms are the recipe's own outputs; dominance ties and plain best-of-N classes do not exist in this design (there is no tournament, no strategy pool — the kill retired them); TIES count toward the arm (wins+ties)",
+ "run_protocol": {
+  "one_shot": true,
+  "one_run": "one run per item; no re-rolls; no tuning of prompts/parameters on any holdout byte before or between items; infra failures typed and resumed (byte-resume), never re-rolled",
+  "trigger": "run ONCE, only after this prereg is committed AND the run claim is pushed; decrypt ONCE at run start; verify the corpus hash + all 24 item hashes; burn the vault key line after the run",
+  "power_note": "at n=24 the Wilson lower bound exceeds 0.50 only at >= 15/24 wins+ties (0.625 point); anything less is UNRESOLVED, never failed-passed (Art. 14)"
+ },
+ "corpus": {
+  "ciphertext_file": "eval/r184_sealed_holdout_PRIVATE.json",
+  "corpus_hash_sha256": "274f7a97557f13ad7ec44464da508c2789f7680baa73d165dba9ddf90c36856e",
+  "item_hashes_sha256": [
+   "50cb917f0c50b55b188e62d91d7cd6e28924c2f002453253559e4499777897ce",
+   "2f13ab46c2759b93162f10f0448191e0695efd1fe874311165b4f6d94f57fe4e",
+   "80eb3a58321b846dbd43966e3d532ac4681263d14158f66e5888af0d25462b4a",
+   "b0b3ff7b2513551f13941896e35f059bb38cc1b4c9342c2d6eb9567aeb6b16a1",
+   "782bade760fc802953dd441a9a7143e8a821ad1884cf39e957c83b1cb0d02e1d",
+   "e7012f63441ed1ba47d4c10bd2d4459dee5b239c86cb58c791152138e29699cf",
+   "94a4192e9dbec612109b81536f4549ec25a953c4b08a357489ba35120d3d272c",
+   "1edbde4dcd3e9f83f4e1752525e6bd2b3cf8f5baa626f839bb2113a760d851fb",
+   "2c48a6172af5b77e62dc941960381abe85d51152bf6f291cab2b57886f5192de",
+   "65c781cae8df40a795d3beb531f72e027e2cd283e08f6b62815639b40fcd874a",
+   "1eba9913dbf5ec03cf49ed61260bc91e8be02d40fa817de82bc5b8317ec63c4d",
+   "40657fb15680f3f6e2adc3aedac5393fe8814f4f8c072d61862f17e692c3237c",
+   "bae83658579c22990b429520788c02bd479ecdb254bda9aeea6d5ae5893f6885",
+   "32662c80890368bb81140e50e5f2434e9420da90ce6d150b6f162a6e7ca34332",
+   "007b0c5bb1c42764ee54fe4289b7e8603014a133b5c0dddae082e3640a69f900",
+   "a4c0f9b8256d7b60ba46e62d666ff72fa26e78a413f7e45d0800121ad00bb43b",
+   "ce575742bd1d822fec8d5ee6c0b04c4628332ccf043ff46556b4f12f6442d4bd",
+   "df16e02e6f64140597acc5fe17fb982eebbdec3a71c78d3d948bf00c10146e73",
+   "89fc6973d47346be3a794629f3b9a74aa3ab0635757cfea7f9fc1566370441da",
+   "e975d0c10341930793365696eeed2962433ecfa47b236386442fe435909b27a9",
+   "c5620849aeaa6a852e9644a8db21d0108dc1a131d447aecf6526ab0bb336e13e",
+   "ffccdde879214f713b891d45f9b7e9823d1ece9a87c556ab3993b520ecc0494b",
+   "ccb408e10851f9fda7b91216200c9593b5cff3ec46e9daa6a352d22082184b4c",
+   "7b8e4589ad2d583a790a1e3017e119b4a0b13423d8d579b8451cf961f6c5b44d"
+  ],
+  "n_items": 24,
+  "domain_disjointness": "verified programmatically at authoring (zero overlap with the 23 r176 DEV domains)",
+  "seal_key_digest_sha256_12": "25b38b9f4ef2"
+ },
+ "kill_condition": "if the shipped recipe does NOT beat the compute-matched single-shot baseline (CI lower <= 50%), score stays 3 and the recipe is the honest no-worse-than-baseline fallback — no further architecture work without a new owner directive (the kill-ship logic extends: nothing ships that does not win)"
+}
