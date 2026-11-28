@@ -6804,7 +6804,7 @@
    "work_id": "r178h-sealed-holdout-authoring",
    "role": "EXECUTOR",
    "kind": "task",
-   "status": "OPEN",
+   "status": "DONE",
    "session_id": "builder-r176s1",
    "claimed_at": "2026-11-27T19:55:00Z",
    "lease_expiry": "2026-11-28T20:00:00Z",
@@ -6813,14 +6813,16 @@
    "artifact_paths": [
     "eval/r178h_sealed_holdout_PRIVATE.json",
     "eval/r178h_holdout_prereg.json"
-   ]
+   ],
+   "closed_at": "2026-11-28T02:30:00Z (sandbox clock, TRUE UTC)",
+   "closure_note": "SEALED-BUT-UNCUSTODIED: the r178h seal key vault (holdout_secrets/, sandbox-persistent per the prereg custody clause) is ABSENT in this sandbox — the plaintext+key cannot be recovered, so the sealed set cannot be run as-is (an undecryptable holdout is not a usable instrument). The ciphertext + item hashes stay committed as the Art. 4 record. DIR 5 re-authors a FRESH n=24 holdout with custody restored under this session's vault discipline. Closed by c-0294."
   },
   {
    "claim_id": "c-0291",
    "work_id": "r178s1-dir2-drive-invention-run-24",
    "role": "EXECUTOR",
    "kind": "measurement",
-   "status": "OPEN",
+   "status": "DONE",
    "session_id": "builder-r178s1",
    "claimed_at": "2026-11-27T22:40:00Z",
    "lease_expiry": "2026-11-28T20:00:00Z",
@@ -6830,7 +6832,9 @@
     "eval/r176_invention_run/",
     "eval/r178s1_dir2_tally.json"
    ],
-   "note": "DIR-2 drive continuation (AM54): the c-0283 executor's sandbox ended in-flight; THIS session drives the same instrument bytes to 24/24 (judge seats ctai gpt-6-luna / snlite / tr-deepseek, blind A/B order-swapped, judge != generator); AM53 genuine-win gate unchanged (>=17/24, CI lower >50%); RE-REGISTERED: the first registration rode commit 20fc33372 whose rebase onto the peer tip dropped it (the :2:-side merge bug, disclosed in the amend) | ID NOTE: this drive claim was first registered as c-0290 in 20fc33372 (dropped by that commit's defective rebase, disclosed); the counter at the repair base (f47a9c567) had already advanced to c-0291, so the guard's monotonic rule re-numbers it c-0291"
+   "note": "DIR-2 drive continuation (AM54): the c-0283 executor's sandbox ended in-flight; THIS session drives the same instrument bytes to 24/24 (judge seats ctai gpt-6-luna / snlite / tr-deepseek, blind A/B order-swapped, judge != generator); AM53 genuine-win gate unchanged (>=17/24, CI lower >50%); RE-REGISTERED: the first registration rode commit 20fc33372 whose rebase onto the peer tip dropped it (the :2:-side merge bug, disclosed in the amend) | ID NOTE: this drive claim was first registered as c-0290 in 20fc33372 (dropped by that commit's defective rebase, disclosed); the counter at the repair base (f47a9c567) had already advanced to c-0291, so the guard's monotonic rule re-numbers it c-0291",
+   "closed_at": "2026-11-28T02:30:00Z (sandbox clock, TRUE UTC)",
+   "closure_note": "SUPERSEDED-BY the R183 kill decision (8f7fb28f2 / eval/r183_kill_decision.json): genuine 4/12 at the decision point, paired collider delta 0.0, gate 16/24<17 unreachable — the pre-declared kill criterion applies; the remaining 12 items NEVER run (one run per measurement, Art. 29(c); the 12 landed pair bytes are final). Drive closed by c-0294."
   },
   {
    "claim_id": "c-0292",
@@ -6846,6 +6850,44 @@
     "eval/r178s1_dir8_resolver_decision.json"
    ],
    "note": "RE-ISSUE: the DIR-8 typed decision (ACCEPT ROOT 218, resolver refactor not authorized; basis + revisit conditions in the record) was first executed as c-0289 @ 528de3237, then the id collided with the peer session's holdout claim and their dedupe commit removed it; this id re-registers the SAME decision record (committed bytes unchanged at eval/r178s1_dir8_resolver_decision.json, verified present at the tip) | ID NOTE: reissued under the next counter slot c-0292 for the same reason"
+  },
+  {
+   "claim_id": "c-0294",
+   "work_id": "r184-kill-ship-merge",
+   "role": "EXECUTOR",
+   "session_id": "builder-r184s1",
+   "kind": "task",
+   "status": "OPEN",
+   "claimed_at": "2026-11-28T02:30:00Z (sandbox clock, TRUE UTC)",
+   "lease_expiry": "2026-11-29T00:00:00Z",
+   "base_sha": "ce377bd3d (queue tip; kill-ship 8f7fb28f2 parent)",
+   "artifact_paths": [
+    "eval/work_claims.json",
+    "eval/r184_kill_ship_merge_record.json",
+    "discovery_fabric/engine/problem_router.py",
+    "discovery_fabric/engine/run.py",
+    "eval/r183_collider_run/",
+    "eval/r183_kill_decision.json",
+    "eval/retirement_ledger.json",
+    "tests/test_r178_problem_router.py"
+   ],
+   "note": "DIR-2/DIR-3: land the R183 kill-ship commit (8f7fb28f2, parent == queue tip) on the queue surface — fast-forward; problem_router/2.0.0 ships best-of-N+critique+revise+verifier for ALL problem classes. Closes superseded OPEN claims c-0291 (drive killed by decision) and c-0289 (r178h custody gap). No new claim kinds (freeze)."
+  },
+  {
+   "claim_id": "c-0295",
+   "work_id": "r178s1-dir2-drive-invention-run-24",
+   "role": "VERIFIER",
+   "session_id": "builder-r184s1",
+   "kind": "measurement",
+   "status": "DONE",
+   "claimed_at": "2026-11-28T02:40:00Z (sandbox clock, TRUE UTC)",
+   "lease_expiry": "2026-11-29T00:00:00Z",
+   "base_sha": "432c42d06 (the kill-ship merge commit)",
+   "artifact_paths": [
+    "eval/r184_verifier_record.json",
+    "eval/r183_collider_run/tally.json"
+   ],
+   "note": "VERIFIER record (Art. 29(c); recompute from committed bytes, never a re-run): the c-0291 drive's judged pairs are independently recomputed by scripts/r183_collider_tally.py -> eval/r183_collider_run/tally.json — n_judged=12, genuine 4/12 (pids r176i-02/-06/-07/-12), Wilson CI [0.138, 0.333, 0.609], 4 dominance ties + 4 plain best-of-N excluded per AM53, paired collider delta 0.0, 0 collision champions, gate_score4 met=false (16/24 < 17 unreachable). The tally reproduces from the raw pair bytes — VERIFIED. The drive's terminal state (kill decision) is consistent with the bytes."
   }
  ],
  "corrections": [
@@ -7512,6 +7554,11 @@
    "note": "R178 session-1 builder lane (fresh sandbox): DIR-3 SHIP (c-0288: problem_router + conductor wiring + 9/9 tests), the CI pinned-line fix (528de3237 GREEN), DIR-8 typed decision (reissued c-0291), and the DIR-2 invention-run drive (c-0290, continues c-0283)",
    "registered_at": "2026-11-27T22:40:00Z (sandbox clock, TRUE UTC)",
    "role": "builder"
+  },
+  "builder-r184s1": {
+   "registered": "2026-11-28T02:30:00Z (sandbox clock, TRUE UTC)",
+   "role": "EXECUTOR (kill-ship merge) + VERIFIER (byte recompute)",
+   "note": "R184S1: the kill-ship merge lane + DIR-5 fresh-holdout re-scope. Constitutions full-read at ce377bd3d/8f7fb28f2 (digests 153ac62efca36c2d / 3775f869a1c19a96); vault 3/3 digests verified; secret-grep 0 live."
   }
  },
  "trailer_violations": [
