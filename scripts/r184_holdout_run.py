@@ -34,8 +34,13 @@ PLAIN = Path(os.environ.get(
         "r184_holdout.jsonl")))
 TR_MODEL = "deepseek/deepseek-v4.1-flash-1017-free"
 TR_BASE = "https://api.tokenrouter.com/v1"
-# JUDGE SEAT (substitution typed in the prereg 1.1.0): snlite via xkiro
-JUDGE_MODEL = "sensenova/sensenova-6.8-flash-lite"
+# JUDGE SEAT (substitution typed in the prereg 1.1.0 + the 1.1.1 note):
+# qwen/qwen3.8-max:free via xkiro. MEASURED: snlite 200-with-EMPTY-choices
+# on real 6-7K-char proposal pairs (3 attempts, 570s hang each, zero
+# pairs landed — typed infra, not a judge verdict); qwen3.8-max:free on
+# the SAME real proposals: 200 in 7.2s, verdict-parsed. Availability-
+# only; qwen family != agnes generator (Art. 26).
+JUDGE_MODEL = "qwen/qwen3.8-max:free"
 JUDGE_BASE = "https://api.xkiro.com/v1"
 AG_MODEL = "agnes-3.0-flash"
 CITE_PAT = re.compile(
@@ -87,8 +92,11 @@ def agnes(prompt, keys, what=""):
                          {"role": "user", "content": prompt}]}
     last = None
     for attempt in range(1, 5):
-        key = keys["AGNES_API_KEY" if ROT % 2 == 0
-                   else "AGNES_API_KEY_2"]
+        # 2-key rotation degrades to the single vaulted key when the
+        # second is absent (this vault carries AGNES_API_KEY only —
+        # typed, availability-only; same model/prompt/budget)
+        key = keys.get("AGNES_API_KEY_2") if ROT % 2 == 1 else None
+        key = key or keys["AGNES_API_KEY"]
         ROT += 1
         st, rsp = _post(base, key, body, timeout=300.0)
         if st == 200:
@@ -264,7 +272,7 @@ def run_one(prob, keys, workers):
         "problem_id": pid, "status": "JUDGED",
         "generator": {"model": AG_MODEL, "transport": "direct-agnes-api",
                       "calls_baseline": 6, "calls_pipeline": 6},
-        "judge": {"seat": "snlite-xkiro", "model": JUDGE_MODEL,
+        "judge": {"seat": "qwen3.8-max-free-xkiro", "model": JUDGE_MODEL,
                   "workers": workers},
         "baseline_text": baseline, "pipeline_text": pipeline,
         "deterministic_verifier": v,
